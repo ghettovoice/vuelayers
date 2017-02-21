@@ -8,7 +8,7 @@
 
 ``` bash
 git clone https://gitlab.com/ghettovoice/vuelayers.git
-cd veulayers
+cd vuelayers
 
 # install dependencies
 npm install
