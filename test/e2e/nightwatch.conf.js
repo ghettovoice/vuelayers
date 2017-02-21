@@ -1,11 +1,11 @@
 require('babel-register')
-var config = require('../../config')
+const config = require('../../config')
 
 // http://nightwatchjs.org/guide#settings-file
 module.exports = {
-  src_folders: ['test/e2e/specs'],
+  src_folders: [ 'test/e2e/specs' ],
   output_folder: 'test/e2e/reports',
-  custom_assertions_path: ['test/e2e/custom-assertions'],
+  custom_assertions_path: [ 'test/e2e/custom-assertions' ],
 
   selenium: {
     start_process: true,

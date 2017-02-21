@@ -1,20 +1,37 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
-var path = require('path')
+const path = require('path')
+const packageJson = require('../package.json')
+
+const entry = {
+  [ packageJson.name ]: path.resolve(__dirname, '../src/index.js')
+}
+
+const banner =
+  `${packageJson.fullname}
+${packageJson.description}
+
+@package ${packageJson.name}
+@author ${packageJson.author}
+@version ${packageJson.version}
+@license ${packageJson.license}
+@copyright (c) ${new Date().getFullYear()}, ${packageJson.author}
+`
 
 module.exports = {
+  name: packageJson.name,
+  fullname: packageJson.fullname,
+  author: packageJson.author,
+  version: packageJson.version,
+  license: packageJson.license,
+  banner: banner,
   build: {
+    entry: entry,
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
-    assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    outPath: path.resolve(__dirname, '../dist'),
+    assetsSubDirectory: 'assets',
+    publicPath: '/',
     productionSourceMap: true,
-    // Gzip off by default as many popular static hosts such as
-    // Surge or Netlify already gzip all static assets for you.
-    // Before setting to `true`, make sure to:
-    // npm install --save-dev compression-webpack-plugin
-    productionGzip: false,
-    productionGzipExtensions: ['js', 'css'],
     // Run the build command with an extra argument to
     // View the bundle analyzer report after build finishes:
     // `npm run build --report`
@@ -22,11 +39,17 @@ module.exports = {
     bundleAnalyzerReport: process.env.npm_config_report
   },
   dev: {
+    entry: Object.assign(
+      {
+        app: path.resolve(__dirname, '../test/main.js')
+      },
+      entry
+    ),
     env: require('./dev.env'),
     port: 8080,
     autoOpenBrowser: true,
-    assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsSubDirectory: 'assets',
+    publicPath: '/',
     proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

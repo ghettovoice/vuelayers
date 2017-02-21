@@ -1,10 +1,13 @@
-# vuelayers
+# VueLayers
 
 > Vue components to work with OpenLayers 3
 
 ## Build Setup
 
 ``` bash
+git clone https://gitlab.com/ghettovoice/vuelayers.git
+cd veulayers
+
 # install dependencies
 npm install
 
@@ -12,10 +15,10 @@ npm install
 npm run dev
 npm start
 
-# build for production with minification
+# build UMD packages ( debug and production ready )
 npm run build
 
-# build for production and view the bundle analyzer report
+# build UMD packages ( debug and production ready ) and view the bundle analyzer report
 npm run build --report
 
 # run unit tests

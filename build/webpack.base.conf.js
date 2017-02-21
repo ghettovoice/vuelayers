@@ -1,25 +1,25 @@
-var path = require('path')
-var utils = require('./utils')
-var config = require('../config')
-var vueLoaderConfig = require('./vue-loader.conf')
+const path = require('path')
+const utils = require('./utils')
+const WebpackNotifierPlugin = require('webpack-notifier')
+const config = require('../config')
+const vueLoaderConfig = require('./vue-loader.conf')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
 module.exports = {
-  entry: {
-    app: './src/main.js'
-  },
+  entry: config.build.entry,
+  devtool: '#source-map',
   output: {
-    path: config.build.assetsRoot,
-    filename: '[name].js',
+    path: config.build.outPath,
+    filename: '[name].bundle.js',
     publicPath: process.env.NODE_ENV === 'production'
-      ? config.build.assetsPublicPath
-      : config.dev.assetsPublicPath
+      ? config.build.publicPath
+      : config.dev.publicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: [ '.js', '.vue', '.json' ],
     modules: [
       resolve('src'),
       resolve('node_modules')
@@ -30,13 +30,19 @@ module.exports = {
       'components': resolve('src/components')
     }
   },
+  node: {
+    global: true,
+    process: true,
+    __filename: 'mock',
+    __dirname: 'mock'
+  },
   module: {
     rules: [
       {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         enforce: "pre",
-        include: [resolve('src'), resolve('test')],
+        include: [ resolve('src'), resolve('test') ],
         options: {
           formatter: require('eslint-friendly-formatter')
         }
@@ -49,7 +55,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        include: [ resolve('src'), resolve('test') ]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -67,6 +73,13 @@ module.exports = {
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
-    ]
-  }
+    ],
+    noParse: [ /openlayers/ ]
+  },
+  plugins: [
+    new WebpackNotifierPlugin({
+      title: config.fullname,
+      alwaysNotify: true
+    })
+  ]
 }

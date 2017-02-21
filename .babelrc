@@ -1,10 +1,13 @@
 {
   "presets": [
-    ["es2015", { "modules": false }],
-    "stage-2"
+    [ "latest" ],
+    "stage-0"
   ],
-  "plugins": ["transform-runtime"],
-  "comments": false,
+  "plugins": [
+    "transform-runtime",
+    "transform-decorators-legacy",
+    "transform-class-properties"
+  ],
   "env": {
     "test": {
       "plugins": [ "istanbul" ]
