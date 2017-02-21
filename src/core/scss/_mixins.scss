@@ -1,0 +1,9 @@
+/**
+ * VueLayers SCSS mixins.
+ * This part of the VueLayers package.
+ */
+
+@mixin vl-wh($w: auto, $h: auto) {
+  width  : $w;
+  height : $h;
+}

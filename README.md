@@ -1,6 +1,8 @@
 # VueLayers
 
-> Vue components to work with OpenLayers 3
+> Vue components to work with [OpenLayers 3](https://openlayers.org)
+
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
 
 ## Build Setup
 
@@ -32,3 +34,9 @@ npm test
 ```
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+### TODO
+
+- [ ] Try with ES2015 version of the OpenLayers. [https://www.npmjs.com/package/ol/](https://www.npmjs.com/package/ol/)
+
+

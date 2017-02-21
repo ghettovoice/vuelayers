@@ -1,2 +1,2 @@
-export Map from './Map'
+export map from './map'
 
