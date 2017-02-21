@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" exclude=".svn;.cvs;.idea;.DS_Store;.git;.hg;*.iml;node_modules;uploads;.sass-cache" autoUploadExternalChanges="true">
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
