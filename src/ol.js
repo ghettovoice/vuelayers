@@ -2,14 +2,16 @@
  * OpenLayers 3 helpers and constants
  */
 import ol from 'openlayers'
-import flow from 'lodash/fp/flow'
-import pick from 'lodash/fp/pick'
-import upperFirst from 'lodash/fp/upperFirst'
-import lowerFirst from 'lodash/fp/lowerFirst'
-import isEmpty from 'lodash/fp/isEmpty'
-import merge from 'lodash/fp/merge'
-import isEqual from 'lodash/fp/isEqual'
-import reduce from 'lodash/fp/reduce'
+import {
+  flow,
+  pick,
+  upperFirst,
+  lowerFirst,
+  isEmpty,
+  isEqual,
+  merge,
+  reduce
+} from 'lodash/fp'
 import { isNumeric } from './utils/func'
 
 const reduceWithKey = reduce.convert({ cap: false })

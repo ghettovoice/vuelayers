@@ -1,2 +1,3 @@
-export map from './map'
+export Map from './map'
+export View from './view'
 

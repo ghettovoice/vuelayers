@@ -37,6 +37,8 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 
 ### TODO
 
+- [ ] Use file structure from [babel-plugin-component](https://github.com/QingWei-Li/babel-plugin-component) that allows 
+      incremental imports of components
 - [ ] Try with ES2015 version of the OpenLayers. [https://www.npmjs.com/package/ol/](https://www.npmjs.com/package/ol/)
 
 

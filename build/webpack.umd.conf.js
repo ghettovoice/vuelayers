@@ -7,6 +7,7 @@ const merge = require('webpack-merge')
 const baseWebpackConfig = require('./webpack.base.conf')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const nodeExternals = require('webpack-node-externals')
 
 const apart = process.argv.includes('--apart')
 const isProduction = process.env.NODE_ENV === 'production'
@@ -21,15 +22,21 @@ let output = {
 }
 
 // bundle each component as individual UMD module
+// todo сделать экспорт компонентов в структуру подходящую для babel-plugin-component
+// todo всё таки надо две отдельные фазы билда: всё в одном файле (компоненты + утилиты + миксины)
+// и отдельная фаза билда по компонентам (утилиты и миксины в отдельных файлах)
+
 if (apart) {
-  baseWebpackConfig.entry = {}
+  baseWebpackConfig.entry = {
+
+  }
   output.filename = minify ? '[name].min.js' : '[name].js'
   output.library = [ config.fullname, '[name]' ]
 
   const componentsPath = 'src/components'
   const components = utils.getDirectories(path.resolve(__dirname, '../', componentsPath))
   components.forEach(component => {
-    baseWebpackConfig.entry[ path.join('components', component, 'index') ] = './' + path.join(componentsPath, component)
+    baseWebpackConfig.entry[ path.join(component, 'index') ] = path.resolve(__dirname, '../', componentsPath, component)
   })
 }
 
@@ -42,20 +49,9 @@ const webpackConfig = merge(baseWebpackConfig, {
       minimize: minify
     })
   },
-  externals: {
-    openlayers: {
-      commonjs: 'openlayers',
-      commonjs2: 'openlayers',
-      amd: 'openlayers',
-      root: 'ol'
-    },
-    vue: {
-      commonjs: 'vue',
-      commonjs2: 'vue',
-      amd: 'vue',
-      root: 'Vue'
-    }
-  },
+  externals: [
+    nodeExternals()
+  ],
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
@@ -76,7 +72,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     ),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: minify ? '[name].bundle.min.css' : '[name].bundle.css'
+      filename: minify ? '[name].min.css' : '[name].css'
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.

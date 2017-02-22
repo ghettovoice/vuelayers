@@ -1,12 +1,13 @@
 {
   "presets": [
-    [ "latest" ],
+    "latest",
     "stage-0"
   ],
   "plugins": [
     "transform-runtime",
     "transform-decorators-legacy",
-    "transform-class-properties"
+    "transform-class-properties",
+    "lodash"
   ],
   "env": {
     "test": {

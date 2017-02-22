@@ -5,16 +5,12 @@
   "description": "Vue components to work with OpenLayers 3",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "dist/vuelayers.bundle.js",
-  "module": "src/index.js",
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
-    "build-min-all": "cross-env NODE_ENV=production node build/build.js --umd --min",
-    "build-min-apart": "cross-env NODE_ENV=production node build/build.js --umd --apart --min",
-    "build-min": "npm run build-min-all && npm run build-min-apart",
-    "build-all": "cross-env NODE_ENV=production node build/build.js --umd",
-    "build-apart": "cross-env NODE_ENV=production node build/build.js --umd --apart",
-    "build": "rm -rf ./dist && npm run build-all && npm run build-apart && npm run build-min",
+    "build-all-min": "cross-env NODE_ENV=production node build/build.js --umd --apart --min",
+    "build-all": "cross-env NODE_ENV=production node build/build.js --umd --apart",
+    "build": "rm -rf ./dist && npm run build-all && npm run build-all-min",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
@@ -48,7 +44,9 @@
     "babel-core": "^6.23.1",
     "babel-eslint": "^7.1.1",
     "babel-loader": "^6.3.2",
+    "babel-plugin-component": "^0.9.0",
     "babel-plugin-istanbul": "^4.0.0",
+    "babel-plugin-lodash": "^3.2.11",
     "babel-plugin-transform-class-properties": "^6.23.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -110,6 +108,7 @@
     "webpack-dev-middleware": "^1.10.1",
     "webpack-hot-middleware": "^2.17.0",
     "webpack-merge": "^3.0.0",
+    "webpack-node-externals": "^1.5.4",
     "webpack-notifier": "^1.5.0"
   },
   "engines": {
@@ -119,7 +118,6 @@
   "files": [
     "LICENSE",
     "README.md",
-    "dist",
-    "src"
+    "dist"
   ]
 }

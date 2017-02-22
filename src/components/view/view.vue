@@ -1,6 +1,5 @@
 <template>
-  <div class="vl-map">
-    <div class="map" ref="map"></div>
+  <div class="vl-view">
     <slot></slot>
   </div>
 </template>
@@ -46,7 +45,7 @@
   }
 
   export default {
-    name: 'vl-map',
+    name: 'vl-view',
     props,
     methods,
     data () {
