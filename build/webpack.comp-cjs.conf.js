@@ -19,15 +19,12 @@ let utilsList = fs.readdirSync(path.resolve(__dirname, '../src/utils'))
 let mixinsList = fs.readdirSync(path.resolve(__dirname, '../src/mixins'))
 
 let entry = baseWebpackConfig.entry = {
-  ol: path.resolve(__dirname, '../src/ol')
+  ol: path.resolve(__dirname, '../src/ol'),
+  rx: path.resolve(__dirname, '../src/rx')
 }
 let externals = {
-  [ `${config.name}/src/ol` ]: {
-    commonjs: `${config.name}/dist/ol`,
-    commonjs2: `${config.name}/dist/ol`,
-    amd: `${config.name}/dist/ol`,
-    root: `${config.fullname}"]["ol`
-  }
+  [ `${config.name}/src/ol` ]: `${config.name}/dist/ol`,
+  [ `${config.name}/src/rx` ]: `${config.name}/dist/rx`
 }
 
 // add components entries

@@ -6,8 +6,15 @@
 </template>
 
 <script rel="text/babel">
+  import { isFunction } from 'lodash/fp'
+  import { Observable } from 'rxjs/Observable'
+  import 'vuelayers/src/rx'
+  import 'rxjs/add/observable/combineLatest'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/debounceTime'
   import ol from 'openlayers'
   import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, createStyleFunc } from 'vuelayers/src/ol'
+  import { roundTo } from 'vuelayers/src/utils/func'
   import positionMarker from './position-marker.svg'
 
   const props = {
@@ -42,6 +49,35 @@
     updateMap () {
       this._map.updateSize()
       this._map.render()
+    },
+    /**
+     * Trigger focus on map container.
+     */
+    focus () {
+      this.$el.tabIndex = 0
+      this.$el.focus()
+    },
+    /**
+     * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
+     */
+    fit (geometryOrExtent, options) {
+      this._map.getView().fit(geometryOrExtent, options)
+    },
+    /**
+     * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
+     * @param {...Object} args
+     * @return {Promise}
+     */
+    animate (...args) {
+      let cb = args.find(isFunction)
+
+      return new Promise(
+        resolve => this._map.getView()
+          .animate(...args, complete => {
+            cb && cb(complete)
+            resolve(complete)
+          })
+      )
     }
   }
 
@@ -57,18 +93,24 @@
       }
     },
     created () {
+      this._subs = {}
+
       this::createMap()
+      this::subscribeToOlChanges()
     },
     mounted () {
-      this.$nextTick(() => {
-        this._map.setTarget(this.$refs.map)
-        this.updateMap()
-      })
+      this._map.setTarget(this.$refs.map)
+      this.$nextTick(this.updateMap)
     },
     updated () {
       this.updateMap()
     },
     beforeDestroy () {
+      Object.keys(this._subs).forEach(name => {
+        this._subs[name].unsubscribe()
+        delete this._subs[name]
+      })
+
       if (this._geoloc) {
         this._geoloc.setTracking(false)
         this._geoloc = this._positionFeature = undefined
@@ -90,6 +132,7 @@
    * @return {ol.Map}
    */
   function createMap () {
+    // todo wrap all controls and interactions
     this._map = new ol.Map({
       view: this::createView(),
       layers: [],
@@ -97,7 +140,7 @@
         this::createSelectInteraction()
       ]),
       // disable all default controls and use custom if defined
-      controls: [],
+//      controls: [],
       loadTilesWhileAnimating: true,
       loadTilesWhileInteracting: true
     })
@@ -134,7 +177,7 @@
    */
   function createView () {
     return new ol.View({
-      center: this.center,
+      center: ol.proj.fromLonLat(this.center, this.projection),
       zoom: this.zoom,
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
@@ -160,6 +203,30 @@
         return layer ? layer.getStyleFunction()(feature) : defStyleFunc(feature)
       }
     })
+  }
+
+  /**
+   * Subscribe to OpenLayers significant events
+   */
+  function subscribeToOlChanges () {
+    const view = this._map.getView()
+    const zoomChanges = Observable.fromOlEvent(view, 'change:resolution')
+    const centerChanges = Observable.fromOlEvent(view, 'change:center')
+    const viewChanges = Observable.combineLatest(zoomChanges, centerChanges, (z, c) => {
+      return [
+        Math.ceil(z),
+        c.map(x => roundTo(x, 6))
+      ]
+    }).debounceTime(100)
+      .distinctUntilChanged()
+
+    this._subs.view = viewChanges.subscribe(
+      ([ zoom, center ]) => {
+        this.currentZoom = zoom
+        this.currentCenter = center
+      },
+      ::console.error
+    )
   }
 </script>
 

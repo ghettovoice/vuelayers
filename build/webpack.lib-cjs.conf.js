@@ -15,7 +15,7 @@ const env = isProduction ? config.build.env : config.dev.env
 
 const webpackConfig = merge(baseWebpackConfig, {
   output: {
-    filename: '[name].js',
+    filename: '[name].cjs.js',
     library: config.fullname,
     libraryTarget: 'commonjs2'
   },
@@ -36,7 +36,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     }),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: '[name].css'
+      filename: '[name].cjs.css'
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
