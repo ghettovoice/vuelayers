@@ -20,6 +20,7 @@ ${packageJson.description}
 module.exports = {
   name: packageJson.name,
   fullname: packageJson.fullname,
+  ns: 'vl',
   author: packageJson.author,
   version: packageJson.version,
   license: packageJson.license,

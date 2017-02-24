@@ -12,7 +12,7 @@ import {
   merge,
   reduce
 } from 'lodash/fp'
-import { isNumeric } from './utils/func'
+import { isNumeric } from 'vuelayers/src/utils/func'
 
 const reduceWithKey = reduce.convert({ cap: false })
 

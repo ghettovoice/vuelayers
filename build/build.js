@@ -1,19 +1,19 @@
 require('./check-versions')()
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-const umd = process.argv.includes('--umd')
-const apart = process.argv.includes('--apart')
-const minify = process.env.NODE_ENV === 'production' && process.argv.includes('--min')
-const configFile = umd ? 'webpack.umd.conf' : 'webpack.prod.conf'
 
 const ora = require('ora')
 let path = require('path')
 const chalk = require('chalk')
 const webpack = require('webpack')
 const config = require('../config')
+const argv = require('yargs').argv
+
+const minify = process.env.NODE_ENV === 'production' && argv.min
+const configFile = `webpack.${argv.conf || 'prod'}.conf`
 const webpackConfig = require(path.join(__dirname, configFile))
 
-const msg = `building from config ${configFile} ${apart ? 'all-in-one bundle' : 'apart each module'} ${minify ? 'with minify' : 'without minify'} in ${process.env.NODE_ENV} env...`
+const msg = `building from config ${configFile} ${minify ? 'with minify' : 'without minify'} in ${process.env.NODE_ENV} env...`
 const spinner = ora(msg)
 spinner.start()
 

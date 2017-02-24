@@ -7,8 +7,8 @@
 
 <script rel="text/babel">
   import ol from 'openlayers'
-  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, createStyleFunc } from 'vl-core/ol'
-  import positionMarker from 'vl-assets/position-marker.svg'
+  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, createStyleFunc } from 'vuelayers/src/ol'
+  import positionMarker from './position-marker.svg'
 
   const props = {
     zoom: {
@@ -163,8 +163,8 @@
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
-  @import "../../scss/mixins";
+<style lang="scss" rel="stylesheet/styles">
+  @import "../../styles/mixins";
 
   .vl-map {
     @include vl-wh(100%, 100%);

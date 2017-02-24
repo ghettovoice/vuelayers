@@ -6,8 +6,7 @@
 
 <script rel="text/babel">
   import ol from 'openlayers'
-  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, createStyleFunc } from 'vl-core/ol'
-  import positionMarker from 'vl-assets/position-marker.svg'
+  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, createStyleFunc } from 'vuelayers/src/ol'
 
   const props = {
     zoom: {
@@ -115,13 +114,6 @@
       this._positionFeature = new ol.Feature({
         internal: true
       })
-      this._positionFeature.setStyle(new ol.style.Style({
-        image: new ol.style.Icon({
-          src: positionMarker,
-          scale: 0.85,
-          anchor: [ 0.5, 1 ]
-        })
-      }))
       this._internalOverlay.getSource().addFeature(this._positionFeature)
     }
 
@@ -162,8 +154,8 @@
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
-  @import "../../scss/mixins";
+<style lang="scss" rel="stylesheet/styles">
+  @import "../../styles/mixins";
 
   .vl-map {
     @include vl-wh(100%, 100%);

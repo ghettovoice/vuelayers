@@ -8,9 +8,9 @@
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
-    "build-all-min": "cross-env NODE_ENV=production node build/build.js --umd --apart --min",
-    "build-all": "cross-env NODE_ENV=production node build/build.js --umd --apart",
-    "build": "rm -rf ./dist && npm run build-all && npm run build-all-min",
+    "build-comp-cjs": "cross-env NODE_ENV=production node build/build.js --conf=comp-cjs",
+    "build-lib-cjs": "cross-env NODE_ENV=production node build/build.js --conf=lib-cjs",
+    "build": "rm -rf ./dist && npm run build-lib-cjs && npm run build-comp-cjs",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
@@ -35,8 +35,11 @@
   },
   "homepage": "https://gitlab.com/ghettovoice/vuelayers",
   "dependencies": {
+    "babel-runtime": "^6.23.0",
     "lodash": "^4.17.4",
-    "openlayers": "^4.0.1",
+    "openlayers": "^4.0.1"
+  },
+  "peerDependencies": {
     "vue": "^2.1.10"
   },
   "devDependencies": {
@@ -109,7 +112,8 @@
     "webpack-hot-middleware": "^2.17.0",
     "webpack-merge": "^3.0.0",
     "webpack-node-externals": "^1.5.4",
-    "webpack-notifier": "^1.5.0"
+    "webpack-notifier": "^1.5.0",
+    "yargs": "^6.6.0"
   },
   "engines": {
     "node": ">= 4.0.0",

@@ -72,7 +72,9 @@ exports.styleLoaders = function (options) {
 }
 
 exports.getDirectories = function (src) {
-  return fs.readdirSync(src).filter((file) => {
-    return fs.statSync(path.join(src, file)).isDirectory();
-  });
+  return fs.readdirSync(src)
+    .filter((file) => {
+      return fs.statSync(path.join(src, file))
+        .isDirectory()
+    })
 }

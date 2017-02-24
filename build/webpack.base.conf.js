@@ -25,9 +25,7 @@ module.exports = {
       resolve('node_modules')
     ],
     alias: {
-      'vl-assets': resolve('src/assets'),
-      'vl-components': resolve('src/components'),
-      'vl-core': resolve('src/core')
+      [ config.name ]: resolve('')
     }
   },
   node: {
