@@ -14,7 +14,6 @@ const baseWebpackConfig = require('./webpack.base.conf')
 const isProduction = process.env.NODE_ENV === 'production'
 const env = isProduction ? config.build.env : config.dev.env
 
-let componentsList = utils.getDirectories(path.resolve(__dirname, '../src/components'))
 let utilsList = fs.readdirSync(path.resolve(__dirname, '../src/utils'))
 let mixinsList = fs.readdirSync(path.resolve(__dirname, '../src/mixins'))
 
@@ -28,9 +27,18 @@ let externals = {
 }
 
 // add components entries
-componentsList.forEach(component => {
-  baseWebpackConfig.entry[ component ] = path.resolve(__dirname, '../src/components', component)
-  externals[ `${config.name}/src/components/${component}` ] = `${config.name}/dist/components/${component}`
+config.components.forEach(component => {
+  let name, relPath
+
+  if (typeof component === 'string') {
+    name = relPath = component
+  } else {
+    name = component.name
+    relPath = component.path
+  }
+
+  baseWebpackConfig.entry[ name ] = path.resolve(__dirname, '../src/components', relPath)
+  externals[ `${config.name}/src/components/${relPath}` ] = `${config.name}/dist/components/${relPath}`
 })
 
 // utils as modules

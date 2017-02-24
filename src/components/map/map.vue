@@ -6,12 +6,13 @@
 </template>
 
 <script rel="text/babel">
-  import { isFunction } from 'lodash/fp'
+  import { isFunction, isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'vuelayers/src/rx'
   import 'rxjs/add/observable/combineLatest'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/debounceTime'
+  import 'rxjs/add/operator/throttleTime'
   import ol from 'openlayers'
   import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, createStyleFunc } from 'vuelayers/src/ol'
   import { roundTo } from 'vuelayers/src/utils/func'
@@ -26,6 +27,10 @@
       type: Array,
       default: () => ([ 0, 0 ]),
       validator: value => value.length === 2
+    },
+    rotation: {
+      type: Number,
+      default: 0
     },
     maxZoom: {
       type: Number,
@@ -47,8 +52,8 @@
      * Updates `ol.Map` view
      */
     updateMap () {
-      this._map.updateSize()
-      this._map.render()
+      this.map.updateSize()
+      this.map.render()
     },
     /**
      * Trigger focus on map container.
@@ -61,7 +66,7 @@
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
      */
     fit (geometryOrExtent, options) {
-      this._map.getView().fit(geometryOrExtent, options)
+      this.map.getView().fit(geometryOrExtent, options)
     },
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
@@ -72,12 +77,15 @@
       let cb = args.find(isFunction)
 
       return new Promise(
-        resolve => this._map.getView()
+        resolve => this.map.getView()
           .animate(...args, complete => {
             cb && cb(complete)
             resolve(complete)
           })
       )
+    },
+    getMap () {
+      return this.map
     }
   }
 
@@ -89,41 +97,48 @@
       return {
         currentZoom: this.zoom,
         currentCenter: this.center,
-        currentProjection: this.projection
+        currentRotation: this.rotation,
+        currentProjection: this.projection,
+        currentPosition: [],
+        currentAccuracy: undefined
       }
     },
     created () {
-      this._subs = {}
+      /**
+       * @protected
+       */
+      this.subs = {}
 
       this::createMap()
-      this::subscribeToOlChanges()
+      this::subscribeToViewChanges()
+      this.geolocApi && this::subscribeToGeolocation()
     },
     mounted () {
-      this._map.setTarget(this.$refs.map)
+      this.map.setTarget(this.$refs.map)
       this.$nextTick(this.updateMap)
     },
     updated () {
       this.updateMap()
     },
     beforeDestroy () {
-      Object.keys(this._subs).forEach(name => {
-        this._subs[name].unsubscribe()
-        delete this._subs[name]
+      Object.keys(this.subs).forEach(name => {
+        this.subs[ name ].unsubscribe()
+        delete this.subs[ name ]
       })
 
-      if (this._geoloc) {
-        this._geoloc.setTracking(false)
-        this._geoloc = this._positionFeature = undefined
+      if (this.geoloc) {
+        this.geoloc.setTracking(false)
+        this.geoloc = this.positionFeature = undefined
       }
 
-      if (this._internalOverlay) {
-        this._internalOverlay.setMap(null)
-        this._internalOverlay = undefined
+      if (this.internalOverlay) {
+        this.internalOverlay.setMap(null)
+        this.internalOverlay = undefined
       }
 
-      if (this._map) {
-        this._map.setTarget(null)
-        this._map = undefined
+      if (this.map) {
+        this.map.setTarget(null)
+        this.map = undefined
       }
     }
   }
@@ -133,7 +148,7 @@
    */
   function createMap () {
     // todo wrap all controls and interactions
-    this._map = new ol.Map({
+    this.map = new ol.Map({
       view: this::createView(),
       layers: [],
       interactions: ol.interaction.defaults().extend([
@@ -145,31 +160,36 @@
       loadTilesWhileInteracting: true
     })
 
-    this._internalOverlay = new ol.layer.Vector({
-      map: this._map,
+    this.internalOverlay = new ol.layer.Vector({
+      map: this.map,
       source: new ol.source.Vector()
     })
 
     if (this.geoloc) {
-      this._geoloc = new ol.Geolocation({
+      /**
+       * @protected
+       */
+      this.geolocApi = new ol.Geolocation({
         tracking: true,
         projection: this.projection
       })
-
-      this._positionFeature = new ol.Feature({
+      /**
+       * @protected
+       */
+      this.positionFeature = new ol.Feature({
         internal: true
       })
-      this._positionFeature.setStyle(new ol.style.Style({
+      this.positionFeature.setStyle(new ol.style.Style({
         image: new ol.style.Icon({
           src: positionMarker,
           scale: 0.85,
           anchor: [ 0.5, 1 ]
         })
       }))
-      this._internalOverlay.getSource().addFeature(this._positionFeature)
+      this.internalOverlay.getSource().addFeature(this.positionFeature)
     }
 
-    return this._map
+    return this.map
   }
 
   /**
@@ -177,11 +197,11 @@
    */
   function createView () {
     return new ol.View({
-      center: ol.proj.fromLonLat(this.center, this.projection),
-      zoom: this.zoom,
+      center: ol.proj.fromLonLat(this.currentCenter, this.currentProjection),
+      zoom: this.currentZoom,
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
-      projection: this.projection
+      projection: this.currentProjection
     })
   }
 
@@ -190,15 +210,13 @@
    */
   function createSelectInteraction () {
     const defStyleFunc = createStyleFunc()
-    const internalFeatures = [
-      this._positionFeature
-    ]
+    const internalFeatures = this.internalOverlay.getFeatures().getArray()
 
     return new ol.interaction.Select({
       filter: feature => !internalFeatures.includes(feature),
       style: feature => {
         const isFeatureLayer = layer => layer === feature.layer
-        const layer = this._map.getLayers().getArray().find(isFeatureLayer)
+        const layer = this.map.getLayers().getArray().find(isFeatureLayer)
 
         return layer ? layer.getStyleFunction()(feature) : defStyleFunc(feature)
       }
@@ -208,32 +226,62 @@
   /**
    * Subscribe to OpenLayers significant events
    */
-  function subscribeToOlChanges () {
-    const view = this._map.getView()
-    const zoomChanges = Observable.fromOlEvent(view, 'change:resolution')
-    const centerChanges = Observable.fromOlEvent(view, 'change:center')
-    const viewChanges = Observable.combineLatest(zoomChanges, centerChanges, (z, c) => {
-      return [
-        Math.ceil(z),
-        c.map(x => roundTo(x, 6))
-      ]
-    }).debounceTime(100)
-      .distinctUntilChanged()
+  function subscribeToViewChanges () {
+    const view = this.map.getView()
+    const viewChanges = Observable.fromOlEvent(
+      view,
+      'change',
+      () => {
+        const center = ol.proj.toLonLat(view.getCenter(), this.currentProjection)
+          .map(x => roundTo(x, 6))
+        const zoom = Math.ceil(view.getZoom())
+        const rotation = roundTo(view.getRotation(), 6)
 
-    this._subs.view = viewChanges.subscribe(
-      ([ zoom, center ]) => {
+        return [ center, zoom, rotation ]
+      }
+    ).debounceTime(100)
+      .distinctUntilChanged((a, b) => isEqual(a, b))
+
+    this.subs.view = viewChanges.subscribe(
+      ([ center, zoom, rotation ]) => {
         this.currentZoom = zoom
         this.currentCenter = center
+        this.currentRotation = rotation
+        this.$emit('viewchanged', [ center, zoom, rotation ])
+      },
+      ::console.error
+    )
+  }
+
+  function subscribeToGeolocation () {
+    const geolocChanges = Observable.fromOlEvent(
+      this.geolocApi,
+      'change',
+      () => {
+        const position = ol.proj.toLonLat(this.geolocApi.getPosition(), this.currentProjection)
+        const accuracy = this.geolocApi.getAccuracy()
+
+        return [ position, accuracy ]
+      }
+    ).throttleTime(100)
+      .distinctUntilChanged((a, b) => isEqual(a, b))
+
+    this.subs.geoloc = geolocChanges.subscribe(
+      ([ position, accuracy ]) => {
+        this.currentPosition = position
+        this.currentAccuracy = accuracy
+
+        this.$emit('positionchanged', [ position, accuracy ])
       },
       ::console.error
     )
   }
 </script>
 
-<style lang="scss" rel="stylesheet/styles">
+<style lang="scss" rel="stylesheet/scss">
   @import "../../styles/mixins";
 
-  .vl-map {
+  .vl-map, .vl-map .map {
     @include vl-wh(100%, 100%);
   }
 </style>

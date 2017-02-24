@@ -1,0 +1,10 @@
+# Components
+- map
+- name: tile-layer
+  path: layers/tile
+- name: vector-layer
+  path: layers/vector
+- name: vector-source
+  path: sources/vector
+- name: xyz-source
+  path: sources/xyz

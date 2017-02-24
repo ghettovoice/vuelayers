@@ -10,7 +10,9 @@
   }
 </script>
 
-<style>
+<style lang="scss">
+  @import "~openlayers/dist/ol";
+
   html, body, #app {
     width  : 100%;
     height : 100%;

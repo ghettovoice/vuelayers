@@ -16,7 +16,6 @@ exports.cssLoaders = function (options) {
   const cssLoader = {
     loader: 'css-loader',
     options: {
-      minimize: options.minimize,
       sourceMap: options.sourceMap
     }
   }
@@ -69,12 +68,4 @@ exports.styleLoaders = function (options) {
     })
   }
   return output
-}
-
-exports.getDirectories = function (src) {
-  return fs.readdirSync(src)
-    .filter((file) => {
-      return fs.statSync(path.join(src, file))
-        .isDirectory()
-    })
 }

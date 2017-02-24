@@ -1,5 +1,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 const path = require('path')
+const fs = require('fs')
+const yaml = require('js-yaml')
 const packageJson = require('../package.json')
 
 const entry = {
@@ -17,6 +19,8 @@ ${packageJson.description}
 @copyright (c) ${new Date().getFullYear()}, ${packageJson.author}
 `
 
+const components = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, './components.yml'), 'utf8'))
+
 module.exports = {
   name: packageJson.name,
   fullname: packageJson.fullname,
@@ -24,7 +28,8 @@ module.exports = {
   author: packageJson.author,
   version: packageJson.version,
   license: packageJson.license,
-  banner: banner,
+  banner,
+  components,
   build: {
     entry: entry,
     env: require('./prod.env'),

@@ -13,7 +13,7 @@ module.exports = {
   devtool: '#source-map',
   output: {
     path: config.build.outPath,
-    filename: '[name].bundle.js',
+    filename: '[name].js',
     publicPath: process.env.NODE_ENV === 'production'
       ? config.build.publicPath
       : config.dev.publicPath
@@ -27,12 +27,6 @@ module.exports = {
     alias: {
       [ config.name ]: resolve('')
     }
-  },
-  node: {
-    global: true,
-    process: true,
-    __filename: 'mock',
-    __dirname: 'mock'
   },
   module: {
     rules: [
