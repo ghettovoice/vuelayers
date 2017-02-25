@@ -14,48 +14,15 @@ const baseWebpackConfig = require('./webpack.base.conf')
 const isProduction = process.env.NODE_ENV === 'production'
 const env = isProduction ? config.build.env : config.dev.env
 
-let utilsList = fs.readdirSync(path.resolve(__dirname, '../src/utils'))
-let mixinsList = fs.readdirSync(path.resolve(__dirname, '../src/mixins'))
-
-let entry = baseWebpackConfig.entry = {
-  ol: path.resolve(__dirname, '../src/ol'),
-  rx: path.resolve(__dirname, '../src/rx')
-}
-let externals = {
-  [ `${config.name}/src/ol` ]: `${config.name}/dist/ol`,
-  [ `${config.name}/src/rx` ]: `${config.name}/dist/rx`
-}
-
-// add components entries
-config.components.forEach(component => {
-  let name, relPath
-
-  if (typeof component === 'string') {
-    name = relPath = component
-  } else {
-    name = component.name
-    relPath = component.path
-  }
-
-  baseWebpackConfig.entry[ name ] = path.resolve(__dirname, '../src/components', relPath)
-  externals[ `${config.name}/src/components/${relPath}` ] = `${config.name}/dist/components/${relPath}`
-})
-
-// utils as modules
-utilsList.forEach(function (file) {
-  file = path.basename(file, '.js')
-  baseWebpackConfig.entry[ `utils/${file}` ] = path.resolve(__dirname, `../src/utils/`, file)
-  externals[ `${config.name}/src/utils/${file}` ] = `${config.name}/dist/utils/${file}`
-})
-// mixins as modules
-mixinsList.forEach(function (file) {
-  file = path.basename(file, '.js')
-  baseWebpackConfig.entry[ `mixins/${file}` ] = path.resolve(__dirname, `../src/mixins/`, file)
-  externals[ `${config.name}/src/utils/${file}` ] = `${config.name}/dist/mixins/${file}`
+baseWebpackConfig.entry = {}
+let externals = {}
+// todo почему то добавляются style.css к ol и rx
+config.modules.map.forEach(mod => {
+  baseWebpackConfig.entry[ mod.name ] = path.resolve(__dirname, '../src', mod.path)
+  externals[ `${config.name}/src/${mod.path}` ] = `${config.name}/dist/${mod.path}`
 })
 
 const webpackConfig = merge(baseWebpackConfig, {
-  entry,
   output: {
     filename: '[name]/index.js',
     library: '[name]',

@@ -19,7 +19,7 @@ ${packageJson.description}
 @copyright (c) ${new Date().getFullYear()}, ${packageJson.author}
 `
 
-const components = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, './components.yml'), 'utf8'))
+const modules = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, './modules.yml'), 'utf8'))
 
 module.exports = {
   name: packageJson.name,
@@ -29,7 +29,7 @@ module.exports = {
   version: packageJson.version,
   license: packageJson.license,
   banner,
-  components,
+  modules,
   build: {
     entry: entry,
     env: require('./prod.env'),

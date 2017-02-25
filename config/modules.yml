@@ -1,0 +1,33 @@
+# Used for CommonJS components build
+#
+# Format:
+#   name - entry name
+#   path - path relative to src
+#
+map:
+  # common
+  - name: ol
+    path: .
+  - name: rx
+    path: .
+  # mixins
+  - name: mixins/empty-node
+    path: mixins/empty-node
+  - name: mixins/layer
+    path: mixins/layer
+  - name: mixins/map-component
+    path: mixins/map-component
+  # utils
+  - name: utils/func
+    path: utils/func
+  # components
+  - name: map
+    path: components
+  - name: tile-layer
+    path: components/layers/tile
+  - name: vector-layer
+    path: components/layers/vector
+  - name: vector-source
+    path: components/sources/vector
+  - name: xyz-source
+    path: components/sources/xyz
