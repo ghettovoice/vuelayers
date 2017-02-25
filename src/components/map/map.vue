@@ -8,14 +8,14 @@
 <script rel="text/babel">
   import { isFunction, isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
-  import 'vuelayers/src/rx'
   import 'rxjs/add/observable/combineLatest'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/debounceTime'
   import 'rxjs/add/operator/throttleTime'
+  import 'vuelayers/src/rx'
   import ol from 'openlayers'
   import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, createStyleFunc } from 'vuelayers/src/ol'
-  import { roundTo } from 'vuelayers/src/utils/func'
+  import { round } from 'vuelayers/src/utils/func'
   import positionMarker from './position-marker.svg'
 
   const props = {
@@ -83,9 +83,6 @@
             resolve(complete)
           })
       )
-    },
-    getMap () {
-      return this.map
     }
   }
 
@@ -99,7 +96,7 @@
         currentCenter: this.center,
         currentRotation: this.rotation,
         currentProjection: this.projection,
-        currentPosition: [],
+        currentPosition: undefined,
         currentAccuracy: undefined
       }
     },
@@ -132,12 +129,12 @@
       }
 
       if (this.internalOverlay) {
-        this.internalOverlay.setMap(null)
+        this.internalOverlay.setMap(undefined)
         this.internalOverlay = undefined
       }
 
       if (this.map) {
-        this.map.setTarget(null)
+        this.map.setTarget(undefined)
         this.map = undefined
       }
     }
@@ -151,10 +148,8 @@
     this.map = new ol.Map({
       view: this::createView(),
       layers: [],
-      interactions: ol.interaction.defaults().extend([
-        this::createSelectInteraction()
-      ]),
-      // disable all default controls and use custom if defined
+      // todo disable all default interaction and controls and use custom if defined, wrap all
+//      interactions: [],
 //      controls: [],
       loadTilesWhileAnimating: true,
       loadTilesWhileInteracting: true
@@ -164,6 +159,8 @@
       map: this.map,
       source: new ol.source.Vector()
     })
+
+    this.map.addInteraction(this::createSelectInteraction())
 
     if (this.geoloc) {
       /**
@@ -210,7 +207,7 @@
    */
   function createSelectInteraction () {
     const defStyleFunc = createStyleFunc()
-    const internalFeatures = this.internalOverlay.getFeatures().getArray()
+    const internalFeatures = this.internalOverlay.getSource().getFeatures()
 
     return new ol.interaction.Select({
       filter: feature => !internalFeatures.includes(feature),
@@ -233,9 +230,9 @@
       'change',
       () => {
         const center = ol.proj.toLonLat(view.getCenter(), this.currentProjection)
-          .map(x => roundTo(x, 6))
+          .map(x => round(x, 6))
         const zoom = Math.ceil(view.getZoom())
-        const rotation = roundTo(view.getRotation(), 6)
+        const rotation = round(view.getRotation(), 6)
 
         return [ center, zoom, rotation ]
       }
@@ -259,7 +256,8 @@
       'change',
       () => {
         const position = ol.proj.toLonLat(this.geolocApi.getPosition(), this.currentProjection)
-        const accuracy = this.geolocApi.getAccuracy()
+          .map(x => round(x, 6))
+        const accuracy = round(this.geolocApi.getAccuracy(), 6)
 
         return [ position, accuracy ]
       }

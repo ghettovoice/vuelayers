@@ -7,9 +7,9 @@
 map:
   # common
   - name: ol
-    path: .
+    path: ol
   - name: rx
-    path: .
+    path: rx
   # mixins
   - name: mixins/empty-node
     path: mixins/empty-node

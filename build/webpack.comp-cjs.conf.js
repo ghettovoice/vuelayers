@@ -13,10 +13,10 @@ const baseWebpackConfig = require('./webpack.base.conf')
 
 const isProduction = process.env.NODE_ENV === 'production'
 const env = isProduction ? config.build.env : config.dev.env
-
+// add each module as entry
 baseWebpackConfig.entry = {}
 let externals = {}
-// todo почему то добавляются style.css к ol и rx
+
 config.modules.map.forEach(mod => {
   baseWebpackConfig.entry[ mod.name ] = path.resolve(__dirname, '../src', mod.path)
   externals[ `${config.name}/src/${mod.path}` ] = `${config.name}/dist/${mod.path}`

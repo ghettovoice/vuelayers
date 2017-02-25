@@ -1,9 +1,7 @@
 import emptyNode from 'vuelayers/src/mixins/empty-node'
-import mapComponent from 'vuelayers/src/mixins/map-component'
-import { MAP_PROJECTION } from 'vuelayers/src/ol'
+import { MAP_PROJECTION, createAttributions } from 'vuelayers/src/ol'
 
 const props = {
-  attributions: Array,
   opacity: {
     type: Number,
     default: 1
@@ -25,6 +23,9 @@ const props = {
 }
 
 const methods = {
+  /**
+   * Updates layer state
+   */
   updateLayer () {
     this.layer.changed()
   },
@@ -34,6 +35,9 @@ const methods = {
   createLayer () {
     throw new Error('Should be overriden')
   },
+  /**
+   * @return {ol.layer.Base}
+   */
   getLayer () {
     return this.layer
   }
@@ -55,7 +59,7 @@ const watch = {
 }
 
 export default {
-  mixins: [ emptyNode, mapComponent ],
+  mixins: [ emptyNode ],
   props,
   methods,
   watch,

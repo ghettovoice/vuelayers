@@ -1,5 +1,3 @@
-import { round } from 'lodash/fp'
-
 /**
  * @param {*} value
  * @return {boolean} True if value is number or numeric string.
@@ -18,9 +16,10 @@ export function coalesce (...args) {
 }
 
 /**
- * @function
  * @param {number} num
- * @param {number} [precision]
+ * @param {number} [precision=0]
  * @return {number}
  */
-export const roundTo = round.convert({ fixed: false })
+export function round (num, precision = 0) {
+  return Number(Math.round(Number(num + 'e+' + precision)) + 'e-' + precision)
+}
