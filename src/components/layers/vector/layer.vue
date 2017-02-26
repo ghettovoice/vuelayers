@@ -1,8 +1,29 @@
+<template>
+  <div>
+    <slot></slot>
+  </div>
+</template>
+
 <script>
   import layer from 'vuelayers/src/mixins/layer'
-  // todo подумать, может достаточно слои и сорсы хранить просто в файле *.vue, не мутить такую вложенность
+  import { createStyleFunc } from 'vuelayers/src/ol'
+
+  const props = {
+    style: Object,
+    updateWhileAnimating: Boolean,
+    updateWhileInteracting: Boolean
+  }
+
+  const computed = {
+    styleFunc () {
+      return createStyleFunc(this.style)
+    }
+  }
+
   export default {
     name: 'vl-vector-layer',
-    mixins: [ layer ]
+    mixins: [ layer ],
+    props,
+    computed
   }
 </script>

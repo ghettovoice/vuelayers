@@ -1,3 +1,7 @@
-/**
- * Created by ghetto on 24.02.17.
- */
+import Layer from './layer.vue'
+
+export default {
+  install (Vue) {
+    Vue.component(Layer.name, Layer)
+  }
+}

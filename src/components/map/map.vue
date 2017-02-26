@@ -44,7 +44,7 @@
       type: String,
       default: MAP_PROJECTION
     },
-    geoloc: Boolean
+    tracking: Boolean
   }
 
   const methods = {
@@ -83,6 +83,18 @@
             resolve(complete)
           })
       )
+    },
+    /**
+     * @return {ol.Map}
+     */
+    getMap () {
+      return this.map
+    }
+  }
+
+  const watch = {
+    tracking (value) {
+      this.geolocApi.setTracking(value)
     }
   }
 
@@ -90,12 +102,12 @@
     name: 'vl-map',
     props,
     methods,
+    watch,
     data () {
       return {
         currentZoom: this.zoom,
         currentCenter: this.center,
         currentRotation: this.rotation,
-        currentProjection: this.projection,
         currentPosition: undefined,
         currentAccuracy: undefined
       }
@@ -107,8 +119,10 @@
       this.subs = {}
 
       this::createMap()
+      this::createGeolocApi()
+
       this::subscribeToViewChanges()
-      this.geolocApi && this::subscribeToGeolocation()
+      this::subscribeToGeolocation()
     },
     mounted () {
       this.map.setTarget(this.$refs.map)
@@ -123,20 +137,11 @@
         delete this.subs[ name ]
       })
 
-      if (this.geoloc) {
-        this.geoloc.setTracking(false)
-        this.geoloc = this.positionFeature = undefined
-      }
+      this.geolocApi && this.geolocApi.setTracking(false)
+      this.internalOverlay && this.internalOverlay.setMap(undefined)
+      this.map && this.map.setTarget(undefined)
 
-      if (this.internalOverlay) {
-        this.internalOverlay.setMap(undefined)
-        this.internalOverlay = undefined
-      }
-
-      if (this.map) {
-        this.map.setTarget(undefined)
-        this.map = undefined
-      }
+      this.map = this.internalOverlay = this.geoloc = this.positionFeature = undefined
     }
   }
 
@@ -155,36 +160,14 @@
       loadTilesWhileInteracting: true
     })
 
+    this.map.vm = this
+
     this.internalOverlay = new ol.layer.Vector({
       map: this.map,
       source: new ol.source.Vector()
     })
 
     this.map.addInteraction(this::createSelectInteraction())
-
-    if (this.geoloc) {
-      /**
-       * @protected
-       */
-      this.geolocApi = new ol.Geolocation({
-        tracking: true,
-        projection: this.projection
-      })
-      /**
-       * @protected
-       */
-      this.positionFeature = new ol.Feature({
-        internal: true
-      })
-      this.positionFeature.setStyle(new ol.style.Style({
-        image: new ol.style.Icon({
-          src: positionMarker,
-          scale: 0.85,
-          anchor: [ 0.5, 1 ]
-        })
-      }))
-      this.internalOverlay.getSource().addFeature(this.positionFeature)
-    }
 
     return this.map
   }
@@ -194,12 +177,42 @@
    */
   function createView () {
     return new ol.View({
-      center: ol.proj.fromLonLat(this.currentCenter, this.currentProjection),
+      center: ol.proj.fromLonLat(this.currentCenter, this.projection),
       zoom: this.currentZoom,
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
-      projection: this.currentProjection
+      projection: this.projection
     })
+  }
+
+  /**
+   * @return {ol.Geolocation}
+   */
+  function createGeolocApi () {
+    /**
+     * @type {ol.Geolocation}
+     * @protected
+     */
+    this.geolocApi = new ol.Geolocation({
+      tracking: this.tracking,
+      projection: this.projection
+    })
+    /**
+     * @protected
+     */
+    this.positionFeature = new ol.Feature({
+      internal: true
+    })
+    this.positionFeature.setStyle(new ol.style.Style({
+      image: new ol.style.Icon({
+        src: positionMarker,
+        scale: 0.85,
+        anchor: [ 0.5, 1 ]
+      })
+    }))
+    this.internalOverlay.getSource().addFeature(this.positionFeature)
+
+    return this.geolocApi
   }
 
   /**
@@ -229,7 +242,7 @@
       view,
       'change',
       () => {
-        const center = ol.proj.toLonLat(view.getCenter(), this.currentProjection)
+        const center = ol.proj.toLonLat(view.getCenter(), this.projection)
           .map(x => round(x, 6))
         const zoom = Math.ceil(view.getZoom())
         const rotation = round(view.getRotation(), 6)
@@ -255,7 +268,7 @@
       this.geolocApi,
       'change',
       () => {
-        const position = ol.proj.toLonLat(this.geolocApi.getPosition(), this.currentProjection)
+        const position = ol.proj.toLonLat(this.geolocApi.getPosition(), this.projection)
           .map(x => round(x, 6))
         const accuracy = round(this.geolocApi.getAccuracy(), 6)
 

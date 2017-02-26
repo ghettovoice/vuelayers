@@ -1,5 +1,4 @@
-import emptyNode from 'vuelayers/src/mixins/empty-node'
-import { MAP_PROJECTION, createAttributions } from 'vuelayers/src/ol'
+import { MAP_PROJECTION } from 'vuelayers/src/ol'
 
 const props = {
   opacity: {
@@ -19,7 +18,8 @@ const props = {
   extent: {
     type: Array,
     validator: value => value.length === 4
-  }
+  },
+  zIndex: Number
 }
 
 const methods = {
@@ -30,16 +30,23 @@ const methods = {
     this.layer.changed()
   },
   /**
+   * @return {ol.layer.Layer}
    * @protected
    */
   createLayer () {
-    throw new Error('Should be overriden')
+    throw new Error('Not implemented')
   },
   /**
    * @return {ol.layer.Base}
    */
   getLayer () {
     return this.layer
+  },
+  /**
+   * @return {ol.Map}
+   */
+  getMap () {
+    return this.map
   }
 }
 
@@ -59,27 +66,30 @@ const watch = {
 }
 
 export default {
-  mixins: [ emptyNode ],
+  name: 'vl-layer',
   props,
   methods,
   watch,
+  beforeCreate () {
+    try {
+      this.map = this.$parent.getMap()
+    } catch (err) {
+      throw new Error('Layer component used not in map component.')
+    }
+  },
   create () {
     /**
      * @type {ol.layer.Layer}
      * @protected
      */
-    this.layer = undefined
-    this.createLayer()
+    this.layer = this.createLayer()
   },
   mounted () {
     this.map.addLayer(this.layer)
   },
   beforeDestroy () {
-    if (this.layer) {
-      this.map.removeLayer(this.layer)
-      this.layer = undefined
-    }
+    this.map && this.layer && this.map.removeLayer(this.layer)
 
-    this.map = undefined
+    this.layer = this.map = undefined
   }
 }

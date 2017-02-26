@@ -1,3 +1,7 @@
-/**
- * Created by ghetto on 24.02.17.
- */
+import Source from './source.vue'
+
+export default {
+  install (Vue) {
+    Vue.component(Source.name, Source)
+  }
+}

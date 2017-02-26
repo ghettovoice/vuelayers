@@ -11,12 +11,10 @@ map:
   - name: rx
     path: rx
   # mixins
-  - name: mixins/empty-node
-    path: mixins/empty-node
   - name: mixins/layer
     path: mixins/layer
-  - name: mixins/map-component
-    path: mixins/map-component
+  - name: mixins/source
+    path: mixins/source
   # utils
   - name: utils/func
     path: utils/func
