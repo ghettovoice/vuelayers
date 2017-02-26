@@ -19,8 +19,11 @@ export const MIN_ZOOM = 0
 /**
  * @type {number} Default tile size
  */
-
 export const TILE_SIZE = 256
+/**
+ * @type {number} Default zoom factor
+ */
+export const ZOOM_FACTOR = 2
 /**
  * @type {number} Earth radius in meters
  */

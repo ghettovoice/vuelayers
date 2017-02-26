@@ -1,6 +1,13 @@
 <template>
   <div id="app">
-    <vl-map></vl-map>
+    <vl-map>
+      <vl-view/>
+      <vl-geoloc/>
+
+      <vl-tile-layer>
+        <vl-osm-source/>
+      </vl-tile-layer>
+    </vl-map>
   </div>
 </template>
 

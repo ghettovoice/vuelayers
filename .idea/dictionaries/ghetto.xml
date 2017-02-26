@@ -4,6 +4,7 @@
       <w>geolocchanged</w>
       <w>lodash</w>
       <w>overriden</w>
+      <w>positionchange</w>
       <w>positionchanged</w>
       <w>viewchanged</w>
       <w>vuelayers</w>

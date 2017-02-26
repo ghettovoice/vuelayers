@@ -45,12 +45,9 @@ module.exports = {
     bundleAnalyzerReport: process.env.npm_config_report
   },
   dev: {
-    entry: Object.assign(
-      {
-        app: path.resolve(__dirname, '../test/main.js')
-      },
-      entry
-    ),
+    entry: {
+      app: path.resolve(__dirname, '../test/main.js')
+    },
     env: require('./dev.env'),
     port: 8081,
     autoOpenBrowser: true,

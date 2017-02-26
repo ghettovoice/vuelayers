@@ -40,7 +40,8 @@
     "ol3-tilecache": "^1.2.2",
     "openlayers": "^4.0.1",
     "rxjs": "^5.2.0",
-    "vue": "^2.1.10"
+    "vue": "^2.1.10",
+    "vue-expose-inject": "^0.3.1"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.4",

@@ -1,3 +1,4 @@
+import exposeContext from 'vuelayers/src/mixins/expose-context'
 import { MAP_PROJECTION } from 'vuelayers/src/ol'
 
 const props = {
@@ -26,7 +27,7 @@ const methods = {
   /**
    * Updates layer state
    */
-  updateLayer () {
+  refresh () {
     this.layer.changed()
   },
   /**
@@ -36,17 +37,11 @@ const methods = {
   createLayer () {
     throw new Error('Not implemented')
   },
-  /**
-   * @return {ol.layer.Base}
-   */
-  getLayer () {
-    return this.layer
-  },
-  /**
-   * @return {ol.Map}
-   */
-  getMap () {
-    return this.map
+  context () {
+    return {
+      ...this.$parent.context(),
+      layer: this.layer
+    }
   }
 }
 
@@ -67,17 +62,12 @@ const watch = {
 
 export default {
   name: 'vl-layer',
+  mixins: [ exposeContext ],
   props,
   methods,
   watch,
-  beforeCreate () {
-    try {
-      this.map = this.$parent.getMap()
-    } catch (err) {
-      throw new Error('Layer component used not in map component.')
-    }
-  },
-  create () {
+  render: h => h('slot'),
+  created () {
     /**
      * @type {ol.layer.Layer}
      * @protected
@@ -85,11 +75,11 @@ export default {
     this.layer = this.createLayer()
   },
   mounted () {
-    this.map.addLayer(this.layer)
+    this.context().map.addLayer(this.layer)
   },
   beforeDestroy () {
-    this.map && this.layer && this.map.removeLayer(this.layer)
+    this.context().map.removeLayer(this.layer)
 
-    this.layer = this.map = undefined
+    this.layer = undefined
   }
 }

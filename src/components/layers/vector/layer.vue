@@ -1,17 +1,17 @@
-<template>
-  <div>
-    <slot></slot>
-  </div>
-</template>
-
 <script>
   import layer from 'vuelayers/src/mixins/layer'
   import { createStyleFunc } from 'vuelayers/src/ol'
 
   const props = {
     style: Object,
-    updateWhileAnimating: Boolean,
-    updateWhileInteracting: Boolean
+    updateWhileAnimating: {
+      type: Boolean,
+      default: true
+    },
+    updateWhileInteracting: {
+      type: Boolean,
+      default: true
+    }
   }
 
   const computed = {

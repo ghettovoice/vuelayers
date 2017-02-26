@@ -11,15 +11,27 @@ map:
   - name: rx
     path: rx
   # mixins
+  - name: mixins/rx-subs
+    path: mixins/rx-subs
+  - name: mixins/expose-context
+    path: mixins/expose-context
   - name: mixins/layer
     path: mixins/layer
   - name: mixins/source
     path: mixins/source
+  - name: mixins/tile-source
+    path: mixins/tile-source
   # utils
   - name: utils/func
     path: utils/func
   # components
   - name: map
+    path: components
+  - name: view
+    path: components
+  - name: geoloc
+    path: components
+  - name: feature
     path: components
   - name: tile-layer
     path: components/layers/tile
@@ -29,3 +41,5 @@ map:
     path: components/sources/vector
   - name: xyz-source
     path: components/sources/xyz
+  - name: osm-source
+    path: components/sources/osm

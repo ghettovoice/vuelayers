@@ -1,3 +1,4 @@
+import exposeContext from 'vuelayers/src/mixins/expose-context'
 import { MAP_PROJECTION, createAttributions } from 'vuelayers/src/ol'
 
 const props = {
@@ -5,6 +6,10 @@ const props = {
   projection: {
     type: String,
     default: MAP_PROJECTION
+  },
+  wrapX: {
+    type: Boolean,
+    default: true
   }
 }
 
@@ -15,6 +20,15 @@ const methods = {
    */
   createSource () {
     throw new Error('Not implemented')
+  },
+  refresh () {
+    this.source.changed()
+  },
+  context () {
+    return {
+      ...this.$parent.context(),
+      source: this.source
+    }
   }
 }
 
@@ -29,34 +43,24 @@ const watch = {
 
 export default {
   name: 'vl-source',
+  mixins: [ exposeContext ],
   props,
   methods,
   watch,
-  beforeCreate () {
-    try {
-      /**
-       * @type {ol.Map}
-       * @protected
-       */
-      this.map = this.$parent.getMap()
-      /**
-       * @type {ol.layer.Layer}
-       * @protected
-       */
-      this.layer = this.$parent.getLayer()
-    } catch (err) {
-      throw new Error('Source component used not in layer component.')
-    }
-  },
-  create () {
+  render: h => h('slot'),
+  created () {
+    /**
+     * @type {ol.source.Source}
+     * @protected
+     */
     this.source = this.createSource()
   },
   mounted () {
-    this.layer.setSource(this.source)
+    this.context().layer.setSource(this.source)
   },
   beforeDestroy () {
-    this.layer && this.layer.setSource(undefined)
+    this.context().layer.setSource(undefined)
 
-    this.source = this.layer = this.map = undefined
+    this.source = undefined
   }
 }
