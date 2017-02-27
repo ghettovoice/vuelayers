@@ -48,7 +48,7 @@ export default {
   methods,
   watch,
   render (h) {
-    return h('span', {
+    return h('i', {
       style: {
         display: 'none'
       }
@@ -62,10 +62,10 @@ export default {
     this.source = this.createSource()
   },
   mounted () {
-    this.context.layer.setSource(this.source)
+    this.$context.layer.setSource(this.source)
   },
   beforeDestroy () {
-    this.context.layer.setSource(undefined)
+    this.$context.layer.setSource(undefined)
   },
   destroyed () {
     this.source = undefined

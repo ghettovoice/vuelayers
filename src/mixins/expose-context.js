@@ -11,11 +11,11 @@ export default {
      * @type {Object}
      * @protected
      */
-    this.context = this.$parent && isFunction(this.$parent.expose)
+    this.$context = this.$parent && isFunction(this.$parent.expose)
       ? this.$parent.expose()
       : {}
   },
   destroyed () {
-    this.context = {}
+    this.$context = {}
   }
 }

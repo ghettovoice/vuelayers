@@ -109,10 +109,10 @@
       this::subscribeToViewChanges()
     },
     mounted () {
-      this.context.map.setView(this.view)
+      this.$context.map.setView(this.view)
     },
     beforeDestroy () {
-      this.context.map.setView(undefined)
+      this.$context.map.setView(undefined)
     },
     destroyed () {
       this.view = undefined

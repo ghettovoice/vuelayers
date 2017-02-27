@@ -43,7 +43,7 @@
     },
     beforeDestroy () {
       this.geoloc.setTracking(false)
-      this.context.serviceOverlay.getSource().removeFeature(this.positionFeature)
+      this.$context.serviceOverlay.getSource().removeFeature(this.positionFeature)
     },
     destroyed () {
       this.geoloc = this.positionFeature = undefined
@@ -78,7 +78,7 @@
         anchor: [ 0.5, 1 ]
       })
     }))
-    this.context.serviceOverlay.getSource().addFeature(this.positionFeature)
+    this.$context.serviceOverlay.getSource().addFeature(this.positionFeature)
 
     return this.geoloc
   }

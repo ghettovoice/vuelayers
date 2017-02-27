@@ -43,3 +43,5 @@ map:
     path: components/sources/xyz
   - name: osm-source
     path: components/sources/osm
+  - name: mapbox-source
+    path: components/sources/mapbox

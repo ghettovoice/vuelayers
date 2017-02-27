@@ -72,7 +72,7 @@ export default {
   methods,
   watch,
   render (h) {
-    return h('span', {
+    return h('i', {
       style: {
         display: 'none'
       }
@@ -86,10 +86,10 @@ export default {
     this.layer = this.createLayer()
   },
   mounted () {
-    this.context.map.addLayer(this.layer)
+    this.$context.map.addLayer(this.layer)
   },
   beforeDestroy () {
-    this.context.map.removeLayer(this.layer)
+    this.$context.map.removeLayer(this.layer)
   },
   destroyed () {
     this.layer = undefined
