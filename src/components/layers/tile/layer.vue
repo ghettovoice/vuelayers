@@ -25,3 +25,7 @@
     methods
   }
 </script>
+
+<style>
+  /* stub style  */
+</style>

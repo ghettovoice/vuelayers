@@ -1,6 +1,6 @@
 <script>
   import layer from 'vuelayers/src/mixins/layer'
-  import { createStyleFunc } from 'vuelayers/src/ol'
+  import { style as olStyle } from 'vuelayers/src/ol'
 
   const props = {
     style: Object,
@@ -16,7 +16,7 @@
 
   const computed = {
     styleFunc () {
-      return createStyleFunc(this.style)
+      return olStyle.createStyleFunc(this.style)
     }
   }
 
@@ -27,3 +27,7 @@
     computed
   }
 </script>
+
+<style>
+  /* stub style  */
+</style>

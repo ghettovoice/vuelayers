@@ -3,5 +3,5 @@ export View from './view'
 export Feature from './feature'
 export Geoloc from './geoloc'
 export { VectorLayer, TileLayer } from './layers'
-export { XyzSource } from './sources'
+export { XyzSource, OsmSource } from './sources'
 

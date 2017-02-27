@@ -1,12 +1,11 @@
 <script>
   import ol from 'openlayers'
-  import { createAttributions } from 'vuelayers/src/ol'
   import tileSource from 'vuelayers/src/mixins/tile-source'
 
   const methods = {
     createSource () {
       return new ol.source.XYZ({
-        attributions: createAttributions(this.attributions),
+        attributions: this.attributions,
         tileUrlFunction: this.createTileUrlFunction(),
         crossOrigin: this.crossOrigin,
         projection: this.projection,
@@ -19,7 +18,11 @@
 
   export default {
     name: 'vl-xyz-source',
-    mixin: [ tileSource ],
+    mixins: [ tileSource ],
     methods
   }
 </script>
+
+<style>
+  /* stub style  */
+</style>

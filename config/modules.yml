@@ -26,13 +26,13 @@ map:
     path: utils/func
   # components
   - name: map
-    path: components
+    path: components/map
   - name: view
-    path: components
+    path: components/view
   - name: geoloc
-    path: components
+    path: components/geoloc
   - name: feature
-    path: components
+    path: components/feature
   - name: tile-layer
     path: components/layers/tile
   - name: vector-layer

@@ -4,6 +4,15 @@
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
 
+## Install
+
+```
+# Install VueJs and OpenLayers if not yet installed
+npm install -S vue openlayers
+# Library install
+npm install -S vuelayers
+```
+
 ## Build Setup
 
 ``` bash
@@ -12,6 +21,8 @@ cd vuelayers
 
 # install dependencies
 npm install
+# Install peer dependencies
+npm install vue openlayers 
 
 # serve with hot reload at localhost:8080
 npm run dev

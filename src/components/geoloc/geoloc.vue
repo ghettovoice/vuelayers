@@ -18,14 +18,6 @@
     }
   }
 
-  const methods = {
-    context () {
-      return {
-        ...this.$parent.context()
-      }
-    }
-  }
-
   const watch = {
     tracking (value) {
       this.geoloc.setTracking(value)
@@ -37,7 +29,6 @@
     mixins: [ exposeContext, rxSubs ],
     props,
     watch,
-    methods,
     render: h => h(),
     data () {
       return {
@@ -52,8 +43,9 @@
     },
     beforeDestroy () {
       this.geoloc.setTracking(false)
-      this.context().serviceOverlay.getSource().removeFeature(this.positionFeature)
-
+      this.context.serviceOverlay.getSource().removeFeature(this.positionFeature)
+    },
+    destroyed () {
       this.geoloc = this.positionFeature = undefined
     }
   }
@@ -86,7 +78,7 @@
         anchor: [ 0.5, 1 ]
       })
     }))
-    this.context().serviceOverlay.getSource().addFeature(this.positionFeature)
+    this.context.serviceOverlay.getSource().addFeature(this.positionFeature)
 
     return this.geoloc
   }
@@ -112,3 +104,7 @@
     )
   }
 </script>
+
+<style>
+  /* stub style  */
+</style>

@@ -16,7 +16,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="13">
+          <list size="14">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -30,6 +30,7 @@
             <item index="10" class="java.lang.String" itemvalue="vl-geoloc" />
             <item index="11" class="java.lang.String" itemvalue="vl-tile-layer" />
             <item index="12" class="java.lang.String" itemvalue="vl-osm-source" />
+            <item index="13" class="java.lang.String" itemvalue="vl-xyz-source" />
           </list>
         </value>
       </option>

@@ -1,11 +1,11 @@
 import exposeContext from 'vuelayers/src/mixins/expose-context'
-import { MAP_PROJECTION, createAttributions } from 'vuelayers/src/ol'
+import { consts as olConsts } from 'vuelayers/src/ol'
 
 const props = {
-  attributions: Array,
+  attributions: String,
   projection: {
     type: String,
-    default: MAP_PROJECTION
+    default: olConsts.MAP_PROJECTION
   },
   wrapX: {
     type: Boolean,
@@ -24,9 +24,9 @@ const methods = {
   refresh () {
     this.source.changed()
   },
-  context () {
+  expose () {
     return {
-      ...this.$parent.context(),
+      ...this.$parent.expose(),
       source: this.source
     }
   }
@@ -34,7 +34,7 @@ const methods = {
 
 const watch = {
   attributions (value) {
-    this.source.setAttributions(createAttributions(value))
+    this.source.setAttributions(value)
   },
   projection (value) {
     this.source.setProjection(value)
@@ -47,7 +47,13 @@ export default {
   props,
   methods,
   watch,
-  render: h => h('slot'),
+  render (h) {
+    return h('span', {
+      style: {
+        display: 'none'
+      }
+    }, this.$slots.default)
+  },
   created () {
     /**
      * @type {ol.source.Source}
@@ -56,11 +62,12 @@ export default {
     this.source = this.createSource()
   },
   mounted () {
-    this.context().layer.setSource(this.source)
+    this.context.layer.setSource(this.source)
   },
   beforeDestroy () {
-    this.context().layer.setSource(undefined)
-
+    this.context.layer.setSource(undefined)
+  },
+  destroyed () {
     this.source = undefined
   }
 }

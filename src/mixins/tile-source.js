@@ -2,30 +2,23 @@ import { pick } from 'lodash/fp'
 import { createTileUrlFunction } from 'ol3-tilecache'
 import { replaceTokens } from 'vuelayers/src/utils/func'
 import source from 'vuelayers/src/mixins/source'
-import { TILE_SIZE } from 'vuelayers/src/ol'
-
-const urlTokens = [
-  'layerName',
-  'tileFormat'
-]
-const pickUrlTokens = pick(urlTokens)
+import { consts as olConsts } from 'vuelayers/src/ol'
 
 const props = {
-  url: String,
-  tileFormat: {
+  url: {
     type: String,
-    default: 'png'
+    default: '',
+    required: true
   },
   tileSize: {
     type: Array,
-    default: () => [ TILE_SIZE, TILE_SIZE ],
+    default: () => [ olConsts.TILE_SIZE, olConsts.TILE_SIZE ],
     validator: value => value.length === 2
   },
   tilePixelRatio: {
     type: Number,
     default: 1
   },
-  layerName: String,
   crossOrigin: {
     type: String,
     default: 'anonymous'
@@ -36,13 +29,26 @@ const props = {
   }
 }
 
+const computed = {
+  urlTokens () {
+    return []
+  }
+}
+
 const methods = {
   /**
    * @return {ol.TileUrlFunction}
    * @protected
    */
   createTileUrlFunction () {
-    return createTileUrlFunction(replaceTokens(this.url, pickUrlTokens(this)))
+    return createTileUrlFunction(this.replaceUrlTokens())
+  },
+  /**
+   * @return {string}
+   * @protected
+   */
+  replaceUrlTokens () {
+    return replaceTokens(this.url, pick(this.urlTokens, this))
   }
 }
 
@@ -50,6 +56,6 @@ export default {
   name: 'vl-tile-source',
   mixins: [ source ],
   props,
-  methods,
-  render: h => h()
+  computed,
+  methods
 }

@@ -8,7 +8,7 @@
 <script rel="text/babel">
   import ol from 'openlayers'
   import exposeContext from 'vuelayers/src/mixins/expose-context'
-  import { createStyleFunc } from 'vuelayers/src/ol'
+  import { style as olStyle } from 'vuelayers/src/ol'
 
   const props = {
     loadTilesWhileAnimating: {
@@ -36,7 +36,7 @@
       this.$el.tabIndex = 0
       this.$el.focus()
     },
-    context () {
+    expose () {
       return {
         map: this.map,
         serviceOverlay: this.serviceOverlay
@@ -64,7 +64,8 @@
     beforeDestroy () {
       this.serviceOverlay.setMap(undefined)
       this.map.setTarget(undefined)
-
+    },
+    destroyed () {
       this.map = this.serviceOverlay = undefined
     }
   }
@@ -99,7 +100,7 @@
    * @return {ol.interaction.Select}
    */
   function createSelectInteraction () {
-    const defStyleFunc = createStyleFunc()
+    const defStyleFunc = olStyle.createStyleFunc()
     const internalFeatures = this.serviceOverlay.getSource().getFeatures()
 
     return new ol.interaction.Select({

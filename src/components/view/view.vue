@@ -9,12 +9,12 @@
   import { round } from 'vuelayers/src/utils/func'
   import exposeContext from 'vuelayers/src/mixins/expose-context'
   import rxSubs from 'vuelayers/src/mixins/rx-subs'
-  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } from 'vuelayers/src/ol'
+  import { consts as olConsts } from 'vuelayers/src/ol'
 
   const props = {
     zoom: {
       type: Number,
-      default: MIN_ZOOM
+      default: olConsts.MIN_ZOOM
     },
     center: {
       type: Array,
@@ -27,15 +27,15 @@
     },
     maxZoom: {
       type: Number,
-      default: MAX_ZOOM
+      default: olConsts.MAX_ZOOM
     },
     minZoom: {
       type: Number,
-      default: MIN_ZOOM
+      default: olConsts.MIN_ZOOM
     },
     projection: {
       type: String,
-      default: MAP_PROJECTION
+      default: olConsts.MAP_PROJECTION
     },
     enableRotation: {
       type: Boolean,
@@ -50,7 +50,7 @@
     resolution: Array,
     zoomFactor: {
       type: Number,
-      default: ZOOM_FACTOR
+      default: olConsts.ZOOM_FACTOR
     }
   }
 
@@ -82,9 +82,9 @@
     refresh () {
       this.view.changed()
     },
-    context () {
+    expose () {
       return {
-        ...this.$parent.context(),
+        ...this.$parent.expose(),
         view: this.view
       }
     }
@@ -109,11 +109,12 @@
       this::subscribeToViewChanges()
     },
     mounted () {
-      this.context().map.setView(this.view)
+      this.context.map.setView(this.view)
     },
     beforeDestroy () {
-      this.context().map.setView(undefined)
-
+      this.context.map.setView(undefined)
+    },
+    destroyed () {
       this.view = undefined
     }
   }
@@ -164,3 +165,7 @@
     )
   }
 </script>
+
+<style>
+  /* stub style  */
+</style>

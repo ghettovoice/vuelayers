@@ -1,8 +1,6 @@
 /**
  * OpenLayers 3 helpers and constants
  */
-module.exports = {
-  ...require('./consts'),
-  ...require('./helpers'),
-  ...require('./style')
-}
+export * as consts from './consts'
+export * as helpers from './helpers'
+export * as style from './style'

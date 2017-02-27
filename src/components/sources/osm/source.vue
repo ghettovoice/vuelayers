@@ -1,11 +1,10 @@
 <script>
   import ol from 'openlayers'
-  import { createAttributions } from 'vuelayers/src/ol'
   import tileSource from 'vuelayers/src/mixins/tile-source'
 
   const props = {
     attributions: {
-      type: Array,
+      type: String,
       default: ol.source.OSM.ATTRIBUTION.getHTML()
     },
     url: {
@@ -14,14 +13,11 @@
     }
   }
 
-  const computed = {
-  }
-
   const methods = {
     createSource () {
       return new ol.source.OSM({
         url: this.url,
-        attributions: createAttributions(this.attributions),
+        attributions: this.attributions,
         crossOrigin: this.crossOrigin
       })
     }
@@ -29,9 +25,12 @@
 
   export default {
     name: 'vl-osm-source',
-    mixin: [ tileSource ],
+    mixins: [ tileSource ],
     props,
-    computed,
     methods
   }
 </script>
+
+<style>
+  /* stub style  */
+</style>

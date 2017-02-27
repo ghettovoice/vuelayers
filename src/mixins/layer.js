@@ -1,7 +1,12 @@
+import uuid from 'node-uuid'
 import exposeContext from 'vuelayers/src/mixins/expose-context'
-import { MAP_PROJECTION } from 'vuelayers/src/ol'
+import { consts as olConsts } from 'vuelayers/src/ol'
 
 const props = {
+  id: {
+    type: String,
+    default: uuid.v4()
+  },
   opacity: {
     type: Number,
     default: 1
@@ -14,7 +19,7 @@ const props = {
   },
   projection: {
     type: String,
-    default: MAP_PROJECTION
+    default: olConsts.MAP_PROJECTION
   },
   extent: {
     type: Array,
@@ -37,9 +42,9 @@ const methods = {
   createLayer () {
     throw new Error('Not implemented')
   },
-  context () {
+  expose () {
     return {
-      ...this.$parent.context(),
+      ...this.$parent.expose(),
       layer: this.layer
     }
   }
@@ -66,7 +71,13 @@ export default {
   props,
   methods,
   watch,
-  render: h => h('slot'),
+  render (h) {
+    return h('span', {
+      style: {
+        display: 'none'
+      }
+    }, this.$slots.default)
+  },
   created () {
     /**
      * @type {ol.layer.Layer}
@@ -75,11 +86,12 @@ export default {
     this.layer = this.createLayer()
   },
   mounted () {
-    this.context().map.addLayer(this.layer)
+    this.context.map.addLayer(this.layer)
   },
   beforeDestroy () {
-    this.context().map.removeLayer(this.layer)
-
+    this.context.map.removeLayer(this.layer)
+  },
+  destroyed () {
     this.layer = undefined
   }
 }
