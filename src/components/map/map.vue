@@ -13,11 +13,11 @@
   const props = {
     loadTilesWhileAnimating: {
       type: Boolean,
-      default: true
+      default: false
     },
     loadTilesWhileInteracting: {
       type: Boolean,
-      default: true
+      default: false
     }
   }
 
@@ -69,9 +69,6 @@
       this.$nextTick(() => {
         this.refresh()
       })
-    },
-    updated () {
-      this.refresh()
     },
     beforeDestroy () {
       this.serviceOverlay.setMap(undefined)

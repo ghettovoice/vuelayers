@@ -6,12 +6,21 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
+import { omit } from 'lodash/fp'
 import * as components from './components'
 
+const flatComponents = {
+  ...omit([ 'geom', 'layer', 'source' ], components),
+  ...components.geom,
+  ...components.layer,
+  ...components.source
+}
+
 export default {
-  ...components,
+  VERSION: process.env.PKG_VERSION,
+  ...flatComponents,
   install (Vue) {
-    Object.keys(components)
-      .forEach(name => Vue.use(components[ name ]))
+    Object.keys(flatComponents)
+      .forEach(name => Vue.use(flatComponents[ name ]))
   }
 }

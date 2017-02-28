@@ -1,0 +1,6 @@
+export GeomPoint from './point'
+export GeomLine from './line'
+export GeomPolygon from './line'
+export GeomMultiPoint from './line'
+export GeomMultiLine from './line'
+export GeomMultiPolygon from './line'

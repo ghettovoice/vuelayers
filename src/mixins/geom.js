@@ -5,7 +5,8 @@ import rxSubs from 'vuelayers/src/mixins/rx-subs'
 const props = {
   coordinates: {
     type: Array,
-    required: true
+    required: true,
+    validator: value => Array.isArray(value) && value.length
   },
   layout: {
     type: String,
@@ -20,6 +21,9 @@ const methods = {
    */
   createGeometry () {
     throw new Error('Not implemented method')
+  },
+  refresh () {
+    this.geometry.changed()
   },
   expose () {
     return {
@@ -43,7 +47,6 @@ const watch = {
 }
 
 export default {
-  name: 'vl-geom',
   mixins: [ exposeInject, rxSubs ],
   inject: [ 'feature' ],
   props,
@@ -56,9 +59,6 @@ export default {
      */
     this.geometry = this.createGeometry()
     this.geometry.vm = this
-  },
-  updated () {
-    this.geometry.changed()
   },
   mounted () {
     this.feature.setGeometry(this.geometry)

@@ -1,12 +1,12 @@
 <template>
   <div id="app">
     <vl-map>
-      <vl-view/>
+      <vl-map-view/>
       <vl-geoloc/>
 
-      <vl-tile-layer id="osm">
-        <vl-osm-source/>
-      </vl-tile-layer>
+      <vl-layer-tile id="osm">
+        <vl-source-osm/>
+      </vl-layer-tile>
     </vl-map>
   </div>
 </template>

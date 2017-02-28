@@ -21,6 +21,9 @@
   const watch = {
     tracking (value) {
       this.geoloc.setTracking(value)
+    },
+    refresh () {
+      this.geoloc.changed()
     }
   }
 

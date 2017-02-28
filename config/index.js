@@ -46,6 +46,7 @@ module.exports = {
   },
   dev: {
     entry: {
+      // ...entry,
       app: path.resolve(__dirname, '../test/main.js')
     },
     env: require('./dev.env'),

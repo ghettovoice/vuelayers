@@ -16,7 +16,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="myValues">
         <value>
-          <list size="14">
+          <list size="15">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -31,6 +31,7 @@
             <item index="11" class="java.lang.String" itemvalue="vl-tile-layer" />
             <item index="12" class="java.lang.String" itemvalue="vl-osm-source" />
             <item index="13" class="java.lang.String" itemvalue="vl-xyz-source" />
+            <item index="14" class="java.lang.String" itemvalue="vl-mapbox-source" />
           </list>
         </value>
       </option>
