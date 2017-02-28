@@ -6,6 +6,7 @@
       <w>overriden</w>
       <w>positionchange</w>
       <w>positionchanged</w>
+      <w>reprojection</w>
       <w>viewchanged</w>
       <w>vuelayers</w>
     </words>

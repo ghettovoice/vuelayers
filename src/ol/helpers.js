@@ -1,6 +1,24 @@
 import ol from 'openlayers'
 import { isEqual } from 'lodash/fp'
-import { EARTH_RADIUS, WGS84_SPHERE, TILE_SIZE } from './consts'
+import { EARTH_RADIUS, WGS84_SPHERE, TILE_SIZE, MAP_PROJECTION, DATA_PROJECTION } from './consts'
+
+/**
+ * @param {ol.Extent} extent
+ * @param {ol.ProjectionLike} projection
+ * @return {ol.Extent}
+ */
+export function extentFromLonLat (extent, projection = MAP_PROJECTION) {
+  return ol.proj.transformExtent(extent, DATA_PROJECTION, projection)
+}
+
+/**
+ * @param {ol.Extent} extent
+ * @param {ol.ProjectionLike} projection
+ * @return {ol.Extent}
+ */
+export function extentToLonLat (extent, projection = MAP_PROJECTION) {
+  return ol.proj.transformExtent(extent, projection, DATA_PROJECTION)
+}
 
 /**
  * @param {number} zoom

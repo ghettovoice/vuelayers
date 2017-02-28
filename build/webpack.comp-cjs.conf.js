@@ -19,7 +19,7 @@ let externals = {}
 
 config.modules.map.forEach(mod => {
   baseWebpackConfig.entry[ mod.name ] = path.resolve(__dirname, '../src', mod.path)
-  externals[ `${config.name}/src/${mod.path}` ] = `${config.name}/dist/${mod.path}`
+  externals[ `${config.name}/src/${mod.path}` ] = `${config.name}/dist/${mod.name}`
 })
 
 const webpackConfig = merge(baseWebpackConfig, {

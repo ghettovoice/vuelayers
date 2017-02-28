@@ -7,9 +7,9 @@
 
 <script rel="text/babel">
   import ol from 'openlayers'
-  import exposeContext from 'vuelayers/src/mixins/expose-context'
+  import exposeInject from 'vuelayers/src/mixins/expose-inject'
   import { style as olStyle } from 'vuelayers/src/ol'
-
+  // todo move all to mixin
   const props = {
     loadTilesWhileAnimating: {
       type: Boolean,
@@ -46,11 +46,23 @@
 
   export default {
     name: 'vl-map',
-    mixins: [ exposeContext ],
+    mixins: [ exposeInject ],
     props,
     methods,
     created () {
-      this::createMap()
+      /**
+       * @type {ol.Map}
+       * @protected
+       */
+      this.map = this::createMap()
+      this.map.vm = this
+
+      this.serviceOverlay = new ol.layer.Vector({
+        map: this.map,
+        source: new ol.source.Vector()
+      })
+
+      this.map.addInteraction(this::createSelectInteraction())
     },
     mounted () {
       this.map.setTarget(this.$refs.map)
@@ -75,7 +87,7 @@
    */
   function createMap () {
     // todo wrap all controls and interactions
-    this.map = new ol.Map({
+    return new ol.Map({
       layers: [],
       // todo disable all default interaction and controls and use custom if defined, wrap all
 //      interactions: [],
@@ -83,17 +95,6 @@
       loadTilesWhileAnimating: this.loadTilesWhileAnimating,
       loadTilesWhileInteracting: this.loadTilesWhileInteracting
     })
-
-    this.map.vm = this
-
-    this.serviceOverlay = new ol.layer.Vector({
-      map: this.map,
-      source: new ol.source.Vector()
-    })
-
-    this.map.addInteraction(this::createSelectInteraction())
-
-    return this.map
   }
 
   /**

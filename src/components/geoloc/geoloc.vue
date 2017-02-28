@@ -7,7 +7,7 @@
   import 'rxjs/add/operator/throttleTime'
   import 'vuelayers/src/rx'
   import { round } from 'vuelayers/src/utils/func'
-  import exposeContext from 'vuelayers/src/mixins/expose-context'
+  import exposeInject from 'vuelayers/src/mixins/expose-inject'
   import rxSubs from 'vuelayers/src/mixins/rx-subs'
   import positionMarker from './position-marker.svg'
 
@@ -26,7 +26,8 @@
 
   export default {
     name: 'vl-geoloc',
-    mixins: [ exposeContext, rxSubs ],
+    mixins: [ exposeInject, rxSubs ],
+    inject: [ 'map', 'serviceOverlay' ],
     props,
     watch,
     render: h => h(),
@@ -43,7 +44,7 @@
     },
     beforeDestroy () {
       this.geoloc.setTracking(false)
-      this.$context.serviceOverlay.getSource().removeFeature(this.positionFeature)
+      this.serviceOverlay.getSource().removeFeature(this.positionFeature)
     },
     destroyed () {
       this.geoloc = this.positionFeature = undefined
@@ -78,7 +79,7 @@
         anchor: [ 0.5, 1 ]
       })
     }))
-    this.$context.serviceOverlay.getSource().addFeature(this.positionFeature)
+    this.serviceOverlay.getSource().addFeature(this.positionFeature)
 
     return this.geoloc
   }

@@ -7,10 +7,10 @@
   import 'rxjs/add/operator/throttleTime'
   import 'vuelayers/src/rx'
   import { round } from 'vuelayers/src/utils/func'
-  import exposeContext from 'vuelayers/src/mixins/expose-context'
+  import exposeInject from 'vuelayers/src/mixins/expose-inject'
   import rxSubs from 'vuelayers/src/mixins/rx-subs'
   import { consts as olConsts } from 'vuelayers/src/ol'
-
+  // todo move all to mixin
   const props = {
     zoom: {
       type: Number,
@@ -92,7 +92,8 @@
 
   export default {
     name: 'vl-view',
-    mixins: [ exposeContext, rxSubs ],
+    inject: [ 'map' ],
+    mixins: [ exposeInject, rxSubs ],
     props,
     methods,
     render: h => h(),
@@ -104,15 +105,20 @@
       }
     },
     created () {
-      this::createView()
+      /**
+       * @type {ol.View}
+       * @protected
+       */
+      this.view = this::createView()
+      this.view.vm = this
 
       this::subscribeToViewChanges()
     },
     mounted () {
-      this.$context.map.setView(this.view)
+      this.map.setView(this.view)
     },
     beforeDestroy () {
-      this.$context.map.setView(undefined)
+      this.map.setView(undefined)
     },
     destroyed () {
       this.view = undefined
@@ -123,21 +129,13 @@
    * @return {ol.View}
    */
   function createView () {
-    /**
-     * @type {ol.View}
-     * @protected
-     */
-    this.view = new ol.View({
+    return new ol.View({
       center: ol.proj.fromLonLat(this.currentCenter, this.projection),
       zoom: this.currentZoom,
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
       projection: this.projection
     })
-
-    this.view.vm = this
-
-    return this.view
   }
 
   /**

@@ -25,6 +25,14 @@ export const TILE_SIZE = 256
  */
 export const ZOOM_FACTOR = 2
 /**
+ * @type {number}
+ */
+export const CACHE_SIZE = 2048
+/**
+ * @type {number}
+ */
+export const PIXEL_RATIO = 1
+/**
  * @type {number} Earth radius in meters
  */
 export const EARTH_RADIUS = 6378137

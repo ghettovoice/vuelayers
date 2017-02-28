@@ -1,30 +1,9 @@
 <script>
-  import layer from 'vuelayers/src/mixins/layer'
-  import { style as olStyle } from 'vuelayers/src/ol'
-
-  const props = {
-    style: Object,
-    updateWhileAnimating: {
-      type: Boolean,
-      default: true
-    },
-    updateWhileInteracting: {
-      type: Boolean,
-      default: true
-    }
-  }
-
-  const computed = {
-    styleFunc () {
-      return olStyle.createStyleFunc(this.style)
-    }
-  }
+  import vectorLayer from 'vuelayers/src/mixins/layers/vector'
 
   export default {
     name: 'vl-vector-layer',
-    mixins: [ layer ],
-    props,
-    computed
+    mixins: [ vectorLayer ]
   }
 </script>
 

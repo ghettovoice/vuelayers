@@ -1,3 +1,5 @@
+import { isString, templateSettings } from 'lodash/fp'
+
 /**
  * @param {*} value
  * @return {boolean} True if value is number or numeric string.
@@ -38,3 +40,14 @@ export function replaceTokens (string, replaces) {
   return string.replace(regExp, match => replaces[ match.substr(1, match.length - 2) ] || '')
 }
 
+/**
+ * Check if string is lodash template string.
+ * @param {string} value
+ * @return {boolean}
+ */
+export function isTemplate (value) {
+  return isString(value) && (
+      value.search(templateSettings.interpolate) !== -1 ||
+      value.search(templateSettings.evaluate) !== -1
+    )
+}

@@ -1,8 +1,10 @@
-import exposeContext from 'vuelayers/src/mixins/expose-context'
+import exposeInject from 'vuelayers/src/mixins/expose-inject'
+import rxSubs from 'vuelayers/src/mixins/rx-subs'
 import { consts as olConsts } from 'vuelayers/src/ol'
 
 const props = {
   attributions: String,
+  url: String,
   projection: {
     type: String,
     default: olConsts.MAP_PROJECTION
@@ -10,7 +12,8 @@ const props = {
   wrapX: {
     type: Boolean,
     default: true
-  }
+  },
+  logo: String
 }
 
 const methods = {
@@ -19,7 +22,7 @@ const methods = {
    * @protected
    */
   createSource () {
-    throw new Error('Not implemented')
+    throw new Error('Not implemented method')
   },
   refresh () {
     this.source.changed()
@@ -43,7 +46,8 @@ const watch = {
 
 export default {
   name: 'vl-source',
-  mixins: [ exposeContext ],
+  mixins: [ exposeInject, rxSubs ],
+  inject: [ 'layer' ],
   props,
   methods,
   watch,
@@ -60,12 +64,16 @@ export default {
      * @protected
      */
     this.source = this.createSource()
+    this.source.vm = this
+  },
+  updated () {
+    this.source.changed()
   },
   mounted () {
-    this.$context.layer.setSource(this.source)
+    this.layer.setSource(this.source)
   },
   beforeDestroy () {
-    this.$context.layer.setSource(undefined)
+    this.layer.setSource(undefined)
   },
   destroyed () {
     this.source = undefined

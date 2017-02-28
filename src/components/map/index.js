@@ -1,11 +1,10 @@
 /**
- * VueLayers Map component
+ * VueLayers map component
  */
 import Map from './map.vue'
 
-export default {
-  Map,
-  install (Vue) {
-    Vue.component(Map.name, Map)
-  }
+Map.install = function (Vue) {
+  Vue.component(Map.name, Map)
 }
+
+export default Map

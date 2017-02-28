@@ -1,5 +1,5 @@
 <script>
-  import XyzSource from 'vuelayers/src/components/sources/xyz'
+  import xyzSource from 'vuelayers/src/mixins/sources/xyz'
   import { coalesce } from 'vuelayers/src/utils/func'
 
   const props = {
@@ -41,7 +41,7 @@
 
   export default {
     name: 'vl-mapbox-source',
-    mixins: [ XyzSource.Source ],
+    mixins: [ xyzSource ],
     props,
     computed
   }

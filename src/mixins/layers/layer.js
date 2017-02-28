@@ -1,5 +1,6 @@
 import uuid from 'node-uuid'
-import exposeContext from 'vuelayers/src/mixins/expose-context'
+import exposeInject from 'vuelayers/src/mixins/expose-inject'
+import rxSubs from 'vuelayers/src/mixins/rx-subs'
 import { consts as olConsts } from 'vuelayers/src/ol'
 
 const props = {
@@ -40,7 +41,7 @@ const methods = {
    * @protected
    */
   createLayer () {
-    throw new Error('Not implemented')
+    throw new Error('Not implemented method')
   },
   expose () {
     return {
@@ -67,7 +68,8 @@ const watch = {
 
 export default {
   name: 'vl-layer',
-  mixins: [ exposeContext ],
+  mixins: [ exposeInject, rxSubs ],
+  inject: [ 'map' ],
   props,
   methods,
   watch,
@@ -84,12 +86,16 @@ export default {
      * @protected
      */
     this.layer = this.createLayer()
+    this.layer.vm = this
+  },
+  updated () {
+    this.layer.changed()
   },
   mounted () {
-    this.$context.map.addLayer(this.layer)
+    this.map.addLayer(this.layer)
   },
   beforeDestroy () {
-    this.$context.map.removeLayer(this.layer)
+    this.map.removeLayer(this.layer)
   },
   destroyed () {
     this.layer = undefined

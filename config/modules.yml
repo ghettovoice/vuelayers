@@ -13,14 +13,26 @@ map:
   # mixins
   - name: mixins/rx-subs
     path: mixins/rx-subs
-  - name: mixins/expose-context
-    path: mixins/expose-context
-  - name: mixins/layer
-    path: mixins/layer
-  - name: mixins/source
-    path: mixins/source
-  - name: mixins/tile-source
-    path: mixins/tile-source
+  - name: mixins/expose-inject
+    path: mixins/expose-inject
+  - name: mixins/feature
+    path: mixins/feature
+  - name: mixins/geom
+    path: mixins/geom
+  - name: mixins/layers/layer
+    path: mixins/layers/layer
+  - name: mixins/layers/tile
+    path: mixins/layers/tile
+  - name: mixins/layers/vector
+    path: mixins/layers/vector
+  - name: mixins/sources/source
+    path: mixins/sources/source
+  - name: mixins/sources/tile
+    path: mixins/sources/tile
+  - name: mixins/sources/xyz
+    path: mixins/sources/xyz
+  - name: mixins/sources/vector
+    path: mixins/sources/vector
   # utils
   - name: utils/func
     path: utils/func
@@ -33,15 +45,17 @@ map:
     path: components/geoloc
   - name: feature
     path: components/feature
+  - name: point-geom
+    path: components/geoms/point
   - name: tile-layer
     path: components/layers/tile
   - name: vector-layer
     path: components/layers/vector
+  - name: mapbox-source
+    path: components/sources/mapbox
+  - name: osm-source
+    path: components/sources/osm
   - name: vector-source
     path: components/sources/vector
   - name: xyz-source
     path: components/sources/xyz
-  - name: osm-source
-    path: components/sources/osm
-  - name: mapbox-source
-    path: components/sources/mapbox

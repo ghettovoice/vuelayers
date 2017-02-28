@@ -9,7 +9,6 @@ const reduceWithKey = reduce.convert({ cap: false })
  * @typedef {Object} GeoStyle
  *
  * Shared
- * @property {string} title
  * @property {string|number[]} fillColor
  * @property {string|number[]} strokeColor
  * @property {number} strokeWidth
@@ -19,6 +18,7 @@ const reduceWithKey = reduce.convert({ cap: false })
  * @property {number} zIndex
  *
  * Text only
+ * @property {string} text
  * @property {string} textFont
  * @property {number} textFontSize
  * @property {number} textScale
@@ -56,7 +56,7 @@ function getDefaultStyleHash () {
     iconRadius: 7,
     textStrokeColor: [ 30, 54, 133, 1 ],
     textFillColor: [ 30, 54, 133, 1 ],
-    textFont: 'Arial, Helvetica, Verdana, sans-serif',
+    textFont: 'sans-serif',
     textFontSize: 12,
     textStrokeWidth: 1
   }
@@ -72,7 +72,7 @@ function getDefaultStyleHash () {
 
   const cluster = {
     ...default_,
-    title: '<%= item.clusterSize %>',
+    text: '<%= item.clusterSize %>',
     iconUrl: null,
     iconImg: null,
     iconPoints: null,
@@ -128,10 +128,12 @@ const transformStyleHash = reduceWithKey((olStyleHash, geoStyles, styleName) => 
  *
  * @param {Object} [styleHash]
  * @return {ol.StyleFunction}
+ * @todo add support for dynamic styling through template strings, or simply set style on Feature
  */
 export function createStyleFunc (styleHash) {
   styleHash = merge(getDefaultStyleHash(), styleHash)
 
+  // Static pre-compilation
   const olStyleHash = transformStyleHash({}, styleHash)
 
   return (
@@ -139,7 +141,7 @@ export function createStyleFunc (styleHash) {
      * @param {ol.Feature} feature
      * @return {ol.style.Style[]}
      */
-    function styleFunc (feature) {
+    function __styleFunc (feature) {
       const styleName = feature.get('styleName') || 'default'
 
       return olStyleHash[ styleName ]
@@ -314,12 +316,13 @@ function transformImageStyle (geoStyle) {
  * @returns {ol.style.Text|undefined}
  */
 function transformTextStyle (geoStyle) {
-  if (geoStyle.title == null) {
+  // noinspection JSValidateTypes
+  if (geoStyle.text == null) {
     return
   }
 
   const textStyle = {
-    text: geoStyle.title
+    text: geoStyle.text
   }
 
   let fontSize = geoStyle.textFontSize ? geoStyle.textFontSize + 'px' : undefined

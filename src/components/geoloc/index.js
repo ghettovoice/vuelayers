@@ -1,8 +1,7 @@
 import Geoloc from './geoloc.vue'
 
-export default {
-  Geoloc,
-  install (Vue) {
-    Vue.component(Geoloc.name, Geoloc)
-  }
+Geoloc.install = function (Vue) {
+  Vue.component(Geoloc.name, Geoloc)
 }
+
+export default Geoloc

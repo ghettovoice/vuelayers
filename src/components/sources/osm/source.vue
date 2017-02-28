@@ -1,6 +1,6 @@
 <script>
   import ol from 'openlayers'
-  import tileSource from 'vuelayers/src/mixins/tile-source'
+  import xyzSource from 'vuelayers/src/mixins/sources/xyz'
 
   const props = {
     attributions: {
@@ -10,6 +10,10 @@
     url: {
       type: String,
       default: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    },
+    maxZoom: {
+      type: Number,
+      default: 19
     }
   }
 
@@ -18,14 +22,15 @@
       return new ol.source.OSM({
         url: this.url,
         attributions: this.attributions,
-        crossOrigin: this.crossOrigin
+        crossOrigin: this.crossOrigin,
+        maxZoom: this.maxZoom
       })
     }
   }
 
   export default {
     name: 'vl-osm-source',
-    mixins: [ tileSource ],
+    mixins: [ xyzSource ],
     props,
     methods
   }
