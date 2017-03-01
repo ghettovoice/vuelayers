@@ -1,7 +1,7 @@
-import Container from '../style/container.vue'
+import StyleContainer from '../style/container.vue'
 
-Container.install = function (Vue) {
-  Vue.component(Container.name, Container)
+StyleContainer.install = function (Vue) {
+  Vue.component(StyleContainer.name, StyleContainer)
 }
 
-export default Container
+export default StyleContainer

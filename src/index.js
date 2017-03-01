@@ -10,12 +10,17 @@
 import { omit } from 'lodash/fp'
 import * as components from './components'
 
+const keys = [
+  'geom',
+  'layer',
+  'source',
+  'style',
+  'interaction'
+]
+
 const flatComponents = {
-  ...omit([ 'geom', 'layer', 'source', 'style' ], components),
-  ...components.geom,
-  ...components.layer,
-  ...components.source,
-  ...components.style
+  ...omit(keys, components),
+  ...keys.reduce((all, key) => ({ ...all, ...components[key] }), {})
 }
 
 export default {

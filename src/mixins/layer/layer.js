@@ -5,7 +5,7 @@ import rxSubs from 'vuelayers/src/mixins/rx-subs'
 const props = {
   id: {
     type: [ String, Number ],
-    default: uuid.v4()
+    default: () => uuid.v4()
   },
   opacity: {
     type: Number,
@@ -21,7 +21,10 @@ const props = {
     type: Array,
     validator: value => value.length === 4
   },
-  zIndex: Number
+  zIndex: {
+    type: Number,
+    default: 0
+  }
 }
 
 const methods = {
@@ -58,6 +61,9 @@ const watch = {
   },
   visible (value) {
     this.layer.setVisible(value)
+  },
+  zIndex (value) {
+    this.layer.setZIndex(value)
   }
 }
 
@@ -70,7 +76,7 @@ export default {
   render (h) {
     return h('i', {
       style: {
-        display: 'none'
+        display: 'none !important'
       }
     }, this.$slots.default)
   },
@@ -81,6 +87,7 @@ export default {
      */
     this.layer = this.createLayer()
     this.layer.vm = this
+    this.layer.set('id', this.id)
   },
   mounted () {
     this.map.addLayer(this.layer)

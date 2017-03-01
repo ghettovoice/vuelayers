@@ -1,14 +1,18 @@
+<template>
+  <i style="display: none !important">
+    <slot></slot>
+  </i>
+</template>
+
 <script>
   /**
    * ol.style.Style wrapper.
    * Acts as an style container that will be injected into "style" slot inside layer or feature components.
-   * All style box components inside style slot would be returned from layer/feature style function.
-   * See layer mixin and components.
    */
   import ol from 'openlayers'
   import { isFunction } from 'lodash/fp'
   import { warn } from 'vuelayers/src/utils/debug'
-  import style from 'vuelayers/src/mixins/style'
+  import style from 'vuelayers/src/mixins/style/style'
 
   const props = {
     zIndex: Number
@@ -21,7 +25,10 @@
      */
     createStyle () {
       return new ol.style.Style({
-        zIndex: this.zIndex
+        zIndex: this.zIndex,
+        fill: this.fill,
+        stroke: this.stroke,
+        image: this.image
       })
     },
     append () {
@@ -31,9 +38,9 @@
       if (isFunction(currentStyle)) {
         if (process.env.NODE_ENV !== 'production') {
           warn('Target has style as ol.StyleFunction, current style will be override by component. ' +
-               'To append style container you should define style as Array or ol.style.Style instance on the target')
+               'To append style container you should define style as Array or ' +
+               'ol.style.Style instance on the target')
         }
-
         currentStyle = this.style
       }
 
@@ -50,7 +57,9 @@
       let currentStyle = this.styleTarget.getStyle() || []
       if (isFunction(currentStyle)) {
         if (process.env.NODE_ENV !== 'production') {
-          warn('Target has style as ol.StyleFunction. To remove style container you should define style as Array or ol.style.Style instance on the target')
+          warn('Target has style as ol.StyleFunction. ' +
+               'To remove style container you should define style as Array or ' +
+               'ol.style.Style instance on the target')
         }
         return
       }
@@ -63,6 +72,13 @@
       currentStyle = currentStyle.filter(style => style !== this.style)
       currentStyle.length || (currentStyle = undefined)
       this.styleTarget.setStyle(currentStyle)
+    },
+    getStyleTarget () {
+      return {
+        setFill: this::setFill,
+        setStroke: this::setStroke,
+        setImage: this::setImage
+      }
     }
   }
 
@@ -77,16 +93,32 @@
     mixins: [ style ],
     props,
     methods,
-    watch,
-    render (h) {
-      return h('i', {
-        style: {
-          display: 'none'
-        }
-      }, this.$slots.default)
-    }
+    watch
   }
 
+  function setFill (fill) {
+    /**
+     * @type {ol.style.Fill}
+     * @protected
+     */
+    this.fill = fill
+  }
+
+  function setStroke (stroke) {
+    /**
+     * @type {ol.style.Stroke}
+     * @protected
+     */
+    this.stroke = stroke
+  }
+
+  function setImage (image) {
+    /**
+     * @type {ol.style.Image}
+     * @protected
+     */
+    this.image = image
+  }
 </script>
 
 <style>/* stub styles */</style>

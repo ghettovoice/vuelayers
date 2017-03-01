@@ -1,15 +1,25 @@
+<template>
+  <i style="display: none !important;">
+    <slot></slot>
+  </i>
+</template>
+
 <script>
   import ol from 'openlayers'
   import uuid from 'node-uuid'
+  import { omit } from 'lodash/fp'
   import rxSubs from 'vuelayers/src/mixins/rx-subs'
   import exposeInject from 'vuelayers/src/mixins/expose-inject'
 
   const props = {
     id: {
       type: [ String, Number ],
-      default: uuid.v4()
+      default: () => uuid.v4()
     },
-    data: Object
+    data: {
+      type: Object,
+      default: () => ({})
+    }
   }
 
   const methods = {
@@ -31,16 +41,6 @@
     inject: [ 'layer', 'source', 'map', 'view' ],
     props,
     methods,
-    render (h) {
-      return h('i', {
-        style: {
-          display: 'none'
-        }
-      }, [
-        ...(this.$slots.default || []),
-        ...(this.$slots.style || [])
-      ])
-    },
     created () {
       /**
        * @type {ol.Feature}
@@ -62,10 +62,13 @@
   }
 
   function createFeature () {
-    return new ol.Feature({
-      ...this.data,
+    const feature = new ol.Feature({
+      ...omit([ 'geometry' ], this.data),
       id: this.id
     })
+    feature.setId(this.id)
+
+    return feature
   }
 </script>
 

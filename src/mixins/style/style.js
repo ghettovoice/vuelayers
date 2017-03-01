@@ -13,11 +13,24 @@ const methods = {
   createStyle () {
     throw new Error('Not implemented method')
   },
+  /**
+   * ol.style.Image do not have some setters than inner styles can't be applied
+   * at runtime after instance of ol.style.Image created.
+   * This method used to emulate needed setters for inner style components.
+   *
+   * @protected
+   */
+  getStyleTarget () {
+    return this.style
+  },
+  /**
+   * @return {{styleTarget: *}}
+   * @protected
+   */
   expose () {
     return {
       ...this.$parent.expose(),
-      style: this.style,
-      styleTarget: this.style
+      styleTarget: this.getStyleTarget()
     }
   },
   /**
@@ -39,22 +52,23 @@ export default {
   inject: [ 'styleTarget' ],
   methods,
   render: h => h(),
-  created () {
+  mounted () {
+    // Create style in  mounted hook because of some ol style classes doesn't have
+    // setters for all inner objects. This setters are emulated through method: getStyleTarget
     /**
      * @type {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text}
      * @protected
      */
     this.style = this.createStyle()
     this.style.vm = this
-  },
-  destroyed () {
-    this.style = undefined
-  },
-  mounted () {
+
     this.append()
   },
   beforeDestroy () {
     this.remove()
+  },
+  destroyed () {
+    this.style = undefined
   }
 }
 

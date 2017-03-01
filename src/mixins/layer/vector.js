@@ -68,9 +68,6 @@ export default {
       style: {
         display: 'none'
       }
-    }, [
-      ...(this.$slots.default || []),
-      ...(this.$slots.style || [])
-    ])
+    }, this.$slots.default)
   }
 }

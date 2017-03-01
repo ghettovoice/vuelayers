@@ -4,23 +4,31 @@
       <vl-map-view/>
       <vl-geoloc/>
 
-      <vl-layer-tile id="osm">
+      <vl-layer-tile>
         <vl-source-osm/>
       </vl-layer-tile>
 
-      <vl-layer-vector id="vector">
-        <vl-style-container slot="style">
-          <vl-style-stroke color="#13A838" :width="4"/>
-          <vl-style-fill color="#62E5E3"/>
-        </vl-style-container>
+      <vl-layer-vector>
+        <vl-style-function>
+          <template scope="ctx">
+            <vl-style-container>
+              <vl-style-stroke color="#13A838" :width="4"/>
+              <vl-style-fill :color="(ctx.feature || {}).color || '#ffffff'"/>
+            </vl-style-container>
+          </template>
+        </vl-style-function>
 
         <vl-source-vector>
-          <vl-feature id="1">
+          <vl-feature :id="1" :data="{ color: '#D46C25' }">
             <vl-geom-polygon :coordinates="[ [ [10, 10], [10, 70], [70, 10], [10, 10] ] ]"/>
           </vl-feature>
 
-          <vl-feature id="2">
-            <vl-style-container slot="style">
+          <vl-feature :id="2" :data="{ color: '#111671' }">
+            <vl-geom-polygon :coordinates="[ [ [-10, 10], [-20, 70], [-70, 10], [-10, 10] ] ]"/>
+          </vl-feature>
+
+          <vl-feature>
+            <vl-style-container>
               <vl-style-circle :radius="10">
                 <vl-style-stroke color="#13A838" :width="4"/>
                 <vl-style-fill color="#62E5E3"/>

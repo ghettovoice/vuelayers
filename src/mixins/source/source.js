@@ -53,7 +53,7 @@ export default {
   render (h) {
     return h('i', {
       style: {
-        display: 'none'
+        display: 'none !important'
       }
     }, this.$slots.default)
   },

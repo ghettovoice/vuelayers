@@ -1,6 +1,6 @@
 <script>
   import ol from 'openlayers'
-  import style from 'vuelayers/src/mixins/style'
+  import style from 'vuelayers/src/mixins/style/style'
 
   const props = {
     color: {

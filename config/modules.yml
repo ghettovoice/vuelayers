@@ -47,7 +47,14 @@ map:
 
   # style mixins
   - name: mixins/style
-    path: mixins/style
+    path: mixins/style/style
+
+  - name: mixins/style-image
+    path: mixins/style/image
+
+  # interaction mixins
+  - name: mixins/interaction
+    path: mixins/interaction/interaction
 
   # utils
   - name: utils/func
@@ -112,11 +119,17 @@ map:
   - name: style-container
     path: components/style-container
 
-  - name: style-circle
-    path: components/style/circle
+  - name: style-function
+    path: components/style-function
 
   - name: style-fill
     path: components/style/fill
 
   - name: style-stroke
     path: components/style/stroke
+
+  - name: style-circle
+    path: components/style/circle
+
+  - name: style-icon
+    path: components/style/icon
