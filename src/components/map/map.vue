@@ -1,8 +1,6 @@
 <template>
   <div class="vl-map">
     <div class="map" ref="map"></div>
-    <slot name="view"></slot>
-    <slot name="layers"></slot>
     <slot></slot>
   </div>
 </template>
@@ -11,7 +9,7 @@
   import ol from 'openlayers'
   import exposeInject from 'vuelayers/src/mixins/expose-inject'
   import { style as olStyle } from 'vuelayers/src/ol'
-  // todo move all to mixin
+
   const props = {
     loadTilesWhileAnimating: {
       type: Boolean,

@@ -5,4 +5,6 @@ export Geoloc from './geoloc'
 export * as geom from './geom'
 export * as layer from './layer'
 export * as source from './source'
+export * as style from './style'
+export StyleContainer from './style-container'
 

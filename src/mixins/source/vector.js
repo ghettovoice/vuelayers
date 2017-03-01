@@ -1,6 +1,6 @@
 import ol from 'openlayers'
 import source from 'vuelayers/src/mixins/source/source'
-import { helpers as olHelpers } from 'vuelayers/src/ol'
+import { coord as coordHelper } from 'vuelayers/src/ol'
 
 const props = {
   loader: Function,
@@ -26,7 +26,7 @@ const methods = {
 
     return async function __loader (extent, resolution, projection) {
       projection = projection.getCode()
-      extent = olHelpers.extentToLonLat(extent, projection)
+      extent = coordHelper.extentToLonLat(extent, projection)
 
       const features = await Promise.resolve(loader(extent, resolution, projection))
 

@@ -4,12 +4,12 @@ export default {
      * @type {Subscription}
      * @protected
      */
-    this.subs = {}
+    this.rxSubs = {}
   },
   beforeDestroy () {
-    Object.keys(this.subs).forEach(name => {
-      this.subs[ name ].unsubscribe()
-      delete this.subs[ name ]
+    Object.keys(this.rxSubs).forEach(name => {
+      this.rxSubs[ name ].unsubscribe()
+      delete this.rxSubs[ name ]
     })
   }
 }

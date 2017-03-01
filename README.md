@@ -19,10 +19,10 @@ npm install -S vuelayers
 git clone https://gitlab.com/ghettovoice/vuelayers.git
 cd vuelayers
 
-# install dependencies
-npm install
 # Install peer dependencies
-npm install vue openlayers 
+npm install vue openlayers
+# install other dependencies
+npm install
 
 # serve with hot reload at localhost:8080
 npm run dev

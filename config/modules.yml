@@ -11,6 +11,7 @@ map:
 
   - name: rx
     path: rx
+
   # mixins
   - name: mixins/rx-subs
     path: mixins/rx-subs
@@ -21,6 +22,7 @@ map:
   - name: mixins/geom
     path: mixins/geom
 
+  # layer mixins
   - name: mixins/layer
     path: mixins/layer/layer
 
@@ -30,6 +32,7 @@ map:
   - name: mixins/layer-vector
     path: mixins/layer/vector
 
+  # source mixins
   - name: mixins/source
     path: mixins/source/source
 
@@ -41,9 +44,18 @@ map:
 
   - name: mixins/source-vector
     path: mixins/source/vector
+
+  # style mixins
+  - name: mixins/style
+    path: mixins/style
+
   # utils
   - name: utils/func
     path: utils/func
+
+  - name: utils/debug
+    path: utils/debug
+
   # components
   - name: map
     path: components/map
@@ -57,11 +69,12 @@ map:
   - name: feature
     path: components/feature
 
+  # geom components
   - name: geom-point
     path: components/geom/point
 
-  - name: geom-line
-    path: components/geom/line
+  - name: geom-line-string
+    path: components/geom/line-string
 
   - name: geom-polygon
     path: components/geom/polygon
@@ -69,18 +82,20 @@ map:
   - name: geom-multi-point
     path: components/geom/multi-point
 
-  - name: geom-multi-line
-    path: components/geom/multi-line
+  - name: geom-multi-line-string
+    path: components/geom/multi-line-string
 
   - name: geom-multi-polygon
     path: components/geom/multi-polygon
 
+  # layer components
   - name: layer-tile
     path: components/layer/tile
 
   - name: layer-vector
     path: components/layer/vector
 
+  # source components
   - name: source-mapbox
     path: components/source/mapbox
 
@@ -92,3 +107,16 @@ map:
 
   - name: source-xyz
     path: components/source/xyz
+
+  # style components
+  - name: style-container
+    path: components/style-container
+
+  - name: style-circle
+    path: components/style/circle
+
+  - name: style-fill
+    path: components/style/fill
+
+  - name: style-stroke
+    path: components/style/stroke

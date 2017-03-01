@@ -4,7 +4,7 @@ import rxSubs from 'vuelayers/src/mixins/rx-subs'
 
 const props = {
   id: {
-    type: String,
+    type: [ String, Number ],
     default: uuid.v4()
   },
   opacity: {
@@ -81,30 +81,14 @@ export default {
      */
     this.layer = this.createLayer()
     this.layer.vm = this
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('create layer', this)
-    }
   },
   mounted () {
     this.map.addLayer(this.layer)
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('mount layer', this)
-    }
   },
   beforeDestroy () {
     this.map.removeLayer(this.layer)
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('unmount layer', this)
-    }
   },
   destroyed () {
     this.layer = undefined
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('layer destroyed', this)
-    }
   }
 }

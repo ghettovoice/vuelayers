@@ -1,4 +1,6 @@
-import { isFunction } from 'lodash/fp'
+import { isFunction, forEach, isString } from 'lodash/fp'
+
+const forEachWithKey = forEach.convert({ cap: false })
 
 export default {
   inject: [],
@@ -25,14 +27,16 @@ function injectContext () {
     : {}
   const inject = this.$options.inject || []
 
-  inject.forEach(key => {
-    if (this.__context[ key ] == null) throw new Error(`Property ${key} not found in context`)
+  forEachWithKey((alias, field) => {
+    field = isString(field) ? field : alias
 
-    Object.defineProperty(this, key, {
+    if (this.__context[ field ] == null) throw new Error(`Property ${field} not found in component context`)
+
+    Object.defineProperty(this, alias, {
       enumerable: true,
       get () {
-        return this.__context[ key ]
+        return this.__context[ field ]
       }
     })
-  })
+  }, inject)
 }

@@ -6,7 +6,7 @@
 
   const props = {
     id: {
-      type: String,
+      type: [ String, Number ],
       default: uuid.v4()
     },
     data: Object
@@ -19,7 +19,8 @@
     expose () {
       return {
         ...this.$parent.expose(),
-        feature: this.feature
+        feature: this.feature,
+        styleTarget: this.feature
       }
     }
   }
@@ -35,7 +36,10 @@
         style: {
           display: 'none'
         }
-      }, this.$slots.default)
+      }, [
+        ...(this.$slots.default || []),
+        ...(this.$slots.style || [])
+      ])
     },
     created () {
       /**
@@ -48,17 +52,9 @@
     },
     mounted () {
       this.source.addFeature(this.feature)
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('mount feature', this)
-      }
     },
     beforeDestroy () {
       this.source.removeFeature(this.feature)
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('unmount feature', this)
-      }
     },
     destroyed () {
       this.feature = undefined

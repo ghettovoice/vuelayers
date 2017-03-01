@@ -1,7 +1,7 @@
-import Layer from './layer.vue'
+import LayerVector from './layer.vue'
 
-Layer.install = function (Vue) {
-  Vue.component(Layer.name, Layer)
+LayerVector.install = function (Vue) {
+  Vue.component(LayerVector.name, LayerVector)
 }
 
-export default Layer
+export default LayerVector

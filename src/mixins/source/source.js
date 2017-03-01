@@ -64,30 +64,14 @@ export default {
      */
     this.source = this.createSource()
     this.source.vm = this
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('create source', this)
-    }
   },
   mounted () {
     this.layer.setSource(this.source)
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('mount source', this)
-    }
   },
   beforeDestroy () {
     this.layer.setSource(undefined)
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('unmount source', this)
-    }
   },
   destroyed () {
     this.source = undefined
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('source destroyed', this)
-    }
   }
 }

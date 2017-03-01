@@ -1,7 +1,7 @@
-import Source from './source.vue'
+import SourceXyz from './source.vue'
 
-Source.install = function (Vue) {
-  Vue.component(Source.name, Source)
+SourceXyz.install = function (Vue) {
+  Vue.component(SourceXyz.name, SourceXyz)
 }
 
-export default Source
+export default SourceXyz

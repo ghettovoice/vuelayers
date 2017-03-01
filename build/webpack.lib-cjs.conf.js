@@ -14,6 +14,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 const env = isProduction ? config.build.env : config.dev.env
 
 const webpackConfig = merge(baseWebpackConfig, {
+  target: 'node',
   output: {
     filename: 'cjs/index.js',
     library: config.fullname,
@@ -32,7 +33,9 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
-      'process.env': env
+      PKG_NAME: `"${config.name}"`,
+      PKG_FULLNAME: `"${config.fullname}"`,
+      PKG_VERSION: `"${config.version}"`
     }),
     // extract css into its own file
     new ExtractTextPlugin({

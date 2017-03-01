@@ -6,7 +6,6 @@
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/throttleTime'
   import 'vuelayers/src/rx'
-  import { round } from 'vuelayers/src/utils/func'
   import exposeInject from 'vuelayers/src/mixins/expose-inject'
   import rxSubs from 'vuelayers/src/mixins/rx-subs'
   import { consts as olConsts } from 'vuelayers/src/ol'
@@ -144,20 +143,19 @@
   function subscribeToViewChanges () {
     const viewChanges = Observable.fromOlEvent(this.view, 'change', () => {
       const center = ol.proj.toLonLat(this.view.getCenter(), this.projection)
-        .map(x => round(x, 6))
       const zoom = Math.ceil(this.view.getZoom())
-      const rotation = round(this.view.getRotation(), 6)
+      const rotation = this.view.getRotation()
 
       return [ center, zoom, rotation ]
     }).throttleTime(100)
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
-    this.subs.viewChanges = viewChanges.subscribe(
+    this.rxSubs.viewChanges = viewChanges.subscribe(
       ([ center, zoom, rotation ]) => {
         this.currentZoom = zoom
         this.currentCenter = center
         this.currentRotation = rotation
-        this.$emit('change', [ center, zoom, rotation ])
+        this.$emit('change', { center, zoom, rotation })
       },
       ::console.error
     )

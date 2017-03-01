@@ -1,7 +1,7 @@
-import Source from './source.vue'
+import SourceOsm from './source.vue'
 
-Source.install = function (Vue) {
-  Vue.component(Source.name, Source)
+SourceOsm.install = function (Vue) {
+  Vue.component(SourceOsm.name, SourceOsm)
 }
 
-export default Source
+export default SourceOsm

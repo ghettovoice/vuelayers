@@ -26,7 +26,10 @@ module.exports = merge(baseWebpackConfig, {
   devtool: '#cheap-module-eval-source-map',
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': config.dev.env
+      'process.env': config.dev.env,
+      PKG_NAME: `"${config.name}"`,
+      PKG_FULLNAME: `"${config.fullname}"`,
+      PKG_VERSION: `"${config.version}"`
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),

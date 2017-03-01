@@ -1,6 +1,7 @@
 <script>
   import ol from 'openlayers'
   import geom from 'vuelayers/src/mixins/geom'
+  import { coord as coordHelper } from 'vuelayers/src/ol'
 
   const props = {
     coordinates: {
@@ -12,12 +13,12 @@
 
   const methods = {
     createGeometry () {
-      return new ol.geom.MultiPolygon(ol.proj.fromLonLat(this.coordinates, this.view.getProjection()))
+      return new ol.geom.MultiPoint(coordHelper.multiPointFromLonLat(this.coordinates, this.view.getProjection()))
     }
   }
 
   export default {
-    name: 'vl-geom-multi-polygon',
+    name: 'vl-geom-multi-point',
     mixins: [ geom ],
     props,
     methods

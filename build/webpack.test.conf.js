@@ -12,7 +12,10 @@ const webpackConfig = merge(baseConfig, {
   devtool: '#inline-source-map',
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': require('../config/test.env')
+      'process.env': require('../config/test.env'),
+      PKG_NAME: `"${config.name}"`,
+      PKG_FULLNAME: `"${config.fullname}"`,
+      PKG_VERSION: `"${config.version}"`
     })
   ]
 })

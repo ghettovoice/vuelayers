@@ -23,6 +23,7 @@ config.modules.map.forEach(mod => {
 })
 
 const webpackConfig = merge(baseWebpackConfig, {
+  target: 'node',
   output: {
     filename: 'cjs/[name]/index.js',
     library: '[name]',
@@ -42,7 +43,9 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
-      'process.env': env
+      PKG_NAME: `"${config.name}"`,
+      PKG_FULLNAME: `"${config.fullname}"`,
+      PKG_VERSION: `"${config.version}"`
     }),
     // extract css into its own file
     new ExtractTextPlugin({

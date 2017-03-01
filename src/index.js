@@ -1,3 +1,4 @@
+/* global PKG_VERSION */
 /**
  * VueLayers
  * Vue components to work with OpenLayers 3.
@@ -10,14 +11,15 @@ import { omit } from 'lodash/fp'
 import * as components from './components'
 
 const flatComponents = {
-  ...omit([ 'geom', 'layer', 'source' ], components),
+  ...omit([ 'geom', 'layer', 'source', 'style' ], components),
   ...components.geom,
   ...components.layer,
-  ...components.source
+  ...components.source,
+  ...components.style
 }
 
 export default {
-  VERSION: process.env.PKG_VERSION,
+  VERSION: PKG_VERSION,
   ...flatComponents,
   install (Vue) {
     Object.keys(flatComponents)

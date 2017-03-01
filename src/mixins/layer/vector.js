@@ -20,6 +20,8 @@ const props = {
   // renderBuffer: Number
 }
 
+const layerExpose = layer.methods.expose
+
 const methods = {
   createStyleFunc () {
     return olStyle.createStyleFunc(this.style)
@@ -35,10 +37,15 @@ const methods = {
       projection: this.projection,
       extent: this.extent,
       zIndex: this.zIndex,
-      // style: this.createStyleFunc(),
       updateWhileAnimating: this.updateWhileAnimating,
       updateWhileInteracting: this.updateWhileInteracting
     })
+  },
+  expose () {
+    return {
+      ...this::layerExpose(),
+      styleTarget: this.layer
+    }
   }
 }
 
@@ -55,5 +62,15 @@ export default {
   mixins: [ layer ],
   props,
   methods,
-  watch
+  watch,
+  render (h) {
+    return h('i', {
+      style: {
+        display: 'none'
+      }
+    }, [
+      ...(this.$slots.default || []),
+      ...(this.$slots.style || [])
+    ])
+  }
 }

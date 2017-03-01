@@ -1,6 +1,7 @@
 <script>
   import ol from 'openlayers'
   import geom from 'vuelayers/src/mixins/geom'
+  import { coord as coordHelper } from 'vuelayers/src/ol'
 
   const props = {
     coordinates: {
@@ -12,16 +13,18 @@
 
   const methods = {
     createGeometry () {
-      return new ol.geom.MultiLineString(ol.proj.fromLonLat(this.coordinates, this.view.getProjection()))
+      return new ol.geom.Polygon(coordHelper.polygonFromLonLat(this.coordinates, this.view.getProjection()))
     }
   }
 
   export default {
-    name: 'vl-geom-multi-line',
+    name: 'vl-geom-polygon',
     mixins: [ geom ],
     props,
     methods
   }
 </script>
 
-<style>/* stub styles */</style>
+<style>
+  /* stub styles */
+</style>

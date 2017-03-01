@@ -1,6 +1,11 @@
-import ol from 'openlayers'
+import { isEqual } from 'lodash/fp'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/operator/throttleTime'
+import 'rxjs/add/operator/distinctUntilChanged'
+import 'vuelayers/src/rx'
 import exposeInject from 'vuelayers/src/mixins/expose-inject'
 import rxSubs from 'vuelayers/src/mixins/rx-subs'
+import { coord as coordHelper } from 'vuelayers/src/ol'
 
 const props = {
   /**
@@ -14,6 +19,12 @@ const props = {
   layout: {
     type: String,
     default: 'XY'
+  }
+}
+
+const computed = {
+  type () {
+    return this.geometry.getType()
   }
 }
 
@@ -33,15 +44,6 @@ const methods = {
       ...this.$parent.expose(),
       geometry: this.geometry
     }
-  },
-  getExtent () {
-    return this.geometry.getExtent()
-  },
-  setCoordinates (coordinates) {
-    this.geometry.setCoordinates(ol.proj.fromLonLat(coordinates, this.view.getProjection()))
-  },
-  getCoordinates () {
-    return ol.proj.toLonLat(this.geometry.getCoordinates(), this.view.getProjection())
   }
 }
 
@@ -49,7 +51,7 @@ const watch = {
   coordinates: {
     deep: true,
     handler (value) {
-      this.setCoordinates(value)
+      this.geometry.setCoordinates(this.coordTransform.fromLonLat(value), this.view.getProjection())
     }
   }
 }
@@ -58,9 +60,16 @@ export default {
   mixins: [ exposeInject, rxSubs ],
   inject: [ 'feature', 'view' ],
   props,
+  computed,
   watch,
   methods,
   render: h => h(),
+  data () {
+    return {
+      currentCoordinates: this.coordinates,
+      currentExtent: []
+    }
+  },
   created () {
     /**
      * @type {ol.geom.SimpleGeometry}
@@ -68,22 +77,41 @@ export default {
      */
     this.geometry = this.createGeometry()
     this.geometry.vm = this
+    /**
+     * @protected
+     */
+    this.coordTransform = coordHelper.coordTransform[ this.geometry.getType() ]
+
+    this.currentCoordinates = this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view.getProjection())
+    this.currentExtent = coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
+
+    this::subscribeToGeomChanges()
   },
   mounted () {
     this.feature.setGeometry(this.geometry)
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('mount geom', this)
-    }
   },
   beforeDestroy () {
     this.feature.setGeometry(undefined)
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('unmount geom', this)
-    }
   },
   destroyed () {
     this.geometry = undefined
   }
+}
+
+function subscribeToGeomChanges () {
+  this.rxSubs.geomChanges = Observable.fromOlEvent(this.geometry, 'change', ({ target }) => {
+    return [
+      this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view.getProjection()),
+      coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
+    ]
+  }).throttleTime(100)
+    .distinctUntilChanged((a, b) => isEqual(a, b))
+    .subscribe(
+      ([ coordinates, extent ]) => {
+        this.currentCoordinates = coordinates
+        this.currentExtent = extent
+        this.$emit('change', { coordinates, extent })
+      },
+      ::console.error
+    )
 }
