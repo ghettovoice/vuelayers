@@ -63,7 +63,7 @@ const watch = {
 
 export default {
   mixins: [ exposeInject, rxSubs ],
-  inject: [ 'map' ],
+  inject: [ 'map', 'view' ],
   props,
   methods,
   watch,

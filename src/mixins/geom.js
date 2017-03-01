@@ -3,6 +3,9 @@ import exposeInject from 'vuelayers/src/mixins/expose-inject'
 import rxSubs from 'vuelayers/src/mixins/rx-subs'
 
 const props = {
+  /**
+   * Coordinates in EPSG:4326
+   */
   coordinates: {
     type: Array,
     required: true,
@@ -10,7 +13,7 @@ const props = {
   },
   layout: {
     type: String,
-    default: ol.geom.GeometryLayout.XY
+    default: 'XY'
   }
 }
 
@@ -33,25 +36,31 @@ const methods = {
   },
   getExtent () {
     return this.geometry.getExtent()
+  },
+  setCoordinates (coordinates) {
+    this.geometry.setCoordinates(ol.proj.fromLonLat(coordinates, this.view.getProjection()))
+  },
+  getCoordinates () {
+    return ol.proj.toLonLat(this.geometry.getCoordinates(), this.view.getProjection())
   }
-  // todo export other ol.geom.SimpleGeometry methods
 }
 
 const watch = {
   coordinates: {
     deep: true,
     handler (value) {
-      this.geometry.setCoordinates(value)
+      this.setCoordinates(value)
     }
   }
 }
 
 export default {
   mixins: [ exposeInject, rxSubs ],
-  inject: [ 'feature' ],
+  inject: [ 'feature', 'view' ],
   props,
   watch,
   methods,
+  render: h => h(),
   created () {
     /**
      * @type {ol.geom.SimpleGeometry}
@@ -62,9 +71,17 @@ export default {
   },
   mounted () {
     this.feature.setGeometry(this.geometry)
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('mount geom', this)
+    }
   },
   beforeDestroy () {
     this.feature.setGeometry(undefined)
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('unmount geom', this)
+    }
   },
   destroyed () {
     this.geometry = undefined

@@ -1,6 +1,8 @@
 <template>
   <div class="vl-map">
     <div class="map" ref="map"></div>
+    <slot name="view"></slot>
+    <slot name="layers"></slot>
     <slot></slot>
   </div>
 </template>
@@ -39,6 +41,7 @@
     expose () {
       return {
         map: this.map,
+        view: this.map.getView(),
         serviceOverlay: this.serviceOverlay
       }
     }

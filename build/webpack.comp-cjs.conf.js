@@ -19,12 +19,12 @@ let externals = {}
 
 config.modules.map.forEach(mod => {
   baseWebpackConfig.entry[ mod.name ] = path.resolve(__dirname, '../src', mod.path)
-  externals[ `${config.name}/src/${mod.path}` ] = `${config.name}/dist/${mod.name}`
+  externals[ `${config.name}/src/${mod.path}` ] = `${config.name}/dist/cjs/${mod.name}`
 })
 
 const webpackConfig = merge(baseWebpackConfig, {
   output: {
-    filename: '[name]/index.js',
+    filename: 'cjs/[name]/index.js',
     library: '[name]',
     libraryTarget: 'commonjs2'
   },
@@ -46,7 +46,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     }),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: '[name]/style.css'
+      filename: 'cjs/[name]/style.css'
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.

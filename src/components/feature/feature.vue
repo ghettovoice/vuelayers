@@ -13,25 +13,21 @@
   }
 
   const methods = {
-    /**
-     * @return {ol.Feature}
-     * @protected
-     */
-    createFeature () {
-      return new ol.Feature({
-        ...this.data,
-        id: this.id
-      })
-    },
     refresh () {
       this.feature.changed()
+    },
+    expose () {
+      return {
+        ...this.$parent.expose(),
+        feature: this.feature
+      }
     }
   }
 
   export default {
     name: 'vl-feature',
     mixins: [ exposeInject, rxSubs ],
-    inject: [ 'layer', 'source' ],
+    inject: [ 'layer', 'source', 'map', 'view' ],
     props,
     methods,
     render (h) {
@@ -46,19 +42,34 @@
        * @type {ol.Feature}
        * @protected
        */
-      this.feature = this.createFeature()
+      this.feature = this::createFeature()
       this.feature.vm = this
       this.feature.layer = this.layer
     },
     mounted () {
       this.source.addFeature(this.feature)
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('mount feature', this)
+      }
     },
     beforeDestroy () {
       this.source.removeFeature(this.feature)
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('unmount feature', this)
+      }
     },
     destroyed () {
       this.feature = undefined
     }
+  }
+
+  function createFeature () {
+    return new ol.Feature({
+      ...this.data,
+      id: this.id
+    })
   }
 </script>
 

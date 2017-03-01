@@ -12,7 +12,7 @@
 
   const methods = {
     createGeometry () {
-      return new ol.geom.Polygon(this.coordinates)
+      return new ol.geom.Polygon(ol.proj.fromLonLat(this.coordinates, this.view.getProjection()))
     }
   }
 

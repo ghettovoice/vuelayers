@@ -35,7 +35,7 @@ const methods = {
       projection: this.projection,
       extent: this.extent,
       zIndex: this.zIndex,
-      style: this.createStyleFunc(),
+      // style: this.createStyleFunc(),
       updateWhileAnimating: this.updateWhileAnimating,
       updateWhileInteracting: this.updateWhileInteracting
     })
