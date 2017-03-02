@@ -13,7 +13,12 @@
   import style from 'vl-components/style/style'
 
   const props = {
-    zIndex: Number
+    zIndex: Number,
+    // todo продумать до конца. condition будет проверяться в styleFunction, если функция - то будет вызвана в контексте { feature, resolution }
+    condition: {
+      type: [ Function, Boolean ],
+      default: true
+    }
   }
 
   const methods = {
@@ -30,18 +35,14 @@
       })
     },
     mountStyle () {
-      if (!this.styleTarget) return
-
-      let currentStyle = this.styleTarget.getStyle() || []
+      let currentStyle = this.getStyle() || []
       currentStyle.push(this.style)
-      this.styleTarget.setStyle(currentStyle)
+      this.setStyle(currentStyle)
     },
     unmountStyle () {
-      if (!this.styleTarget) return
-
-      let currentStyle = (this.styleTarget.getStyle() || []).filter(style => style !== this.style)
+      let currentStyle = (this.getStyle() || []).filter(style => style !== this.style)
       currentStyle.length || (currentStyle = undefined)
-      this.styleTarget.setStyle(currentStyle)
+      this.setStyle(currentStyle)
     },
     getStyleTarget () {
       return {
@@ -61,9 +62,17 @@
   export default {
     name: 'vl-style-container',
     mixins: [ style ],
+    inject: [ 'setStyle', 'getStyle' ],
     props,
     methods,
-    watch
+    watch,
+    provide () {
+      return {
+        setFill: this::setFill,
+        setStroke: this::setStroke,
+        setImage: this::setImage
+      }
+    }
   }
 
   function setFill (fill) {

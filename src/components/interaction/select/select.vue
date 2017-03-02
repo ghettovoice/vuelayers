@@ -40,21 +40,13 @@
       const style = this.styles && this.styles.length
         ? () => this.styles
         : undefined
+      const serviceFeatures = this.serviceOverlay().getSource().getFeatures()
 
       return new ol.interaction.Select({
         multi: this.multi,
-        filter: feature => !this.serviceOverlay.getSource().getFeatures().includes(feature),
+        filter: feature => !serviceFeatures.includes(feature),
         style
       })
-    },
-    /**
-     * @protected
-     */
-    getStyleTarget () {
-      return {
-        setStyle: this::setStyle,
-        getStyle: this::getStyle
-      }
     },
     refresh () {
       this.interaction.getFeatures().changed()
@@ -72,7 +64,7 @@
      */
     select (id) {
       const selection = this.interaction.getFeatures()
-      const layers = this.map.getLayers()
+      const layers = this.map().getLayers()
         .getArray()
         .filter(layer => layer.vm && layer instanceof ol.layer.Vector)
 
@@ -113,10 +105,16 @@
   export default {
     name: 'vl-interaction-select',
     mixins: [ interaction ],
+    inject: [ 'map', 'serviceOverlay' ],
     props,
-//    computed,
     methods,
     watch,
+    provide () {
+      return {
+        setStyle: this::setStyle,
+        getStyle: this::getStyle
+      }
+    },
     data () {
       return {
         currentSelected: this.selected.slice()

@@ -4,7 +4,6 @@
  * Injects styleTarget from parent to apply self style.
  */
 import { debounce } from 'lodash/fp'
-import exposeInject from 'vl-mixins/expose-inject'
 
 const methods = {
   /**
@@ -32,19 +31,7 @@ const methods = {
    *
    * @protected
    */
-  getStyleTarget () {
-    return this.style
-  },
-  /**
-   * @return {{styleTarget: *}}
-   * @protected
-   */
-  expose () {
-    return {
-      ...this.$parent.expose(),
-      styleTarget: this.getStyleTarget()
-    }
-  },
+  getStyleTarget () { },
   /**
    * @protected
    */
@@ -63,8 +50,6 @@ const methods = {
 }
 
 export default {
-  mixins: [ exposeInject ],
-  inject: [ 'styleTarget' ],
   methods,
   render: h => h(),
   mounted () {

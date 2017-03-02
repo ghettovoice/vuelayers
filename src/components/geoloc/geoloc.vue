@@ -8,7 +8,6 @@
   import 'rxjs/add/operator/map'
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
-  import exposeInject from 'vl-mixins/expose-inject'
   import rxSubs from 'vl-mixins/rx-subs'
   import positionMarker from './position-marker.svg'
 
@@ -33,8 +32,8 @@
 
   export default {
     name: 'vl-geoloc',
-    mixins: [ exposeInject, rxSubs ],
-    inject: [ 'map', 'serviceOverlay' ],
+    mixins: [ rxSubs ],
+    inject: [ 'serviceOverlay' ],
     props,
     watch,
     methods,
@@ -51,7 +50,7 @@
     },
     beforeDestroy () {
       this.geoloc.setTracking(false)
-      this.serviceOverlay.getSource().removeFeature(this.positionFeature)
+      this.serviceOverlay().getSource().removeFeature(this.positionFeature)
     },
     destroyed () {
       this.geoloc = this.positionFeature = undefined
@@ -86,7 +85,7 @@
         anchor: [ 0.5, 1 ]
       })
     }))
-    this.serviceOverlay.getSource().addFeature(this.positionFeature)
+    this.serviceOverlay().getSource().addFeature(this.positionFeature)
 
     return this.geoloc
   }

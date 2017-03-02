@@ -1,5 +1,4 @@
 import rxSubs from 'vl-mixins/rx-subs'
-import exposeInject from 'vl-mixins/expose-inject'
 
 const props = {}
 
@@ -26,31 +25,13 @@ const methods = {
    * @protected
    */
   mountInteraction () {
-    this.map.addInteraction(this.interaction)
+    this.map().addInteraction(this.interaction)
   },
   /**
    * @protected
    */
   unmountInteraction () {
-    this.map.removeInteraction(this.interaction)
-  },
-  /**
-   * @return {{}}
-   * @protected
-   */
-  getStyleTarget () {
-    return {}
-  },
-  /**
-   * @return {Object}
-   * @protected
-   */
-  expose () {
-    return {
-      ...this.$parent.expose(),
-      interaction: this.interaction,
-      styleTarget: this.getStyleTarget()
-    }
+    this.map().removeInteraction(this.interaction)
   },
   refresh () {
     this.interaction.changed()
@@ -58,10 +39,15 @@ const methods = {
 }
 
 export default {
-  mixins: [ exposeInject, rxSubs ],
-  inject: [ 'map', 'view', 'serviceOverlay' ],
+  mixins: [ rxSubs ],
+  inject: [ 'map' ],
   props,
   methods,
+  provide () {
+    return {
+      interaction: () => this.interaction
+    }
+  },
   render (h) {
     return h('i', {
       style: {

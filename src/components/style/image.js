@@ -2,19 +2,18 @@ import { debounce } from 'lodash/fp'
 import style from 'vl-components/style/style'
 
 const styleRefresh = style.methods.refresh
-
 const methods = {
   /**
    * @protected
    */
   mountStyle () {
-    this.styleTarget && this.styleTarget.setImage(this.style)
+    this.setImage(this.style)
   },
   /**
    * @protected
    */
   unmountStyle () {
-    this.styleTarget && this.styleTarget.setImage(undefined)
+    this.setImage(undefined)
   },
   refresh: debounce(100, function () {
     this.initialize()
@@ -24,6 +23,7 @@ const methods = {
 
 export default {
   mixins: [ style ],
+  inject: [ 'setImage' ],
   methods,
   render (h) {
     return h('i', {

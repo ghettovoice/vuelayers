@@ -35,9 +35,9 @@ map:
     path: mixins/rx-subs
     alias: vl-mixins/rx-subs
 
-  - name: mixins/expose-inject
-    path: mixins/expose-inject
-    alias: vl-mixins/expose-inject
+#  - name: mixins/expose-inject
+#    path: mixins/expose-inject
+#    alias: vl-mixins/expose-inject
 
 #####################################################################
 #   COMMON COMPONENTS

@@ -49,7 +49,13 @@
     mixins: [ imageStyle ],
     props,
     methods,
-    watch
+    watch,
+    provide () {
+      return {
+        setFill: this::setFill,
+        setStroke: this::setStroke
+      }
+    }
   }
 
   function setFill (fill) {

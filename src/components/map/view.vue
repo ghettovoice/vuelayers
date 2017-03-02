@@ -7,8 +7,7 @@
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/map'
   import 'vl-rx'
-  import { errordbg } from 'vl-utils/debug'
-  import exposeInject from 'vl-mixins/expose-inject'
+  import { errordbg, warn } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
   import { consts as olConsts } from 'vl-ol'
 
@@ -80,12 +79,6 @@
     refresh () {
       this.view.changed()
     },
-    expose () {
-      return {
-        ...this.$parent.expose(),
-        view: this.view
-      }
-    },
     setCurrentView ({ center, zoom, rotation }) {
       if (center != null && !isEqual(center, this.currentCenter)) {
         this.view.setCenter(center)
@@ -96,6 +89,22 @@
       if (rotation != null && rotation !== this.currentRotation) {
         this.view.setRotation(rotation)
       }
+    },
+    mountView () {
+      let view = this.map().getView()
+
+      if (view && view.vm) {
+        if (process.env.NODE_ENV !== 'production') {
+          warn('Map already has unmounted vl-view component. ' +
+               'It will be replaced with new.')
+        }
+        view.vm.unmountView()
+      }
+
+      this.map().setView(this.view)
+    },
+    unmountView () {
+      this.map().setView(undefined)
     }
   }
 
@@ -114,7 +123,7 @@
   export default {
     name: 'vl-map-view',
     inject: [ 'map' ],
-    mixins: [ exposeInject, rxSubs ],
+    mixins: [ rxSubs ],
     props,
     methods,
     watch,
@@ -131,10 +140,10 @@
       this::subscribeToViewChanges()
     },
     mounted () {
-      this.map.setView(this.view)
+      this.mountView()
     },
     beforeDestroy () {
-      this.map.setView(undefined)
+      this.unmountView()
     },
     destroyed () {
       this.view = undefined

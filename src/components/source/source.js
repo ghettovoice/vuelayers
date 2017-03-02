@@ -1,4 +1,3 @@
-import exposeInject from 'vl-mixins/expose-inject'
 import rxSubs from 'vl-mixins/rx-subs'
 import { consts as olConsts } from 'vl-ol'
 
@@ -36,23 +35,13 @@ const methods = {
     throw new Error('Not implemented method')
   },
   mountSource () {
-    this.layer.setSource(this.source)
+    this.layer().setSource(this.source)
   },
   unmountSource () {
-    this.layer.setSource(undefined)
+    this.layer().setSource(undefined)
   },
   refresh () {
     this.source.changed()
-  },
-  /**
-   * @return {{source: *}}
-   * @protected
-   */
-  expose () {
-    return {
-      ...this.$parent.expose(),
-      source: this.source
-    }
   }
 }
 
@@ -66,11 +55,16 @@ const watch = {
 }
 
 export default {
-  mixins: [ exposeInject, rxSubs ],
-  inject: [ 'layer', 'map', 'view' ],
+  mixins: [ rxSubs ],
+  inject: [ 'layer' ],
   props,
   methods,
   watch,
+  provide () {
+    return {
+      source: () => this.source
+    }
+  },
   render (h) {
     return h('i', {
       style: {

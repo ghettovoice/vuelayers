@@ -12,7 +12,6 @@
   import uuid from 'node-uuid'
   import { omit } from 'lodash/fp'
   import rxSubs from 'vl-mixins/rx-subs'
-  import exposeInject from 'vl-mixins/expose-inject'
 
   const props = {
     id: {
@@ -30,7 +29,7 @@
       return {
         ...this.$data,
         ...this.$props,
-        layer: this.layer.vm.id
+        layer: this.layer() && this.layer().vm.id
       }
     }
   }
@@ -38,22 +37,6 @@
   const methods = {
     refresh () {
       this.feature.changed()
-    },
-    /**
-     * @return {{setStyle: function, getStyle: function}}
-     * @protected
-     */
-    getStyleTarget () {
-      return {
-        setStyle: this::setStyle,
-        getStyle: this::getStyle
-      }
-    },
-    expose () {
-      return Object.assign(this.$parent.expose(), {
-        feature: this.feature,
-        styleTarget: this.getStyleTarget()
-      })
     }
   }
 
@@ -68,20 +51,27 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [ exposeInject, rxSubs ],
-    inject: [ 'layer', 'source', 'map', 'view' ],
+    mixins: [ rxSubs ],
+    inject: [ 'layer', 'source' ],
     props,
     methods,
     watch,
     computed,
+    provide () {
+      return {
+        feature: () => this.feature,
+        setStyle: this::setStyle,
+        getStyle: this::getStyle
+      }
+    },
     created () {
       this::createFeature()
     },
     mounted () {
-      this.source.addFeature(this.feature)
+      this.source().addFeature(this.feature)
     },
     beforeDestroy () {
-      this.source.removeFeature(this.feature)
+      this.source().removeFeature(this.feature)
     },
     destroyed () {
       this.feature = undefined
@@ -102,7 +92,6 @@
     this.feature = new ol.Feature(omit([ 'geometry' ], this.data))
     this.feature.setId(this.id)
     this.feature.vm = this
-    this.feature.layer = this.layer
 
     return this.feature
   }

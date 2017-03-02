@@ -44,13 +44,13 @@
      * @protected
      */
     mountStyle () {
-      this.styleTarget && this.styleTarget.setStroke(this.style)
+      this.setStroke(this.style)
     },
     /**
      * @protected
      */
     unmountStyle () {
-      this.styleTarget && this.styleTarget.setStroke(undefined)
+      this.setStroke(undefined)
     }
   }
 
@@ -81,6 +81,7 @@
   export default {
     name: 'vl-style-stroke',
     mixins: [ style ],
+    inject: [ 'setStroke' ],
     props,
     watch,
     methods

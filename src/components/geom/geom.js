@@ -4,7 +4,6 @@ import 'rxjs/add/operator/throttleTime'
 import 'rxjs/add/operator/distinctUntilChanged'
 import 'rxjs/add/operator/map'
 import 'vl-rx'
-import exposeInject from 'vl-mixins/expose-inject'
 import rxSubs from 'vl-mixins/rx-subs'
 import { coord as coordHelper } from 'vl-ol'
 
@@ -45,8 +44,8 @@ const methods = {
      */
     this.coordTransform = coordHelper.coordTransform[ this.geometry.getType() ]
 
-    this.currentCoordinates = this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view.getProjection())
-    this.currentExtent = coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
+    this.currentCoordinates = this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view().getProjection())
+    this.currentExtent = coordHelper.extentToLonLat(this.geometry.getExtent(), this.view().getProjection())
 
     this::subscribeToGeomChanges()
   },
@@ -61,42 +60,37 @@ const methods = {
    * @protected
    */
   mountGeometry () {
-    this.feature.setGeometry(this.geometry)
+    this.feature().setGeometry(this.geometry)
   },
   /**
    * @protected
    */
   unmountGeometry () {
-    this.feature.setGeometry(undefined)
+    this.feature().setGeometry(undefined)
   },
   refresh () {
     this.geometry.changed()
-  },
-  /**
-   * @return {{geometry: *}}
-   * @protected
-   */
-  expose () {
-    return {
-      ...this.$parent.expose(),
-      geometry: this.geometry
-    }
   }
 }
 
 const watch = {
   coordinates (value) {
-    this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view.getProjection()))
+    this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view().getProjection()))
   }
 }
 
 export default {
-  mixins: [ exposeInject, rxSubs ],
-  inject: [ 'feature', 'view' ],
+  mixins: [ rxSubs ],
+  inject: [ 'view', 'feature' ],
   props,
   computed,
   watch,
   methods,
+  provide () {
+    return {
+      geometry: () => this.geometry
+    }
+  },
   render: h => h(),
   data () {
     return {
@@ -123,8 +117,8 @@ function subscribeToGeomChanges () {
     .throttleTime(100)
     .map(() => {
       return [
-        this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view.getProjection()),
-        coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
+        this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view().getProjection()),
+        coordHelper.extentToLonLat(this.geometry.getExtent(), this.view().getProjection())
       ]
     })
     .distinctUntilChanged((a, b) => isEqual(a, b))

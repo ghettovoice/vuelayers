@@ -6,7 +6,6 @@
 
 <script rel="text/babel">
   import ol from 'openlayers'
-  import exposeInject from 'vl-mixins/expose-inject'
 
   const props = {
     loadTilesWhileAnimating: {
@@ -41,21 +40,20 @@
     focus () {
       this.$el.tabIndex = 0
       this.$el.focus()
-    },
-    expose () {
-      return {
-        map: this.map,
-        view: this.map.getView(),
-        serviceOverlay: this.serviceOverlay
-      }
     }
   }
 
   export default {
     name: 'vl-map',
-    mixins: [ exposeInject ],
     props,
     methods,
+    provide () {
+      return {
+        map: () => this.map,
+        serviceOverlay: () => this.serviceOverlay,
+        view: () => this.map.getView()
+      }
+    },
     created () {
       this::createMap()
     },

@@ -1,5 +1,4 @@
 import uuid from 'node-uuid'
-import exposeInject from 'vl-mixins/expose-inject'
 import rxSubs from 'vl-mixins/rx-subs'
 
 const props = {
@@ -57,23 +56,13 @@ const methods = {
    * @protected
    */
   mountLayer () {
-    this.map.addLayer(this.layer)
+    this.map().addLayer(this.layer)
   },
   /**
    * @protected
    */
   unmountLayer () {
-    this.map.removeLayer(this.layer)
-  },
-  /**
-   * @return {{layer: *}}
-   * @protected
-   */
-  expose () {
-    return {
-      ...this.$parent.expose(),
-      layer: this.layer
-    }
+    this.map().removeLayer(this.layer)
   }
 }
 
@@ -96,11 +85,16 @@ const watch = {
 }
 
 export default {
-  mixins: [ exposeInject, rxSubs ],
-  inject: [ 'map', 'view' ],
+  mixins: [ rxSubs ],
+  inject: [ 'map' ],
   props,
   methods,
   watch,
+  provide () {
+    return {
+      layer: () => this.layer
+    }
+  },
   render (h) {
     return h('i', {
       style: {

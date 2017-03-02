@@ -13,7 +13,7 @@
 
   const methods = {
     createGeometry () {
-      return new ol.geom.MultiPolygon(coordHelper.multiPolygonFromLonLat(this.coordinates, this.view.getProjection()))
+      return new ol.geom.MultiPolygon(coordHelper.multiPolygonFromLonLat(this.coordinates, this.view().getProjection()))
     }
   }
 

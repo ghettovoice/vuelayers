@@ -23,13 +23,13 @@
      * @protected
      */
     mountStyle () {
-      this.styleTarget && this.styleTarget.setFill(this.style)
+      this.setFill(this.style)
     },
     /**
      * @protected
      */
     unmountStyle () {
-      this.styleTarget && this.styleTarget.setFill(undefined)
+      this.setFill(undefined)
     }
   }
 
@@ -43,6 +43,7 @@
   export default {
     name: 'vl-style-fill',
     mixins: [ style ],
+    inject: [ 'setFill' ],
     props,
     methods,
     watch

@@ -15,8 +15,6 @@ const props = {
   // renderBuffer: Number
 }
 
-const layerExpose = layer.methods.expose
-
 const methods = {
   createLayer () {
     return new ol.layer.Vector({
@@ -32,18 +30,6 @@ const methods = {
       updateWhileAnimating: this.updateWhileAnimating,
       updateWhileInteracting: this.updateWhileInteracting
     })
-  },
-  getStyleTarget () {
-    return {
-      setStyle: this::setStyle,
-      getStyle: this::getStyle
-    }
-  },
-  expose () {
-    return {
-      ...this::layerExpose(),
-      styleTarget: this.getStyleTarget()
-    }
   }
 }
 
@@ -51,6 +37,13 @@ export default {
   mixins: [ layer ],
   props,
   methods,
+  provide () {
+    return {
+      layer: () => this.layer,
+      setStyle: this::setStyle,
+      getStyle: this::getStyle
+    }
+  },
   render (h) {
     return h('i', {
       style: {
