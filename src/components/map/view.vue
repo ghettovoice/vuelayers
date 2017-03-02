@@ -55,6 +55,15 @@
     }
   }
 
+  const computed = {
+    changes () {
+      this.currentZoom
+      this.currentCenter
+      this.currentRotation
+      return Date.now()
+    }
+  }
+
   const methods = {
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
@@ -91,12 +100,24 @@
     }
   }
 
+  const watch = {
+    changes () {
+      this.$emit('change', {
+        center: this.currentCenter,
+        zoom: this.currentZoom,
+        rotation: this.currentRotation
+      })
+    }
+  }
+
   export default {
     name: 'vl-map-view',
     inject: [ 'map' ],
     mixins: [ exposeInject, rxSubs ],
     props,
+    computed,
     methods,
+    watch,
     render: h => h(),
     data () {
       return {
@@ -159,7 +180,6 @@
         this.currentZoom = zoom
         this.currentCenter = center
         this.currentRotation = rotation
-        this.$emit('change', center, zoom, rotation)
       },
       errordbg
     )

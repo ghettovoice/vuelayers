@@ -7,8 +7,6 @@
 <script rel>
   /**
    * Wrapper around ol.Feature.
-   *
-   * Emits select/deselect events by select interaction
    */
   import ol from 'openlayers'
   import uuid from 'node-uuid'
@@ -60,9 +58,6 @@
   }
 
   const watch = {
-    selected (value) {
-      this.$emit('select', value)
-    },
     id (value) {
       this.feature.setId(value)
     },
@@ -79,11 +74,6 @@
     methods,
     watch,
     computed,
-    data () {
-      return {
-        selected: false
-      }
-    },
     created () {
       /**
        * @type {ol.Feature}

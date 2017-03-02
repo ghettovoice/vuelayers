@@ -19,12 +19,26 @@
     }
   }
 
+  const computed = {
+    changes () {
+      this.currentPosition
+      this.currentAccuracy
+      return Date.now()
+    }
+  }
+
   const watch = {
     tracking (value) {
       this.geoloc.setTracking(value)
     },
     refresh () {
       this.geoloc.changed()
+    },
+    changes () {
+      this.$emit('change', {
+        position: this.currentPosition,
+        accuracy: this.currentAccuracy
+      })
     }
   }
 
@@ -33,6 +47,7 @@
     mixins: [ exposeInject, rxSubs ],
     inject: [ 'map', 'serviceOverlay' ],
     props,
+    computed,
     watch,
     render: h => h(),
     data () {
@@ -103,8 +118,6 @@
       ([ position, accuracy ]) => {
         this.currentPosition = position
         this.currentAccuracy = accuracy
-
-        this.$emit('change', position, accuracy)
       },
       errordbg
     )

@@ -4,7 +4,7 @@
       <vl-map-view @change="viewChanged"/>
       <vl-geoloc/>
 
-      <vl-interaction-select>
+      <vl-interaction-select ref="select">
         <vl-style-container>
           <vl-style-stroke color="#D421E5"/>
           <vl-style-fill color="#E5BC15"/>
@@ -19,7 +19,7 @@
         <vl-source-osm/>
       </vl-layer-tile>
 
-      <vl-layer-vector>
+      <vl-layer-vector id="vector">
         <vl-style-container>
           <vl-style-stroke color="#13A838" :width="stroke"/>
           <vl-style-fill :color="color"/>
@@ -73,6 +73,7 @@
         Change color
       </button>
       <button @click="stroke = Math.ceil(Math.random() * 10)">Change stroke</button>
+      <button @click="deselect">Deselect</button>
     </div>
   </div>
 </template>
@@ -83,6 +84,9 @@
     methods: {
       viewChanged ({ zoom }) {
         this.zoom = zoom
+      },
+      deselect () {
+        this.$refs.select.deselect([ { id: 1, layer: 'vector' } ])
       }
     },
     data () {

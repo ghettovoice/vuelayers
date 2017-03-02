@@ -1,5 +1,6 @@
 <script>
   import ol from 'openlayers'
+  import { flow, forEach, filter } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/map'
@@ -18,8 +19,13 @@
     }
   }
 
-  const interactionRefresh = interaction.methods.refresh
+  const computed = {
+    selectedIds () {
+      return this.selected.map(f => f.id)
+    }
+  }
 
+  const interactionRefresh = interaction.methods.refresh
   const methods = {
     /**
      * @return {ol.interaction.Select}
@@ -47,8 +53,54 @@
       this::interactionRefresh()
     },
     recreate () {
+      this.rxSubs.select.unsubscribe()
       this.interaction = this.createInteraction()
       this.interaction.vm = this
+      this::subscribeToSelect()
+    },
+    /**
+     * @param {Object[]} features
+     */
+    select (features) {
+      const selection = this.interaction.getFeatures()
+      const layers = this.map.getLayers().getArray()
+        .filter(layer => layer instanceof ol.layer.Vector && layer.vm)
+
+      const pushFeatures = flow(
+        filter(f => !this.selectedIds.includes(f.id)),
+        forEach(f => {
+          const layer = layers.find(layer => layer.vm.id === f.layer)
+
+          if (layer) {
+            selection.push(layer.getSource().getFeatureById(f.id))
+          }
+        })
+      )
+
+      pushFeatures(features)
+      this.refresh()
+    },
+    /**
+     * @param {Object[]} features
+     */
+    deselect (features) {
+      const selection = this.interaction.getFeatures()
+      const selectionArray = selection.getArray()
+      console.log(selectionArray, features)
+      features.forEach(f => {
+        const idx = selectionArray.findIndex(feature => feature.getId() === f.id)
+
+        if (idx !== -1) {
+          selection.removeAt(idx)
+        }
+      })
+      this.refresh()
+    }
+  }
+
+  const watch = {
+    selected () {
+      this.$emit('select', this.selected)
     }
   }
 
@@ -56,7 +108,14 @@
     name: 'vl-interaction-select',
     mixins: [ interaction ],
     props,
+    computed,
     methods,
+    watch,
+    data () {
+      return {
+        selected: []
+      }
+    },
     created () {
       this::subscribeToSelect()
     }
@@ -78,21 +137,11 @@
   function subscribeToSelect () {
     this.rxSubs.select = Observable.fromOlEvent(this.interaction, 'select')
       .throttleTime(100)
-      .map(({ selected, deselected }) => ({
-        selected: selected.map(feature => feature.vm),
-        deselected: deselected.map(feature => feature.vm)
-      }))
+      .map(({ selected }) => selected.map(feature => feature.vm.plain))
       .subscribe(
-        ({ selected, deselected }) => {
-          selected = selected.map(vm => {
-            vm.selected = true
-            return vm.plain
-          })
-          deselected = deselected.map(vm => {
-            vm.selected = false
-            return vm.plain
-          })
-          this.$emit('select', selected, deselected)
+        selected => {
+          console.log(1)
+          this.selected = selected
         },
         errordbg
       )
