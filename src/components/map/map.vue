@@ -7,7 +7,7 @@
 
 <script rel="text/babel">
   import ol from 'openlayers'
-  import exposeInject from 'vuelayers/src/mixins/expose-inject'
+  import exposeInject from 'vl-mixins/expose-inject'
 
   const props = {
     loadTilesWhileAnimating: {

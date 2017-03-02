@@ -1,6 +1,6 @@
-import exposeInject from 'vuelayers/src/mixins/expose-inject'
-import rxSubs from 'vuelayers/src/mixins/rx-subs'
-import { consts as olConsts } from 'vuelayers/src/ol'
+import exposeInject from 'vl-mixins/expose-inject'
+import rxSubs from 'vl-mixins/rx-subs'
+import { consts as olConsts } from 'vl-ol'
 
 const props = {
   attributions: String,

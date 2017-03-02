@@ -1,6 +1,6 @@
 <template>
   <i style="display: none !important;">
-    <slot></slot>
+    <slot :feature="plain"></slot>
   </i>
 </template>
 
@@ -13,8 +13,8 @@
   import ol from 'openlayers'
   import uuid from 'node-uuid'
   import { omit } from 'lodash/fp'
-  import rxSubs from 'vuelayers/src/mixins/rx-subs'
-  import exposeInject from 'vuelayers/src/mixins/expose-inject'
+  import rxSubs from 'vl-mixins/rx-subs'
+  import exposeInject from 'vl-mixins/expose-inject'
 
   const props = {
     id: {
@@ -121,10 +121,14 @@
     this.styles = style
 
     if (this.feature) {
-      this.feature.setStyle((feature, resolution) => {
-        // todo implement conditions on vl-style-container
-        return this.styles
-      })
+      if (this.styles && this.styles.length) {
+        this.feature.setStyle((feature, resolution) => {
+          // todo implement conditions on vl-style-container
+          return this.styles
+        })
+      } else {
+        this.feature.setStyle(undefined)
+      }
       this.refresh()
     }
   }

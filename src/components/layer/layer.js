@@ -1,6 +1,6 @@
 import uuid from 'node-uuid'
-import exposeInject from 'vuelayers/src/mixins/expose-inject'
-import rxSubs from 'vuelayers/src/mixins/rx-subs'
+import exposeInject from 'vl-mixins/expose-inject'
+import rxSubs from 'vl-mixins/rx-subs'
 
 const props = {
   id: {

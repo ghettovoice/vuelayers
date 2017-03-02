@@ -3,9 +3,9 @@
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/map'
-  import 'vuelayers/src/rx'
-  import { errordbg } from 'vuelayers/src/utils/debug'
-  import interaction from 'vuelayers/src/mixins/interaction/interaction'
+  import 'vl-rx'
+  import { errordbg } from 'vl-utils/debug'
+  import interaction from 'vl-components/interaction/interaction'
 
   const props = {
     multi: {
@@ -18,11 +18,22 @@
     }
   }
 
+  const interactionRefresh = interaction.methods.refresh
+
   const methods = {
+    /**
+     * @return {ol.interaction.Select}
+     * @protected
+     */
     createInteraction () {
+      const style = this.styles && this.styles.length
+        ? () => this.styles
+        : undefined
+
       return new ol.interaction.Select({
         multi: this.multi,
-        filter: feature => !this.serviceOverlay.getSource().getFeatures().includes(feature)
+        filter: feature => !this.serviceOverlay.getSource().getFeatures().includes(feature),
+        style
       })
     },
     getStyleTarget () {
@@ -30,6 +41,14 @@
         setStyle: this::setStyle,
         getStyle: this::getStyle
       }
+    },
+    refresh () {
+      this.interaction.getFeatures().changed()
+      this::interactionRefresh()
+    },
+    recreate () {
+      this.interaction = this.createInteraction()
+      this.interaction.vm = this
     }
   }
 
@@ -46,11 +65,8 @@
   function setStyle (style) {
     this.styles = style
 
-    if (this.layer) {
-      this.layer.setStyle((feature, resolution) => {
-        // todo implement conditions on vl-style-container
-        return this.styles
-      })
+    if (this.interaction) {
+      this.recreate()
       this.refresh()
     }
   }

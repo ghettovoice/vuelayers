@@ -4,7 +4,16 @@
       <vl-map-view @change="viewChanged"/>
       <vl-geoloc/>
 
-      <vl-interaction-select/>
+      <vl-interaction-select>
+        <vl-style-container>
+          <vl-style-stroke color="#D421E5"/>
+          <vl-style-fill color="#E5BC15"/>
+          <vl-style-circle :radius="15">
+            <vl-style-stroke color="#D421E5"/>
+            <vl-style-fill color="#E5BC15"/>
+          </vl-style-circle>
+        </vl-style-container>
+      </vl-interaction-select>
 
       <vl-layer-tile>
         <vl-source-osm/>
@@ -23,6 +32,19 @@
 
         <vl-source-vector>
           <vl-feature v-for="feature in features" :key="feature.id" :id="feature.id" :data="feature.data">
+            <!--<template scope="ctx">-->
+              <!--<vl-style-container v-if="ctx.feature.selected">-->
+                <!--<vl-style-stroke color="#E5000B" :width="stroke"/>-->
+                <!--<vl-style-fill color="#3AE525"/>-->
+                <!--<vl-style-circle :radius="20">-->
+                  <!--<vl-style-stroke color="#E5000B" :width="stroke"/>-->
+                  <!--<vl-style-fill color="#3AE525"/>-->
+                <!--</vl-style-circle>-->
+              <!--</vl-style-container>-->
+
+              <component :is="feature.geometry.type" :coordinates="feature.geometry.coordinates"/>
+            <!--</template>-->
+
             <!--<vl-style-container v-if="zoom > 2">-->
               <!--<vl-style-stroke color="#13A838" :width="stroke"/>-->
               <!--<vl-style-fill :color="color"/>-->
@@ -40,8 +62,6 @@
                 <!--<vl-style-fill :color="feature.data.color"/>-->
               <!--</vl-style-circle>-->
             <!--</vl-style-container>-->
-
-            <component :is="feature.geometry.type" :coordinates="feature.geometry.coordinates"/>
           </vl-feature>
         </vl-source-vector>
       </vl-layer-vector>

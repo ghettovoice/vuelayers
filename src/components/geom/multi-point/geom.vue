@@ -1,7 +1,7 @@
 <script>
   import ol from 'openlayers'
-  import geom from 'vuelayers/src/mixins/geom'
-  import { coord as coordHelper } from 'vuelayers/src/ol'
+  import geom from 'vl-components/geom/geom'
+  import { coord as coordHelper } from 'vl-ol'
 
   const props = {
     coordinates: {

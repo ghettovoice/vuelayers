@@ -1,9 +1,9 @@
 import ol from 'openlayers'
 import { pick } from 'lodash/fp'
 import { createTileUrlFunction } from 'ol3-tilecache'
-import { replaceTokens } from 'vuelayers/src/utils/func'
-import source from 'vuelayers/src/mixins/source/source'
-import { consts as olConsts } from 'vuelayers/src/ol'
+import { replaceTokens } from 'vl-utils/func'
+import source from 'vl-components/source/source'
+import { consts as olConsts } from 'vl-ol'
 
 const props = {
   url: {

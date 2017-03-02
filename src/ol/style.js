@@ -1,6 +1,6 @@
 import ol from 'openlayers'
 import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce } from 'lodash/fp'
-import { isNumeric } from 'vuelayers/src/utils/func'
+import { isNumeric } from 'vl-utils/func'
 
 const reduceWithKey = reduce.convert({ cap: false })
 

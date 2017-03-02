@@ -3,10 +3,10 @@ import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/operator/throttleTime'
 import 'rxjs/add/operator/distinctUntilChanged'
 import 'rxjs/add/operator/map'
-import 'vuelayers/src/rx'
-import exposeInject from 'vuelayers/src/mixins/expose-inject'
-import rxSubs from 'vuelayers/src/mixins/rx-subs'
-import { coord as coordHelper } from 'vuelayers/src/ol'
+import 'vl-rx'
+import exposeInject from 'vl-mixins/expose-inject'
+import rxSubs from 'vl-mixins/rx-subs'
+import { coord as coordHelper } from 'vl-ol'
 
 const props = {
   /**

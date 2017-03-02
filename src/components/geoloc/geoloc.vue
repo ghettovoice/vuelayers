@@ -6,10 +6,10 @@
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/map'
-  import 'vuelayers/src/rx'
-  import { errordbg } from 'vuelayers/src/utils/debug'
-  import exposeInject from 'vuelayers/src/mixins/expose-inject'
-  import rxSubs from 'vuelayers/src/mixins/rx-subs'
+  import 'vl-rx'
+  import { errordbg } from 'vl-utils/debug'
+  import exposeInject from 'vl-mixins/expose-inject'
+  import rxSubs from 'vl-mixins/rx-subs'
   import positionMarker from './position-marker.svg'
 
   const props = {
@@ -104,7 +104,7 @@
         this.currentPosition = position
         this.currentAccuracy = accuracy
 
-        this.$emit('change', { position, accuracy })
+        this.$emit('change', position, accuracy)
       },
       errordbg
     )

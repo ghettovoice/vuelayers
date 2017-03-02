@@ -1,5 +1,5 @@
 <script>
-  import vectorLayer from 'vuelayers/src/mixins/layer/vector'
+  import vectorLayer from 'vl-components/layer/vector-base'
 
   export default {
     name: 'vl-layer-vector',

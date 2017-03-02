@@ -1,6 +1,6 @@
 <script>
   import ol from 'openlayers'
-  import xyzSource from 'vuelayers/src/mixins/source/xyz'
+  import xyzSource from 'vl-components/source/xyz-base'
 
   const props = {
     attributions: {

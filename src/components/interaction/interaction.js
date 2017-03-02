@@ -1,5 +1,5 @@
-import rxSubs from 'vuelayers/src/mixins/rx-subs'
-import exposeInject from 'vuelayers/src/mixins/expose-inject'
+import rxSubs from 'vl-mixins/rx-subs'
+import exposeInject from 'vl-mixins/expose-inject'
 
 const props = {}
 
@@ -20,6 +20,9 @@ const methods = {
       interaction: this.interaction,
       styleTarget: this.getStyleTarget()
     }
+  },
+  refresh () {
+    this.interaction.changed()
   }
 }
 

@@ -1,5 +1,5 @@
 <script>
-  import xyzSource from 'vuelayers/src/mixins/source/xyz'
+  import xyzSource from 'vl-components/source/xyz-base'
 
   export default {
     name: 'vl-source-xyz',

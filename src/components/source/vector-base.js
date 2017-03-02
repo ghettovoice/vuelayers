@@ -1,6 +1,6 @@
 import ol from 'openlayers'
-import source from 'vuelayers/src/mixins/source/source'
-import { coord as coordHelper } from 'vuelayers/src/ol'
+import source from 'vl-components/source/source'
+import { coord as coordHelper } from 'vl-ol'
 
 const props = {
   loader: Function,

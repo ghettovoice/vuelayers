@@ -1,5 +1,5 @@
 import ol from 'openlayers'
-import layer from 'vuelayers/src/mixins/layer/layer'
+import layer from 'vl-components/layer/layer'
 
 const props = {
   preload: Number

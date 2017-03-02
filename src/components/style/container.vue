@@ -10,7 +10,7 @@
    * Acts as an style container that will be injected into "style" slot inside layer or feature components.
    */
   import ol from 'openlayers'
-  import style from 'vuelayers/src/mixins/style/style'
+  import style from 'vl-components/style/style'
 
   const props = {
     zIndex: Number

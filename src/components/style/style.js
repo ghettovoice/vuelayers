@@ -4,7 +4,7 @@
  * Injects styleTarget from parent to apply self style.
  */
 import { debounce } from 'lodash/fp'
-import exposeInject from 'vuelayers/src/mixins/expose-inject'
+import exposeInject from 'vl-mixins/expose-inject'
 
 const methods = {
   /**

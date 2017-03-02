@@ -1,5 +1,5 @@
 <script>
-  import vectorSource from 'vuelayers/src/mixins/source/vector'
+  import vectorSource from 'vl-components/source/vector-base'
 
   export default {
     name: 'vl-source-vector',

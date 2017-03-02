@@ -1,6 +1,6 @@
 <script>
   import ol from 'openlayers'
-  import imageStyle from 'vuelayers/src/mixins/style/image'
+  import imageStyle from 'vl-components/style/image'
 
   const props = {
     src: {

@@ -3,130 +3,193 @@
 # Format:
 #   name - entry name
 #   path - path relative to src
+#   alias - alias that used in source code
 #
 map:
-  # common
+####################################################################
+#   COMMON
+####################################################################
   - name: ol
     path: ol
+    alias: vl-ol
 
   - name: rx
     path: rx
+    alias: vl-rx
 
-  # mixins
-  - name: mixins/rx-subs
-    path: mixins/rx-subs
-
-  - name: mixins/expose-inject
-    path: mixins/expose-inject
-
-  - name: mixins/geom
-    path: mixins/geom
-
-  # layer mixins
-  - name: mixins/layer
-    path: mixins/layer/layer
-
-  - name: mixins/layer-tile
-    path: mixins/layer/tile
-
-  - name: mixins/layer-vector
-    path: mixins/layer/vector
-
-  # source mixins
-  - name: mixins/source
-    path: mixins/source/source
-
-  - name: mixins/source-tile
-    path: mixins/source/tile
-
-  - name: mixins/source-xyz
-    path: mixins/source/xyz
-
-  - name: mixins/source-vector
-    path: mixins/source/vector
-
-  # style mixins
-  - name: mixins/style
-    path: mixins/style/style
-
-  - name: mixins/style-image
-    path: mixins/style/image
-
-  # interaction mixins
-  - name: mixins/interaction
-    path: mixins/interaction/interaction
-
-  # utils
+#####################################################################
+#   UTILS
+#####################################################################
   - name: utils/func
     path: utils/func
+    alias: vl-utils/func
 
   - name: utils/debug
     path: utils/debug
+    alias: vl-utils/func
 
-  # components
+#####################################################################
+#   MIXINS
+#####################################################################
+  - name: mixins/rx-subs
+    path: mixins/rx-subs
+    alias: vl-mixins/rx-subs
+
+  - name: mixins/expose-inject
+    path: mixins/expose-inject
+    alias: vl-mixins/expose-inject
+
+#####################################################################
+#   COMMON COMPONENTS
+#####################################################################
   - name: map
     path: components/map
+    alias: vl-components/map
 
   - name: map-view
     path: components/map-view
+    alias: vl-components/map-view
 
   - name: geoloc
     path: components/geoloc
+    alias: vl-components/geoloc
 
   - name: feature
     path: components/feature
+    alias: vl-components/feature
 
-  # geom components
+########################################################################
+#   GEOM
+########################################################################
+  # mixins
+  - name: mixins/geom
+    path: components/geom/geom
+    alias: vl-components/geom/geom
+  # components
   - name: geom-point
     path: components/geom/point
+    alias: vl-components/geom/point
 
   - name: geom-line-string
     path: components/geom/line-string
+    alias: vl-components/geom/line-string
 
   - name: geom-polygon
     path: components/geom/polygon
+    alias: vl-components/geom/polygon
 
   - name: geom-multi-point
     path: components/geom/multi-point
+    alias: vl-components/geom/multi-point
 
   - name: geom-multi-line-string
     path: components/geom/multi-line-string
+    alias: vl-components/geom/multi-line-string
 
   - name: geom-multi-polygon
     path: components/geom/multi-polygon
+    alias: vl-components/geom/multi-polygon
 
-  # layer components
+##########################################################################
+#   LAYER
+##########################################################################
+  # mixins
+  - name: mixins/layer
+    path: components/layer/layer
+    alias: vl-components/layer/layer
+
+  - name: mixins/layer-tile
+    path: components/layer/tile-base
+    alias: vl-components/layer/tile-base
+
+  - name: mixins/layer-vector
+    path: components/layer/vector-base
+    alias: vl-components/layer/vector-base
+  # components
   - name: layer-tile
     path: components/layer/tile
+    alias: vl-components/layer/tile
 
   - name: layer-vector
     path: components/layer/vector
+    alias: vl-components/layer/vector
 
-  # source components
+##########################################################################
+#   SOURCE
+##########################################################################
+  # mixins
+  - name: mixins/source
+    path: components/source/source
+    alias: vl-components/source/source
+
+  - name: mixins/source-tile
+    path: components/source/tile-base
+    alias: vl-components/source/tile-base
+
+  - name: mixins/source-xyz
+    path: components/source/xyz-base
+    alias: vl-components/source/xyz-base
+
+  - name: mixins/source-vector
+    path: components/source/vector-base
+    alias: vl-components/source/vector-base
+  # components
   - name: source-mapbox
     path: components/source/mapbox
+    alias: vl-components/source/mapbox
 
   - name: source-osm
     path: components/source/osm
+    alias: vl-components/source/osm
 
   - name: source-vector
     path: components/source/vector
+    alias: vl-components/source/vector
 
   - name: source-xyz
     path: components/source/xyz
+    alias: vl-components/source/xyz
 
-  # style components
+#############################################################################
+#   STYLE
+#############################################################################
+  # mixins
+  - name: mixins/style
+    path: components/style/style
+    alias: vl-components/style/style
+
+  - name: mixins/style-image
+    path: components/style/image
+    alias: vl-components/style/image
+  # components
   - name: style-container
     path: components/style-container
+    alias: vl-components/style-container
 
   - name: style-fill
     path: components/style/fill
+    alias: vl-components/style/fill
 
   - name: style-stroke
     path: components/style/stroke
+    alias: vl-components/style/stroke
 
   - name: style-circle
     path: components/style/circle
+    alias: vl-components/style/circle
 
   - name: style-icon
     path: components/style/icon
+    alias: vl-components/style/icon
+
+#############################################################################
+#  INTERACTION
+#############################################################################
+  # mixins
+  - name: mixins/interaction
+    path: components/interaction/interaction
+    alias: vl-components/interaction/interaction
+  # components
+  - name: interaction-select
+    path: components/interaction/select
+    alias: vl-components/interaction/select

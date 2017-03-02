@@ -1,5 +1,5 @@
 import ol from 'openlayers'
-import layer from 'vuelayers/src/mixins/layer/layer'
+import layer from 'vl-components/layer/layer'
 
 const props = {
   updateWhileAnimating: {
@@ -64,10 +64,14 @@ function setStyle (style) {
   this.styles = style
 
   if (this.layer) {
-    this.layer.setStyle((feature, resolution) => {
-      // todo implement conditions on vl-style-container
-      return this.styles
-    })
+    if (this.styles && this.styles.length) {
+      this.layer.setStyle((feature, resolution) => {
+        // todo implement conditions on vl-style-container
+        return this.styles
+      })
+    } else {
+      this.layer.setStyle(undefined)
+    }
     this.refresh()
   }
 }

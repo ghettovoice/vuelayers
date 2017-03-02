@@ -1,5 +1,5 @@
 import { debounce } from 'lodash/fp'
-import style from 'vuelayers/src/mixins/style/style'
+import style from 'vl-components/style/style'
 
 const styleRefresh = style.methods.refresh
 
@@ -16,9 +16,12 @@ const methods = {
   remove () {
     this.styleTarget && this.styleTarget.setImage(undefined)
   },
-  refresh: debounce(100, function () {
+  recreate () {
     this.style = this.createStyle()
     this.style.vm = this
+  },
+  refresh: debounce(100, function () {
+    this.recreate()
     this::styleRefresh()
   })
 }

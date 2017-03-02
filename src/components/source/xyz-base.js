@@ -1,5 +1,5 @@
 import ol from 'openlayers'
-import tileSource from 'vuelayers/src/mixins/source/tile'
+import tileSource from 'vl-components/source/tile-base'
 
 const methods = {
   createSource () {

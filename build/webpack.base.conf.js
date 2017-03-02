@@ -25,7 +25,12 @@ module.exports = {
       resolve('node_modules')
     ],
     alias: {
-      [ config.name ]: resolve('')
+      [ config.name ]: resolve(''),
+      'vl-components': resolve('src/components'),
+      'vl-mixins': resolve('src/mixins'),
+      'vl-utils': resolve('src/utils'),
+      'vl-ol': resolve('src/ol'),
+      'vl-rx': resolve('src/rx')
     }
   },
   module: {

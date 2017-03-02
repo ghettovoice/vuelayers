@@ -1,5 +1,5 @@
 <script>
-  import tileLayer from 'vuelayers/src/mixins/layer/tile'
+  import tileLayer from 'vl-components/layer/tile-base'
 
   export default {
     name: 'vl-layer-tile',

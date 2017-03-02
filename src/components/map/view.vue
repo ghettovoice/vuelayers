@@ -6,11 +6,11 @@
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/map'
-  import 'vuelayers/src/rx'
-  import { errordbg } from 'vuelayers/src/utils/debug'
-  import exposeInject from 'vuelayers/src/mixins/expose-inject'
-  import rxSubs from 'vuelayers/src/mixins/rx-subs'
-  import { consts as olConsts } from 'vuelayers/src/ol'
+  import 'vl-rx'
+  import { errordbg } from 'vl-utils/debug'
+  import exposeInject from 'vl-mixins/expose-inject'
+  import rxSubs from 'vl-mixins/rx-subs'
+  import { consts as olConsts } from 'vl-ol'
 
   const props = {
     zoom: {
@@ -159,7 +159,7 @@
         this.currentZoom = zoom
         this.currentCenter = center
         this.currentRotation = rotation
-        this.$emit('change', { center, zoom, rotation })
+        this.$emit('change', center, zoom, rotation)
       },
       errordbg
     )

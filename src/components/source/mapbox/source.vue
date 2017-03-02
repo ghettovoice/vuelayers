@@ -1,6 +1,6 @@
 <script>
-  import xyzSource from 'vuelayers/src/mixins/source/xyz'
-  import { coalesce } from 'vuelayers/src/utils/func'
+  import xyzSource from 'vl-components/source/xyz-base'
+  import { coalesce } from 'vl-utils/func'
 
   const props = {
     url: {
