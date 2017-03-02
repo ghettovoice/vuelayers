@@ -36,6 +36,7 @@
   const watch = {
     color (value) {
       this.style.setColor(value)
+      this.refresh()
     }
   }
 

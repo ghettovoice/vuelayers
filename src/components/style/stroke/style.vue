@@ -57,18 +57,23 @@
   const watch = {
     color (value) {
       this.style.setColor(value)
+      this.refresh()
     },
     lineCap (value) {
       this.style.setLineCap(value)
+      this.refresh()
     },
     lineDash (value) {
       this.style.setLineDash(value)
+      this.refresh()
     },
     lineJoin (value) {
       this.style.setLineJoin(value)
+      this.refresh()
     },
     width (value) {
       this.style.setWidth(value)
+      this.refresh()
     }
     // todo добавить остальный вотчеры
   }

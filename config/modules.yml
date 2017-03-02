@@ -119,9 +119,6 @@ map:
   - name: style-container
     path: components/style-container
 
-  - name: style-function
-    path: components/style-function
-
   - name: style-fill
     path: components/style/fill
 

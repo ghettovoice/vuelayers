@@ -12,7 +12,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   getStyleTarget () {
-    return this.interaction
+    return {}
   },
   expose () {
     return {

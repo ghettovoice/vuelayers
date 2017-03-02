@@ -27,7 +27,7 @@
       })
     },
     /**
-     * @return {{setFill: methods.reCreate, setStroke: methods.reCreate}}
+     * @return {{setFill: function, setStroke: function}}
      * @protected
      */
     getStyleTarget () {
@@ -38,11 +38,18 @@
     }
   }
 
+  const watch = {
+    radius () {
+      this.refresh()
+    }
+  }
+
   export default {
     name: 'vl-style-circle',
     mixins: [ imageStyle ],
     props,
-    methods
+    methods,
+    watch
   }
 
   function setFill (fill) {
@@ -51,6 +58,7 @@
      * @private
      */
     this.fill = fill
+    this.refresh()
   }
 
   function setStroke (stroke) {
@@ -59,6 +67,7 @@
      * @private
      */
     this.stroke = stroke
+    this.refresh()
   }
 </script>
 

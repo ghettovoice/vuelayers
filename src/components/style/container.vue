@@ -10,8 +10,6 @@
    * Acts as an style container that will be injected into "style" slot inside layer or feature components.
    */
   import ol from 'openlayers'
-  import { isFunction } from 'lodash/fp'
-  import { warn } from 'vuelayers/src/utils/debug'
   import style from 'vuelayers/src/mixins/style/style'
 
   const props = {
@@ -35,41 +33,13 @@
       if (!this.styleTarget) return
 
       let currentStyle = this.styleTarget.getStyle() || []
-      if (isFunction(currentStyle)) {
-        if (process.env.NODE_ENV !== 'production') {
-          warn('Target has style as ol.StyleFunction, current style will be override by component. ' +
-               'To append style container you should define style as Array or ' +
-               'ol.style.Style instance on the target')
-        }
-        currentStyle = this.style
-      }
-
-      if (currentStyle instanceof ol.style.Style) {
-        currentStyle = [ currentStyle ]
-      }
-
       currentStyle.push(this.style)
       this.styleTarget.setStyle(currentStyle)
     },
     remove () {
       if (!this.styleTarget) return
 
-      let currentStyle = this.styleTarget.getStyle() || []
-      if (isFunction(currentStyle)) {
-        if (process.env.NODE_ENV !== 'production') {
-          warn('Target has style as ol.StyleFunction. ' +
-               'To remove style container you should define style as Array or ' +
-               'ol.style.Style instance on the target')
-        }
-        return
-      }
-
-      if (currentStyle instanceof ol.style.Style && currentStyle === this.style) {
-        this.styleTarget.setStyle(undefined)
-        return
-      }
-
-      currentStyle = currentStyle.filter(style => style !== this.style)
+      let currentStyle = (this.styleTarget.getStyle() || []).filter(style => style !== this.style)
       currentStyle.length || (currentStyle = undefined)
       this.styleTarget.setStyle(currentStyle)
     },
@@ -102,6 +72,11 @@
      * @protected
      */
     this.fill = fill
+
+    if (this.style) {
+      this.style.setFill(this.fill)
+      this.append()
+    }
   }
 
   function setStroke (stroke) {
@@ -110,6 +85,11 @@
      * @protected
      */
     this.stroke = stroke
+
+    if (this.style) {
+      this.style.setStroke(this.stroke)
+      this.append()
+    }
   }
 
   function setImage (image) {
@@ -118,6 +98,11 @@
      * @protected
      */
     this.image = image
+
+    if (this.style) {
+      this.style.setImage(this.image)
+      this.append()
+    }
   }
 </script>
 

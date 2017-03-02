@@ -8,7 +8,6 @@
 <script rel="text/babel">
   import ol from 'openlayers'
   import exposeInject from 'vuelayers/src/mixins/expose-inject'
-  import { style as olStyle } from 'vuelayers/src/ol'
 
   const props = {
     loadTilesWhileAnimating: {
@@ -62,8 +61,6 @@
         map: this.map,
         source: new ol.source.Vector()
       })
-
-      this.map.addInteraction(this::createSelectInteraction())
     },
     mounted () {
       this.map.setTarget(this.$refs.map)
@@ -92,24 +89,6 @@
 //      controls: [],
       loadTilesWhileAnimating: this.loadTilesWhileAnimating,
       loadTilesWhileInteracting: this.loadTilesWhileInteracting
-    })
-  }
-
-  /**
-   * @return {ol.interaction.Select}
-   */
-  function createSelectInteraction () {
-    const defStyleFunc = olStyle.createStyleFunc()
-    const internalFeatures = this.serviceOverlay.getSource().getFeatures()
-
-    return new ol.interaction.Select({
-      filter: feature => !internalFeatures.includes(feature),
-      style: feature => {
-        const isFeatureLayer = layer => layer === feature.layer
-        const layer = this.map.getLayers().getArray().find(isFeatureLayer)
-
-        return layer ? layer.getStyleFunction()(feature) : defStyleFunc(feature)
-      }
     })
   }
 </script>

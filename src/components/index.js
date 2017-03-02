@@ -7,6 +7,5 @@ export * as layer from './layer'
 export * as source from './source'
 export * as style from './style'
 export StyleContainer from './style-container'
-export StyleFunction from './style-function'
 export * as interaction from './interaction'
 

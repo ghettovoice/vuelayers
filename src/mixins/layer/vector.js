@@ -1,12 +1,7 @@
 import ol from 'openlayers'
 import layer from 'vuelayers/src/mixins/layer/layer'
-import { style as olStyle } from 'vuelayers/src/ol'
 
 const props = {
-  /**
-   * Style hash, e.i. hash of styles
-   */
-  style: Object,
   updateWhileAnimating: {
     type: Boolean,
     default: false
@@ -23,9 +18,6 @@ const props = {
 const layerExpose = layer.methods.expose
 
 const methods = {
-  createStyleFunc () {
-    return olStyle.createStyleFunc(this.style)
-  },
   createLayer () {
     return new ol.layer.Vector({
       id: this.id,
@@ -41,19 +33,16 @@ const methods = {
       updateWhileInteracting: this.updateWhileInteracting
     })
   },
+  getStyleTarget () {
+    return {
+      setStyle: this::setStyle,
+      getStyle: this::getStyle
+    }
+  },
   expose () {
     return {
       ...this::layerExpose(),
-      styleTarget: this.layer
-    }
-  }
-}
-
-const watch = {
-  style: {
-    deep: true,
-    handler () {
-      this.layer.setStyle(this.createStyleFunc())
+      styleTarget: this.getStyleTarget()
     }
   }
 }
@@ -62,12 +51,27 @@ export default {
   mixins: [ layer ],
   props,
   methods,
-  watch,
   render (h) {
     return h('i', {
       style: {
-        display: 'none'
+        display: 'none !important'
       }
     }, this.$slots.default)
   }
+}
+
+function setStyle (style) {
+  this.styles = style
+
+  if (this.layer) {
+    this.layer.setStyle((feature, resolution) => {
+      // todo implement conditions on vl-style-container
+      return this.styles
+    })
+    this.refresh()
+  }
+}
+
+function getStyle () {
+  return this.styles || []
 }

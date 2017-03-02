@@ -3,6 +3,7 @@
  * Exposes for children inner OpenLayer style object as styleTarget.
  * Injects styleTarget from parent to apply self style.
  */
+import { debounce } from 'lodash/fp'
 import exposeInject from 'vuelayers/src/mixins/expose-inject'
 
 const methods = {
@@ -44,7 +45,10 @@ const methods = {
    */
   remove () {
     throw new Error('Not implemented method')
-  }
+  },
+  refresh: debounce(100, function () {
+    this.append()
+  })
 }
 
 export default {

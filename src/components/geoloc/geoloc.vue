@@ -5,7 +5,9 @@
   import 'rxjs/add/observable/combineLatest'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/map'
   import 'vuelayers/src/rx'
+  import { errordbg } from 'vuelayers/src/utils/debug'
   import exposeInject from 'vuelayers/src/mixins/expose-inject'
   import rxSubs from 'vuelayers/src/mixins/rx-subs'
   import positionMarker from './position-marker.svg'
@@ -87,12 +89,14 @@
   }
 
   function subscribeToGeolocation () {
-    const geolocChanges = Observable.fromOlEvent(this.geoloc, 'change', () => {
-      const position = ol.proj.toLonLat(this.geoloc.getPosition(), this.projection)
-      const accuracy = this.geoloc.getAccuracy()
+    const geolocChanges = Observable.fromOlEvent(this.geoloc, 'change')
+      .throttleTime(100)
+      .map(() => {
+        const position = ol.proj.toLonLat(this.geoloc.getPosition(), this.projection)
+        const accuracy = this.geoloc.getAccuracy()
 
-      return [ position, accuracy ]
-    }).throttleTime(100)
+        return [ position, accuracy ]
+      })
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
     this.rxSubs.geoloc = geolocChanges.subscribe(
@@ -102,7 +106,7 @@
 
         this.$emit('change', { position, accuracy })
       },
-      ::console.error
+      errordbg
     )
   }
 </script>

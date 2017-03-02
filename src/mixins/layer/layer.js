@@ -33,6 +33,9 @@ const methods = {
    */
   refresh () {
     this.layer.changed()
+
+    const source = this.layer.getSource()
+    source && source.changed()
   },
   /**
    * @return {ol.layer.Layer}

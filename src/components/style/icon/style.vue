@@ -84,12 +84,25 @@
       })
     }
   }
-  // todo add watchers
+  // todo other watchers
+  const watch = {
+    src () {
+      this.refresh()
+    },
+    size () {
+      this.refresh()
+    },
+    anchor () {
+      this.refresh()
+    }
+  }
+
   export default {
     name: 'vl-style-icon',
     mixins: [ imageStyle ],
     props,
-    methods
+    methods,
+    watch
   }
 </script>
 

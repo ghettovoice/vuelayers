@@ -5,7 +5,9 @@
   import 'rxjs/add/observable/combineLatest'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/map'
   import 'vuelayers/src/rx'
+  import { errordbg } from 'vuelayers/src/utils/debug'
   import exposeInject from 'vuelayers/src/mixins/expose-inject'
   import rxSubs from 'vuelayers/src/mixins/rx-subs'
   import { consts as olConsts } from 'vuelayers/src/ol'
@@ -141,13 +143,15 @@
    * Subscribe to OpenLayers significant events
    */
   function subscribeToViewChanges () {
-    const viewChanges = Observable.fromOlEvent(this.view, 'change', () => {
-      const center = ol.proj.toLonLat(this.view.getCenter(), this.projection)
-      const zoom = Math.ceil(this.view.getZoom())
-      const rotation = this.view.getRotation()
+    const viewChanges = Observable.fromOlEvent(this.view, 'change')
+      .throttleTime(100)
+      .map(() => {
+        const center = ol.proj.toLonLat(this.view.getCenter(), this.projection)
+        const zoom = Math.ceil(this.view.getZoom())
+        const rotation = this.view.getRotation()
 
-      return [ center, zoom, rotation ]
-    }).throttleTime(100)
+        return [ center, zoom, rotation ]
+      })
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
     this.rxSubs.viewChanges = viewChanges.subscribe(
@@ -157,7 +161,7 @@
         this.currentRotation = rotation
         this.$emit('change', { center, zoom, rotation })
       },
-      ::console.error
+      errordbg
     )
   }
 </script>
