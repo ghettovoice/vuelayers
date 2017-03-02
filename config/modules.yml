@@ -26,7 +26,7 @@ map:
 
   - name: utils/debug
     path: utils/debug
-    alias: vl-utils/func
+    alias: vl-utils/debug
 
 #####################################################################
 #   MIXINS
