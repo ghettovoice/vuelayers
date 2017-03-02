@@ -37,6 +37,15 @@ const methods = {
     const source = this.layer.getSource()
     source && source.changed()
   },
+  initialize () {
+    /**
+     * @type {ol.layer.Layer}
+     * @protected
+     */
+    this.layer = this.createLayer()
+    this.layer.vm = this
+    this.layer.set('id', this.id)
+  },
   /**
    * @return {ol.layer.Layer}
    * @protected
@@ -44,6 +53,22 @@ const methods = {
   createLayer () {
     throw new Error('Not implemented method')
   },
+  /**
+   * @protected
+   */
+  mountLayer () {
+    this.map.addLayer(this.layer)
+  },
+  /**
+   * @protected
+   */
+  unmountLayer () {
+    this.map.removeLayer(this.layer)
+  },
+  /**
+   * @return {{layer: *}}
+   * @protected
+   */
   expose () {
     return {
       ...this.$parent.expose(),
@@ -84,19 +109,13 @@ export default {
     }, this.$slots.default)
   },
   created () {
-    /**
-     * @type {ol.layer.Layer}
-     * @protected
-     */
-    this.layer = this.createLayer()
-    this.layer.vm = this
-    this.layer.set('id', this.id)
+    this.initialize()
   },
   mounted () {
-    this.map.addLayer(this.layer)
+    this.mountLayer()
   },
   beforeDestroy () {
-    this.map.removeLayer(this.layer)
+    this.unmountLayer()
   },
   destroyed () {
     this.layer = undefined

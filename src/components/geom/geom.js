@@ -31,47 +31,9 @@ const computed = {
 
 const methods = {
   /**
-   * @return {ol.geom.SimpleGeometry}
    * @protected
    */
-  createGeometry () {
-    throw new Error('Not implemented method')
-  },
-  refresh () {
-    this.geometry.changed()
-  },
-  expose () {
-    return {
-      ...this.$parent.expose(),
-      geometry: this.geometry
-    }
-  }
-}
-
-const watch = {
-  coordinates: {
-    deep: true,
-    handler (value) {
-      this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view.getProjection()))
-    }
-  }
-}
-
-export default {
-  mixins: [ exposeInject, rxSubs ],
-  inject: [ 'feature', 'view' ],
-  props,
-  computed,
-  watch,
-  methods,
-  render: h => h(),
-  data () {
-    return {
-      currentCoordinates: this.coordinates,
-      currentExtent: []
-    }
-  },
-  created () {
+  initialize () {
     /**
      * @type {ol.geom.SimpleGeometry}
      * @protected
@@ -88,11 +50,68 @@ export default {
 
     this::subscribeToGeomChanges()
   },
-  mounted () {
+  /**
+   * @return {ol.geom.SimpleGeometry}
+   * @protected
+   */
+  createGeometry () {
+    throw new Error('Not implemented method')
+  },
+  /**
+   * @protected
+   */
+  mountGeometry () {
     this.feature.setGeometry(this.geometry)
   },
-  beforeDestroy () {
+  /**
+   * @protected
+   */
+  unmountGeometry () {
     this.feature.setGeometry(undefined)
+  },
+  refresh () {
+    this.geometry.changed()
+  },
+  /**
+   * @return {{geometry: *}}
+   * @protected
+   */
+  expose () {
+    return {
+      ...this.$parent.expose(),
+      geometry: this.geometry
+    }
+  }
+}
+
+const watch = {
+  coordinates (value) {
+    this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view.getProjection()))
+  }
+}
+
+export default {
+  mixins: [ exposeInject, rxSubs ],
+  inject: [ 'feature', 'view' ],
+  props,
+  computed,
+  watch,
+  methods,
+  render: h => h(),
+  data () {
+    return {
+      currentCoordinates: this.coordinates.slice(),
+      currentExtent: []
+    }
+  },
+  created () {
+    this.initialize()
+  },
+  mounted () {
+    this.mountGeometry()
+  },
+  beforeDestroy () {
+    this.unmountGeometry()
   },
   destroyed () {
     this.geometry = undefined

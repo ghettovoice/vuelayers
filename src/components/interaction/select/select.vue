@@ -1,13 +1,12 @@
 <script>
   import ol from 'openlayers'
-  import { flow, forEach, filter } from 'lodash/fp'
+  import { forEach } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/map'
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
   import interaction from 'vl-components/interaction/interaction'
 
+  // todo add other options, like event modifiers
   const props = {
     multi: {
       type: Boolean,
@@ -16,17 +15,23 @@
     wrapX: {
       type: Boolean,
       default: true
-    }
-  }
-
-  const computed = {
-    selectedIds () {
-      return this.selected.map(f => f.id)
+    },
+    selected: {
+      type: Array,
+      default: () => []
     }
   }
 
   const interactionRefresh = interaction.methods.refresh
+  const interactionInitialize = interaction.methods.initialize
   const methods = {
+    /**
+     * @protected
+     */
+    initialize () {
+      this::interactionInitialize()
+      this::subscribeToInteractionChanges()
+    },
     /**
      * @return {ol.interaction.Select}
      * @protected
@@ -42,6 +47,9 @@
         style
       })
     },
+    /**
+     * @protected
+     */
     getStyleTarget () {
       return {
         setStyle: this::setStyle,
@@ -52,55 +60,53 @@
       this.interaction.getFeatures().changed()
       this::interactionRefresh()
     },
+    /**
+     * @private
+     */
     recreate () {
-      this.rxSubs.select.unsubscribe()
-      this.interaction = this.createInteraction()
-      this.interaction.vm = this
-      this::subscribeToSelect()
+      this.unsubscribeAll()
+      this.initialize()
     },
     /**
-     * @param {Object[]} features
+     * @param {number} id
      */
-    select (features) {
+    select (id) {
       const selection = this.interaction.getFeatures()
-      const layers = this.map.getLayers().getArray()
-        .filter(layer => layer instanceof ol.layer.Vector && layer.vm)
+      const layers = this.map.getLayers()
+        .getArray()
+        .filter(layer => layer.vm && layer instanceof ol.layer.Vector)
 
-      const pushFeatures = flow(
-        filter(f => !this.selectedIds.includes(f.id)),
-        forEach(f => {
-          const layer = layers.find(layer => layer.vm.id === f.layer)
+      if (this.currentSelected.includes(id)) return
 
-          if (layer) {
-            selection.push(layer.getSource().getFeatureById(f.id))
-          }
-        })
-      )
+      let feature
+      forEach(layer => {
+        feature = layer.getSource().getFeatureById(id)
+        return !feature
+      }, layers)
 
-      pushFeatures(features)
-      this.refresh()
+      feature && selection.push(feature)
     },
     /**
-     * @param {Object[]} features
+     * @param {number} id
      */
-    deselect (features) {
+    unselect (id) {
       const selection = this.interaction.getFeatures()
       const selectionArray = selection.getArray()
-      console.log(selectionArray, features)
-      features.forEach(f => {
-        const idx = selectionArray.findIndex(feature => feature.getId() === f.id)
+      const idx = selectionArray.findIndex(feature => feature.getId() === id)
 
-        if (idx !== -1) {
-          selection.removeAt(idx)
-        }
-      })
-      this.refresh()
+      if (idx !== -1) {
+        selection.removeAt(idx)
+      }
+    },
+    unselectAll () {
+      this.interaction.getFeatures().clear()
     }
   }
 
   const watch = {
-    selected () {
-      this.$emit('select', this.selected)
+    selected (selected) {
+      this.unselectAll()
+      selected.forEach(id => this.select(id))
     }
   }
 
@@ -108,16 +114,13 @@
     name: 'vl-interaction-select',
     mixins: [ interaction ],
     props,
-    computed,
+//    computed,
     methods,
     watch,
     data () {
       return {
-        selected: []
+        currentSelected: this.selected.slice()
       }
-    },
-    created () {
-      this::subscribeToSelect()
     }
   }
 
@@ -126,7 +129,6 @@
 
     if (this.interaction) {
       this.recreate()
-      this.refresh()
     }
   }
 
@@ -134,14 +136,22 @@
     return this.styles || []
   }
 
-  function subscribeToSelect () {
-    this.rxSubs.select = Observable.fromOlEvent(this.interaction, 'select')
-      .throttleTime(100)
-      .map(({ selected }) => selected.map(feature => feature.vm.plain))
+  function subscribeToInteractionChanges () {
+    const selection = this.interaction.getFeatures()
+
+    this.rxSubs.select = Observable.fromOlEvent(selection, 'add', evt => evt.element)
       .subscribe(
-        selected => {
-          console.log(1)
-          this.selected = selected
+        feature => {
+          this.currentSelected.push(feature.getId())
+          this.$emit('select', feature.getId())
+        },
+        errordbg
+      )
+    this.rxSubs.unselect = Observable.fromOlEvent(selection, 'remove', evt => evt.element)
+      .subscribe(
+        feature => {
+          this.currentSelected = this.currentSelected.filter(x => x !== feature.getId())
+          this.$emit('unselect', feature.getId())
         },
         errordbg
       )

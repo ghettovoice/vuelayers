@@ -29,14 +29,14 @@
         image: this.image
       })
     },
-    append () {
+    mountStyle () {
       if (!this.styleTarget) return
 
       let currentStyle = this.styleTarget.getStyle() || []
       currentStyle.push(this.style)
       this.styleTarget.setStyle(currentStyle)
     },
-    remove () {
+    unmountStyle () {
       if (!this.styleTarget) return
 
       let currentStyle = (this.styleTarget.getStyle() || []).filter(style => style !== this.style)
@@ -75,7 +75,7 @@
 
     if (this.style) {
       this.style.setFill(this.fill)
-      this.append()
+      this.mountStyle()
     }
   }
 
@@ -88,7 +88,7 @@
 
     if (this.style) {
       this.style.setStroke(this.stroke)
-      this.append()
+      this.mountStyle()
     }
   }
 
@@ -101,7 +101,7 @@
 
     if (this.style) {
       this.style.setImage(this.image)
-      this.append()
+      this.mountStyle()
     }
   }
 </script>

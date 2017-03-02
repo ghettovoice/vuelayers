@@ -5,15 +5,46 @@ const props = {}
 
 const methods = {
   /**
+   * @protected
+   */
+  initialize () {
+    /**
+     * @type {ol.interaction.Interaction}
+     * @protected
+     */
+    this.interaction = this.createInteraction()
+    this.interaction.vm = this
+  },
+  /**
    * @return {ol.interaction.Interaction}
    * @protected
    */
   createInteraction () {
     throw new Error('Not implemented method')
   },
+  /**
+   * @protected
+   */
+  mountInteraction () {
+    this.map.addInteraction(this.interaction)
+  },
+  /**
+   * @protected
+   */
+  unmountInteraction () {
+    this.map.removeInteraction(this.interaction)
+  },
+  /**
+   * @return {{}}
+   * @protected
+   */
   getStyleTarget () {
     return {}
   },
+  /**
+   * @return {Object}
+   * @protected
+   */
   expose () {
     return {
       ...this.$parent.expose(),
@@ -39,18 +70,13 @@ export default {
     }, this.$slots.default)
   },
   created () {
-    /**
-     * @type {ol.interaction.Interaction}
-     * @protected
-     */
-    this.interaction = this.createInteraction()
-    this.interaction.vm = this
+    this.initialize()
   },
   mounted () {
-    this.map.addInteraction(this.interaction)
+    this.mountInteraction()
   },
   beforeDestroy () {
-    this.map.removeInteraction(this.interaction)
+    this.unmountInteraction()
   },
   destroyed () {
     this.interaction = undefined

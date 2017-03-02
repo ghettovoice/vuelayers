@@ -18,15 +18,36 @@ const props = {
 
 const methods = {
   /**
+   * @protected
+   */
+  initialize () {
+    /**
+     * @type {ol.source.Source}
+     * @protected
+     */
+    this.source = this.createSource()
+    this.source.vm = this
+  },
+  /**
    * @return {ol.source.Source}
    * @protected
    */
   createSource () {
     throw new Error('Not implemented method')
   },
+  mountSource () {
+    this.layer.setSource(this.source)
+  },
+  unmountSource () {
+    this.layer.setSource(undefined)
+  },
   refresh () {
     this.source.changed()
   },
+  /**
+   * @return {{source: *}}
+   * @protected
+   */
   expose () {
     return {
       ...this.$parent.expose(),
@@ -58,18 +79,13 @@ export default {
     }, this.$slots.default)
   },
   created () {
-    /**
-     * @type {ol.source.Source}
-     * @protected
-     */
-    this.source = this.createSource()
-    this.source.vm = this
+    this.initialize()
   },
   mounted () {
-    this.layer.setSource(this.source)
+    this.mountSource()
   },
   beforeDestroy () {
-    this.layer.setSource(undefined)
+    this.unmountSource()
   },
   destroyed () {
     this.source = undefined

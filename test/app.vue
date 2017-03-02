@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <vl-map>
-      <vl-map-view @change="viewChanged"/>
+      <vl-map-view :zoom="2" @change="viewChanged"/>
       <vl-geoloc/>
 
-      <vl-interaction-select ref="select">
+      <vl-interaction-select ref="select" :selected="selected">
         <vl-style-container>
           <vl-style-stroke color="#D421E5"/>
           <vl-style-fill color="#E5BC15"/>
@@ -15,7 +15,7 @@
         </vl-style-container>
       </vl-interaction-select>
 
-      <vl-layer-tile>
+      <vl-layer-tile id="osm">
         <vl-source-osm/>
       </vl-layer-tile>
 
@@ -32,36 +32,7 @@
 
         <vl-source-vector>
           <vl-feature v-for="feature in features" :key="feature.id" :id="feature.id" :data="feature.data">
-            <!--<template scope="ctx">-->
-              <!--<vl-style-container v-if="ctx.feature.selected">-->
-                <!--<vl-style-stroke color="#E5000B" :width="stroke"/>-->
-                <!--<vl-style-fill color="#3AE525"/>-->
-                <!--<vl-style-circle :radius="20">-->
-                  <!--<vl-style-stroke color="#E5000B" :width="stroke"/>-->
-                  <!--<vl-style-fill color="#3AE525"/>-->
-                <!--</vl-style-circle>-->
-              <!--</vl-style-container>-->
-
-              <component :is="feature.geometry.type" :coordinates="feature.geometry.coordinates"/>
-            <!--</template>-->
-
-            <!--<vl-style-container v-if="zoom > 2">-->
-              <!--<vl-style-stroke color="#13A838" :width="stroke"/>-->
-              <!--<vl-style-fill :color="color"/>-->
-              <!--<vl-style-circle :radius="20">-->
-                <!--<vl-style-stroke color="#13A838" :width="stroke"/>-->
-                <!--<vl-style-fill :color="color"/>-->
-              <!--</vl-style-circle>-->
-            <!--</vl-style-container>-->
-
-            <!--<vl-style-container v-if="zoom <= 2">-->
-              <!--<vl-style-stroke color="#13A838" :width="4"/>-->
-              <!--<vl-style-fill :color="feature.data.color"/>-->
-              <!--<vl-style-circle :radius="10">-->
-                <!--<vl-style-stroke color="#13A838" :width="4"/>-->
-                <!--<vl-style-fill :color="feature.data.color"/>-->
-              <!--</vl-style-circle>-->
-            <!--</vl-style-container>-->
+            <component :is="feature.geometry.type" :coordinates="feature.geometry.coordinates"/>
           </vl-feature>
         </vl-source-vector>
       </vl-layer-vector>
@@ -73,7 +44,9 @@
         Change color
       </button>
       <button @click="stroke = Math.ceil(Math.random() * 10)">Change stroke</button>
-      <button @click="deselect">Deselect</button>
+      <button @click="toggleSelect(1)">Toggle 1</button>
+      <button @click="toggleSelect(2)">Toggle 2</button>
+      <button @click="toggleSelect(3)">Toggle 3</button>
     </div>
   </div>
 </template>
@@ -85,8 +58,13 @@
       viewChanged ({ zoom }) {
         this.zoom = zoom
       },
-      deselect () {
-        this.$refs.select.deselect([ { id: 1, layer: 'vector' } ])
+      toggleSelect (id) {
+        const idx = this.selected.indexOf(id)
+        if (idx === -1) {
+          this.selected.push(id)
+        } else {
+          this.selected.splice(idx, 1)
+        }
       }
     },
     data () {
@@ -94,6 +72,7 @@
         zoom: 0,
         color: [ 255, 255, 255, 0.5 ],
         stroke: 2,
+        selected: [],
         features: [
           {
             id: 1,

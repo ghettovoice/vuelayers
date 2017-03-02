@@ -19,26 +19,15 @@
     }
   }
 
-  const computed = {
-    changes () {
-      this.currentPosition
-      this.currentAccuracy
-      return Date.now()
+  const methods = {
+    refresh () {
+      this.geoloc.changed()
     }
   }
 
   const watch = {
     tracking (value) {
       this.geoloc.setTracking(value)
-    },
-    refresh () {
-      this.geoloc.changed()
-    },
-    changes () {
-      this.$emit('change', {
-        position: this.currentPosition,
-        accuracy: this.currentAccuracy
-      })
     }
   }
 
@@ -47,8 +36,8 @@
     mixins: [ exposeInject, rxSubs ],
     inject: [ 'map', 'serviceOverlay' ],
     props,
-    computed,
     watch,
+    methods,
     render: h => h(),
     data () {
       return {
@@ -58,7 +47,6 @@
     },
     created () {
       this::createGeolocApi()
-
       this::subscribeToGeolocation()
     },
     beforeDestroy () {
@@ -110,14 +98,15 @@
         const position = ol.proj.toLonLat(this.geoloc.getPosition(), this.projection)
         const accuracy = this.geoloc.getAccuracy()
 
-        return [ position, accuracy ]
+        return { position, accuracy }
       })
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
     this.rxSubs.geoloc = geolocChanges.subscribe(
-      ([ position, accuracy ]) => {
+      ({ position, accuracy }) => {
         this.currentPosition = position
         this.currentAccuracy = accuracy
+        this.$emit('change', { position, accuracy })
       },
       errordbg
     )

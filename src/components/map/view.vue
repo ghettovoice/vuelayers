@@ -55,15 +55,6 @@
     }
   }
 
-  const computed = {
-    changes () {
-      this.currentZoom
-      this.currentCenter
-      this.currentRotation
-      return Date.now()
-    }
-  }
-
   const methods = {
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
@@ -86,9 +77,6 @@
         })
       )
     },
-    getView () {
-      return this.view
-    },
     refresh () {
       this.view.changed()
     },
@@ -97,16 +85,29 @@
         ...this.$parent.expose(),
         view: this.view
       }
+    },
+    setCurrentView ({ center, zoom, rotation }) {
+      if (center != null && !isEqual(center, this.currentCenter)) {
+        this.view.setCenter(center)
+      }
+      if (zoom != null && zoom !== this.currentZoom) {
+        this.view.setZoom(zoom)
+      }
+      if (rotation != null && rotation !== this.currentRotation) {
+        this.view.setRotation(rotation)
+      }
     }
   }
 
   const watch = {
-    changes () {
-      this.$emit('change', {
-        center: this.currentCenter,
-        zoom: this.currentZoom,
-        rotation: this.currentRotation
-      })
+    center (center) {
+      this.setCurrentView({ center })
+    },
+    zoom (zoom) {
+      this.setCurrentView({ zoom })
+    },
+    rotation (rotation) {
+      this.setCurrentView({ rotation })
     }
   }
 
@@ -115,25 +116,18 @@
     inject: [ 'map' ],
     mixins: [ exposeInject, rxSubs ],
     props,
-    computed,
     methods,
     watch,
     render: h => h(),
     data () {
       return {
         currentZoom: this.zoom,
-        currentCenter: this.center,
+        currentCenter: this.center.slice(),
         currentRotation: this.rotation
       }
     },
     created () {
-      /**
-       * @type {ol.View}
-       * @protected
-       */
-      this.view = this::createView()
-      this.view.vm = this
-
+      this::createView()
       this::subscribeToViewChanges()
     },
     mounted () {
@@ -151,13 +145,20 @@
    * @return {ol.View}
    */
   function createView () {
-    return new ol.View({
+    /**
+     * @type {ol.View}
+     * @protected
+     */
+    this.view = new ol.View({
       center: ol.proj.fromLonLat(this.currentCenter, this.projection),
       zoom: this.currentZoom,
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
       projection: this.projection
     })
+    this.view.vm = this
+
+    return this.view
   }
 
   /**
@@ -165,21 +166,22 @@
    */
   function subscribeToViewChanges () {
     const viewChanges = Observable.fromOlEvent(this.view, 'change')
-      .throttleTime(100)
+      .throttleTime(300)
       .map(() => {
         const center = ol.proj.toLonLat(this.view.getCenter(), this.projection)
         const zoom = Math.ceil(this.view.getZoom())
         const rotation = this.view.getRotation()
 
-        return [ center, zoom, rotation ]
+        return { center, zoom, rotation }
       })
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
     this.rxSubs.viewChanges = viewChanges.subscribe(
-      ([ center, zoom, rotation ]) => {
-        this.currentZoom = zoom
+      ({ center, zoom, rotation }) => {
         this.currentCenter = center
+        this.currentZoom = zoom
         this.currentRotation = rotation
+        this.$emit('change', { center, zoom, rotation })
       },
       errordbg
     )

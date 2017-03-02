@@ -43,13 +43,13 @@
     /**
      * @protected
      */
-    append () {
+    mountStyle () {
       this.styleTarget && this.styleTarget.setStroke(this.style)
     },
     /**
      * @protected
      */
-    remove () {
+    unmountStyle () {
       this.styleTarget && this.styleTarget.setStroke(undefined)
     }
   }

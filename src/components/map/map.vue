@@ -1,6 +1,5 @@
 <template>
-  <div class="vl-map">
-    <div class="map" ref="map"></div>
+  <div class="vl-map" :tabindex="tabIndex">
     <slot></slot>
   </div>
 </template>
@@ -17,6 +16,14 @@
     loadTilesWhileInteracting: {
       type: Boolean,
       default: false
+    },
+    pixelRatio: Number,
+    renderer: [ String, Array ],
+    logo: [ String, Object ],
+    keyboardEventTarget: [ String, Node ],
+    tabIndex: {
+      type: Number,
+      default: 0
     }
   }
 
@@ -50,20 +57,10 @@
     props,
     methods,
     created () {
-      /**
-       * @type {ol.Map}
-       * @protected
-       */
-      this.map = this::createMap()
-      this.map.vm = this
-
-      this.serviceOverlay = new ol.layer.Vector({
-        map: this.map,
-        source: new ol.source.Vector()
-      })
+      this::createMap()
     },
     mounted () {
-      this.map.setTarget(this.$refs.map)
+      this.map.setTarget(this.$el)
       this.$nextTick(() => {
         this.refresh()
       })
@@ -81,15 +78,31 @@
    * @return {ol.Map}
    */
   function createMap () {
-    // todo wrap all controls and interactions
-    return new ol.Map({
+    /**
+     * @type {ol.Map}
+     * @protected
+     */
+    this.map = new ol.Map({
       layers: [],
       // todo disable all default interaction and controls and use custom if defined, wrap all
 //      interactions: [],
 //      controls: [],
       loadTilesWhileAnimating: this.loadTilesWhileAnimating,
-      loadTilesWhileInteracting: this.loadTilesWhileInteracting
+      loadTilesWhileInteracting: this.loadTilesWhileInteracting,
+      pixelRatio: this.pixelRatio,
+      renderer: this.renderer,
+      logo: this.logo,
+      keyboardEventTarget: this.keyboardEventTarget
     })
+
+    this.map.vm = this
+
+    this.serviceOverlay = new ol.layer.Vector({
+      map: this.map,
+      source: new ol.source.Vector()
+    })
+
+    return this.map
   }
 </script>
 

@@ -58,7 +58,7 @@
       default: 0
     }
   }
-  // todo img, imgSize options?
+
   const methods = {
     /**
      * @return {ol.style.Icon}

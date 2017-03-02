@@ -22,13 +22,13 @@
     /**
      * @protected
      */
-    append () {
+    mountStyle () {
       this.styleTarget && this.styleTarget.setFill(this.style)
     },
     /**
      * @protected
      */
-    remove () {
+    unmountStyle () {
       this.styleTarget && this.styleTarget.setFill(undefined)
     }
   }

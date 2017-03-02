@@ -8,6 +8,17 @@ import exposeInject from 'vl-mixins/expose-inject'
 
 const methods = {
   /**
+   * @protected
+   */
+  initialize () {
+    /**
+     * @type {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text}
+     * @protected
+     */
+    this.style = this.createStyle()
+    this.style.vm = this
+  },
+  /**
    * @return {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text}
    * @protected
    */
@@ -37,17 +48,17 @@ const methods = {
   /**
    * @protected
    */
-  append () {
+  mountStyle () {
     throw new Error('Not implemented method')
   },
   /**
    * @protected
    */
-  remove () {
+  unmountStyle () {
     throw new Error('Not implemented method')
   },
   refresh: debounce(100, function () {
-    this.append()
+    this.mountStyle()
   })
 }
 
@@ -59,17 +70,11 @@ export default {
   mounted () {
     // Create style in  mounted hook because of some ol style classes doesn't have
     // setters for all inner objects. This setters are emulated through method: getStyleTarget
-    /**
-     * @type {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text}
-     * @protected
-     */
-    this.style = this.createStyle()
-    this.style.vm = this
-
-    this.append()
+    this.initialize()
+    this.mountStyle()
   },
   beforeDestroy () {
-    this.remove()
+    this.unmountStyle()
   },
   destroyed () {
     this.style = undefined

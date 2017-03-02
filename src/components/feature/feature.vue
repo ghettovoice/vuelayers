@@ -75,13 +75,7 @@
     watch,
     computed,
     created () {
-      /**
-       * @type {ol.Feature}
-       * @protected
-       */
-      this.feature = this::createFeature()
-      this.feature.vm = this
-      this.feature.layer = this.layer
+      this::createFeature()
     },
     mounted () {
       this.source.addFeature(this.feature)
@@ -101,10 +95,16 @@
    * @return {ol.Feature}
    */
   function createFeature () {
-    const feature = new ol.Feature(omit([ 'geometry' ], this.data))
-    feature.setId(this.id)
+    /**
+     * @type {ol.Feature}
+     * @protected
+     */
+    this.feature = new ol.Feature(omit([ 'geometry' ], this.data))
+    this.feature.setId(this.id)
+    this.feature.vm = this
+    this.feature.layer = this.layer
 
-    return feature
+    return this.feature
   }
 
   function setStyle (style) {

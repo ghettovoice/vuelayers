@@ -7,21 +7,17 @@ const methods = {
   /**
    * @protected
    */
-  append () {
+  mountStyle () {
     this.styleTarget && this.styleTarget.setImage(this.style)
   },
   /**
    * @protected
    */
-  remove () {
+  unmountStyle () {
     this.styleTarget && this.styleTarget.setImage(undefined)
   },
-  recreate () {
-    this.style = this.createStyle()
-    this.style.vm = this
-  },
   refresh: debounce(100, function () {
-    this.recreate()
+    this.initialize()
     this::styleRefresh()
   })
 }
