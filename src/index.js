@@ -9,8 +9,6 @@
  */
 import { omit, merge, forEach } from 'lodash/fp'
 import * as components from './components'
-import * as ol from './ol'
-import * as rx from './rx'
 
 const forEachWithKey = forEach.convert({ cap: false })
 const keys = [
@@ -30,8 +28,6 @@ export default {
   PKG_NAME: PKG_FULLNAME,
   VERSION: PKG_VERSION,
   ...flatComponents,
-  ol,
-  rx,
   install (Vue) {
     forEachWithKey((component, key) => {
       if (component.install) {
