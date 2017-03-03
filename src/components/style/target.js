@@ -56,7 +56,6 @@ export function createStyleFunc (styles, styleTarget) {
   const styleTargetStylesFilter = createStylesFilter(styles)
 
   return function __styleTargetStyleFunc (feature, resolution) {
-    console.log(feature)
     // apply feature level styles
     if (feature.$vm && feature.$vm.styles && feature.$vm.styles.length) {
       const featureStylesFilter = createStylesFilter(feature.$vm.styles)
