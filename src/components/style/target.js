@@ -18,6 +18,7 @@ export default {
 
       if (styleTarget) {
         if (this.styles && this.styles.length) {
+          console.log(this._name)
           styleTarget.setStyle(
             isFunction(this.styles)
               ? this.styles
@@ -56,6 +57,7 @@ export function createStyleFunc (styles, styleTarget) {
   const styleTargetStylesFilter = createStylesFilter(styles)
 
   return function __styleTargetStyleFunc (feature, resolution) {
+    console.log(feature.$vm.styles)
     // apply feature level styles
     if (feature.$vm && feature.$vm.styles && feature.$vm.styles.length) {
       const featureStylesFilter = createStylesFilter(feature.$vm.styles)
