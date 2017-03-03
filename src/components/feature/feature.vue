@@ -9,7 +9,7 @@
    * Wrapper around ol.Feature.
    */
   import ol from 'openlayers'
-  import uuid from 'node-uuid'
+  import uuid from 'uuid/v4'
   import { omit } from 'lodash/fp'
   import rxSubs from 'vl-mixins/rx-subs'
   import styleTarget from 'vl-components/style/target'
@@ -18,7 +18,7 @@
   const props = {
     id: {
       type: [ String, Number ],
-      default: () => uuid.v4()
+      default: () => uuid()
     },
     data: {
       type: Object,

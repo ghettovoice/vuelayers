@@ -37,9 +37,9 @@
   "dependencies": {
     "babel-runtime": "^6.23.0",
     "lodash": "^4.17.4",
-    "node-uuid": "^1.4.7",
     "ol3-tilecache": "^1.2.2",
-    "rxjs": "^5.2.0"
+    "rxjs": "^5.2.0",
+    "uuid": "^3.0.1"
   },
   "peerDependencies": {
     "vue": "^2.2.0",

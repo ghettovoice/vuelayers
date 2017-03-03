@@ -1,10 +1,10 @@
-import uuid from 'node-uuid'
+import uuid from 'uuid/v4'
 import rxSubs from 'vl-mixins/rx-subs'
 
 const props = {
   id: {
     type: [ String, Number ],
-    default: () => uuid.v4()
+    default: () => uuid()
   },
   opacity: {
     type: Number,
