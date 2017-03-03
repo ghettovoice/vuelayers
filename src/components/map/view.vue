@@ -81,7 +81,7 @@
     },
     setCurrentView ({ center, zoom, rotation }) {
       if (center != null && !isEqual(center, this.currentCenter)) {
-        this.view.setCenter(center)
+        this.view.setCenter(ol.proj.fromLonLat(center, this.projection))
       }
       if (zoom != null && zoom !== this.currentZoom) {
         this.view.setZoom(zoom)
