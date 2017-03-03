@@ -49,15 +49,6 @@
     },
     styleTarget () {
       return this.feature
-    },
-    /**
-     * @param {ol.style.Style} style
-     */
-    setStyle (style) {
-      // Do not setup style to ol.Feature header, feature level styles will be applied in
-      // layer level style function
-      this.styles = style
-      console.log(this._name)
     }
   }
 

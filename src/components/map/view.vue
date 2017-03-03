@@ -100,7 +100,6 @@
           warn('Map already has unmounted vl-view component. ' +
                'It will be replaced with new.')
         }
-        console.log(view.$vm)
         view.$vm.unmountView()
       }
 
