@@ -4,7 +4,7 @@
   </i>
 </template>
 
-<script rel>
+<script>
   /**
    * Wrapper around ol.Feature.
    */
@@ -12,6 +12,7 @@
   import uuid from 'node-uuid'
   import { omit } from 'lodash/fp'
   import rxSubs from 'vl-mixins/rx-subs'
+  import styleTarget from 'vl-components/style/style-target'
   import { warn } from 'vl-utils/debug'
 
   const props = {
@@ -25,19 +26,26 @@
     }
   }
 
-  const computed = {
-    plain () {
-      return {
-        ...this.$data,
-        ...this.$props,
-        layer: this.layer() && this.layer().$vm.id
-      }
-    }
-  }
-
   const methods = {
     refresh () {
       this.feature.changed()
+    },
+    plain () {
+      const obj = {
+        id: this.id,
+        layer: this.layer() && this.layer().$vm.id,
+        data: this.data
+      }
+
+      const geom = this.feature.getGeometry()
+      if (geom) {
+        obj.geometry = {
+          type: geom.getType(),
+          coordinates: geom.getCoordinates()
+        }
+      }
+
+      return obj
     }
   }
 
@@ -52,17 +60,16 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [ rxSubs ],
+    mixins: [ rxSubs, styleTarget ],
     inject: [ 'layer', 'source' ],
     props,
     methods,
     watch,
-    computed,
     provide () {
       return {
         feature: () => this.feature,
-        setStyle: this::setStyle,
-        getStyle: this::getStyle
+        setStyle: ::this.setStyle,
+        getStyle: ::this.getStyle
       }
     },
     created () {
@@ -76,12 +83,7 @@
       }
     },
     destroyed () {
-      console.log(this.source())
-      if (this.source()) {
-        this.source().removeFeature(this.feature)
-      } else {
-        // todo
-      }
+      this.source() && this.source().removeFeature(this.feature)
       this.feature = undefined
     }
   }
@@ -102,26 +104,6 @@
     this.feature.$vm = this
 
     return this.feature
-  }
-
-  function setStyle (style) {
-    this.styles = style
-
-    if (this.feature) {
-      if (this.styles && this.styles.length) {
-        this.feature.setStyle((feature, resolution) => {
-          // todo implement conditions on vl-style-container
-          return this.styles
-        })
-      } else {
-        this.feature.setStyle(undefined)
-      }
-      this.refresh()
-    }
-  }
-
-  function getStyle () {
-    return this.styles || []
   }
 </script>
 

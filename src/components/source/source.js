@@ -43,12 +43,7 @@ const methods = {
     }
   },
   unmountSource () {
-    console.log(this.layer())
-    if (this.layer()) {
-      this.layer().setSource(undefined)
-    } else {
-      // todo
-    }
+    this.layer() && this.layer().setSource(undefined)
   },
   refresh () {
     this.source.changed()

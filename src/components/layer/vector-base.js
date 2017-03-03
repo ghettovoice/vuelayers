@@ -1,5 +1,6 @@
 import ol from 'openlayers'
 import layer from 'vl-components/layer/layer'
+import styleTarget from 'vl-components/style/style-target'
 
 const props = {
   updateWhileAnimating: {
@@ -34,14 +35,14 @@ const methods = {
 }
 
 export default {
-  mixins: [ layer ],
+  mixins: [ layer, styleTarget ],
   props,
   methods,
   provide () {
     return {
       layer: () => this.layer,
-      setStyle: this::setStyle,
-      getStyle: this::getStyle
+      setStyle: ::this.setStyle,
+      getStyle: ::this.getStyle
     }
   },
   render (h) {
@@ -51,24 +52,4 @@ export default {
       }
     }, this.$slots.default)
   }
-}
-
-function setStyle (style) {
-  this.styles = style
-
-  if (this.layer) {
-    if (this.styles && this.styles.length) {
-      this.layer.setStyle((feature, resolution) => {
-        // todo implement conditions on vl-style-container
-        return this.styles
-      })
-    } else {
-      this.layer.setStyle(undefined)
-    }
-    this.refresh()
-  }
-}
-
-function getStyle () {
-  return this.styles || []
 }

@@ -62,7 +62,6 @@ const methods = {
    * @protected
    */
   unmountLayer () {
-    console.log(this.map())
     this.map() && this.map().removeLayer(this.layer)
   }
 }

@@ -8,10 +8,12 @@
         <vl-style-container>
           <vl-style-stroke color="#D421E5"/>
           <vl-style-fill color="#E5BC15"/>
+
           <vl-style-circle :radius="15">
             <vl-style-stroke color="#D421E5"/>
             <vl-style-fill color="#E5BC15"/>
           </vl-style-circle>
+
         </vl-style-container>
       </vl-interaction-select>
 
@@ -20,12 +22,21 @@
       </vl-layer-tile>
 
       <vl-layer-vector id="vector">
-        <vl-style-container>
+        <vl-style-container :condition="'feature.geometry && feature.geometry.type == \'Polygon\''">
           <vl-style-stroke color="#13A838" :width="stroke"/>
           <vl-style-fill :color="color"/>
 
           <vl-style-circle :radius="10">
             <vl-style-stroke color="#13A838" :width="stroke"/>
+            <vl-style-fill :color="color"/>
+          </vl-style-circle>
+        </vl-style-container>
+        <vl-style-container :condition="'feature.geometry && feature.geometry.type != \'Polygon\''">
+          <vl-style-stroke color="#787878" :width="stroke"/>
+          <vl-style-fill :color="color"/>
+
+          <vl-style-circle :radius="10">
+            <vl-style-stroke color="#787878" :width="stroke"/>
             <vl-style-fill :color="color"/>
           </vl-style-circle>
         </vl-style-container>

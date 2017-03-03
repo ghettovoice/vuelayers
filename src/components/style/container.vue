@@ -16,7 +16,7 @@
     zIndex: Number,
     // todo продумать до конца. condition будет проверяться в styleFunction, если функция - то будет вызвана в контексте { feature, resolution }
     condition: {
-      type: [ Function, Boolean ],
+      type: [ Function, Boolean, String ],
       default: true
     }
   }
@@ -36,11 +36,11 @@
     },
     mountStyle () {
       let currentStyle = this.getStyle() || []
-      currentStyle.push(this.style)
+      currentStyle.push([ this.style, this.condition ])
       this.setStyle(currentStyle)
     },
     unmountStyle () {
-      let currentStyle = (this.getStyle() || []).filter(style => style !== this.style)
+      let currentStyle = (this.getStyle() || []).filter(style => style[ 0 ] !== this.style)
       currentStyle.length || (currentStyle = undefined)
       this.setStyle(currentStyle)
     },

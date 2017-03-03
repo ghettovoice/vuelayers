@@ -5,6 +5,7 @@
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
   import interaction from 'vl-components/interaction/interaction'
+  import styleTarget, { filterStyles } from 'vl-components/style/style-target'
 
   // todo add other options, like event modifiers
   const props = {
@@ -38,7 +39,7 @@
      */
     createInteraction () {
       const style = this.styles && this.styles.length
-        ? () => this.styles
+        ? (feature, resolution) => filterStyles(feature.$vm.plain(), resolution)(this.styles)
         : undefined
       const serviceFeatures = this.serviceOverlay().getSource().getFeatures()
 
@@ -107,7 +108,7 @@
 
   export default {
     name: 'vl-interaction-select',
-    mixins: [ interaction ],
+    mixins: [ interaction, styleTarget ],
     inject: [ 'map', 'serviceOverlay' ],
     props,
     methods,
