@@ -91,20 +91,23 @@
       }
     },
     mountView () {
+      if (!this.map()) return
+
       let view = this.map().getView()
 
-      if (view && view.vm) {
+      if (view && view.$vm) {
         if (process.env.NODE_ENV !== 'production') {
           warn('Map already has unmounted vl-view component. ' +
                'It will be replaced with new.')
         }
-        view.vm.unmountView()
+        console.log(view.$vm)
+        view.$vm.unmountView()
       }
 
       this.map().setView(this.view)
     },
     unmountView () {
-      this.map().setView(undefined)
+      this.map() && this.map().setView(undefined)
     }
   }
 
@@ -142,10 +145,8 @@
     mounted () {
       this.mountView()
     },
-    beforeDestroy () {
-      this.unmountView()
-    },
     destroyed () {
+      this.unmountView()
       this.view = undefined
     }
   }
@@ -165,7 +166,7 @@
       minZoom: this.minZoom,
       projection: this.projection
     })
-    this.view.vm = this
+    this.view.$vm = this
 
     return this.view
   }

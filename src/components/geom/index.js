@@ -1,6 +1,12 @@
-export GeomPoint from './point'
-export GeomLineString from './line-string'
-export GeomPolygon from './polygon'
-export GeomMultiPoint from './multi-point'
-export GeomMultiLineString from './multi-line-string'
-export GeomMultiPolygon from './multi-polygon'
+import geom from './geom'
+
+export VlGeomPoint from './point'
+export VlGeomLineString from './line-string'
+export VlGeomPolygon from './polygon'
+export VlGeomMultiPoint from './multi-point'
+export VlGeomMultiLineString from './multi-line-string'
+export VlGeomMultiPolygon from './multi-polygon'
+
+export const mixins = {
+  geom
+}

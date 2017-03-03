@@ -38,7 +38,7 @@ const methods = {
      * @protected
      */
     this.geometry = this.createGeometry()
-    this.geometry.vm = this
+    this.geometry.$vm = this
     /**
      * @protected
      */
@@ -60,13 +60,13 @@ const methods = {
    * @protected
    */
   mountGeometry () {
-    this.feature().setGeometry(this.geometry)
+    this.feature() && this.feature().setGeometry(this.geometry)
   },
   /**
    * @protected
    */
   unmountGeometry () {
-    this.feature().setGeometry(undefined)
+    this.feature() && this.feature().setGeometry(undefined)
   },
   refresh () {
     this.geometry.changed()
@@ -104,10 +104,8 @@ export default {
   mounted () {
     this.mountGeometry()
   },
-  beforeDestroy () {
-    this.unmountGeometry()
-  },
   destroyed () {
+    this.unmountGeometry()
     this.geometry = undefined
   }
 }

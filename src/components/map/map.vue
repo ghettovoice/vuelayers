@@ -63,11 +63,9 @@
         this.refresh()
       })
     },
-    beforeDestroy () {
+    destroyed () {
       this.serviceOverlay.setMap(undefined)
       this.map.setTarget(undefined)
-    },
-    destroyed () {
       this.map = this.serviceOverlay = undefined
     }
   }
@@ -93,7 +91,7 @@
       keyboardEventTarget: this.keyboardEventTarget
     })
 
-    this.map.vm = this
+    this.map.$vm = this
 
     this.serviceOverlay = new ol.layer.Vector({
       map: this.map,

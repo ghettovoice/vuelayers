@@ -4,7 +4,7 @@
       <vl-map-view :zoom="2" @change="viewChanged"/>
       <vl-geoloc/>
 
-      <vl-interaction-select ref="select" :selected="selected">
+      <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
         <vl-style-container>
           <vl-style-stroke color="#D421E5"/>
           <vl-style-fill color="#E5BC15"/>
@@ -61,10 +61,19 @@
       toggleSelect (id) {
         const idx = this.selected.indexOf(id)
         if (idx === -1) {
-          this.selected.push(id)
+          this.select(id)
         } else {
-          this.selected.splice(idx, 1)
+          this.unselect(id)
         }
+      },
+      select (id) {
+        if (this.selected.indexOf(id) === -1) {
+          this.selected.push(id)
+        }
+      },
+      unselect (id) {
+        let idx = this.selected.indexOf(id)
+        if (idx !== -1) this.selected.splice(idx, 1)
       }
     },
     data () {

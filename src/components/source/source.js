@@ -1,5 +1,6 @@
 import rxSubs from 'vl-mixins/rx-subs'
 import { consts as olConsts } from 'vl-ol'
+import { warn } from 'vl-utils/debug'
 
 const props = {
   attributions: String,
@@ -25,7 +26,7 @@ const methods = {
      * @protected
      */
     this.source = this.createSource()
-    this.source.vm = this
+    this.source.$vm = this
   },
   /**
    * @return {ol.source.Source}
@@ -35,10 +36,19 @@ const methods = {
     throw new Error('Not implemented method')
   },
   mountSource () {
-    this.layer().setSource(this.source)
+    if (this.layer()) {
+      this.layer().setSource(this.source)
+    } else if (process.env.NODE_ENV !== 'production') {
+      warn("Invalid usage of source component, should have layer component among it's ancestors")
+    }
   },
   unmountSource () {
-    this.layer().setSource(undefined)
+    console.log(this.layer())
+    if (this.layer()) {
+      this.layer().setSource(undefined)
+    } else {
+      // todo
+    }
   },
   refresh () {
     this.source.changed()
@@ -78,10 +88,8 @@ export default {
   mounted () {
     this.mountSource()
   },
-  beforeDestroy () {
-    this.unmountSource()
-  },
   destroyed () {
+    this.unmountSource()
     this.source = undefined
   }
 }

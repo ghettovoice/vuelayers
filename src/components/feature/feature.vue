@@ -12,6 +12,7 @@
   import uuid from 'node-uuid'
   import { omit } from 'lodash/fp'
   import rxSubs from 'vl-mixins/rx-subs'
+  import { warn } from 'vl-utils/debug'
 
   const props = {
     id: {
@@ -29,7 +30,7 @@
       return {
         ...this.$data,
         ...this.$props,
-        layer: this.layer() && this.layer().vm.id
+        layer: this.layer() && this.layer().$vm.id
       }
     }
   }
@@ -68,12 +69,19 @@
       this::createFeature()
     },
     mounted () {
-      this.source().addFeature(this.feature)
-    },
-    beforeDestroy () {
-      this.source().removeFeature(this.feature)
+      if (this.source()) {
+        this.source().addFeature(this.feature)
+      } else if (process.env.NODE_ENV !== 'production') {
+        warn("Invalid usage of feature component, should have source component among it's ancestors")
+      }
     },
     destroyed () {
+      console.log(this.source())
+      if (this.source()) {
+        this.source().removeFeature(this.feature)
+      } else {
+        // todo
+      }
       this.feature = undefined
     }
   }
@@ -91,7 +99,7 @@
      */
     this.feature = new ol.Feature(omit([ 'geometry' ], this.data))
     this.feature.setId(this.id)
-    this.feature.vm = this
+    this.feature.$vm = this
 
     return this.feature
   }

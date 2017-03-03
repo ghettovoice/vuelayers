@@ -48,11 +48,9 @@
       this::createGeolocApi()
       this::subscribeToGeolocation()
     },
-    beforeDestroy () {
-      this.geoloc.setTracking(false)
-      this.serviceOverlay().getSource().removeFeature(this.positionFeature)
-    },
     destroyed () {
+      this.geoloc.setTracking(false)
+      this.serviceOverlay() && this.serviceOverlay().getSource().removeFeature(this.positionFeature)
       this.geoloc = this.positionFeature = undefined
     }
   }
@@ -70,7 +68,7 @@
       projection: this.projection
     })
 
-    this.geoloc.vm = this
+    this.geoloc.$vm = this
     /**
      * @type {ol.Feature}
      * @protected
@@ -85,7 +83,7 @@
         anchor: [ 0.5, 1 ]
       })
     }))
-    this.serviceOverlay().getSource().addFeature(this.positionFeature)
+    this.serviceOverlay() && this.serviceOverlay().getSource().addFeature(this.positionFeature)
 
     return this.geoloc
   }

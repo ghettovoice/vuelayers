@@ -1,6 +1,6 @@
 <script>
   import ol from 'openlayers'
-  import { forEach } from 'lodash/fp'
+  import { forEach, difference } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
@@ -66,7 +66,7 @@
       const selection = this.interaction.getFeatures()
       const layers = this.map().getLayers()
         .getArray()
-        .filter(layer => layer.vm && layer instanceof ol.layer.Vector)
+        .filter(layer => layer.$vm && layer instanceof ol.layer.Vector)
 
       if (this.currentSelected.includes(id)) return
 
@@ -97,8 +97,11 @@
 
   const watch = {
     selected (selected) {
-      this.unselectAll()
-      selected.forEach(id => this.select(id))
+      let forSelect = difference(selected, this.currentSelected)
+      let forUnselect = difference(this.currentSelected, selected)
+
+      forSelect.forEach(id => this.select(id))
+      forUnselect.forEach(id => this.unselect(id))
     }
   }
 

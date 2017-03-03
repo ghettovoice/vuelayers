@@ -12,7 +12,7 @@ const methods = {
      * @protected
      */
     this.interaction = this.createInteraction()
-    this.interaction.vm = this
+    this.interaction.$vm = this
   },
   /**
    * @return {ol.interaction.Interaction}
@@ -25,13 +25,13 @@ const methods = {
    * @protected
    */
   mountInteraction () {
-    this.map().addInteraction(this.interaction)
+    this.map() && this.map().addInteraction(this.interaction)
   },
   /**
    * @protected
    */
   unmountInteraction () {
-    this.map().removeInteraction(this.interaction)
+    this.map() && this.map().removeInteraction(this.interaction)
   },
   refresh () {
     this.interaction.changed()
@@ -61,10 +61,8 @@ export default {
   mounted () {
     this.mountInteraction()
   },
-  beforeDestroy () {
-    this.unmountInteraction()
-  },
   destroyed () {
+    this.unmountInteraction()
     this.interaction = undefined
   }
 }

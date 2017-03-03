@@ -15,7 +15,7 @@ const methods = {
      * @protected
      */
     this.style = this.createStyle()
-    this.style.vm = this
+    this.style.$vm = this
   },
   /**
    * @return {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text}
@@ -58,10 +58,8 @@ export default {
     this.initialize()
     this.mountStyle()
   },
-  beforeDestroy () {
-    this.unmountStyle()
-  },
   destroyed () {
+    this.unmountStyle()
     this.style = undefined
   }
 }

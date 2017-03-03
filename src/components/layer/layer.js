@@ -42,7 +42,7 @@ const methods = {
      * @protected
      */
     this.layer = this.createLayer()
-    this.layer.vm = this
+    this.layer.$vm = this
     this.layer.set('id', this.id)
   },
   /**
@@ -56,13 +56,14 @@ const methods = {
    * @protected
    */
   mountLayer () {
-    this.map().addLayer(this.layer)
+    this.map() && this.map().addLayer(this.layer)
   },
   /**
    * @protected
    */
   unmountLayer () {
-    this.map().removeLayer(this.layer)
+    console.log(this.map())
+    this.map() && this.map().removeLayer(this.layer)
   }
 }
 
@@ -108,10 +109,8 @@ export default {
   mounted () {
     this.mountLayer()
   },
-  beforeDestroy () {
-    this.unmountLayer()
-  },
   destroyed () {
+    this.unmountLayer()
     this.layer = undefined
   }
 }

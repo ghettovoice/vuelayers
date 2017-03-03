@@ -1,4 +1,4 @@
-/* global PKG_VERSION */
+/* global PKG_VERSION, PKG_FULLNAME */
 /**
  * VueLayers
  * Vue components to work with OpenLayers 3.
@@ -7,7 +7,7 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
-import { omit } from 'lodash/fp'
+import { omit, merge } from 'lodash/fp'
 import * as components from './components'
 
 const keys = [
@@ -20,14 +20,19 @@ const keys = [
 
 const flatComponents = {
   ...omit(keys, components),
-  ...keys.reduce((all, key) => ({ ...all, ...components[key] }), {})
+  ...keys.reduce((all, key) => merge(all, components[ key ]), {})
 }
 
 export default {
+  PKG_NAME: PKG_FULLNAME,
   VERSION: PKG_VERSION,
   ...flatComponents,
   install (Vue) {
     Object.keys(flatComponents)
-      .forEach(name => Vue.use(flatComponents[ name ]))
+      .forEach(name => {
+        if (typeof flatComponents[ name ].install === 'function') {
+          Vue.use(flatComponents[ name ])
+        }
+      })
   }
 }
