@@ -1,5 +1,6 @@
 <template>
-  <div class="vl-map" :tabindex="tabIndex">
+  <div class="vl-map">
+    <div class="map" :tabindex="tabIndex" ref="map"></div>
     <slot></slot>
   </div>
 </template>
@@ -58,7 +59,7 @@
       this::createMap()
     },
     mounted () {
-      this.map.setTarget(this.$el)
+      this.map.setTarget(this.$refs.map)
       this.$nextTick(() => {
         this.refresh()
       })
