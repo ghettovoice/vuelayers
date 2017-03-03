@@ -19,7 +19,7 @@ export default {
   unbind (el, binding, vnode) {
     const component = vnode.componentInstance
     if (component.styleTarget()) {
-      component.styleTarget().setStyle(component.styles)
+      component.setStyle(component.styles)
     }
   },
   update (el, binding, vnode) {

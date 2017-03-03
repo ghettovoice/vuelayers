@@ -10,6 +10,7 @@
    * Acts as an style container that will be injected into "style" slot inside layer or feature components.
    */
   import ol from 'openlayers'
+  import { warn } from 'vl-utils/debug'
   import style from 'vl-components/style/style'
 
   const props = {
@@ -35,11 +36,26 @@
     },
     mountStyle () {
       let currentStyle = this.getStyle() || []
+      if (!Array.isArray(currentStyle)) {
+        if (process.env.NODE_ENV !== 'production') {
+          warn('Current style is not an array, will be replaced with new style array')
+        }
+        currentStyle = []
+      }
+
       currentStyle.push([ this.style, this.condition ])
       this.setStyle(currentStyle)
     },
     unmountStyle () {
-      let currentStyle = (this.getStyle() || []).filter(style => style[ 0 ] !== this.style)
+      let currentStyle = this.getStyle() || []
+      if (!Array.isArray(currentStyle)) {
+        if (process.env.NODE_ENV !== 'production') {
+          warn('Current style is not an array, will be replaced with new style array')
+        }
+        currentStyle = []
+      }
+
+      currentStyle = currentStyle.filter(s => s[0] !== this.style)
       currentStyle.length || (currentStyle = undefined)
       this.setStyle(currentStyle)
     }

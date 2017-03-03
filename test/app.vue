@@ -21,7 +21,7 @@
         <vl-source-osm/>
       </vl-layer-tile>
 
-      <vl-layer-vector id="vector" v-style-func="styleFunction()">
+      <vl-layer-vector id="vector">
         <vl-style-container>
           <vl-style-stroke color="#13A838" :width="20"/>
           <vl-style-fill :color="color"/>
@@ -43,6 +43,16 @@
         <vl-source-vector>
           <vl-feature v-for="feature in features" :key="feature.id" :id="feature.id" :data="feature.data">
             <component :is="feature.geometry.type" :coordinates="feature.geometry.coordinates"/>
+
+            <vl-style-container :condition="notSelected">
+              <vl-style-stroke color="#E514A7" :width="5"/>
+              <vl-style-fill :color="feature.data && feature.data.color || '#E50E00'"/>
+
+              <vl-style-circle :radius="10">
+                <vl-style-stroke color="feature.data && feature.data.color || '#E50E00'" :width="5"/>
+                <vl-style-fill :color="color"/>
+              </vl-style-circle>
+            </vl-style-container>
           </vl-feature>
         </vl-source-vector>
       </vl-layer-vector>
@@ -114,6 +124,9 @@
             })
           ]
         }
+      },
+      notSelected (feature) {
+        return !this.selected.includes(feature.id)
       }
     },
     data () {

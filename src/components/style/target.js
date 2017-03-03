@@ -18,7 +18,11 @@ export default {
 
       if (styleTarget) {
         if (this.styles && this.styles.length) {
-          styleTarget.setStyle(isFunction(this.styles) ? this.styles : createStyleFunc(this.styles))
+          styleTarget.setStyle(
+            isFunction(this.styles)
+              ? this.styles
+              : createStyleFunc(this.styles, styleTarget)
+          )
         } else {
           styleTarget.setStyle(undefined)
         }
@@ -32,24 +36,39 @@ export default {
 }
 
 export function createStylesFilter (styles) {
-  return (feature, resolution) => flow(
+  return (featureData, resolution) => flow(
     filter(([ style, condition ]) => {
       if (condition == null) return style
 
       if (condition != null && isString(condition)) {
         // eslint-disable-next-line no-new-func
-        condition = new Function('feature', 'resolution', `;return ${condition};`)
+        condition = new Function('feature', 'resolution', `return ${condition}`)
       }
 
       return isBoolean(condition) && condition ||
-             isFunction(condition) && condition(feature, resolution)
+             isFunction(condition) && condition(featureData, resolution)
     }),
     map(([ style ]) => style)
   )(styles)
 }
 
-export function createStyleFunc (styles) {
-  const styleFilter = createStylesFilter(styles)
+export function createStyleFunc (styles, styleTarget) {
+  const styleTargetStylesFilter = createStylesFilter(styles)
 
-  return (feature, resolution) => styleFilter(feature.$vm.plain(), resolution)
+  return function __styleTargetStyleFunc (feature, resolution) {
+    console.log(feature)
+    // apply feature level styles
+    if (feature.$vm && feature.$vm.styles && feature.$vm.styles.length) {
+      const featureStylesFilter = createStylesFilter(feature.$vm.styles)
+
+      return featureStylesFilter(feature.$vm.plain(), resolution)
+    }
+
+    return styleTargetStylesFilter(
+      feature.$vm
+        ? feature.$vm.plain()
+        : feature.getProperties(),
+      resolution
+    )
+  }
 }
