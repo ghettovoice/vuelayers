@@ -46,7 +46,7 @@ const reduceWithKey = reduce.convert({ cap: false })
  * @property {ol.Color | string | undefined} iconColor
  * @property {ol.style.IconOrigin | undefined} iconOffsetOrigin
  */
-function getDefaultStyleHash () {
+export function getDefaultStyleHash () {
   const default_ = {
     fillColor: [ 255, 255, 255, 0.7 ],
     strokeColor: [ 30, 54, 133, 1 ],
@@ -111,7 +111,7 @@ function getDefaultStyleHash () {
  * @return {Object<string, ol.style.Style[]>}
  * @function
  */
-const transformStyleHash = reduceWithKey((olStyleHash, geoStyles, styleName) => {
+export const transformStyleHash = reduceWithKey((olStyleHash, geoStyles, styleName) => {
   if (geoStyles && geoStyles.length) {
     const olStyle = geoStyles.map(transformStyle)
 
@@ -128,7 +128,6 @@ const transformStyleHash = reduceWithKey((olStyleHash, geoStyles, styleName) => 
  *
  * @param {Object} [styleHash]
  * @return {ol.StyleFunction}
- * @todo add support for dynamic styling through template strings, or simply set style on Feature
  */
 export function createStyleFunc (styleHash) {
   styleHash = merge(getDefaultStyleHash(), styleHash)
@@ -153,7 +152,7 @@ export function createStyleFunc (styleHash) {
  * @param {GeoStyle} geoStyle
  * @return {ol.style.Style|undefined}
  */
-function transformStyle (geoStyle) {
+export function transformStyle (geoStyle) {
   if (isEmpty(geoStyle)) return
 
   const olStyle = {
@@ -176,7 +175,7 @@ const addPrefix = prefix => str => prefix + (prefix ? upperFirst(str) : str)
  * @param {string} [prefix]
  * @returns {ol.style.Fill|undefined}
  */
-function transformFillStyle (geoStyle, prefix = '') {
+export function transformFillStyle (geoStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
   const keys = [ 'fillColor' ].map(prefixKey)
 
@@ -205,7 +204,7 @@ function transformFillStyle (geoStyle, prefix = '') {
  * @param {string} [prefix]
  * @returns {ol.style.Stroke|undefined}
  */
-function transformStrokeStyle (geoStyle, prefix = '') {
+export function transformStrokeStyle (geoStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
   const keys = [ 'strokeColor', 'strokeWidth', 'strokeDash', 'strokeCap', 'strokeJoin' ].map(prefixKey)
 
@@ -244,7 +243,7 @@ function transformStrokeStyle (geoStyle, prefix = '') {
  * @param {GeoStyle} geoStyle
  * @returns {ol.style.Icon|ol.style.Circle|ol.style.RegularShape|undefined}
  */
-function transformImageStyle (geoStyle) {
+export function transformImageStyle (geoStyle) {
   if (
     isEmpty(geoStyle.iconUrl) && isEmpty(geoStyle.iconImg) &&
     isEmpty(geoStyle.iconPoints) && !isNumeric(geoStyle.iconRadius)
@@ -315,7 +314,7 @@ function transformImageStyle (geoStyle) {
  * @param {GeoStyle} geoStyle
  * @returns {ol.style.Text|undefined}
  */
-function transformTextStyle (geoStyle) {
+export function transformTextStyle (geoStyle) {
   // noinspection JSValidateTypes
   if (geoStyle.text == null) {
     return

@@ -12,7 +12,7 @@
   import uuid from 'node-uuid'
   import { omit } from 'lodash/fp'
   import rxSubs from 'vl-mixins/rx-subs'
-  import styleTarget from 'vl-components/style/style-target'
+  import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
 
   const props = {
@@ -46,6 +46,9 @@
       }
 
       return obj
+    },
+    styleTarget () {
+      return this.feature
     }
   }
 
@@ -58,6 +61,8 @@
     }
   }
 
+  const { provide: styleTargetProvide } = styleTarget
+
   export default {
     name: 'vl-feature',
     mixins: [ rxSubs, styleTarget ],
@@ -67,9 +72,8 @@
     watch,
     provide () {
       return {
-        feature: () => this.feature,
-        setStyle: ::this.setStyle,
-        getStyle: ::this.getStyle
+        ...this::styleTargetProvide(),
+        feature: () => this.feature
       }
     },
     created () {

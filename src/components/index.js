@@ -6,6 +6,5 @@ export * as geom from './geom'
 export * as layer from './layer'
 export * as source from './source'
 export * as style from './style'
-export VlStyleContainer from './style-container'
 export * as interaction from './interaction'
 

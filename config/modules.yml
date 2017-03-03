@@ -65,6 +65,7 @@ map:
   - name: mixins/geom
     path: components/geom/geom
     alias: vl-components/geom/geom
+
   # components
   - name: geom-point
     path: components/geom/point
@@ -105,6 +106,7 @@ map:
   - name: mixins/layer-vector
     path: components/layer/vector-base
     alias: vl-components/layer/vector-base
+
   # components
   - name: layer-tile
     path: components/layer/tile
@@ -133,6 +135,7 @@ map:
   - name: mixins/source-vector
     path: components/source/vector-base
     alias: vl-components/source/vector-base
+
   # components
   - name: source-mapbox
     path: components/source/mapbox
@@ -161,10 +164,20 @@ map:
   - name: mixins/style-image
     path: components/style/image
     alias: vl-components/style/image
+
+  - name: mixins/style-target
+    path: components/style/target
+    alias: vl-components/style/target
+
+  # directives
+  - name: directives/style-func
+    path: components/style/func
+    alias: vl-components/style/func
+
   # components
   - name: style-container
-    path: components/style-container
-    alias: vl-components/style-container
+    path: components/style/container
+    alias: vl-components/style/container
 
   - name: style-fill
     path: components/style/fill
@@ -189,6 +202,7 @@ map:
   - name: mixins/interaction
     path: components/interaction/interaction
     alias: vl-components/interaction/interaction
+
   # components
   - name: interaction-select
     path: components/interaction/select

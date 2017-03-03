@@ -9,6 +9,7 @@
       <w>positionchanged</w>
       <w>reprojection</w>
       <w>viewchanged</w>
+      <w>vnode</w>
       <w>vuelayers</w>
     </words>
   </dictionary>

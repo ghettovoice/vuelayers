@@ -25,16 +25,6 @@
         fill: this.fill,
         stroke: this.stroke
       })
-    },
-    /**
-     * @return {{setFill: function, setStroke: function}}
-     * @protected
-     */
-    getStyleTarget () {
-      return {
-        setFill: this::setFill,
-        setStroke: this::setStroke
-      }
     }
   }
 

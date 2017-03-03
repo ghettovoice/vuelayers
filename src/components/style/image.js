@@ -1,4 +1,3 @@
-import { debounce } from 'lodash/fp'
 import style from 'vl-components/style/style'
 
 const styleRefresh = style.methods.refresh
@@ -15,10 +14,10 @@ const methods = {
   unmountStyle () {
     this.setImage(undefined)
   },
-  refresh: debounce(100, function () {
+  refresh () {
     this.initialize()
     this::styleRefresh()
-  })
+  }
 }
 
 export default {

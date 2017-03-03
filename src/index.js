@@ -7,9 +7,12 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
-import { omit, merge } from 'lodash/fp'
+import { omit, merge, forEach } from 'lodash/fp'
 import * as components from './components'
+import * as ol from './ol'
+import * as rx from './rx'
 
+const forEachWithKey = forEach.convert({ cap: false })
 const keys = [
   'geom',
   'layer',
@@ -27,12 +30,15 @@ export default {
   PKG_NAME: PKG_FULLNAME,
   VERSION: PKG_VERSION,
   ...flatComponents,
+  ol,
+  rx,
   install (Vue) {
-    Object.keys(flatComponents)
-      .forEach(name => {
-        if (typeof flatComponents[ name ].install === 'function') {
-          Vue.use(flatComponents[ name ])
-        }
-      })
+    forEachWithKey((component, key) => {
+      if (component.install) {
+        Vue.use(component)
+      } else if (key === 'directives') {
+        forEach(::Vue.use, component)
+      }
+    }, flatComponents)
   }
 }

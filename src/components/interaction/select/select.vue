@@ -5,7 +5,7 @@
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
   import interaction from 'vl-components/interaction/interaction'
-  import styleTarget, { filterStyles } from 'vl-components/style/style-target'
+  import styleTarget, { createStyleFunc } from 'vl-components/style/target'
 
   // todo add other options, like event modifiers
   const props = {
@@ -39,7 +39,7 @@
      */
     createInteraction () {
       const style = this.styles && this.styles.length
-        ? (feature, resolution) => filterStyles(feature.$vm.plain(), resolution)(this.styles)
+        ? createStyleFunc(this.styles)
         : undefined
       const serviceFeatures = this.serviceOverlay().getSource().getFeatures()
 
@@ -93,6 +93,19 @@
     },
     unselectAll () {
       this.interaction.getFeatures().clear()
+    },
+    styleTarget () {
+      return this.interaction
+    },
+    setStyle (style) {
+      this.styles = style
+
+      if (this.interaction) {
+        this.recreate()
+      }
+    },
+    getStyle () {
+      return this.styles || []
     }
   }
 
@@ -106,6 +119,9 @@
     }
   }
 
+  const { provide: interactionProvide } = interaction
+  const { provide: styleTargetProvide } = styleTarget
+
   export default {
     name: 'vl-interaction-select',
     mixins: [ interaction, styleTarget ],
@@ -115,8 +131,8 @@
     watch,
     provide () {
       return {
-        setStyle: this::setStyle,
-        getStyle: this::getStyle
+        ...this::interactionProvide(),
+        ...this::styleTargetProvide()
       }
     },
     data () {
@@ -124,18 +140,6 @@
         currentSelected: this.selected.slice()
       }
     }
-  }
-
-  function setStyle (style) {
-    this.styles = style
-
-    if (this.interaction) {
-      this.recreate()
-    }
-  }
-
-  function getStyle () {
-    return this.styles || []
   }
 
   function subscribeToInteractionChanges () {

@@ -3,7 +3,6 @@
  * Exposes for children inner OpenLayer style object as styleTarget.
  * Injects styleTarget from parent to apply self style.
  */
-import { debounce } from 'lodash/fp'
 
 const methods = {
   /**
@@ -44,9 +43,9 @@ const methods = {
   unmountStyle () {
     throw new Error('Not implemented method')
   },
-  refresh: debounce(100, function () {
+  refresh () {
     this.mountStyle()
-  })
+  }
 }
 
 export default {

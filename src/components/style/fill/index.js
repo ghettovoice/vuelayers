@@ -1,4 +1,4 @@
-import StyleFill from './style.vue'
+import StyleFill from './fill.vue'
 
 StyleFill.install = function (Vue) {
   Vue.component(StyleFill.name, StyleFill)

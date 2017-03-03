@@ -21,23 +21,22 @@
         <vl-source-osm/>
       </vl-layer-tile>
 
-      <vl-layer-vector id="vector">
-        <vl-style-container :condition="'feature.geometry && feature.geometry.type == \'Polygon\''">
-          <vl-style-stroke color="#13A838" :width="stroke"/>
+      <vl-layer-vector id="vector" v-style-func="styleFunction()">
+        <vl-style-container>
+          <vl-style-stroke color="#13A838" :width="20"/>
           <vl-style-fill :color="color"/>
 
           <vl-style-circle :radius="10">
-            <vl-style-stroke color="#13A838" :width="stroke"/>
+            <vl-style-stroke color="#13A838" :width="20"/>
             <vl-style-fill :color="color"/>
           </vl-style-circle>
         </vl-style-container>
-        <vl-style-container :condition="'feature.geometry && feature.geometry.type != \'Polygon\''">
+
+        <vl-style-container>
           <vl-style-stroke color="#787878" :width="stroke"/>
-          <vl-style-fill :color="color"/>
 
           <vl-style-circle :radius="10">
             <vl-style-stroke color="#787878" :width="stroke"/>
-            <vl-style-fill :color="color"/>
           </vl-style-circle>
         </vl-style-container>
 
@@ -63,6 +62,9 @@
 </template>
 
 <script>
+  import ol from 'openlayers'
+  import { style as olStyleHelper } from '../src/ol'
+
   export default {
     name: 'app',
     methods: {
@@ -85,6 +87,33 @@
       unselect (id) {
         let idx = this.selected.indexOf(id)
         if (idx !== -1) this.selected.splice(idx, 1)
+      },
+      styleFunction () {
+        const style = olStyleHelper.transformStyle({
+          strokeWidth: 5,
+          strokeColor: '#E514A7',
+          fillColor: '#E50E00',
+          iconRadius: 10
+        })
+
+        return (feature, resolution) => {
+          if (feature.$vm.data.color == null) return [ style ]
+
+          return [
+            new ol.style.Style({
+              stroke: style.stroke,
+              fill: olStyleHelper.transformFillStyle({
+                fillColor: feature.$vm.data.color
+              }),
+              image: olStyleHelper.transformImageStyle({
+                strokeWidth: 5,
+                strokeColor: '#E514A7',
+                fillColor: feature.$vm.data.color,
+                iconRadius: 10
+              })
+            })
+          ]
+        }
       }
     },
     data () {
@@ -117,7 +146,7 @@
           {
             id: 3,
             data: {
-              color: 'rgba(33, 66, 99, 0.3)'
+//              color: 'rgba(33, 66, 99, 0.3)'
             },
             geometry: {
               type: 'vl-geom-multi-point',

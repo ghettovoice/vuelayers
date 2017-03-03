@@ -14,7 +14,6 @@
 
   const props = {
     zIndex: Number,
-    // todo продумать до конца. condition будет проверяться в styleFunction, если функция - то будет вызвана в контексте { feature, resolution }
     condition: {
       type: [ Function, Boolean, String ],
       default: true
@@ -43,13 +42,6 @@
       let currentStyle = (this.getStyle() || []).filter(style => style[ 0 ] !== this.style)
       currentStyle.length || (currentStyle = undefined)
       this.setStyle(currentStyle)
-    },
-    getStyleTarget () {
-      return {
-        setFill: this::setFill,
-        setStroke: this::setStroke,
-        setImage: this::setImage
-      }
     }
   }
 

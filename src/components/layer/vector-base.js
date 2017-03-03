@@ -1,6 +1,6 @@
 import ol from 'openlayers'
 import layer from 'vl-components/layer/layer'
-import styleTarget from 'vl-components/style/style-target'
+import styleTarget from 'vl-components/style/target'
 
 const props = {
   updateWhileAnimating: {
@@ -31,8 +31,14 @@ const methods = {
       updateWhileAnimating: this.updateWhileAnimating,
       updateWhileInteracting: this.updateWhileInteracting
     })
+  },
+  styleTarget () {
+    return this.layer
   }
 }
+
+const { provide: layerProvide } = layer
+const { provide: styleTargetProvide } = styleTarget
 
 export default {
   mixins: [ layer, styleTarget ],
@@ -40,9 +46,8 @@ export default {
   methods,
   provide () {
     return {
-      layer: () => this.layer,
-      setStyle: ::this.setStyle,
-      getStyle: ::this.getStyle
+      ...this::layerProvide(),
+      ...this::styleTargetProvide()
     }
   },
   render (h) {
