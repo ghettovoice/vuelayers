@@ -44,7 +44,7 @@
           <vl-feature v-for="feature in features" :key="feature.id" :id="feature.id" :data="feature.data">
             <component :is="feature.geometry.type" :coordinates="feature.geometry.coordinates"/>
 
-            <vl-style-container :condition="notSelected">
+            <vl-style-container v-if="selected.includes(feature.id)">
               <vl-style-stroke color="#E514A7" :width="5"/>
               <vl-style-fill :color="feature.data && feature.data.color || '#E50E00'"/>
 
