@@ -7,4 +7,3 @@ export * as layer from './layer'
 export * as source from './source'
 export * as style from './style'
 export * as interaction from './interaction'
-

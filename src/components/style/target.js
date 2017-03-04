@@ -45,8 +45,8 @@ export function createStylesFilter (styles) {
         condition = new Function('feature', 'resolution', `return ${condition}`)
       }
 
-      return isBoolean(condition) && condition ||
-             isFunction(condition) && condition(featureData, resolution)
+      return (isBoolean(condition) && condition) ||
+             (isFunction(condition) && condition(featureData, resolution))
     }),
     map(([ style ]) => style)
   )(styles)

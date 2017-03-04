@@ -222,7 +222,6 @@ export function transformStrokeStyle (geoStyle, prefix = '') {
           case prefixKey('strokeJoin'):
             name = 'line' + name.replace(new RegExp(prefixKey('stroke')), '')
             break
-
         }
 
         result[ name ] = value

@@ -62,4 +62,3 @@ export default {
     this.style = undefined
   }
 }
-

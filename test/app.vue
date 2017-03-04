@@ -143,7 +143,7 @@
             },
             geometry: {
               type: 'vl-geom-polygon',
-              coordinates: [ [ [ 10, 10 ], [ 10, 70 ], [ 70, 10 ], [ 10, 10 ] ] ]
+              coordinates: [ [ [ 0, 50 ], [ 10, 70 ], [ 70, 10 ], [ 10, 10 ] ] ]
             }
           },
           {
