@@ -94,6 +94,9 @@
     },
     anchor () {
       this.refresh()
+    },
+    scale () {
+      this.refresh()
     }
   }
 

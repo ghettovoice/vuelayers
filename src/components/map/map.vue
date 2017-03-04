@@ -51,7 +51,7 @@
     provide () {
       return {
         map: () => this.map,
-        serviceOverlay: () => this.serviceOverlay,
+        serviceLayer: () => this.serviceLayer,
         view: () => this.map.getView()
       }
     },
@@ -65,9 +65,9 @@
       })
     },
     destroyed () {
-      this.serviceOverlay.setMap(undefined)
+      this.serviceLayer.setMap(undefined)
       this.map.setTarget(undefined)
-      this.map = this.serviceOverlay = undefined
+      this.map = this.serviceLayer = undefined
     }
   }
 
@@ -94,7 +94,7 @@
 
     this.map.$vm = this
 
-    this.serviceOverlay = new ol.layer.Vector({
+    this.serviceLayer = new ol.layer.Vector({
       map: this.map,
       source: new ol.source.Vector()
     })
@@ -105,6 +105,7 @@
 
 <style lang="scss" rel="stylesheet/scss">
   @import "../../styles/mixins";
+  @import "~openlayers/dist/ol";
 
   .vl-map, .vl-map .map {
     @include vl-wh(100%, 100%);

@@ -1,5 +1,6 @@
 export default {
   methods: {
+    subscribeAll () { },
     /**
      * @protected
      */
@@ -17,7 +18,7 @@ export default {
      */
     this.rxSubs = {}
   },
-  beforeDestroy () {
+  destroyed () {
     this.unsubscribeAll()
   }
 }

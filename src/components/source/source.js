@@ -38,15 +38,17 @@ const methods = {
   mountSource () {
     if (this.layer()) {
       this.layer().setSource(this.source)
+      this.subscribeAll()
     } else if (process.env.NODE_ENV !== 'production') {
       warn("Invalid usage of source component, should have layer component among it's ancestors")
     }
   },
   unmountSource () {
+    this.unsubscribeAll()
     this.layer() && this.layer().setSource(undefined)
   },
   refresh () {
-    this.source.changed()
+    this.source && this.source.changed()
   }
 }
 

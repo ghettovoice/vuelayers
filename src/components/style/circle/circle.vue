@@ -31,6 +31,9 @@
   const watch = {
     radius () {
       this.refresh()
+    },
+    snapToPixel () {
+      this.refresh()
     }
   }
 

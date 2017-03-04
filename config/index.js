@@ -35,7 +35,8 @@ module.exports = {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
     outPath: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'assets',
+    assetsPublicPath: '/',
+    assetsSubDirectory: 'static',
     publicPath: '/',
     productionSourceMap: true,
     // Run the build command with an extra argument to
@@ -46,13 +47,13 @@ module.exports = {
   },
   dev: {
     entry: {
-      // ...entry,
       app: path.resolve(__dirname, '../test/main.js')
     },
     env: require('./dev.env'),
     port: 8081,
     autoOpenBrowser: true,
-    assetsSubDirectory: 'assets',
+    assetsPublicPath: '/',
+    assetsSubDirectory: 'static',
     publicPath: '/',
     proxyTable: {},
     // CSS Sourcemaps off by default because relative paths are "buggy"

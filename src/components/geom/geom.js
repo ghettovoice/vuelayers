@@ -6,6 +6,7 @@ import 'rxjs/add/operator/map'
 import 'vl-rx'
 import rxSubs from 'vl-mixins/rx-subs'
 import { coord as coordHelper } from 'vl-ol'
+import { warn } from 'vl-utils/debug'
 
 const props = {
   /**
@@ -46,8 +47,6 @@ const methods = {
 
     this.currentCoordinates = this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view().getProjection())
     this.currentExtent = coordHelper.extentToLonLat(this.geometry.getExtent(), this.view().getProjection())
-
-    this::subscribeToGeomChanges()
   },
   /**
    * @return {ol.geom.SimpleGeometry}
@@ -56,20 +55,29 @@ const methods = {
   createGeometry () {
     throw new Error('Not implemented method')
   },
+  subscribeAll () {
+    this::subscribeToGeomChanges()
+  },
   /**
    * @protected
    */
   mountGeometry () {
-    this.feature() && this.feature().setGeometry(this.geometry)
+    if (this.feature()) {
+      this.feature().setGeometry(this.geometry)
+      this.subscribeAll()
+    } else if (process.env.NODE_ENV !== 'production') {
+      warn("Invalid usage of geometry component, should have feature component among it's ancestors")
+    }
   },
   /**
    * @protected
    */
   unmountGeometry () {
+    this.unsubscribeAll()
     this.feature() && this.feature().setGeometry(undefined)
   },
   refresh () {
-    this.geometry.changed()
+    this.geometry && this.geometry.changed()
   }
 }
 

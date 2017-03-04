@@ -9,12 +9,17 @@
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
-  import positionMarker from './position-marker.svg'
+  import { consts as olConsts } from 'vl-ol'
+//  import positionMarker from './position-marker.svg'
 
   const props = {
     tracking: {
       type: Boolean,
       default: true
+    },
+    projection: {
+      type: String,
+      default: olConsts.MAP_PROJECTION
     }
   }
 
@@ -33,7 +38,7 @@
   export default {
     name: 'vl-geoloc',
     mixins: [ rxSubs ],
-    inject: [ 'serviceOverlay' ],
+    inject: [ 'serviceLayer' ],
     props,
     watch,
     methods,
@@ -50,7 +55,7 @@
     },
     destroyed () {
       this.geoloc.setTracking(false)
-      this.serviceOverlay() && this.serviceOverlay().getSource().removeFeature(this.positionFeature)
+//      this.serviceLayer() && this.serviceLayer().getSource().removeFeature(this.positionFeature)
       this.geoloc = this.positionFeature = undefined
     }
   }
@@ -73,17 +78,17 @@
      * @type {ol.Feature}
      * @protected
      */
-    this.positionFeature = new ol.Feature({
-      internal: true
-    })
-    this.positionFeature.setStyle(new ol.style.Style({
-      image: new ol.style.Icon({
-        src: positionMarker,
-        scale: 0.85,
-        anchor: [ 0.5, 1 ]
-      })
-    }))
-    this.serviceOverlay() && this.serviceOverlay().getSource().addFeature(this.positionFeature)
+//    this.positionFeature = new ol.Feature({
+//      internal: true
+//    })
+//    this.positionFeature.setStyle(new ol.style.Style({
+//      image: new ol.style.Icon({
+//        src: positionMarker,
+//        scale: 0.85,
+//        anchor: [ 0.5, 1 ]
+//      })
+//    }))
+//    this.serviceLayer() && this.serviceLayer().getSource().addFeature(this.positionFeature)
 
     return this.geoloc
   }

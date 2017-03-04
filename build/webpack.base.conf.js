@@ -71,7 +71,7 @@ module.exports = {
         }
       },
       {
-        test: /\.json$/,
+        test: /\.(geo)?json$/,
         loader: 'json-loader'
       },
       {

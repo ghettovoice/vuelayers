@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4'
 import rxSubs from 'vl-mixins/rx-subs'
+import { warn } from 'vl-utils/debug'
 
 const props = {
   id: {
@@ -31,10 +32,7 @@ const methods = {
    * Updates layer state
    */
   refresh () {
-    this.layer.changed()
-
-    const source = this.layer.getSource()
-    source && source.changed()
+    this.layer && this.layer.changed()
   },
   initialize () {
     /**
@@ -56,12 +54,18 @@ const methods = {
    * @protected
    */
   mountLayer () {
-    this.map() && this.map().addLayer(this.layer)
+    if (this.map()) {
+      this.map().addLayer(this.layer)
+      this.subscribeAll()
+    } else if (process.env.NODE_ENV !== 'production') {
+      warn("Invalid usage of map component, should have layer component among it's ancestors")
+    }
   },
   /**
    * @protected
    */
   unmountLayer () {
+    this.unsubscribeAll()
     this.map() && this.map().removeLayer(this.layer)
   }
 }

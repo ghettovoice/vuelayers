@@ -1,6 +1,8 @@
 import Vue from 'vue'
+import ol from 'openlayers'
 import { isFunction } from 'lodash/fp'
-import { createStylesFilter } from 'vl-components/style/target'
+import { createStyleFunc } from 'vl-components/style/target'
+import { style as styleHelper } from 'vl-ol'
 
 /**
  * Directive for advanced low-level dynamic styling using ol.StyleFunction.
@@ -10,11 +12,11 @@ export default {
   name: 'style-func',
   bind (el, binding, vnode) {
     const component = vnode.componentInstance
-    const styleFunction = binding.value
+    const styleFunctionFactory = binding.value
 
-    if (!isFunction(styleFunction)) return
+    if (!isFunction(styleFunctionFactory) || !component.styleTarget()) return
 
-    bindStyleFunction(styleFunction, component)
+    bindStyleFunction(styleFunctionFactory(ol, styleHelper), component)
   },
   unbind (el, binding, vnode) {
     const component = vnode.componentInstance
@@ -27,18 +29,18 @@ export default {
   }
 }
 
-function bindStyleFunction (styleFunction, component) {
-  const defStylesFilter = createStylesFilter(component.styles)
+function bindStyleFunction (styleFunc, component) {
+  const defStyleFunc = createStyleFunc(component)
 
   Vue.nextTick(() => {
-    component.styleTarget().setStyle((feature, resolution) => {
-      let styles = styleFunction(feature, resolution)
+    component.styleTarget().setStyle(function __directiveStyleFunc (feature, resolution) {
+      let styles = styleFunc(feature, resolution)
 
-      if (styles == null || !styles.length) {
-        return defStylesFilter(feature, resolution)
+      if (styles === null || (Array.isArray(styles) && styles.length)) {
+        return styles
       }
 
-      return styles
+      return defStyleFunc(feature, resolution)
     })
   })
 }

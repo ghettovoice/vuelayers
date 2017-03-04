@@ -7,11 +7,12 @@
 <script>
   /**
    * Wrapper around ol.Feature.
+   *
+   * @todo Add property 'visible', like in layer. If visible = false -> set null style
    */
   import ol from 'openlayers'
   import uuid from 'uuid/v4'
   import { omit } from 'lodash/fp'
-  import rxSubs from 'vl-mixins/rx-subs'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
 
@@ -28,7 +29,7 @@
 
   const methods = {
     refresh () {
-      this.feature.changed()
+      this.feature && this.feature.changed()
     },
     plain () {
       const obj = {
@@ -65,7 +66,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [ rxSubs, styleTarget ],
+    mixins: [ styleTarget ],
     inject: [ 'layer', 'source' ],
     props,
     methods,

@@ -1,4 +1,5 @@
 import rxSubs from 'vl-mixins/rx-subs'
+import { warn } from 'vl-utils/debug'
 
 const props = {}
 
@@ -25,16 +26,22 @@ const methods = {
    * @protected
    */
   mountInteraction () {
-    this.map() && this.map().addInteraction(this.interaction)
+    if (this.map()) {
+      this.map() && this.map().addInteraction(this.interaction)
+      this.subscribeAll()
+    } else if (process.env.NODE_ENV !== 'production') {
+      warn("Invalid usage of interaction component, should have map component among it's ancestors")
+    }
   },
   /**
    * @protected
    */
   unmountInteraction () {
+    this.unsubscribeAll()
     this.map() && this.map().removeInteraction(this.interaction)
   },
   refresh () {
-    this.interaction.changed()
+    this.interaction && this.interaction.changed()
   }
 }
 

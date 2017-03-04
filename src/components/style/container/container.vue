@@ -15,10 +15,7 @@
 
   const props = {
     zIndex: Number,
-    condition: {
-      type: [ Function, Boolean, String ],
-      default: true
-    }
+    geomType: String
   }
 
   const methods = {
@@ -43,7 +40,10 @@
         currentStyle = []
       }
 
-      currentStyle.push([ this.style, this.condition ])
+      currentStyle.push({
+        style: this.style,
+        geomType: this.geomType
+      })
       this.setStyle(currentStyle)
     },
     unmountStyle () {
@@ -55,7 +55,7 @@
         currentStyle = []
       }
 
-      currentStyle = currentStyle.filter(s => s[0] !== this.style)
+      currentStyle = currentStyle.filter(s => s.style !== this.style)
       currentStyle.length || (currentStyle = undefined)
       this.setStyle(currentStyle)
     }
@@ -64,6 +64,9 @@
   const watch = {
     zIndex (value) {
       this.style.setZIndex(value)
+    },
+    geomType () {
+      this.refresh()
     }
   }
 
@@ -92,7 +95,7 @@
 
     if (this.style) {
       this.style.setFill(this.fill)
-      this.mountStyle()
+      this.refresh()
     }
   }
 
@@ -105,7 +108,7 @@
 
     if (this.style) {
       this.style.setStroke(this.stroke)
-      this.mountStyle()
+      this.refresh()
     }
   }
 
@@ -118,7 +121,7 @@
 
     if (this.style) {
       this.style.setImage(this.image)
-      this.mountStyle()
+      this.refresh()
     }
   }
 </script>

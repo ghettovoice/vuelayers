@@ -1,4 +1,4 @@
-import { isBoolean, isFunction, isString, flow, filter, map } from 'lodash/fp'
+import { isFunction, kebabCase } from 'lodash/fp'
 
 export default {
   provide () {
@@ -21,7 +21,7 @@ export default {
           styleTarget.setStyle(
             isFunction(this.styles)
               ? this.styles
-              : createStyleFunc(this.styles, styleTarget)
+              : createStyleFunc(this)
           )
         } else {
           styleTarget.setStyle(undefined)
@@ -34,33 +34,24 @@ export default {
     }
   }
 }
-
-export function createStylesFilter (styles) {
-  return (featureData, resolution) => flow(
-    filter(([ style, condition ]) => {
-      if (condition == null) return style
-
-      if (condition != null && isString(condition)) {
-        // eslint-disable-next-line no-new-func
-        condition = new Function('feature', 'resolution', `return ${condition}`)
-      }
-
-      return (isBoolean(condition) && condition) ||
-             (isFunction(condition) && condition(featureData, resolution))
-    }),
-    map(([ style ]) => style)
-  )(styles)
-}
-
-export function createStyleFunc (styles, styleTarget) {
-  const styleTargetStylesFilter = createStylesFilter(styles)
-
+// todo implement removed, aka null style
+export function createStyleFunc (styleTarget) {
   return function __styleTargetStyleFunc (feature, resolution) {
-    return styleTargetStylesFilter(
-      feature.$vm
-        ? feature.$vm.plain()
-        : feature.getProperties(),
-      resolution
-    )
+    if (!styleTarget.styles || !styleTarget.styles.length) return null
+
+    const plainFeature = feature.$vm ? feature.$vm.plain() : feature.getProperties()
+    if (!plainFeature.geometry) return null
+
+    const styles = []
+    styleTarget.styles.forEach(({ style, geomType }) => {
+      if (
+        geomType == null || plainFeature.geometry.type === geomType ||
+        kebabCase(feature.geometry.type) === geomType
+      ) {
+        styles.push(style)
+      }
+    })
+
+    return styles
   }
 }

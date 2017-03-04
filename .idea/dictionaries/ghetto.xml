@@ -5,12 +5,15 @@
       <w>geolocchanged</w>
       <w>lodash</w>
       <w>overriden</w>
+      <w>pacman</w>
       <w>positionchange</w>
       <w>positionchanged</w>
       <w>reprojection</w>
       <w>viewchanged</w>
       <w>vnode</w>
       <w>vuelayers</w>
+      <w>whatwg</w>
+      <w>yargs</w>
     </words>
   </dictionary>
 </component>

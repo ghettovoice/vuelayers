@@ -1,183 +1,189 @@
 <template>
   <div id="app">
     <vl-map>
-      <vl-map-view :zoom="2" @change="viewChanged"/>
-      <vl-geoloc/>
+      <vl-map-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
+      <vl-geoloc @change="updateGeoloc"/>
 
+      <!-- interactions -->
       <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
         <vl-style-container>
-          <vl-style-stroke color="#D421E5"/>
-          <vl-style-fill color="#E5BC15"/>
-
-          <vl-style-circle :radius="15">
-            <vl-style-stroke color="#D421E5"/>
-            <vl-style-fill color="#E5BC15"/>
-          </vl-style-circle>
-
+          <vl-style-stroke color="#f03b20" :width="3"/>
+          <vl-style-fill :color="[254, 178, 76, 0.7]"/>
         </vl-style-container>
       </vl-interaction-select>
+      <!--// interactions -->
 
-      <vl-layer-tile id="osm">
-        <vl-source-osm/>
+      <vl-layer-tile id="mapbox" :visible="layers.mapbox">
+        <vl-source-mapbox map-id="ghettovoice.nbm2olb0"
+                          access-token="pk.eyJ1IjoiZ2hldHRvdm9pY2UiLCJhIjoiMzMxYzMyMWQ3NTgzMTU4Nzk3ZTNmMmI3MmQ1NmVhMjgifQ._erAEzdvdB0jfYXXqzOJCg"/>
       </vl-layer-tile>
+      <!--// base layers -->
 
-      <vl-layer-vector id="vector">
-        <vl-style-container>
-          <vl-style-stroke color="#13A838" :width="20"/>
-          <vl-style-fill :color="color"/>
-
-          <vl-style-circle :radius="10">
-            <vl-style-stroke color="#13A838" :width="20"/>
-            <vl-style-fill :color="color"/>
-          </vl-style-circle>
-        </vl-style-container>
-
-        <vl-style-container>
-          <vl-style-stroke color="#787878" :width="stroke"/>
-
-          <vl-style-circle :radius="10">
-            <vl-style-stroke color="#787878" :width="stroke"/>
-          </vl-style-circle>
-        </vl-style-container>
-
+      <!-- pacman, use v-style-func for advanced styling -->
+      <vl-layer-vector id="pacman" v-if="pacman.length" v-style-func="pacmanStyleFunc" :visible="layers.pacman">
         <vl-source-vector>
-          <vl-feature v-for="feature in features" :key="feature.id" :id="feature.id" :data="feature.data">
-            <component :is="feature.geometry.type" :coordinates="feature.geometry.coordinates"/>
-
-            <vl-style-container v-if="selected.includes(feature.id)">
-              <vl-style-stroke color="#E514A7" :width="5"/>
-              <vl-style-fill :color="feature.data && feature.data.color || '#E50E00'"/>
-
-              <vl-style-circle :radius="10">
-                <vl-style-stroke color="feature.data && feature.data.color || '#E50E00'" :width="5"/>
-                <vl-style-fill :color="color"/>
-              </vl-style-circle>
-            </vl-style-container>
+          <vl-feature v-for="feature in pacman" :key="feature.id" :id="feature.id" :data="feature.properties">
+            <component :is="geometryTypeToCompName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
           </vl-feature>
         </vl-source-vector>
       </vl-layer-vector>
+      <!--// pacman -->
+
+      <!-- position -->
+      <vl-layer-vector v-if="position.length" id="my-position" :z-index="100">
+        <vl-style-container>
+          <vl-style-icon src="/static/marker.png" :scale="0.3" :anchor="[0.5, 1]"/>
+        </vl-style-container>
+
+        <vl-source-vector>
+          <vl-feature id="my-position">
+            <vl-geom-point :coordinates="position"/>
+          </vl-feature>
+        </vl-source-vector>
+      </vl-layer-vector>
+      <!--// position -->
     </vl-map>
 
-    <div style="position: absolute; top: 10px; right: 10px">
-      <button
-        @click="color = [Math.ceil(Math.random() * 100), Math.ceil(Math.random() * 100), Math.ceil(Math.random() * 100), Math.random()]">
-        Change color
+    <div class="controls">
+      <button v-for="layer in ['mapbox', 'pacman']" :key="layer" @click="toggleLayer(layer)">
+        Toggle layer {{ layer }}
       </button>
-      <button @click="stroke = Math.ceil(Math.random() * 10)">Change stroke</button>
-      <button @click="toggleSelect(1)">Toggle 1</button>
-      <button @click="toggleSelect(2)">Toggle 2</button>
-      <button @click="toggleSelect(3)">Toggle 3</button>
     </div>
   </div>
 </template>
 
 <script>
-  import ol from 'openlayers'
-  import { style as olStyleHelper } from '../src/ol'
+  import { kebabCase } from 'lodash/fp'
+
+  const methods = {
+    geometryTypeToCompName (type) {
+      return 'vl-geom-' + kebabCase(type)
+    },
+    updateMapView ({ center, zoom, rotation }) {
+      this.center = center
+      this.zoom = zoom
+      this.rotation = rotation
+    },
+    updateGeoloc ({ position }) {
+      this.position = position
+    },
+    select (id) {
+      if (this.selected.indexOf(id) === -1) {
+        this.selected.push(id)
+      }
+    },
+    unselect (id) {
+      const i = this.selected.indexOf(id)
+      if (i !== -1) {
+        this.selected.splice(i, 1)
+      }
+    },
+    pacmanStyleFunc (ol, styleHelper) {
+      const pacman = [
+        new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: '#DE9147',
+            width: 3
+          }),
+          fill: new ol.style.Fill({
+            color: [ 222, 189, 36, 0.8 ]
+          })
+        })
+      ]
+      const path = [
+        new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'blue',
+            width: 1
+          })
+        }),
+        new ol.style.Style({
+          image: new ol.style.Circle({
+            radius: 5,
+            fill: new ol.style.Fill({
+              color: 'orange'
+            })
+          }),
+          geometry (feature) {
+            return new ol.geom.MultiPoint(feature.getGeometry().getCoordinates())
+          }
+        })
+      ]
+      const eye = [
+        new ol.style.Style({
+          image: new ol.style.Circle({
+            radius: 6,
+            fill: new ol.style.Fill({
+              color: '#444444'
+            })
+          })
+        })
+      ]
+
+      return function __pacmanStyleFunc (feature, resolution) {
+        switch (feature.getId()) {
+          case 'pacman':
+            return pacman
+          case 'pacman-path':
+            return path
+          case 'pacman-eye':
+            return eye
+        }
+      }
+    },
+    toggleLayer (layer) {
+      this.layers[ layer ] = !this.layers[ layer ]
+    }
+  }
 
   export default {
     name: 'app',
-    methods: {
-      viewChanged ({ zoom }) {
-        this.zoom = zoom
-      },
-      toggleSelect (id) {
-        const idx = this.selected.indexOf(id)
-        if (idx === -1) {
-          this.select(id)
-        } else {
-          this.unselect(id)
-        }
-      },
-      select (id) {
-        if (this.selected.indexOf(id) === -1) {
-          this.selected.push(id)
-        }
-      },
-      unselect (id) {
-        let idx = this.selected.indexOf(id)
-        if (idx !== -1) this.selected.splice(idx, 1)
-      },
-      styleFunction () {
-        const style = olStyleHelper.transformStyle({
-          strokeWidth: 5,
-          strokeColor: '#E514A7',
-          fillColor: '#E50E00',
-          iconRadius: 10
-        })
-
-        return (feature, resolution) => {
-          if (feature.$vm.data.color == null) return [ style ]
-
-          return [
-            new ol.style.Style({
-              stroke: style.stroke,
-              fill: olStyleHelper.transformFillStyle({
-                fillColor: feature.$vm.data.color
-              }),
-              image: olStyleHelper.transformImageStyle({
-                strokeWidth: 5,
-                strokeColor: '#E514A7',
-                fillColor: feature.$vm.data.color,
-                iconRadius: 10
-              })
-            })
-          ]
-        }
-      },
-      notSelected (feature) {
-        return !this.selected.includes(feature.id)
-      }
-    },
+    methods,
     data () {
       return {
-        zoom: 0,
-        color: [ 255, 255, 255, 0.5 ],
-        stroke: 2,
+        zoom: 2,
+        center: [ 0, 0 ],
+        rotation: 0,
         selected: [],
-        features: [
-          {
-            id: 1,
-            data: {
-              color: [ 123, 56, 255, 0.8 ]
-            },
-            geometry: {
-              type: 'vl-geom-polygon',
-              coordinates: [ [ [ 0, 50 ], [ 10, 70 ], [ 70, 10 ], [ 10, 10 ] ] ]
-            }
-          },
-          {
-            id: 2,
-            data: {
-              color: '#111671'
-            },
-            geometry: {
-              type: 'vl-geom-polygon',
-              coordinates: [ [ [ -10, 10 ], [ -20, 70 ], [ -70, 10 ], [ -10, 10 ] ] ]
-            }
-          },
-          {
-            id: 3,
-            data: {
-//              color: 'rgba(33, 66, 99, 0.3)'
-            },
-            geometry: {
-              type: 'vl-geom-multi-point',
-              coordinates: [ [ -50, -50 ], [ -45, -45 ] ]
-            }
-          }
-        ]
+        pacman: require('../static/pacman.geojson').features,
+        position: [],
+        layers: {
+          mapbox: true,
+          pacman: false
+        }
       }
     }
   }
 </script>
 
-<style lang="scss">
-  @import "~openlayers/dist/ol";
-
+<style lang="scss" rel="stylesheet/scss">
   html, body, #app {
-    width  : 100%;
-    height : 100%;
-    margin : 0;
+    width       : 100%;
+    height      : 100%;
+    margin      : 0;
+    box-sizing  : border-box;
+    font-family : Helvetica, Arial, sans-serif;
+    overflow    : hidden;
+
+    * {
+      box-sizing : border-box;
+    }
+  }
+
+  .controls {
+    position   : absolute;
+    bottom     : 10px;
+    left       : 50%;
+    transform  : translateX(-50%);
+    width      : 70vw;
+    background : rgba(255, 255, 255, 0.7);
+    box-shadow : 0 0 20px rgba(2, 2, 2, 0.1);
+    padding    : 5px;
+    text-align : center;
+
+    > button {
+      margin         : 5px;
+      text-transform : uppercase;
+    }
   }
 </style>

@@ -24,14 +24,6 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * ol.style.Image do not have some setters than inner styles can't be applied
-   * at runtime after instance of ol.style.Image created.
-   * This method used to emulate needed setters for inner style components.
-   *
-   * @protected
-   */
-  getStyleTarget () { },
-  /**
    * @protected
    */
   mountStyle () {
@@ -44,7 +36,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   refresh () {
-    this.mountStyle()
+    this.$nextTick(this.mountStyle)
   }
 }
 

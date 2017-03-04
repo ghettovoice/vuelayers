@@ -4,6 +4,7 @@
   import { Observable } from 'rxjs/Observable'
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
+  import { style as styleHelper } from 'vl-ol'
   import interaction from 'vl-components/interaction/interaction'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
 
@@ -24,13 +25,11 @@
   }
 
   const interactionRefresh = interaction.methods.refresh
-  const interactionInitialize = interaction.methods.initialize
   const methods = {
     /**
      * @protected
      */
-    initialize () {
-      this::interactionInitialize()
+    subscribeAll () {
       this::subscribeToInteractionChanges()
     },
     /**
@@ -38,10 +37,19 @@
      * @protected
      */
     createInteraction () {
-      const style = this.styles && this.styles.length
-        ? createStyleFunc(this.styles)
-        : undefined
-      const serviceFeatures = this.serviceOverlay().getSource().getFeatures()
+      const defaultStyles = styleHelper.defaultEditStyle()
+      const styleFunc = createStyleFunc(this)
+      const style = function __selectStyleFunc (feature, resolution) {
+        const styles = styleFunc(feature, resolution)
+        if (styles === null || (Array.isArray(styles) && styles.length)) {
+          return styles
+        }
+
+        return feature.getGeometry() != null
+          ? defaultStyles[ feature.getGeometry().getType() ]
+          : null
+      }
+      const serviceFeatures = this.serviceLayer() && this.serviceLayer().getSource().getFeatures()
 
       return new ol.interaction.Select({
         multi: this.multi,
@@ -50,15 +58,8 @@
       })
     },
     refresh () {
-      this.interaction.getFeatures().changed()
+      this.interaction && this.interaction.getFeatures().changed()
       this::interactionRefresh()
-    },
-    /**
-     * @private
-     */
-    recreate () {
-      this.unsubscribeAll()
-      this.initialize()
     },
     /**
      * @param {number} id
@@ -99,13 +100,7 @@
     },
     setStyle (style) {
       this.styles = style
-
-      if (this.interaction) {
-        this.recreate()
-      }
-    },
-    getStyle () {
-      return this.styles || []
+      this.refresh()
     }
   }
 
@@ -125,7 +120,7 @@
   export default {
     name: 'vl-interaction-select',
     mixins: [ interaction, styleTarget ],
-    inject: [ 'map', 'serviceOverlay' ],
+    inject: [ 'map', 'serviceLayer' ],
     props,
     methods,
     watch,

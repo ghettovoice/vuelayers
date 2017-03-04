@@ -90,8 +90,13 @@
         this.view.setRotation(rotation)
       }
     },
+    subscribeAll () {
+      this::subscribeToViewChanges()
+    },
     mountView () {
-      if (!this.map()) return
+      if (!this.map()) {
+        warn("Invalid usage of view component, should have map component among it's ancestors")
+      }
 
       let view = this.map().getView()
 
@@ -104,12 +109,14 @@
       }
 
       this.map().setView(this.view)
+      this.subscribeAll()
     },
     unmountView () {
+      this.unsubscribeAll()
       this.map() && this.map().setView(undefined)
     }
   }
-
+  // todo watch other props
   const watch = {
     center (center) {
       this.setCurrentView({ center })
@@ -139,7 +146,6 @@
     },
     created () {
       this::createView()
-      this::subscribeToViewChanges()
     },
     mounted () {
       this.mountView()

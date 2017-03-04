@@ -1,5 +1,7 @@
 require('./check-versions')()
 
+const argv = require('yargs').argv
+
 const config = require('../config')
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = JSON.parse(config.dev.env.NODE_ENV)
@@ -12,7 +14,9 @@ const webpack = require('webpack')
 const proxyMiddleware = require('http-proxy-middleware')
 const webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./webpack.prod.conf')
-  : require('./webpack.dev.conf')
+  : ( argv.conf
+    ? require(`./webpack.${argv.conf}.conf`)
+    : require('./webpack.dev.conf') )
 
 // default port where dev server listens for incoming traffic
 const port = process.env.PORT || config.dev.port
@@ -59,6 +63,10 @@ app.use(devMiddleware)
 // enable hot-reload and state-preserving
 // compilation error display
 app.use(hotMiddleware)
+
+// serve pure static assets
+const staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
+app.use(staticPath, express.static('./static'))
 
 const uri = 'http://localhost:' + port
 
