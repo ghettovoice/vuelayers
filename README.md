@@ -3,6 +3,12 @@
 > Vue components to work with [OpenLayers](https://openlayers.org)
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
+[![GitHub tag](https://img.shields.io/github/tag/ghettovoice/vuelayers.svg)](https://github.com/ghettovoice/vuelayers/releases)
+[![NPM version](https://img.shields.io/npm/v/vuelayers.svg)](https://www.npmjs.com/package/vuelayers)
+[![License](https://img.shields.io/github/license/ghettovoice/vuelayers.svg)](https://github.com/ghettovoice/vuelayers/blob/master/LICENSE)
+[![Dependencies](https://img.shields.io/david/ghettovoice/vuelayers.svg)](https://david-dm.org/ghettovoice/vuelayers)
+
+**[Demo](https://ghettovoice.github.io/vuelayers/)**
 
 ## Install
 
@@ -10,6 +16,10 @@
 # install Vue and VueLayers
 npm install -S vue vuelayers
 ```
+
+## Documentation
+
+TODO...
 
 ## Build Setup
 
@@ -43,4 +53,7 @@ npm run e2e
 npm test
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## License
+
+**MIT** (c) 2017, Vladimir Vershinin  
+Based on [Vue](https://vuejs.org/) and [OpenLayers](https://openlayers.org/)

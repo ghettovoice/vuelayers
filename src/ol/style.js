@@ -1,7 +1,7 @@
 import ol from 'openlayers'
 import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce } from 'lodash/fp'
 import { isNumeric } from 'vl-utils/func'
-import consts from './consts'
+import * as consts from './consts'
 
 const reduceWithKey = reduce.convert({ cap: false })
 
