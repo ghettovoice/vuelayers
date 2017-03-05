@@ -138,7 +138,6 @@
     "LICENSE",
     "README.md",
     "dist",
-    "docs",
     "src"
   ]
 }
