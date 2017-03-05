@@ -101,7 +101,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _layer = __webpack_require__(20);
+var _layer = __webpack_require__(21);
 
 var _layer2 = _interopRequireDefault(_layer);
 
@@ -135,7 +135,7 @@ exports.default = {
 
 /***/ }),
 
-/***/ 20:
+/***/ 21:
 /***/ (function(module, exports) {
 
 module.exports = require("vuelayers/dist/cjs/mixins/layer");

@@ -12,14 +12,16 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const env = config.build.env
 
+baseWebpackConfig.entry = {
+  app: path.resolve(__dirname, '../docs/main.js')
+}
+
 const webpackConfig = merge(baseWebpackConfig, {
-  entry: {
-    app: path.resolve(__dirname, '../docs/main.js')
-  },
   output: {
     path: path.resolve(__dirname, '../dist/demo'),
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
-    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
+    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js'),
+    publicPath: ''
   },
   module: {
     rules: utils.styleLoaders({
@@ -28,6 +30,11 @@ const webpackConfig = merge(baseWebpackConfig, {
       minimize: process.env.NODE_ENV === 'production'
     })
   },
+  // resolve: {
+  //   alias: {
+  //     openlayers$: 'openlayers/dist/ol-debug'
+  //   }
+  // },
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html

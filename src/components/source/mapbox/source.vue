@@ -5,7 +5,7 @@
   const props = {
     url: {
       type: String,
-      default: 'http://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
+      default: 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
     },
     accessToken: {
       type: String,

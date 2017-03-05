@@ -37,3 +37,14 @@ export const PIXEL_RATIO = 1
  */
 export const EARTH_RADIUS = 6378137
 export const WGS84_SPHERE = new ol.Sphere(EARTH_RADIUS)
+
+export const GEOMETRY_TYPE = {
+  POINT: 'Point',
+  LINE_STRING: 'LineString',
+  POLYGON: 'Polygon',
+  MULTI_POINT: 'MultiPoint',
+  MULTI_LINE_STRING: 'MultiLineString',
+  MULTI_POLYGON: 'MultiPolygon',
+  GEOMETRY_COLLECTION: 'GeometryCollection',
+  CIRCLE: 'Circle'
+}

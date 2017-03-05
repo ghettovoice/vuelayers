@@ -141,3 +141,4 @@ $RECYCLE.BIN/
 ### App
 .DS_Store
 test/e2e/reports
+dist

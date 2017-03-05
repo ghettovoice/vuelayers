@@ -150,7 +150,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.coord = exports.style = exports.helpers = exports.consts = undefined;
 
-var _consts2 = __webpack_require__(16);
+var _consts2 = __webpack_require__(11);
 
 var _consts = _interopRequireWildcard(_consts2);
 
@@ -239,7 +239,7 @@ var _slicedToArray2 = __webpack_require__(141);
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
-var _isEqual2 = __webpack_require__(12);
+var _isEqual2 = __webpack_require__(13);
 
 var _isEqual3 = _interopRequireDefault(_isEqual2);
 
@@ -251,7 +251,7 @@ __webpack_require__(20);
 
 __webpack_require__(21);
 
-__webpack_require__(11);
+__webpack_require__(12);
 
 var _rxSubs = __webpack_require__(5);
 
@@ -665,6 +665,73 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.GEOMETRY_TYPE = exports.WGS84_SPHERE = exports.EARTH_RADIUS = exports.PIXEL_RATIO = exports.CACHE_SIZE = exports.ZOOM_FACTOR = exports.TILE_SIZE = exports.MIN_ZOOM = exports.MAX_ZOOM = exports.DATA_PROJECTION = exports.MAP_PROJECTION = undefined;
+
+var _openlayers = __webpack_require__(0);
+
+var _openlayers2 = _interopRequireDefault(_openlayers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * @type {string} Default map projection.
+ */
+var MAP_PROJECTION = exports.MAP_PROJECTION = 'EPSG:3857';
+/**
+ * @type {string} Default data source projection.
+ */
+var DATA_PROJECTION = exports.DATA_PROJECTION = 'EPSG:4326';
+/**
+ * @type {number} Default map max zoom
+ */
+var MAX_ZOOM = exports.MAX_ZOOM = 28;
+/**
+ * @type {number} Default map min zoom
+ */
+var MIN_ZOOM = exports.MIN_ZOOM = 0;
+/**
+ * @type {number} Default tile size
+ */
+var TILE_SIZE = exports.TILE_SIZE = 256;
+/**
+ * @type {number} Default zoom factor
+ */
+var ZOOM_FACTOR = exports.ZOOM_FACTOR = 2;
+/**
+ * @type {number}
+ */
+var CACHE_SIZE = exports.CACHE_SIZE = 2048;
+/**
+ * @type {number}
+ */
+var PIXEL_RATIO = exports.PIXEL_RATIO = 1;
+/**
+ * @type {number} Earth radius in meters
+ */
+var EARTH_RADIUS = exports.EARTH_RADIUS = 6378137;
+var WGS84_SPHERE = exports.WGS84_SPHERE = new _openlayers2.default.Sphere(EARTH_RADIUS);
+
+var GEOMETRY_TYPE = exports.GEOMETRY_TYPE = {
+  POINT: 'Point',
+  LINE_STRING: 'LineString',
+  POLYGON: 'Polygon',
+  MULTI_POINT: 'MultiPoint',
+  MULTI_LINE_STRING: 'MultiLineString',
+  MULTI_POLYGON: 'MultiPolygon',
+  GEOMETRY_COLLECTION: 'GeometryCollection',
+  CIRCLE: 'Circle'
+};
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.fromOlEvent = undefined;
 
 var _fromOlEvent2 = __webpack_require__(68);
@@ -678,13 +745,13 @@ exports.fromOlEvent = _fromOlEvent3.default; /**
                                               */
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = require("lodash/fp/isEqual");
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -834,7 +901,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -949,7 +1016,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -998,62 +1065,6 @@ exports.default = {
     }, this.$slots.default);
   }
 };
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.WGS84_SPHERE = exports.EARTH_RADIUS = exports.PIXEL_RATIO = exports.CACHE_SIZE = exports.ZOOM_FACTOR = exports.TILE_SIZE = exports.MIN_ZOOM = exports.MAX_ZOOM = exports.DATA_PROJECTION = exports.MAP_PROJECTION = undefined;
-
-var _openlayers = __webpack_require__(0);
-
-var _openlayers2 = _interopRequireDefault(_openlayers);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * @type {string} Default map projection.
- */
-var MAP_PROJECTION = exports.MAP_PROJECTION = 'EPSG:3857';
-/**
- * @type {string} Default data source projection.
- */
-var DATA_PROJECTION = exports.DATA_PROJECTION = 'EPSG:4326';
-/**
- * @type {number} Default map max zoom
- */
-var MAX_ZOOM = exports.MAX_ZOOM = 28;
-/**
- * @type {number} Default map min zoom
- */
-var MIN_ZOOM = exports.MIN_ZOOM = 0;
-/**
- * @type {number} Default tile size
- */
-var TILE_SIZE = exports.TILE_SIZE = 256;
-/**
- * @type {number} Default zoom factor
- */
-var ZOOM_FACTOR = exports.ZOOM_FACTOR = 2;
-/**
- * @type {number}
- */
-var CACHE_SIZE = exports.CACHE_SIZE = 2048;
-/**
- * @type {number}
- */
-var PIXEL_RATIO = exports.PIXEL_RATIO = 1;
-/**
- * @type {number} Earth radius in meters
- */
-var EARTH_RADIUS = exports.EARTH_RADIUS = 6378137;
-var WGS84_SPHERE = exports.WGS84_SPHERE = new _openlayers2.default.Sphere(EARTH_RADIUS);
 
 /***/ }),
 /* 17 */
@@ -1309,7 +1320,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _layer = __webpack_require__(13);
+var _layer = __webpack_require__(14);
 
 var _layer2 = _interopRequireDefault(_layer);
 
@@ -1360,7 +1371,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _layer = __webpack_require__(13);
+var _layer = __webpack_require__(14);
 
 var _layer2 = _interopRequireDefault(_layer);
 
@@ -1446,7 +1457,7 @@ var _ol3Tilecache = __webpack_require__(152);
 
 var _func = __webpack_require__(17);
 
-var _source = __webpack_require__(14);
+var _source = __webpack_require__(15);
 
 var _source2 = _interopRequireDefault(_source);
 
@@ -1562,7 +1573,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _source = __webpack_require__(14);
+var _source = __webpack_require__(15);
 
 var _source2 = _interopRequireDefault(_source);
 
@@ -2037,7 +2048,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.mixins = exports.VlLayerTile = exports.VlLayerVector = undefined;
 
-var _layer = __webpack_require__(13);
+var _layer = __webpack_require__(14);
 
 var _layer2 = _interopRequireDefault(_layer);
 
@@ -2172,7 +2183,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.mixins = exports.VlSourceVector = exports.VlSourceMapbox = exports.VlSourceOsm = exports.VlSourceXyz = undefined;
 
-var _source = __webpack_require__(14);
+var _source = __webpack_require__(15);
 
 var _source2 = _interopRequireDefault(_source);
 
@@ -2510,7 +2521,7 @@ var _style = __webpack_require__(7);
 
 var _style2 = _interopRequireDefault(_style);
 
-var _image = __webpack_require__(15);
+var _image = __webpack_require__(16);
 
 var _image2 = _interopRequireDefault(_image);
 
@@ -2612,7 +2623,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _consts = __webpack_require__(16);
+var _consts = __webpack_require__(11);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2770,7 +2781,7 @@ var _log = __webpack_require__(138);
 
 var _log2 = _interopRequireDefault(_log);
 
-var _isEqual2 = __webpack_require__(12);
+var _isEqual2 = __webpack_require__(13);
 
 var _isEqual3 = _interopRequireDefault(_isEqual2);
 
@@ -2784,7 +2795,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _consts = __webpack_require__(16);
+var _consts = __webpack_require__(11);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2943,6 +2954,10 @@ var _openlayers = __webpack_require__(0);
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
 var _func = __webpack_require__(17);
+
+var _consts = __webpack_require__(11);
+
+var _consts2 = _interopRequireDefault(_consts);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3295,17 +3310,17 @@ function defaultStyle() {
 /**
  * Default OpenLayers edit style.
  *
- * @return {Object.<ol.geom.GeometryType, Array.<ol.style.Style>>}
+ * @return {Object.<consts.GEOMETRY_TYPE, Array.<ol.style.Style>>}
  * @see {@link https://github.com/openlayers/openlayers/blob/master/src/ol/style/style.js#L324}
  */
 function defaultEditStyle() {
-  /** @type {Object.<ol.geom.GeometryType, Array.<ol.style.Style>>} */
+  /** @type {Object.<consts.GEOMETRY_TYPE, Array.<ol.style.Style>>} */
   var styles = {};
   var white = [255, 255, 255, 1];
   var blue = [0, 153, 255, 1];
   var width = 3;
 
-  styles[_openlayers2.default.geom.GeometryType.LINE_STRING] = [new _openlayers2.default.style.Style({
+  styles[_consts2.default.GEOMETRY_TYPE.LINE_STRING] = [new _openlayers2.default.style.Style({
     stroke: new _openlayers2.default.style.Stroke({
       color: white,
       width: width + 2
@@ -3316,18 +3331,18 @@ function defaultEditStyle() {
       width: width
     })
   })];
-  styles[_openlayers2.default.geom.GeometryType.MULTI_LINE_STRING] = styles[_openlayers2.default.geom.GeometryType.LINE_STRING];
+  styles[_consts2.default.GEOMETRY_TYPE.MULTI_LINE_STRING] = styles[_consts2.default.GEOMETRY_TYPE.LINE_STRING];
 
-  styles[_openlayers2.default.geom.GeometryType.POLYGON] = [new _openlayers2.default.style.Style({
+  styles[_consts2.default.GEOMETRY_TYPE.POLYGON] = [new _openlayers2.default.style.Style({
     fill: new _openlayers2.default.style.Fill({
       color: [255, 255, 255, 0.5]
     })
-  })].concat(styles[_openlayers2.default.geom.GeometryType.LINE_STRING]);
-  styles[_openlayers2.default.geom.GeometryType.MULTI_POLYGON] = styles[_openlayers2.default.geom.GeometryType.POLYGON];
+  })].concat(styles[_consts2.default.GEOMETRY_TYPE.LINE_STRING]);
+  styles[_consts2.default.GEOMETRY_TYPE.MULTI_POLYGON] = styles[_consts2.default.GEOMETRY_TYPE.POLYGON];
 
-  styles[_openlayers2.default.geom.GeometryType.CIRCLE] = styles[_openlayers2.default.geom.GeometryType.POLYGON].concat(styles[_openlayers2.default.geom.GeometryType.LINE_STRING]);
+  styles[_consts2.default.GEOMETRY_TYPE.CIRCLE] = styles[_consts2.default.GEOMETRY_TYPE.POLYGON].concat(styles[_consts2.default.GEOMETRY_TYPE.LINE_STRING]);
 
-  styles[_openlayers2.default.geom.GeometryType.POINT] = [new _openlayers2.default.style.Style({
+  styles[_consts2.default.GEOMETRY_TYPE.POINT] = [new _openlayers2.default.style.Style({
     image: new _openlayers2.default.style.Circle({
       radius: width * 2,
       fill: new _openlayers2.default.style.Fill({
@@ -3340,9 +3355,9 @@ function defaultEditStyle() {
     }),
     zIndex: Infinity
   })];
-  styles[_openlayers2.default.geom.GeometryType.MULTI_POINT] = styles[_openlayers2.default.geom.GeometryType.POINT];
+  styles[_consts2.default.GEOMETRY_TYPE.MULTI_POINT] = styles[_consts2.default.GEOMETRY_TYPE.POINT];
 
-  styles[_openlayers2.default.geom.GeometryType.GEOMETRY_COLLECTION] = styles[_openlayers2.default.geom.GeometryType.POLYGON].concat(styles[_openlayers2.default.geom.GeometryType.LINE_STRING], styles[_openlayers2.default.geom.GeometryType.POINT]);
+  styles[_consts2.default.GEOMETRY_TYPE.GEOMETRY_COLLECTION] = styles[_consts2.default.GEOMETRY_TYPE.POLYGON].concat(styles[_consts2.default.GEOMETRY_TYPE.LINE_STRING], styles[_consts2.default.GEOMETRY_TYPE.POINT]);
 
   return styles;
 }
@@ -3550,7 +3565,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _isEqual2 = __webpack_require__(12);
+var _isEqual2 = __webpack_require__(13);
 
 var _isEqual3 = _interopRequireDefault(_isEqual2);
 
@@ -3568,7 +3583,7 @@ __webpack_require__(22);
 
 __webpack_require__(21);
 
-__webpack_require__(11);
+__webpack_require__(12);
 
 var _debug = __webpack_require__(3);
 
@@ -3997,7 +4012,7 @@ var _openlayers2 = _interopRequireDefault(_openlayers);
 
 var _Observable = __webpack_require__(9);
 
-__webpack_require__(11);
+__webpack_require__(12);
 
 var _debug = __webpack_require__(3);
 
@@ -4361,7 +4376,7 @@ var _promise = __webpack_require__(18);
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _isEqual2 = __webpack_require__(12);
+var _isEqual2 = __webpack_require__(13);
 
 var _isEqual3 = _interopRequireDefault(_isEqual2);
 
@@ -4383,7 +4398,7 @@ __webpack_require__(22);
 
 __webpack_require__(21);
 
-__webpack_require__(11);
+__webpack_require__(12);
 
 var _debug = __webpack_require__(3);
 
@@ -4631,7 +4646,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var props = {
   url: {
     type: String,
-    default: 'http://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
+    default: 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   },
   accessToken: {
     type: String,
@@ -4803,7 +4818,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _image = __webpack_require__(15);
+var _image = __webpack_require__(16);
 
 var _image2 = _interopRequireDefault(_image);
 
@@ -5113,7 +5128,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _image = __webpack_require__(15);
+var _image = __webpack_require__(16);
 
 var _image2 = _interopRequireDefault(_image);
 

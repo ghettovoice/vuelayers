@@ -1,6 +1,7 @@
 import ol from 'openlayers'
 import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce } from 'lodash/fp'
 import { isNumeric } from 'vl-utils/func'
+import consts from './consts'
 
 const reduceWithKey = reduce.convert({ cap: false })
 
@@ -376,17 +377,17 @@ export function defaultStyle () {
 /**
  * Default OpenLayers edit style.
  *
- * @return {Object.<ol.geom.GeometryType, Array.<ol.style.Style>>}
+ * @return {Object.<consts.GEOMETRY_TYPE, Array.<ol.style.Style>>}
  * @see {@link https://github.com/openlayers/openlayers/blob/master/src/ol/style/style.js#L324}
  */
 export function defaultEditStyle () {
-  /** @type {Object.<ol.geom.GeometryType, Array.<ol.style.Style>>} */
+  /** @type {Object.<consts.GEOMETRY_TYPE, Array.<ol.style.Style>>} */
   let styles = {}
   let white = [ 255, 255, 255, 1 ]
   let blue = [ 0, 153, 255, 1 ]
   let width = 3
 
-  styles[ ol.geom.GeometryType.LINE_STRING ] = [
+  styles[ consts.GEOMETRY_TYPE.LINE_STRING ] = [
     new ol.style.Style({
       stroke: new ol.style.Stroke({
         color: white,
@@ -400,25 +401,25 @@ export function defaultEditStyle () {
       })
     })
   ]
-  styles[ ol.geom.GeometryType.MULTI_LINE_STRING ] =
-    styles[ ol.geom.GeometryType.LINE_STRING ]
+  styles[ consts.GEOMETRY_TYPE.MULTI_LINE_STRING ] =
+    styles[ consts.GEOMETRY_TYPE.LINE_STRING ]
 
-  styles[ ol.geom.GeometryType.POLYGON ] = [
+  styles[ consts.GEOMETRY_TYPE.POLYGON ] = [
     new ol.style.Style({
       fill: new ol.style.Fill({
         color: [ 255, 255, 255, 0.5 ]
       })
     })
-  ].concat(styles[ ol.geom.GeometryType.LINE_STRING ])
-  styles[ ol.geom.GeometryType.MULTI_POLYGON ] =
-    styles[ ol.geom.GeometryType.POLYGON ]
+  ].concat(styles[ consts.GEOMETRY_TYPE.LINE_STRING ])
+  styles[ consts.GEOMETRY_TYPE.MULTI_POLYGON ] =
+    styles[ consts.GEOMETRY_TYPE.POLYGON ]
 
-  styles[ ol.geom.GeometryType.CIRCLE ] =
-    styles[ ol.geom.GeometryType.POLYGON ].concat(
-      styles[ ol.geom.GeometryType.LINE_STRING ]
+  styles[ consts.GEOMETRY_TYPE.CIRCLE ] =
+    styles[ consts.GEOMETRY_TYPE.POLYGON ].concat(
+      styles[ consts.GEOMETRY_TYPE.LINE_STRING ]
     )
 
-  styles[ ol.geom.GeometryType.POINT ] = [
+  styles[ consts.GEOMETRY_TYPE.POINT ] = [
     new ol.style.Style({
       image: new ol.style.Circle({
         radius: width * 2,
@@ -433,13 +434,13 @@ export function defaultEditStyle () {
       zIndex: Infinity
     })
   ]
-  styles[ ol.geom.GeometryType.MULTI_POINT ] =
-    styles[ ol.geom.GeometryType.POINT ]
+  styles[ consts.GEOMETRY_TYPE.MULTI_POINT ] =
+    styles[ consts.GEOMETRY_TYPE.POINT ]
 
-  styles[ ol.geom.GeometryType.GEOMETRY_COLLECTION ] =
-    styles[ ol.geom.GeometryType.POLYGON ].concat(
-      styles[ ol.geom.GeometryType.LINE_STRING ],
-      styles[ ol.geom.GeometryType.POINT ]
+  styles[ consts.GEOMETRY_TYPE.GEOMETRY_COLLECTION ] =
+    styles[ consts.GEOMETRY_TYPE.POLYGON ].concat(
+      styles[ consts.GEOMETRY_TYPE.LINE_STRING ],
+      styles[ consts.GEOMETRY_TYPE.POINT ]
     )
 
   return styles

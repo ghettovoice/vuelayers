@@ -120,7 +120,7 @@ var _openlayers = __webpack_require__(0);
 
 var _openlayers2 = _interopRequireDefault(_openlayers);
 
-var _source = __webpack_require__(21);
+var _source = __webpack_require__(22);
 
 var _source2 = _interopRequireDefault(_source);
 
@@ -220,7 +220,7 @@ module.exports = require("vuelayers/dist/cjs/ol");
 
 /***/ }),
 
-/***/ 21:
+/***/ 22:
 /***/ (function(module, exports) {
 
 module.exports = require("vuelayers/dist/cjs/mixins/source");
