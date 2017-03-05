@@ -412,8 +412,8 @@ export default {
   highlight.registerLanguage('scss', highlightSCSS)
   highlight.registerLanguage('xml', highlightXML)
   highlight.registerLanguage('javascript', highlightJavascript)
-  highlight.registerLanguage('javascript', highlightJson)
-  highlight.registerLanguage('javascript', highlightBash)
+  highlight.registerLanguage('json', highlightJson)
+  highlight.registerLanguage('bash', highlightBash)
 
   const methods = {
     geometryTypeToCompName (type) {
