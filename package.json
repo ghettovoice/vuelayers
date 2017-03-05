@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
-    "demo": "node build/dev-server.js --conf=demo",
+    "demo": "node build/dev-server.js --conf=demo-dev",
+    "build-demo": "node build/build.js --conf=demo-prod",
     "build-comp-cjs": "cross-env NODE_ENV=production node build/build.js --conf=comp-cjs",
     "build-lib-cjs": "cross-env NODE_ENV=production node build/build.js --conf=lib-cjs",
     "build": "rm -rf ./dist && npm run build-lib-cjs && npm run build-comp-cjs",

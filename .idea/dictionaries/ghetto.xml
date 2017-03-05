@@ -1,6 +1,8 @@
 <component name="ProjectDictionaryState">
   <dictionary name="ghetto">
     <words>
+      <w>chunkhash</w>
+      <w>contenthash</w>
       <w>eslint</w>
       <w>geolocchanged</w>
       <w>lodash</w>
