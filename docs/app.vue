@@ -83,7 +83,7 @@
         Toggle layer {{ layer }}
       </button>
 
-      <button @click="showSourceCode">Show source code</button>
+      <button @click="showSourceCode">Show usage info / example source code</button>
 
       <hr />
       Center: {{ center.map(x => parseFloat(x.toPrecision(6))) }} Zoom: {{ zoom }} Rotation {{ rotation }}<br />
@@ -96,10 +96,91 @@
         <div class="controls">
           <button @click="sourceCode = false">Close</button>
         </div>
-        <div>
-          <h1>HTML</h1>
-          <pre>
-            <code class="xml">
+
+        <h2 id="install">Install</h2>
+
+        <pre><code class="bash">
+# install Vue and VueLayers
+npm install -S vue vuelayers
+        </code></pre>
+
+        <h2 id="usage">Usage</h2>
+
+        <h4 id="fullimport">Full import</h4>
+
+        <p>Import full library code with all components and mixins</p>
+
+        <pre><code class="javascript jsx">
+import Vue from 'vue'
+import VueLayers from 'vuelayers'
+
+Vue.use(VueLayers)
+// now all components installed and ready to use
+new Vue({
+  el: '#app',
+  render: h =&gt; h(App)
+})
+        </code></pre>
+
+        <p><strong>Note</strong>: CSS file needs to be imported separately. <br/>
+          Inside your App.vue</p>
+
+        <pre><code class="vue">
+&lt;template&gt;...&lt;/template&gt;
+&lt;script&gt;...&lt;/script&gt;
+&lt;style&gt;
+  @import "~vuelayers/dist/cjs/style.css";
+&lt;/style&gt;
+        </code></pre>
+
+        <h4 id="ondemand">On demand</h4>
+
+        <p>First, install <a href="https://github.com/QingWei-Li/babel-plugin-component">babel-plugin-component</a></p>
+
+        <pre><code class="bash">
+npm install babel-plugin-component -D
+        </code></pre>
+
+        <p>Then edit your <code>.babelrc</code></p>
+
+        <pre><code class="json">
+{
+  "presets": [
+    ["es2015", "latest"]
+  ],
+  "plugins": [["component", [
+    {
+      "libraryName": "vuelayers",
+      "style": true,
+      "libDir": "dist/cjs"
+    }
+  ]]]
+}
+        </code></pre>
+
+        <p>Now you can import only what you need</p>
+
+        <pre><code class="javascript jsx">
+import Vue from 'vue'
+import { Map, MapView, LayerTile, SourceOsm } from 'vuelayers'
+
+Vue.use(Map)
+Vue.use(MapView)
+Vue.use(LayerTile)
+Vue.use(SourceOsm)
+
+new Vue({
+  el: '#app',
+  render: h =&gt; h(App)
+})
+        </code></pre>
+
+        <p><strong>Note</strong>: the above library setup automatically imports CSS files</p>
+
+        <h2>Demo source code</h2>
+
+        <h3>HTML</h3>
+        <pre><code class="xml">
 &lt;vl-map&gt;
   &lt;vl-map-view :center=&quot;center&quot; :zoom=&quot;zoom&quot; :rotation=&quot;rotation&quot; @change=&quot;updateMapView&quot;/&gt;
   &lt;vl-geoloc @change=&quot;updateGeoloc&quot;/&gt;
@@ -177,14 +258,10 @@
   &lt;/vl-layer-vector&gt;
   &lt;!-- position --&gt;
 &lt;/vl-map&gt;
-            </code>
-          </pre>
-        </div>
+        </code></pre>
 
-        <div>
-          <h1>JavaScript</h1>
-          <pre>
-            <code class="javascript">
+        <h3>JavaScript</h3>
+        <pre><code class="javascript jsx">
 import 'whatwg-fetch'
 import { kebabCase } from 'lodash/fp'
 
@@ -312,9 +389,8 @@ export default {
       .catch(::console.error)
   }
 }
-            </code>
-          </pre>
-        </div>
+        </code></pre>
+
         <div class="controls">
           <button @click="sourceCode = false">Close</button>
         </div>
@@ -330,10 +406,14 @@ export default {
   import highlightSCSS from 'highlight.js/lib/languages/scss'
   import highlightXML from 'highlight.js/lib/languages/xml'
   import highlightJavascript from 'highlight.js/lib/languages/javascript'
+  import highlightBash from 'highlight.js/lib/languages/bash'
+  import highlightJson from 'highlight.js/lib/languages/json'
 
   highlight.registerLanguage('scss', highlightSCSS)
   highlight.registerLanguage('xml', highlightXML)
   highlight.registerLanguage('javascript', highlightJavascript)
+  highlight.registerLanguage('javascript', highlightJson)
+  highlight.registerLanguage('javascript', highlightBash)
 
   const methods = {
     geometryTypeToCompName (type) {
@@ -502,6 +582,7 @@ export default {
 
     > button {
       margin         : 5px;
+      padding        : 5px 10px;
       text-transform : uppercase;
     }
   }

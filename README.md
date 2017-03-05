@@ -12,14 +12,87 @@
 
 ## Install
 
-```
+```bash
 # install Vue and VueLayers
 npm install -S vue vuelayers
 ```
 
+## Usage
+
+#### Full import  
+
+Import full library code with all components and mixins
+
+```js
+import Vue from 'vue'
+import VueLayers from 'vuelayers'
+
+Vue.use(VueLayers)
+// now all components installed and ready to use
+new Vue({
+  el: '#app',
+  render: h => h(App)
+})
+```
+
+**Note**: CSS file needs to be imported separately.    
+Inside your App.vue
+
+```vue
+<template>...</template>
+<script>...</script>
+<style>
+  @import "~vuelayers/dist/cjs/style.css";
+</style>
+```
+
+#### On demand  
+
+First, install [babel-plugin-component](https://github.com/QingWei-Li/babel-plugin-component)
+
+```bash
+npm install babel-plugin-component -D
+```
+
+Then edit your `.babelrc`
+
+```json
+{
+  "presets": [
+    ["es2015", "latest"]
+  ],
+  "plugins": [["component", [
+    {
+      "libraryName": "vuelayers",
+      "style": true,
+      "libDir": "dist/cjs"
+    }
+  ]]]
+}
+```
+
+Now you can import only what you need
+
+```js
+import Vue from 'vue'
+import { Map, MapView, LayerTile, SourceOsm } from 'vuelayers'
+
+Vue.use(Map)
+Vue.use(MapView)
+Vue.use(LayerTile)
+Vue.use(SourceOsm)
+
+new Vue({
+  el: '#app',
+  render: h => h(App)
+})
+```
+
+**Note**: the above library setup automatically imports CSS files
+
 ## Documentation
 
-TODO...
+TODO
 
 ## Build Setup
 
