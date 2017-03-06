@@ -110,17 +110,19 @@ export default {
     this.initialize()
   },
   mounted () {
-    this.mountGeometry()
+    this.$nextTick(this.mountGeometry)
   },
   destroyed () {
-    this.unmountGeometry()
-    this.geometry = undefined
+    this.$nextTick(() => {
+      this.unmountGeometry()
+      this.geometry = undefined
+    })
   }
 }
 
 function subscribeToGeomChanges () {
   this.rxSubs.geomChanges = Observable.fromOlEvent(this.geometry, 'change')
-    .throttleTime(100)
+    .throttleTime(1000)
     .map(() => {
       return [
         this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view().getProjection()),

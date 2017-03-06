@@ -12,7 +12,6 @@
    */
   import ol from 'openlayers'
   import uuid from 'uuid/v4'
-  import { omit } from 'lodash/fp'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
 
@@ -38,7 +37,7 @@
         data: this.data
       }
 
-      const geom = this.feature.getGeometry()
+      const geom = this.feature && this.feature.getGeometry()
       if (geom) {
         obj.geometry = {
           type: geom.getType(),
@@ -55,10 +54,13 @@
 
   const watch = {
     id (value) {
-      this.feature.setId(value)
+      if (this.feature) {
+        this.feature.setId(value)
+        this.feature.set('id', value)
+      }
     },
     data (value) {
-      this.feature.setProperties(omit([ 'geometry' ], value))
+      this.feature && this.feature.set('data', value)
     }
   }
 
@@ -81,15 +83,19 @@
       this::createFeature()
     },
     mounted () {
-      if (this.source()) {
-        this.source().addFeature(this.feature)
-      } else if (process.env.NODE_ENV !== 'production') {
-        warn("Invalid usage of feature component, should have source component among it's ancestors")
-      }
+      this.$nextTick(() => {
+        if (this.source()) {
+          this.source().addFeature(this.feature)
+        } else if (process.env.NODE_ENV !== 'production') {
+          warn("Invalid usage of feature component, should have source component among it's ancestors")
+        }
+      })
     },
     destroyed () {
-      this.source() && this.source().removeFeature(this.feature)
-      this.feature = undefined
+      this.$nextTick(() => {
+        this.source() && this.source().removeFeature(this.feature)
+        this.feature = undefined
+      })
     }
   }
 
@@ -104,7 +110,11 @@
      * @type {ol.Feature}
      * @protected
      */
-    this.feature = new ol.Feature(omit([ 'geometry' ], this.data))
+    this.feature = new ol.Feature({
+      id: this.id,
+      data: this.data,
+      layer: this.layer() && this.layer().$vm.id
+    })
     this.feature.setId(this.id)
     this.feature.$vm = this
 

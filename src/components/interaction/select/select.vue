@@ -1,6 +1,6 @@
 <script>
   import ol from 'openlayers'
-  import { forEach, difference } from 'lodash/fp'
+  import { forEach, constant, differenceWith } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
@@ -21,10 +21,25 @@
     selected: {
       type: Array,
       default: () => []
+    },
+    filter: {
+      type: Function,
+      default: constant(true)
     }
   }
 
-  const interactionRefresh = interaction.methods.refresh
+  const computed = {
+    selectedIds () {
+      return this.currentSelected.map(feature => feature.id)
+    }
+  }
+
+  const {
+    refresh: interactionRefresh,
+    mountInteraction: interactionMountInteraction,
+    unmountInteraction: interactionUnmountInteraction
+  } = interaction.methods
+  const defaultStyles = styleHelper.defaultEditStyle()
   const methods = {
     /**
      * @protected
@@ -37,7 +52,6 @@
      * @protected
      */
     createInteraction () {
-      const defaultStyles = styleHelper.defaultEditStyle()
       const styleFunc = createStyleFunc(this)
       const style = function __selectStyleFunc (feature, resolution) {
         const styles = styleFunc(feature, resolution)
@@ -49,11 +63,16 @@
           ? defaultStyles[ feature.getGeometry().getType() ]
           : null
       }
-      const serviceFeatures = this.serviceLayer() && this.serviceLayer().getSource().getFeatures()
+
+      const filterFunc = this.filter
+      const filter = function __selectFilter (feature, layer) {
+        return filterFunc(feature.$vm.plain())
+      }
 
       return new ol.interaction.Select({
         multi: this.multi,
-        filter: feature => !serviceFeatures.includes(feature),
+        wrapX: this.wrapX,
+        filter,
         style
       })
     },
@@ -62,28 +81,43 @@
       this::interactionRefresh()
     },
     /**
-     * @param {number} id
+     * @param {Object} plainFeature
+     * @param {string|number} plainFeature.id
+     * @param {string|number} plainFeature.layer
      */
-    select (id) {
+    select ({ id, layer }) {
+      if (!this.map() || this.selectedIds.includes(id)) return
+
       const selection = this.interaction.getFeatures()
-      const layers = this.map().getLayers()
-        .getArray()
-        .filter(layer => layer.$vm && layer instanceof ol.layer.Vector)
-
-      if (this.currentSelected.includes(id)) return
-
       let feature
-      forEach(layer => {
-        feature = layer.getSource().getFeatureById(id)
-        return !feature
-      }, layers)
+
+      if (id) {
+        if (layer) {
+          let layer = this.map().getLayers().getArray().find(layer => layer.id === layer)
+          if (layer) {
+            feature = layer.getSource().getFeatureById(id)
+          }
+        } else {
+          const layers = this.map().getLayers()
+            .getArray()
+            .filter(layer => layer instanceof ol.layer.Vector)
+
+          forEach(layer => {
+            feature = layer.getSource().getFeatureById(id)
+            return !feature
+          }, layers)
+        }
+      }
 
       feature && selection.push(feature)
     },
     /**
-     * @param {number} id
+     * @param {Object} plainFeature
+     * @param {string|number} plainFeature.id
      */
-    unselect (id) {
+    unselect ({ id }) {
+      if (!this.map() || !this.selectedIds.includes(id)) return
+
       const selection = this.interaction.getFeatures()
       const selectionArray = selection.getArray()
       const idx = selectionArray.findIndex(feature => feature.getId() === id)
@@ -101,16 +135,25 @@
     setStyle (style) {
       this.styles = style
       this.refresh()
+    },
+    mountInteraction () {
+      this::interactionMountInteraction()
+      this.$nextTick(() => this.currentSelected.forEach(this.select))
+    },
+    unmountInteraction () {
+      this.currentSelected.forEach(this.unselect)
+      this::interactionUnmountInteraction()
     }
   }
 
+  const diffById = differenceWith((a, b) => a.id === b.id)
   const watch = {
     selected (selected) {
-      let forSelect = difference(selected, this.currentSelected)
-      let forUnselect = difference(this.currentSelected, selected)
+      let forSelect = diffById(selected, this.currentSelected)
+      let forUnselect = diffById(this.currentSelected, selected)
 
-      forSelect.forEach(id => this.select(id))
-      forUnselect.forEach(id => this.unselect(id))
+      forSelect.forEach(this.select)
+      forUnselect.forEach(this.unselect)
     }
   }
 
@@ -122,6 +165,7 @@
     mixins: [ interaction, styleTarget ],
     inject: [ 'map', 'serviceLayer' ],
     props,
+    computed,
     methods,
     watch,
     provide () {
@@ -140,19 +184,19 @@
   function subscribeToInteractionChanges () {
     const selection = this.interaction.getFeatures()
 
-    this.rxSubs.select = Observable.fromOlEvent(selection, 'add', evt => evt.element)
+    this.rxSubs.select = Observable.fromOlEvent(selection, 'add', evt => evt.element.$vm.plain())
       .subscribe(
         feature => {
-          this.currentSelected.push(feature.getId())
-          this.$emit('select', feature.getId())
+          this.currentSelected.push(feature)
+          this.$emit('select', feature)
         },
         errordbg
       )
-    this.rxSubs.unselect = Observable.fromOlEvent(selection, 'remove', evt => evt.element)
+    this.rxSubs.unselect = Observable.fromOlEvent(selection, 'remove', evt => evt.element.$vm.plain())
       .subscribe(
         feature => {
-          this.currentSelected = this.currentSelected.filter(x => x !== feature.getId())
-          this.$emit('unselect', feature.getId())
+          this.currentSelected = this.currentSelected.filter(({ id }) => id !== feature.id)
+          this.$emit('unselect', feature)
         },
         errordbg
       )

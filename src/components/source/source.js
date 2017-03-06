@@ -83,10 +83,12 @@ export default {
     this.initialize()
   },
   mounted () {
-    this.mountSource()
+    this.$nextTick(this.mountSource)
   },
   destroyed () {
-    this.unmountSource()
-    this.source = undefined
+    this.$nextTick(() => {
+      this.unmountSource()
+      this.source = undefined
+    })
   }
 }

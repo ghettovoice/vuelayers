@@ -24,6 +24,10 @@ const props = {
   zIndex: {
     type: Number,
     default: 0
+  },
+  overlay: {
+    type: Boolean,
+    default: false
   }
 }
 
@@ -55,7 +59,11 @@ const methods = {
    */
   mountLayer () {
     if (this.map()) {
-      this.map().addLayer(this.layer)
+      if (this.overlay) {
+        this.layer.setMap(this.map())
+      } else {
+        this.map().addLayer(this.layer)
+      }
       this.subscribeAll()
     } else if (process.env.NODE_ENV !== 'production') {
       warn("Invalid usage of map component, should have layer component among it's ancestors")
@@ -66,7 +74,13 @@ const methods = {
    */
   unmountLayer () {
     this.unsubscribeAll()
-    this.map() && this.map().removeLayer(this.layer)
+    if (this.map()) {
+      if (this.overlay) {
+        this.layer.setMap(undefined)
+      } else {
+        this.map().removeLayer(this.layer)
+      }
+    }
   }
 }
 
@@ -110,10 +124,12 @@ export default {
     this.initialize()
   },
   mounted () {
-    this.mountLayer()
+    this.$nextTick(this.mountLayer)
   },
   destroyed () {
-    this.unmountLayer()
-    this.layer = undefined
+    this.$nextTick(() => {
+      this.unmountLayer()
+      this.layer = undefined
+    })
   }
 }

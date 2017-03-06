@@ -15,8 +15,10 @@ const methods = {
     this.setImage(undefined)
   },
   refresh () {
-    this.initialize()
-    this::styleRefresh()
+    this.$nextTick(() => {
+      this.initialize()
+      this::styleRefresh()
+    })
   }
 }
 

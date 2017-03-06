@@ -10,7 +10,6 @@
   import { errordbg } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
   import { consts as olConsts } from 'vl-ol'
-//  import positionMarker from './position-marker.svg'
 
   const props = {
     tracking: {
@@ -54,9 +53,10 @@
       this::subscribeToGeolocation()
     },
     destroyed () {
-      this.geoloc.setTracking(false)
-//      this.serviceLayer() && this.serviceLayer().getSource().removeFeature(this.positionFeature)
-      this.geoloc = this.positionFeature = undefined
+      this.$nextTick(() => {
+        this.geoloc.setTracking(false)
+        this.geoloc = undefined
+      })
     }
   }
 
@@ -74,28 +74,13 @@
     })
 
     this.geoloc.$vm = this
-    /**
-     * @type {ol.Feature}
-     * @protected
-     */
-//    this.positionFeature = new ol.Feature({
-//      internal: true
-//    })
-//    this.positionFeature.setStyle(new ol.style.Style({
-//      image: new ol.style.Icon({
-//        src: positionMarker,
-//        scale: 0.85,
-//        anchor: [ 0.5, 1 ]
-//      })
-//    }))
-//    this.serviceLayer() && this.serviceLayer().getSource().addFeature(this.positionFeature)
 
     return this.geoloc
   }
 
   function subscribeToGeolocation () {
     const geolocChanges = Observable.fromOlEvent(this.geoloc, 'change')
-      .throttleTime(100)
+      .throttleTime(1000)
       .map(() => {
         const position = ol.proj.toLonLat(this.geoloc.getPosition(), this.projection)
         const accuracy = this.geoloc.getAccuracy()

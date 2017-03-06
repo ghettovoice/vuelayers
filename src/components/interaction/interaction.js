@@ -66,10 +66,12 @@ export default {
     this.initialize()
   },
   mounted () {
-    this.mountInteraction()
+    this.$nextTick(this.mountInteraction)
   },
   destroyed () {
-    this.unmountInteraction()
-    this.interaction = undefined
+    this.$nextTick(() => {
+      this.unmountInteraction()
+      this.interaction = undefined
+    })
   }
 }

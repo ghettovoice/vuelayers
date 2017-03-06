@@ -148,11 +148,13 @@
       this::createView()
     },
     mounted () {
-      this.mountView()
+      this.$nextTick(this.mountView)
     },
     destroyed () {
-      this.unmountView()
-      this.view = undefined
+      this.$nextTick(() => {
+        this.unmountView()
+        this.view = undefined
+      })
     }
   }
 
@@ -181,7 +183,7 @@
    */
   function subscribeToViewChanges () {
     const viewChanges = Observable.fromOlEvent(this.view, 'change')
-      .throttleTime(300)
+      .throttleTime(1000)
       .map(() => {
         const center = ol.proj.toLonLat(this.view.getCenter(), this.projection)
         const zoom = Math.ceil(this.view.getZoom())

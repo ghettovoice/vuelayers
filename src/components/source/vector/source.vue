@@ -1,9 +1,12 @@
 <script>
   import vectorSource from 'vl-components/source/vector-base'
 
+  const props = {}
+
   export default {
     name: 'vl-source-vector',
-    mixins: [ vectorSource ]
+    mixins: [ vectorSource ],
+    props
   }
 </script>
 

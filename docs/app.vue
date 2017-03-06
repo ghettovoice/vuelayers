@@ -5,7 +5,8 @@
       <vl-geoloc @change="updateGeoloc"/>
 
       <!-- interactions -->
-      <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
+      <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect"
+                             :filter="selectFilter">
         <vl-style-container>
           <vl-style-stroke color="#f03b20" :width="3"/>
           <vl-style-fill :color="[254, 178, 76, 0.7]"/>
@@ -38,12 +39,12 @@
             <component :is="geometryTypeToCompName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
 
             <!-- feature level style -->
-            <vl-style-container v-if="feature.properties.color && !selected.includes(feature.id)">
+            <vl-style-container v-if="!selectedIds.includes(feature.id) && feature.properties.color">
               <vl-style-stroke color="#8856a7" :width="2"/>
               <vl-style-fill :color="feature.properties.color"/>
             </vl-style-container>
 
-            <vl-style-container v-if="selected.includes(feature.id) && feature.properties.selectColor">
+            <vl-style-container v-if="selectedIds.includes(feature.id) && feature.properties.selectColor">
               <vl-style-stroke color="#8856a7" :width="2"/>
               <vl-style-fill :color="feature.properties.selectColor"/>
             </vl-style-container>
@@ -63,19 +64,19 @@
       </vl-layer-vector>
       <!--// pacman -->
 
-      <!-- position -->
-      <vl-layer-vector v-if="position.length" id="my-position" :z-index="100">
+      <!-- current position overlay -->
+      <vl-layer-vector v-if="position.length" id="my-position" :z-index="100" :overlay="true">
         <vl-style-container>
           <vl-style-icon src="static/img/marker.png" :scale="0.3" :anchor="[0.5, 1]"/>
         </vl-style-container>
 
         <vl-source-vector>
-          <vl-feature id="my-position">
+          <vl-feature id="my-position" :z-index="999">
             <vl-geom-point :coordinates="position"/>
           </vl-feature>
         </vl-source-vector>
       </vl-layer-vector>
-      <!--// position -->
+      <!--// current position overlay -->
     </vl-map>
 
     <div class="controls">
@@ -88,7 +89,7 @@
       <hr />
       Center: {{ center.map(x => parseFloat(x.toPrecision(6))) }} Zoom: {{ zoom }} Rotation {{ rotation }}<br />
       My position: {{ position.map(x => parseFloat(x.toPrecision(6))) }}<br />
-      Current selection: {{ selected }}
+      Current selection: {{ selectedIds }}
     </div>
 
     <transition name="slide">
@@ -182,17 +183,18 @@ new Vue({
         <h3>HTML</h3>
         <pre><code class="xml">
 &lt;vl-map&gt;
-  &lt;vl-map-view :center=&quot;center&quot; :zoom=&quot;zoom&quot; :rotation=&quot;rotation&quot; @change=&quot;updateMapView&quot;/&gt;
+  &lt;vl-map-view :center="center" :zoom=&quot;zoom&quot; :rotation=&quot;rotation&quot; @change=&quot;updateMapView&quot;/&gt;
   &lt;vl-geoloc @change=&quot;updateGeoloc&quot;/&gt;
 
   &lt;!-- interactions --&gt;
-  &lt;vl-interaction-select ref=&quot;select&quot; :selected=&quot;selected&quot; @select=&quot;select&quot; @unselect=&quot;unselect&quot;&gt;
+  &lt;vl-interaction-select ref=&quot;select&quot; :selected=&quot;selected&quot; @select=&quot;select&quot; @unselect=&quot;unselect&quot;
+                         :filter=&quot;selectFilter&quot;&gt;
     &lt;vl-style-container&gt;
       &lt;vl-style-stroke color=&quot;#f03b20&quot; :width=&quot;3&quot;/&gt;
       &lt;vl-style-fill :color=&quot;[254, 178, 76, 0.7]&quot;/&gt;
     &lt;/vl-style-container&gt;
   &lt;/vl-interaction-select&gt;
-  &lt;!-- interactions --&gt;
+  &lt;!--// interactions --&gt;
 
   &lt;!-- base layers --&gt;
   &lt;vl-layer-tile id=&quot;osm&quot; :visible=&quot;layers.osm&quot;&gt;
@@ -203,7 +205,7 @@ new Vue({
     &lt;vl-source-mapbox map-id=&quot;ghettovoice.nbm2olb0&quot;
                       access-token=&quot;pk.eyJ1IjoiZ2hldHRvdm9pY2UiLCJhIjoiMzMxYzMyMWQ3NTgzMTU4Nzk3ZTNmMmI3MmQ1NmVhMjgifQ._erAEzdvdB0jfYXXqzOJCg&quot;/&gt;
   &lt;/vl-layer-tile&gt;
-  &lt;!-- base layers --&gt;
+  &lt;!--// base layers --&gt;
 
   &lt;!-- countries vector --&gt;
   &lt;vl-layer-vector id=&quot;countries&quot; v-if=&quot;countries.length&quot; :visible=&quot;layers.countries&quot;&gt;
@@ -212,19 +214,19 @@ new Vue({
       &lt;vl-style-stroke color=&quot;#8856a7&quot; :width=&quot;2&quot;/&gt;
       &lt;vl-style-fill :color=&quot;[158, 188, 218, 0.5]&quot;/&gt;
     &lt;/vl-style-container&gt;
-    &lt;!-- layer level style --&gt;
+    &lt;!--// layer level style --&gt;
 
     &lt;vl-source-vector&gt;
       &lt;vl-feature v-for=&quot;feature in countries&quot; :key=&quot;feature.id&quot; :id=&quot;feature.id&quot; :data=&quot;feature.properties&quot;&gt;
         &lt;component :is=&quot;geometryTypeToCompName(feature.geometry.type)&quot; :coordinates=&quot;feature.geometry.coordinates&quot;/&gt;
 
         &lt;!-- feature level style --&gt;
-        &lt;vl-style-container v-if=&quot;feature.properties.color &amp;&amp; !selected.includes(feature.id)&quot;&gt;
+        &lt;vl-style-container v-if=&quot;!selectedIds.includes(feature.id) &amp;&amp; feature.properties.color&quot;&gt;
           &lt;vl-style-stroke color=&quot;#8856a7&quot; :width=&quot;2&quot;/&gt;
           &lt;vl-style-fill :color=&quot;feature.properties.color&quot;/&gt;
         &lt;/vl-style-container&gt;
 
-        &lt;vl-style-container v-if=&quot;selected.includes(feature.id) &amp;&amp; feature.properties.selectColor&quot;&gt;
+        &lt;vl-style-container v-if=&quot;selectedIds.includes(feature.id) &amp;&amp; feature.properties.selectColor&quot;&gt;
           &lt;vl-style-stroke color=&quot;#8856a7&quot; :width=&quot;2&quot;/&gt;
           &lt;vl-style-fill :color=&quot;feature.properties.selectColor&quot;/&gt;
         &lt;/vl-style-container&gt;
@@ -232,7 +234,7 @@ new Vue({
       &lt;/vl-feature&gt;
     &lt;/vl-source-vector&gt;
   &lt;/vl-layer-vector&gt;
-  &lt;!-- countries vector --&gt;
+  &lt;!--// countries vector --&gt;
 
   &lt;!-- pacman, use v-style-func for advanced styling --&gt;
   &lt;vl-layer-vector id=&quot;pacman&quot; v-if=&quot;pacman.length&quot; v-style-func=&quot;pacmanStyleFunc&quot; :visible=&quot;layers.pacman&quot;&gt;
@@ -242,28 +244,34 @@ new Vue({
       &lt;/vl-feature&gt;
     &lt;/vl-source-vector&gt;
   &lt;/vl-layer-vector&gt;
-  &lt;!-- pacman --&gt;
+  &lt;!--// pacman --&gt;
 
-  &lt;!-- position --&gt;
-  &lt;vl-layer-vector v-if=&quot;position.length&quot; id=&quot;my-position&quot; :z-index=&quot;100&quot;&gt;
+  &lt;!-- current position overlay --&gt;
+  &lt;vl-layer-vector v-if=&quot;position.length&quot; id=&quot;my-position&quot; :z-index=&quot;100&quot; :overlay=&quot;true&quot;&gt;
     &lt;vl-style-container&gt;
-      &lt;vl-style-icon src=&quot;/static/marker.png&quot; :scale=&quot;0.3&quot; :anchor=&quot;[0.5, 1]&quot;/&gt;
+      &lt;vl-style-icon src=&quot;static/img/marker.png&quot; :scale=&quot;0.3&quot; :anchor=&quot;[0.5, 1]&quot;/&gt;
     &lt;/vl-style-container&gt;
 
     &lt;vl-source-vector&gt;
-      &lt;vl-feature id=&quot;my-position&quot;&gt;
+      &lt;vl-feature id=&quot;my-position&quot; :z-index=&quot;999&quot;&gt;
         &lt;vl-geom-point :coordinates=&quot;position&quot;/&gt;
       &lt;/vl-feature&gt;
     &lt;/vl-source-vector&gt;
   &lt;/vl-layer-vector&gt;
-  &lt;!-- position --&gt;
+  &lt;!--// current position overlay --&gt;
 &lt;/vl-map&gt;
         </code></pre>
 
         <h3>JavaScript</h3>
         <pre><code class="javascript jsx">
 import 'whatwg-fetch'
-import { kebabCase } from 'lodash/fp'
+import { kebabCase, forEach } from 'lodash/fp'
+
+const computed = {
+  selectedIds () {
+    return this.selected.map(({ id }) =&gt; id)
+  }
+}
 
 const methods = {
   geometryTypeToCompName (type) {
@@ -277,13 +285,14 @@ const methods = {
   updateGeoloc ({ position }) {
     this.position = position
   },
-  select (id) {
-    if (this.selected.indexOf(id) === -1) {
-      this.selected.push(id)
+  select (plainFeature) {
+    const i = this.selectedIds.indexOf(plainFeature.id)
+    if (i === -1) {
+      this.selected.push(plainFeature)
     }
   },
-  unselect (id) {
-    const i = this.selected.indexOf(id)
+  unselect ({ id }) {
+    const i = this.selectedIds.indexOf(id)
     if (i !== -1) {
       this.selected.splice(i, 1)
     }
@@ -303,9 +312,6 @@ const methods = {
 
     return this.countries
   },
-  /**
-   * Style function factory, use with v-style-func directive to apply complex stylings with OpenLayers native API.
-   */
   pacmanStyleFunc (ol, styleHelper) {
     const pacman = [
       new ol.style.Style({
@@ -361,11 +367,15 @@ const methods = {
   },
   toggleLayer (layer) {
     this.layers[ layer ] = !this.layers[ layer ]
+  },
+  selectFilter (feature) {
+    return feature.layer !== 'my-position'
   }
 }
 
 export default {
   name: 'app',
+  computed,
   methods,
   data () {
     return {
@@ -415,6 +425,12 @@ export default {
   highlight.registerLanguage('json', highlightJson)
   highlight.registerLanguage('bash', highlightBash)
 
+  const computed = {
+    selectedIds () {
+      return this.selected.map(({ id }) => id)
+    }
+  }
+
   const methods = {
     geometryTypeToCompName (type) {
       return 'vl-geom-' + kebabCase(type)
@@ -427,13 +443,14 @@ export default {
     updateGeoloc ({ position }) {
       this.position = position
     },
-    select (id) {
-      if (this.selected.indexOf(id) === -1) {
-        this.selected.push(id)
+    select (plainFeature) {
+      const i = this.selectedIds.indexOf(plainFeature.id)
+      if (i === -1) {
+        this.selected.push(plainFeature)
       }
     },
-    unselect (id) {
-      const i = this.selected.indexOf(id)
+    unselect ({ id }) {
+      const i = this.selectedIds.indexOf(id)
       if (i !== -1) {
         this.selected.splice(i, 1)
       }
@@ -509,6 +526,9 @@ export default {
     toggleLayer (layer) {
       this.layers[ layer ] = !this.layers[ layer ]
     },
+    selectFilter (feature) {
+      return feature.layer !== 'my-position'
+    },
     showSourceCode () {
       this.sourceCode = true
     }
@@ -526,6 +546,7 @@ export default {
 
   export default {
     name: 'app',
+    computed,
     watch,
     methods,
     data () {

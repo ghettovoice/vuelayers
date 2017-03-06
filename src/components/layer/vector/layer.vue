@@ -1,9 +1,12 @@
 <script>
   import vectorLayer from 'vl-components/layer/vector-base'
 
+  const props = {}
+
   export default {
     name: 'vl-layer-vector',
-    mixins: [ vectorLayer ]
+    mixins: [ vectorLayer ],
+    props
   }
 </script>
 

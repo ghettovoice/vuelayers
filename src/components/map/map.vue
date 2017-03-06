@@ -17,7 +17,10 @@
       type: Boolean,
       default: false
     },
-    pixelRatio: Number,
+    pixelRatio: {
+      type: Number,
+      default: 1
+    },
     renderer: [ String, Array ],
     logo: [ String, Object ],
     keyboardEventTarget: [ String, Node ],
@@ -59,15 +62,17 @@
       this::createMap()
     },
     mounted () {
-      this.map.setTarget(this.$refs.map)
       this.$nextTick(() => {
+        this.map.setTarget(this.$refs.map)
         this.refresh()
       })
     },
     destroyed () {
-      this.serviceLayer.setMap(undefined)
-      this.map.setTarget(undefined)
-      this.map = this.serviceLayer = undefined
+      this.$nextTick(() => {
+        this.serviceLayer.setMap(undefined)
+        this.map.setTarget(undefined)
+        this.map = this.serviceLayer = undefined
+      })
     }
   }
 

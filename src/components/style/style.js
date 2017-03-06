@@ -36,7 +36,10 @@ const methods = {
     throw new Error('Not implemented method')
   },
   refresh () {
-    this.$nextTick(this.mountStyle)
+    this.$nextTick(() => {
+      this.unmountStyle()
+      this.mountStyle()
+    })
   }
 }
 
@@ -47,10 +50,12 @@ export default {
     // Create style in  mounted hook because of some ol style classes doesn't have
     // setters for all inner objects. This setters are emulated through method: getStyleTarget
     this.initialize()
-    this.mountStyle()
+    this.$nextTick(this.mountStyle)
   },
   destroyed () {
-    this.unmountStyle()
-    this.style = undefined
+    this.$nextTick(() => {
+      this.unmountStyle()
+      this.style = undefined
+    })
   }
 }

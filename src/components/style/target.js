@@ -17,7 +17,7 @@ export default {
       const styleTarget = this.styleTarget()
 
       if (styleTarget) {
-        if (this.styles && this.styles.length) {
+        if (this.styles === null || (Array.isArray(this.styles) && this.styles.length)) {
           styleTarget.setStyle(
             isFunction(this.styles)
               ? this.styles
@@ -37,10 +37,11 @@ export default {
 // todo implement removed, aka null style
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
-    if (!vm.styles || !vm.styles.length) return null
+    if (vm.styles === null) return null
+    if (!vm.styles.length) return
 
     const plainFeature = feature.$vm ? feature.$vm.plain() : feature.getProperties()
-    if (!plainFeature.geometry) return null
+    if (!plainFeature.geometry) return
 
     const styles = []
     vm.styles.forEach(({ style, geomType }) => {
