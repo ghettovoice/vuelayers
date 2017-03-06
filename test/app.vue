@@ -32,7 +32,7 @@
       <!-- position -->
       <vl-layer-vector v-if="position.length" id="my-position" :z-index="100">
         <vl-style-container>
-          <vl-style-icon src="/static/marker.png" :scale="0.3" :anchor="[0.5, 1]"/>
+          <vl-style-icon src="/static/img/marker.png" :scale="0.3" :anchor="[0.5, 1]"/>
         </vl-style-container>
 
         <vl-source-vector>

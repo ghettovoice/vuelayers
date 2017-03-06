@@ -1,6 +1,6 @@
 import interaction from './interaction'
 
-export VlInteractionSelect from './select'
+export InteractionSelect from './select'
 
 export const mixins = {
   interaction

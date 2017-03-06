@@ -32,8 +32,6 @@ export default {
     forEachWithKey((component, key) => {
       if (component.install) {
         Vue.use(component)
-      } else if (key === 'directives') {
-        forEach(::Vue.use, component)
       }
     }, flatComponents)
   }

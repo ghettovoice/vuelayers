@@ -3,6 +3,7 @@ import ol from 'openlayers'
 import { isFunction } from 'lodash/fp'
 import { createStyleFunc } from 'vl-components/style/target'
 import { style as styleHelper } from 'vl-ol'
+import './style.css'
 
 /**
  * Directive for advanced low-level dynamic styling using ol.StyleFunction.

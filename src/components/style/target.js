@@ -35,15 +35,15 @@ export default {
   }
 }
 // todo implement removed, aka null style
-export function createStyleFunc (styleTarget) {
+export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
-    if (!styleTarget.styles || !styleTarget.styles.length) return null
+    if (!vm.styles || !vm.styles.length) return null
 
     const plainFeature = feature.$vm ? feature.$vm.plain() : feature.getProperties()
     if (!plainFeature.geometry) return null
 
     const styles = []
-    styleTarget.styles.forEach(({ style, geomType }) => {
+    vm.styles.forEach(({ style, geomType }) => {
       if (
         geomType == null || plainFeature.geometry.type === geomType ||
         kebabCase(feature.geometry.type) === geomType

@@ -170,7 +170,7 @@ map:
     alias: vl-components/style/target
 
   # directives
-  - name: directives/style-func
+  - name: style-func
     path: components/style/func
     alias: vl-components/style/func
 
