@@ -18,7 +18,7 @@
       </vl-layer-tile>
       <!--// base layers -->
 
-      <vl-layer-vector id="countries" v-if="countries.length">
+      <vl-layer-vector id="countries">
         <!-- layer level style -->
         <vl-style-container>
           <vl-style-stroke color="#8856a7" :width="2"/>
@@ -71,7 +71,12 @@
       const geomCollection = await res.json()
       this.countries = geomCollection.features// .filter(x => x.id === 'RUS')
 
-      return this.countries
+//      return this.countries
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(this.countries)
+        }, 3000)
+      })
     }
   }
 

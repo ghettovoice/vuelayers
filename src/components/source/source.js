@@ -72,13 +72,7 @@ export default {
       source: () => this.source
     }
   },
-  render (h) {
-    return h('i', {
-      style: {
-        display: 'none !important'
-      }
-    }, this.$slots.default)
-  },
+  render: h => h(),
   created () {
     this.initialize()
   },

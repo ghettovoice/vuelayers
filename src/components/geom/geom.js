@@ -110,7 +110,6 @@ export default {
     this.initialize()
   },
   mounted () {
-    console.log('mount geometry')
     this.$nextTick(this.mountGeometry)
   },
   destroyed () {

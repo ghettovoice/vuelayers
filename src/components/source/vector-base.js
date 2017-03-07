@@ -59,5 +59,12 @@ const methods = {
 export default {
   mixins: [ source ],
   props,
-  methods
+  methods,
+  render (h) {
+    return h('i', {
+      style: {
+        display: 'none !important'
+      }
+    }, this.$slots.default)
+  }
 }
