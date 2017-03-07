@@ -1,9 +1,9 @@
-import { isEqual } from 'lodash/fp'
-import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/operator/throttleTime'
-import 'rxjs/add/operator/distinctUntilChanged'
-import 'rxjs/add/operator/map'
-import 'vl-rx'
+// import { isEqual } from 'lodash/fp'
+// import { Observable } from 'rxjs/Observable'
+// import 'rxjs/add/operator/throttleTime'
+// import 'rxjs/add/operator/distinctUntilChanged'
+// import 'rxjs/add/operator/map'
+// import 'vl-rx'
 import rxSubs from 'vl-mixins/rx-subs'
 import { coord as coordHelper } from 'vl-ol'
 import { warn } from 'vl-utils/debug'
@@ -56,7 +56,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   subscribeAll () {
-    this::subscribeToGeomChanges()
+    // this::subscribeToGeomChanges()
   },
   /**
    * @protected
@@ -80,10 +80,10 @@ const methods = {
     this.geometry && this.geometry.changed()
   }
 }
-
+// todo use turf.js to optimize geometry compare
 const watch = {
   coordinates (value) {
-    this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view().getProjection()))
+    // this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view().getProjection()))
   }
 }
 
@@ -110,6 +110,7 @@ export default {
     this.initialize()
   },
   mounted () {
+    console.log('mount geometry')
     this.$nextTick(this.mountGeometry)
   },
   destroyed () {
@@ -120,22 +121,22 @@ export default {
   }
 }
 
-function subscribeToGeomChanges () {
-  this.rxSubs.geomChanges = Observable.fromOlEvent(this.geometry, 'change')
-    .throttleTime(1000)
-    .map(() => {
-      return [
-        this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view().getProjection()),
-        coordHelper.extentToLonLat(this.geometry.getExtent(), this.view().getProjection())
-      ]
-    })
-    .distinctUntilChanged((a, b) => isEqual(a, b))
-    .subscribe(
-      ([ coordinates, extent ]) => {
-        this.currentCoordinates = coordinates
-        this.currentExtent = extent
-        this.$emit('change', { coordinates, extent })
-      },
-      ::console.error
-    )
-}
+// function subscribeToGeomChanges () {
+//   this.rxSubs.geomChanges = Observable.fromOlEvent(this.geometry, 'change')
+//     .throttleTime(1000)
+//     .map(() => {
+//       return [
+//         this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view().getProjection()),
+//         coordHelper.extentToLonLat(this.geometry.getExtent(), this.view().getProjection())
+//       ]
+//     })
+//     .distinctUntilChanged((a, b) => isEqual(a, b))
+//     .subscribe(
+//       ([ coordinates, extent ]) => {
+//         this.currentCoordinates = coordinates
+//         this.currentExtent = extent
+//         this.$emit('change', { coordinates, extent })
+//       },
+//       ::console.error
+//     )
+// }

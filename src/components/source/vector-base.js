@@ -31,11 +31,13 @@ const methods = {
       const features = await Promise.resolve(loader(extent, resolution, projection))
 
       if (features && features.length) {
-        self.$emit('load', {
-          features,
-          extent,
-          resolution,
-          projection
+        self.$nextTick(() => {
+          self.$emit('load', {
+            features,
+            extent,
+            resolution,
+            projection
+          })
         })
       }
     }

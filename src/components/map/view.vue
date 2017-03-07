@@ -195,10 +195,21 @@
 
     this.rxSubs.viewChanges = viewChanges.subscribe(
       ({ center, zoom, rotation }) => {
-        this.currentCenter = center
-        this.currentZoom = zoom
-        this.currentRotation = rotation
-        this.$emit('change', { center, zoom, rotation })
+        let changes = false
+        if (!isEqual(this.currentCenter, center)) {
+          this.currentCenter = center
+          changes = true
+        }
+        if (this.currentZoom !== zoom) {
+          this.currentZoom = zoom
+          changes = true
+        }
+        if (this.currentRotation !== rotation) {
+          this.currentRotation = rotation
+          changes = true
+        }
+
+        changes && this.$emit('change', { center, zoom, rotation })
       },
       errordbg
     )
