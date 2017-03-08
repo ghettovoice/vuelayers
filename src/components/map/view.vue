@@ -9,6 +9,7 @@
   import 'vl-rx'
   import { errordbg, warn } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
+  import stubVNode from 'vl-mixins/stub-vnode'
   import { consts as olConsts } from 'vl-ol'
 
   const props = {
@@ -81,12 +82,15 @@
     },
     setCurrentView ({ center, zoom, rotation }) {
       if (center != null && !isEqual(center, this.currentCenter)) {
+        console.log('update center')
         this.view.setCenter(ol.proj.fromLonLat(center, this.projection))
       }
       if (zoom != null && zoom !== this.currentZoom) {
+        console.log('update zoom')
         this.view.setZoom(zoom)
       }
       if (rotation != null && rotation !== this.currentRotation) {
+        console.log('update zoom')
         this.view.setRotation(rotation)
       }
     },
@@ -132,11 +136,15 @@
   export default {
     name: 'vl-map-view',
     inject: [ 'map' ],
-    mixins: [ rxSubs ],
+    mixins: [ rxSubs, stubVNode ],
     props,
     methods,
     watch,
-    render: h => h(),
+    stubVNode: {
+      empty () {
+        return this.$options.name
+      }
+    },
     data () {
       return {
         currentZoom: this.zoom,

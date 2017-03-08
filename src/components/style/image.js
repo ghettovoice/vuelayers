@@ -26,11 +26,12 @@ export default {
   mixins: [ style ],
   inject: [ 'setImage' ],
   methods,
-  render (h) {
-    return h('i', {
-      style: {
-        display: 'none !important'
+  stubVNode: {
+    empty: false,
+    attrs () {
+      return {
+        id: this.$options.name
       }
-    }, this.$slots.default)
+    }
   }
 }

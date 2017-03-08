@@ -1,3 +1,4 @@
+import stubVNode from 'vl-mixins/stub-vnode'
 /**
  * Basic style mixin.
  * Exposes for children inner OpenLayer style object as styleTarget.
@@ -44,8 +45,13 @@ const methods = {
 }
 
 export default {
+  mixins: [ stubVNode ],
   methods,
-  render: h => h(),
+  stubVNode: {
+    empty () {
+      return this.$options.name
+    }
+  },
   mounted () {
     // Create style in  mounted hook because of some ol style classes doesn't have
     // setters for all inner objects. This setters are emulated through method: getStyleTarget

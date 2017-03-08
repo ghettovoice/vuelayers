@@ -9,6 +9,7 @@
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
+  import stubVNode from 'vl-mixins/stub-vnode'
   import { consts as olConsts } from 'vl-ol'
 
   const props = {
@@ -36,12 +37,16 @@
 
   export default {
     name: 'vl-geoloc',
-    mixins: [ rxSubs ],
+    mixins: [ rxSubs, stubVNode ],
     inject: [ 'serviceLayer' ],
     props,
     watch,
     methods,
-    render: h => h(),
+    stubVNode: {
+      empty () {
+        return this.$options.name
+      }
+    },
     data () {
       return {
         currentPosition: undefined,

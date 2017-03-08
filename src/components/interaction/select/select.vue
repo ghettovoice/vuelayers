@@ -168,6 +168,14 @@
     computed,
     methods,
     watch,
+    stubVNode: {
+      empty: false,
+      attrs () {
+        return {
+          id: this.$options.name
+        }
+      }
+    },
     provide () {
       return {
         ...this::interactionProvide(),

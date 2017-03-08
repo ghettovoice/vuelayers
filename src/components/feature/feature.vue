@@ -1,9 +1,3 @@
-<template>
-  <i style="display: none !important;">
-    <slot :feature="plain"></slot>
-  </i>
-</template>
-
 <script>
   /**
    * Wrapper around ol.Feature.
@@ -12,6 +6,7 @@
    */
   import ol from 'openlayers'
   import uuid from 'uuid/v4'
+  import stubVNode from 'vl-mixins/stub-vnode'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
 
@@ -68,11 +63,18 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [ styleTarget ],
+    mixins: [ stubVNode, styleTarget ],
     inject: [ 'layer', 'source' ],
     props,
     methods,
     watch,
+    stubVNode: {
+      attrs () {
+        return {
+          id: [ this.$options.name, this.id ].join('-')
+        }
+      }
+    },
     provide () {
       return {
         ...this::styleTargetProvide(),

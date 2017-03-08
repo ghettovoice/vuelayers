@@ -1,9 +1,3 @@
-<template>
-  <i style="display: none !important">
-    <slot></slot>
-  </i>
-</template>
-
 <script>
   /**
    * ol.style.Style wrapper.
@@ -77,6 +71,14 @@
     props,
     methods,
     watch,
+    stubVNode: {
+      empty: false,
+      attrs () {
+        return {
+          id: this.$options.name
+        }
+      }
+    },
     provide () {
       return {
         setFill: this::setFill,

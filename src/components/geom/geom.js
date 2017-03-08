@@ -5,6 +5,7 @@
 // import 'rxjs/add/operator/map'
 // import 'vl-rx'
 import rxSubs from 'vl-mixins/rx-subs'
+import stubVNode from 'vl-mixins/stub-vnode'
 import { coord as coordHelper } from 'vl-ol'
 import { warn } from 'vl-utils/debug'
 
@@ -88,18 +89,22 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs ],
+  mixins: [ rxSubs, stubVNode ],
   inject: [ 'view', 'feature' ],
   props,
   computed,
   watch,
   methods,
+  stubVNode: {
+    empty () {
+      return this.$options.name
+    }
+  },
   provide () {
     return {
       geometry: () => this.geometry
     }
   },
-  render: h => h(),
   data () {
     return {
       currentCoordinates: this.coordinates.slice(),

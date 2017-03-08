@@ -1,5 +1,6 @@
 import ol from 'openlayers'
 import source from 'vl-components/source/source'
+import virtSlot from 'vl-mixins/virt-slot'
 import { coord as coordHelper } from 'vl-ol'
 
 const props = {
@@ -57,14 +58,19 @@ const methods = {
 }
 
 export default {
-  mixins: [ source ],
+  mixins: [ source, virtSlot ],
   props,
   methods,
-  render (h) {
-    return h('i', {
-      style: {
-        display: 'none !important'
+  virtSlot: {
+    slots: [ 'default' ]
+  },
+  stubVNode: {
+    empty: false,
+    slots: false,
+    attrs () {
+      return {
+        id: this.$options.name
       }
-    }, this.$slots.default)
+    }
   }
 }

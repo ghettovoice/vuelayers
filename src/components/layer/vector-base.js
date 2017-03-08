@@ -49,12 +49,5 @@ export default {
       ...this::layerProvide(),
       ...this::styleTargetProvide()
     }
-  },
-  render (h) {
-    return h('i', {
-      style: {
-        display: 'none !important'
-      }
-    }, this.$slots.default)
   }
 }

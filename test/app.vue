@@ -18,7 +18,7 @@
       </vl-layer-tile>
       <!--// base layers -->
 
-      <vl-layer-vector id="countries">
+      <vl-layer-vector id="countries" v-if="countriesLayer">
         <!-- layer level style -->
         <vl-style-container>
           <vl-style-stroke color="#8856a7" :width="2"/>
@@ -33,6 +33,11 @@
         </vl-source-vector>
       </vl-layer-vector>
     </vl-map>
+
+    <div class="controls">
+      <button @click="countriesLayer = !countriesLayer">Toggle</button>
+      <button @click="countries = countries.slice(10)">Remove</button>
+    </div>
   </div>
 </template>
 
@@ -71,12 +76,12 @@
       const geomCollection = await res.json()
       this.countries = geomCollection.features// .filter(x => x.id === 'RUS')
 
-//      return this.countries
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(this.countries)
-        }, 3000)
-      })
+      return this.countries
+//      return new Promise(resolve => {
+//        setTimeout(() => {
+//          resolve(this.countries)
+//        }, 3000)
+//      })
     }
   }
 
@@ -90,7 +95,8 @@
         center: [ 0, 0 ],
         rotation: 0,
         selected: [],
-        countries: []
+        countries: [],
+        countriesLayer: true
       }
     },
     created () {
@@ -111,6 +117,24 @@
 
     * {
       box-sizing : border-box;
+    }
+  }
+
+  .controls {
+    position   : absolute;
+    bottom     : 10px;
+    left       : 50%;
+    transform  : translateX(-50%);
+    width      : 70vw;
+    background : rgba(255, 255, 255, 0.7);
+    box-shadow : 0 0 20px rgba(2, 2, 2, 0.1);
+    padding    : 5px;
+    text-align : center;
+
+    > button {
+      margin         : 5px;
+      padding        : 5px 10px;
+      text-transform : uppercase;
     }
   }
 </style>

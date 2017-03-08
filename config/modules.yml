@@ -35,9 +35,13 @@ map:
     path: mixins/rx-subs
     alias: vl-mixins/rx-subs
 
-#  - name: mixins/expose-inject
-#    path: mixins/expose-inject
-#    alias: vl-mixins/expose-inject
+  - name: mixins/stub-vnode
+    path: mixins/stub-vnode
+    alias: vl-mixins/stub-vnode
+
+  - name: mixins/virt-slot
+    path: mixins/virt-slot
+    alias: vl-mixins/virt-slot
 
 #####################################################################
 #   COMMON COMPONENTS

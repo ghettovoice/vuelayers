@@ -1,4 +1,5 @@
 import rxSubs from 'vl-mixins/rx-subs'
+import stubVNode from 'vl-mixins/stub-vnode'
 import { consts as olConsts } from 'vl-ol'
 import { warn } from 'vl-utils/debug'
 
@@ -62,17 +63,21 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs ],
+  mixins: [ rxSubs, stubVNode ],
   inject: [ 'layer' ],
   props,
   methods,
   watch,
+  stubVNode: {
+    empty () {
+      return this.$options.name
+    }
+  },
   provide () {
     return {
       source: () => this.source
     }
   },
-  render: h => h(),
   created () {
     this.initialize()
   },

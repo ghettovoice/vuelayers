@@ -1,4 +1,5 @@
 import rxSubs from 'vl-mixins/rx-subs'
+import stubVNode from 'vl-mixins/stub-vnode'
 import { warn } from 'vl-utils/debug'
 
 const props = {}
@@ -46,21 +47,19 @@ const methods = {
 }
 
 export default {
-  mixins: [ rxSubs ],
+  mixins: [ rxSubs, stubVNode ],
   inject: [ 'map' ],
   props,
   methods,
+  stubVNode: {
+    empty () {
+      return this.$options.name
+    }
+  },
   provide () {
     return {
       interaction: () => this.interaction
     }
-  },
-  render (h) {
-    return h('i', {
-      style: {
-        display: 'none !important'
-      }
-    }, this.$slots.default)
   },
   created () {
     this.initialize()

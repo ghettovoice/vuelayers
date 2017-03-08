@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4'
 import rxSubs from 'vl-mixins/rx-subs'
+import stubVNode from 'vl-mixins/stub-vnode'
 import { warn } from 'vl-utils/debug'
 
 const props = {
@@ -103,22 +104,22 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs ],
+  mixins: [ rxSubs, stubVNode ],
   inject: [ 'map' ],
   props,
   methods,
   watch,
+  stubVNode: {
+    attrs () {
+      return {
+        id: [ this.$options.name, this.id ].join('-')
+      }
+    }
+  },
   provide () {
     return {
       layer: () => this.layer
     }
-  },
-  render (h) {
-    return h('i', {
-      style: {
-        display: 'none !important'
-      }
-    }, this.$slots.default)
   },
   created () {
     this.initialize()
