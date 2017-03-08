@@ -1,36 +1,48 @@
-import Vue from 'vue'
+// import Vue from 'vue'
 import { reduce } from 'lodash/fp'
 
 const reduceWithKey = reduce.convert({ cap: false })
 
-const Comp = Vue.extend({
-  functional: true,
-  render (h, { props, children, parent, data }) {
-    data.hook = {
-      // create (vnode) {
-      //   vnode.parent = undefined
-      // },
-      insert (vnode) {
-        console.log(vnode)
-        if (vnode.elm.parentNode) {
-          vnode.elm.parentNode.removeChild(vnode.elm)
-        }
-      },
-      postpatch (oldNode, vnode) {
-        if (vnode.elm.parentNode) {
-          vnode.elm.parentNode.removeChild(vnode.elm)
-        }
-      }
-    }
-    data.attrs = {
-      id: 'vl-virt'
-    }
-
-    return h('i', data, children)
-  }
-})
+// const Comp = Vue.extend({
+//   functional: true,
+//   render (h, { props, children, parent, data }) {
+//     data.hook = {
+//       // create (vnode) {
+//       //   vnode.parent = undefined
+//       // },
+//       insert (vnode) {
+//         console.log(vnode)
+//         if (vnode.elm.parentNode) {
+//           vnode.elm.parentNode.removeChild(vnode.elm)
+//         }
+//       },
+//       postpatch (oldNode, vnode) {
+//         if (vnode.elm.parentNode) {
+//           vnode.elm.parentNode.removeChild(vnode.elm)
+//         }
+//       }
+//     }
+//     data.attrs = {
+//       id: 'vl-virt'
+//     }
+//
+//     return h('i', data, children)
+//   }
+// })
 
 export default {
+  // beforeUpdate () {
+  //   this.$nextTick(() => {
+  //     this.$children = this.$children.filter(vm => {
+  //       if (vm.virt) {
+  //         vm.$destroy()
+  //         return false
+  //       }
+  //
+  //       return true
+  //     })
+  //   })
+  // },
   // updated () {
   //   this::mount()
   //   console.log('updated')
@@ -42,10 +54,27 @@ export default {
   //   console.log('updated')
   // },
   render (h) {
-    const options = this.$options.virtSlot || {}
+    const data = {
+      attrs: {
+        id: 'vl-virt'
+      },
+      hook: {
+        insert: vnode => {
+          if (vnode.elm && vnode.elm.parentNode) {
+            vnode.elm.parentNode.removeChild(vnode.elm)
+          }
+        }
+      }
+    }
 
-    return h(Comp, extractChildren(this.$slots, options.slots))
+    return h('i', data, extractChildren(this.$slots))
   }
+  // ,
+  // render (h) {
+  //   const options = this.$options.virtSlot || {}
+  //
+  //   return h(Comp, extractChildren(this.$slots, options.slots))
+  // }
 }
 
 function extractChildren (slots, slotNames = []) {
@@ -62,9 +91,11 @@ function extractChildren (slots, slotNames = []) {
 //   this.$nextTick(() => {
 //     const options = this.$options.virtSlot || {}
 //
-//     if (options.slots) {
-//       options.slots.forEach(mountSlotComponents(this, this.$slots))
-//     }
+//     this.$nextTick(() => {
+//       if (options.slots) {
+//         options.slots.forEach(mountSlotComponents(this, this.$slots))
+//       }
+//     })
 //   })
 // }
 //
@@ -81,14 +112,18 @@ function extractChildren (slots, slotNames = []) {
 //
 //       const comp = vnode.componentInstance = createComponentInstanceForVnode(vnode, parent)
 //       comp.$mount()
+//       comp.virt = true
+//  // todo recursive mount
+// if (comp.$children) {
+//   comp.$children.forEach(vm => {
+//     vm.virt = true
+//     vm.$mount()
+//   })
+// }
+// }
 //
-//       if (comp.$children) {
-//         comp.$children.forEach(vm => vm.$mount())
-//       }
-//     }
-//
-//     return vnode.componentInstance
-//   }
+// return vnode.componentInstance
+// }
 // }
 // function createComponentInstanceForVnode (vnode, parent) {
 //   const vnodeComponentOptions = vnode.componentOptions

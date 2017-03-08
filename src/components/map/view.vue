@@ -190,8 +190,12 @@
    * Subscribe to OpenLayers significant events
    */
   function subscribeToViewChanges () {
-    const viewChanges = Observable.fromOlEvent(this.view, 'change')
-      .throttleTime(1000)
+    const viewChanges = Observable.combineLatest(
+      Observable.fromOlEvent(this.view, 'change:center'),
+      Observable.fromOlEvent(this.view, 'change:zoom'),
+      Observable.fromOlEvent(this.view, 'change:rotation')
+    ).throttleTime(1000)
+      .distinctUntilChanged((a, b) => isEqual(a, b))
       .map(() => {
         const center = ol.proj.toLonLat(this.view.getCenter(), this.projection)
         const zoom = Math.ceil(this.view.getZoom())
@@ -199,7 +203,6 @@
 
         return { center, zoom, rotation }
       })
-      .distinctUntilChanged((a, b) => isEqual(a, b))
 
     this.rxSubs.viewChanges = viewChanges.subscribe(
       ({ center, zoom, rotation }) => {
@@ -219,7 +222,7 @@
 
         changes && this.$emit('change', { center, zoom, rotation })
       },
-      errordbg
+      err => errordbg(err.stack)
     )
   }
 </script>

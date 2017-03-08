@@ -84,15 +84,17 @@
   }
 
   function subscribeToGeolocation () {
-    const geolocChanges = Observable.fromOlEvent(this.geoloc, 'change')
-      .throttleTime(1000)
+    const geolocChanges = Observable.combineLatest(
+      Observable.fromOlEvent(this.geoloc, 'change:position'),
+      Observable.fromOlEvent(this.geoloc, 'change:accuracy')
+    ).throttleTime(1000)
+      .distinctUntilChanged((a, b) => isEqual(a, b))
       .map(() => {
         const position = ol.proj.toLonLat(this.geoloc.getPosition(), this.projection)
         const accuracy = this.geoloc.getAccuracy()
 
         return { position, accuracy }
       })
-      .distinctUntilChanged((a, b) => isEqual(a, b))
 
     this.rxSubs.geoloc = geolocChanges.subscribe(
       ({ position, accuracy }) => {
@@ -100,7 +102,7 @@
         this.currentAccuracy = accuracy
         this.$emit('change', { position, accuracy })
       },
-      errordbg
+      err => errordbg(err.stack)
     )
   }
 </script>
