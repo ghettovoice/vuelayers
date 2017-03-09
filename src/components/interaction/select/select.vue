@@ -40,6 +40,7 @@
     unmountInteraction: interactionUnmountInteraction
   } = interaction.methods
   const defaultStyles = styleHelper.defaultEditStyle()
+
   const methods = {
     /**
      * @protected
@@ -66,7 +67,7 @@
 
       const filterFunc = this.filter
       const filter = function __selectFilter (feature, layer) {
-        return filterFunc(feature.$vm.plain())
+        return filterFunc(feature.plain())
       }
 
       return new ol.interaction.Select({
@@ -192,21 +193,21 @@
   function subscribeToInteractionChanges () {
     const selection = this.interaction.getFeatures()
 
-    this.rxSubs.select = Observable.fromOlEvent(selection, 'add', evt => evt.element.$vm.plain())
+    this.rxSubs.select = Observable.fromOlEvent(selection, 'add', evt => evt.element.plain())
       .subscribe(
         feature => {
           this.currentSelected.push(feature)
           this.$emit('select', feature)
         },
-        errordbg
+        err => errordbg(err.stack)
       )
-    this.rxSubs.unselect = Observable.fromOlEvent(selection, 'remove', evt => evt.element.$vm.plain())
+    this.rxSubs.unselect = Observable.fromOlEvent(selection, 'remove', evt => evt.element.plain())
       .subscribe(
         feature => {
           this.currentSelected = this.currentSelected.filter(({ id }) => id !== feature.id)
           this.$emit('unselect', feature)
         },
-        errordbg
+        err => errordbg(err.stack)
       )
   }
 </script>

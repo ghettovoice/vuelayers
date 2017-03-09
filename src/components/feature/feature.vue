@@ -4,20 +4,21 @@
    *
    * @todo Add property 'visible', like in layer. If visible = false -> set null style
    */
-  import ol from 'openlayers'
   import uuid from 'uuid/v4'
+  import { omit } from 'lodash/fp'
   import stubVNode from 'vl-mixins/stub-vnode'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
+  import { feature as featureHelper } from 'vl-ol'
 
   const props = {
     id: {
       type: [ String, Number ],
       default: () => uuid()
     },
-    data: {
+    properties: {
       type: Object,
-      default: () => ({})
+      default: () => Object.create(null)
     }
   }
 
@@ -26,21 +27,7 @@
       this.feature && this.feature.changed()
     },
     plain () {
-      const obj = {
-        id: this.id,
-        layer: this.layer() && this.layer().$vm.id,
-        data: this.data
-      }
-
-      const geom = this.feature && this.feature.getGeometry()
-      if (geom) {
-        obj.geometry = {
-          type: geom.getType(),
-          coordinates: geom.getCoordinates()
-        }
-      }
-
-      return obj
+      return this.feature.plain(this.view().$vm.projection)
     },
     styleTarget () {
       return this.feature
@@ -51,11 +38,12 @@
     id (value) {
       if (this.feature) {
         this.feature.setId(value)
-        this.feature.set('id', value)
       }
     },
-    data (value) {
-      this.feature && this.feature.set('data', value)
+    properties (value) {
+      if (this.feature) {
+        this.feature.setProperties(omit([ 'geometry' ], value))
+      }
     }
   }
 
@@ -64,7 +52,7 @@
   export default {
     name: 'vl-feature',
     mixins: [ stubVNode, styleTarget ],
-    inject: [ 'layer', 'source' ],
+    inject: [ 'layer', 'source', 'view' ],
     props,
     methods,
     watch,
@@ -88,6 +76,7 @@
       this.$nextTick(() => {
         if (this.source()) {
           this.source().addFeature(this.feature)
+          this.feature.set('layer', this.layer().get('id'))
         } else if (process.env.NODE_ENV !== 'production') {
           warn("Invalid usage of feature component, should have source component among it's ancestors")
         }
@@ -112,12 +101,10 @@
      * @type {ol.Feature}
      * @protected
      */
-    this.feature = new ol.Feature({
+    this.feature = featureHelper.createFeature({
       id: this.id,
-      data: this.data,
-      layer: this.layer() && this.layer().$vm.id
-    })
-    this.feature.setId(this.id)
+      properties: this.properties
+    }, this.view().$vm.projection)
     this.feature.$vm = this
 
     return this.feature

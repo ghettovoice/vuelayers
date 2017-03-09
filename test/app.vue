@@ -8,6 +8,11 @@
         <vl-style-container>
           <vl-style-stroke color="#f03b20" :width="3"/>
           <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+
+          <vl-style-circle>
+            <vl-style-stroke color="#f03b20" :width="3"/>
+            <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+          </vl-style-circle>
         </vl-style-container>
       </vl-interaction-select>
       <!--// interactions -->
@@ -18,31 +23,32 @@
       </vl-layer-tile>
       <!--// base layers -->
 
-      <vl-layer-vector id="countries" v-if="countriesLayer">
+      <vl-layer-vector id="points" v-if="pointsLayer">
         <!-- layer level style -->
         <vl-style-container>
           <vl-style-stroke color="#8856a7" :width="2"/>
           <vl-style-fill :color="[158, 188, 218, 0.5]"/>
+
+          <vl-style-circle>
+            <vl-style-stroke color="#8856a7" :width="2"/>
+            <vl-style-fill :color="[158, 188, 218, 0.5]"/>
+          </vl-style-circle>
         </vl-style-container>
         <!--// layer level style -->
 
-        <vl-source-vector>
-          <vl-feature v-for="feature in countries" :key="feature.id" :id="feature.id" :data="feature.properties">
-            <component :is="geometryTypeToCompName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
-          </vl-feature>
-        </vl-source-vector>
+        <vl-source-vector :loader="loader" :features="points" />
       </vl-layer-vector>
     </vl-map>
 
     <div class="controls">
-      <button @click="countriesLayer = !countriesLayer">Toggle</button>
-      <button @click="countries = countries.slice(10)">Remove</button>
+      <button @click="pointsLayer = !pointsLayer">Toggle</button>
+      <button @click="points = points.slice(1)">Remove</button>
     </div>
   </div>
 </template>
 
 <script>
-  import { kebabCase } from 'lodash/fp'
+  import { kebabCase, range, random } from 'lodash/fp'
 
   const computed = {
     selectedIds () {
@@ -71,17 +77,55 @@
         this.selected.splice(i, 1)
       }
     },
-    async loadData () {
-      const res = await fetch('https://openlayers.org/en/latest/examples/data/geojson/countries.geojson')
-      const geomCollection = await res.json()
-      this.countries = geomCollection.features// .filter(x => x.id === 'RUS')
+    loadData () {
+      const points = []
+      range(1, 100).forEach(i => {
+        points.push({
+          id: i,
+          properties: {
+            id: i
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [
+              random(-179, 179),
+              random(-89, 89)
+            ]
+          }
+        })
+      })
 
-      return this.countries
+      this.points = points
 //      return new Promise(resolve => {
 //        setTimeout(() => {
 //          resolve(this.countries)
 //        }, 3000)
 //      })
+    },
+    async loader (extent) {
+      const url = 'http://geoportal.glonass-112.net/api/layers/6d4cb269-d4b4-4e10-b787-3c8c769941c8/features'
+      const response = await fetch(
+        `${url}?filter[bbox][]=${extent[ 0 ]}&filter[bbox][]=${extent[ 1 ]}&filter[bbox][]=${extent[ 2 ]}&filter[bbox][]=${extent[ 3 ]}`,
+        {
+          method: 'GET',
+          mode: 'cors',
+          credentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-App': '1ff6d35b517e9cc3'
+          }
+        }
+      )
+      const points = await response.json()
+
+      if (points && points.length) {
+        this.points = points.map(point => ({
+          id: point.id,
+          properties: point,
+          geometry: point.geometry
+        }))
+      }
     }
   }
 
@@ -91,17 +135,17 @@
     methods,
     data () {
       return {
-        zoom: 2,
-        center: [ 0, 0 ],
+        zoom: 10,
+        center: [ 50.69435, 55.452967 ],
         rotation: 0,
         selected: [],
-        countries: [],
-        countriesLayer: true
+        points: [],
+        pointsLayer: true
       }
     },
     created () {
-      this.loadData()
-        .catch(::console.error)
+//      this.loadData()
+//        .catch(::console.error)
     }
   }
 </script>

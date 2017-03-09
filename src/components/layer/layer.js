@@ -45,8 +45,8 @@ const methods = {
      * @protected
      */
     this.layer = this.createLayer()
-    this.layer.$vm = this
     this.layer.set('id', this.id)
+    this.layer.$vm = this
   },
   /**
    * @return {ol.layer.Layer}

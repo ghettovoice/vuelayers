@@ -28,16 +28,14 @@ export default {
       ? this::options.attrs()
       : options.attrs
 
-    return h(
-      options.tag || 'i',
-      {
-        attrs,
-        style: {
-          display: 'none !important'
-        }
-      },
-      children
-    )
+    let data = {
+      attrs,
+      style: {
+        display: 'none !important'
+      }
+    }
+
+    return h(options.tag || 'i', data, children)
   }
 }
 
