@@ -411,7 +411,7 @@ export default {
 
 <script>
   import 'whatwg-fetch'
-  import { kebabCase, forEach } from 'lodash/fp'
+  import { kebabCase, forEach } from 'vl-utils/func'
   import highlight from 'highlight.js'
   import highlightSCSS from 'highlight.js/lib/languages/scss'
   import highlightXML from 'highlight.js/lib/languages/xml'

@@ -48,7 +48,7 @@
 </template>
 
 <script>
-  import { kebabCase, range, random } from 'lodash/fp'
+  import { kebabCase, range, random } from 'vl-utils/func'
 
   const computed = {
     selectedIds () {
