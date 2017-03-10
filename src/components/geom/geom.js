@@ -14,10 +14,6 @@ const props = {
     type: Array,
     required: true,
     validator: value => Array.isArray(value) && value.length
-  },
-  layout: {
-    type: String,
-    default: 'XY'
   }
 }
 
@@ -43,8 +39,8 @@ const methods = {
      */
     this.coordTransform = coordHelper.coordTransform[ this.geometry.getType() ]
 
-    this.currentCoordinates = this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view().getProjection())
-    this.currentExtent = coordHelper.extentToLonLat(this.geometry.getExtent(), this.view().getProjection())
+    this.currentCoordinates = this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view.getProjection())
+    this.currentExtent = coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
   },
   /**
    * @return {ol.geom.SimpleGeometry}
@@ -60,8 +56,8 @@ const methods = {
    * @protected
    */
   mountGeometry () {
-    if (this.feature()) {
-      this.feature().setGeometry(this.geometry)
+    if (this.feature) {
+      this.feature.setGeometry(this.geometry)
       this.subscribeAll()
     } else if (process.env.NODE_ENV !== 'production') {
       warn("Invalid usage of geometry component, should have feature component among it's ancestors")
@@ -72,7 +68,7 @@ const methods = {
    */
   unmountGeometry () {
     this.unsubscribeAll()
-    this.feature() && this.feature().setGeometry(undefined)
+    this.feature && this.feature.setGeometry(undefined)
   },
   refresh () {
     this.geometry && this.geometry.changed()
@@ -81,7 +77,7 @@ const methods = {
 // todo use turf.js to optimize geometry compare
 const watch = {
   coordinates (value) {
-    // this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view().getProjection()))
+    // this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view.getProjection()))
   }
 }
 
@@ -98,9 +94,12 @@ export default {
     }
   },
   provide () {
-    return {
-      geometry: () => this.geometry
-    }
+    return Object.defineProperties(Object.create(null), {
+      geometry: {
+        enumerable: true,
+        get: () => this.geometry
+      }
+    })
   },
   data () {
     return {
@@ -127,8 +126,8 @@ export default {
 //     .throttleTime(1000)
 //     .map(() => {
 //       return [
-//         this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view().getProjection()),
-//         coordHelper.extentToLonLat(this.geometry.getExtent(), this.view().getProjection())
+//         this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view.getProjection()),
+//         coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
 //       ]
 //     })
 //     .distinctUntilChanged((a, b) => isEqual(a, b))

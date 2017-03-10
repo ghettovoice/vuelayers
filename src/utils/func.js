@@ -10,13 +10,37 @@ import {
   omit,
   upperFirst,
   lowerFirst,
-  merge,
+  merge as lodashMerge,
   constant,
   differenceWith,
   kebabCase,
   range,
   random
 } from 'lodash/fp'
+
+// lodash re-exports
+export const reduce = lodashReduce.convert({ cap: false })
+export const forEach = lodashForEach.convert({ cap: false })
+export const merge = lodashMerge.convert({ fixed: false })
+export {
+  isFunction,
+  isString,
+  isEmpty,
+  isEqual,
+  flow,
+  pick,
+  omit,
+  upperFirst,
+  lowerFirst,
+  constant,
+  differenceWith,
+  kebabCase,
+  range,
+  random
+}
+
+export const diffById = differenceWith((a, b) => a.id === b.id)
+export const idMatchFilter = id => x => x.id === id
 
 /**
  * @param {*} value
@@ -87,26 +111,4 @@ export function timedChunk (items, process, processContext, callback, callbackCo
       resolve(items)
     }
   })
-}
-
-// lodash re-exports
-export const reduce = lodashReduce.convert({ cap: false })
-export const forEach = lodashForEach.convert({ cap: false })
-export const diffById = differenceWith((a, b) => a.id === b.id)
-export {
-  isFunction,
-  isString,
-  isEmpty,
-  isEqual,
-  flow,
-  pick,
-  omit,
-  upperFirst,
-  lowerFirst,
-  merge,
-  constant,
-  differenceWith,
-  kebabCase,
-  range,
-  random
 }

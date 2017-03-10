@@ -85,19 +85,19 @@
      * @param {string|number} plainFeature.layer
      */
     select ({ id, layer }) {
-      if (!this.map() || this.selectedIds.includes(id)) return
+      if (!this.map || this.selectedIds.includes(id)) return
 
       const selection = this.interaction.getFeatures()
       let feature
 
       if (id) {
         if (layer) {
-          let layer = this.map().getLayers().getArray().find(layer => layer.id === layer)
+          let layer = this.map.getLayers().getArray().find(layer => layer.id === layer)
           if (layer) {
             feature = layer.getSource().getFeatureById(id)
           }
         } else {
-          const layers = this.map().getLayers()
+          const layers = this.map.getLayers()
             .getArray()
             .filter(layer => layer instanceof ol.layer.Vector)
 
@@ -115,7 +115,7 @@
      * @param {string|number} plainFeature.id
      */
     unselect ({ id }) {
-      if (!this.map() || !this.selectedIds.includes(id)) return
+      if (!this.map || !this.selectedIds.includes(id)) return
 
       const selection = this.interaction.getFeatures()
       const selectionArray = selection.getArray()
@@ -137,7 +137,7 @@
     },
     mountInteraction () {
       this::interactionMountInteraction()
-      this.$nextTick(() => this.currentSelected.forEach(this.select))
+      this.currentSelected.forEach(this.select)
     },
     unmountInteraction () {
       this.currentSelected.forEach(this.unselect)
@@ -175,10 +175,7 @@
       }
     },
     provide () {
-      return {
-        ...this::interactionProvide(),
-        ...this::styleTargetProvide()
-      }
+      return Object.assign(this::interactionProvide(), this::styleTargetProvide())
     },
     data () {
       return {

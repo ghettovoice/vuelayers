@@ -38,8 +38,8 @@ const methods = {
     throw new Error('Not implemented method')
   },
   mountSource () {
-    if (this.layer()) {
-      this.layer().setSource(this.source)
+    if (this.layer) {
+      this.layer.setSource(this.source)
       this.subscribeAll()
     } else if (process.env.NODE_ENV !== 'production') {
       warn("Invalid usage of source component, should have layer component among it's ancestors")
@@ -47,7 +47,7 @@ const methods = {
   },
   unmountSource () {
     this.unsubscribeAll()
-    this.layer() && this.layer().setSource(undefined)
+    this.layer && this.layer.setSource(undefined)
   },
   refresh () {
     this.source && this.source.changed()

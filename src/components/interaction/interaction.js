@@ -28,8 +28,8 @@ const methods = {
    * @protected
    */
   mountInteraction () {
-    if (this.map()) {
-      this.map() && this.map().addInteraction(this.interaction)
+    if (this.map) {
+      this.map.addInteraction(this.interaction)
       this.subscribeAll()
     } else if (process.env.NODE_ENV !== 'production') {
       warn("Invalid usage of interaction component, should have map component among it's ancestors")
@@ -40,7 +40,7 @@ const methods = {
    */
   unmountInteraction () {
     this.unsubscribeAll()
-    this.map() && this.map().removeInteraction(this.interaction)
+    this.map && this.map.removeInteraction(this.interaction)
   },
   refresh () {
     this.interaction && this.interaction.changed()
@@ -58,9 +58,12 @@ export default {
     }
   },
   provide () {
-    return {
-      interaction: () => this.interaction
-    }
+    return Object.defineProperties(Object.create(null), {
+      interaction: {
+        enumerable: true,
+        get: () => this.interaction
+      }
+    })
   },
   created () {
     this.initialize()

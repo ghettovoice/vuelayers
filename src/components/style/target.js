@@ -11,6 +11,11 @@ export default {
     this.styles = []
   },
   methods: {
+    /**
+     * Returns styleable OpenLayers object
+     *
+     * @protected
+     */
     styleTarget () { },
     setStyle (style) {
       this.styles = style
@@ -26,21 +31,20 @@ export default {
         } else {
           styleTarget.setStyle(undefined)
         }
-        this.refresh()
       }
     },
     getStyle () {
-      return this.styles || []
+      return this.styles
     }
   }
 }
-// todo implement removed, aka null style
+
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
     if (vm.styles === null) return null
     if (!vm.styles.length) return
 
-    const plainFeature = feature.$vm ? feature.$vm.plain() : feature.getProperties()
+    const plainFeature = feature.plain()
     if (!plainFeature.geometry) return
 
     const styles = []

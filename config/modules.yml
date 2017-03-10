@@ -50,9 +50,9 @@ map:
     path: components/map
     alias: vl-components/map
 
-  - name: map-view
-    path: components/map-view
-    alias: vl-components/map-view
+  - name: view
+    path: components/view
+    alias: vl-components/view
 
   - name: geoloc
     path: components/geoloc

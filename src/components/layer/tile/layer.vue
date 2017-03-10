@@ -10,6 +10,4 @@
   }
 </script>
 
-<style>
-  /* stub style  */
-</style>
+<style>/* stub style  */</style>

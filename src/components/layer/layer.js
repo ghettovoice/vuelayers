@@ -46,8 +46,12 @@ const methods = {
      * @protected
      */
     this.layer = this.createLayer()
-    this.layer.set('id', this.id)
     this.bindSelfTo(this.layer)
+    Object.defineProperty(this.layer, 'id', {
+      enumerable: true,
+      configurable: true,
+      get: () => this.id
+    })
   },
   /**
    * @return {ol.layer.Layer}
@@ -60,11 +64,11 @@ const methods = {
    * @protected
    */
   mountLayer () {
-    if (this.map()) {
+    if (this.map) {
       if (this.overlay) {
-        this.layer.setMap(this.map())
+        this.layer.setMap(this.map)
       } else {
-        this.map().addLayer(this.layer)
+        this.map.addLayer(this.layer)
       }
       this.subscribeAll()
     } else if (process.env.NODE_ENV !== 'production') {
@@ -76,11 +80,11 @@ const methods = {
    */
   unmountLayer () {
     this.unsubscribeAll()
-    if (this.map()) {
+    if (this.map) {
       if (this.overlay) {
         this.layer.setMap(undefined)
       } else {
-        this.map().removeLayer(this.layer)
+        this.map.removeLayer(this.layer)
       }
     }
   }
@@ -118,9 +122,12 @@ export default {
     }
   },
   provide () {
-    return {
-      layer: () => this.layer
-    }
+    return Object.defineProperties(Object.create(null), {
+      layer: {
+        enumerable: true,
+        get: () => this.layer
+      }
+    })
   },
   created () {
     this.initialize()
@@ -131,6 +138,7 @@ export default {
   destroyed () {
     this.$nextTick(() => {
       this.unmountLayer()
+      delete this.layer.id
       this.layer = undefined
     })
   }

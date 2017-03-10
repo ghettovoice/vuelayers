@@ -3,10 +3,7 @@
   import style from 'vl-components/style/style'
 
   const props = {
-    color: {
-      type: [ Array, String ],
-      default: null
-    },
+    color: [ Array, String ],
     lineCap: {
       type: String,
       default: 'round' // round, butt, square
@@ -20,7 +17,7 @@
     miterLimit: Number,
     width: {
       type: Number,
-      default: 1
+      default: 1.25
     }
   }
 

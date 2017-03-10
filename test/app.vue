@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <vl-map>
-      <vl-map-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
+      <vl-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
 
       <!-- interactions -->
       <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">

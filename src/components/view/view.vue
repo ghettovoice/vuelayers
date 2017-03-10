@@ -130,7 +130,7 @@
   }
 
   export default {
-    name: 'vl-map-view',
+    name: 'vl-view',
     inject: [ 'map' ],
     mixins: [ rxSubs, vmBind, stubVNode ],
     props,
@@ -157,7 +157,6 @@
     destroyed () {
       this.$nextTick(() => {
         this.unmountView()
-        delete this.view.$vm
         this.view = undefined
       })
     }

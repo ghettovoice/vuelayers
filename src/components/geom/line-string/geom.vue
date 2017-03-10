@@ -12,7 +12,7 @@
 
   const methods = {
     createGeometry () {
-      return new ol.geom.LineString(coordHelper.lineFromLonLat(this.coordinates, this.view().getProjection()))
+      return new ol.geom.LineString(coordHelper.lineFromLonLat(this.coordinates, this.view.getProjection()))
     }
   }
 

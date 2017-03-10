@@ -5,13 +5,12 @@ export default {
 
       return Object.defineProperty(object, '$vm', {
         enumerable: true,
+        configurable: true,
         get: () => this
       })
     }
   },
   destroyed () {
-    if (this._vmBinded) {
-      this._vmBinded.$vm = undefined
-    }
+    delete this._vmBinded.$vm
   }
 }

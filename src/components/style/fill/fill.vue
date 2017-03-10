@@ -3,10 +3,7 @@
   import style from 'vl-components/style/style'
 
   const props = {
-    color: {
-      type: [ String, Array ],
-      default: null
-    }
+    color: [ String, Array ]
   }
 
   const methods = {

@@ -16,7 +16,7 @@
      * @protected
      */
     createGeometry () {
-      return new ol.geom.Point(coordHelper.pointFromLonLat(this.coordinates, this.view().getProjection()))
+      return new ol.geom.Point(coordHelper.pointFromLonLat(this.coordinates, this.view.getProjection()))
     }
   }
 

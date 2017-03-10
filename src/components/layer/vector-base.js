@@ -45,9 +45,6 @@ export default {
   props,
   methods,
   provide () {
-    return {
-      ...this::layerProvide(),
-      ...this::styleTargetProvide()
-    }
+    return Object.assign(this::layerProvide(), this::styleTargetProvide())
   }
 }

@@ -107,7 +107,7 @@ function createFeature (plainFeature) {
   plainFeature.properties || (plainFeature.properties = {})
   plainFeature.properties = {
     ...plainFeature.properties,
-    layer: this.layer().get('id')
+    layer: this.layer.id
   }
 
   return featureHelper.createFeature(plainFeature, this.projection)

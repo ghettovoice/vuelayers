@@ -12,7 +12,7 @@
 
   const methods = {
     createGeometry () {
-      return new ol.geom.MultiPoint(coordHelper.multiPointFromLonLat(this.coordinates, this.view().getProjection()))
+      return new ol.geom.MultiPoint(coordHelper.multiPointFromLonLat(this.coordinates, this.view.getProjection()))
     }
   }
 

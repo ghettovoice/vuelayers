@@ -9,7 +9,6 @@
   import vmBind from 'vl-mixins/vm-bind'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
-  import { reduce } from 'vl-utils/func'
   import { feature as featureHelper } from 'vl-ol'
 
   const props = {
@@ -61,13 +60,15 @@
       }
     },
     provide () {
-      return Object.defineProperties(Object.create(null), {
-        ...reduce((all, value, key) => {}, {}, this::styleTargetProvide()),
-        feature: {
-          enumerable: true,
-          get: () => this.feature
-        }
-      })
+      return Object.assign(
+        Object.defineProperties(Object.create(null), {
+          feature: {
+            enumerable: true,
+            get: () => this.feature
+          }
+        }),
+        this::styleTargetProvide()
+      )
     },
     created () {
       this::createFeature()
@@ -76,7 +77,11 @@
       this.$nextTick(() => {
         if (this.source) {
           this.source.addFeature(this.feature)
-          this.feature.set('layer', this.layer.get('id'))
+          Object.defineProperty(this.feature, 'layer', {
+            enumerable: true,
+            configurable: true,
+            get: () => this.layer
+          })
         } else if (process.env.NODE_ENV !== 'production') {
           warn("Invalid usage of feature component, should have source component among it's ancestors")
         }
@@ -85,6 +90,7 @@
     destroyed () {
       this.$nextTick(() => {
         this.source && this.source.removeFeature(this.feature)
+        delete this.feature.layer
         this.feature = undefined
       })
     }
