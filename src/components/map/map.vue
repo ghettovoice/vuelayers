@@ -56,10 +56,16 @@
     props,
     methods,
     provide () {
-      return {
-        map: () => this.map,
-        view: () => this.map.getView()
-      }
+      return Object.defineProperties(Object.create(null), {
+        map: {
+          enumerable: true,
+          get: () => this.map
+        },
+        view: {
+          enumerable: true,
+          get: () => this.map.getView()
+        }
+      })
     },
     created () {
       this::createMap()

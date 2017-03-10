@@ -100,11 +100,11 @@
       this::subscribeToViewChanges()
     },
     mountView () {
-      if (!this.map()) {
+      if (!this.map) {
         warn("Invalid usage of view component, should have map component among it's ancestors")
       }
 
-      let view = this.map().getView()
+      let view = this.map.getView()
 
       if (view && view.$vm) {
         if (process.env.NODE_ENV !== 'production') {
@@ -114,12 +114,12 @@
         view.$vm.unmountView()
       }
 
-      this.map().setView(this.view)
+      this.map.setView(this.view)
       this.subscribeAll()
     },
     unmountView () {
       this.unsubscribeAll()
-      this.map() && this.map().setView(undefined)
+      this.map && this.map.setView(undefined)
     }
   }
   // todo watch other props
@@ -163,6 +163,7 @@
     destroyed () {
       this.$nextTick(() => {
         this.unmountView()
+        delete this.view.$vm
         this.view = undefined
       })
     }

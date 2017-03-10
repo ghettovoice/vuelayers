@@ -1,5 +1,6 @@
 import {
   reduce as lodashReduce,
+  forEach as lodashForEach,
   isFunction,
   isString,
   isEmpty,
@@ -10,10 +11,11 @@ import {
   upperFirst,
   lowerFirst,
   merge,
-  forEach as lodashForEach,
   constant,
   differenceWith,
-  kebabCase
+  kebabCase,
+  range,
+  random
 } from 'lodash/fp'
 
 /**
@@ -54,18 +56,6 @@ export function replaceTokens (string, replaces) {
   const regExp = new RegExp(Object.keys(replaces).map(field => '(\\{' + field + '\\})').join('|'), 'ig')
 
   return string.replace(regExp, match => replaces[ match.substr(1, match.length - 2) ] || '')
-}
-
-/**
- * Check if string is lodash template string.
- * @param {string} value
- * @return {boolean}
- */
-export function isTemplate (value) {
-  return isString(value) && (
-      value.search(templateSettings.interpolate) !== -1 ||
-      value.search(templateSettings.evaluate) !== -1
-    )
 }
 
 // Copyright 2009 Nicholas C. Zakas. All rights reserved.
@@ -110,7 +100,13 @@ export {
   isEqual,
   flow,
   pick,
+  omit,
   upperFirst,
   lowerFirst,
-  merge
+  merge,
+  constant,
+  differenceWith,
+  kebabCase,
+  range,
+  random
 }

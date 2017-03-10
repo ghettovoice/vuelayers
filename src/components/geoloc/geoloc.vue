@@ -63,6 +63,7 @@
     destroyed () {
       this.$nextTick(() => {
         this.geoloc.setTracking(false)
+        delete this.geoloc.$vm
         this.geoloc = undefined
       })
     }

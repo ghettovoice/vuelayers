@@ -2,7 +2,7 @@
   import ol from 'openlayers'
   import { Observable } from 'rxjs/Observable'
   import 'vl-rx'
-  import { forEach, constant, differenceWith } from 'vl-utils/func'
+  import { forEach, constant, diffById } from 'vl-utils/func'
   import { errordbg } from 'vl-utils/debug'
   import { style as styleHelper } from 'vl-ol'
   import interaction from 'vl-components/interaction/interaction'
@@ -147,7 +147,6 @@
     }
   }
 
-  const diffById = differenceWith((a, b) => a.id === b.id)
   const watch = {
     selected (selected) {
       let forSelect = diffById(selected, this.currentSelected)

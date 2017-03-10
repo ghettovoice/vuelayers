@@ -1,4 +1,4 @@
-<script>
+<script type="text/babel">
   /**
    * Wrapper around ol.Feature.
    *
@@ -28,7 +28,7 @@
       this.feature && this.feature.changed()
     },
     plain () {
-      return this.feature.plain(this.view().$vm.projection)
+      return this.feature && this.feature.plain(this.view.getProjection())
     },
     styleTarget () {
       return this.feature
@@ -61,19 +61,22 @@
       }
     },
     provide () {
-      return {
-        ...this::styleTargetProvide(),
-        feature: () => this.feature
-      }
+      return Object.defineProperties(Object.create(null), {
+        ...reduce((all, value, key), {}, this::styleTargetProvide()),
+        feature: {
+          enumerable: true,
+          get: () => this.feature
+        }
+      })
     },
     created () {
       this::createFeature()
     },
     mounted () {
       this.$nextTick(() => {
-        if (this.source()) {
-          this.source().addFeature(this.feature)
-          this.feature.set('layer', this.layer().get('id'))
+        if (this.source) {
+          this.source.addFeature(this.feature)
+          this.feature.set('layer', this.layer.get('id'))
         } else if (process.env.NODE_ENV !== 'production') {
           warn("Invalid usage of feature component, should have source component among it's ancestors")
         }
@@ -81,7 +84,7 @@
     },
     destroyed () {
       this.$nextTick(() => {
-        this.source() && this.source().removeFeature(this.feature)
+        this.source && this.source.removeFeature(this.feature)
         this.feature = undefined
       })
     }
@@ -101,7 +104,7 @@
     this.feature = featureHelper.createFeature({
       id: this.id,
       properties: this.properties
-    }, this.view().$vm.projection)
+    }, this.view.getProjection())
 
     this.bindSelfTo(this.feature)
 
