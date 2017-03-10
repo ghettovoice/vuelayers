@@ -139,7 +139,7 @@
   "files": [
     "LICENSE",
     "README.md",
-    "dist",
+    "dist/cjs",
     "src"
   ]
 }
