@@ -1,4 +1,4 @@
-import ol from 'openlayers'
+import ol from 'vl-ol'
 import layer from 'vl-components/layer/layer'
 import styleTarget from 'vl-components/style/target'
 

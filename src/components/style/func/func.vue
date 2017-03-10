@@ -1,8 +1,7 @@
 <script>
-  import ol from 'openlayers'
+  import ol, { style as styleHelper } from 'vl-ol'
   import style from 'vl-components/style/style'
   import { warn } from 'vl-utils/debug'
-  import { style as styleHelper } from 'vl-ol'
 
   const props = {
     factory: {

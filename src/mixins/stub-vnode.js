@@ -1,4 +1,4 @@
-import { isFunction, isString, reduce } from 'vl-utils/fp'
+import { isFunction, isString, reduce } from 'vl-utils/func'
 
 export default {
   render (h) {

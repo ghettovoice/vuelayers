@@ -1,7 +1,6 @@
-import ol from 'openlayers'
+import ol, { coord as coordHelper, feature as featureHelper } from 'vl-ol'
 import { diffById } from 'vl-utils/func'
 import source from 'vl-components/source/source'
-import { coord as coordHelper, feature as featureHelper } from 'vl-ol'
 
 const props = {
   loader: Function,

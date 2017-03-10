@@ -9,7 +9,7 @@
   import vmBind from 'vl-mixins/vm-bind'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
-  import { reduce, omit } from 'vl-utils/func'
+  import { reduce } from 'vl-utils/func'
   import { feature as featureHelper } from 'vl-ol'
 
   const props = {
@@ -62,7 +62,7 @@
     },
     provide () {
       return Object.defineProperties(Object.create(null), {
-        ...reduce((all, value, key), {}, this::styleTargetProvide()),
+        ...reduce((all, value, key) => {}, {}, this::styleTargetProvide()),
         feature: {
           enumerable: true,
           get: () => this.feature

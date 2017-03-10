@@ -1,5 +1,5 @@
 <script>
-  import ol from 'openlayers'
+  import ol from 'vl-ol'
   import xyzSource from 'vl-components/source/xyz-base'
 
   const props = {

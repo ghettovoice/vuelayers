@@ -105,7 +105,7 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs, stubVNode ],
+  mixins: [ rxSubs, vmBind, stubVNode ],
   inject: [ 'map' ],
   props,
   methods,

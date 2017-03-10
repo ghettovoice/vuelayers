@@ -1,5 +1,5 @@
 <script>
-  import ol from 'openlayers'
+  import ol from 'vl-ol'
   import imageStyle from 'vl-components/style/image'
 
   const props = {

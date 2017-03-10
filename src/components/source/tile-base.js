@@ -1,8 +1,7 @@
-import ol from 'openlayers'
+import ol, { consts as olConsts } from 'vl-ol'
 import { createTileUrlFunction } from 'ol3-tilecache'
 import { pick, replaceTokens } from 'vl-utils/func'
 import source from 'vl-components/source/source'
-import { consts as olConsts } from 'vl-ol'
 
 const props = {
   url: {

@@ -1,17 +1,11 @@
 <script>
-  import ol from 'openlayers'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/combineLatest'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/map'
-  import 'vl-rx'
+  import ol, { consts as olConsts } from 'vl-ol'
+  import Observable from 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
   import { isEqual } from 'vl-utils/func'
   import rxSubs from 'vl-mixins/rx-subs'
   import vmBind from 'vl-mixins/vm-bind'
   import stubVNode from 'vl-mixins/stub-vnode'
-  import { consts as olConsts } from 'vl-ol'
 
   const props = {
     tracking: {

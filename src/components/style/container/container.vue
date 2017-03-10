@@ -3,7 +3,7 @@
    * ol.style.Style wrapper.
    * Acts as an style container that will be injected into "style" slot inside layer or feature components.
    */
-  import ol from 'openlayers'
+  import ol from 'vl-ol'
   import { warn } from 'vl-utils/debug'
   import style from 'vl-components/style/style'
 

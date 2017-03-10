@@ -1,10 +1,8 @@
 <script>
-  import ol from 'openlayers'
-  import { Observable } from 'rxjs/Observable'
-  import 'vl-rx'
+  import ol, { style as styleHelper } from 'vl-ol'
+  import Observable from 'vl-rx'
   import { forEach, constant, diffById } from 'vl-utils/func'
   import { errordbg } from 'vl-utils/debug'
-  import { style as styleHelper } from 'vl-ol'
   import interaction from 'vl-components/interaction/interaction'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
 

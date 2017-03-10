@@ -1,6 +1,10 @@
 /**
  * OpenLayers 3 helpers and constants
  */
+import ol from 'openlayers'
+
+export default ol
+
 export * as consts from './consts'
 export * as helpers from './helpers'
 export * as style from './style'

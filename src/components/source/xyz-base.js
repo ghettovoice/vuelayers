@@ -1,4 +1,4 @@
-import ol from 'openlayers'
+import ol from 'vl-ol'
 import tileSource from 'vl-components/source/tile-base'
 
 const methods = {

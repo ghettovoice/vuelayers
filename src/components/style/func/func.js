@@ -1,8 +1,7 @@
 import Vue from 'vue'
-import ol from 'openlayers'
-import { isFunction } from 'vl-utils'
+import ol, { style as styleHelper } from 'vl-ol'
+import { isFunction } from 'vl-utils/func'
 import { createStyleFunc } from 'vl-components/style/target'
-import { style as styleHelper } from 'vl-ol'
 import './style.css'
 
 /**

@@ -1,17 +1,11 @@
 <script>
-  import ol from 'openlayers'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/combineLatest'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/map'
-  import 'vl-rx'
+  import ol, { consts as olConsts } from 'vl-ol'
+  import Observable from 'vl-rx'
   import { isFunction, isEqual } from 'vl-utils/func'
   import { errordbg, warn } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
   import vmBind from 'vl-mixins/vm-bind'
   import stubVNode from 'vl-mixins/stub-vnode'
-  import { consts as olConsts } from 'vl-ol'
 
   const props = {
     zoom: {
@@ -71,7 +65,7 @@
     animate (...args) {
       let cb = args.find(isFunction)
 
-      if (!this.view) return Promise.reject()
+      if (!this.view) return Promise.resolve()
 
       return new Promise(
         resolve => this.view.animate(...args, complete => {
@@ -138,7 +132,7 @@
   export default {
     name: 'vl-map-view',
     inject: [ 'map' ],
-    mixins: [ rxSubs, stubVNode ],
+    mixins: [ rxSubs, vmBind, stubVNode ],
     props,
     methods,
     watch,

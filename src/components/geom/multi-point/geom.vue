@@ -1,7 +1,6 @@
 <script>
-  import ol from 'openlayers'
+  import ol, { coord as coordHelper } from 'vl-ol'
   import geom from 'vl-components/geom/geom'
-  import { coord as coordHelper } from 'vl-ol'
 
   const props = {
     coordinates: {
