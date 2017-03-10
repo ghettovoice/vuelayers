@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import ol from 'openlayers'
-import { isFunction } from 'lodash/fp'
+import { isFunction } from 'vl-utils'
 import { createStyleFunc } from 'vl-components/style/target'
 import { style as styleHelper } from 'vl-ol'
 import './style.css'

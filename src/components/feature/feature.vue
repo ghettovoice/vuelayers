@@ -5,10 +5,11 @@
    * @todo Add property 'visible', like in layer. If visible = false -> set null style
    */
   import uuid from 'uuid/v4'
-  import { omit } from 'lodash/fp'
   import stubVNode from 'vl-mixins/stub-vnode'
+  import vmBind from 'vl-mixins/vm-bind'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
+  import { reduce, omit } from 'vl-utils/func'
   import { feature as featureHelper } from 'vl-ol'
 
   const props = {
@@ -36,14 +37,10 @@
 
   const watch = {
     id (value) {
-      if (this.feature) {
-        this.feature.setId(value)
-      }
+      this.feature && this.feature.setId(value)
     },
     properties (value) {
-      if (this.feature) {
-        this.feature.setProperties(omit([ 'geometry' ], value))
-      }
+      this.feature && this.feature.setProperties(featureHelper.cleanProperties(value))
     }
   }
 
@@ -51,7 +48,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [ stubVNode, styleTarget ],
+    mixins: [ vmBind, stubVNode, styleTarget ],
     inject: [ 'layer', 'source', 'view' ],
     props,
     methods,
@@ -105,7 +102,8 @@
       id: this.id,
       properties: this.properties
     }, this.view().$vm.projection)
-    this.feature.$vm = this
+
+    this.bindSelfTo(this.feature)
 
     return this.feature
   }

@@ -1,4 +1,20 @@
-import { isString, templateSettings } from 'lodash/fp'
+import {
+  reduce as lodashReduce,
+  isFunction,
+  isString,
+  isEmpty,
+  isEqual,
+  flow,
+  pick,
+  omit,
+  upperFirst,
+  lowerFirst,
+  merge,
+  forEach as lodashForEach,
+  constant,
+  differenceWith,
+  kebabCase
+} from 'lodash/fp'
 
 /**
  * @param {*} value
@@ -81,4 +97,20 @@ export function timedChunk (items, process, processContext, callback, callbackCo
       resolve(items)
     }
   })
+}
+
+// lodash re-exports
+export const reduce = lodashReduce.convert({ cap: false })
+export const forEach = lodashForEach.convert({ cap: false })
+export const diffById = differenceWith((a, b) => a.id === b.id)
+export {
+  isFunction,
+  isString,
+  isEmpty,
+  isEqual,
+  flow,
+  pick,
+  upperFirst,
+  lowerFirst,
+  merge
 }

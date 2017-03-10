@@ -1,5 +1,5 @@
 import ol from 'openlayers'
-import { isEqual } from 'lodash/fp'
+import { isEqual } from 'vl-utils/func'
 import { EARTH_RADIUS, WGS84_SPHERE, TILE_SIZE } from './consts'
 
 /**

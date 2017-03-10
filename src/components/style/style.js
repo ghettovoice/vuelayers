@@ -1,3 +1,4 @@
+import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
 /**
  * Basic style mixin.
@@ -15,7 +16,7 @@ const methods = {
      * @protected
      */
     this.style = this.createStyle()
-    this.style.$vm = this
+    this.bindSelfTo(this.style)
   },
   /**
    * @return {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text}
@@ -45,7 +46,7 @@ const methods = {
 }
 
 export default {
-  mixins: [ stubVNode ],
+  mixins: [ vmBind, stubVNode ],
   methods,
   stubVNode: {
     empty () {

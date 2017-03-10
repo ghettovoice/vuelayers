@@ -1,6 +1,5 @@
 <script>
   import ol from 'openlayers'
-  import { isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/combineLatest'
   import 'rxjs/add/operator/distinctUntilChanged'
@@ -8,7 +7,9 @@
   import 'rxjs/add/operator/map'
   import 'vl-rx'
   import { errordbg } from 'vl-utils/debug'
+  import { isEqual } from 'vl-utils/func'
   import rxSubs from 'vl-mixins/rx-subs'
+  import vmBind from 'vl-mixins/vm-bind'
   import stubVNode from 'vl-mixins/stub-vnode'
   import { consts as olConsts } from 'vl-ol'
 
@@ -25,7 +26,10 @@
 
   const methods = {
     refresh () {
-      this.geoloc.changed()
+      this.geoloc && this.geoloc.changed()
+    },
+    subscribeAll () {
+      this::subscribeToGeolocation()
     }
   }
 
@@ -37,8 +41,7 @@
 
   export default {
     name: 'vl-geoloc',
-    mixins: [ rxSubs, stubVNode ],
-    inject: [ 'serviceLayer' ],
+    mixins: [ rxSubs, vmBind, stubVNode ],
     props,
     watch,
     methods,
@@ -55,7 +58,7 @@
     },
     created () {
       this::createGeolocApi()
-      this::subscribeToGeolocation()
+      this.subscribeAll()
     },
     destroyed () {
       this.$nextTick(() => {
@@ -78,7 +81,7 @@
       projection: this.projection
     })
 
-    this.geoloc.$vm = this
+    this.bindSelfTo(this.geoloc)
 
     return this.geoloc
   }
@@ -98,15 +101,21 @@
 
     this.rxSubs.geoloc = geolocChanges.subscribe(
       ({ position, accuracy }) => {
-        this.currentPosition = position
-        this.currentAccuracy = accuracy
-        this.$emit('change', { position, accuracy })
+        let changed
+        if (!isEqual(position, this.currentPosition)) {
+          this.currentPosition = position
+          changed = true
+        }
+        if (accuracy !== this.currentAccuracy) {
+          this.currentAccuracy = accuracy
+          changed = true
+        }
+
+        changed && this.$emit('change', { position, accuracy })
       },
       err => errordbg(err.stack)
     )
   }
 </script>
 
-<style>
-  /* stub style  */
-</style>
+<style>/* stub style  */</style>

@@ -1,5 +1,5 @@
 import ol from 'openlayers'
-import { differenceWith } from 'lodash/fp'
+import { differenceWith } from 'vl-utils/func'
 import source from 'vl-components/source/source'
 import { coord as coordHelper, feature as featureHelper } from 'vl-ol'
 

@@ -7,10 +7,9 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
-import { omit, merge, forEach } from 'lodash/fp'
+import { omit, merge, forEach } from 'vl-utils/func'
 import * as components from './components'
 
-const forEachWithKey = forEach.convert({ cap: false })
 const keys = [
   'geom',
   'layer',
@@ -29,7 +28,7 @@ export default {
   VERSION: PKG_VERSION,
   ...flatComponents,
   install (Vue) {
-    forEachWithKey((component, key) => {
+    forEach((component, key) => {
       if (component.install) {
         Vue.use(component)
       }

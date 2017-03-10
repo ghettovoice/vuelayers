@@ -1,8 +1,8 @@
 <script>
   import ol from 'openlayers'
-  import { forEach, constant, differenceWith } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'vl-rx'
+  import { forEach, constant, differenceWith } from 'vl-utils/func'
   import { errordbg } from 'vl-utils/debug'
   import { style as styleHelper } from 'vl-ol'
   import interaction from 'vl-components/interaction/interaction'

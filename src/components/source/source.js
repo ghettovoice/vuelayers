@@ -1,4 +1,5 @@
 import rxSubs from 'vl-mixins/rx-subs'
+import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
 import { consts as olConsts } from 'vl-ol'
 import { warn } from 'vl-utils/debug'
@@ -27,7 +28,7 @@ const methods = {
      * @protected
      */
     this.source = this.createSource()
-    this.source.$vm = this
+    this.bindSelfTo(this.source)
   },
   /**
    * @return {ol.source.Source}
@@ -63,7 +64,7 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs, stubVNode ],
+  mixins: [ rxSubs, vmBind, stubVNode ],
   inject: [ 'layer' ],
   props,
   methods,

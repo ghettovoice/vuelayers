@@ -1,14 +1,16 @@
 import ol from 'openlayers'
-import { omit } from 'lodash/fp'
+import { omit } from 'vl-utils/func'
 import { MAP_PROJECTION } from './consts'
 
 const geoJsonFormat = new ol.format.GeoJSON()
+
+export const cleanProperties = omit([ 'geometry' ])
 
 export function createFeature (geoJson = {}, featureProjection = MAP_PROJECTION) {
   const feature = geoJsonFormat.readFeature({
     ...geoJson,
     type: 'Feature',
-    properties: omit([ 'geometry' ], geoJson.properties || {})
+    properties: cleanProperties(geoJson.properties || {})
   }, {
     featureProjection: MAP_PROJECTION
   })

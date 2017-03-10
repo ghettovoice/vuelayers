@@ -1,7 +1,6 @@
 import ol from 'openlayers'
-import { pick } from 'lodash/fp'
 import { createTileUrlFunction } from 'ol3-tilecache'
-import { replaceTokens } from 'vl-utils/func'
+import { pick, replaceTokens } from 'vl-utils/func'
 import source from 'vl-components/source/source'
 import { consts as olConsts } from 'vl-ol'
 

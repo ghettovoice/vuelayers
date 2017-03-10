@@ -1,6 +1,4 @@
-import { isFunction, isString, reduce } from 'lodash/fp'
-
-const reduceWithKey = reduce.convert({ cap: false })
+import { isFunction, isString, reduce } from 'vl-utils/fp'
 
 export default {
   render (h) {
@@ -40,9 +38,9 @@ export default {
 }
 
 function extractChildren (slots, slotNames = []) {
-  return reduceWithKey((all, vnodes, name) => {
+  return reduce((all, nodes, name) => {
     if (!slotNames.length || slotNames.includes(name)) {
-      all = all.concat(vnodes)
+      all = all.concat(nodes)
     }
 
     return all

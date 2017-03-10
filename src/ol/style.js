@@ -1,9 +1,6 @@
 import ol from 'openlayers'
-import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce } from 'lodash/fp'
-import { isNumeric } from 'vl-utils/func'
+import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce, isNumeric } from 'vl-utils/func'
 import * as consts from './consts'
-
-const reduceWithKey = reduce.convert({ cap: false })
 
 // Style helpers (get from geo-1.1)
 /**
@@ -112,7 +109,7 @@ export function getDefaultStyleHash () {
  * @return {Object<string, ol.style.Style[]>}
  * @function
  */
-export const transformStyleHash = reduceWithKey((olStyleHash, geoStyles, styleName) => {
+export const transformStyleHash = reduce((olStyleHash, geoStyles, styleName) => {
   if (geoStyles && geoStyles.length) {
     const olStyle = geoStyles.map(transformStyle)
 
@@ -182,7 +179,7 @@ export function transformFillStyle (geoStyle, prefix = '') {
 
   const transform = flow(
     pick(keys),
-    reduceWithKey(
+    reduce(
       (result, value, name) => {
         name = lowerFirst(name.replace(new RegExp(prefixKey('fill')), ''))
         result[ name ] = value
@@ -211,7 +208,7 @@ export function transformStrokeStyle (geoStyle, prefix = '') {
 
   const transform = flow(
     pick(keys),
-    reduceWithKey(
+    reduce(
       (result, value, name) => {
         switch (name) {
           case prefixKey('strokeColor'):

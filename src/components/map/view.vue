@@ -1,14 +1,15 @@
 <script>
   import ol from 'openlayers'
-  import { isFunction, isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/combineLatest'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/map'
   import 'vl-rx'
+  import { isFunction, isEqual } from 'vl-utils/func'
   import { errordbg, warn } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
+  import vmBind from 'vl-mixins/vm-bind'
   import stubVNode from 'vl-mixins/stub-vnode'
   import { consts as olConsts } from 'vl-ol'
 
@@ -19,7 +20,7 @@
     },
     center: {
       type: Array,
-      default: () => ([ 0, 0 ]),
+      default: () => [ 0, 0 ],
       validator: value => value.length === 2
     },
     rotation: {
@@ -60,7 +61,7 @@
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
      */
     fit (geometryOrExtent, options) {
-      this.view.fit(geometryOrExtent, options)
+      this.view && this.view.fit(geometryOrExtent, options)
     },
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
@@ -70,6 +71,8 @@
     animate (...args) {
       let cb = args.find(isFunction)
 
+      if (!this.view) return Promise.reject()
+
       return new Promise(
         resolve => this.view.animate(...args, complete => {
           cb && cb(complete)
@@ -78,19 +81,18 @@
       )
     },
     refresh () {
-      this.view.changed()
+      this.view && this.view.changed()
     },
     setCurrentView ({ center, zoom, rotation }) {
+      if (!this.view) return
+
       if (center != null && !isEqual(center, this.currentCenter)) {
-        console.log('update center')
         this.view.setCenter(ol.proj.fromLonLat(center, this.projection))
       }
       if (zoom != null && zoom !== this.currentZoom) {
-        console.log('update zoom')
         this.view.setZoom(zoom)
       }
       if (rotation != null && rotation !== this.currentRotation) {
-        console.log('update zoom')
         this.view.setRotation(rotation)
       }
     },
@@ -106,7 +108,7 @@
 
       if (view && view.$vm) {
         if (process.env.NODE_ENV !== 'production') {
-          warn('Map already has unmounted vl-view component. ' +
+          warn('Map already has mounted vl-view component. ' +
                'It will be replaced with new.')
         }
         view.$vm.unmountView()
@@ -181,7 +183,8 @@
       minZoom: this.minZoom,
       projection: this.projection
     })
-    this.view.$vm = this
+
+    this.bindSelfTo(this.view)
 
     return this.view
   }
@@ -206,21 +209,21 @@
 
     this.rxSubs.viewChanges = viewChanges.subscribe(
       ({ center, zoom, rotation }) => {
-        let changes = false
+        let changed = false
         if (!isEqual(this.currentCenter, center)) {
           this.currentCenter = center
-          changes = true
+          changed = true
         }
         if (this.currentZoom !== zoom) {
           this.currentZoom = zoom
-          changes = true
+          changed = true
         }
         if (this.currentRotation !== rotation) {
           this.currentRotation = rotation
-          changes = true
+          changed = true
         }
 
-        changes && this.$emit('change', { center, zoom, rotation })
+        changed && this.$emit('change', { center, zoom, rotation })
       },
       err => errordbg(err.stack)
     )

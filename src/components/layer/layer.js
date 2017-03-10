@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4'
 import rxSubs from 'vl-mixins/rx-subs'
+import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
 import { warn } from 'vl-utils/debug'
 
@@ -46,7 +47,7 @@ const methods = {
      */
     this.layer = this.createLayer()
     this.layer.set('id', this.id)
-    this.layer.$vm = this
+    this.bindSelfTo(this.layer)
   },
   /**
    * @return {ol.layer.Layer}

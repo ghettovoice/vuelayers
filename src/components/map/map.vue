@@ -5,8 +5,9 @@
   </div>
 </template>
 
-<script rel="text/babel">
+<script>
   import ol from 'openlayers'
+  import vmBind from 'vl-mixins/vm-bind'
 
   const props = {
     loadTilesWhileAnimating: {
@@ -35,8 +36,10 @@
      * Updates `ol.Map` view
      */
     refresh () {
-      this.map.updateSize()
-      this.map.render()
+      if (this.map) {
+        this.map.updateSize()
+        this.map.render()
+      }
     },
     /**
      * Trigger focus on map container.
@@ -49,12 +52,12 @@
 
   export default {
     name: 'vl-map',
+    mixins: [ vmBind ],
     props,
     methods,
     provide () {
       return {
         map: () => this.map,
-        serviceLayer: () => this.serviceLayer,
         view: () => this.map.getView()
       }
     },
@@ -69,9 +72,8 @@
     },
     destroyed () {
       this.$nextTick(() => {
-        this.serviceLayer.setMap(undefined)
         this.map.setTarget(undefined)
-        this.map = this.serviceLayer = undefined
+        this.map = undefined
       })
     }
   }
@@ -97,12 +99,7 @@
       keyboardEventTarget: this.keyboardEventTarget
     })
 
-    this.map.$vm = this
-
-    this.serviceLayer = new ol.layer.Vector({
-      map: this.map,
-      source: new ol.source.Vector()
-    })
+    this.bindSelfTo(this.map)
 
     return this.map
   }

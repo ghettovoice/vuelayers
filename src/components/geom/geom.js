@@ -1,10 +1,11 @@
-// import { isEqual } from 'lodash/fp'
+// import { isEqual } from 'vl-utils/func'
 // import { Observable } from 'rxjs/Observable'
 // import 'rxjs/add/operator/throttleTime'
 // import 'rxjs/add/operator/distinctUntilChanged'
 // import 'rxjs/add/operator/map'
 // import 'vl-rx'
 import rxSubs from 'vl-mixins/rx-subs'
+import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
 import { coord as coordHelper } from 'vl-ol'
 import { warn } from 'vl-utils/debug'
@@ -40,7 +41,7 @@ const methods = {
      * @protected
      */
     this.geometry = this.createGeometry()
-    this.geometry.$vm = this
+    this.bindSelfTo(this.geometry)
     /**
      * @protected
      */
@@ -89,7 +90,7 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs, stubVNode ],
+  mixins: [ rxSubs, vmBind, stubVNode ],
   inject: [ 'view', 'feature' ],
   props,
   computed,

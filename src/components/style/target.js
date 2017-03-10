@@ -1,4 +1,4 @@
-import { isFunction, kebabCase } from 'lodash/fp'
+import { isFunction, kebabCase } from 'vl-utils/func'
 
 export default {
   provide () {
