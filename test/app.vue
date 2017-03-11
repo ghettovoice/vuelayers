@@ -36,7 +36,7 @@
         </vl-style-container>
         <!--// layer level style -->
 
-        <vl-source-vector :loader="loader" :features="points" />
+        <vl-source-vector :features="points" />
       </vl-layer-vector>
     </vl-map>
 
@@ -79,7 +79,7 @@
     },
     loadData () {
       const points = []
-      range(1, 100).forEach(i => {
+      range(1, 1000).forEach(i => {
         points.push({
           id: i,
           properties: {
@@ -96,36 +96,8 @@
       })
 
       this.points = points
-//      return new Promise(resolve => {
-//        setTimeout(() => {
-//          resolve(this.countries)
-//        }, 3000)
-//      })
-    },
-    async loader (extent) {
-      const url = 'http://geoportal.glonass-112.net/api/layers/6d4cb269-d4b4-4e10-b787-3c8c769941c8/features'
-      const response = await fetch(
-        `${url}?filter[bbox][]=${extent[ 0 ]}&filter[bbox][]=${extent[ 1 ]}&filter[bbox][]=${extent[ 2 ]}&filter[bbox][]=${extent[ 3 ]}`,
-        {
-          method: 'GET',
-          mode: 'cors',
-          credentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-App': '1ff6d35b517e9cc3'
-          }
-        }
-      )
-      const points = await response.json()
 
-      if (points && points.length) {
-        this.points = points.map(point => ({
-          id: point.id,
-          properties: point,
-          geometry: point.geometry
-        }))
-      }
+      return Promise.resolve(this.points)
     }
   }
 
@@ -135,8 +107,8 @@
     methods,
     data () {
       return {
-        zoom: 10,
-        center: [ 50.69435, 55.452967 ],
+        zoom: 2,
+        center: [ 0, 0 ],
         rotation: 0,
         selected: [],
         points: [],
@@ -144,8 +116,8 @@
       }
     },
     created () {
-//      this.loadData()
-//        .catch(::console.error)
+      this.loadData()
+        .catch(::console.error)
     }
   }
 </script>

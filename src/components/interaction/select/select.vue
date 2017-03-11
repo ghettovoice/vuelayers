@@ -1,7 +1,7 @@
 <script>
   import ol, { style as styleHelper } from 'vl-ol'
   import Observable from 'vl-rx'
-  import { forEach, constant, diffById } from 'vl-utils/func'
+  import { forEach, constant, diffById, isEmpty } from 'vl-utils/func'
   import { errordbg } from 'vl-utils/debug'
   import interaction from 'vl-components/interaction/interaction'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
@@ -54,9 +54,7 @@
       const styleFunc = createStyleFunc(this)
       const style = function __selectStyleFunc (feature, resolution) {
         const styles = styleFunc(feature, resolution)
-        if (styles === null || (Array.isArray(styles) && styles.length)) {
-          return styles
-        }
+        if (!isEmpty(styles)) return styles
 
         return feature.getGeometry() != null
           ? defaultStyles[ feature.getGeometry().getType() ]
@@ -65,7 +63,7 @@
 
       const filterFunc = this.filter
       const filter = function __selectFilter (feature, layer) {
-        return filterFunc(feature.plain())
+        return filterFunc(feature.plain(), layer && layer.id)
       }
 
       return new ol.interaction.Select({
@@ -161,7 +159,7 @@
   export default {
     name: 'vl-interaction-select',
     mixins: [ interaction, styleTarget ],
-    inject: [ 'map', 'serviceLayer' ],
+    inject: [ 'map' ],
     props,
     computed,
     methods,

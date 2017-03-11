@@ -39,6 +39,10 @@ map:
     path: mixins/stub-vnode
     alias: vl-mixins/stub-vnode
 
+  - name: mixins/vm-bind
+    path: mixins/vm-bind
+    alias: vl-mixins/vm-bind
+
 #  - name: mixins/virt-slot
 #    path: mixins/virt-slot
 #    alias: vl-mixins/virt-slot
@@ -173,12 +177,11 @@ map:
     path: components/style/target
     alias: vl-components/style/target
 
-  # directives
+  # components
   - name: style-func
     path: components/style/func
     alias: vl-components/style/func
 
-  # components
   - name: style-container
     path: components/style/container
     alias: vl-components/style/container

@@ -9,7 +9,10 @@
 
   const props = {
     zIndex: Number,
-    geomType: String
+    condition: {
+      type: [ Function, Boolean ],
+      default: true
+    }
   }
 
   const methods = {
@@ -36,7 +39,7 @@
 
       currentStyle.push({
         style: this.style,
-        geomType: this.geomType
+        condition: this.condition
       })
       this.setStyle(currentStyle)
     },

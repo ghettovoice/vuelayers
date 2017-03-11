@@ -1,4 +1,4 @@
-import { isFunction, kebabCase } from 'vl-utils/func'
+import { isEmpty, isFunction, isBoolean, flow, map, filter } from 'vl-utils/func'
 
 export default {
   provide () {
@@ -22,7 +22,10 @@ export default {
       const styleTarget = this.styleTarget()
 
       if (styleTarget) {
-        if (this.styles === null || (Array.isArray(this.styles) && this.styles.length)) {
+        if (
+          isFunction(this.styles) ||
+          (Array.isArray(this.styles) && this.styles.length)
+        ) {
           styleTarget.setStyle(
             isFunction(this.styles)
               ? this.styles
@@ -41,22 +44,20 @@ export default {
 
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
-    if (vm.styles === null) return null
-    if (!vm.styles.length) return
+    if (isEmpty(vm.styles)) return
 
     const plainFeature = feature.plain()
     if (!plainFeature.geometry) return
 
-    const styles = []
-    vm.styles.forEach(({ style, geomType }) => {
-      if (
-        geomType == null || plainFeature.geometry.type === geomType ||
-        kebabCase(feature.geometry.type) === geomType
-      ) {
-        styles.push(style)
-      }
-    })
+    const layer = feature.layer
 
-    return styles
+    return flow(
+      filter(({ style, condition }) => {
+        return condition == null ||
+               (isBoolean(condition) && condition) ||
+               (isFunction(condition) && condition(plainFeature, resolution, layer && layer.id))
+      }),
+      map(({ style }) => style)
+    )(vm.styles)
   }
 }

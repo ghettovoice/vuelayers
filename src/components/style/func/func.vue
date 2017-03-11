@@ -1,7 +1,14 @@
 <script>
+  /**
+   * Style function component for advanced styling.
+   * Plays the role of both a style that mounts itself to style target (layer, feature & etc.)
+   * and style target for inner style containers.
+   */
   import ol, { style as styleHelper } from 'vl-ol'
   import style from 'vl-components/style/style'
+  import styleTarget, { createStyleFunc } from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
+  import { isEmpty } from 'vl-utils/func'
 
   const props = {
     factory: {
@@ -16,39 +23,55 @@
      * @protected
      */
     createStyle () {
-      const self = this
-      const styleFunc = this.factory(ol, styleHelper)
+      // user provided style function
+      const providedStyleFunc = this.factory(ol, styleHelper)
+      // fallback style function made from inner style containers
+      const fallbackStyleFunc = createStyleFunc(this)
 
       return function __styleFunc (feature, resolution) {
         const plainFeature = feature.plain()
+        let styles = providedStyleFunc(plainFeature, resolution, feature.layer && feature.layer.id)
 
-        return styleFunc(plainFeature, resolution)
+        if (!isEmpty(styles)) return styles
+
+        return fallbackStyleFunc(feature, resolution)
       }
     },
     mountStyle () {
-      if (this.getStyle()) {
+      if (this.parentGetStyle()) {
         if (process.env.NODE_ENV !== 'production') {
           warn('Style target already have defined styles, will be replaced with style function')
         }
       }
 
-      this.setStyle(this.style)
+      this.parentSetStyle(this.style)
     },
     unmountStyle () {
-      this.setStyle(undefined)
+      this.parentSetStyle(undefined)
+    },
+    setStyle (style) {
+      // simply save all inner styles and
+      // use them later in style function as fallback
+      this.styles = style
     }
   }
 
   const watch = {
-    factory () {}
+    factory () {
+      // todo implement
+    }
   }
 
   export default {
     name: 'vl-style-func',
-    mixins: [ style ],
-    inject: [ 'setStyle', 'getStyle' ],
+    mixins: [ style, styleTarget ],
+    inject: {
+      setStyle: 'parentSetStyle',
+      getStyle: 'parentGetStyle'
+    },
     props,
-    watch,
+    methods,
+    watch
   }
 </script>
 

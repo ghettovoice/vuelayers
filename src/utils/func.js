@@ -3,6 +3,7 @@ import {
   forEach as lodashForEach,
   isFunction,
   isString,
+  isBoolean,
   isEmpty,
   isEqual,
   flow,
@@ -15,16 +16,22 @@ import {
   differenceWith,
   kebabCase,
   range,
-  random
+  rangeStep,
+  random,
+  map as lodashMap,
+  filter as lodashFilter
 } from 'lodash/fp'
 
 // lodash re-exports
 export const reduce = lodashReduce.convert({ cap: false })
 export const forEach = lodashForEach.convert({ cap: false })
+export const map = lodashMap.convert({ cap: false })
+export const filter = lodashFilter.convert({ cap: false })
 export const merge = lodashMerge.convert({ fixed: false })
 export {
   isFunction,
   isString,
+  isBoolean,
   isEmpty,
   isEqual,
   flow,
@@ -36,6 +43,7 @@ export {
   differenceWith,
   kebabCase,
   range,
+  rangeStep,
   random
 }
 
@@ -111,4 +119,8 @@ export function timedChunk (items, process, processContext, callback, callbackCo
       resolve(items)
     }
   })
+}
+
+export function delay (dt) {
+  return new Promise(resolve => setTimeout(resolve, dt))
 }
