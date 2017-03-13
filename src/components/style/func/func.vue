@@ -38,7 +38,7 @@
       }
     },
     mountStyle () {
-      if (this.parentGetStyle()) {
+      if (!isEmpty(this.parentGetStyle())) {
         if (process.env.NODE_ENV !== 'production') {
           warn('Style target already have defined styles, will be replaced with style function')
         }
