@@ -3,6 +3,7 @@ import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce, isNumeric }
 import * as consts from './consts'
 
 // Style helpers (get from geo-1.1)
+// todo change to ol3 default
 /**
  * @typedef {Object} GeoStyle
  *
@@ -48,7 +49,7 @@ export function getDefaultStyleHash () {
   const default_ = {
     fillColor: [ 255, 255, 255, 0.7 ],
     strokeColor: [ 30, 54, 133, 1 ],
-    strokeWidth: 3,
+    strokeWidth: 2,
     strokeCap: 'round',
     strokeJoin: 'round',
     iconRadius: 7,
@@ -109,17 +110,21 @@ export function getDefaultStyleHash () {
  * @return {Object<string, ol.style.Style[]>}
  * @function
  */
-export const transformStyleHash = reduce((olStyleHash, geoStyles, styleName) => {
-  if (geoStyles && geoStyles.length) {
-    const olStyle = geoStyles.map(transformStyle)
+export function transformStyleHash (styleHash) {
+  const transformer = reduce((olStyleHash, geoStyles, styleName) => {
+    if (geoStyles && geoStyles.length) {
+      const olStyle = geoStyles.map(transformStyle)
 
-    if (!isEmpty(olStyle)) {
-      olStyleHash[ styleName ] = olStyle
+      if (!isEmpty(olStyle)) {
+        olStyleHash[ styleName ] = olStyle
+      }
     }
-  }
 
-  return olStyleHash
-})
+    return olStyleHash
+  }, Object.create(null))
+
+  return transformer(styleHash)
+}
 
 /**
  * Returns style function for `styleHash` or default style function.
@@ -131,7 +136,7 @@ export function createStyleFunc (styleHash) {
   styleHash = merge(getDefaultStyleHash(), styleHash)
 
   // Static pre-compilation
-  const olStyleHash = transformStyleHash({}, styleHash)
+  const olStyleHash = transformStyleHash(styleHash)
 
   return (
     /**
