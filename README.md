@@ -2,6 +2,7 @@
 
 > Vue components to work with [OpenLayers](https://openlayers.org)
 
+[![Build Status](https://travis-ci.org/ghettovoice/vuelayers.svg?branch=master)](https://travis-ci.org/ghettovoice/vuelayers)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
 [![GitHub tag](https://img.shields.io/github/tag/ghettovoice/vuelayers.svg)](https://github.com/ghettovoice/vuelayers/releases)
 [![NPM version](https://img.shields.io/npm/v/vuelayers.svg)](https://www.npmjs.com/package/vuelayers)

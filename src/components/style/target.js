@@ -11,7 +11,7 @@ export default {
     /**
      * @type {ol.style.Style[]|ol.StyleFunction|undefined}
      */
-    this.styles = undefined
+    this.styles = this.defaultStyles = undefined
   },
   methods: {
     /**
@@ -25,15 +25,8 @@ export default {
       const styleTarget = this.styleTarget()
 
       if (styleTarget) {
-        if (
-          isFunction(this.styles) ||
-          (Array.isArray(this.styles) && this.styles.length)
-        ) {
-          styleTarget.setStyle(
-            isFunction(this.styles)
-              ? this.styles
-              : createStyleFunc(this)
-          )
+        if (this.styles != null) {
+          styleTarget.setStyle(createStyleFunc(this))
         } else {
           styleTarget.setStyle(undefined)
         }
@@ -52,15 +45,30 @@ export function createStyleFunc (vm) {
     const plainFeature = feature.plain()
     if (!plainFeature.geometry) return
 
-    const layer = feature.layer
+    const layer = feature.layer || {}
 
-    return flow(
-      filter(({ style, condition }) => {
-        return condition == null ||
-               (isBoolean(condition) && condition) ||
-               (isFunction(condition) && condition(plainFeature, resolution, layer && layer.id))
-      }),
-      map(({ style }) => style)
-    )(vm.styles)
+    if (isFunction(vm.styles)) {
+      return vm.styles(feature, resolution)
+    }
+
+    if (Array.isArray(vm.styles)) {
+      return flow(
+        filter(({ style, condition }) => {
+          return condition == null ||
+                 (isBoolean(condition) && condition) ||
+                 (
+                   isFunction(condition) &&
+                   condition(plainFeature, resolution, layer.id)
+                 )
+        }),
+        map(({ style }) => style)
+      )(vm.styles)
+    }
+
+    if (vm.defaultStyles != null) {
+      return isFunction(vm.defaultStyles)
+        ? vm.defaultStyles(feature, resolution)
+        : vm.defaultStyles
+    }
   }
 }

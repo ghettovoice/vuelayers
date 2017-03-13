@@ -13,6 +13,7 @@ module.exports = {
     host: '127.0.0.1',
     port: 4444,
     cli_args: {
+      'webdriver.gecko.driver': require('geckodriver').path,
       'webdriver.chrome.driver': require('chromedriver').path
     }
   },
@@ -24,6 +25,11 @@ module.exports = {
       silent: true,
       globals: {
         devServerURL: 'http://localhost:' + (process.env.PORT || config.dev.port)
+      },
+      desiredCapabilities: {
+        browserName: 'firefox',
+        javascriptEnabled: true,
+        acceptSslCerts: true
       }
     },
 
@@ -40,6 +46,16 @@ module.exports = {
         browserName: 'firefox',
         javascriptEnabled: true,
         acceptSslCerts: true
+      }
+    },
+
+    travis: {
+      desiredCapabilities: {
+        browserName: 'phantomjs',
+        javascriptEnabled: true,
+        acceptSslCerts: true,
+        'phantomjs.binary.path': require('phantomjs-prebuilt').path,
+        'phantomjs.cli.args': []
       }
     }
   }

@@ -6,7 +6,7 @@
    */
   import ol, { style as styleHelper } from 'vl-ol'
   import style from 'vl-components/style/style'
-  import { createStyleFunc } from 'vl-components/style/target'
+  import styleTarget, { createStyleFunc } from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
   import { isEmpty } from 'vl-utils/func'
 
@@ -30,7 +30,8 @@
 
       return function __styleFunc (feature, resolution) {
         const plainFeature = feature.plain()
-        let styles = providedStyleFunc(plainFeature, resolution, feature.layer && feature.layer.id)
+        const layer = feature.layer || {}
+        const styles = providedStyleFunc(plainFeature, resolution, layer.id)
 
         if (!isEmpty(styles)) return styles
 
@@ -38,10 +39,10 @@
       }
     },
     mountStyle () {
-      if (!isEmpty(this.getStyle())) {
-        if (process.env.NODE_ENV !== 'production') {
-          warn('Style target already have defined styles, will be replaced with style function')
-        }
+      let currentStyle = this.getStyle()
+      if (currentStyle && process.env.NODE_ENV !== 'production') {
+        warn('Style target already has defined style. Avoid use of multiple vl-style-func or' +
+             'combining vl-style-func and vl-style-container components on the same level')
       }
 
       this.setStyle(this.style)
@@ -67,7 +68,7 @@
 
   export default {
     name: 'vl-style-func',
-    mixins: [ style ],
+    mixins: [ style, styleTarget ],
     inject: [ 'setStyle', 'getStyle' ],
     stubVNode: {
       empty: false,

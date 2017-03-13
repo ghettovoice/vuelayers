@@ -1,0 +1,21 @@
+branches:
+  only:
+    - master
+    - develop
+language: java
+jdk:
+  - oraclejdk8
+env:
+  - NODE_VERSION=6 DBUS_SESSION_BUS_ADDRESS=/dev/null
+cache:
+  directories:
+    - node_modules
+install:
+  - nvm install $NODE_VERSION
+  - nvm use $NODE_VERSION
+  - node --version
+  - npm --version
+  - npm install vue
+  - npm install
+script:
+  - npm run unit && npm run e2e -- --env travis
