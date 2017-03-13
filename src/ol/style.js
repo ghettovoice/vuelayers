@@ -1,5 +1,5 @@
 import ol from 'openlayers'
-import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce, isNumeric } from 'vl-utils/func'
+import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce, isNumeric, isString } from 'vl-utils/func'
 import * as consts from './consts'
 
 // Style helpers (get from geo-1.1)
@@ -8,39 +8,41 @@ import * as consts from './consts'
  * @typedef {Object} GeoStyle
  *
  * Shared
- * @property {string|number[]} fillColor
- * @property {string|number[]} strokeColor
- * @property {number} strokeWidth
- * @property {number[]} strokeDash
- * @property {string} strokeCap
- * @property {string} strokeJoin
- * @property {number} zIndex
+ * @property {string|number[]|undefined} fillColor
+ * @property {string|number[]|undefined} strokeColor
+ * @property {number|undefined} strokeWidth
+ * @property {number[]|undefined} strokeDash
+ * @property {string|undefined} strokeCap
+ * @property {string|undefined} strokeJoin
+ * @property {number|undefined} zIndex
  *
  * Text only
- * @property {string} text
- * @property {string} textFont
- * @property {number} textFontSize
- * @property {number} textScale
- * @property {string} textAlign
- * @property {number} textRotation
- * @property {number} textOffsetX
- * @property {number} textOffsetY
+ * @property {string|undefined} text
+ * @property {string|undefined} textFont
+ * @property {number|undefined} textFontSize
+ * @property {number|undefined} textFillColor
+ * @property {number|undefined} textStrokeColor
+ * @property {number|undefined} textScale
+ * @property {string|undefined} textAlign
+ * @property {number|undefined} textRotation
+ * @property {number|undefined} textOffsetX
+ * @property {number|undefined} textOffsetY
  *
  * Icon only
- * @property {string} iconUrl
- * @property {Image} iconImg
- * @property {number[]} iconSize
- * @property {number[]} iconImgSize
- * @property {number} iconOffset
- * @property {number[]} iconAnchor
- * @property {number} iconScale
- * @property {number} iconRotation
- * @property {number} iconRadius
- * @property {number} iconRadius1
- * @property {number} iconRadius2
- * @property {number} iconPoints
- * @property {number} iconAngle
- * @property {number} iconOpacity
+ * @property {string|undefined} iconUrl
+ * @property {Image|undefined} iconImg
+ * @property {number[]|undefined} iconSize
+ * @property {number[]|undefined} iconImgSize
+ * @property {number|undefined} iconOffset
+ * @property {number[]|undefined} iconAnchor
+ * @property {number|undefined} iconScale
+ * @property {number|undefined} iconRotation
+ * @property {number|undefined} iconRadius
+ * @property {number|undefined} iconRadius1
+ * @property {number|undefined} iconRadius2
+ * @property {number|undefined} iconPoints
+ * @property {number|undefined} iconAngle
+ * @property {number|undefined} iconOpacity
  * @property {ol.style.IconOrigin | undefined} iconAnchorOrigin
  * @property {ol.Color | string | undefined} iconColor
  * @property {ol.style.IconOrigin | undefined} iconOffsetOrigin
@@ -173,6 +175,14 @@ export function transformStyle (geoStyle) {
 
 const addPrefix = prefix => str => prefix + (prefix ? upperFirst(str) : str)
 
+export function normalizeColorValue (color) {
+  if (isString(color) && !/^rgb.*/.test(color) && color[ 0 ] !== '#') {
+    color = '#' + color
+  }
+
+  return color
+}
+
 /**
  * @param {GeoStyle} geoStyle
  * @param {string} [prefix]
@@ -187,6 +197,11 @@ export function transformFillStyle (geoStyle, prefix = '') {
     reduce(
       (result, value, name) => {
         name = lowerFirst(name.replace(new RegExp(prefixKey('fill')), ''))
+
+        if (name === 'color') {
+          value = normalizeColorValue(value)
+        }
+
         result[ name ] = value
 
         return result
@@ -225,6 +240,10 @@ export function transformStrokeStyle (geoStyle, prefix = '') {
           case prefixKey('strokeJoin'):
             name = 'line' + name.replace(new RegExp(prefixKey('stroke')), '')
             break
+        }
+
+        if (name === 'color') {
+          value = normalizeColorValue(value)
         }
 
         result[ name ] = value

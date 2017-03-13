@@ -6,7 +6,7 @@
    */
   import ol, { style as styleHelper } from 'vl-ol'
   import style from 'vl-components/style/style'
-  import styleTarget, { createStyleFunc } from 'vl-components/style/target'
+  import { createStyleFunc } from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
   import { isEmpty } from 'vl-utils/func'
 
@@ -38,21 +38,24 @@
       }
     },
     mountStyle () {
-      if (!isEmpty(this.parentGetStyle())) {
+      if (!isEmpty(this.getStyle())) {
         if (process.env.NODE_ENV !== 'production') {
           warn('Style target already have defined styles, will be replaced with style function')
         }
       }
 
-      this.parentSetStyle(this.style)
+      this.setStyle(this.style)
     },
     unmountStyle () {
-      this.parentSetStyle(undefined)
+      this.setStyle(undefined)
     },
-    setStyle (style) {
+    setFallbackStyle (style) {
       // simply save all inner styles and
       // use them later in style function as fallback
       this.styles = style
+    },
+    getFallbackStyle () {
+      return this.styles
     }
   }
 
@@ -64,14 +67,28 @@
 
   export default {
     name: 'vl-style-func',
-    mixins: [ style, styleTarget ],
-    inject: {
-      parentSetStyle: 'setStyle',
-      parentGetStyle: 'getStyle'
+    mixins: [ style ],
+    inject: [ 'setStyle', 'getStyle' ],
+    stubVNode: {
+      empty: false,
+      attrs () {
+        return {
+          id: this.$options.name
+        }
+      }
     },
     props,
     methods,
-    watch
+    watch,
+    created () {
+      // custom provide of setStyle / getStyle methods to mirror style target between
+      // real style target (layer, feature) and style container
+      // defined here because Vue starts checking of provided key from self instance
+      this._provided = {
+        setStyle: ::this.setFallbackStyle,
+        getStyle: ::this.getFallbackStyle
+      }
+    }
   }
 </script>
 

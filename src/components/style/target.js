@@ -8,7 +8,10 @@ export default {
     }
   },
   beforeCreate () {
-    this.styles = []
+    /**
+     * @type {ol.style.Style[]|ol.StyleFunction|undefined}
+     */
+    this.styles = undefined
   },
   methods: {
     /**

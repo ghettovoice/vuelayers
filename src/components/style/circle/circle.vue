@@ -50,7 +50,7 @@
       }
     }
   }
-
+  // todo do not recreate if already create and has fill/stroke, use setters instead
   function setFill (fill) {
     /**
      * @type {ol.style.Fill}

@@ -31,7 +31,7 @@
     mountStyle () {
       let currentStyle = this.getStyle() || []
       if (!Array.isArray(currentStyle)) {
-        if (process.env.NODE_ENV !== 'production') {
+        if (currentStyle && process.env.NODE_ENV !== 'production') {
           warn('Current style is not an array, will be replaced with new style array')
         }
         currentStyle = []
@@ -46,7 +46,7 @@
     unmountStyle () {
       let currentStyle = this.getStyle() || []
       if (!Array.isArray(currentStyle)) {
-        if (process.env.NODE_ENV !== 'production') {
+        if (currentStyle && process.env.NODE_ENV !== 'production') {
           warn('Current style is not an array, will be replaced with new style array')
         }
         currentStyle = []
