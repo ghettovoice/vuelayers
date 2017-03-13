@@ -13,7 +13,7 @@
   const props = {
     factory: {
       type: Function,
-      default: () => {}
+      required: true
     }
   }
 
