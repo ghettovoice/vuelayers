@@ -19,11 +19,16 @@
 
   const methods = {
     createSource () {
+      // always EPSG:3857, size: 256x256, format png
       return new ol.source.OSM({
-        url: this.url,
-        attributions: this.attributions,
+        url: this.currentUrl,
+        attributions: this.currentAttributions,
         crossOrigin: this.crossOrigin,
-        maxZoom: this.maxZoom
+        maxZoom: this.currentMaxZoom,
+        cacheSize: this.cacheSize,
+        opaque: this.opaque,
+        reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+        wrapX: this.wrapX
       })
     }
   }
@@ -36,6 +41,4 @@
   }
 </script>
 
-<style>
-  /* stub style  */
-</style>
+<style>/* stub style  */</style>

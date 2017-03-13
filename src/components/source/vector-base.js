@@ -17,6 +17,12 @@ const props = {
   // strategy: String
 }
 
+const computed = {
+  currentLoader () {
+    return this.loader
+  }
+}
+
 const {
   mountSource: sourceMountSource,
   unmountSource: sourceUnmountSource
@@ -28,9 +34,9 @@ const methods = {
    * @protected
    */
   sourceLoader () {
-    if (!this.loader) return
+    if (!this.currentLoader) return
 
-    const loader = this.loader.bind(this)
+    const loader = this.currentLoader.bind(this)
     const self = this
 
     return async function __loader (extent, resolution, projection) {
@@ -53,8 +59,8 @@ const methods = {
   },
   createSource () {
     return new ol.source.Vector({
-      attributions: this.attributions,
-      projection: this.projection,
+      attributions: this.currentAttributions,
+      projection: this.currentProjection,
       loader: this.sourceLoader(),
       useSpatialIndex: this.useSpatialIndex,
       wrapX: this.wrapX,
@@ -83,7 +89,12 @@ const watch = {
 
     this.source.addFeatures(forAdd.map(this::createFeature))
     forRemove.map(plainFeature => {
-      this.source.removeFeature(this.source.getFeatureById(plainFeature.id))
+      const feature = this.source.getFeatureById(plainFeature.id)
+
+      if (feature) {
+        this.source.removeFeature(feature)
+        delete feature.layer
+      }
     })
   }
 }
@@ -91,6 +102,7 @@ const watch = {
 export default {
   mixins: [ source ],
   props,
+  computed,
   methods,
   watch,
   stubVNode: {
@@ -104,11 +116,18 @@ export default {
 }
 
 function createFeature (plainFeature) {
-  plainFeature.properties || (plainFeature.properties = {})
-  plainFeature.properties = {
-    ...plainFeature.properties,
-    layer: this.layer.id
-  }
+  // plainFeature.properties || (plainFeature.properties = {})
+  // plainFeature.properties = {
+  //   ...plainFeature.properties,
+  //   layer: this.layer.id
+  // }
 
-  return featureHelper.createFeature(plainFeature, this.projection)
+  const feature = featureHelper.createFeature(plainFeature, this.currentProjection)
+  Object.defineProperty(feature, 'layer', {
+    enumerable: true,
+    configurable: true,
+    get: () => this.layer
+  })
+
+  return feature
 }

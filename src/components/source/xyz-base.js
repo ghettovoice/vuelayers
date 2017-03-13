@@ -4,17 +4,18 @@ import tileSource from 'vl-components/source/tile-base'
 const methods = {
   createSource () {
     return new ol.source.XYZ({
-      attributions: this.attributions,
+      attributions: this.currentAttributions,
       tileUrlFunction: this.createTileUrlFunction(),
       crossOrigin: this.crossOrigin,
-      projection: this.projection,
-      tileGrid: this.createTileGrid(),
-      tilePixelRatio: this.tilePixelRatio,
-      minZoom: this.minZoom,
-      maxZoom: this.maxZoom,
+      projection: this.currentProjection,
+      tileGrid: this.tileGrid,
+      tilePixelRatio: this.currentTilePixelRatio,
+      minZoom: this.currentMinZoom,
+      maxZoom: this.currentMaxZoom,
       wrapX: this.wrapX,
       opaque: this.opaque,
-      cacheSize: this.cacheSize
+      cacheSize: this.cacheSize,
+      reprojectionErrorThreshold: this.reprojectionErrorThreshold
     })
   }
 }

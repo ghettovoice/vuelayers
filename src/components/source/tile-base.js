@@ -33,41 +33,75 @@ const props = {
   maxZoom: {
     type: Number,
     default: olConsts.MAX_ZOOM
+  },
+  reprojectionErrorThreshold: {
+    type: Number,
+    default: 0.5
   }
 }
 
 const computed = {
+  currentTileSize () {
+    return this.tileSize
+  },
+  currentTilePixelRatio () {
+    return this.tilePixelRatio
+  },
+  currentMinZoom () {
+    return this.minZoom
+  },
+  currentMaxZoom () {
+    return this.maxZoom
+  },
   urlTokens () {
     return []
   }
 }
 
+const { initialize: sourceInitialize } = source.methods
+
 const methods = {
+  initialize () {
+    // prepare tile grid and tile grid extent to use it in source / url function /... creation
+    this.createTileGrid()
+    this::sourceInitialize()
+  },
   /**
    * @return {ol.tilegrid.TileGrid}
    * @protected
    */
   createTileGrid () {
-    return ol.tilegrid.createXYZ({
-      extent: ol.proj.get(this.projection).getExtent(),
-      minZoom: this.minZoom,
-      maxZoom: this.maxZoom,
-      tileSize: this.tileSize
+    /**
+     * @type {ol.Extent}
+     * @protected
+     */
+    this.tileGridExtent = ol.proj.get(this.currentProjection).getExtent()
+    /**
+     * @type {ol.tileGrid.TileGrid}
+     * @protected
+     */
+    this.tileGrid = ol.tilegrid.createXYZ({
+      extent: this.tileGridExtent,
+      minZoom: this.currentMinZoom,
+      maxZoom: this.currentMaxZoom,
+      tileSize: this.currentTileSize
     })
+
+    return this.tileGrid
   },
   /**
    * @return {ol.TileUrlFunction}
    * @protected
    */
   createTileUrlFunction () {
-    return createTileUrlFunction(this.replaceUrlTokens())
+    return createTileUrlFunction(this.replaceUrlTokens(), this.tileGrid, this.tileGridExtent)
   },
   /**
    * @return {string}
    * @protected
    */
   replaceUrlTokens () {
-    return replaceTokens(this.url, pick(this.urlTokens, this))
+    return replaceTokens(this.currentUrl, pick(this.urlTokens, this))
   }
 }
 

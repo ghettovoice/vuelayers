@@ -1,11 +1,15 @@
 <script>
   import xyzSource from 'vl-components/source/xyz-base'
-  import { coalesce } from 'vl-utils/func'
+  import { coalesce, constant } from 'vl-utils/func'
+  import { consts as olConsts } from 'vl-ol'
+
+  export const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
+  export const MAPBOX_ATTRIBUTIONS = '© <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
 
   const props = {
     url: {
       type: String,
-      default: 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
+      default: MAPBOX_URL_TEMPLATE
     },
     accessToken: {
       type: String,
@@ -17,7 +21,7 @@
     },
     attributions: {
       type: String,
-      default: '© <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
+      default: MAPBOX_ATTRIBUTIONS
     },
     tileFormat: {
       type: String,
@@ -26,6 +30,9 @@
   }
 
   const computed = {
+    // bind to constant values: projection and tile size
+    currentProjection: constant(olConsts.MAP_PROJECTION),
+    currentTileSize: constant([ olConsts.TILE_SIZE, olConsts.TILE_SIZE ]),
     tileNameSuffix () {
       return tileNameSuffix(this.tilePixelRatio)
     },
@@ -69,6 +76,4 @@
   }
 </script>
 
-<style>
-  /* stub style  */
-</style>
+<style>/* stub style  */</style>

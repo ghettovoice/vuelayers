@@ -12,7 +12,7 @@ export function createFeature (geoJson = {}, featureProjection = MAP_PROJECTION)
     type: 'Feature',
     properties: cleanProperties(geoJson.properties || {})
   }, {
-    featureProjection: MAP_PROJECTION
+    featureProjection: featureProjection
   })
   feature.plain = function (featureProjection = MAP_PROJECTION) {
     return plainFeature(this, featureProjection)

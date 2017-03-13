@@ -132,6 +132,10 @@ map:
     path: components/source/source
     alias: vl-components/source/source
 
+  - name: mixins/source-vector
+    path: components/source/vector-base
+    alias: vl-components/source/vector-base
+
   - name: mixins/source-tile
     path: components/source/tile-base
     alias: vl-components/source/tile-base
@@ -140,11 +144,19 @@ map:
     path: components/source/xyz-base
     alias: vl-components/source/xyz-base
 
-  - name: mixins/source-vector
-    path: components/source/vector-base
-    alias: vl-components/source/vector-base
+  - name: mixins/source-wms
+    path: components/source/wms-base
+    alias: vl-components/source/wms-base
 
   # components
+  - name: source-vector
+    path: components/source/vector
+    alias: vl-components/source/vector
+
+  - name: source-xyz
+    path: components/source/xyz
+    alias: vl-components/source/xyz
+
   - name: source-mapbox
     path: components/source/mapbox
     alias: vl-components/source/mapbox
@@ -153,13 +165,9 @@ map:
     path: components/source/osm
     alias: vl-components/source/osm
 
-  - name: source-vector
-    path: components/source/vector
-    alias: vl-components/source/vector
-
-  - name: source-xyz
-    path: components/source/xyz
-    alias: vl-components/source/xyz
+  - name: source-wms
+    path: components/source/wms
+    alias: vl-components/source/wms
 
 #############################################################################
 #   STYLE

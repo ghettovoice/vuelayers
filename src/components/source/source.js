@@ -5,7 +5,7 @@ import { consts as olConsts } from 'vl-ol'
 import { warn } from 'vl-utils/debug'
 
 const props = {
-  attributions: String,
+  attributions: [ String, Array ],
   url: String,
   projection: {
     type: String,
@@ -16,6 +16,18 @@ const props = {
     default: true
   },
   logo: String
+}
+
+const computed = {
+  currentUrl () {
+    return this.url
+  },
+  currentProjection () {
+    return this.projection
+  },
+  currentAttributions () {
+    return this.attributions
+  }
 }
 
 const methods = {
@@ -67,6 +79,7 @@ export default {
   mixins: [ rxSubs, vmBind, stubVNode ],
   inject: [ 'layer' ],
   props,
+  computed,
   methods,
   watch,
   stubVNode: {
