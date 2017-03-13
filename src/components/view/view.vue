@@ -188,17 +188,20 @@
    */
   function subscribeToViewChanges () {
     const viewChanges = Observable.combineLatest(
-      Observable.fromOlEvent(this.view, 'change:center'),
-      Observable.fromOlEvent(this.view, 'change:zoom'),
-      Observable.fromOlEvent(this.view, 'change:rotation')
+      Observable.of(this.view.getCenter())
+        .merge(Observable.fromOlEvent(this.view, 'change:center', () => this.view.getCenter())),
+      Observable.of(this.view.getZoom())
+        .merge(Observable.fromOlEvent(this.view, 'change:resolution', () => this.view.getZoom())),
+      Observable.of(this.view.getRotation())
+        .merge(Observable.fromOlEvent(this.view, 'change:rotation', () => this.view.getRotation()))
     ).throttleTime(1000)
       .distinctUntilChanged((a, b) => isEqual(a, b))
-      .map(() => {
-        const center = ol.proj.toLonLat(this.view.getCenter(), this.projection)
-        const zoom = Math.ceil(this.view.getZoom())
-        const rotation = this.view.getRotation()
-
-        return { center, zoom, rotation }
+      .map(([ center, zoom, rotation ]) => {
+        return {
+          center: ol.proj.toLonLat(center, this.projection),
+          zoom: Math.ceil(this.view.getZoom()),
+          rotation
+        }
       })
 
     this.rxSubs.viewChanges = viewChanges.subscribe(

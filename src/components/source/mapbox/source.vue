@@ -3,8 +3,8 @@
   import { coalesce, constant } from 'vl-utils/func'
   import { consts as olConsts } from 'vl-ol'
 
-  export const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
-  export const MAPBOX_ATTRIBUTIONS = '© <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
+  const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
+  const MAPBOX_ATTRIBUTIONS = '© <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
 
   const props = {
     url: {
