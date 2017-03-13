@@ -66,8 +66,8 @@
     name: 'vl-style-func',
     mixins: [ style, styleTarget ],
     inject: {
-      setStyle: 'parentSetStyle',
-      getStyle: 'parentGetStyle'
+      parentSetStyle: 'setStyle',
+      parentGetStyle: 'getStyle'
     },
     props,
     methods,
