@@ -78,30 +78,22 @@
     /**
      * @param {Object} plainFeature
      * @param {string|number} plainFeature.id
-     * @param {string|number} plainFeature.layer
      */
-    select ({ id, layer }) {
+    select ({ id }) {
       if (!this.map || this.selectedIds.includes(id)) return
 
       const selection = this.interaction.getFeatures()
       let feature
 
       if (id) {
-        if (layer) {
-          let layer = this.map.getLayers().getArray().find(layer => layer.id === layer)
-          if (layer) {
-            feature = layer.getSource().getFeatureById(id)
-          }
-        } else {
-          const layers = this.map.getLayers()
-            .getArray()
-            .filter(layer => layer instanceof ol.layer.Vector)
+        const layers = this.map.getLayers()
+          .getArray()
+          .filter(layer => layer instanceof ol.layer.Vector)
 
-          forEach(layer => {
-            feature = layer.getSource().getFeatureById(id)
-            return !feature
-          }, layers)
-        }
+        forEach(layer => {
+          feature = layer.getSource().getFeatureById(id)
+          return !feature
+        }, layers)
       }
 
       feature && selection.push(feature)
