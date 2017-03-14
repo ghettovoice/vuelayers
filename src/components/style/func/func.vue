@@ -41,7 +41,7 @@
     mountStyle () {
       let currentStyle = this.getStyle()
       if (currentStyle && process.env.NODE_ENV !== 'production') {
-        warn('Style target already has defined style. Avoid use of multiple vl-style-func or' +
+        warn('Style target already has defined style. Avoid use of multiple vl-style-func or ' +
              'combining vl-style-func and vl-style-container components on the same level')
       }
 
@@ -70,6 +70,7 @@
     name: 'vl-style-func',
     mixins: [ style, styleTarget ],
     inject: [ 'setStyle', 'getStyle' ],
+    provide: false, // reset provide from style target mixin
     stubVNode: {
       empty: false,
       attrs () {

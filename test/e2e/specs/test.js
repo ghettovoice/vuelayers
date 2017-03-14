@@ -12,6 +12,7 @@ module.exports = {
       .url(devServer)
       .waitForElementVisible('#app', 3000)
       .assert.elementPresent('.vl-map')
+      .assert.elementPresent('.vl-map .ol-viewport canvas')
       .end()
   }
 }
