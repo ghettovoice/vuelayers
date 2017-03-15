@@ -19,7 +19,9 @@ import {
   rangeStep,
   random,
   map as lodashMap,
-  filter as lodashFilter
+  filter as lodashFilter,
+  get,
+  set
 } from 'lodash/fp'
 
 // lodash re-exports
@@ -44,11 +46,15 @@ export {
   kebabCase,
   range,
   rangeStep,
-  random
+  random,
+  get,
+  set
 }
 
 export const diffById = differenceWith((a, b) => a.id === b.id)
 export const idMatchFilter = id => x => x.id === id
+
+export const noop = () => {}
 
 /**
  * @param {*} value

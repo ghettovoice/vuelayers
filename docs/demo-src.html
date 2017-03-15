@@ -1,0 +1,300 @@
+<h2>Demo source code</h2>
+
+<h3>HTML</h3>
+
+<pre><code class="xml">&lt;vl-map&gt;
+  &lt;vl-view :center=&quot;center&quot; :zoom=&quot;zoom&quot; :rotation=&quot;rotation&quot; @change=&quot;updateMapView&quot;/&gt;
+  &lt;vl-geoloc @change=&quot;updateGeoloc&quot;/&gt;
+
+  &lt;!-- interactions --&gt;
+  &lt;vl-interaction-select ref=&quot;select&quot; :selected=&quot;selected&quot; @select=&quot;select&quot; @unselect=&quot;unselect&quot;
+                         :filter=&quot;selectFilter&quot;&gt;
+    &lt;vl-style-func :factory=&quot;selectStyleFunc&quot;&gt;
+      &lt;!-- fallback style --&gt;
+      &lt;vl-style-container&gt;
+        &lt;vl-style-stroke color=&quot;#f03b20&quot; :width=&quot;3&quot;/&gt;
+        &lt;vl-style-fill :color=&quot;[254, 178, 76, 0.7]&quot;/&gt;
+      &lt;/vl-style-container&gt;
+      &lt;!--// fallback style --&gt;
+    &lt;/vl-style-func&gt;
+  &lt;/vl-interaction-select&gt;
+  &lt;!--// interactions --&gt;
+
+  &lt;!-- base layers --&gt;
+  &lt;vl-layer-tile id=&quot;osm&quot; :visible=&quot;layers.osm&quot;&gt;
+    &lt;vl-source-osm/&gt;
+  &lt;/vl-layer-tile&gt;
+
+  &lt;vl-layer-tile id=&quot;mapbox&quot; :visible=&quot;layers.mapbox&quot;&gt;
+    &lt;vl-source-mapbox map-id=&quot;ghettovoice.nbm2olb0&quot;
+                      access-token=&quot;pk.eyJ1IjoiZ2hldHRvdm9pY2UiLCJhIjoiMzMxYzMyMWQ3NTgzMTU4Nzk3ZTNmMmI3MmQ1NmVhMjgifQ._erAEzdvdB0jfYXXqzOJCg&quot;/&gt;
+  &lt;/vl-layer-tile&gt;
+  &lt;!--// base layers --&gt;
+
+  &lt;!-- Tile WMS --&gt;
+  &lt;vl-layer-tile id=&quot;wms&quot; :visible=&quot;layers.wms&quot;&gt;
+    &lt;vl-source-wms url=&quot;https://ahocevar.com/geoserver/wms&quot; layers=&quot;topp:states&quot;
+                   :ext-params=&quot;{ TILED: true }&quot; server-type=&quot;geoserver&quot; /&gt;
+  &lt;/vl-layer-tile&gt;
+  &lt;!--// Tile WMS --&gt;
+
+  &lt;!-- countries vector --&gt;
+  &lt;vl-layer-vector id=&quot;countries&quot; v-if=&quot;countries.length&quot; :visible=&quot;layers.countries&quot;&gt;
+    &lt;!-- layer level style defined as style function for complex styling  --&gt;
+    &lt;vl-style-func :factory=&quot;countriesStyleFunc&quot;&gt;
+      &lt;!-- fallback styles --&gt;
+      &lt;vl-style-container&gt;
+        &lt;vl-style-stroke color=&quot;#8856a7&quot; :width=&quot;2&quot;/&gt;
+        &lt;vl-style-fill :color=&quot;[158, 188, 218, 0.5]&quot;/&gt;
+      &lt;/vl-style-container&gt;
+      &lt;!--// fallback styles --&gt;
+    &lt;/vl-style-func&gt;
+    &lt;!--// layer level style --&gt;
+
+    &lt;!-- pass features as array for the huge or server loading datasets --&gt;
+    &lt;vl-source-vector :features=&quot;countries&quot;/&gt;
+  &lt;/vl-layer-vector&gt;
+  &lt;!--// countries vector --&gt;
+
+  &lt;!-- pacman, use vl-style-func for advanced styling --&gt;
+  &lt;vl-layer-vector id=&quot;pacman&quot; v-if=&quot;pacman.length&quot; :visible=&quot;layers.pacman&quot;&gt;
+    &lt;vl-style-func :factory=&quot;pacmanStyleFunc&quot;/&gt;
+
+    &lt;vl-source-vector&gt;
+      &lt;vl-feature v-for=&quot;feature in pacman&quot; :key=&quot;feature.id&quot; :id=&quot;feature.id&quot; :data=&quot;feature.properties&quot;&gt;
+        &lt;component :is=&quot;geometryTypeToCompName(feature.geometry.type)&quot; :coordinates=&quot;feature.geometry.coordinates&quot;/&gt;
+      &lt;/vl-feature&gt;
+    &lt;/vl-source-vector&gt;
+  &lt;/vl-layer-vector&gt;
+  &lt;!--// pacman --&gt;
+
+  &lt;!-- current position overlay --&gt;
+  &lt;vl-layer-vector v-if=&quot;position.length&quot; id=&quot;my-position&quot; :z-index=&quot;100&quot; :overlay=&quot;true&quot;&gt;
+    &lt;vl-style-container&gt;
+      &lt;vl-style-icon src=&quot;static/img/marker.png&quot; :scale=&quot;0.3&quot; :anchor=&quot;[0.5, 1]&quot;/&gt;
+    &lt;/vl-style-container&gt;
+
+    &lt;vl-source-vector&gt;
+      &lt;vl-feature id=&quot;my-position&quot; :z-index=&quot;999&quot;&gt;
+        &lt;vl-geom-point :coordinates=&quot;position&quot;/&gt;
+      &lt;/vl-feature&gt;
+    &lt;/vl-source-vector&gt;
+  &lt;/vl-layer-vector&gt;
+  &lt;!--// current position overlay --&gt;
+&lt;/vl-map&gt;
+
+&lt;div class=&quot;controls&quot;&gt;
+  &lt;button v-for=&quot;layer in [&apos;osm&apos;, &apos;mapbox&apos;, &apos;countries&apos;, &apos;pacman&apos;, &apos;wms&apos;]&quot; :key=&quot;layer&quot; @click=&quot;toggleLayer(layer)&quot;&gt;
+    Toggle layer {{ layer }}
+  &lt;/button&gt;
+
+  &lt;hr /&gt;
+  Center: {{ center.map(x =&gt; parseFloat(x.toPrecision(6))) }} Zoom: {{ zoom }} Rotation {{ rotation }}&lt;br /&gt;
+  My position: {{ position.map(x =&gt; parseFloat(x.toPrecision(6))) }}&lt;br /&gt;
+  Current selection: {{ selectedIds }}
+&lt;/div&gt;</code></pre>
+
+<h3>JavaScript</h3>
+
+<pre><code class="javascript jsx">  import &apos;whatwg-fetch&apos;
+import { kebabCase, forEach, get, set } from &apos;vl-utils/func&apos;
+
+const computed = {
+  selectedIds () {
+    return this.selected.map(({ id }) =&gt; id)
+  }
+}
+
+const methods = {
+  geometryTypeToCompName (type) {
+    return &apos;vl-geom-&apos; + kebabCase(type)
+  },
+  updateMapView ({ center, zoom, rotation }) {
+    this.center = center
+    this.zoom = zoom
+    this.rotation = rotation
+  },
+  updateGeoloc ({ position }) {
+    this.position = position
+  },
+  select (plainFeature) {
+    const i = this.selectedIds.indexOf(plainFeature.id)
+    if (i === -1) {
+      this.selected.push(plainFeature)
+    }
+  },
+  unselect ({ id }) {
+    const i = this.selectedIds.indexOf(id)
+    if (i !== -1) {
+      this.selected.splice(i, 1)
+    }
+  },
+  async loadData () {
+    const res = await fetch(&apos;https://openlayers.org/en/latest/examples/data/geojson/countries.geojson&apos;)
+    const geomCollection = await res.json()
+    this.countries = geomCollection.features.map((feature, i) =&gt; {
+      feature.properties = {
+        ...feature.properties,
+        color: i % 2 === 0 ? [ 49, 163, 84, 0.35 ] : [ 166, 100, 255, 0.35 ],
+        selectColor: (i + 1) % 2 !== 0 ? [ 221, 28, 119, 0.5 ] : undefined
+      }
+
+      return feature
+    })
+
+    return this.countries
+  },
+  selectStyleFunc (ol, styleHelper) {
+    const styleName = &apos;select&apos;
+    const styleByFeature = {}
+    const self = this
+
+    return function __selectStyleFunc ({ id, properties }, resolution, layer) {
+      if (properties.selectColor) {
+        let styles = get([ id, styleName ], styleByFeature)
+        if (!styles) {
+          styles = [
+            new ol.style.Style({
+              stroke: new ol.style.Stroke({
+                color: &apos;#8856a7&apos;,
+                width: 4
+              }),
+              fill: new ol.style.Fill({
+                color: properties.selectColor
+              })
+            })
+          ]
+
+          set([ id, styleName ], styles, styleByFeature)
+
+          return styles
+        }
+      }
+    }
+  },
+  countriesStyleFunc (ol, styleHelper) {
+    const stroke = new ol.style.Stroke({
+      color: &apos;#8856a7&apos;,
+      width: 1
+    })
+    const styleName = &apos;default&apos;
+    const styleByFeature = {}
+    const self = this
+
+    return function __countriesStyleFunc ({ id, properties }) {
+      let styles = get([ id, styleName ], styleByFeature)
+      if (!styles) {
+        styles = [
+          new ol.style.Style({
+            stroke: stroke,
+            fill: new ol.style.Fill({
+              color: properties.color
+            })
+          })
+        ]
+
+        set([ id, styleName ], styles, styleByFeature)
+      }
+
+      return styles
+    }
+  },
+  pacmanStyleFunc (ol, styleHelper) {
+    const pacman = [
+      new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          color: &apos;#DE9147&apos;,
+          width: 3
+        }),
+        fill: new ol.style.Fill({
+          color: [ 222, 189, 36, 0.8 ]
+        })
+      })
+    ]
+    const path = [
+      new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          color: &apos;blue&apos;,
+          width: 1
+        })
+      }),
+      new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 5,
+          fill: new ol.style.Fill({
+            color: &apos;orange&apos;
+          })
+        }),
+        geometry (feature) {
+          return new ol.geom.MultiPoint(feature.getGeometry().getCoordinates())
+        }
+      })
+    ]
+    const eye = [
+      new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 6,
+          fill: new ol.style.Fill({
+            color: &apos;#444444&apos;
+          })
+        })
+      })
+    ]
+
+    return function __pacmanStyleFunc (feature) {
+      switch (feature.id) {
+        case &apos;pacman&apos;:
+          return pacman
+        case &apos;pacman-path&apos;:
+          return path
+        case &apos;pacman-eye&apos;:
+          return eye
+      }
+    }
+  },
+  toggleLayer (layer) {
+    this.layers[ layer ] = !this.layers[ layer ]
+  },
+  selectFilter (feature, layer) {
+    return layer &amp;&amp; [ &apos;my-position&apos;, &apos;pacman&apos; ].indexOf(layer) === -1
+  }
+}
+
+const watch = {
+  sourceCode (value) {
+    if (value) {
+      this.$nextTick(() =&gt; {
+        forEach(::highlight.highlightBlock, this.$refs.sourceCode.querySelectorAll(&apos;pre &gt; code&apos;))
+      })
+    }
+  }
+}
+
+export default {
+  name: &apos;app&apos;,
+  computed,
+  watch,
+  methods,
+  data () {
+    return {
+      zoom: 2,
+      center: [ 0, 0 ],
+      rotation: 0,
+      selected: [],
+      countries: [],
+      pacman: require(&apos;../static/pacman.geojson&apos;).features,
+      position: [],
+      layers: {
+        osm: false,
+        mapbox: true,
+        countries: true,
+        pacman: false,
+        wms: false
+      }
+    }
+  },
+  created () {
+    this.loadData()
+      .catch(::console.error)
+  }
+}</code></pre>

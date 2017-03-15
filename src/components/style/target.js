@@ -25,7 +25,7 @@ export default {
       const styleTarget = this.styleTarget()
 
       if (styleTarget) {
-        if (this.styles != null) {
+        if (this.styles === null || this.styles) {
           styleTarget.setStyle(createStyleFunc(this))
         } else {
           styleTarget.setStyle(undefined)
@@ -40,19 +40,16 @@ export default {
 
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
-    if (isEmpty(vm.styles)) return
-
     const plainFeature = feature.plain()
     if (!plainFeature.geometry) return
 
     const layer = feature.layer || {}
+    let styles = vm.styles
 
-    if (isFunction(vm.styles)) {
-      return vm.styles(feature, resolution)
-    }
-
-    if (Array.isArray(vm.styles)) {
-      return flow(
+    if (isFunction(styles)) {
+      styles = styles(feature, resolution)
+    } else if (Array.isArray(styles)) {
+      styles = flow(
         filter(({ style, condition }) => {
           return condition == null ||
                  (isBoolean(condition) && condition) ||
@@ -62,10 +59,13 @@ export function createStyleFunc (vm) {
                  )
         }),
         map(({ style }) => style)
-      )(vm.styles)
+      )(styles)
     }
 
-    if (vm.defaultStyles != null) {
+    // null style
+    if (styles === null || !isEmpty(styles)) return styles
+
+    if (vm.defaultStyles) {
       return isFunction(vm.defaultStyles)
         ? vm.defaultStyles(feature, resolution)
         : vm.defaultStyles

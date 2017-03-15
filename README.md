@@ -76,10 +76,10 @@ Now you can import only what you need
 
 ```js
 import Vue from 'vue'
-import { Map, MapView, LayerTile, SourceOsm } from 'vuelayers'
+import { Map, View, LayerTile, SourceOsm } from 'vuelayers'
 
 Vue.use(Map)
-Vue.use(MapView)
+Vue.use(View)
 Vue.use(LayerTile)
 Vue.use(SourceOsm)
 

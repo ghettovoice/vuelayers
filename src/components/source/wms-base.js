@@ -10,6 +10,7 @@ const props = {
     required: true
   },
   styles: String, // WMS Request styles
+  extParams: Object, // Additional WMS Request params
   gutter: Number,
   hidpi: Boolean,
   serverType: String
@@ -24,6 +25,9 @@ const computed = {
   },
   currentServerType () {
     return this.serverType
+  },
+  currentExtParams () {
+    return this.extParams
   }
 }
 
@@ -33,6 +37,7 @@ const methods = {
       attributions: this.currentAttributions,
       cacheSize: this.cacheSize,
       params: {
+        ...this.currentExtParams,
         LAYERS: this.currentLayers,
         STYLES: this.currentStyles
       },

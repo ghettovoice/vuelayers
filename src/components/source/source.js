@@ -88,9 +88,12 @@ export default {
     }
   },
   provide () {
-    return {
-      source: () => this.source
-    }
+    return Object.defineProperties(Object.create(null), {
+      source: {
+        enumerable: true,
+        get: () => this.source
+      }
+    })
   },
   created () {
     this.initialize()

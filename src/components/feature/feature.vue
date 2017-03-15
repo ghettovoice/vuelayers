@@ -89,7 +89,9 @@
     },
     destroyed () {
       this.$nextTick(() => {
-        this.source && this.source.removeFeature(this.feature)
+        if (this.source && this.source.getFeatureById(this.feature.getId())) {
+          this.source.removeFeature(this.feature)
+        }
         delete this.feature.layer
         this.feature = undefined
       })
