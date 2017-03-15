@@ -96,6 +96,7 @@
       // custom provide of setStyle / getStyle methods to mirror style target between
       // real style target (layer, feature) and style container
       // defined here because Vue starts checking of provided key from self instance
+      // todo rewrite without using Vue internals
       this._provided = {
         setStyle: ::this.setFallbackStyle,
         getStyle: ::this.getFallbackStyle

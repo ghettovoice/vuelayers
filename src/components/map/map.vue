@@ -45,8 +45,7 @@
      * Trigger focus on map container.
      */
     focus () {
-      this.$el.tabIndex = 0
-      this.$el.focus()
+      this.$refs.map.focus()
     }
   }
 
