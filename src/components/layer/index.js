@@ -7,6 +7,6 @@ export LayerTile from './tile'
 
 export const mixins = {
   layer,
-  layerTileBase,
-  layerVectorBase
+  layerTile: layerTileBase,
+  layerVector: layerVectorBase
 }

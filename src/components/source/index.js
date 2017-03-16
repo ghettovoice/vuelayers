@@ -12,8 +12,8 @@ export SourceWms from './wms'
 
 export const mixins = {
   source,
-  sourceVectorBase,
-  sourceTileBase,
-  sourceXyzBase,
-  sourceWmsBase
+  sourceVector: sourceVectorBase,
+  sourceTile: sourceTileBase,
+  sourceXyz: sourceXyzBase,
+  sourceWms: sourceWmsBase
 }
