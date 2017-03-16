@@ -1,7 +1,7 @@
 /* global PKG_VERSION, PKG_FULLNAME */
 /**
  * VueLayers
- * Vue components to work with OpenLayers 3.
+ * Vue components to work with OpenLayers.
  *
  * @author Vladimir Vershinin <ghettovoice@gmail.com>
  * @license MIT

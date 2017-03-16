@@ -1,5 +1,5 @@
 /**
- * OpenLayers 3 helpers and constants
+ * OpenLayers helpers and constants
  */
 import ol from 'openlayers'
 

@@ -3,7 +3,7 @@ import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce, isNumeric, 
 import * as consts from './consts'
 
 // Style helpers (get from geo-1.1)
-// todo change to ol3 default
+// todo change to ol default
 /**
  * @typedef {Object} GeoStyle
  *

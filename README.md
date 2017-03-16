@@ -9,6 +9,7 @@
 [![NPM version](https://img.shields.io/npm/v/vuelayers.svg)](https://www.npmjs.com/package/vuelayers)
 [![License](https://img.shields.io/github/license/ghettovoice/vuelayers.svg)](https://github.com/ghettovoice/vuelayers/blob/master/LICENSE)
 [![Dependencies](https://img.shields.io/david/ghettovoice/vuelayers.svg)](https://david-dm.org/ghettovoice/vuelayers)
+[![Dev dependencies](https://img.shields.io/david/dev/ghettovoice/vuelayers.svg)](https://david-dm.org/ghettovoice/vuelayers?type=dev)
 
 **[Demo](https://ghettovoice.github.io/vuelayers/)**
 
