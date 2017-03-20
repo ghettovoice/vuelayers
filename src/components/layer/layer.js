@@ -33,6 +33,24 @@ const props = {
   }
 }
 
+const computed = {
+  currentId () {
+    return this.id
+  },
+  currentMinResolution () {
+    return this.minResolution
+  },
+  currentMaxResolution () {
+    return this.maxResolution
+  },
+  currentExtent () {
+    return this.extent
+  },
+  currentOpacity () {
+    return this.opacity
+  }
+}
+
 const methods = {
   /**
    * Updates layer state
@@ -47,10 +65,11 @@ const methods = {
      */
     this.layer = this.createLayer()
     this.bindSelfTo(this.layer)
+    this.layer.set('id', this.currentId)
     Object.defineProperty(this.layer, 'id', {
       enumerable: true,
       configurable: true,
-      get: () => this.id
+      get: () => this.currentId
     })
   },
   /**
@@ -91,13 +110,16 @@ const methods = {
 }
 
 const watch = {
-  maxResolution (value) {
+  currentId (value) {
+    return this.layer.set('id', value)
+  },
+  currentMaxResolution (value) {
     this.layer.setMaxResolution(value)
   },
-  minResolution (value) {
+  currentMinResolution (value) {
     this.layer.setMinResolution(value)
   },
-  opacity (value) {
+  currentOpacity (value) {
     this.layer.setOpacity(value)
   },
   visible (value) {
@@ -112,12 +134,13 @@ export default {
   mixins: [ rxSubs, vmBind, stubVNode ],
   inject: [ 'map' ],
   props,
+  computed,
   methods,
   watch,
   stubVNode: {
     attrs () {
       return {
-        id: [ this.$options.name, this.id ].join('-')
+        id: [ this.$options.name, this.currentId ].join('-')
       }
     }
   },

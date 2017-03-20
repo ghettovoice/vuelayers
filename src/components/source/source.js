@@ -6,7 +6,6 @@ import { warn } from 'vl-utils/debug'
 
 const props = {
   attributions: [ String, Array ],
-  url: String,
   projection: {
     type: String,
     default: olConsts.MAP_PROJECTION
@@ -67,10 +66,10 @@ const methods = {
 }
 
 const watch = {
-  attributions (value) {
+  currentAttributions (value) {
     this.source.setAttributions(value)
   },
-  projection (value) {
+  currentProjection (value) {
     // todo recreate source?
   }
 }

@@ -19,14 +19,13 @@ const props = {
 const methods = {
   createLayer () {
     return new ol.layer.Vector({
-      id: this.id,
-      minResolution: this.minResolution,
-      maxResolution: this.maxResolution,
-      opacity: this.opacity,
+      id: this.currentId,
+      minResolution: this.currentMinResolution,
+      maxResolution: this.currentMaxResolution,
+      opacity: this.currentOpacity,
       visible: this.visible,
       preload: this.preload,
-      projection: this.projection,
-      extent: this.extent,
+      extent: this.currentExtent,
       zIndex: this.zIndex,
       updateWhileAnimating: this.updateWhileAnimating,
       updateWhileInteracting: this.updateWhileInteracting

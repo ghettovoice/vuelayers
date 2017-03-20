@@ -20,6 +20,9 @@ const props = {
 const computed = {
   currentLoader () {
     return this.loader
+  },
+  currentFeatures () {
+    return this.features
   }
 }
 
@@ -72,8 +75,8 @@ const methods = {
   mountSource () {
     this::sourceMountSource()
 
-    if (this.features.length) {
-      this.source.addFeatures(this.features.map(this::createFeature))
+    if (this.currentFeatures.length) {
+      this.source.addFeatures(this.currentFeatures.map(this::createFeature))
     }
   },
   unmountSource () {
@@ -83,7 +86,10 @@ const methods = {
 }
 
 const watch = {
-  features (value, oldValue) {
+  currentLoader () {
+    // todo
+  },
+  currentFeatures (value, oldValue) {
     let forAdd = diffById(value, oldValue)
     let forRemove = diffById(oldValue, value)
 
@@ -116,12 +122,6 @@ export default {
 }
 
 function createFeature (plainFeature) {
-  // plainFeature.properties || (plainFeature.properties = {})
-  // plainFeature.properties = {
-  //   ...plainFeature.properties,
-  //   layer: this.layer.id
-  // }
-
   const feature = featureHelper.createFeature(plainFeature, this.currentProjection)
   Object.defineProperty(feature, 'layer', {
     enumerable: true,

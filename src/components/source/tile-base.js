@@ -105,9 +105,28 @@ const methods = {
   }
 }
 
+const watch = {
+  currentUrl () {
+    this.source.setTileUrlFunction(this.createTileUrlFunction())
+  },
+  currentTileSize () {
+    this.source.setTileUrlFunction(this.createTileUrlFunction())
+  },
+  currentProjection () {
+    this.source.setTileUrlFunction(this.createTileUrlFunction())
+  },
+  currentMinZoom () {
+    this.source.setTileUrlFunction(this.createTileUrlFunction())
+  },
+  currentMaxZoom () {
+    this.source.setTileUrlFunction(this.createTileUrlFunction())
+  }
+}
+
 export default {
   mixins: [ source ],
   props,
   computed,
-  methods
+  methods,
+  watch
 }
