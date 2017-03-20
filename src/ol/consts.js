@@ -48,3 +48,8 @@ export const GEOMETRY_TYPE = {
   GEOMETRY_COLLECTION: 'GeometryCollection',
   CIRCLE: 'Circle'
 }
+
+/**
+ * @type {string} Default WMS version
+ */
+export const WMS_VERSION = '1.3.0'
