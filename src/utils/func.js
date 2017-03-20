@@ -20,6 +20,8 @@ import {
   random,
   map as lodashMap,
   filter as lodashFilter,
+  mapValues as lodashMapValues,
+  mapKeys as lodashMapKeys,
   get,
   set
 } from 'lodash/fp'
@@ -30,6 +32,8 @@ export const forEach = lodashForEach.convert({ cap: false })
 export const map = lodashMap.convert({ cap: false })
 export const filter = lodashFilter.convert({ cap: false })
 export const merge = lodashMerge.convert({ fixed: false })
+export const mapValues = lodashMapValues.convert({ cap: false })
+export const mapKeys = lodashMapKeys.convert({ cap: false })
 export {
   isFunction,
   isString,

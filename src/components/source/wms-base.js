@@ -1,7 +1,8 @@
 /**
  * Base mixin for WMS sources
  */
-import ol, { consts as olConsts } from 'vl-ol'
+import { omit, mapKeys } from 'vl-utils/func'
+import ol, { consts as olConsts, coord as coordHelper } from 'vl-ol'
 import tileSource from 'vl-components/source/tile-base'
 
 const props = {
@@ -38,13 +39,17 @@ const computed = {
   }
 }
 
+const toUpperCase = x => x.toUpperCase()
+const mapKeysToUpperCase = mapKeys(toUpperCase)
+const cleanExtParams = params => omit(['LAYERS', 'VERSION', 'STYLES'], mapKeysToUpperCase(params))
+
 const methods = {
   createSource () {
     return new ol.source.TileWMS({
       attributions: this.currentAttributions,
       cacheSize: this.cacheSize,
       params: {
-        ...this.currentExtParams,
+        ...cleanExtParams(this.currentExtParams),
         LAYERS: this.currentLayers,
         STYLES: this.currentStyles,
         VERSION: this.currentVersion
@@ -60,6 +65,44 @@ const methods = {
       wrapX: this.wrapX,
       url: this.replaceUrlTokens()
     })
+  },
+  /**
+   * @param {number[]} coordinate Coordinate in EPSG:4326
+   * @param {number} [resolution]
+   * @param {string} [projection]
+   * @param {Object} [params] GetFeatureInfo params. `info_format` at least should be provided.
+   *                          If `query_layers` is not provided then the layers specified in the `layers` prop will be used.
+   *                          `version` should not be specified here (value from `version` prop will be used).
+   * @return {string|undefined}
+   */
+  getGetFeatureInfoUrl (coordinate, resolution = this.view.getResolution(), projection = this.currentProjection, params = {}) {
+    return this.source.getFeatureInfoUrl(
+      coordHelper.pointFromLonLat(coordinate, projection),
+      resolution,
+      projection,
+      cleanExtParams(params)
+    )
+  }
+}
+
+const watch = {
+  currentLayers (value) {
+    this.updateParams({
+      LAYERS: value
+    })
+  },
+  currentVersion (value) {
+    this.updateParams({
+      VERSION: value
+    })
+  },
+  currentStyles (value) {
+    this.updateParams({
+      STYLES: value
+    })
+  },
+  currentExtParams (value) {
+    this.updateParams(cleanExtParams(value))
   }
 }
 
@@ -67,5 +110,6 @@ export default {
   mixins: [ tileSource ],
   props,
   computed,
-  methods
+  methods,
+  watch
 }
