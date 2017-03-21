@@ -1,12 +1,20 @@
 /**
- * OpenLayers helpers and constants
+ * OpenLayers extensions
  */
 import ol from 'openlayers'
+import { merge } from 'vl-utils/func'
+import * as consts from './consts'
+import * as style from './style'
+import * as extent from './extent'
+import * as coordinate from './coordinate'
+import geoJson from './geojson'
+
+merge(ol, {
+  consts,
+  style,
+  coordinate,
+  extent,
+  geoJson
+})
 
 export default ol
-
-export * as consts from './consts'
-export * as helpers from './helpers'
-export * as style from './style'
-export * as coord from './coord'
-export * as feature from './feature'

@@ -1,12 +1,35 @@
+/**
+ * Feature extensions
+ */
 import ol from 'openlayers'
 import { omit, constant } from 'vl-utils/func'
-import { MAP_PROJECTION, DATA_PROJECTION } from './consts'
-
-const geoJsonFormat = new ol.format.GeoJSON({
-  defaultDataProjection: DATA_PROJECTION
-})
+import { MAP_PROJECTION } from './consts'
+import geoJson from './geojson'
 
 export const cleanProperties = omit([ 'geometry' ])
+
+export default class Feature extends ol.Feature {
+  get id () {
+    return this.getId()
+  }
+
+  // noinspection JSMethodCanBeStatic
+  get type () {
+    return 'Feature'
+  }
+
+  get properties () {
+    return cleanProperties(this.getProperties())
+  }
+
+  get geometry () {
+    return this.getGeometry().plain
+  }
+
+  get plain () {
+    return plain(this)
+  }
+}
 
 /**
  * @param {GeoJSONFeature} geoJson
@@ -14,37 +37,11 @@ export const cleanProperties = omit([ 'geometry' ])
  * @return {ol.Feature}
  */
 export function createFeature (geoJson = {}, featureProjection = MAP_PROJECTION) {
-  const feature = geoJsonFormat.readFeature({
+  return geoJson.readFeature({
     ...geoJson,
     type: 'Feature',
-    properties: cleanProperties(geoJson.properties || {})
+    properties: cleanProperties(geoJson.properties)
   }, { featureProjection })
-
-  return Object.defineProperties(feature, {
-    id: {
-      get () {
-        return this.getId()
-      }
-    },
-    type: {
-      get: constant('Feature')
-    },
-    properties: {
-      get () {
-        return cleanProperties(this.getProperties())
-      }
-    },
-    geometry: {
-      get () {
-        return this.getGeometry().plain
-      }
-    },
-    plain: {
-      get () {
-        return plainFeature(this, featureProjection)
-      }
-    }
-  })
 }
 
 /**
@@ -52,6 +49,6 @@ export function createFeature (geoJson = {}, featureProjection = MAP_PROJECTION)
  * @param {ol.ProjectionLike|undefined} [featureProjection=EPSG:3857]
  * @return {GeoJSONFeature}
  */
-export function plainFeature (feature, featureProjection = MAP_PROJECTION) {
-  return geoJsonFormat.writeFeatureObject(feature, { featureProjection })
+export function plain (feature, featureProjection = MAP_PROJECTION) {
+  return geoJson.writeFeatureObject(feature, { featureProjection })
 }

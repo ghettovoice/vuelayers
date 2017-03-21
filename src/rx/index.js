@@ -9,6 +9,10 @@ import 'rxjs/add/operator/throttleTime'
 import 'rxjs/add/operator/debounceTime'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/merge'
-import './from-ol-event'
+import fromOlEvent from './from-ol-event'
+
+Object.assign(Observable, {
+  fromOlEvent
+})
 
 export default Observable

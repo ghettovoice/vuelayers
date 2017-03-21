@@ -47,5 +47,3 @@ export default function fromOlEvent (target, eventName, selector) {
     selector
   )
 }
-
-Observable.fromOlEvent = fromOlEvent
