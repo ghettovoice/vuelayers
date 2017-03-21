@@ -1,7 +1,15 @@
 <script>
-  import ol, { consts as olConsts } from 'vl-ol'
-  import Observable from 'vl-rx'
-  import { isEqual } from 'vl-utils/func'
+  import Geolocation from 'ol/geolocation'
+  import { consts, coordinateHelper } from 'vl-ol'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/observable/combineLatest'
+  import 'rxjs/add/observable/of'
+  import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/merge'
+  import 'vl-rx'
+  import { isEqual } from 'lodash/fp'
   import rxSubs from 'vl-mixins/rx-subs'
   import vmBind from 'vl-mixins/vm-bind'
   import stubVNode from 'vl-mixins/stub-vnode'
@@ -13,7 +21,7 @@
     },
     projection: {
       type: String,
-      default: olConsts.MAP_PROJECTION
+      default: consts.MAP_PROJECTION
     }
   }
 
@@ -71,14 +79,14 @@
   }
 
   /**
-   * @return {ol.Geolocation}
+   * @return {Geolocation}
    */
   function createGeolocApi () {
     /**
-     * @type {ol.Geolocation}
+     * @type {Geolocation}
      * @protected
      */
-    this.geoloc = new ol.Geolocation({
+    this.geoloc = new Geolocation({
       tracking: this.tracking,
       projection: this.projection
     })
@@ -90,18 +98,28 @@
 
   function subscribeToGeolocation () {
     const geolocChanges = Observable.combineLatest(
-      Observable.of()
-        .merge(Observable.fromOlEvent(this.geoloc, 'change:position', () => this.geoloc.getPosition())),
-      Observable.of()
-        .merge(Observable.fromOlEvent(this.geoloc, 'change:accuracy', () => this.geoloc.getAccuracy()))
+      Observable.of(this.geoloc.getPosition())
+        .merge(
+          Observable.fromOlEvent(
+            this.geoloc,
+            'change:position',
+            () => this.geoloc.getPosition()
+          )
+        ),
+      Observable.of(this.geoloc.getAccuracy())
+        .merge(
+          Observable.fromOlEvent(
+            this.geoloc,
+            'change:accuracy',
+            () => this.geoloc.getAccuracy()
+          )
+        )
     ).throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
-      .map(([ position, accuracy ]) => {
-        return {
-          position: ol.proj.toLonLat(this.geoloc.getPosition(), this.projection),
-          accuracy
-        }
-      })
+      .map(([ position, accuracy ]) => ({
+        position: coordinateHelper.pointToLonLat(position, this.projection),
+        accuracy
+      }))
 
     this.subscribeTo(
       geolocChanges,

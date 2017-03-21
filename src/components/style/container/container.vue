@@ -1,11 +1,11 @@
 <script>
   /**
-   * ol.style.Style wrapper.
+   * Style wrapper.
    * Acts as an style container that will be injected into "style" slot inside layer or feature components.
    */
-  import ol from 'vl-ol'
+  import Style from 'ol/style/style'
   import { warn } from 'vl-utils/debug'
-  import { isFunction } from 'vl-utils/func'
+  import { isFunction, isArray } from 'vl-utils/func'
   import style from 'vl-components/style/style'
 
   const props = {
@@ -18,11 +18,11 @@
 
   const methods = {
     /**
-     * @return {ol.style.Style}
+     * @return {Style}
      * @protected
      */
     createStyle () {
-      return new ol.style.Style({
+      return new Style({
         zIndex: this.zIndex,
         fill: this.fill,
         stroke: this.stroke,
@@ -31,7 +31,7 @@
     },
     mountStyle () {
       let currentStyle = this.getStyle() || []
-      if (currentStyle && !Array.isArray(currentStyle)) {
+      if (currentStyle && !isArray(currentStyle)) {
         if (isFunction(currentStyle) && process.env.NODE_ENV !== 'production') {
           warn('Avoid combining vl-style-func and vl-style-container components on the same level ' +
                'because it can lead to the wrong result')
@@ -47,7 +47,7 @@
     },
     unmountStyle () {
       let currentStyle = this.getStyle() || []
-      if (currentStyle && !Array.isArray(currentStyle)) {
+      if (currentStyle && !isArray(currentStyle)) {
         if (isFunction(currentStyle) && process.env.NODE_ENV !== 'production') {
           warn('Style target already has defined style that is not an array. ' +
                'Avoid combining vl-style-func and vl-style-container components on the same level ' +
@@ -56,7 +56,7 @@
         currentStyle = []
       }
 
-      currentStyle = currentStyle.filter(s => s.style !== this.style)
+      currentStyle = currentStyle.filter(x => x.style !== this.style)
       currentStyle.length || (currentStyle = undefined)
       this.setStyle(currentStyle)
     }
@@ -74,7 +74,7 @@
   export default {
     name: 'vl-style-container',
     mixins: [ style ],
-    inject: [ 'setStyle', 'getStyle' ],
+    inject: style.inject.concat([ 'setStyle', 'getStyle' ]),
     props,
     methods,
     watch,
@@ -97,7 +97,7 @@
 
   function setFill (fill) {
     /**
-     * @type {ol.style.Fill}
+     * @type {Fill}
      * @protected
      */
     this.fill = fill
@@ -110,7 +110,7 @@
 
   function setStroke (stroke) {
     /**
-     * @type {ol.style.Stroke}
+     * @type {Stroke}
      * @protected
      */
     this.stroke = stroke
@@ -123,7 +123,7 @@
 
   function setImage (image) {
     /**
-     * @type {ol.style.Image}
+     * @type {Image}
      * @protected
      */
     this.image = image

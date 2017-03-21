@@ -7,8 +7,9 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
-import { omit, merge, forEach } from 'vl-utils/func'
+import { omit, merge } from 'lodash/fp'
 import * as components from './components'
+const forEach = require('lodash/fp/forEach').convert({ cap: false })
 
 const keys = [
   'geom',

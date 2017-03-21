@@ -1,5 +1,7 @@
 <script>
-  import ol, { coord as coordHelper } from 'vl-ol'
+  import PointGeom from 'ol/geom/point'
+  import { constant } from 'vl-utils/func'
+  import { consts } from 'vl-ol'
   import geom from 'vl-components/geom/geom'
 
   const props = {
@@ -10,13 +12,17 @@
     }
   }
 
+  const computed = {
+    type: constant(consts.GEOMETRY_TYPE.POINT)
+  }
+
   const methods = {
     /**
-     * @return {ol.geom.Point}
+     * @return {Point}
      * @protected
      */
     createGeometry () {
-      return new ol.geom.Point(coordHelper.pointFromLonLat(this.coordinates, this.view.getProjection()))
+      return new PointGeom(this.fromLonLat(this.currentCoordinates))
     }
   }
 
@@ -24,10 +30,9 @@
     name: 'vl-geom-point',
     mixins: [ geom ],
     props,
+    computed,
     methods
   }
 </script>
 
-<style>
-  /* stub styles */
-</style>
+<style>/* stub styles */</style>

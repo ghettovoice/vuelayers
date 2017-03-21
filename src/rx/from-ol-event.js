@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/fromEventPattern'
 import 'rxjs/add/observable/merge'
-import { isArray, isPlainObject } from 'vl-utils/func'
+import { isArray, isPlainObject } from 'lodash/fp'
 
 /**
  * Creates an Observable using OpenLayers event pattern that emits events of a specific type

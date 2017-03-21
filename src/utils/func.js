@@ -1,75 +1,10 @@
-import {
-  reduce as lodashReduce,
-  forEach as lodashForEach,
-  isFunction,
-  isString,
-  isBoolean,
-  isEmpty,
-  isEqual,
-  isObject,
-  isPlainObject,
-  flow,
-  pick,
-  omit,
-  upperFirst,
-  lowerFirst,
-  merge as lodashMerge,
-  constant,
-  differenceWith,
-  kebabCase,
-  range,
-  rangeStep,
-  random,
-  map as lodashMap,
-  filter as lodashFilter,
-  mapValues as lodashMapValues,
-  mapKeys as lodashMapKeys,
-  get,
-  set,
-  remove as lodashRemove,
-  first,
-  last
-} from 'lodash/fp'
-
-// lodash re-exports
-export const reduce = lodashReduce.convert({ cap: false })
-export const forEach = lodashForEach.convert({ cap: false })
-export const map = lodashMap.convert({ cap: false })
-export const filter = lodashFilter.convert({ cap: false })
-export const merge = lodashMerge.convert({ fixed: false })
-export const mapValues = lodashMapValues.convert({ cap: false })
-export const mapKeys = lodashMapKeys.convert({ cap: false })
-export const remove = lodashRemove.convert({ cap: false })
-export {
-  isFunction,
-  isString,
-  isBoolean,
-  isEmpty,
-  isEqual,
-  isObject,
-  isPlainObject,
-  flow,
-  pick,
-  omit,
-  upperFirst,
-  lowerFirst,
-  constant,
-  differenceWith,
-  kebabCase,
-  range,
-  rangeStep,
-  random,
-  get,
-  set,
-  first,
-  last
-}
+import { differenceWith } from 'lodash/fp'
 
 export const diffById = differenceWith((a, b) => a.id === b.id)
 export const idMatchFilter = id => x => x.id === id
-
 export const noop = () => {}
 export const identity = x => x
+export const constant = x => () => x
 
 /**
  * @param {*} value
@@ -85,6 +20,10 @@ export function isNumeric (value) {
  */
 export function isArray (value) {
   return Array.isArray(value)
+}
+
+export function isFunction (value) {
+  return typeof value === 'function'
 }
 
 /**

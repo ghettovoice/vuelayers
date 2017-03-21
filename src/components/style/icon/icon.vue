@@ -1,5 +1,5 @@
 <script>
-  import ol from 'vl-ol'
+  import Icon from 'ol/style/icon'
   import imageStyle from 'vl-components/style/image'
 
   const props = {
@@ -64,11 +64,11 @@
 
   const methods = {
     /**
-     * @return {ol.style.Icon}
+     * @return {Icon}
      * @protected
      */
     createStyle () {
-      return new ol.style.Icon({
+      return new Icon({
         anchor: this.anchor,
         anchorOrigin: this.anchorOrigin,
         anchorXUnits: this.anchorXUnits,

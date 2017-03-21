@@ -1,8 +1,8 @@
 /**
  * Provide method to add to some object `$vm` getter.
  */
-import { remove } from 'vl-utils/func'
-
+import { remove } from 'lodash/fp'
+// todo remove this shit later
 export default {
   methods: {
     /**

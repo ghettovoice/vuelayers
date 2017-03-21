@@ -1,8 +1,9 @@
 /**
  * Base mixin for WMS sources
  */
-import { omit, mapKeys } from 'vl-utils/func'
-import ol, { consts as olConsts, coord as coordHelper } from 'vl-ol'
+import TileWmsSource from 'ol/source/tilewms'
+import { omit } from 'lodash/fp'
+import { consts, coordinateHelper } from 'vl-ol'
 import tileSource from 'vl-components/source/tile-base'
 
 const props = {
@@ -39,13 +40,13 @@ const computed = {
   }
 }
 
-const toUpperCase = x => x.toUpperCase()
-const mapKeysToUpperCase = mapKeys(toUpperCase)
-const cleanExtParams = params => omit(['LAYERS', 'VERSION', 'STYLES'], mapKeysToUpperCase(params))
+const upperCase = x => x.toUpperCase()
+const keysToUpperCase = x => Object.keys(x).map(upperCase)
+const cleanExtParams = params => omit(['LAYERS', 'VERSION', 'STYLES'], keysToUpperCase(params))
 
 const methods = {
   createSource () {
-    return new ol.source.TileWMS({
+    return new TileWmsSource({
       attributions: this.currentAttributions,
       cacheSize: this.cacheSize,
       params: {
@@ -75,7 +76,12 @@ const methods = {
    *                          `version` should not be specified here (value from `version` prop will be used).
    * @return {string|undefined}
    */
-  getGetFeatureInfoUrl (coordinate, resolution = this.view.getResolution(), projection = this.currentProjection, params = {}) {
+  getGetFeatureInfoUrl (
+    coordinate,
+    resolution = this.view.getResolution(),
+    projection = this.currentProjection,
+    params = {}
+  ) {
     return this.source.getFeatureInfoUrl(
       coordHelper.pointFromLonLat(coordinate, projection),
       resolution,

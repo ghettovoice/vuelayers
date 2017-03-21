@@ -1,11 +1,20 @@
-import ol from 'openlayers'
-import { flow, pick, upperFirst, lowerFirst, isEmpty, merge, reduce, isNumeric, isString } from 'vl-utils/func'
-import * as consts from './consts'
-
-// Style helpers (get from geo-1.1)
-// todo change to ol default
 /**
- * @typedef {Object} GeoStyle
+ * Style helpers
+ */
+import ol from 'openlayers'
+import Style from 'ol/style/style'
+import Fill from 'ol/style/fill'
+import Stroke from 'ol/style/stroke'
+import Circle from 'ol/style/circle'
+import Icon from 'ol/style/icon'
+import RegularShape from 'ol/style/regularshape'
+import Text from 'ol/style/text'
+import { isEmpty, upperFirst, lowerFirst, flow, pick, isString } from 'lodash/fp'
+import { isNumeric } from 'vl-utils/func'
+const reduce = require('lodash/fp/reduce').convert({ cap: false })
+
+/**
+ * @typedef {Object} VlStyle
  *
  * Shared
  * @property {string|number[]|undefined} fillColor
@@ -43,133 +52,90 @@ import * as consts from './consts'
  * @property {number|undefined} iconPoints
  * @property {number|undefined} iconAngle
  * @property {number|undefined} iconOpacity
- * @property {ol.style.IconOrigin | undefined} iconAnchorOrigin
- * @property {ol.Color | string | undefined} iconColor
- * @property {ol.style.IconOrigin | undefined} iconOffsetOrigin
+ * @property {IconOrigin | undefined} iconAnchorOrigin
+ * @property {Color | string | undefined} iconColor
+ * @property {IconOrigin | undefined} iconOffsetOrigin
  */
-export function getDefaultStyleHash () {
-  const default_ = {
-    fillColor: [ 255, 255, 255, 0.7 ],
-    strokeColor: [ 30, 54, 133, 1 ],
-    strokeWidth: 2,
-    strokeCap: 'round',
-    strokeJoin: 'round',
-    iconRadius: 7,
-    textStrokeColor: [ 30, 54, 133, 1 ],
-    textFillColor: [ 30, 54, 133, 1 ],
-    textFont: 'sans-serif',
-    textFontSize: 12,
-    textStrokeWidth: 1
-  }
 
-  const select = {
-    ...default_,
-    fillColor: [ 255, 255, 255, 0.8 ],
-    strokeColor: [ 255, 121, 1, 1 ],
-    textFillColor: [ 255, 121, 1, 1 ],
-    textStrokeColor: [ 255, 121, 1, 1 ],
-    zIndex: 1
-  }
-
-  const cluster = {
-    ...default_,
-    text: '<%= item.clusterSize %>',
-    iconUrl: null,
-    iconImg: null,
-    iconPoints: null,
-    iconRadius: 20,
-    textFontSize: 14,
-    zIndex: 1
-  }
-
-  const modify = {
-    ...default_,
-    fillColor: [ 255, 255, 255, 0.8 ],
-    strokeColor: '#FF1E23',
-    zIndex: 1
-  }
-
-  const current = {
-    ...default_,
-    fillColor: [ 27, 226, 23, 0.8 ],
-    strokeColor: [ 14, 118, 11, 1 ],
-    strokeWidth: 4,
-    zIndex: 1
-  }
-
-  return {
-    default: [ { ...default_ } ],
-    select: [ { ...select } ],
-    cluster: [ { ...cluster } ],
-    remove: null,
-    modify: [ { ...modify } ],
-    current: [ { ...current } ]
-  }
+/**
+ * @return {VlStyle[]}
+ */
+export function defaultStyle () {
+  return [ {
+    fillColor: [ 255, 255, 255, 0.4 ],
+    strokeColor: '#3399CC',
+    strokeWidth: 1.25,
+    iconRadius: 5
+  } ]
 }
 
 /**
- * @param {Object<string, GeoStyle[]>} styleHash
- * @return {Object<string, ol.style.Style[]>}
- * @function
+ * @return {Object<consts.GEOMETRY_TYPE, Array<VlStyle>>}
  */
-export function transformStyleHash (styleHash) {
-  const transformer = reduce((olStyleHash, geoStyles, styleName) => {
-    if (geoStyles && geoStyles.length) {
-      const olStyle = geoStyles.map(transformStyle)
+export function defaultEditStyle () {
+  /** @type {Object<consts.GEOMETRY_TYPE, Array<VlStyle>>} */
+  let styles = {}
+  let white = [ 255, 255, 255, 1 ]
+  let blue = [ 0, 153, 255, 1 ]
+  let width = 3
 
-      if (!isEmpty(olStyle)) {
-        olStyleHash[ styleName ] = olStyle
-      }
-    }
+  styles[ consts.GEOMETRY_TYPE.LINE_STRING ] = [ {
+    strokeColor: white,
+    strokeWidth: width + 2
+  }, {
+    strokeColor: blue,
+    strokeWidth: width
+  } ]
+  styles[ consts.GEOMETRY_TYPE.MULTI_LINE_STRING ] =
+    styles[ consts.GEOMETRY_TYPE.LINE_STRING ]
 
-    return olStyleHash
-  }, Object.create(null))
+  styles[ consts.GEOMETRY_TYPE.POLYGON ] = [ {
+    fillColor: [ 255, 255, 255, 0.5 ]
+  } ].concat(styles[ consts.GEOMETRY_TYPE.LINE_STRING ])
+  styles[ consts.GEOMETRY_TYPE.MULTI_POLYGON ] =
+    styles[ consts.GEOMETRY_TYPE.POLYGON ]
 
-  return transformer(styleHash)
+  styles[ consts.GEOMETRY_TYPE.CIRCLE ] =
+    styles[ consts.GEOMETRY_TYPE.POLYGON ].concat(
+      styles[ consts.GEOMETRY_TYPE.LINE_STRING ]
+    )
+
+  styles[ consts.GEOMETRY_TYPE.POINT ] = [ {
+    iconRadius: width * 2,
+    fillColor: blue,
+    strokeColor: white,
+    strokeWidth: width / 2,
+    zIndex: Infinity
+  } ]
+  styles[ consts.GEOMETRY_TYPE.MULTI_POINT ] =
+    styles[ consts.GEOMETRY_TYPE.POINT ]
+
+  styles[ consts.GEOMETRY_TYPE.GEOMETRY_COLLECTION ] =
+    styles[ consts.GEOMETRY_TYPE.POLYGON ].concat(
+      styles[ consts.GEOMETRY_TYPE.LINE_STRING ],
+      styles[ consts.GEOMETRY_TYPE.POINT ]
+    )
+
+  return styles
 }
 
 /**
- * Returns style function for `styleHash` or default style function.
- *
- * @param {Object} [styleHash]
- * @return {ol.StyleFunction}
+ * @param {VlStyle} vlStyle
+ * @return {Style|undefined}
  */
-export function createStyleFunc (styleHash) {
-  styleHash = merge(getDefaultStyleHash(), styleHash)
-
-  // Static pre-compilation
-  const olStyleHash = transformStyleHash(styleHash)
-
-  return (
-    /**
-     * @param {ol.Feature} feature
-     * @return {ol.style.Style[]}
-     */
-    function __styleFunc (feature) {
-      const styleName = feature.get('styleName') || 'default'
-
-      return olStyleHash[ styleName ]
-    }
-  )
-}
-
-/**
- * @param {GeoStyle} geoStyle
- * @return {ol.style.Style|undefined}
- */
-export function transformStyle (geoStyle) {
-  if (isEmpty(geoStyle)) return
+export function transformStyle (vlStyle) {
+  if (isEmpty(vlStyle)) return
 
   const olStyle = {
-    text: transformTextStyle(geoStyle),
-    fill: transformFillStyle(geoStyle),
-    stroke: transformStrokeStyle(geoStyle),
-    image: transformImageStyle(geoStyle),
-    zIndex: geoStyle.zIndex
+    text: transformTextStyle(vlStyle),
+    fill: transformFillStyle(vlStyle),
+    stroke: transformStrokeStyle(vlStyle),
+    image: transformImageStyle(vlStyle),
+    zIndex: vlStyle.zIndex
   }
 
   if (!isEmpty(olStyle)) {
-    return new ol.style.Style(olStyle)
+    return new Style(olStyle)
   }
 }
 
@@ -184,11 +150,11 @@ export function normalizeColorValue (color) {
 }
 
 /**
- * @param {GeoStyle} geoStyle
+ * @param {VlStyle} vlStyle
  * @param {string} [prefix]
- * @returns {ol.style.Fill|undefined}
+ * @returns {Fill|undefined}
  */
-export function transformFillStyle (geoStyle, prefix = '') {
+export function transformFillStyle (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
   const keys = [ 'fillColor' ].map(prefixKey)
 
@@ -210,19 +176,19 @@ export function transformFillStyle (geoStyle, prefix = '') {
     )
   )
 
-  const fillStyle = transform(geoStyle)
+  const fillStyle = transform(vlStyle)
 
   if (!isEmpty(fillStyle)) {
-    return new ol.style.Fill(fillStyle)
+    return new Fill(fillStyle)
   }
 }
 
 /**
- * @param {GeoStyle} geoStyle
+ * @param {VlStyle} vlStyle
  * @param {string} [prefix]
- * @returns {ol.style.Stroke|undefined}
+ * @returns {Stroke|undefined}
  */
-export function transformStrokeStyle (geoStyle, prefix = '') {
+export function transformStrokeStyle (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
   const keys = [ 'strokeColor', 'strokeWidth', 'strokeDash', 'strokeCap', 'strokeJoin' ].map(prefixKey)
 
@@ -253,216 +219,107 @@ export function transformStrokeStyle (geoStyle, prefix = '') {
       {}
     )
   )
-  const strokeStyle = transform(geoStyle)
+
+  const strokeStyle = transform(vlStyle)
 
   if (!isEmpty(strokeStyle)) {
-    return new ol.style.Stroke(strokeStyle)
+    return new Stroke(strokeStyle)
   }
 }
 
 /**
- * @param {GeoStyle} geoStyle
- * @returns {ol.style.Icon|ol.style.Circle|ol.style.RegularShape|undefined}
+ * @param {VlStyle} vlStyle
+ * @returns {Icon|Circle|RegularShape|undefined}
  */
-export function transformImageStyle (geoStyle) {
+export function transformImageStyle (vlStyle) {
   if (
-    isEmpty(geoStyle.iconUrl) && isEmpty(geoStyle.iconImg) &&
-    isEmpty(geoStyle.iconPoints) && !isNumeric(geoStyle.iconRadius)
+    isEmpty(vlStyle.iconUrl) && isEmpty(vlStyle.iconImg) &&
+    isEmpty(vlStyle.iconPoints) && !isNumeric(vlStyle.iconRadius)
   ) {
     return
   }
 
-  let imageStyle
+  let imageStyle, Ctor
 
-  if (!isEmpty(geoStyle.iconUrl) || !isEmpty(geoStyle.iconImg)) {
+  if (!isEmpty(vlStyle.iconUrl) || !isEmpty(vlStyle.iconImg)) {
+    Ctor = Icon
     // then create ol.style.Icon options
     imageStyle = {
-      ...geoStyle,
-      ...{
-        type: 'icon',
-        anchor: geoStyle.iconAnchor,
-        anchorOrigin: geoStyle.iconAnchorOrigin,
-        color: geoStyle.iconColor,
-        offset: geoStyle.iconOffset,
-        offsetOrigin: geoStyle.iconOffsetOrigin,
-        opacity: geoStyle.iconOpacity,
-        scale: geoStyle.iconScale,
-        rotation: geoStyle.iconRotation,
-        size: geoStyle.iconSize,
-        imgSize: geoStyle.iconImgSize,
-        src: geoStyle.iconUrl,
-        crossOrigin: 'anonymous'
-      }
+      ...vlStyle,
+      anchor: vlStyle.iconAnchor,
+      anchorOrigin: vlStyle.iconAnchorOrigin,
+      color: vlStyle.iconColor,
+      offset: vlStyle.iconOffset,
+      offsetOrigin: vlStyle.iconOffsetOrigin,
+      opacity: vlStyle.iconOpacity,
+      scale: vlStyle.iconScale,
+      rotation: vlStyle.iconRotation,
+      size: vlStyle.iconSize,
+      imgSize: vlStyle.iconImgSize,
+      src: vlStyle.iconUrl,
+      crossOrigin: 'anonymous'
     }
-  } else if (geoStyle.iconPoints != null) {
+  } else if (vlStyle.iconPoints != null) {
+    Ctor = RegularShape
     // create ol.style.RegularShape options
     imageStyle = {
-      ...geoStyle,
-      ...{
-        type: 'shape',
-        points: geoStyle.iconPoints,
-        radius: geoStyle.iconRadius,
-        radius1: geoStyle.iconRadius1,
-        radius2: geoStyle.iconRadius2,
-        angle: geoStyle.iconAngle,
-        rotation: geoStyle.iconRotation
-      }
+      ...vlStyle,
+      points: vlStyle.iconPoints,
+      radius: vlStyle.iconRadius,
+      radius1: vlStyle.iconRadius1,
+      radius2: vlStyle.iconRadius2,
+      angle: vlStyle.iconAngle,
+      rotation: vlStyle.iconRotation
     }
   } else {
+    Ctor = Circle
     // create ol.style.Circle options
     imageStyle = {
-      ...geoStyle,
-      ...{
-        type: 'circle',
-        radius: geoStyle.iconRadius
-      }
+      ...vlStyle,
+      radius: vlStyle.iconRadius
     }
   }
 
   imageStyle = {
     ...imageStyle,
-    fill: transformFillStyle(geoStyle, 'icon') || transformFillStyle(geoStyle),
-    stroke: transformStrokeStyle(geoStyle, 'icon') || transformStrokeStyle(geoStyle),
+    fill: transformFillStyle(vlStyle, 'icon') || transformFillStyle(vlStyle),
+    stroke: transformStrokeStyle(vlStyle, 'icon') || transformStrokeStyle(vlStyle),
     snapToPixel: true
   }
 
   if (!isEmpty(imageStyle)) {
-    return new ol.style[ upperFirst(imageStyle.type) ](imageStyle)
+    return new Ctor(imageStyle)
   }
 }
 
 /**
- * @param {GeoStyle} geoStyle
- * @returns {ol.style.Text|undefined}
+ * @param {VlStyle} vlStyle
+ * @returns {Text|undefined}
  */
-export function transformTextStyle (geoStyle) {
+export function transformTextStyle (vlStyle) {
   // noinspection JSValidateTypes
-  if (geoStyle.text == null) {
+  if (vlStyle.text == null) {
     return
   }
 
   const textStyle = {
-    text: geoStyle.text
+    text: vlStyle.text
   }
 
-  let fontSize = geoStyle.textFontSize ? geoStyle.textFontSize + 'px' : undefined
-  let font = [ 'normal', fontSize, geoStyle.textFont ].filter(x => !!x).join(' ')
+  let fontSize = vlStyle.textFontSize ? vlStyle.textFontSize + 'px' : undefined
+  let font = [ 'normal', fontSize, vlStyle.textFont ].filter(x => !!x).join(' ')
 
   Object.assign(
     textStyle,
-    pick([ 'textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign' ])(geoStyle),
+    pick([ 'textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign' ])(vlStyle),
     {
       font,
-      fill: transformFillStyle(geoStyle, 'text') || transformFillStyle(geoStyle),
-      stroke: transformStrokeStyle(geoStyle, 'text') || transformStrokeStyle(geoStyle)
+      fill: transformFillStyle(vlStyle, 'text') || transformFillStyle(vlStyle),
+      stroke: transformStrokeStyle(vlStyle, 'text') || transformStrokeStyle(vlStyle)
     }
   )
 
   if (!isEmpty(textStyle)) {
-    return new ol.style.Text(textStyle)
+    return new Text(textStyle)
   }
-}
-
-/**
- * Default OpenLayers styles
- *
- * @return {ol.style.Style[]}
- * @see {@link https://github.com/openlayers/openlayers/blob/master/src/ol/style/style.js#L290}
- */
-export function defaultStyle () {
-  // We don't use an immediately-invoked function
-  // and a closure so we don't get an error at script evaluation time in
-  // browsers that do not support Canvas. (ol.style.Circle does
-  // canvas.getContext('2d') at construction time, which will cause an.error
-  // in such browsers.)
-  const fill = new ol.style.Fill({
-    color: 'rgba(255,255,255,0.4)'
-  })
-  const stroke = new ol.style.Stroke({
-    color: '#3399CC',
-    width: 1.25
-  })
-  return [
-    new ol.style.Style({
-      image: new ol.style.Circle({
-        fill: fill,
-        stroke: stroke,
-        radius: 5
-      }),
-      fill: fill,
-      stroke: stroke
-    })
-  ]
-}
-
-/**
- * Default OpenLayers edit style.
- *
- * @return {Object.<consts.GEOMETRY_TYPE, Array.<ol.style.Style>>}
- * @see {@link https://github.com/openlayers/openlayers/blob/master/src/ol/style/style.js#L324}
- */
-export function defaultEditStyle () {
-  /** @type {Object.<consts.GEOMETRY_TYPE, Array.<ol.style.Style>>} */
-  let styles = {}
-  let white = [ 255, 255, 255, 1 ]
-  let blue = [ 0, 153, 255, 1 ]
-  let width = 3
-
-  styles[ consts.GEOMETRY_TYPE.LINE_STRING ] = [
-    new ol.style.Style({
-      stroke: new ol.style.Stroke({
-        color: white,
-        width: width + 2
-      })
-    }),
-    new ol.style.Style({
-      stroke: new ol.style.Stroke({
-        color: blue,
-        width: width
-      })
-    })
-  ]
-  styles[ consts.GEOMETRY_TYPE.MULTI_LINE_STRING ] =
-    styles[ consts.GEOMETRY_TYPE.LINE_STRING ]
-
-  styles[ consts.GEOMETRY_TYPE.POLYGON ] = [
-    new ol.style.Style({
-      fill: new ol.style.Fill({
-        color: [ 255, 255, 255, 0.5 ]
-      })
-    })
-  ].concat(styles[ consts.GEOMETRY_TYPE.LINE_STRING ])
-  styles[ consts.GEOMETRY_TYPE.MULTI_POLYGON ] =
-    styles[ consts.GEOMETRY_TYPE.POLYGON ]
-
-  styles[ consts.GEOMETRY_TYPE.CIRCLE ] =
-    styles[ consts.GEOMETRY_TYPE.POLYGON ].concat(
-      styles[ consts.GEOMETRY_TYPE.LINE_STRING ]
-    )
-
-  styles[ consts.GEOMETRY_TYPE.POINT ] = [
-    new ol.style.Style({
-      image: new ol.style.Circle({
-        radius: width * 2,
-        fill: new ol.style.Fill({
-          color: blue
-        }),
-        stroke: new ol.style.Stroke({
-          color: white,
-          width: width / 2
-        })
-      }),
-      zIndex: Infinity
-    })
-  ]
-  styles[ consts.GEOMETRY_TYPE.MULTI_POINT ] =
-    styles[ consts.GEOMETRY_TYPE.POINT ]
-
-  styles[ consts.GEOMETRY_TYPE.GEOMETRY_COLLECTION ] =
-    styles[ consts.GEOMETRY_TYPE.POLYGON ].concat(
-      styles[ consts.GEOMETRY_TYPE.LINE_STRING ],
-      styles[ consts.GEOMETRY_TYPE.POINT ]
-    )
-
-  return styles
 }

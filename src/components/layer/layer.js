@@ -60,20 +60,15 @@ const methods = {
   },
   initialize () {
     /**
-     * @type {ol.layer.Layer}
+     * @type {Layer}
      * @protected
      */
     this.layer = this.createLayer()
     this.bindSelfTo(this.layer)
-
-    Object.defineProperty(this.layer, 'id', {
-      enumerable: true,
-      configurable: true,
-      get: () => this.currentId
-    })
+    this.layer.set('id', this.currentId)
   },
   /**
-   * @return {ol.layer.Layer}
+   * @return {Layer}
    * @protected
    */
   createLayer () {
@@ -161,7 +156,6 @@ export default {
   destroyed () {
     this.$nextTick(() => {
       this.unmountLayer()
-      delete this.layer.id
       this.layer = undefined
     })
   }

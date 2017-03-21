@@ -17,6 +17,7 @@
       <w>positionchange</w>
       <w>positionchanged</w>
       <w>reprojection</w>
+      <w>singleclick</w>
       <w>viewchanged</w>
       <w>virt</w>
       <w>vnode</w>

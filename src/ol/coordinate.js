@@ -1,14 +1,14 @@
 /**
  * Coordinate extensions
  */
-import ol from 'openlayers'
+import { fromLonLat, toLonLat } from 'ol/proj'
 import { MAP_PROJECTION, GEOMETRY_TYPE } from './consts'
 
 export function pointToLonLat (coordinate, projection = MAP_PROJECTION) {
-  return ol.proj.toLonLat(coordinate, projection)
+  return toLonLat(coordinate, projection)
 }
 export function pointFromLonLat (coordinate, projection = MAP_PROJECTION) {
-  return ol.proj.fromLonLat(coordinate, projection)
+  return fromLonLat(coordinate, projection)
 }
 
 export function lineToLonLat (coordinates, projection = MAP_PROJECTION) {
@@ -46,7 +46,7 @@ export function multiPolygonFromLonLat (coordinates, projection = MAP_PROJECTION
   return coordinates.map(polygon => polygonFromLonLat(polygon, projection))
 }
 
-export default {
+export const transforms = {
   [ GEOMETRY_TYPE.POINT ]: {
     toLonLat: pointToLonLat,
     fromLonLat: pointFromLonLat

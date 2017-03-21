@@ -1,6 +1,6 @@
 import style from 'vl-components/style/style'
 
-const styleRefresh = style.methods.refresh
+const { refresh: styleRefresh } = style.methods
 const methods = {
   /**
    * @protected
@@ -24,7 +24,7 @@ const methods = {
 
 export default {
   mixins: [ style ],
-  inject: [ 'setImage' ],
+  inject: style.inject.concat([ 'setImage' ]),
   methods,
   stubVNode: {
     empty: false,

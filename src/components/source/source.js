@@ -1,14 +1,14 @@
 import rxSubs from 'vl-mixins/rx-subs'
 import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
-import { consts as olConsts } from 'vl-ol'
+import { consts } from 'vl-ol'
 import { warn } from 'vl-utils/debug'
 
 const props = {
   attributions: [ String, Array ],
   projection: {
     type: String,
-    default: olConsts.MAP_PROJECTION
+    default: consts.MAP_PROJECTION
   },
   wrapX: {
     type: Boolean,
@@ -32,14 +32,14 @@ const methods = {
    */
   initialize () {
     /**
-     * @type {ol.source.Source}
+     * @type {Source}
      * @protected
      */
     this.source = this.createSource()
     this.bindSelfTo(this.source)
   },
   /**
-   * @return {ol.source.Source}
+   * @return {Source}
    * @protected
    */
   createSource () {

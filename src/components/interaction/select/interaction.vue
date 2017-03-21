@@ -1,7 +1,11 @@
 <script>
-  import ol, { style as styleHelper } from 'vl-ol'
-  import Observable from 'vl-rx'
-  import { forEach, constant, diffById } from 'vl-utils/func'
+  import SelectInteraction from 'ol/interaction/select'
+  import VectorLayer from 'ol/layer/vector'
+  import { styleHelper, geoJson } from 'vl-ol'
+  import { Observable } from 'rxjs/Observable'
+  import 'vl-rx'
+  import { forEach } from 'lodash/fp'
+  import { constant, diffById } from 'vl-utils/func'
   import interaction from 'vl-components/interaction/interaction'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
 
@@ -27,7 +31,7 @@
 
   const computed = {
     selectedIds () {
-      return this.currentSelected.map(feature => feature.id)
+      return this.currentSelected.map(x => x.id)
     }
   }
 
@@ -46,7 +50,7 @@
       this::subscribeToInteractionChanges()
     },
     /**
-     * @return {ol.interaction.Select}
+     * @return {Select}
      * @protected
      */
     createInteraction () {
@@ -60,10 +64,10 @@
 
       const filterFunc = this.filter
       const filter = function __selectFilter (feature, layer) {
-        return filterFunc(feature, layer, ol)
+        return filterFunc(geoJson.write(feature, this.view.getProjection()), layer && layer.get('id'))
       }
 
-      return new ol.interaction.Select({
+      return new SelectInteraction({
         multi: this.multi,
         wrapX: this.wrapX,
         filter,
@@ -75,8 +79,8 @@
       this::interactionRefresh()
     },
     /**
-     * @param {Object} plainFeature
-     * @param {string|number} plainFeature.id
+     * @param {Object} geoJsonFeature
+     * @param {string|number} geoJsonFeature.id
      */
     select ({ id }) {
       if (!this.map || this.selectedIds.includes(id)) return
@@ -85,12 +89,12 @@
       let feature
 
       if (id) {
-        const layers = this.map.getLayers()
-          .getArray()
-          .filter(layer => layer instanceof ol.layer.Vector)
+        const layers = this.map.getLayers().getArray()
 
         forEach(layer => {
-          feature = layer.getSource().getFeatureById(id)
+          if (layer instanceof VectorLayer) {
+            feature = layer.getSource().getFeatureById(id)
+          }
           return !feature
         }, layers)
       }
@@ -98,15 +102,15 @@
       feature && selection.push(feature)
     },
     /**
-     * @param {Object} plainFeature
-     * @param {string|number} plainFeature.id
+     * @param {Object} geoJsonFeature
+     * @param {string|number} geoJsonFeature.id
      */
     unselect ({ id }) {
       if (!this.map || !this.selectedIds.includes(id)) return
 
       const selection = this.interaction.getFeatures()
       const selectionArray = selection.getArray()
-      const idx = selectionArray.findIndex(feature => feature.id === id)
+      const idx = selectionArray.findIndex(x => x.id === id)
 
       if (idx !== -1) {
         selection.removeAt(idx)
@@ -148,7 +152,7 @@
   export default {
     name: 'vl-interaction-select',
     mixins: [ interaction, styleTarget ],
-    inject: [ 'map' ],
+    inject: [ 'map', 'view' ],
     props,
     computed,
     methods,
@@ -175,14 +179,14 @@
     const selection = this.interaction.getFeatures()
 
     this.subscribeTo(
-      Observable.fromOlEvent(selection, 'add', evt => evt.element.plain),
+      Observable.fromOlEvent(selection, 'add', ({ element }) => geoJson.write(element, this.view.getProjection())),
       feature => {
         this.currentSelected.push(feature)
         this.$emit('select', feature)
       }
     )
     this.subscribeTo(
-      Observable.fromOlEvent(selection, 'remove', evt => evt.element.plain),
+      Observable.fromOlEvent(selection, 'remove', ({ element }) => geoJson.write(element, this.view.getProjection())),
       feature => {
         this.currentSelected = this.currentSelected.filter(({ id }) => id !== feature.id)
         this.$emit('unselect', feature)

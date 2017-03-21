@@ -1,4 +1,7 @@
-import ol, { coord as coordHelper, feature as featureHelper } from 'vl-ol'
+import VectorSource from 'ol/source/vector'
+import loadingStrategy from 'ol/loadingstrategy'
+import { merge } from 'lodash/fp'
+import { extentHelper, geoJson, consts } from 'vl-ol'
 import { diffById } from 'vl-utils/func'
 import source from 'vl-components/source/source'
 
@@ -39,12 +42,12 @@ const methods = {
   sourceLoader () {
     if (!this.currentLoader) return
 
-    const loader = this.currentLoader.bind(this)
+    const loader = this::currentLoader
     const self = this
 
     return async function __loader (extent, resolution, projection) {
       projection = projection.getCode()
-      extent = coordHelper.extentToLonLat(extent, projection)
+      extent = extentHelper.toLonLat(extent, projection)
 
       const features = await Promise.resolve(loader(extent, resolution, projection))
 
@@ -61,14 +64,14 @@ const methods = {
     }
   },
   createSource () {
-    return new ol.source.Vector({
+    return new VectorSource({
       attributions: this.currentAttributions,
       projection: this.currentProjection,
       loader: this.sourceLoader(),
       useSpatialIndex: this.useSpatialIndex,
       wrapX: this.wrapX,
       logo: this.logo,
-      strategy: ol.loadingstrategy.bbox
+      strategy: loadingStrategy.bbox
       // url: this.url,
     })
   },
@@ -97,12 +100,12 @@ const watch = {
     let forRemove = diffById(oldValue, value)
 
     this.source.addFeatures(forAdd.map(this::createFeature))
-    forRemove.map(plainFeature => {
-      const feature = this.source.getFeatureById(plainFeature.id)
+    forRemove.map(geoJsonFeature => {
+      const feature = this.source.getFeatureById(geoJsonFeature.id)
 
       if (feature) {
         this.source.removeFeature(feature)
-        delete feature.layer
+        feature.unset(consts.LAYER_PROP)
       }
     })
   }
@@ -124,13 +127,10 @@ export default {
   }
 }
 
-function createFeature (plainFeature) {
-  const feature = featureHelper.createFeature(plainFeature, this.currentProjection)
-  Object.defineProperty(feature, 'layer', {
-    enumerable: true,
-    configurable: true,
-    get: () => this.layer
-  })
-
-  return feature
+function createFeature (geoJsonFeature) {
+  return geoJson.read(merge(geoJsonFeature, {
+    properties: {
+      [ consts.LAYER_PROP ]: this.layer.get('id')
+    }
+  }), this.currentProjection)
 }

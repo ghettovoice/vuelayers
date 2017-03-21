@@ -6,11 +6,13 @@
 </template>
 
 <script>
-  import ol from 'openlayers'
-  import Observable from 'vl-rx'
+  import Map from 'ol/map'
+  import Observable from 'rxjs'
+  import 'vl-rx'
   import vmBind from 'vl-mixins/vm-bind'
   import rxSubs from 'vl-mixins/rx-subs'
-  import { isFunction } from 'vl-utils/func'
+  import { isFunction, isEqual } from 'lodash/fp'
+  import { coordinateHelper } from 'vl-ol'
 
   const props = {
     loadTilesWhileAnimating: {
@@ -54,11 +56,13 @@
     subscribeAll () {
       this::subscribeToMapEvents()
     },
+    // todo work with GeoJSON
     forEachFeatureAtPixel (pixel, cb, layerFilter, hitTolerance) {
       const opts = isFunction(layerFilter) ? { layerFilter, hitTolerance } : layerFilter
 
       return this.map.forEachFeatureAtPixel(pixel, cb, opts)
     },
+    // todo work with GeoJSON
     forEachLayerAtPixel (pixel, cb, layerFilter) {
       return this.map.forEachLayerAtPixel(pixel, cb, undefined, layerFilter)
     },
@@ -105,14 +109,14 @@
   }
 
   /**
-   * @return {ol.Map}
+   * @return {Map}
    */
   function createMap () {
     /**
-     * @type {ol.Map}
+     * @type {Map}
      * @protected
      */
-    this.map = new ol.Map({
+    this.map = new Map({
       layers: [],
       // todo disable all default interaction and controls and use custom if defined, wrap all
 //      interactions: [],
@@ -134,8 +138,13 @@
     this.subscribeTo(
       Observable.fromOlEvent(
         this.map,
-        [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ]
-      ),
+        [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ],
+        ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
+      ).distinctUntilChanged((a, b) => isEqual(a, b))
+        .map(evt => ({
+          ...evt,
+          coordinate: coordinateHelper.pointToLonLat(coordinate, this.view.getProjection())
+        })),
       evt => this.$emit(evt.type, evt)
     )
   }

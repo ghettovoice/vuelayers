@@ -1,7 +1,8 @@
-import ol from 'openlayers'
-import { isEmpty, isFunction, isBoolean, flow, map, filter } from 'vl-utils/func'
+import { isEmpty, isFunction, isBoolean, flow, map, filter, get } from 'lodash/fp'
+import { geoJson, consts } from 'vl-ol'
 
 export default {
+  inject: [ 'view' ],
   provide () {
     return {
       setStyle: ::this.setStyle,
@@ -10,7 +11,7 @@ export default {
   },
   beforeCreate () {
     /**
-     * @type {ol.style.Style[]|ol.StyleFunction|undefined}
+     * @type {Style[]|StyleFunction|undefined}
      */
     this.styles = this.defaultStyles = undefined
   },
@@ -44,9 +45,11 @@ export function createStyleFunc (vm) {
     if (!feature.getGeometry()) return
 
     let styles = vm.styles
+    let geoJsonFeature = geoJson.write(feature, vm.view.getProjection())
+    let layerId = get([ 'properties', consts.LAYER_PROP ], geoJsonFeature)
 
     if (isFunction(styles)) {
-      styles = styles(feature, resolution, feature.layer, ol)
+      styles = styles(geoJsonFeature, resolution, layerId)
     } else if (Array.isArray(styles)) {
       styles = flow(
         filter(({ style, condition }) => {
@@ -54,10 +57,10 @@ export function createStyleFunc (vm) {
                  (isBoolean(condition) && condition) ||
                  (
                    isFunction(condition) &&
-                   condition(feature, resolution, feature.layer, ol)
+                   condition(geoJsonFeature, resolution, layerId)
                  )
         }),
-        map(({ style }) => style)
+        map('style')
       )(styles)
     }
     // null style
@@ -65,7 +68,7 @@ export function createStyleFunc (vm) {
 
     if (vm.defaultStyles) {
       return isFunction(vm.defaultStyles)
-        ? vm.defaultStyles(feature, resolution, feature.layer, ol)
+        ? vm.defaultStyles(geoJsonFeature, resolution, layerId)
         : vm.defaultStyles
     }
   }

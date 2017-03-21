@@ -1,5 +1,5 @@
 <script>
-  import ol from 'vl-ol'
+  import Fill from 'ol/style/fill'
   import style from 'vl-components/style/style'
 
   const props = {
@@ -8,11 +8,11 @@
 
   const methods = {
     /**
-     * @return {ol.style.Fill}
+     * @return {Fill}
      * @protected
      */
     createStyle () {
-      return new ol.style.Fill({
+      return new Fill({
         color: this.color
       })
     },

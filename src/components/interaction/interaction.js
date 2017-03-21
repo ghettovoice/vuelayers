@@ -11,14 +11,14 @@ const methods = {
    */
   initialize () {
     /**
-     * @type {ol.interaction.Interaction}
+     * @type {Interaction}
      * @protected
      */
     this.interaction = this.createInteraction()
     this.bindSelfTo(this.interaction)
   },
   /**
-   * @return {ol.interaction.Interaction}
+   * @return {Interaction}
    * @protected
    */
   createInteraction () {

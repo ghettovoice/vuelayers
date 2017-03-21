@@ -7,7 +7,7 @@
   import vmBind from 'vl-mixins/vm-bind'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
-  import { feature as featureHelper } from 'vl-ol'
+  import { geoJson, consts } from 'vl-ol'
 
   const props = {
     id: {
@@ -30,11 +30,7 @@
     mountFeature () {
       if (this.source) {
         this.source.addFeature(this.feature)
-
-        Object.defineProperty(this.feature, 'layer', {
-          configurable: true,
-          get: () => this.layer
-        })
+        this.feature.set(consts.LAYER_PROP, this.layer.get('id'))
       } else if (process.env.NODE_ENV !== 'production') {
         warn("Invalid usage of feature component, should have source component among it's ancestors")
       }
@@ -42,7 +38,7 @@
     unmountFeature () {
       if (this.source && this.source.getFeatureById(this.id)) {
         this.source.removeFeature(this.feature)
-        delete this.feature.layer
+        this.feature.unset(consts.LAYER_PROP)
       }
     }
   }
@@ -52,7 +48,7 @@
       this.feature.setId(value)
     },
     properties (value) {
-      this.feature.setProperties(featureHelper.cleanProperties(value))
+      this.feature.setProperties(geoJson.cleanProperties(value))
     }
   }
 
@@ -108,7 +104,7 @@
      * @type {ol.Feature}
      * @protected
      */
-    this.feature = featureHelper.createFeature({
+    this.feature = geoJson.read({
       id: this.id,
       properties: this.properties
     }, this.view.getProjection())
@@ -119,4 +115,4 @@
   }
 </script>
 
-<style>/* stub style  */</style>
+<style>/* stub style */</style>

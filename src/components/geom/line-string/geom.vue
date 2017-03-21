@@ -1,5 +1,7 @@
 <script>
-  import ol, { coord as coordHelper } from 'vl-ol'
+  import LineStringGeom from 'ol/geom/linestring'
+  import { constant } from 'lodash/fp'
+  import { consts } from 'vl-ol'
   import geom from 'vl-components/geom/geom'
 
   const props = {
@@ -10,9 +12,13 @@
     }
   }
 
+  const computed = {
+    type: constant(consts.GEOMETRY_TYPE.LINE_STRING)
+  }
+
   const methods = {
     createGeometry () {
-      return new ol.geom.LineString(coordHelper.lineFromLonLat(this.coordinates, this.view.getProjection()))
+      return new LineStringGeom(this.fromLonLat(this.currentCoordinates))
     }
   }
 
@@ -20,6 +26,7 @@
     name: 'vl-geom-line-string',
     mixins: [ geom ],
     props,
+    computed,
     methods
   }
 </script>

@@ -1,7 +1,8 @@
 /**
  * Renders stub VNode for component.
  */
-import { isFunction, isString, reduce } from 'vl-utils/func'
+import { isFunction, isString } from 'lodash/fp'
+const reduce = require('lodash/fp/reduce').convert({ cap: false })
 
 export default {
   render (h) {

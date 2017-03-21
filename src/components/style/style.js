@@ -12,14 +12,14 @@ const methods = {
    */
   initialize () {
     /**
-     * @type {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text}
+     * @type {Style|Image|Fill|Stroke|Text}
      * @protected
      */
     this.style = this.createStyle()
     this.bindSelfTo(this.style)
   },
   /**
-   * @return {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text}
+   * @return {Style|Image|Fill|Stroke|Text}
    * @protected
    */
   createStyle () {
@@ -47,6 +47,7 @@ const methods = {
 
 export default {
   mixins: [ vmBind, stubVNode ],
+  inject: [ 'view' ],
   methods,
   stubVNode: {
     empty () {

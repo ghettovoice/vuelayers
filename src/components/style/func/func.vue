@@ -4,11 +4,12 @@
    * Plays the role of both a style that mounts itself to style target (layer, feature & etc.)
    * and style target for inner style containers.
    */
-  import ol, { style as styleHelper } from 'vl-ol'
+  import { isEmpty } from 'lodash/fp'
+  import { isFunction, noop } from 'vl-utils/func'
+  import { styleHelper, geoJson, consts } from 'vl-ol'
   import style from 'vl-components/style/style'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
-  import { isEmpty, isFunction, noop } from 'vl-utils/func'
 
   const props = {
     factory: {
@@ -26,7 +27,7 @@
       // fallback style function made from inner style containers
       const fallbackStyleFunc = createStyleFunc(this)
       // user provided style function
-      let providedStyleFunc = this.factory(ol, styleHelper)
+      let providedStyleFunc = this.factory(styleHelper)
       if (!isFunction(providedStyleFunc)) {
         if (process.env.NODE_ENV !== 'production') {
           let type = typeof providedStyleFunc
@@ -35,8 +36,14 @@
         providedStyleFunc = noop
       }
 
+      const view = this.view
+
       return function __styleFunc (feature, resolution) {
-        const styles = providedStyleFunc(feature, resolution, feature.layer, ol)
+        const styles = providedStyleFunc(
+          getJson.write(feature, view.getProjection()),
+          resolution,
+          feature.get(consts.LAYER_PROP)
+        )
 
         if (styles === null || !isEmpty(styles)) return styles
 
@@ -74,6 +81,10 @@
     name: 'vl-style-func',
     mixins: [ style, styleTarget ],
     inject: {
+      ...style.inject.reduce((all, value) => ({
+        ...all,
+        [ value ]: value
+      }), {}),
       stSetStyle: 'setStyle',
       stGetStyle: 'getStyle'
     },

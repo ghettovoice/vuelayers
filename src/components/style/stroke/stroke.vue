@@ -1,5 +1,5 @@
 <script>
-  import ol from 'vl-ol'
+  import Stroke from 'ol/style/stroke'
   import style from 'vl-components/style/style'
 
   const props = {
@@ -23,11 +23,11 @@
 
   const methods = {
     /**
-     * @return {ol.style.Stroke}
+     * @return {Stroke}
      * @protected
      */
     createStyle () {
-      return new ol.style.Stroke({
+      return new Stroke({
         color: this.color,
         lineCap: this.lineCap,
         lineJoin: this.lineJoin,
@@ -78,7 +78,7 @@
   export default {
     name: 'vl-style-stroke',
     mixins: [ style ],
-    inject: [ 'setStroke' ],
+    inject: style.inject.concat([ 'setStroke' ]),
     props,
     watch,
     methods

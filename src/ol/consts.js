@@ -1,4 +1,4 @@
-import ol from 'openlayers'
+import Sphere from 'ol/sphere'
 
 /**
  * @type {string} Default map projection.
@@ -36,7 +36,7 @@ export const PIXEL_RATIO = 1
  * @type {number} Earth radius in meters
  */
 export const EARTH_RADIUS = 6378137
-export const WGS84_SPHERE = new ol.Sphere(EARTH_RADIUS)
+export const WGS84_SPHERE = new Sphere(EARTH_RADIUS)
 
 export const GEOMETRY_TYPE = {
   POINT: 'Point',
@@ -53,3 +53,5 @@ export const GEOMETRY_TYPE = {
  * @type {string} Default WMS version
  */
 export const WMS_VERSION = '1.3.0'
+// todo try with Symbol to prevent conflicts with user provided properties
+export const LAYER_PROP = 'layer'

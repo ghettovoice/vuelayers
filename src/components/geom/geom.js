@@ -1,9 +1,16 @@
 // import { isEqual } from 'vl-utils/func'
 // import Observable from 'vl-rx'
+// import { Observable } from 'rxjs/Observable'
+// import 'rxjs/add/observable/combineLatest'
+// import 'rxjs/add/operator/throttleTime'
+// import 'rxjs/add/operator/distinctUntilChanged'
+// import 'rxjs/add/operator/map'
+// import 'vl-rx'
+import { partialRight } from 'lodash/fp'
 import rxSubs from 'vl-mixins/rx-subs'
 import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
-import { coord as coordHelper } from 'vl-ol'
+import { coordinateHelper, extentHelper } from 'vl-ol'
 import { warn } from 'vl-utils/debug'
 
 const props = {
@@ -18,6 +25,9 @@ const props = {
 }
 
 const computed = {
+  type () {
+    throw new Error('Not implemented computed property')
+  }
 }
 
 const methods = {
@@ -25,23 +35,37 @@ const methods = {
    * @protected
    */
   initialize () {
+    // define helper methods based on geometry type
+    const { toLonLat, fromLonLat } = coordinateHelper.transforms[ this.type ]
     /**
-     * @type {ol.geom.SimpleGeometry}
+     * @param {Array} coordinates
+     * @returns {Array}
+     * @protected
+     */
+    this.toLonLat = coordinates => toLonLat(coordinates, this.view.getProjection())
+    /**
+     * @param {Array} coordinates
+     * @param {Array}
+     * @protected
+     */
+    this.fromLonLat = coordinates => fromLonLat(coordinates, this.view.getProjection())
+    /**
+     * @param {Array} extent
+     * @returns {Array}
+     * @protected
+     */
+    this.extentToLonLat = extent => extentHelper.toLonLat(extent, this.view.getProjection())
+    /**
+     * @type {SimpleGeometry}
      * @protected
      */
     this.geometry = this.createGeometry()
     this.bindSelfTo(this.geometry)
 
-    /**
-     * @protected
-     */
-    this.coordTransform = coordHelper.coordTransform[ this.geometry.getType() ]
-
-    this.currentCoordinates = this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view.getProjection())
-    this.currentExtent = coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
+    this.currentExtent = this.extentToLonLat(this.geometry.getExtent())
   },
   /**
-   * @return {ol.geom.SimpleGeometry}
+   * @return {SimpleGeometry}
    * @protected
    */
   createGeometry () {
@@ -75,7 +99,7 @@ const methods = {
 // todo use turf.js to optimize geometry compare
 const watch = {
   coordinates (value) {
-    // this.geometry.setCoordinates(this.coordTransform.fromLonLat(value, this.view.getProjection()))
+    // this.geometry.setCoordinates(this.fromLonLat(value, this.view.getProjection()))
   }
 }
 
@@ -125,8 +149,8 @@ export default {
 //     .throttleTime(1000)
 //     .map(() => {
 //       return [
-//         this.coordTransform.toLonLat(this.geometry.getCoordinates(), this.view.getProjection()),
-//         coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
+//         this.toLonLat(this.geometry.getCoordinates(), this.view.getProjection()),
+//         extentHelper.toLonLat(this.geometry.getExtent(), this.view.getProjection())
 //       ]
 //     })
 //     .distinctUntilChanged((a, b) => isEqual(a, b)),

@@ -1,7 +1,7 @@
 /**
  * RxJS subscriptions manager.
  */
-import { isPlainObject, isFunction, first, noop } from 'vl-utils/func'
+import { isPlainObject, isFunction, first, noop } from 'lodash/fp'
 import { errordbg } from 'vl-utils/debug'
 
 export default {

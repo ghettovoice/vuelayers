@@ -1,4 +1,4 @@
-import ol from 'vl-ol'
+import VectorLayer from 'ol/layer/vector'
 import layer from 'vl-components/layer/layer'
 import styleTarget from 'vl-components/style/target'
 
@@ -18,7 +18,7 @@ const props = {
 
 const methods = {
   createLayer () {
-    return new ol.layer.Vector({
+    return new VectorLayer({
       id: this.currentId,
       minResolution: this.currentMinResolution,
       maxResolution: this.currentMaxResolution,

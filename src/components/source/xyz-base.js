@@ -1,9 +1,9 @@
-import ol from 'vl-ol'
+import XyzSource from 'ol/source/xyz'
 import tileSource from 'vl-components/source/tile-base'
 
 const methods = {
   createSource () {
-    return new ol.source.XYZ({
+    return new XyzSource({
       attributions: this.currentAttributions,
       tileUrlFunction: this.createTileUrlFunction(),
       crossOrigin: this.crossOrigin,

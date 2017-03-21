@@ -1,4 +1,4 @@
-import ol from 'vl-ol'
+import TileLayer from 'ol/layer/tile'
 import layer from 'vl-components/layer/layer'
 
 const props = {
@@ -7,7 +7,7 @@ const props = {
 
 const methods = {
   createLayer () {
-    return new ol.layer.Tile({
+    return new TileLayer({
       id: this.currentId,
       minResolution: this.currentMinResolution,
       maxResolution: this.currentMaxResolution,

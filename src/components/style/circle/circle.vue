@@ -1,5 +1,5 @@
 <script>
-  import ol from 'vl-ol'
+  import Circle from 'ol/style/circle'
   import imageStyle from 'vl-components/style/image'
 
   const props = {
@@ -15,11 +15,11 @@
 
   const methods = {
     /**
-     * @return {ol.style.Circle}
+     * @return {Circle}
      * @protected
      */
     createStyle () {
-      return new ol.style.Circle({
+      return new Circle({
         radius: this.radius,
         snapToPixel: this.snapToPixel,
         fill: this.fill,
@@ -53,7 +53,7 @@
   // todo do not recreate if already create and has fill/stroke, use setters instead
   function setFill (fill) {
     /**
-     * @type {ol.style.Fill}
+     * @type {Fill}
      * @private
      */
     this.fill = fill
@@ -62,7 +62,7 @@
 
   function setStroke (stroke) {
     /**
-     * @type {ol.style.Stroke}
+     * @type {Stroke}
      * @private
      */
     this.stroke = stroke
