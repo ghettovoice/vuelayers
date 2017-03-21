@@ -18,9 +18,6 @@ const props = {
 }
 
 const computed = {
-  currentUrl () {
-    return this.url
-  },
   currentProjection () {
     return this.projection
   },
@@ -61,7 +58,7 @@ const methods = {
     this.layer && this.layer.setSource(undefined)
   },
   refresh () {
-    this.source && this.source.changed()
+    this.source.changed()
   }
 }
 

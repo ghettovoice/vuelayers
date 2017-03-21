@@ -1,7 +1,6 @@
 <script>
   import ol, { consts as olConsts } from 'vl-ol'
   import Observable from 'vl-rx'
-  import { errordbg } from 'vl-utils/debug'
   import { isEqual } from 'vl-utils/func'
   import rxSubs from 'vl-mixins/rx-subs'
   import vmBind from 'vl-mixins/vm-bind'
@@ -20,10 +19,17 @@
 
   const methods = {
     refresh () {
-      this.geoloc && this.geoloc.changed()
+      this.geoloc.changed()
     },
     subscribeAll () {
       this::subscribeToGeolocation()
+    },
+    mountGeoloc () {
+      this.subscribeAll()
+    },
+    unmountGeoloc () {
+      this.unsubscribeAll()
+      this.geoloc.setTracking(false)
     }
   }
 
@@ -52,11 +58,13 @@
     },
     created () {
       this::createGeolocApi()
-      this.subscribeAll()
+    },
+    mounted () {
+      this.$nextTick(this.mountGeoloc)
     },
     destroyed () {
       this.$nextTick(() => {
-        this.geoloc.setTracking(false)
+        this.unmountGeoloc()
         this.geoloc = undefined
       })
     }
@@ -86,7 +94,7 @@
         .merge(Observable.fromOlEvent(this.geoloc, 'change:position', () => this.geoloc.getPosition())),
       Observable.of()
         .merge(Observable.fromOlEvent(this.geoloc, 'change:accuracy', () => this.geoloc.getAccuracy()))
-    ).throttleTime(1000)
+    ).throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
       .map(([ position, accuracy ]) => {
         return {
@@ -95,7 +103,8 @@
         }
       })
 
-    this.rxSubs.geoloc = geolocChanges.subscribe(
+    this.subscribeTo(
+      geolocChanges,
       ({ position, accuracy }) => {
         let changed
         if (!isEqual(position, this.currentPosition)) {
@@ -108,8 +117,7 @@
         }
 
         changed && this.$emit('change', { position, accuracy })
-      },
-      err => errordbg(err.stack)
+      }
     )
   }
 </script>

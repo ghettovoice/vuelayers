@@ -1,16 +1,45 @@
+/**
+ * Provide method to add to some object `$vm` getter.
+ */
+import { remove } from 'vl-utils/func'
+
 export default {
   methods: {
+    /**
+     * @param {*} object
+     * @return {*}
+     * @protected
+     */
     bindSelfTo (object) {
-      this._vmBinded = object
+      this._vmBinded.push(object)
 
       return Object.defineProperty(object, '$vm', {
-        enumerable: true,
         configurable: true,
         get: () => this
       })
+    },
+    /**
+     * @protected
+     */
+    unbindSelfFrom (object) {
+      delete object.$vm
+      remove(x => x === object, this._vmBinded)
+    },
+    /**
+     * @protected
+     */
+    unbindFromAll () {
+      this._vmBinded.forEach(this.unbindSelfFrom)
     }
   },
+  beforeCreate () {
+    /**
+     * @type {Array}
+     * @private
+     */
+    this._vmBinded = []
+  },
   destroyed () {
-    delete this._vmBinded.$vm
+    this.unbindFromAll()
   }
 }

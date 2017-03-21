@@ -2,7 +2,7 @@
   import ol, { consts as olConsts } from 'vl-ol'
   import Observable from 'vl-rx'
   import { isFunction, isEqual } from 'vl-utils/func'
-  import { errordbg, warn } from 'vl-utils/debug'
+  import { warn } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
   import vmBind from 'vl-mixins/vm-bind'
   import stubVNode from 'vl-mixins/stub-vnode'
@@ -55,7 +55,7 @@
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
      */
     fit (geometryOrExtent, options) {
-      this.view && this.view.fit(geometryOrExtent, options)
+      this.view.fit(geometryOrExtent, options)
     },
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
@@ -65,8 +65,6 @@
     animate (...args) {
       let cb = args.find(isFunction)
 
-      if (!this.view) return Promise.resolve()
-
       return new Promise(
         resolve => this.view.animate(...args, complete => {
           cb && cb(complete)
@@ -75,11 +73,9 @@
       )
     },
     refresh () {
-      this.view && this.view.changed()
+      this.view.changed()
     },
     setCurrentView ({ center, zoom, rotation }) {
-      if (!this.view) return
-
       if (center != null && !isEqual(center, this.currentCenter)) {
         this.view.setCenter(ol.proj.fromLonLat(center, this.projection))
       }
@@ -194,7 +190,7 @@
         .merge(Observable.fromOlEvent(this.view, 'change:resolution', () => this.view.getZoom())),
       Observable.of(this.view.getRotation())
         .merge(Observable.fromOlEvent(this.view, 'change:rotation', () => this.view.getRotation()))
-    ).throttleTime(1000)
+    ).throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
       .map(([ center, zoom, rotation ]) => {
         return {
@@ -204,7 +200,8 @@
         }
       })
 
-    this.rxSubs.viewChanges = viewChanges.subscribe(
+    this.subscribeTo(
+      viewChanges,
       ({ center, zoom, rotation }) => {
         let changed = false
         if (!isEqual(this.currentCenter, center)) {
@@ -221,8 +218,7 @@
         }
 
         changed && this.$emit('change', { center, zoom, rotation })
-      },
-      err => errordbg(err.stack)
+      }
     )
   }
 </script>

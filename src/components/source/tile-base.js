@@ -41,6 +41,9 @@ const props = {
 }
 
 const computed = {
+  currentUrl () {
+    return this.url
+  },
   currentTileSize () {
     return this.tileSize
   },

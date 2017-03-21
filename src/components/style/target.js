@@ -1,3 +1,4 @@
+import ol from 'openlayers'
 import { isEmpty, isFunction, isBoolean, flow, map, filter } from 'vl-utils/func'
 
 export default {
@@ -40,14 +41,12 @@ export default {
 
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
-    const plainFeature = feature.plain()
-    if (!plainFeature.geometry) return
+    if (!feature.getGeometry()) return
 
-    const layer = feature.layer || {}
     let styles = vm.styles
 
     if (isFunction(styles)) {
-      styles = styles(feature, resolution)
+      styles = styles(feature, resolution, feature.layer, ol)
     } else if (Array.isArray(styles)) {
       styles = flow(
         filter(({ style, condition }) => {
@@ -55,19 +54,18 @@ export function createStyleFunc (vm) {
                  (isBoolean(condition) && condition) ||
                  (
                    isFunction(condition) &&
-                   condition(plainFeature, resolution, layer.id)
+                   condition(feature, resolution, feature.layer, ol)
                  )
         }),
         map(({ style }) => style)
       )(styles)
     }
-
     // null style
     if (styles === null || !isEmpty(styles)) return styles
 
     if (vm.defaultStyles) {
       return isFunction(vm.defaultStyles)
-        ? vm.defaultStyles(feature, resolution)
+        ? vm.defaultStyles(feature, resolution, feature.layer, ol)
         : vm.defaultStyles
     }
   }

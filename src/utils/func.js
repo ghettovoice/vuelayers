@@ -6,6 +6,8 @@ import {
   isBoolean,
   isEmpty,
   isEqual,
+  isObject,
+  isPlainObject,
   flow,
   pick,
   omit,
@@ -23,7 +25,10 @@ import {
   mapValues as lodashMapValues,
   mapKeys as lodashMapKeys,
   get,
-  set
+  set,
+  remove as lodashRemove,
+  first,
+  last
 } from 'lodash/fp'
 
 // lodash re-exports
@@ -34,12 +39,15 @@ export const filter = lodashFilter.convert({ cap: false })
 export const merge = lodashMerge.convert({ fixed: false })
 export const mapValues = lodashMapValues.convert({ cap: false })
 export const mapKeys = lodashMapKeys.convert({ cap: false })
+export const remove = lodashRemove.convert({ cap: false })
 export {
   isFunction,
   isString,
   isBoolean,
   isEmpty,
   isEqual,
+  isObject,
+  isPlainObject,
   flow,
   pick,
   omit,
@@ -52,13 +60,16 @@ export {
   rangeStep,
   random,
   get,
-  set
+  set,
+  first,
+  last
 }
 
 export const diffById = differenceWith((a, b) => a.id === b.id)
 export const idMatchFilter = id => x => x.id === id
 
 export const noop = () => {}
+export const identity = x => x
 
 /**
  * @param {*} value
@@ -66,6 +77,14 @@ export const noop = () => {}
  */
 export function isNumeric (value) {
   return !isNaN(parseFloat(value)) && isFinite(value)
+}
+
+/**
+ * @param {*} value
+ * @return {boolean}
+ */
+export function isArray (value) {
+  return Array.isArray(value)
 }
 
 /**

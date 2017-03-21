@@ -43,7 +43,7 @@ const methods = {
     this.map && this.map.removeInteraction(this.interaction)
   },
   refresh () {
-    this.interaction && this.interaction.changed()
+    this.interaction.changed()
   }
 }
 

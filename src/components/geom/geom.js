@@ -18,9 +18,6 @@ const props = {
 }
 
 const computed = {
-  type () {
-    return this.geometry.getType()
-  }
 }
 
 const methods = {
@@ -34,6 +31,7 @@ const methods = {
      */
     this.geometry = this.createGeometry()
     this.bindSelfTo(this.geometry)
+
     /**
      * @protected
      */
@@ -71,7 +69,7 @@ const methods = {
     this.feature && this.feature.setGeometry(undefined)
   },
   refresh () {
-    this.geometry && this.geometry.changed()
+    this.geometry.changed()
   }
 }
 // todo use turf.js to optimize geometry compare
@@ -122,7 +120,8 @@ export default {
 }
 
 // function subscribeToGeomChanges () {
-//   this.rxSubs.geomChanges = Observable.fromOlEvent(this.geometry, 'change')
+//   this.subscribeTo(
+//     Observable.fromOlEvent(this.geometry, 'change')
 //     .throttleTime(1000)
 //     .map(() => {
 //       return [
@@ -130,13 +129,11 @@ export default {
 //         coordHelper.extentToLonLat(this.geometry.getExtent(), this.view.getProjection())
 //       ]
 //     })
-//     .distinctUntilChanged((a, b) => isEqual(a, b))
-//     .subscribe(
+//     .distinctUntilChanged((a, b) => isEqual(a, b)),
 //       ([ coordinates, extent ]) => {
 //         this.currentCoordinates = coordinates
 //         this.currentExtent = extent
 //         this.$emit('change', { coordinates, extent })
-//       },
-//       ::console.error
+//       }
 //     )
 // }

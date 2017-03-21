@@ -1,3 +1,6 @@
+/**
+ * Renders stub VNode for component.
+ */
 import { isFunction, isString, reduce } from 'vl-utils/func'
 
 export default {

@@ -81,6 +81,9 @@ const methods = {
   },
   unmountSource () {
     this::sourceUnmountSource()
+    this.clear()
+  },
+  clear () {
     this.source.clear()
   }
 }

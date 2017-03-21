@@ -2,7 +2,6 @@
   import ol, { style as styleHelper } from 'vl-ol'
   import Observable from 'vl-rx'
   import { forEach, constant, diffById } from 'vl-utils/func'
-  import { errordbg } from 'vl-utils/debug'
   import interaction from 'vl-components/interaction/interaction'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
 
@@ -61,7 +60,7 @@
 
       const filterFunc = this.filter
       const filter = function __selectFilter (feature, layer) {
-        return filterFunc(feature.plain(), layer && layer.id)
+        return filterFunc(feature, layer, ol)
       }
 
       return new ol.interaction.Select({
@@ -107,7 +106,7 @@
 
       const selection = this.interaction.getFeatures()
       const selectionArray = selection.getArray()
-      const idx = selectionArray.findIndex(feature => feature.getId() === id)
+      const idx = selectionArray.findIndex(feature => feature.id === id)
 
       if (idx !== -1) {
         selection.removeAt(idx)
@@ -175,22 +174,20 @@
   function subscribeToInteractionChanges () {
     const selection = this.interaction.getFeatures()
 
-    this.rxSubs.select = Observable.fromOlEvent(selection, 'add', evt => evt.element.plain())
-      .subscribe(
-        feature => {
-          this.currentSelected.push(feature)
-          this.$emit('select', feature)
-        },
-        err => errordbg(err.stack)
-      )
-    this.rxSubs.unselect = Observable.fromOlEvent(selection, 'remove', evt => evt.element.plain())
-      .subscribe(
-        feature => {
-          this.currentSelected = this.currentSelected.filter(({ id }) => id !== feature.id)
-          this.$emit('unselect', feature)
-        },
-        err => errordbg(err.stack)
-      )
+    this.subscribeTo(
+      Observable.fromOlEvent(selection, 'add', evt => evt.element.plain),
+      feature => {
+        this.currentSelected.push(feature)
+        this.$emit('select', feature)
+      }
+    )
+    this.subscribeTo(
+      Observable.fromOlEvent(selection, 'remove', evt => evt.element.plain),
+      feature => {
+        this.currentSelected = this.currentSelected.filter(({ id }) => id !== feature.id)
+        this.$emit('unselect', feature)
+      }
+    )
   }
 </script>
 

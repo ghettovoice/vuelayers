@@ -87,22 +87,22 @@ const methods = {
 
 const watch = {
   currentLayers (value) {
-    this.updateParams({
+    this.source.updateParams({
       LAYERS: value
     })
   },
   currentVersion (value) {
-    this.updateParams({
+    this.source.updateParams({
       VERSION: value
     })
   },
   currentStyles (value) {
-    this.updateParams({
+    this.source.updateParams({
       STYLES: value
     })
   },
   currentExtParams (value) {
-    this.updateParams(cleanExtParams(value))
+    this.source.updateParams(cleanExtParams(value))
   }
 }
 

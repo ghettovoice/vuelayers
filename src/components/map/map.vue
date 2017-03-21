@@ -7,7 +7,10 @@
 
 <script>
   import ol from 'openlayers'
+  import Observable from 'vl-rx'
   import vmBind from 'vl-mixins/vm-bind'
+  import rxSubs from 'vl-mixins/rx-subs'
+  import { isFunction } from 'vl-utils/func'
 
   const props = {
     loadTilesWhileAnimating: {
@@ -36,22 +39,43 @@
      * Updates `ol.Map` view
      */
     refresh () {
-      if (this.map) {
-        this.map.updateSize()
-        this.map.render()
-      }
+      this.map.updateSize()
+      this.map.render()
     },
     /**
      * Trigger focus on map container.
      */
     focus () {
       this.$refs.map.focus()
+    },
+    /**
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToMapEvents()
+    },
+    forEachFeatureAtPixel (pixel, cb, layerFilter, hitTolerance) {
+      const opts = isFunction(layerFilter) ? { layerFilter, hitTolerance } : layerFilter
+
+      return this.map.forEachFeatureAtPixel(pixel, cb, opts)
+    },
+    forEachLayerAtPixel (pixel, cb, layerFilter) {
+      return this.map.forEachLayerAtPixel(pixel, cb, undefined, layerFilter)
+    },
+    mountMap () {
+      this.map.setTarget(this.$refs.map)
+      this.refresh()
+      this.subscribeAll()
+    },
+    unmountMap () {
+      this.unsubscribeAll()
+      this.map.setTarget(undefined)
     }
   }
 
   export default {
     name: 'vl-map',
-    mixins: [ vmBind ],
+    mixins: [ rxSubs, vmBind ],
     props,
     methods,
     provide () {
@@ -70,14 +94,11 @@
       this::createMap()
     },
     mounted () {
-      this.$nextTick(() => {
-        this.map.setTarget(this.$refs.map)
-        this.refresh()
-      })
+      this.$nextTick(this.mountMap)
     },
     destroyed () {
       this.$nextTick(() => {
-        this.map.setTarget(undefined)
+        this.unmountMap()
         this.map = undefined
       })
     }
@@ -107,6 +128,16 @@
     this.bindSelfTo(this.map)
 
     return this.map
+  }
+
+  function subscribeToMapEvents () {
+    this.subscribeTo(
+      Observable.fromOlEvent(
+        this.map,
+        [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ]
+      ),
+      evt => this.$emit(evt.type, evt)
+    )
   }
 </script>
 

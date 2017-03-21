@@ -65,7 +65,7 @@ const methods = {
      */
     this.layer = this.createLayer()
     this.bindSelfTo(this.layer)
-    this.layer.set('id', this.currentId)
+
     Object.defineProperty(this.layer, 'id', {
       enumerable: true,
       configurable: true,

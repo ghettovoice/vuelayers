@@ -43,10 +43,6 @@ map:
     path: mixins/vm-bind
     alias: vl-mixins/vm-bind
 
-#  - name: mixins/virt-slot
-#    path: mixins/virt-slot
-#    alias: vl-mixins/virt-slot
-
 #####################################################################
 #   COMMON COMPONENTS
 #####################################################################

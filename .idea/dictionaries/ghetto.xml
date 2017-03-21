@@ -4,12 +4,16 @@
       <w>chunkhash</w>
       <w>contenthash</w>
       <w>datasets</w>
+      <w>dblclick</w>
+      <w>debounce</w>
       <w>eslint</w>
       <w>geolocchanged</w>
       <w>hidpi</w>
       <w>lodash</w>
       <w>overriden</w>
       <w>pacman</w>
+      <w>pointerdrag</w>
+      <w>pointermove</w>
       <w>positionchange</w>
       <w>positionchanged</w>
       <w>reprojection</w>

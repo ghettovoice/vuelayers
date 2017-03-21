@@ -65,10 +65,10 @@
       this.zoom = zoom
       this.rotation = rotation
     },
-    select (plainFeature) {
-      const i = this.selectedIds.indexOf(plainFeature.id)
+    select (feature) {
+      const i = this.selectedIds.indexOf(feature.id)
       if (i === -1) {
-        this.selected.push(plainFeature)
+        this.selected.push(feature)
       }
     },
     unselect ({ id }) {
@@ -79,7 +79,7 @@
     },
     loadData () {
       const points = []
-      range(1, 1000).forEach(i => {
+      range(1, 100).forEach(i => {
         points.push({
           id: i,
           properties: {

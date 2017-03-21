@@ -36,10 +36,7 @@
       }
 
       return function __styleFunc (feature, resolution) {
-        const plainFeature = feature.plain()
-        const layer = feature.layer || {}
-
-        const styles = providedStyleFunc(plainFeature, resolution, layer.id)
+        const styles = providedStyleFunc(feature, resolution, feature.layer, ol)
 
         if (styles === null || !isEmpty(styles)) return styles
 

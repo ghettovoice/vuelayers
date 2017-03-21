@@ -1,8 +1,6 @@
 <script type="text/babel">
   /**
    * Wrapper around ol.Feature.
-   *
-   * @todo Add property 'visible', like in layer. If visible = false -> set null style
    */
   import uuid from 'uuid/v4'
   import stubVNode from 'vl-mixins/stub-vnode'
@@ -24,22 +22,37 @@
 
   const methods = {
     refresh () {
-      this.feature && this.feature.changed()
-    },
-    plain () {
-      return this.feature && this.feature.plain(this.view.getProjection())
+      this.feature.changed()
     },
     styleTarget () {
       return this.feature
+    },
+    mountFeature () {
+      if (this.source) {
+        this.source.addFeature(this.feature)
+
+        Object.defineProperty(this.feature, 'layer', {
+          configurable: true,
+          get: () => this.layer
+        })
+      } else if (process.env.NODE_ENV !== 'production') {
+        warn("Invalid usage of feature component, should have source component among it's ancestors")
+      }
+    },
+    unmountFeature () {
+      if (this.source && this.source.getFeatureById(this.id)) {
+        this.source.removeFeature(this.feature)
+        delete this.feature.layer
+      }
     }
   }
 
   const watch = {
     id (value) {
-      this.feature && this.feature.setId(value)
+      this.feature.setId(value)
     },
     properties (value) {
-      this.feature && this.feature.setProperties(featureHelper.cleanProperties(value))
+      this.feature.setProperties(featureHelper.cleanProperties(value))
     }
   }
 
@@ -74,25 +87,11 @@
       this::createFeature()
     },
     mounted () {
-      this.$nextTick(() => {
-        if (this.source) {
-          this.source.addFeature(this.feature)
-          Object.defineProperty(this.feature, 'layer', {
-            enumerable: true,
-            configurable: true,
-            get: () => this.layer
-          })
-        } else if (process.env.NODE_ENV !== 'production') {
-          warn("Invalid usage of feature component, should have source component among it's ancestors")
-        }
-      })
+      this.$nextTick(this.mountFeature)
     },
     destroyed () {
       this.$nextTick(() => {
-        if (this.source && this.source.getFeatureById(this.feature.getId())) {
-          this.source.removeFeature(this.feature)
-        }
-        delete this.feature.layer
+        this.unmountFeature()
         this.feature = undefined
       })
     }
