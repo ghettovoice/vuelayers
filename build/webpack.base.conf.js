@@ -30,7 +30,8 @@ module.exports = {
       'vl-mixins': resolve('src/mixins'),
       'vl-utils': resolve('src/utils'),
       'vl-ol': resolve('src/ol'),
-      'vl-rx': resolve('src/rx')
+      'vl-rx': resolve('src/rx'),
+      openlayers: resolve('src/ol')
     }
   },
   module: {

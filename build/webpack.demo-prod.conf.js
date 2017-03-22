@@ -30,11 +30,6 @@ const webpackConfig = merge(baseWebpackConfig, {
       minimize: process.env.NODE_ENV === 'production'
     })
   },
-  // resolve: {
-  //   alias: {
-  //     openlayers$: 'openlayers/dist/ol-debug'
-  //   }
-  // },
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
