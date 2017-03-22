@@ -4,7 +4,7 @@ import { identity } from 'lodash/fp'
 import { Observable } from 'rxjs/Observable'
 import 'vl-rx'
 
-describe('RxJS bootstrap and operators', () => {
+describe('RxJS extensions', () => {
   describe('fromOlEvent', () => {
     let olMock = new OlObject()
     beforeEach(() => {
