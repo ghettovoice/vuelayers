@@ -1,31 +1,12 @@
 import sinon from 'sinon'
-import ol from 'openlayers'
-import Observable from 'vl-rx'
-import { identity } from 'vl-utils/func'
+import OlObject from 'ol/object'
+import { identity } from 'lodash/fp'
+import { Observable } from 'rxjs/Observable'
+import 'vl-rx'
 
 describe('RxJS bootstrap and operators', () => {
-  describe('observable', () => {
-    it('should have expected operators', () => {
-      const factories = [
-        'of',
-        'combineLatest',
-        'fromOlEvent'
-      ]
-      const operators = [
-        'distinctUntilChanged',
-        'throttleTime',
-        'debounceTime',
-        'map',
-        'merge'
-      ]
-
-      factories.forEach(x => expect(Observable[ x ]).to.be.a('function'))
-      operators.forEach(x => expect(Observable.prototype[ x ]).to.be.a('function'))
-    })
-  })
-
   describe('fromOlEvent', () => {
-    let olMock = new ol.Object()
+    let olMock = new OlObject()
     beforeEach(() => {
       sinon.spy(olMock, 'on')
       sinon.spy(olMock, 'un')

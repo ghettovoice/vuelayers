@@ -9,7 +9,6 @@
  */
 import { omit, merge } from 'lodash/fp'
 import * as components from './components'
-const forEach = require('lodash/fp/forEach').convert({ cap: false })
 
 const keys = [
   'geom',
@@ -29,10 +28,10 @@ export default {
   VERSION: PKG_VERSION,
   ...flatComponents,
   install (Vue) {
-    forEach((component, key) => {
-      if (component.install) {
-        Vue.use(component)
+    Object.keys(flatComponents).forEach(key => {
+      if (flatComponents[ key ].install) {
+        Vue.use(flatComponents[ key ])
       }
-    }, flatComponents)
+    })
   }
 }

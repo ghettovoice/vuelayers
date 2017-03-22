@@ -1,9 +1,9 @@
-import { get as getProj } from 'ol/proj'
-import { createXYZ } from 'ol/tilegrid'
-import { consts } from 'vl-ol'
+import proj from 'ol/proj'
+import tileGrid from 'ol/tilegrid'
 import { createTileUrlFunction } from 'ol-tilecache'
 import { pick } from 'lodash/fp'
-import { replaceTokens } from 'vl-utils/func'
+import { TILE_SIZE, CACHE_SIZE, MIN_ZOOM, MAX_ZOOM, PIXEL_RATIO } from 'vl-ol/consts'
+import replaceTokens from 'vl-utils/replace-tokens'
 import source from 'vl-components/source/source'
 
 const props = {
@@ -13,12 +13,12 @@ const props = {
   },
   tileSize: {
     type: Array,
-    default: () => [ consts.TILE_SIZE, consts.TILE_SIZE ],
-    validator: value => value.length === 2
+    default: () => [ TILE_SIZE, TILE_SIZE ],
+    validator: value => Array.isArray(value) && value.length === 2
   },
   tilePixelRatio: {
     type: Number,
-    default: olConsts.PIXEL_RATIO
+    default: PIXEL_RATIO
   },
   crossOrigin: {
     type: String,
@@ -26,16 +26,16 @@ const props = {
   },
   cacheSize: {
     type: Number,
-    default: olConsts.CACHE_SIZE
+    default: CACHE_SIZE
   },
   opaque: Boolean,
   minZoom: {
     type: Number,
-    default: olConsts.MIN_ZOOM
+    default: MIN_ZOOM
   },
   maxZoom: {
     type: Number,
-    default: olConsts.MAX_ZOOM
+    default: MAX_ZOOM
   },
   reprojectionErrorThreshold: {
     type: Number,
@@ -81,12 +81,12 @@ const methods = {
      * @type {Extent}
      * @protected
      */
-    this.tileGridExtent = getProj(this.currentProjection).getExtent()
+    this.tileGridExtent = proj.get(this.currentProjection).getExtent()
     /**
      * @type {TileGrid}
      * @protected
      */
-    this.tileGrid = createXYZ({
+    this.tileGrid = tileGrid.createXYZ({
       extent: this.tileGridExtent,
       minZoom: this.currentMinZoom,
       maxZoom: this.currentMaxZoom,

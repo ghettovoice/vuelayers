@@ -6,6 +6,9 @@ const props = {
 }
 
 const methods = {
+  /**
+   * @return {TileLayer}
+   */
   createLayer () {
     return new TileLayer({
       id: this.currentId,

@@ -1,7 +1,6 @@
 <script>
-  import LineStringGeom from 'ol/geom/linestring'
-  import { constant } from 'lodash/fp'
-  import { consts } from 'vl-ol'
+  import LineString from 'ol/geom/linestring'
+  import { GEOMETRY_TYPE } from 'vl-ol/consts'
   import geom from 'vl-components/geom/geom'
 
   const props = {
@@ -13,12 +12,12 @@
   }
 
   const computed = {
-    type: constant(consts.GEOMETRY_TYPE.LINE_STRING)
+    type: () => GEOMETRY_TYPE.LINE_STRING
   }
 
   const methods = {
     createGeometry () {
-      return new LineStringGeom(this.fromLonLat(this.currentCoordinates))
+      return new LineString(this.fromLonLat(this.currentCoordinates))
     }
   }
 

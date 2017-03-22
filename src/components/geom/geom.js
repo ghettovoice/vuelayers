@@ -1,16 +1,14 @@
-// import { isEqual } from 'vl-utils/func'
-// import Observable from 'vl-rx'
+// import { isEqual } from 'lodash/fp'
 // import { Observable } from 'rxjs/Observable'
 // import 'rxjs/add/observable/combineLatest'
 // import 'rxjs/add/operator/throttleTime'
 // import 'rxjs/add/operator/distinctUntilChanged'
 // import 'rxjs/add/operator/map'
-// import 'vl-rx'
-import { partialRight } from 'lodash/fp'
+// import 'vl-rx/from-ol-event'
 import rxSubs from 'vl-mixins/rx-subs'
-import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
-import { coordinateHelper, extentHelper } from 'vl-ol'
+import { transforms } from 'vl-ol/coordinate'
+import { toLonLat as extentToLonLat } from 'vl-ol/extent'
 import { warn } from 'vl-utils/debug'
 
 const props = {
@@ -36,7 +34,7 @@ const methods = {
    */
   initialize () {
     // define helper methods based on geometry type
-    const { toLonLat, fromLonLat } = coordinateHelper.transforms[ this.type ]
+    const { toLonLat, fromLonLat } = transforms[ this.type ]
     /**
      * @param {Array} coordinates
      * @returns {Array}
@@ -54,14 +52,13 @@ const methods = {
      * @returns {Array}
      * @protected
      */
-    this.extentToLonLat = extent => extentHelper.toLonLat(extent, this.view.getProjection())
+    this.extentToLonLat = extent => extentToLonLat(extent, this.view.getProjection())
     /**
      * @type {SimpleGeometry}
      * @protected
      */
     this.geometry = this.createGeometry()
-    this.bindSelfTo(this.geometry)
-
+    this.geometry.set('vm', this)
     this.currentExtent = this.extentToLonLat(this.geometry.getExtent())
   },
   /**
@@ -104,7 +101,7 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs, vmBind, stubVNode ],
+  mixins: [ rxSubs, stubVNode ],
   inject: [ 'view', 'feature' ],
   props,
   computed,

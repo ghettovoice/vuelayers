@@ -1,7 +1,6 @@
 <script>
-  import MultiLineStringGeom from 'ol/geom/multilinestring'
-  import { constant } from 'vl-utils/func'
-  import { consts } from 'vl-ol'
+  import MultiLineString from 'ol/geom/multilinestring'
+  import { GEOMETRY_TYPE } from 'vl-ol/consts'
   import geom from 'vl-components/geom/geom'
 
   const props = {
@@ -13,12 +12,12 @@
   }
 
   const computed = {
-    type: constant(consts.GEOMETRY_TYPE.MULTI_LINE_STRING)
+    type: () => GEOMETRY_TYPE.MULTI_LINE_STRING
   }
 
   const methods = {
     createGeometry () {
-      return new MultiLineStringGeom(this.fromLonLat(this.currentCoordinates))
+      return new MultiLineString(this.fromLonLat(this.currentCoordinates))
     }
   }
 

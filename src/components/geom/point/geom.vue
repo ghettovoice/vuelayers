@@ -1,7 +1,6 @@
 <script>
-  import PointGeom from 'ol/geom/point'
-  import { constant } from 'vl-utils/func'
-  import { consts } from 'vl-ol'
+  import Point from 'ol/geom/point'
+  import { GEOMETRY_TYPE } from 'vl-ol/consts'
   import geom from 'vl-components/geom/geom'
 
   const props = {
@@ -13,7 +12,7 @@
   }
 
   const computed = {
-    type: constant(consts.GEOMETRY_TYPE.POINT)
+    type: () => GEOMETRY_TYPE.POINT
   }
 
   const methods = {
@@ -22,7 +21,7 @@
      * @protected
      */
     createGeometry () {
-      return new PointGeom(this.fromLonLat(this.currentCoordinates))
+      return new Point(this.fromLonLat(this.currentCoordinates))
     }
   }
 

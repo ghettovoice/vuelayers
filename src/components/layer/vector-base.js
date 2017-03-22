@@ -17,6 +17,9 @@ const props = {
 }
 
 const methods = {
+  /**
+   * @return {VectorLayer}
+   */
   createLayer () {
     return new VectorLayer({
       id: this.currentId,

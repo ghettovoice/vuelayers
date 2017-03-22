@@ -1,11 +1,11 @@
 <script>
   import SelectInteraction from 'ol/interaction/select'
   import VectorLayer from 'ol/layer/vector'
-  import { styleHelper, geoJson } from 'vl-ol'
   import { Observable } from 'rxjs/Observable'
-  import 'vl-rx'
-  import { forEach } from 'lodash/fp'
-  import { constant, diffById } from 'vl-utils/func'
+  import 'vl-rx/from-ol-event'
+  import { forEach, differenceWith } from 'lodash/fp'
+  import { defaultEditStyle } from 'vl-ol/style'
+  import { write } from 'vl-ol/geojson'
   import interaction from 'vl-components/interaction/interaction'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
 
@@ -25,7 +25,7 @@
     },
     filter: {
       type: Function,
-      default: constant(true)
+      default: () => true
     }
   }
 
@@ -40,7 +40,7 @@
     mountInteraction: interactionMountInteraction,
     unmountInteraction: interactionUnmountInteraction
   } = interaction.methods
-  const defaultStyles = styleHelper.defaultEditStyle()
+  const defaultStyles = defaultEditStyle()
 
   const methods = {
     /**
@@ -50,7 +50,7 @@
       this::subscribeToInteractionChanges()
     },
     /**
-     * @return {Select}
+     * @return {SelectInteraction}
      * @protected
      */
     createInteraction () {
@@ -64,7 +64,7 @@
 
       const filterFunc = this.filter
       const filter = function __selectFilter (feature, layer) {
-        return filterFunc(geoJson.write(feature, this.view.getProjection()), layer && layer.get('id'))
+        return filterFunc(write(feature, this.view.getProjection()), layer && layer.get('id'))
       }
 
       return new SelectInteraction({
@@ -136,6 +136,7 @@
     }
   }
 
+  const diffById = differenceWith((a, b) => a.id === b.id)
   const watch = {
     selected (selected) {
       let forSelect = diffById(selected, this.currentSelected)
@@ -179,14 +180,22 @@
     const selection = this.interaction.getFeatures()
 
     this.subscribeTo(
-      Observable.fromOlEvent(selection, 'add', ({ element }) => geoJson.write(element, this.view.getProjection())),
+      Observable.fromOlEvent(
+        selection,
+        'add',
+        ({ element }) => write(element, this.view.getProjection())
+      ),
       feature => {
         this.currentSelected.push(feature)
         this.$emit('select', feature)
       }
     )
     this.subscribeTo(
-      Observable.fromOlEvent(selection, 'remove', ({ element }) => geoJson.write(element, this.view.getProjection())),
+      Observable.fromOlEvent(
+        selection,
+        'remove',
+        ({ element }) => write(element, this.view.getProjection())
+      ),
       feature => {
         this.currentSelected = this.currentSelected.filter(({ id }) => id !== feature.id)
         this.$emit('unselect', feature)

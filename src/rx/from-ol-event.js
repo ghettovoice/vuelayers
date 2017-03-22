@@ -1,8 +1,6 @@
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/fromEventPattern'
 import 'rxjs/add/observable/merge'
-import { isArray, isPlainObject } from 'lodash/fp'
-
 /**
  * Creates an Observable using OpenLayers event pattern that emits events of a specific type
  * coming from the given event target.
@@ -18,17 +16,17 @@ import { isArray, isPlainObject } from 'lodash/fp'
  *                          or an array of events/selectors like `[{ event: 'event1', selector?: x => x }, ...]`.
  * @param {function(...*): *} [selector] An optional function to post-process results. It takes the arguments
  *    from the event handler and should return a single value.
- * @return {Observable<T>}
+ * @return {Observable}
  * @memberOf {Observable}
  */
 export default function fromOlEvent (target, eventName, selector) {
-  if (isArray(eventName)) {
+  if (Array.isArray(eventName)) {
     return Observable.merge(
       ...eventName.map(
         elem => {
           let eventName, selector
 
-          if (isPlainObject(elem)) {
+          if (typeof elem === 'object') {
             eventName = elem.event
             selector = elem.selector
           } else {
@@ -47,3 +45,5 @@ export default function fromOlEvent (target, eventName, selector) {
     selector
   )
 }
+
+Observable.fromOlEvent = fromOlEvent

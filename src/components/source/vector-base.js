@@ -1,8 +1,9 @@
 import VectorSource from 'ol/source/vector'
 import loadingStrategy from 'ol/loadingstrategy'
-import { merge } from 'lodash/fp'
-import { extentHelper, geoJson, consts } from 'vl-ol'
-import { diffById } from 'vl-utils/func'
+import { merge, differenceWith } from 'lodash/fp'
+import { toLonLat as extentToLonLat } from 'vl-ol/extent'
+import { read } from 'vl-ol/geojson'
+import { LAYER_PROP } from 'vl-ol/consts'
 import source from 'vl-components/source/source'
 
 const props = {
@@ -42,12 +43,12 @@ const methods = {
   sourceLoader () {
     if (!this.currentLoader) return
 
-    const loader = this::currentLoader
+    const loader = this.currentLoader
     const self = this
 
     return async function __loader (extent, resolution, projection) {
       projection = projection.getCode()
-      extent = extentHelper.toLonLat(extent, projection)
+      extent = extentToLonLat(extent, projection)
 
       const features = await Promise.resolve(loader(extent, resolution, projection))
 
@@ -91,6 +92,7 @@ const methods = {
   }
 }
 
+const diffById = differenceWith((a, b) => a.id === b.id)
 const watch = {
   currentLoader () {
     // todo
@@ -105,7 +107,7 @@ const watch = {
 
       if (feature) {
         this.source.removeFeature(feature)
-        feature.unset(consts.LAYER_PROP)
+        feature.unset(LAYER_PROP)
       }
     })
   }
@@ -128,9 +130,9 @@ export default {
 }
 
 function createFeature (geoJsonFeature) {
-  return geoJson.read(merge(geoJsonFeature, {
+  return read(merge(geoJsonFeature, {
     properties: {
-      [ consts.LAYER_PROP ]: this.layer.get('id')
+      [ LAYER_PROP ]: this.layer.get('id')
     }
   }), this.currentProjection)
 }

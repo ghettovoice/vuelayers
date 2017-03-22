@@ -1,7 +1,6 @@
 /**
  * Style helpers
  */
-import ol from 'openlayers'
 import Style from 'ol/style/style'
 import Fill from 'ol/style/fill'
 import Stroke from 'ol/style/stroke'
@@ -9,8 +8,9 @@ import Circle from 'ol/style/circle'
 import Icon from 'ol/style/icon'
 import RegularShape from 'ol/style/regularshape'
 import Text from 'ol/style/text'
-import { isEmpty, upperFirst, lowerFirst, flow, pick, isString } from 'lodash/fp'
-import { isNumeric } from 'vl-utils/func'
+import { upperFirst, lowerFirst, flow, pick } from 'lodash/fp'
+import isNumeric from 'vl-utils/is-numeric'
+import { GEOMETRY_TYPE } from 'vl-ol/consts'
 const reduce = require('lodash/fp/reduce').convert({ cap: false })
 
 /**
@@ -70,53 +70,61 @@ export function defaultStyle () {
 }
 
 /**
- * @return {Object<consts.GEOMETRY_TYPE, Array<VlStyle>>}
+ * @return {Object<GEOMETRY_TYPE, Array<VlStyle>>}
  */
 export function defaultEditStyle () {
-  /** @type {Object<consts.GEOMETRY_TYPE, Array<VlStyle>>} */
+  /** @type {Object<GEOMETRY_TYPE, Array<VlStyle>>} */
   let styles = {}
   let white = [ 255, 255, 255, 1 ]
   let blue = [ 0, 153, 255, 1 ]
   let width = 3
 
-  styles[ consts.GEOMETRY_TYPE.LINE_STRING ] = [ {
+  styles[ GEOMETRY_TYPE.LINE_STRING ] = [ {
     strokeColor: white,
     strokeWidth: width + 2
   }, {
     strokeColor: blue,
     strokeWidth: width
   } ]
-  styles[ consts.GEOMETRY_TYPE.MULTI_LINE_STRING ] =
-    styles[ consts.GEOMETRY_TYPE.LINE_STRING ]
+  styles[ GEOMETRY_TYPE.MULTI_LINE_STRING ] =
+    styles[ GEOMETRY_TYPE.LINE_STRING ]
 
-  styles[ consts.GEOMETRY_TYPE.POLYGON ] = [ {
+  styles[ GEOMETRY_TYPE.POLYGON ] = [ {
     fillColor: [ 255, 255, 255, 0.5 ]
-  } ].concat(styles[ consts.GEOMETRY_TYPE.LINE_STRING ])
-  styles[ consts.GEOMETRY_TYPE.MULTI_POLYGON ] =
-    styles[ consts.GEOMETRY_TYPE.POLYGON ]
+  } ].concat(styles[ GEOMETRY_TYPE.LINE_STRING ])
+  styles[ GEOMETRY_TYPE.MULTI_POLYGON ] =
+    styles[ GEOMETRY_TYPE.POLYGON ]
 
-  styles[ consts.GEOMETRY_TYPE.CIRCLE ] =
-    styles[ consts.GEOMETRY_TYPE.POLYGON ].concat(
-      styles[ consts.GEOMETRY_TYPE.LINE_STRING ]
+  styles[ GEOMETRY_TYPE.CIRCLE ] =
+    styles[ GEOMETRY_TYPE.POLYGON ].concat(
+      styles[ GEOMETRY_TYPE.LINE_STRING ]
     )
 
-  styles[ consts.GEOMETRY_TYPE.POINT ] = [ {
+  styles[ GEOMETRY_TYPE.POINT ] = [ {
     iconRadius: width * 2,
     fillColor: blue,
     strokeColor: white,
     strokeWidth: width / 2,
     zIndex: Infinity
   } ]
-  styles[ consts.GEOMETRY_TYPE.MULTI_POINT ] =
-    styles[ consts.GEOMETRY_TYPE.POINT ]
+  styles[ GEOMETRY_TYPE.MULTI_POINT ] =
+    styles[ GEOMETRY_TYPE.POINT ]
 
-  styles[ consts.GEOMETRY_TYPE.GEOMETRY_COLLECTION ] =
-    styles[ consts.GEOMETRY_TYPE.POLYGON ].concat(
-      styles[ consts.GEOMETRY_TYPE.LINE_STRING ],
-      styles[ consts.GEOMETRY_TYPE.POINT ]
+  styles[ GEOMETRY_TYPE.GEOMETRY_COLLECTION ] =
+    styles[ GEOMETRY_TYPE.POLYGON ].concat(
+      styles[ GEOMETRY_TYPE.LINE_STRING ],
+      styles[ GEOMETRY_TYPE.POINT ]
     )
 
   return styles
+}
+
+const isEmpty = x => {
+  if (x == null) return true
+  if (typeof x === 'number') return false
+
+  return ((typeof x === 'string' || Array.isArray(x)) && !x.length) ||
+         !Object.keys(x).length
 }
 
 /**
@@ -142,7 +150,7 @@ export function transformStyle (vlStyle) {
 const addPrefix = prefix => str => prefix + (prefix ? upperFirst(str) : str)
 
 export function normalizeColorValue (color) {
-  if (isString(color) && !/^rgb.*/.test(color) && color[ 0 ] !== '#') {
+  if (typeof color === 'string' && !/^rgb.*/.test(color) && color[ 0 ] !== '#') {
     color = '#' + color
   }
 
@@ -311,7 +319,7 @@ export function transformTextStyle (vlStyle) {
 
   Object.assign(
     textStyle,
-    pick([ 'textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign' ])(vlStyle),
+    pick([ 'textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign' ], vlStyle),
     {
       font,
       fill: transformFillStyle(vlStyle, 'text') || transformFillStyle(vlStyle),

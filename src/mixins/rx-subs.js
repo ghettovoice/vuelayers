@@ -1,8 +1,9 @@
 /**
  * RxJS subscriptions manager.
  */
-import { isPlainObject, isFunction, first, noop } from 'lodash/fp'
 import { errordbg } from 'vl-utils/debug'
+
+const noop = () => {}
 
 export default {
   methods: {
@@ -29,9 +30,9 @@ export default {
     subscribeTo (observable, ...args) {
       let observer = {}
 
-      if (isPlainObject(first(args))) {
+      if (typeof args[ 0 ] === 'object') {
         observer = args.shift()
-      } else if (isFunction(first(args))) {
+      } else if (typeof args[ 0 ] === 'function') {
         observer = {
           next: args.shift(),
           error: args.shift(),

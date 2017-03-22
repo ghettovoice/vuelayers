@@ -1,7 +1,6 @@
 <script>
-  import MultiPointGeom from 'ol/geom/multipoint'
-  import { constant } from 'vl-utils/func'
-  import { consts } from 'vl-ol'
+  import MultiPoint from 'ol/geom/multipoint'
+  import { GEOMETRY_TYPE } from 'vl-ol/consts'
   import geom from 'vl-components/geom/geom'
 
   const props = {
@@ -13,12 +12,12 @@
   }
 
   const computed = {
-    type: constant(consts.GEOMETRY_TYPE.MULTI_POINT)
+    type: () => GEOMETRY_TYPE.MULTI_POINT
   }
 
   const methods = {
     createGeometry () {
-      return new MultiPointGeom(this.fromLonLat(this.currentCoordinates))
+      return new MultiPoint(this.fromLonLat(this.currentCoordinates))
     }
   }
 

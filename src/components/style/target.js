@@ -1,5 +1,7 @@
-import { isEmpty, isFunction, isBoolean, flow, map, filter, get } from 'lodash/fp'
-import { geoJson, consts } from 'vl-ol'
+import { flow, map, filter } from 'lodash/fp'
+import { LAYER_PROP } from 'vl-ol/consts'
+import { write } from 'vl-ol/geojson'
+import * as styleHelper from 'vl-ol/style'
 
 export default {
   inject: [ 'view' ],
@@ -45,18 +47,18 @@ export function createStyleFunc (vm) {
     if (!feature.getGeometry()) return
 
     let styles = vm.styles
-    let geoJsonFeature = geoJson.write(feature, vm.view.getProjection())
-    let layerId = get([ 'properties', consts.LAYER_PROP ], geoJsonFeature)
+    let geoJsonFeature = write(feature, vm.view.getProjection())
+    let layerId = feature.get(LAYER_PROP)
 
-    if (isFunction(styles)) {
-      styles = styles(geoJsonFeature, resolution, layerId)
+    if (typeof styles === 'function') {
+      styles = styles(geoJsonFeature, resolution, layerId, styleHelper)
     } else if (Array.isArray(styles)) {
       styles = flow(
         filter(({ style, condition }) => {
           return condition == null ||
-                 (isBoolean(condition) && condition) ||
+                 (condition === true) ||
                  (
-                   isFunction(condition) &&
+                   typeof condition === 'function' &&
                    condition(geoJsonFeature, resolution, layerId)
                  )
         }),
@@ -64,11 +66,11 @@ export function createStyleFunc (vm) {
       )(styles)
     }
     // null style
-    if (styles === null || !isEmpty(styles)) return styles
+    if (styles === null || styles.length) return styles
 
     if (vm.defaultStyles) {
-      return isFunction(vm.defaultStyles)
-        ? vm.defaultStyles(geoJsonFeature, resolution, layerId)
+      return typeof vm.defaultStyles === 'function'
+        ? vm.defaultStyles(geoJsonFeature, resolution, layerId, styleHelper)
         : vm.defaultStyles
     }
   }

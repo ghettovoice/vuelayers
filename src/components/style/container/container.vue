@@ -5,7 +5,6 @@
    */
   import Style from 'ol/style/style'
   import { warn } from 'vl-utils/debug'
-  import { isFunction, isArray } from 'vl-utils/func'
   import style from 'vl-components/style/style'
 
   const props = {
@@ -31,8 +30,8 @@
     },
     mountStyle () {
       let currentStyle = this.getStyle() || []
-      if (currentStyle && !isArray(currentStyle)) {
-        if (isFunction(currentStyle) && process.env.NODE_ENV !== 'production') {
+      if (currentStyle && !Array.isArray(currentStyle)) {
+        if (typeof currentStyle === 'function' && process.env.NODE_ENV !== 'production') {
           warn('Avoid combining vl-style-func and vl-style-container components on the same level ' +
                'because it can lead to the wrong result')
         }
@@ -47,8 +46,8 @@
     },
     unmountStyle () {
       let currentStyle = this.getStyle() || []
-      if (currentStyle && !isArray(currentStyle)) {
-        if (isFunction(currentStyle) && process.env.NODE_ENV !== 'production') {
+      if (currentStyle && !Array.isArray(currentStyle)) {
+        if (typeof currentStyle === 'function' && process.env.NODE_ENV !== 'production') {
           warn('Style target already has defined style that is not an array. ' +
                'Avoid combining vl-style-func and vl-style-container components on the same level ' +
                'because it can lead to the wrong result')

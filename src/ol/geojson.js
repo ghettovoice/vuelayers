@@ -7,8 +7,6 @@ const geoJson = new GeoJson({
   defaultDataProjection: DATA_PROJECTION
 })
 
-export default geoJson
-
 export const cleanProperties = omitBy(x => isObject(x) && !isPlainObject(x))
 
 /**

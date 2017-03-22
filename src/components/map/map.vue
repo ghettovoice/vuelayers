@@ -7,12 +7,13 @@
 
 <script>
   import Map from 'ol/map'
-  import Observable from 'rxjs'
-  import 'vl-rx'
-  import vmBind from 'vl-mixins/vm-bind'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/map'
+  import 'vl-rx/from-ol-event'
   import rxSubs from 'vl-mixins/rx-subs'
-  import { isFunction, isEqual } from 'lodash/fp'
-  import { coordinateHelper } from 'vl-ol'
+  import { isEqual } from 'lodash/fp'
+  import { toLonLat } from 'vl-ol/coordinate'
 
   const props = {
     loadTilesWhileAnimating: {
@@ -58,7 +59,7 @@
     },
     // todo work with GeoJSON
     forEachFeatureAtPixel (pixel, cb, layerFilter, hitTolerance) {
-      const opts = isFunction(layerFilter) ? { layerFilter, hitTolerance } : layerFilter
+      const opts = typeof layerFilter === 'function' ? { layerFilter, hitTolerance } : layerFilter
 
       return this.map.forEachFeatureAtPixel(pixel, cb, opts)
     },
@@ -79,7 +80,7 @@
 
   export default {
     name: 'vl-map',
-    mixins: [ rxSubs, vmBind ],
+    mixins: [ rxSubs ],
     props,
     methods,
     provide () {
@@ -128,31 +129,29 @@
       logo: this.logo,
       keyboardEventTarget: this.keyboardEventTarget
     })
-
-    this.bindSelfTo(this.map)
+    this.map.set('vm', this)
 
     return this.map
   }
 
   function subscribeToMapEvents () {
-    this.subscribeTo(
-      Observable.fromOlEvent(
-        this.map,
-        [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ],
-        ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
-      ).distinctUntilChanged((a, b) => isEqual(a, b))
-        .map(evt => ({
-          ...evt,
-          coordinate: coordinateHelper.pointToLonLat(coordinate, this.view.getProjection())
-        })),
-      evt => this.$emit(evt.type, evt)
-    )
+    const pointerEvents = Observable.fromOlEvent(
+      this.map,
+      [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ],
+      ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
+    ).distinctUntilChanged((a, b) => isEqual(a, b))
+      .map(evt => ({
+        ...evt,
+        coordinate: toLonLat(evt.coordinate, this.view.getProjection())
+      }))
+
+    this.subscribeTo(pointerEvents, evt => this.$emit(evt.type, evt))
   }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
   @import "../../styles/mixins";
-  @import "~openlayers/dist/ol";
+  @import "~ol/ol.css";
 
   .vl-map, .vl-map .map {
     @include vl-wh(100%, 100%);

@@ -1,7 +1,6 @@
 <script>
-  import MultiPolygonGeom from 'ol/geom/multipolygon'
-  import { constant } from 'vl-utils/func'
-  import { consts } from 'vl-ol'
+  import MultiPolygon from 'ol/geom/multipolygon'
+  import { GEOMETRY_TYPE } from 'vl-ol/consts'
   import geom from 'vl-components/geom/geom'
 
   const props = {
@@ -13,12 +12,12 @@
   }
 
   const computed = {
-    type: constant(consts.GEOMETRY_TYPE.MULTI_POLYGON)
+    type: () => GEOMETRY_TYPE.MULTI_POLYGON
   }
 
   const methods = {
     createGeometry () {
-      return new MultiPolygonGeom(this.fromLonLat(this.currentCoordinates))
+      return new MultiPolygon(this.fromLonLat(this.currentCoordinates))
     }
   }
 

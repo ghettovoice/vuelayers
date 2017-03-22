@@ -3,7 +3,8 @@
  */
 import TileWmsSource from 'ol/source/tilewms'
 import { omit } from 'lodash/fp'
-import { consts, coordinateHelper } from 'vl-ol'
+import { WMS_VERSION } from 'vl-ol/consts'
+import { toLonLat } from 'vl-ol/coordinate'
 import tileSource from 'vl-components/source/tile-base'
 
 const props = {
@@ -13,7 +14,7 @@ const props = {
   },
   version: {
     type: String,
-    default: olConsts.WMS_VERSION
+    default: WMS_VERSION
   },
   styles: String, // WMS Request styles
   extParams: Object, // Additional WMS Request params
@@ -83,7 +84,7 @@ const methods = {
     params = {}
   ) {
     return this.source.getFeatureInfoUrl(
-      coordHelper.pointFromLonLat(coordinate, projection),
+      toLonLat(coordinate, projection),
       resolution,
       projection,
       cleanExtParams(params)

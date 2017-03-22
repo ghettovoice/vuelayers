@@ -1,21 +1,30 @@
 <script>
-  import ol, { consts as olConsts } from 'vl-ol'
-  import Observable from 'vl-rx'
-  import { isFunction, isEqual } from 'vl-utils/func'
+  import Vue from 'vue'
+  import View from 'ol/view'
+  import { isEqual } from 'lodash/fp'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/observable/combineLatest'
+  import 'rxjs/add/observable/of'
+  import 'rxjs/add/operator/merge'
+  import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/map'
+  import 'vl-rx/from-ol-event'
+  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } from 'vl-ol/consts'
+  import { toLonLat, fromLonLat } from 'vl-ol/coordinate'
   import { warn } from 'vl-utils/debug'
   import rxSubs from 'vl-mixins/rx-subs'
-  import vmBind from 'vl-mixins/vm-bind'
   import stubVNode from 'vl-mixins/stub-vnode'
 
   const props = {
     zoom: {
       type: Number,
-      default: olConsts.MIN_ZOOM
+      default: MIN_ZOOM
     },
     center: {
       type: Array,
       default: () => [ 0, 0 ],
-      validator: value => value.length === 2
+      validator: value => Array.isArray(value) && value.length === 2
     },
     rotation: {
       type: Number,
@@ -23,15 +32,15 @@
     },
     maxZoom: {
       type: Number,
-      default: olConsts.MAX_ZOOM
+      default: MAX_ZOOM
     },
     minZoom: {
       type: Number,
-      default: olConsts.MIN_ZOOM
+      default: MIN_ZOOM
     },
     projection: {
       type: String,
-      default: olConsts.MAP_PROJECTION
+      default: MAP_PROJECTION
     },
     enableRotation: {
       type: Boolean,
@@ -39,14 +48,14 @@
     },
     extent: {
       type: Array,
-      validator: value => value.length === 4
+      validator: value => Array.isArray(value) && value.length === 4
     },
     maxResolution: Number,
     minResolution: Number,
     resolution: Array,
     zoomFactor: {
       type: Number,
-      default: olConsts.ZOOM_FACTOR
+      default: ZOOM_FACTOR
     }
   }
 
@@ -63,7 +72,7 @@
      * @return {Promise}
      */
     animate (...args) {
-      let cb = args.find(isFunction)
+      let cb = args.reverse().find(x => typeof x === 'function')
 
       return new Promise(
         resolve => this.view.animate(...args, complete => {
@@ -77,7 +86,7 @@
     },
     setCurrentView ({ center, zoom, rotation }) {
       if (center != null && !isEqual(center, this.currentCenter)) {
-        this.view.setCenter(ol.proj.fromLonLat(center, this.projection))
+        this.view.setCenter(fromLonLat(center, this.projection))
       }
       if (zoom != null && zoom !== this.currentZoom) {
         this.view.setZoom(zoom)
@@ -96,12 +105,12 @@
 
       let view = this.map.getView()
 
-      if (view && view.$vm) {
+      if (view && view.get('vm') instanceof Vue) {
         if (process.env.NODE_ENV !== 'production') {
           warn('Map already has mounted vl-view component. ' +
                'It will be replaced with new.')
         }
-        view.$vm.unmountView()
+        view.get('vm').unmountView()
       }
 
       this.map.setView(this.view)
@@ -128,7 +137,7 @@
   export default {
     name: 'vl-view',
     inject: [ 'map' ],
-    mixins: [ rxSubs, vmBind, stubVNode ],
+    mixins: [ rxSubs, stubVNode ],
     props,
     methods,
     watch,
@@ -159,22 +168,21 @@
   }
 
   /**
-   * @return {ol.View}
+   * @return {View}
    */
   function createView () {
     /**
-     * @type {ol.View}
+     * @type {View}
      * @protected
      */
-    this.view = new ol.View({
-      center: ol.proj.fromLonLat(this.currentCenter, this.projection),
+    this.view = new View({
+      center: fromLonLat(this.currentCenter, this.projection),
       zoom: this.currentZoom,
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
       projection: this.projection
     })
-
-    this.bindSelfTo(this.view)
+    this.view.set('vm', this)
 
     return this.view
   }
@@ -183,18 +191,40 @@
    * Subscribe to OpenLayers significant events
    */
   function subscribeToViewChanges () {
+    const centerChanges = Observable.of(this.view.getCenter())
+      .merge(
+        Observable.fromOlEvent(
+          this.view,
+          'change:center',
+          () => this.view.getCenter()
+        )
+      )
+    const resolutionChanges = Observable.of(this.view.getZoom())
+      .merge(
+        Observable.fromOlEvent(
+          this.view,
+          'change:resolution',
+          () => this.view.getZoom()
+        )
+      )
+    const rotationChanges = Observable.of(this.view.getRotation())
+      .merge(
+        Observable.fromOlEvent(
+          this.view,
+          'change:rotation',
+          () => this.view.getRotation()
+        )
+      )
+
     const viewChanges = Observable.combineLatest(
-      Observable.of(this.view.getCenter())
-        .merge(Observable.fromOlEvent(this.view, 'change:center', () => this.view.getCenter())),
-      Observable.of(this.view.getZoom())
-        .merge(Observable.fromOlEvent(this.view, 'change:resolution', () => this.view.getZoom())),
-      Observable.of(this.view.getRotation())
-        .merge(Observable.fromOlEvent(this.view, 'change:rotation', () => this.view.getRotation()))
+      centerChanges,
+      resolutionChanges,
+      rotationChanges
     ).throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
       .map(([ center, zoom, rotation ]) => {
         return {
-          center: ol.proj.toLonLat(center, this.projection),
+          center: toLonLat(center, this.projection),
           zoom: Math.ceil(this.view.getZoom()),
           rotation
         }
@@ -223,6 +253,4 @@
   }
 </script>
 
-<style>
-  /* stub style  */
-</style>
+<style>/* stub style  */</style>

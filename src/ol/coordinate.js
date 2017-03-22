@@ -1,8 +1,14 @@
 /**
  * Coordinate extensions
  */
-import { fromLonLat, toLonLat } from 'ol/proj'
+import proj from 'ol/proj'
 import { MAP_PROJECTION, GEOMETRY_TYPE } from './consts'
+
+const { fromLonLat, toLonLat } = proj
+export {
+  fromLonLat,
+  toLonLat
+}
 
 export function pointToLonLat (coordinate, projection = MAP_PROJECTION) {
   return toLonLat(coordinate, projection)

@@ -1,18 +1,15 @@
 /**
  * Renders stub VNode for component.
  */
-import { isFunction, isString } from 'lodash/fp'
-const reduce = require('lodash/fp/reduce').convert({ cap: false })
-
 export default {
   render (h) {
     const options = this.$options.stubVNode || {}
     // render as HTML comment
     if (options.empty) {
       let vnode = h()
-      if (isString(options.empty)) {
+      if (typeof options.empty === 'string') {
         vnode.text = options.empty
-      } else if (isFunction(options.empty)) {
+      } else if (typeof options.empty === 'function') {
         vnode.text = this::options.empty()
       }
 
@@ -26,7 +23,7 @@ export default {
       children = extractChildren(this.$slots, options.slots)
     }
 
-    let attrs = isFunction(options.attrs)
+    let attrs = typeof options.attrs === 'function'
       ? this::options.attrs()
       : options.attrs
 
@@ -42,11 +39,11 @@ export default {
 }
 
 function extractChildren (slots, slotNames = []) {
-  return reduce((all, nodes, name) => {
+  return Object.keys(slots).reduce((all, name) => {
     if (!slotNames.length || slotNames.includes(name)) {
-      all = all.concat(nodes)
+      all = all.concat(slots[ name ])
     }
 
     return all
-  }, [], slots)
+  }, [])
 }

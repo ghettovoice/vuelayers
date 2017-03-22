@@ -1,4 +1,4 @@
-import ol from 'openlayers'
+import OlMap from 'ol/map'
 import Vue from 'vue'
 import Map from 'vl-components/map'
 
@@ -10,8 +10,8 @@ describe('map component', () => {
       const vm = new Ctor().$mount()
 
       Vue.nextTick(() => {
-        expect(vm.map).to.be.instanceOf(ol.Map)
-        expect(vm.map.$vm).to.be.equal(vm)
+        expect(vm.map).to.be.instanceof(OlMap)
+        expect(vm.map.get('vm')).to.be.equal(vm)
         expect(vm.map.getTargetElement()).to.be.equal(vm.$refs.map)
         expect(vm.map.getLayers().getLength()).to.be.equal(0)
 

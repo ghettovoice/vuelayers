@@ -7,26 +7,65 @@
 #
 map:
 ####################################################################
-#   COMMON
+#   OPENLAYERS EXTENSIONS
 ####################################################################
   - name: ol
     path: ol
     alias: vl-ol
 
+  - name: ol/consts
+    path: ol/consts
+    alias: vl-ol/consts
+
+  - name: ol/coordinate
+    path: ol/coordinate
+    alias: vl-ol/coordinate
+
+  - name: ol/extent
+    path: ol/extent
+    alias: vl-ol/extent
+
+  - name: ol/geojson
+    path: ol/geojson
+    alias: vl-ol/geojson
+
+  - name: ol/style
+    path: ol/style
+    alias: vl-ol/style
+
+####################################################################
+#   RXJS EXTENSIONS
+####################################################################
   - name: rx
     path: rx
     alias: vl-rx
 
+  - name: rx/from-ol-event
+    path: rx/from-ol-event
+    alias: vl-rx/from-ol-event
+
 #####################################################################
 #   UTILS
 #####################################################################
-  - name: utils/func
-    path: utils/func
-    alias: vl-utils/func
+  - name: utils/coalesce
+    path: utils/coalesce
+    alias: vl-utils/coalesce
 
   - name: utils/debug
     path: utils/debug
     alias: vl-utils/debug
+
+  - name: utils/is-numeric
+    path: utils/is-numeric
+    alias: vl-utils/is-numeric
+
+  - name: utils/replace-tokens
+    path: utils/replace-tokens
+    alias: vl-utils/replace-tokens
+
+  - name: utils/timed-chunk
+    path: utils/timed-chunk
+    alias: vl-utils/timed-chunk
 
 #####################################################################
 #   MIXINS
@@ -38,10 +77,6 @@ map:
   - name: mixins/stub-vnode
     path: mixins/stub-vnode
     alias: vl-mixins/stub-vnode
-
-  - name: mixins/vm-bind
-    path: mixins/vm-bind
-    alias: vl-mixins/vm-bind
 
 #####################################################################
 #   COMMON COMPONENTS

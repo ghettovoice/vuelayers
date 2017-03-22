@@ -1,7 +1,7 @@
 <script>
+  import coalesce from 'vl-utils/coalesce'
+  import { TILE_SIZE, MAP_PROJECTION } from 'vl-ol/consts'
   import xyzSource from 'vl-components/source/xyz-base'
-  import { coalesce, constant } from 'vl-utils/func'
-  import { consts } from 'vl-ol'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
@@ -31,8 +31,8 @@
 
   const computed = {
     // bind to constant values: projection and tile size
-    currentProjection: constant(consts.MAP_PROJECTION),
-    currentTileSize: constant([ consts.TILE_SIZE, consts.TILE_SIZE ]),
+    currentProjection: () => MAP_PROJECTION,
+    currentTileSize: () => [ TILE_SIZE, TILE_SIZE ],
     tileNameSuffix () {
       return tileNameSuffix(this.tilePixelRatio)
     },

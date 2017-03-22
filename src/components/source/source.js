@@ -1,14 +1,13 @@
 import rxSubs from 'vl-mixins/rx-subs'
-import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
-import { consts } from 'vl-ol'
+import { MAP_PROJECTION } from 'vl-ol/consts'
 import { warn } from 'vl-utils/debug'
 
 const props = {
   attributions: [ String, Array ],
   projection: {
     type: String,
-    default: consts.MAP_PROJECTION
+    default: MAP_PROJECTION
   },
   wrapX: {
     type: Boolean,
@@ -36,7 +35,7 @@ const methods = {
      * @protected
      */
     this.source = this.createSource()
-    this.bindSelfTo(this.source)
+    this.source.set('vm', this)
   },
   /**
    * @return {Source}
@@ -72,7 +71,7 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs, vmBind, stubVNode ],
+  mixins: [ rxSubs, stubVNode ],
   inject: [ 'layer' ],
   props,
   computed,

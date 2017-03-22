@@ -1,7 +1,6 @@
 <script>
-  import PolygonGeom from 'ol/geom/polygon'
-  import { constant } from 'vl-utils/func'
-  import { consts } from 'vl-ol'
+  import Polygon from 'ol/geom/polygon'
+  import { GEOMETRY_TYPE } from 'vl-ol/consts'
   import geom from 'vl-components/geom/geom'
 
   const props = {
@@ -13,12 +12,12 @@
   }
 
   const computed = {
-    type: constant(consts.GEOMETRY_TYPE.POLYGON)
+    type: () => GEOMETRY_TYPE.POLYGON
   }
 
   const methods = {
     createGeometry () {
-      return new PolygonGeom(this.fromLonLat(this.currentCoordinates))
+      return new Polygon(this.fromLonLat(this.currentCoordinates))
     }
   }
 

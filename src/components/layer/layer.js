@@ -1,6 +1,5 @@
 import uuid from 'uuid/v4'
 import rxSubs from 'vl-mixins/rx-subs'
-import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
 import { warn } from 'vl-utils/debug'
 
@@ -21,7 +20,7 @@ const props = {
   },
   extent: {
     type: Array,
-    validator: value => value.length === 4
+    validator: value => Array.isArray(value) && value.length === 4
   },
   zIndex: {
     type: Number,
@@ -64,8 +63,10 @@ const methods = {
      * @protected
      */
     this.layer = this.createLayer()
-    this.bindSelfTo(this.layer)
-    this.layer.set('id', this.currentId)
+    this.layer.setProperties({
+      id: this.currentId,
+      vm: this
+    })
   },
   /**
    * @return {Layer}
@@ -126,7 +127,7 @@ const watch = {
 }
 
 export default {
-  mixins: [ rxSubs, vmBind, stubVNode ],
+  mixins: [ rxSubs, stubVNode ],
   inject: [ 'map' ],
   props,
   computed,

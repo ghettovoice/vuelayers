@@ -1,5 +1,4 @@
 import rxSubs from 'vl-mixins/rx-subs'
-import vmBind from 'vl-mixins/vm-bind'
 import stubVNode from 'vl-mixins/stub-vnode'
 import { warn } from 'vl-utils/debug'
 
@@ -15,7 +14,7 @@ const methods = {
      * @protected
      */
     this.interaction = this.createInteraction()
-    this.bindSelfTo(this.interaction)
+    this.interaction.set('vm', this)
   },
   /**
    * @return {Interaction}
@@ -48,7 +47,7 @@ const methods = {
 }
 
 export default {
-  mixins: [ rxSubs, vmBind, stubVNode ],
+  mixins: [ rxSubs, stubVNode ],
   inject: [ 'map' ],
   props,
   methods,

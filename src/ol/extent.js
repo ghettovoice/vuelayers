@@ -1,8 +1,14 @@
 /**
  * Extent extensions
  */
-import { transformExtent } from 'ol/proj'
+import proj from 'ol/proj'
 import { MAP_PROJECTION, DATA_PROJECTION } from './consts'
+
+const { transformExtent } = proj
+
+export {
+  transformExtent as transform
+}
 
 /**
  * @param {Extent} extent

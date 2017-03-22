@@ -4,10 +4,10 @@
    */
   import uuid from 'uuid/v4'
   import stubVNode from 'vl-mixins/stub-vnode'
-  import vmBind from 'vl-mixins/vm-bind'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
-  import { geoJson, consts } from 'vl-ol'
+  import { read, cleanProperties } from 'vl-ol/geojson'
+  import { LAYER_PROP } from 'vl-ol/consts'
 
   const props = {
     id: {
@@ -30,7 +30,7 @@
     mountFeature () {
       if (this.source) {
         this.source.addFeature(this.feature)
-        this.feature.set(consts.LAYER_PROP, this.layer.get('id'))
+        this.feature.set(LAYER_PROP, this.layer.get('id'))
       } else if (process.env.NODE_ENV !== 'production') {
         warn("Invalid usage of feature component, should have source component among it's ancestors")
       }
@@ -38,7 +38,7 @@
     unmountFeature () {
       if (this.source && this.source.getFeatureById(this.id)) {
         this.source.removeFeature(this.feature)
-        this.feature.unset(consts.LAYER_PROP)
+        this.feature.unset(LAYER_PROP)
       }
     }
   }
@@ -48,7 +48,7 @@
       this.feature.setId(value)
     },
     properties (value) {
-      this.feature.setProperties(geoJson.cleanProperties(value))
+      this.feature.setProperties(cleanProperties(value))
     }
   }
 
@@ -56,7 +56,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [ vmBind, stubVNode, styleTarget ],
+    mixins: [ stubVNode, styleTarget ],
     inject: [ 'layer', 'source', 'view' ],
     props,
     methods,
@@ -104,12 +104,11 @@
      * @type {ol.Feature}
      * @protected
      */
-    this.feature = geoJson.read({
+    this.feature = read({
       id: this.id,
       properties: this.properties
     }, this.view.getProjection())
-
-    this.bindSelfTo(this.feature)
+    this.feature.set('vm', this)
 
     return this.feature
   }

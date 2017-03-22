@@ -4,12 +4,12 @@
    * Plays the role of both a style that mounts itself to style target (layer, feature & etc.)
    * and style target for inner style containers.
    */
-  import { isEmpty } from 'lodash/fp'
-  import { isFunction, noop } from 'vl-utils/func'
-  import { styleHelper, geoJson, consts } from 'vl-ol'
+  import { write } from 'vl-ol/geojson'
+  import { LAYER_PROP } from 'vl-ol/consts'
+  import * as styleHelper from 'vl-ol/style'
+  import { warn } from 'vl-utils/debug'
   import style from 'vl-components/style/style'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
-  import { warn } from 'vl-utils/debug'
 
   const props = {
     factory: {
@@ -28,24 +28,25 @@
       const fallbackStyleFunc = createStyleFunc(this)
       // user provided style function
       let providedStyleFunc = this.factory(styleHelper)
-      if (!isFunction(providedStyleFunc)) {
+      let type = typeof providedStyleFunc
+      if (type !== 'function') {
         if (process.env.NODE_ENV !== 'production') {
-          let type = typeof providedStyleFunc
           warn(`Style function factory returned value is of type ${type}, expected type is Function`)
         }
-        providedStyleFunc = noop
+        providedStyleFunc = () => {}
       }
 
       const view = this.view
 
       return function __styleFunc (feature, resolution) {
         const styles = providedStyleFunc(
-          getJson.write(feature, view.getProjection()),
+          write(feature, view.getProjection()),
           resolution,
-          feature.get(consts.LAYER_PROP)
+          feature.get(LAYER_PROP),
+          styleHelper
         )
 
-        if (styles === null || !isEmpty(styles)) return styles
+        if (styles === null || !styles.length) return styles
 
         return fallbackStyleFunc(feature, resolution)
       }
