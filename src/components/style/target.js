@@ -4,7 +4,6 @@ import { write } from 'vl-ol/geojson'
 import * as styleHelper from 'vl-ol/style'
 
 export default {
-  inject: [ 'view' ],
   provide () {
     return {
       setStyle: ::this.setStyle,

@@ -87,7 +87,7 @@ const methods = {
       }
       this.subscribeAll()
     } else if (process.env.NODE_ENV !== 'production') {
-      warn("Invalid usage of map component, should have layer component among it's ancestors")
+      warn("Invalid usage of layer component, should have map component among it's ancestors")
     }
   },
   /**
@@ -128,7 +128,7 @@ const watch = {
 
 export default {
   mixins: [ rxSubs, stubVNode ],
-  inject: [ 'map' ],
+  inject: [ 'map', 'view' ],
   props,
   computed,
   methods,

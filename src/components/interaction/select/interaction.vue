@@ -61,10 +61,10 @@
         }
       }
       const style = createStyleFunc(this)
-
+      const view = this.view
       const filterFunc = this.filter
       const filter = function __selectFilter (feature, layer) {
-        return filterFunc(write(feature, this.view.getProjection()), layer && layer.get('id'))
+        return filterFunc(write(feature, view.getProjection()), layer && layer.get('id'))
       }
 
       return new SelectInteraction({
@@ -75,7 +75,7 @@
       })
     },
     refresh () {
-      this.interaction && this.interaction.getFeatures().changed()
+      this.interaction.getFeatures().changed()
       this::interactionRefresh()
     },
     /**
@@ -124,7 +124,7 @@
     },
     setStyle (style) {
       this.styles = style
-      this.refresh()
+      this.interaction && this.refresh()
     },
     mountInteraction () {
       this::interactionMountInteraction()
@@ -153,7 +153,6 @@
   export default {
     name: 'vl-interaction-select',
     mixins: [ interaction, styleTarget ],
-    inject: [ 'map', 'view' ],
     props,
     computed,
     methods,
