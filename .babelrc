@@ -18,7 +18,7 @@
           "./modules/babel-plugin-transform-nested-import",
           {
             "pkg": "openlayers",
-            "pkgVar": "_ol_",
+            "pkgVar": "__ol__",
             "regex": "^ol(?:\/(.*))?$"
           }
         ]
