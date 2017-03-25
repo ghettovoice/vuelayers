@@ -1,11 +1,11 @@
 <script>
-  import OsmSource from 'ol/source/osm'
+  import OSMSource from 'ol/source/osm'
   import xyzSource from 'vl-components/source/xyz-base'
 
   const props = {
     attributions: {
       type: String,
-      default: OsmSource.ATTRIBUTION.getHTML()
+      default: OSMSource.ATTRIBUTION.getHTML()
     },
     url: {
       type: String,
@@ -20,7 +20,7 @@
   const methods = {
     createSource () {
       // always EPSG:3857, size: 256x256, format png
-      return new OsmSource({
+      return new OSMSource({
         url: this.currentUrl,
         attributions: this.currentAttributions,
         crossOrigin: this.crossOrigin,

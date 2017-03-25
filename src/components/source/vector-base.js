@@ -1,5 +1,5 @@
 import VectorSource from 'ol/source/vector'
-import loadingStrategy from 'ol/loadingstrategy'
+import loadingstrategy from 'ol/loadingstrategy'
 import { merge, differenceWith } from 'lodash/fp'
 import { toLonLat as extentToLonLat } from 'vl-ol/extent'
 import { read } from 'vl-ol/geojson'
@@ -72,7 +72,7 @@ const methods = {
       useSpatialIndex: this.useSpatialIndex,
       wrapX: this.wrapX,
       logo: this.logo,
-      strategy: loadingStrategy.bbox
+      strategy: loadingstrategy.bbox
       // url: this.url,
     })
   },

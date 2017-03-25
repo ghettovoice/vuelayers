@@ -1,9 +1,9 @@
-import GeoJson from 'ol/format/geojson'
+import GeoJSON from 'ol/format/geojson'
 import { DATA_PROJECTION, MAP_PROJECTION } from './consts'
 import { isPlainObject, isObject } from 'lodash/fp'
 const omitBy = require('lodash/fp/omitBy').convert({ cap: false })
 
-const geoJson = new GeoJson({
+const geoJson = new GeoJSON({
   defaultDataProjection: DATA_PROJECTION
 })
 

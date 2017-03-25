@@ -1,5 +1,5 @@
 import proj from 'ol/proj'
-import tileGrid from 'ol/tilegrid'
+import tilegrid from 'ol/tilegrid'
 import { createTileUrlFunction } from 'ol-tilecache'
 import { pick } from 'lodash/fp'
 import { TILE_SIZE, CACHE_SIZE, MIN_ZOOM, MAX_ZOOM, PIXEL_RATIO } from 'vl-ol/consts'
@@ -86,7 +86,7 @@ const methods = {
      * @type {TileGrid}
      * @protected
      */
-    this.tileGrid = tileGrid.createXYZ({
+    this.tileGrid = tilegrid.createXYZ({
       extent: this.tileGridExtent,
       minZoom: this.currentMinZoom,
       maxZoom: this.currentMaxZoom,

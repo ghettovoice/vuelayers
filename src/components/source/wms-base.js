@@ -1,7 +1,7 @@
 /**
  * Base mixin for WMS sources
  */
-import TileWmsSource from 'ol/source/tilewms'
+import TileWMSSource from 'ol/source/tilewms'
 import { omit } from 'lodash/fp'
 import { WMS_VERSION } from 'vl-ol/consts'
 import { toLonLat } from 'vl-ol/coordinate'
@@ -47,7 +47,7 @@ const cleanExtParams = params => omit(['LAYERS', 'VERSION', 'STYLES'], keysToUpp
 
 const methods = {
   createSource () {
-    return new TileWmsSource({
+    return new TileWMSSource({
       attributions: this.currentAttributions,
       cacheSize: this.cacheSize,
       params: {

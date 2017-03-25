@@ -12,6 +12,18 @@
     "lodash"
   ],
   "env": {
+    "dist": {
+      "plugins": [
+        [
+          "./modules/babel-plugin-transform-nested-import",
+          {
+            "pkg": "openlayers",
+            "pkgVar": "_ol_",
+            "regex": "^ol(?:\/(.*))?$"
+          }
+        ]
+      ]
+    },
     "test": {
       "plugins": [ "istanbul" ]
     }
