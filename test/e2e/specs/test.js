@@ -10,8 +10,7 @@ module.exports = {
 
     browser
       .url(devServer)
-      .waitForElementVisible('#app', 3000)
-      .assert.elementPresent('.vl-map')
+      .waitForElementVisible('#app', 5000)
       .assert.elementPresent('.vl-map .ol-viewport canvas')
       .end()
   }
