@@ -42,7 +42,7 @@
   "dependencies": {
     "lodash": "^4.17.4",
     "ol": "^4.0.1-beta.2",
-    "ol-tilecache": "^2.0.0-beta",
+    "ol-tilecache": "^2.0.0-beta.1",
     "rxjs": "^5.2.0",
     "uuid": "^3.0.1"
   },
