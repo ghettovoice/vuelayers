@@ -18,7 +18,7 @@ baseWebpackConfig.entry = {
 
 const webpackConfig = merge(baseWebpackConfig, {
   output: {
-    path: path.resolve(__dirname, '../dist/demo'),
+    path: path.resolve(__dirname, '../dist-demo'),
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js'),
     publicPath: ''
@@ -59,7 +59,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, '../dist/demo/index.html'),
+      filename: path.resolve(__dirname, '../dist-demo/index.html'),
       template: 'docs/index.html',
       inject: true,
       minify: {

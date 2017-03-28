@@ -142,3 +142,4 @@ $RECYCLE.BIN/
 .DS_Store
 test/e2e/reports
 dist
+dist-demo

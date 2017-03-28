@@ -13,7 +13,7 @@
     "lodash"
   ],
   "env": {
-    "dist": {
+    "cjs": {
       "plugins": [
         [
           "./modules/babel-plugin-transform-nested-import",
