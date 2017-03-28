@@ -67,6 +67,10 @@ map:
     path: utils/timed-chunk
     alias: vl-utils/timed-chunk
 
+  - name: utils/plain-props
+    path: utils/plain-props
+    alias: vl-utils/plain-props
+
 #####################################################################
 #   MIXINS
 #####################################################################

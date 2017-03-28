@@ -1,6 +1,5 @@
 import { flow, map, filter } from 'lodash/fp'
-import { LAYER_PROP } from 'vl-ol/consts'
-import { write } from 'vl-ol/geojson'
+import * as geoJson from 'vl-ol/geojson'
 import * as styleHelper from 'vl-ol/style'
 
 export default {
@@ -46,11 +45,10 @@ export function createStyleFunc (vm) {
     if (!feature.getGeometry()) return
 
     let styles = vm.styles
-    let geoJsonFeature = write(feature, vm.view.getProjection())
-    let layerId = feature.get(LAYER_PROP)
+    let geoJsonFeature = geoJson.write(feature, vm.view.getProjection())
 
     if (typeof styles === 'function') {
-      styles = styles(geoJsonFeature, resolution, layerId, styleHelper)
+      styles = styles(geoJsonFeature, resolution, styleHelper)
     } else if (Array.isArray(styles)) {
       styles = flow(
         filter(({ style, condition }) => {
@@ -58,7 +56,7 @@ export function createStyleFunc (vm) {
                  (condition === true) ||
                  (
                    typeof condition === 'function' &&
-                   condition(geoJsonFeature, resolution, layerId)
+                   condition(geoJsonFeature, resolution)
                  )
         }),
         map('style')
@@ -69,7 +67,7 @@ export function createStyleFunc (vm) {
 
     if (vm.defaultStyles) {
       return typeof vm.defaultStyles === 'function'
-        ? vm.defaultStyles(geoJsonFeature, resolution, layerId, styleHelper)
+        ? vm.defaultStyles(geoJsonFeature, resolution, styleHelper)
         : vm.defaultStyles
     }
   }

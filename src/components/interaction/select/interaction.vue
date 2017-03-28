@@ -4,8 +4,9 @@
   import { Observable } from 'rxjs/Observable'
   import 'vl-rx/from-ol-event'
   import { forEach, differenceWith } from 'lodash/fp'
+  import plainProps from 'vl-utils/plain-props'
   import { defaultEditStyle } from 'vl-ol/style'
-  import { write } from 'vl-ol/geojson'
+  import * as geoJson from 'vl-ol/geojson'
   import interaction from 'vl-components/interaction/interaction'
   import styleTarget, { createStyleFunc } from 'vl-components/style/target'
 
@@ -64,7 +65,7 @@
       const view = this.view
       const filterFunc = this.filter
       const filter = function __selectFilter (feature, layer) {
-        return filterFunc(write(feature, view.getProjection()), layer && layer.get('id'))
+        return filterFunc(geoJson.write(feature, view.getProjection()), layer && plainProps(layer.getProperties()))
       }
 
       return new SelectInteraction({
@@ -182,7 +183,7 @@
       Observable.fromOlEvent(
         selection,
         'add',
-        ({ element }) => write(element, this.view.getProjection())
+        ({ element }) => geoJson.write(element, this.view.getProjection())
       ),
       feature => {
         this.currentSelected.push(feature)
@@ -193,7 +194,7 @@
       Observable.fromOlEvent(
         selection,
         'remove',
-        ({ element }) => write(element, this.view.getProjection())
+        ({ element }) => geoJson.write(element, this.view.getProjection())
       ),
       feature => {
         this.currentSelected = this.currentSelected.filter(({ id }) => id !== feature.id)

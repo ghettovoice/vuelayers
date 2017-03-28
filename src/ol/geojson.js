@@ -1,13 +1,10 @@
 import GeoJSON from 'ol/format/geojson'
+import plainProps from 'vl-utils/plain-props'
 import { DATA_PROJECTION, MAP_PROJECTION } from './consts'
-import { isPlainObject, isObject } from 'lodash/fp'
-const omitBy = require('lodash/fp/omitBy').convert({ cap: false })
 
 const geoJson = new GeoJSON({
   defaultDataProjection: DATA_PROJECTION
 })
-
-export const cleanProperties = omitBy(x => isObject(x) && !isPlainObject(x))
 
 /**
  * @param {ol.Feature} feature
@@ -27,6 +24,6 @@ export function read (geoJsonFeature, featureProjection = MAP_PROJECTION) {
   return geoJson.readFeature({
     ...geoJsonFeature,
     type: 'Feature',
-    properties: cleanProperties(geoJson.properties)
+    properties: plainProps(geoJson.properties)
   }, { featureProjection })
 }

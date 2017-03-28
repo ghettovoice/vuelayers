@@ -7,13 +7,17 @@
 
 <script>
   import Map from 'ol/map'
-//  import { Observable } from 'rxjs/Observable'
-//  import 'rxjs/add/operator/distinctUntilChanged'
-//  import 'rxjs/add/operator/map'
-//  import 'vl-rx/from-ol-event'
+  import { isEqual, constant } from 'lodash/fp'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/map'
+  import 'vl-rx/from-ol-event'
+  import plainProps from 'vl-utils/plain-props'
+  import { toLonLat } from 'vl-ol/coordinate'
+  import * as geoJson from 'vl-ol/geojson'
   import rxSubs from 'vl-mixins/rx-subs'
-//  import { isEqual } from 'lodash/fp'
-//  import { toLonLat } from 'vl-ol/coordinate'
+
+  const noop = () => {}
 
   const props = {
     loadTilesWhileAnimating: {
@@ -55,17 +59,32 @@
      * @protected
      */
     subscribeAll () {
-//      this::subscribeToMapEvents()
+      this::subscribeToMapEvents()
     },
     // todo work with GeoJSON
-    forEachFeatureAtPixel (pixel, cb, layerFilter, hitTolerance) {
-      const opts = typeof layerFilter === 'function' ? { layerFilter, hitTolerance } : layerFilter
+    forEachFeatureAtPixel (pixel, callback, opts = {}) {
+      const cb = (feature, layer) => {
+        return callback(
+          geoJson.write(feature),
+          layer && plainProps(layer.getProperties())
+        )
+      }
+      const layerFilter = opts.layerFilter || constant(true)
+      opts.layerFilter = layer => layerFilter(plainProps(layer.getProperties()))
 
       return this.map.forEachFeatureAtPixel(pixel, cb, opts)
     },
     // todo work with GeoJSON
-    forEachLayerAtPixel (pixel, cb, layerFilter) {
-      return this.map.forEachLayerAtPixel(pixel, cb, undefined, layerFilter)
+    forEachLayerAtPixel (pixel, callback, layerFilter = noop) {
+      const cb = (layer, rgba) => {
+        return callback(
+          plainProps(layer.getProperties()),
+          rgba
+        )
+      }
+      const lf = layer => layerFilter(plainProps(layer.getProperties()))
+
+      return this.map.forEachLayerAtPixel(pixel, cb, undefined, lf)
     },
     mountMap () {
       this.map.setTarget(this.$refs.map)
@@ -134,19 +153,19 @@
     return this.map
   }
 
-//  function subscribeToMapEvents () {
-//    const pointerEvents = Observable.fromOlEvent(
-//      this.map,
-//      [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ],
-//      ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
-//    ).distinctUntilChanged((a, b) => isEqual(a, b))
-//      .map(evt => ({
-//        ...evt,
-//        coordinate: toLonLat(evt.coordinate, this.view.getProjection())
-//      }))
-//
-//    this.subscribeTo(pointerEvents, evt => this.$emit(evt.type, evt))
-//  }
+  function subscribeToMapEvents () {
+    const pointerEvents = Observable.fromOlEvent(
+      this.map,
+      [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ],
+      ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
+    ).distinctUntilChanged((a, b) => isEqual(a, b))
+      .map(evt => ({
+        ...evt,
+        coordinate: toLonLat(evt.coordinate, this.view.getProjection())
+      }))
+
+    this.subscribeTo(pointerEvents, evt => this.$emit(evt.type, evt))
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

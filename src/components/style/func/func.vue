@@ -4,8 +4,7 @@
    * Plays the role of both a style that mounts itself to style target (layer, feature & etc.)
    * and style target for inner style containers.
    */
-  import { write } from 'vl-ol/geojson'
-  import { LAYER_PROP } from 'vl-ol/consts'
+  import * as geoJson from 'vl-ol/geojson'
   import * as styleHelper from 'vl-ol/style'
   import { warn } from 'vl-utils/debug'
   import style from 'vl-components/style/style'
@@ -40,9 +39,8 @@
 
       return function __styleFunc (feature, resolution) {
         const styles = providedStyleFunc(
-          write(feature, view.getProjection()),
+          geoJson.write(feature, view.getProjection()),
           resolution,
-          feature.get(LAYER_PROP),
           styleHelper
         )
 

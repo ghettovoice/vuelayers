@@ -6,7 +6,8 @@
   import stubVNode from 'vl-mixins/stub-vnode'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
-  import { read, cleanProperties } from 'vl-ol/geojson'
+  import plainProps from 'vl-utils/plain-props'
+  import * as geoJson from 'vl-ol/geojson'
   import { LAYER_PROP } from 'vl-ol/consts'
 
   const props = {
@@ -48,7 +49,7 @@
       this.feature.setId(value)
     },
     properties (value) {
-      this.feature.setProperties(cleanProperties(value))
+      this.feature.setProperties(plainProps(value))
     }
   }
 
@@ -104,7 +105,7 @@
      * @type {ol.Feature}
      * @protected
      */
-    this.feature = read({
+    this.feature = geoJson.read({
       id: this.id,
       properties: this.properties
     }, this.view.getProjection())

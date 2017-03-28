@@ -2,7 +2,7 @@ import VectorSource from 'ol/source/vector'
 import loadingstrategy from 'ol/loadingstrategy'
 import { merge, differenceWith } from 'lodash/fp'
 import { toLonLat as extentToLonLat } from 'vl-ol/extent'
-import { read } from 'vl-ol/geojson'
+import * as geoJson from 'vl-ol/geojson'
 import { LAYER_PROP } from 'vl-ol/consts'
 import source from 'vl-components/source/source'
 
@@ -130,7 +130,7 @@ export default {
 }
 
 function createFeature (geoJsonFeature) {
-  return read(merge(geoJsonFeature, {
+  return geoJson.read(merge(geoJsonFeature, {
     properties: {
       [ LAYER_PROP ]: this.layer.get('id')
     }
