@@ -27,7 +27,7 @@
       type: String,
       default: 'fraction' // pixels, fraction
     },
-    color: Array,
+    color: [ Array, String ],
     crossOrigin: {
       type: String,
       default: 'anonymous'
@@ -47,10 +47,6 @@
     scale: {
       type: Number,
       default: 1
-    },
-    snapToPixel: {
-      type: Boolean,
-      default: true
     },
     rotateWithView: {
       type: Boolean,

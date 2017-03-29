@@ -1,5 +1,12 @@
 import style from 'vl-components/style/style'
 
+const props = {
+  snapToPixel: {
+    type: Boolean,
+    default: true
+  }
+}
+
 const { refresh: styleRefresh } = style.methods
 const methods = {
   /**

@@ -7,6 +7,7 @@ export StyleFill from './fill'
 export StyleStroke from './stroke'
 export StyleCircle from './circle'
 export StyleIcon from './icon'
+export StyleRegShape from './reg-shape'
 export StyleFunc from './func'
 
 export const mixins = {

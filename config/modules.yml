@@ -245,6 +245,10 @@ map:
     path: components/style/icon
     alias: vl-components/style/icon
 
+  - name: style-reg-shape
+    path: components/style/reg-shape
+    alias: vl-components/style/reg-shape
+
 #############################################################################
 #  INTERACTION
 #############################################################################

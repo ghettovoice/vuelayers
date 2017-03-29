@@ -1,22 +1,43 @@
 <script>
-  import Circle from 'ol/style/circle'
+  import RegularShape from 'ol/style/regularshape'
   import imageStyle from 'vl-components/style/image'
 
   const props = {
-    radius: {
+    points: {
       type: Number,
-      default: 5
+      required: true
+    },
+    radius: Number,
+    radius1: Number,
+    radius2: Number,
+    angle: {
+      type: Number,
+      default: 0
+    },
+    rotation: {
+      type: Number,
+      default: 0
+    },
+    rotateWithView: {
+      type: Boolean,
+      default: false
     }
   }
 
   const methods = {
     /**
-     * @return {Circle}
+     * @return {RegularShape}
      * @protected
      */
     createStyle () {
-      return new Circle({
+      return new RegularShape({
+        points: this.points,
         radius: this.radius,
+        radius1: this.radius1,
+        radius2: this.radius2,
+        angle: this.angle,
+        rotation: this.rotation,
+        rotateWithView: this.rotateWithView,
         snapToPixel: this.snapToPixel,
         fill: this.fill,
         stroke: this.stroke
@@ -24,21 +45,11 @@
     }
   }
 
-  const watch = {
-    radius () {
-      this.refresh()
-    },
-    snapToPixel () {
-      this.refresh()
-    }
-  }
-
   export default {
-    name: 'vl-style-circle',
+    name: 'vl-style-reg-shape',
     mixins: [ imageStyle ],
     props,
     methods,
-    watch,
     provide () {
       return {
         setFill: this::setFill,
@@ -46,6 +57,7 @@
       }
     }
   }
+
   // todo do not recreate if already create and has fill/stroke, use setters instead
   function setFill (fill) {
     /**
@@ -66,4 +78,4 @@
   }
 </script>
 
-<style>/* stub styles */</style>
+<style>/* stub style */</style>
