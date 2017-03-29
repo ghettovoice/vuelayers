@@ -1,6 +1,5 @@
 import rxSubs from 'vl-mixins/rx-subs'
 import stubVNode from 'vl-mixins/stub-vnode'
-import { warn } from 'vl-utils/debug'
 
 const props = {}
 
@@ -27,12 +26,12 @@ const methods = {
    * @protected
    */
   mountInteraction () {
-    if (this.map) {
-      this.map.addInteraction(this.interaction)
-      this.subscribeAll()
-    } else if (process.env.NODE_ENV !== 'production') {
-      warn("Invalid usage of interaction component, should have map component among it's ancestors")
+    if (!this.map) {
+      throw new Error("Invalid usage of interaction component, should have map component among it's ancestors")
     }
+
+    this.map.addInteraction(this.interaction)
+    this.subscribeAll()
   },
   /**
    * @protected

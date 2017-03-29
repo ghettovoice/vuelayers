@@ -100,7 +100,7 @@
     },
     mountView () {
       if (!this.map) {
-        warn("Invalid usage of view component, should have map component among it's ancestors")
+        throw new Error("Invalid usage of view component, should have map component among it's ancestors")
       }
 
       let view = this.map.getView()

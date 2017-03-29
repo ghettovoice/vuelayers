@@ -9,7 +9,6 @@ import rxSubs from 'vl-mixins/rx-subs'
 import stubVNode from 'vl-mixins/stub-vnode'
 import { transforms } from 'vl-ol/coordinate'
 import { toLonLat as extentToLonLat } from 'vl-ol/extent'
-import { warn } from 'vl-utils/debug'
 
 const props = {
   /**
@@ -75,12 +74,12 @@ const methods = {
    * @protected
    */
   mountGeometry () {
-    if (this.feature) {
-      this.feature.setGeometry(this.geometry)
-      this.subscribeAll()
-    } else if (process.env.NODE_ENV !== 'production') {
-      warn("Invalid usage of geometry component, should have feature component among it's ancestors")
+    if (!this.feature) {
+      throw new Error("Invalid usage of geometry component, should have feature component among it's ancestors")
     }
+
+    this.feature.setGeometry(this.geometry)
+    this.subscribeAll()
   },
   /**
    * @protected

@@ -1,7 +1,6 @@
 import rxSubs from 'vl-mixins/rx-subs'
 import stubVNode from 'vl-mixins/stub-vnode'
 import { MAP_PROJECTION } from 'vl-ol/consts'
-import { warn } from 'vl-utils/debug'
 
 const props = {
   attributions: [ String, Array ],
@@ -45,12 +44,12 @@ const methods = {
     throw new Error('Not implemented method')
   },
   mountSource () {
-    if (this.layer) {
-      this.layer.setSource(this.source)
-      this.subscribeAll()
-    } else if (process.env.NODE_ENV !== 'production') {
-      warn("Invalid usage of source component, should have layer component among it's ancestors")
+    if (!this.source) {
+      throw new Error("Invalid usage of source component, should have layer component among it's ancestors")
     }
+
+    this.layer.setSource(this.source)
+    this.subscribeAll()
   },
   unmountSource () {
     this.unsubscribeAll()

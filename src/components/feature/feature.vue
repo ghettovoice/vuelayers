@@ -9,7 +9,6 @@
   import rxSubs from 'vl-mixins/rx-subs'
   import stubVNode from 'vl-mixins/stub-vnode'
   import styleTarget from 'vl-components/style/target'
-  import { warn } from 'vl-utils/debug'
   import plainProps from 'vl-utils/plain-props'
   import * as geoJson from 'vl-ol/geojson'
   import { LAYER_PROP } from 'vl-ol/consts'
@@ -34,13 +33,13 @@
       return this.feature
     },
     mountFeature () {
-      if (this.source) {
-        this.source.addFeature(this.feature)
-        this.feature.set(LAYER_PROP, this.layer.get('id'))
-        this.subscribeAll()
-      } else if (process.env.NODE_ENV !== 'production') {
-        warn("Invalid usage of feature component, should have source component among it's ancestors")
+      if (!this.source) {
+        throw new Error("Invalid usage of feature component, should have source component among it's ancestors")
       }
+
+      this.source.addFeature(this.feature)
+      this.feature.set(LAYER_PROP, this.layer.get('id'))
+      this.subscribeAll()
     },
     unmountFeature () {
       this.unsubscribeAll()

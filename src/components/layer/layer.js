@@ -4,7 +4,6 @@ import 'rxjs/add/operator/map'
 import 'vl-rx/from-ol-event'
 import rxSubs from 'vl-mixins/rx-subs'
 import stubVNode from 'vl-mixins/stub-vnode'
-import { warn } from 'vl-utils/debug'
 import { toLonLat } from 'vl-ol/coordinate'
 
 const props = {
@@ -83,16 +82,16 @@ const methods = {
    * @protected
    */
   mountLayer () {
-    if (this.map) {
-      if (this.overlay) {
-        this.layer.setMap(this.map)
-      } else {
-        this.map.addLayer(this.layer)
-      }
-      this.subscribeAll()
-    } else if (process.env.NODE_ENV !== 'production') {
-      warn("Invalid usage of layer component, should have map component among it's ancestors")
+    if (!this.map) {
+      throw new Error("Invalid usage of layer component, should have map component among it's ancestors")
     }
+
+    if (this.overlay) {
+      this.layer.setMap(this.map)
+    } else {
+      this.map.addLayer(this.layer)
+    }
+    this.subscribeAll()
   },
   /**
    * @protected
