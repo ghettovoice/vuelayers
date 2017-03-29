@@ -32,6 +32,7 @@ const methods = {
 export default {
   mixins: [ style ],
   inject: style.inject.concat([ 'setImage' ]),
+  props,
   methods,
   stubVNode: {
     empty: false,

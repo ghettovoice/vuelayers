@@ -5,4 +5,3 @@ StyleRegShape.install = function (Vue) {
 }
 
 export default StyleRegShape
-
