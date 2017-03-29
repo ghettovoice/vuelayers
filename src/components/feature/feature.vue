@@ -3,12 +3,17 @@
    * Wrapper around ol.Feature.
    */
   import uuid from 'uuid/v4'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/operator/map'
+  import 'vl-rx/from-ol-event'
+  import rxSubs from 'vl-mixins/rx-subs'
   import stubVNode from 'vl-mixins/stub-vnode'
   import styleTarget from 'vl-components/style/target'
   import { warn } from 'vl-utils/debug'
   import plainProps from 'vl-utils/plain-props'
   import * as geoJson from 'vl-ol/geojson'
   import { LAYER_PROP } from 'vl-ol/consts'
+  import { toLonLat } from 'vl-ol/coordinate'
 
   const props = {
     id: {
@@ -32,15 +37,29 @@
       if (this.source) {
         this.source.addFeature(this.feature)
         this.feature.set(LAYER_PROP, this.layer.get('id'))
+        this.subscribeAll()
       } else if (process.env.NODE_ENV !== 'production') {
         warn("Invalid usage of feature component, should have source component among it's ancestors")
       }
     },
     unmountFeature () {
+      this.unsubscribeAll()
       if (this.source && this.source.getFeatureById(this.id)) {
         this.source.removeFeature(this.feature)
         this.feature.unset(LAYER_PROP)
       }
+    },
+    subscribeAll () {
+      this::subscribeToMapEvents()
+    },
+    isAtPixel (pixel) {
+      return this.map.forEachFeatureAtPixel(
+        pixel,
+        feature => feature === this.feature,
+        {
+          layerFilter: layer => layer === this.layer
+        }
+      )
     }
   }
 
@@ -57,8 +76,8 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [ stubVNode, styleTarget ],
-    inject: [ 'layer', 'source', 'view' ],
+    mixins: [ rxSubs, stubVNode, styleTarget ],
+    inject: [ 'map', 'view', 'layer', 'source' ],
     props,
     methods,
     watch,
@@ -112,6 +131,23 @@
     this.feature.set('vm', this)
 
     return this.feature
+  }
+
+  function subscribeToMapEvents () {
+    const pointerEvents = Observable.fromOlEvent(
+      this.map,
+      [ 'click', 'dblclick', 'singleclick' ],
+      ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
+    ).map(evt => ({
+      ...evt,
+      coordinate: toLonLat(evt.coordinate, this.view.getProjection())
+    }))
+
+    this.subscribeTo(pointerEvents, evt => {
+      if (this.isAtPixel(evt.pixel)) {
+        this.$emit(evt.type, evt)
+      }
+    })
   }
 </script>
 

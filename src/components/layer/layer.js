@@ -1,7 +1,11 @@
 import uuid from 'uuid/v4'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/operator/map'
+import 'vl-rx/from-ol-event'
 import rxSubs from 'vl-mixins/rx-subs'
 import stubVNode from 'vl-mixins/stub-vnode'
 import { warn } from 'vl-utils/debug'
+import { toLonLat } from 'vl-ol/coordinate'
 
 const props = {
   id: {
@@ -102,6 +106,12 @@ const methods = {
         this.map.removeLayer(this.layer)
       }
     }
+  },
+  subscribeAll () {
+    this::subscribeToMapEvents()
+  },
+  isAtPixel (pixel) {
+    return this.map.forEachLayerAtPixel(pixel, layer => layer === this.layer)
   }
 }
 
@@ -160,4 +170,21 @@ export default {
       this.layer = undefined
     })
   }
+}
+
+function subscribeToMapEvents () {
+  const pointerEvents = Observable.fromOlEvent(
+    this.map,
+    [ 'click', 'dblclick', 'singleclick' ],
+    ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
+  ).map(evt => ({
+    ...evt,
+    coordinate: toLonLat(evt.coordinate, this.view.getProjection())
+  }))
+
+  this.subscribeTo(pointerEvents, evt => {
+    if (this.isAtPixel(evt.pixel)) {
+      this.$emit(evt.type, evt)
+    }
+  })
 }

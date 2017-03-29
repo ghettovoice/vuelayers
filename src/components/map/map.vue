@@ -7,9 +7,8 @@
 
 <script>
   import Map from 'ol/map'
-  import { isEqual, constant } from 'lodash/fp'
+  import { constant } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
   import 'vl-rx/from-ol-event'
   import plainProps from 'vl-utils/plain-props'
@@ -61,7 +60,6 @@
     subscribeAll () {
       this::subscribeToMapEvents()
     },
-    // todo work with GeoJSON
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       const cb = (feature, layer) => {
         return callback(
@@ -74,7 +72,6 @@
 
       return this.map.forEachFeatureAtPixel(pixel, cb, opts)
     },
-    // todo work with GeoJSON
     forEachLayerAtPixel (pixel, callback, layerFilter = noop) {
       const cb = (layer, rgba) => {
         return callback(
@@ -85,6 +82,9 @@
       const lf = layer => layerFilter(plainProps(layer.getProperties()))
 
       return this.map.forEachLayerAtPixel(pixel, cb, undefined, lf)
+    },
+    getCoordinateFromPixel (pixel) {
+      return toLonLat(this.map.getCoordinateFromPixel(), this.view.getProjection())
     },
     mountMap () {
       this.map.setTarget(this.$refs.map)
@@ -158,11 +158,10 @@
       this.map,
       [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ],
       ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
-    ).distinctUntilChanged((a, b) => isEqual(a, b))
-      .map(evt => ({
-        ...evt,
-        coordinate: toLonLat(evt.coordinate, this.view.getProjection())
-      }))
+    ).map(evt => ({
+      ...evt,
+      coordinate: toLonLat(evt.coordinate, this.view.getProjection())
+    }))
 
     this.subscribeTo(pointerEvents, evt => this.$emit(evt.type, evt))
   }
