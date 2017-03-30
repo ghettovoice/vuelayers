@@ -10,8 +10,7 @@
   import 'rxjs/add/operator/merge'
   import 'vl-rx/from-ol-event'
   import { isEqual } from 'lodash/fp'
-  import { MAP_PROJECTION } from 'vl-ol/consts'
-  import { toLonLat } from 'vl-ol/coordinate'
+  import { DATA_PROJECTION } from 'vl-ol/consts'
   import rxSubs from 'vl-mixins/rx-subs'
   import stubVNode from 'vl-mixins/stub-vnode'
 
@@ -19,10 +18,6 @@
     tracking: {
       type: Boolean,
       default: true
-    },
-    projection: {
-      type: String,
-      default: MAP_PROJECTION
     }
   }
 
@@ -89,7 +84,7 @@
      */
     this.geoloc = new Geolocation({
       tracking: this.tracking,
-      projection: this.projection
+      projection: DATA_PROJECTION
     })
     this.geoloc.set('vm', this)
 
@@ -122,7 +117,7 @@
       .distinctUntilChanged((a, b) => isEqual(a, b))
       .map(([ position, accuracy ]) => {
         return ({
-          position: toLonLat(position, this.projection),
+          position: position,
           accuracy
         })
       })
