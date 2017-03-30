@@ -1,6 +1,8 @@
 /**
  * Style helpers
  */
+import parseColor from 'parse-color'
+import Geometry from 'ol/geom/geometry'
 import Style from 'ol/style/style'
 import Fill from 'ol/style/fill'
 import Stroke from 'ol/style/stroke'
@@ -8,9 +10,11 @@ import Circle from 'ol/style/circle'
 import Icon from 'ol/style/icon'
 import RegularShape from 'ol/style/regularshape'
 import Text from 'ol/style/text'
-import { upperFirst, lowerFirst, flow, pick } from 'lodash/fp'
+import ImageStyle from 'ol/style/image'
+import { flow, isPlainObject, lowerFirst, pick, upperFirst } from 'lodash/fp'
 import isNumeric from 'vl-utils/is-numeric'
 import { GEOMETRY_TYPE } from 'vl-ol/consts'
+import * as geoJson from 'vl-ol/geojson'
 const reduce = require('lodash/fp/reduce').convert({ cap: false })
 
 /**
@@ -24,37 +28,53 @@ const reduce = require('lodash/fp/reduce').convert({ cap: false })
  * @property {string|undefined} strokeCap
  * @property {string|undefined} strokeJoin
  * @property {number|undefined} zIndex
+ * @property {ol.style.Fill|undefined} fill
+ * @protected {ol.style.Stroke|undefined} stroke
  *
  * Text only
- * @property {string|undefined} text
+ * @property {string|ol.style.Text|undefined} text
  * @property {string|undefined} textFont
  * @property {number|undefined} textFontSize
- * @property {number|undefined} textFillColor
- * @property {number|undefined} textStrokeColor
+ * @property {string|number[]|undefined} textFillColor
+ * @property {string|number[]|undefined} textStrokeColor
+ * @property {number|undefined} textStrokeWidth
+ * @property {number[]|undefined} textStrokeDash
+ * @property {string|undefined} textStrokeCap
+ * @property {string|undefined} textStrokeJoin
  * @property {number|undefined} textScale
  * @property {string|undefined} textAlign
  * @property {number|undefined} textRotation
  * @property {number|undefined} textOffsetX
  * @property {number|undefined} textOffsetY
+ * @protected {ol.style.Stroke|undefined} textStroke
+ * @protected {ol.style.Fill|undefined} textFill
  *
- * Icon only
- * @property {string|undefined} iconUrl
- * @property {Image|undefined} iconImg
- * @property {number[]|undefined} iconSize
- * @property {number[]|undefined} iconImgSize
- * @property {number|undefined} iconOffset
- * @property {number[]|undefined} iconAnchor
- * @property {number|undefined} iconScale
- * @property {number|undefined} iconRotation
- * @property {number|undefined} iconRadius
- * @property {number|undefined} iconRadius1
- * @property {number|undefined} iconRadius2
- * @property {number|undefined} iconPoints
- * @property {number|undefined} iconAngle
- * @property {number|undefined} iconOpacity
- * @property {IconOrigin | undefined} iconAnchorOrigin
- * @property {Color | string | undefined} iconColor
- * @property {IconOrigin | undefined} iconOffsetOrigin
+ * Image only
+ * @property {ol.style.Image|Image|undefined} image
+ * @property {string|undefined} imageSrc
+ * @property {number[]|undefined} imageSize
+ * @property {number[]|undefined} imageImgSize
+ * @property {number|undefined} imageOffset
+ * @property {number[]|undefined} imageAnchor
+ * @property {number|undefined} imageScale
+ * @property {number|undefined} imageRotation
+ * @property {number|undefined} imageRadius
+ * @property {number|undefined} imageRadius1
+ * @property {number|undefined} imageRadius2
+ * @property {number|undefined} imagePoints
+ * @property {number|undefined} imageAngle
+ * @property {number|undefined} imageOpacity
+ * @property {string|number[]|undefined} imageFillColor
+ * @property {string|number[]|undefined} imageStrokeColor
+ * @property {number|undefined} imageStrokeWidth
+ * @property {number[]|undefined} imageStrokeDash
+ * @property {string|undefined} imageStrokeCap
+ * @property {string|undefined} imageStrokeJoin
+ * @property {ol.style.IconOrigin|undefined} imageAnchorOrigin
+ * @property {ol.ColorLike|undefined} imageColor
+ * @property {ol.style.IconOrigin|undefined} imageOffsetOrigin
+ * @protected {ol.style.Stroke|undefined} imageStroke
+ * @protected {ol.style.Fill|undefined} imageFill
  */
 
 /**
@@ -65,7 +85,7 @@ export function defaultStyle () {
     fillColor: [ 255, 255, 255, 0.4 ],
     strokeColor: '#3399CC',
     strokeWidth: 1.25,
-    iconRadius: 5
+    imageRadius: 5
   } ]
 }
 
@@ -101,7 +121,7 @@ export function defaultEditStyle () {
     )
 
   styles[ GEOMETRY_TYPE.POINT ] = [ {
-    iconRadius: width * 2,
+    imageRadius: width * 2,
     fillColor: blue,
     strokeColor: white,
     strokeWidth: width / 2,
@@ -131,14 +151,15 @@ const isEmpty = x => {
  * @param {VlStyle} vlStyle
  * @return {Style|undefined}
  */
-export function transformStyle (vlStyle) {
+export function style (vlStyle) {
   if (isEmpty(vlStyle)) return
 
   const olStyle = {
-    text: transformTextStyle(vlStyle),
-    fill: transformFillStyle(vlStyle),
-    stroke: transformStrokeStyle(vlStyle),
-    image: transformImageStyle(vlStyle),
+    text: text(vlStyle),
+    fill: fill(vlStyle),
+    stroke: stroke(vlStyle),
+    image: image(vlStyle),
+    geometry: geom(vlStyle),
     zIndex: vlStyle.zIndex
   }
 
@@ -150,11 +171,13 @@ export function transformStyle (vlStyle) {
 const addPrefix = prefix => str => prefix + (prefix ? upperFirst(str) : str)
 
 export function normalizeColorValue (color) {
-  if (typeof color === 'string' && !/^rgb.*/.test(color) && color[ 0 ] !== '#') {
-    color = '#' + color
+  let c = color
+
+  if (typeof color === 'string') {
+    c = parseColor(color).rgba
   }
 
-  return color
+  return c
 }
 
 /**
@@ -162,9 +185,13 @@ export function normalizeColorValue (color) {
  * @param {string} [prefix]
  * @returns {Fill|undefined}
  */
-export function transformFillStyle (vlStyle, prefix = '') {
+export function fill (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
   const keys = [ 'fillColor' ].map(prefixKey)
+  const compiledKey = prefixKey('fill')
+
+  // check on already compiled style existence
+  if (vlStyle[ compiledKey ] instanceof Fill) return vlStyle[ compiledKey ]
 
   const transform = flow(
     pick(keys),
@@ -196,9 +223,12 @@ export function transformFillStyle (vlStyle, prefix = '') {
  * @param {string} [prefix]
  * @returns {Stroke|undefined}
  */
-export function transformStrokeStyle (vlStyle, prefix = '') {
+export function stroke (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
   const keys = [ 'strokeColor', 'strokeWidth', 'strokeDash', 'strokeCap', 'strokeJoin' ].map(prefixKey)
+  const compiledKey = prefixKey('stroke')
+
+  if (vlStyle[ compiledKey ] instanceof Stroke) return vlStyle[ compiledKey ]
 
   const transform = flow(
     pick(keys),
@@ -238,60 +268,69 @@ export function transformStrokeStyle (vlStyle, prefix = '') {
 /**
  * @param {VlStyle} vlStyle
  * @returns {Icon|Circle|RegularShape|undefined}
+ * @todo split to separate circle, regShape, Icon
  */
-export function transformImageStyle (vlStyle) {
+export function image (vlStyle) {
   if (
-    isEmpty(vlStyle.iconUrl) && isEmpty(vlStyle.iconImg) &&
-    isEmpty(vlStyle.iconPoints) && !isNumeric(vlStyle.iconRadius)
+    isEmpty(vlStyle.imageSrc) &&
+    isEmpty(vlStyle.image) &&
+    isEmpty(vlStyle.imagePoints) &&
+    !isNumeric(vlStyle.imageRadius)
   ) {
     return
   }
 
+  if (vlStyle.image instanceof ImageStyle) return vlStyle.image
+
   let imageStyle, Ctor
 
-  if (!isEmpty(vlStyle.iconUrl) || !isEmpty(vlStyle.iconImg)) {
+  if (!isEmpty(vlStyle.imageSrc) || !isEmpty(vlStyle.image)) {
+    // icon construction
     Ctor = Icon
     // then create ol.style.Icon options
     imageStyle = {
       ...vlStyle,
-      anchor: vlStyle.iconAnchor,
-      anchorOrigin: vlStyle.iconAnchorOrigin,
-      color: vlStyle.iconColor,
-      offset: vlStyle.iconOffset,
-      offsetOrigin: vlStyle.iconOffsetOrigin,
-      opacity: vlStyle.iconOpacity,
-      scale: vlStyle.iconScale,
-      rotation: vlStyle.iconRotation,
-      size: vlStyle.iconSize,
-      imgSize: vlStyle.iconImgSize,
-      src: vlStyle.iconUrl,
+      anchor: vlStyle.imageAnchor,
+      anchorOrigin: vlStyle.imageAnchorOrigin,
+      color: vlStyle.imageColor,
+      offset: vlStyle.imageOffset,
+      offsetOrigin: vlStyle.imageOffsetOrigin,
+      opacity: vlStyle.imageOpacity,
+      scale: vlStyle.imageScale,
+      rotation: vlStyle.imageRotation,
+      size: vlStyle.imageSize,
+      img: vlStyle.image,
+      imgSize: vlStyle.imageImgSize,
+      src: vlStyle.imageSrc,
       crossOrigin: 'anonymous'
     }
-  } else if (vlStyle.iconPoints != null) {
+  } else if (vlStyle.imagePoints != null) {
+    // regular shape construction
     Ctor = RegularShape
     // create ol.style.RegularShape options
     imageStyle = {
       ...vlStyle,
-      points: vlStyle.iconPoints,
-      radius: vlStyle.iconRadius,
-      radius1: vlStyle.iconRadius1,
-      radius2: vlStyle.iconRadius2,
-      angle: vlStyle.iconAngle,
-      rotation: vlStyle.iconRotation
+      points: vlStyle.imagePoints,
+      radius: vlStyle.imageRadius,
+      radius1: vlStyle.imageRadius1,
+      radius2: vlStyle.imageRadius2,
+      angle: vlStyle.imageAngle,
+      rotation: vlStyle.imageRotation
     }
   } else {
+    // circle construction
     Ctor = Circle
     // create ol.style.Circle options
     imageStyle = {
       ...vlStyle,
-      radius: vlStyle.iconRadius
+      radius: vlStyle.imageRadius
     }
   }
 
   imageStyle = {
     ...imageStyle,
-    fill: transformFillStyle(vlStyle, 'icon') || transformFillStyle(vlStyle),
-    stroke: transformStrokeStyle(vlStyle, 'icon') || transformStrokeStyle(vlStyle),
+    fill: fill(vlStyle, 'image') || fill(vlStyle),
+    stroke: stroke(vlStyle, 'image') || stroke(vlStyle),
     snapToPixel: true
   }
 
@@ -304,11 +343,10 @@ export function transformImageStyle (vlStyle) {
  * @param {VlStyle} vlStyle
  * @returns {Text|undefined}
  */
-export function transformTextStyle (vlStyle) {
+export function text (vlStyle) {
   // noinspection JSValidateTypes
-  if (vlStyle.text == null) {
-    return
-  }
+  if (vlStyle.text == null) return
+  if (vlStyle.text instanceof Text) return vlStyle.text
 
   const textStyle = {
     text: vlStyle.text
@@ -322,12 +360,36 @@ export function transformTextStyle (vlStyle) {
     pick([ 'textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign' ], vlStyle),
     {
       font,
-      fill: transformFillStyle(vlStyle, 'text') || transformFillStyle(vlStyle),
-      stroke: transformStrokeStyle(vlStyle, 'text') || transformStrokeStyle(vlStyle)
+      fill: fill(vlStyle, 'text') || fill(vlStyle),
+      stroke: stroke(vlStyle, 'text') || stroke(vlStyle)
     }
   )
 
   if (!isEmpty(textStyle)) {
     return new Text(textStyle)
   }
+}
+
+/**
+ * @param {VlStyle} vlStyle
+ * @return {ol.geom.Geometry|ol.StyleGeometryFunction|undefined}
+ */
+export function geom (vlStyle) {
+  // todo how to transform to current map projection? now is assumed EPSG:3857
+  const processGeom = geom => {
+    if (geom == null) return
+    if (geom instanceof Geometry) return geom
+    if (isPlainObject(geom)) return geoJson.readGeometry(geom)
+  }
+
+  if (typeof vlStyle.geom === 'function') {
+    return function __styleGeomFunc (feature) {
+      const geomFn = vlStyle.geom || (() => {})
+      const geom = geomFn(geoJson.writeFeature(feature))
+
+      return processGeom(geom)
+    }
+  }
+
+  return processGeom(vlStyle.geom)
 }

@@ -48,6 +48,7 @@
     "ol-cesium": "^1.25.0",
     "ol-tilecache": "^2.0.0-beta.3",
     "openlayers": "^4.0.1",
+    "parse-color": "^1.0.0",
     "rxjs": "^5.2.0",
     "uuid": "^3.0.1"
   },

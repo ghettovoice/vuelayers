@@ -67,7 +67,7 @@
       <!--// pacman -->
 
       <!-- current position overlay -->
-      <vl-layer-vector v-if="position.length" id="my-position" :z-index="100" :overlay="true">
+      <vl-layer-vector v-if="position.length" id="position-layer" :z-index="100" :overlay="true">
         <vl-style-container>
           <vl-style-icon src="static/img/marker.png" :scale="0.3" :anchor="[0.5, 1]"/>
         </vl-style-container>
@@ -114,7 +114,7 @@
 
 <script>
   import 'whatwg-fetch'
-  import { kebabCase, forEach, get, set } from 'vl-utils/func'
+  import { kebabCase, forEach, get, set } from 'lodash/fp'
   import highlight from 'highlight.js'
   import highlightSCSS from 'highlight.js/lib/languages/scss'
   import highlightXML from 'highlight.js/lib/languages/xml'
@@ -179,24 +179,23 @@
 
       return this.countries
     },
-    selectStyleFunc (ol, styleHelper) {
+    selectStyleFunc (s) {
       const styleName = 'select'
       const styleByFeature = {}
       const self = this
+      const stroke = s.stroke({
+        strokeColor: '#8856a7',
+        strokeWidth: 4
+      })
 
-      return function __selectStyleFunc ({ id, properties }, resolution, layer) {
+      return function __selectStyleFunc ({ id, properties }, resolution) {
         if (properties.selectColor) {
           let styles = get([ id, styleName ], styleByFeature)
           if (!styles) {
             styles = [
-              new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                  color: '#8856a7',
-                  width: 4
-                }),
-                fill: new ol.style.Fill({
-                  color: properties.selectColor
-                })
+              s.style({
+                stroke,
+                fillColor: properties.selectColor
               })
             ]
 
@@ -207,10 +206,10 @@
         }
       }
     },
-    countriesStyleFunc (ol, styleHelper) {
-      const stroke = new ol.style.Stroke({
-        color: '#8856a7',
-        width: 1
+    countriesStyleFunc (s) {
+      const stroke = s.stroke({
+        strokeColor: '#8856a7',
+        strokeWidth: 1
       })
       const styleName = 'default'
       const styleByFeature = {}
@@ -220,11 +219,9 @@
         let styles = get([ id, styleName ], styleByFeature)
         if (!styles) {
           styles = [
-            new ol.style.Style({
-              stroke: stroke,
-              fill: new ol.style.Fill({
-                color: properties.color
-              })
+            s.style({
+              stroke,
+              fillColor: properties.color
             })
           ]
 
@@ -234,45 +231,36 @@
         return styles
       }
     },
-    pacmanStyleFunc (ol, styleHelper) {
+    pacmanStyleFunc (s) {
       const pacman = [
-        new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: '#DE9147',
-            width: 3
-          }),
-          fill: new ol.style.Fill({
-            color: [ 222, 189, 36, 0.8 ]
-          })
+        s.style({
+          strokeColor: '#DE9147',
+          strokeWidth: 3,
+          fillColor: [ 222, 189, 36, 0.8 ]
         })
       ]
       const path = [
-        new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: 'blue',
-            width: 1
-          })
+        s.style({
+          strokeColor: 'blue',
+          strokeWidth: 1
         }),
-        new ol.style.Style({
-          image: new ol.style.Circle({
-            radius: 5,
-            fill: new ol.style.Fill({
-              color: 'orange'
-            })
-          }),
-          geometry (feature) {
-            return new ol.geom.MultiPoint(feature.getGeometry().getCoordinates())
+        s.style({
+          imageRadius: 5,
+          imageFillColor: 'orange',
+          geom ({ geometry }) {
+            // geometry is an LineString, convert it to MultiPoint to style vertex
+            // use turf.js for complex work with geometries
+            return {
+              ...geometry,
+              type: 'MultiPoint'
+            }
           }
         })
       ]
       const eye = [
-        new ol.style.Style({
-          image: new ol.style.Circle({
-            radius: 6,
-            fill: new ol.style.Fill({
-              color: '#444444'
-            })
-          })
+        s.style({
+          imageRadius: 6,
+          imageFillColor: '#444444'
         })
       ]
 
@@ -291,7 +279,7 @@
       this.layers[ layer ] = !this.layers[ layer ]
     },
     selectFilter (feature, layer) {
-      return layer && [ 'my-position', 'pacman' ].indexOf(layer) === -1
+      return layer && layer.id && [ 'position-layer', 'pacman' ].indexOf(layer.id) === -1
     },
     showSourceCode () {
       this.sourceCode = true
