@@ -39,13 +39,13 @@ const webpackConfig = merge(baseWebpackConfig, {
       PKG_FULLNAME: `"${config.fullname}"`,
       PKG_VERSION: `"${config.version}"`
     }),
-    new webpack.optimize.UglifyJsPlugin({
+    ...( isProduction ? [ new webpack.optimize.UglifyJsPlugin({
       mangle: true,
       compress: {
         warnings: false
       },
       sourceMap: true
-    }),
+    }) ] : [] ),
     // extract css into its own file
     new ExtractTextPlugin({
       filename: 'style.umd.css'
