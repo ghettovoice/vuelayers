@@ -44,7 +44,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   mountSource () {
-    if (!this.source) {
+    if (!this.layer) {
       throw new Error("Invalid usage of source component, should have layer component among it's ancestors")
     }
 

@@ -84,7 +84,7 @@
       return this.map.forEachLayerAtPixel(pixel, cb, undefined, lf)
     },
     getCoordinateFromPixel (pixel) {
-      return toLonLat(this.map.getCoordinateFromPixel(), this.view.getProjection())
+      return toLonLat(this.map.getCoordinateFromPixel(pixel), this.map.getView().getProjection())
     },
     mountMap () {
       this.map.setTarget(this.$refs.map)
@@ -160,7 +160,7 @@
       ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
     ).map(evt => ({
       ...evt,
-      coordinate: toLonLat(evt.coordinate, this.view.getProjection())
+      coordinate: toLonLat(evt.coordinate, this.map.getView().getProjection())
     }))
 
     this.subscribeTo(pointerEvents, evt => this.$emit(evt.type, evt))
