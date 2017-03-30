@@ -43,7 +43,7 @@ export default {
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
     if (!feature.getGeometry()) return
-
+    // todo разобраться с путанице в представлении feature в колбэках
     let styles = vm.styles
     let geoJsonFeature = geoJson.writeFeature(feature, vm.view.getProjection())
 

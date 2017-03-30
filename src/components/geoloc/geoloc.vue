@@ -6,6 +6,7 @@
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/filter'
   import 'rxjs/add/operator/merge'
   import 'vl-rx/from-ol-event'
   import { isEqual } from 'lodash/fp'
@@ -104,6 +105,7 @@
           () => this.geoloc.getPosition()
         )
       )
+      .filter(x => x != null)
 
     const accuracyChanges = Observable.of(this.geoloc.getAccuracy())
       .merge(
@@ -113,14 +115,17 @@
           () => this.geoloc.getAccuracy()
         )
       )
+      .filter(x => x != null)
 
     const geolocChanges = Observable.combineLatest(positionChanges, accuracyChanges)
       .throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
-      .map(([ position, accuracy ]) => ({
-        position: toLonLat(position, this.projection),
-        accuracy
-      }))
+      .map(([ position, accuracy ]) => {
+        return ({
+          position: toLonLat(position, this.projection),
+          accuracy
+        })
+      })
 
     this.subscribeTo(
       geolocChanges,
