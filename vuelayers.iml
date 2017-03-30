@@ -12,6 +12,7 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/dist-demo" />
     </content>
     <content url="file://$MODULE_DIR$/node_modules/openlayers" />
     <content url="file://$MODULE_DIR$/node_modules/vue" />

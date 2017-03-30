@@ -1,7 +1,7 @@
 {
   "name": "vuelayers",
   "fullname": "VueLayers",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Vue components to work with OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
     "start": "npm run dev",
     "demo": "node build/dev-server.js --conf=demo-dev",
     "demo-deploy": "gh-pages -d ./dist-demo",
-    "build-demo": "rm -rf ./dist-demo && cross-env BABEL_ENV=dist node build/build.js --conf=demo-prod",
+    "build-demo": "rm -rf ./dist-demo && cross-env node build/build.js --conf=demo-prod",
     "build-comp-cjs": "cross-env BABEL_ENV=cjs NODE_ENV=production node build/build.js --conf=comp-cjs",
     "build-lib-cjs": "cross-env BABEL_ENV=cjs NODE_ENV=production node build/build.js --conf=lib-cjs",
     "build-lib-umd": "cross-env NODE_ENV=production node build/build.js --conf=lib-umd",
