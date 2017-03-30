@@ -45,7 +45,7 @@ Inside your App.vue
 <template>...</template>
 <script>...</script>
 <style>
-  @import "~vuelayers/dist/cjs/style.css";
+  @import "~vuelayers/dist/style.css";
 </style>
 ```
 
@@ -68,7 +68,7 @@ Then edit your `.babelrc`
     {
       "libraryName": "vuelayers",
       "style": true,
-      "libDir": "dist/cjs"
+      "libDir": "dist"
     }
   ]]]
 }

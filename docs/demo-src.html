@@ -69,7 +69,7 @@
   &lt;!--// pacman --&gt;
 
   &lt;!-- current position overlay --&gt;
-  &lt;vl-layer-vector v-if=&quot;position.length&quot; id=&quot;my-position&quot; :z-index=&quot;100&quot; :overlay=&quot;true&quot;&gt;
+  &lt;vl-layer-vector v-if=&quot;position.length&quot; id=&quot;position-layer&quot; :z-index=&quot;100&quot; :overlay=&quot;true&quot;&gt;
     &lt;vl-style-container&gt;
       &lt;vl-style-icon src=&quot;static/img/marker.png&quot; :scale=&quot;0.3&quot; :anchor=&quot;[0.5, 1]&quot;/&gt;
     &lt;/vl-style-container&gt;
@@ -81,23 +81,12 @@
     &lt;/vl-source-vector&gt;
   &lt;/vl-layer-vector&gt;
   &lt;!--// current position overlay --&gt;
-&lt;/vl-map&gt;
-
-&lt;div class=&quot;controls&quot;&gt;
-  &lt;button v-for=&quot;layer in [&apos;osm&apos;, &apos;mapbox&apos;, &apos;countries&apos;, &apos;pacman&apos;, &apos;wms&apos;]&quot; :key=&quot;layer&quot; @click=&quot;toggleLayer(layer)&quot;&gt;
-    Toggle layer {{ layer }}
-  &lt;/button&gt;
-
-  &lt;hr /&gt;
-  Center: {{ center.map(x =&gt; parseFloat(x.toPrecision(6))) }} Zoom: {{ zoom }} Rotation {{ rotation }}&lt;br /&gt;
-  My position: {{ position.map(x =&gt; parseFloat(x.toPrecision(6))) }}&lt;br /&gt;
-  Current selection: {{ selectedIds }}
-&lt;/div&gt;</code></pre>
+&lt;/vl-map&gt;</code></pre>
 
 <h3>JavaScript</h3>
 
-<pre><code class="javascript jsx">  import &apos;whatwg-fetch&apos;
-import { kebabCase, forEach, get, set } from &apos;vl-utils/func&apos;
+<pre><code class="javascript jsx">import &apos;whatwg-fetch&apos;
+import { kebabCase, forEach, get, set } from &apos;lodash/fp&apos;
 
 const computed = {
   selectedIds () {
@@ -144,38 +133,37 @@ const methods = {
 
     return this.countries
   },
-  selectStyleFunc (ol, styleHelper) {
+  selectStyleFunc (s) {
     const styleName = &apos;select&apos;
     const styleByFeature = {}
     const self = this
+    const stroke = s.stroke({
+      strokeColor: &apos;#8856a7&apos;,
+      strokeWidth: 4
+    })
 
-    return function __selectStyleFunc ({ id, properties }, resolution, layer) {
+    return function __selectStyleFunc ({ id, properties }, resolution) {
       if (properties.selectColor) {
         let styles = get([ id, styleName ], styleByFeature)
         if (!styles) {
           styles = [
-            new ol.style.Style({
-              stroke: new ol.style.Stroke({
-                color: &apos;#8856a7&apos;,
-                width: 4
-              }),
-              fill: new ol.style.Fill({
-                color: properties.selectColor
-              })
+            s.style({
+              stroke,
+              fillColor: properties.selectColor
             })
           ]
 
           set([ id, styleName ], styles, styleByFeature)
-
-          return styles
         }
+
+        return styles
       }
     }
   },
-  countriesStyleFunc (ol, styleHelper) {
-    const stroke = new ol.style.Stroke({
-      color: &apos;#8856a7&apos;,
-      width: 1
+  countriesStyleFunc (s) {
+    const stroke = s.stroke({
+      strokeColor: &apos;#8856a7&apos;,
+      strokeWidth: 1
     })
     const styleName = &apos;default&apos;
     const styleByFeature = {}
@@ -185,11 +173,9 @@ const methods = {
       let styles = get([ id, styleName ], styleByFeature)
       if (!styles) {
         styles = [
-          new ol.style.Style({
-            stroke: stroke,
-            fill: new ol.style.Fill({
-              color: properties.color
-            })
+          s.style({
+            stroke,
+            fillColor: properties.color
           })
         ]
 
@@ -199,45 +185,36 @@ const methods = {
       return styles
     }
   },
-  pacmanStyleFunc (ol, styleHelper) {
+  pacmanStyleFunc (s) {
     const pacman = [
-      new ol.style.Style({
-        stroke: new ol.style.Stroke({
-          color: &apos;#DE9147&apos;,
-          width: 3
-        }),
-        fill: new ol.style.Fill({
-          color: [ 222, 189, 36, 0.8 ]
-        })
+      s.style({
+        strokeColor: &apos;#DE9147&apos;,
+        strokeWidth: 3,
+        fillColor: [ 222, 189, 36, 0.8 ]
       })
     ]
     const path = [
-      new ol.style.Style({
-        stroke: new ol.style.Stroke({
-          color: &apos;blue&apos;,
-          width: 1
-        })
+      s.style({
+        strokeColor: &apos;blue&apos;,
+        strokeWidth: 1
       }),
-      new ol.style.Style({
-        image: new ol.style.Circle({
-          radius: 5,
-          fill: new ol.style.Fill({
-            color: &apos;orange&apos;
-          })
-        }),
-        geometry (feature) {
-          return new ol.geom.MultiPoint(feature.getGeometry().getCoordinates())
+      s.style({
+        imageRadius: 5,
+        imageFillColor: &apos;orange&apos;,
+        geom ({ geometry }) {
+          // geometry is an LineString, convert it to MultiPoint to style vertex
+          // use turf.js for complex work with geometries
+          return {
+            ...geometry,
+            type: &apos;MultiPoint&apos;
+          }
         }
       })
     ]
     const eye = [
-      new ol.style.Style({
-        image: new ol.style.Circle({
-          radius: 6,
-          fill: new ol.style.Fill({
-            color: &apos;#444444&apos;
-          })
-        })
+      s.style({
+        imageRadius: 6,
+        imageFillColor: &apos;#444444&apos;
       })
     ]
 
@@ -256,7 +233,7 @@ const methods = {
     this.layers[ layer ] = !this.layers[ layer ]
   },
   selectFilter (feature, layer) {
-    return layer &amp;&amp; [ &apos;my-position&apos;, &apos;pacman&apos; ].indexOf(layer) === -1
+    return layer &amp;&amp; layer.id &amp;&amp; [ &apos;position-layer&apos;, &apos;pacman&apos; ].indexOf(layer.id) === -1
   }
 }
 
