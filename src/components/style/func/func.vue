@@ -37,14 +37,14 @@
 
       const view = this.view
 
-      return function __styleFunc (feature, resolution) {
+      return function __styleFunc (feature, resolution, styleHelper) {
         const styles = providedStyleFunc(
           geoJson.writeFeature(feature, view.getProjection()),
           resolution,
           styleHelper
         )
 
-        if (styles === null || !styles.length) return styles
+        if (styles === null || (Array.isArray(styles) && styles.length)) return styles
 
         return fallbackStyleFunc(feature, resolution)
       }

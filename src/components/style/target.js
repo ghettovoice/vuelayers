@@ -1,4 +1,4 @@
-import { flow, map, filter } from 'lodash/fp'
+import { filter, flow, map } from 'lodash/fp'
 import * as geoJson from 'vl-ol/geojson'
 import * as styleHelper from 'vl-ol/style'
 
@@ -43,12 +43,12 @@ export default {
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
     if (!feature.getGeometry()) return
-    // todo разобраться с путанице в представлении feature в колбэках
+
     let styles = vm.styles
     let geoJsonFeature = geoJson.writeFeature(feature, vm.view.getProjection())
 
     if (typeof styles === 'function') {
-      styles = styles(geoJsonFeature, resolution, styleHelper)
+      styles = styles(feature, resolution, styleHelper)
     } else if (Array.isArray(styles)) {
       styles = flow(
         filter(({ style, condition }) => {
@@ -63,11 +63,11 @@ export function createStyleFunc (vm) {
       )(styles)
     }
     // null style
-    if (styles === null || styles.length) return styles
+    if (styles === null || (Array.isArray(styles) && styles.length)) return styles
 
     if (vm.defaultStyles) {
       return typeof vm.defaultStyles === 'function'
-        ? vm.defaultStyles(geoJsonFeature, resolution, styleHelper)
+        ? vm.defaultStyles(feature, resolution, styleHelper)
         : vm.defaultStyles
     }
   }

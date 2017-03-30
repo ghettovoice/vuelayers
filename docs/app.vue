@@ -200,9 +200,9 @@
             ]
 
             set([ id, styleName ], styles, styleByFeature)
-
-            return styles
           }
+
+          return styles
         }
       }
     },

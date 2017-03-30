@@ -24,7 +24,7 @@ export function readFeature (geoJsonFeature, featureProjection = MAP_PROJECTION)
   return geoJson.readFeature({
     ...geoJsonFeature,
     type: 'Feature',
-    properties: plainProps(geoJson.properties)
+    properties: plainProps(geoJsonFeature.properties)
   }, { featureProjection })
 }
 
