@@ -63,7 +63,7 @@
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       const cb = (feature, layer) => {
         return callback(
-          geoJson.write(feature),
+          geoJson.writeFeature(feature),
           layer && plainProps(layer.getProperties())
         )
       }

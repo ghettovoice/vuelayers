@@ -11,7 +11,7 @@ const geoJson = new GeoJSON({
  * @param {ol.ProjectionLike|undefined} [featureProjection=EPSG:3857]
  * @return {GeoJSONFeature}
  */
-export function write (feature, featureProjection = MAP_PROJECTION) {
+export function writeFeature (feature, featureProjection = MAP_PROJECTION) {
   return geoJson.writeFeatureObject(feature, { featureProjection })
 }
 
@@ -20,10 +20,32 @@ export function write (feature, featureProjection = MAP_PROJECTION) {
  * @param {ol.ProjectionLike|undefined} [featureProjection=EPSG:3857]
  * @return {ol.Feature}
  */
-export function read (geoJsonFeature, featureProjection = MAP_PROJECTION) {
+export function readFeature (geoJsonFeature, featureProjection = MAP_PROJECTION) {
   return geoJson.readFeature({
     ...geoJsonFeature,
     type: 'Feature',
     properties: plainProps(geoJson.properties)
   }, { featureProjection })
+}
+
+/**
+ * @param {ol.geom.Geometry} geometry
+ * @param {ol.ProjectionLike|undefined} [geometryProjection=EPSG:3857]
+ * @return {GeoJSONGeometry|GeoJSONGeometryCollection}
+ */
+export function writeGeometry (geometry, geometryProjection = MAP_PROJECTION) {
+  return geoJson.writeGeometryObject(geometry, {
+    featureProjection: geometryProjection
+  })
+}
+
+/**
+ * @param {GeoJSONGeometry} geoJsonGeometry
+ * @param {ol.ProjectionLike|undefined} [geometryProjection=EPSG:3857]
+ * @return {ol.geom.Geometry}
+ */
+export function readGeometry (geoJsonGeometry, geometryProjection = MAP_PROJECTION) {
+  return geoJson.readGeometryFromObject(geoJsonGeometry, {
+    featureProjection: geometryProjection
+  })
 }

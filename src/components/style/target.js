@@ -45,7 +45,7 @@ export function createStyleFunc (vm) {
     if (!feature.getGeometry()) return
 
     let styles = vm.styles
-    let geoJsonFeature = geoJson.write(feature, vm.view.getProjection())
+    let geoJsonFeature = geoJson.writeFeature(feature, vm.view.getProjection())
 
     if (typeof styles === 'function') {
       styles = styles(geoJsonFeature, resolution, styleHelper)

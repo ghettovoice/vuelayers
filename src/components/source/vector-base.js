@@ -130,7 +130,7 @@ export default {
 }
 
 function createFeature (geoJsonFeature) {
-  return geoJson.read(merge(geoJsonFeature, {
+  return geoJson.readFeature(merge(geoJsonFeature, {
     properties: {
       [ LAYER_PROP ]: this.layer.get('id')
     }

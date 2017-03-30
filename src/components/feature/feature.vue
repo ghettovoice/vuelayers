@@ -123,7 +123,7 @@
      * @type {ol.Feature}
      * @protected
      */
-    this.feature = geoJson.read({
+    this.feature = geoJson.readFeature({
       id: this.id,
       properties: this.properties
     }, this.view.getProjection())

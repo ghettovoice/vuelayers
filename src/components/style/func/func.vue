@@ -39,7 +39,7 @@
 
       return function __styleFunc (feature, resolution) {
         const styles = providedStyleFunc(
-          geoJson.write(feature, view.getProjection()),
+          geoJson.writeFeature(feature, view.getProjection()),
           resolution,
           styleHelper
         )
