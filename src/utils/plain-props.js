@@ -1,8 +1,12 @@
-import { isPlainObject, isObject, omitBy } from 'lodash/fp'
+import { pickBy, isNumber, isString, isBoolean, isPlainObject } from 'lodash/fp'
 /**
  * @func
  * @param {Object} value
  * @param {Object} Returns object only with plain properties.
  */
-const plainProps = omitBy(x => isObject(x) && !isPlainObject(x))
+const plainProps = pickBy(x => isNumber(x) ||
+                               isString(x) ||
+                               Array.isArray(x) ||
+                               isBoolean(x) ||
+                               isPlainObject(x))
 export default plainProps
