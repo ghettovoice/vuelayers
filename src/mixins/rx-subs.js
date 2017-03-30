@@ -20,33 +20,20 @@ export default {
     },
     /**
      * @param {Observable} observable
-     * @param {function|Observer} [next] Next handler or Observer object.
+     * @param {function} [next] Next handler or Observer object.
      * @param {function} [error] Error handler.
      * @param {function} [complete] Complete handler.
      * @return {Subscription}
      *
      * @protected
      */
-    subscribeTo (observable, ...args) {
-      let observer = {}
-
-      if (typeof args[ 0 ] === 'object') {
-        observer = args.shift()
-      } else if (typeof args[ 0 ] === 'function') {
-        observer = {
-          next: args.shift(),
-          error: args.shift(),
-          complete: args.shift()
-        }
-      }
-
-      const errHandler = observer.error || noop
-      observer.error = err => {
+    subscribeTo (observable, next = noop, error = noop, complete = noop) {
+      error = err => {
         errordbg(err.stack)
-        errHandler(err)
+        error(err)
       }
 
-      const subs = observable.subscribe(...args)
+      const subs = observable.subscribe(next, error, complete)
       this.rxSubs.push(subs)
 
       return subs

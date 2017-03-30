@@ -156,7 +156,7 @@
   function subscribeToMapEvents () {
     const pointerEvents = Observable.fromOlEvent(
       this.map,
-      [ 'click', 'dblclick', 'singleclick', 'pointerdrag', 'pointermove' ],
+      [ 'click', 'dblclick', 'singleclick' ],
       ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
     ).map(evt => ({
       ...evt,
