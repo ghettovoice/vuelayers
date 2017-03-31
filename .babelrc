@@ -1,15 +1,14 @@
 {
   "presets": [
-    "latest",
+    ["latest", {
+      "es2015": {
+        "modules": false
+      }
+    }],
     "stage-0"
   ],
   "plugins": [
-    "add-module-exports",
     "transform-runtime",
-    "transform-decorators-legacy",
-    "transform-class-properties",
-    "transform-es5-property-mutators",
-    "transform-flow-strip-types",
     "lodash"
   ],
   "env": {
