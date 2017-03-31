@@ -1,4 +1,4 @@
-// This the Webpack config for running e2e tests
+// This the Webpack config for building docs prod
 const path = require('path')
 const utils = require('./utils')
 const webpack = require('webpack')
@@ -13,15 +13,14 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const env = config.build.env
 
 baseWebpackConfig.entry = {
-  app: path.resolve(__dirname, '../docs/main.js')
+  app: path.resolve(__dirname, '../docs/src/main.js')
 }
 
 const webpackConfig = merge(baseWebpackConfig, {
   output: {
-    path: path.resolve(__dirname, '../dist-demo'),
+    path: path.resolve(__dirname, '../dist-docs'),
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
-    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js'),
-    publicPath: ''
+    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
   },
   module: {
     rules: utils.styleLoaders({
@@ -59,7 +58,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, '../dist-demo/index.html'),
+      filename: path.resolve(__dirname, '../dist-docs/index.html'),
       template: 'docs/index.html',
       inject: true,
       minify: {

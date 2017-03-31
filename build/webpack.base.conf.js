@@ -39,7 +39,11 @@ module.exports = {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         enforce: "pre",
-        include: [ resolve('src'), resolve('test') ],
+        include: [
+          resolve('src'),
+          resolve('docs'),
+          resolve('test')
+        ],
         options: {
           formatter: require('eslint-friendly-formatter')
         }
@@ -54,6 +58,7 @@ module.exports = {
         loader: 'babel-loader',
         include: [
           resolve('src'),
+          resolve('docs'),
           resolve('test'),
           resolve('node_modules/ol-tilecache')
         ]

@@ -1,4 +1,4 @@
-// This is webpack config for hot mode
+// This is webpack config for HMR running docs
 const path = require('path')
 const utils = require('./utils')
 const webpack = require('webpack')
@@ -9,7 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 
 baseWebpackConfig.entry = {
-  app: path.resolve(__dirname, '../docs/main.js')
+  app: path.resolve(__dirname, '../docs/src/main.js')
 }
 // add hot-reload related code to entry chunks
 Object.keys(baseWebpackConfig.entry).forEach(function (name) {
@@ -17,6 +17,9 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 })
 
 module.exports = merge(baseWebpackConfig, {
+  output: {
+    path: path.resolve(__dirname, '../dist-docs')
+  },
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
   },
@@ -35,7 +38,7 @@ module.exports = merge(baseWebpackConfig, {
     // https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: 'test/index.html',
+      template: 'docs/index.html',
       inject: true
     }),
     new FriendlyErrorsPlugin()

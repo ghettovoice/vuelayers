@@ -9,9 +9,6 @@
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
-    "demo": "node build/dev-server.js --conf=demo-dev",
-    "demo-deploy": "gh-pages -d ./dist-demo",
-    "build-demo": "rm -rf ./dist-demo && cross-env node build/build.js --conf=demo-prod",
     "build-comp-cjs": "cross-env BABEL_ENV=cjs NODE_ENV=production node build/build.js --conf=comp-cjs",
     "build-lib-cjs": "cross-env BABEL_ENV=cjs NODE_ENV=production node build/build.js --conf=lib-cjs",
     "build-lib-umd": "cross-env NODE_ENV=production node build/build.js --conf=lib-umd",
@@ -19,8 +16,11 @@
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
-    "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs",
-    "coveralls": "cat ./test/unit/coverage/lcov.info | coveralls"
+    "lint": "eslint --ext .js,.vue src docs test/unit/specs test/e2e/specs",
+    "coveralls": "cat ./test/unit/coverage/lcov.info | coveralls",
+    "start-docs": "node build/dev-server.js --conf=docs-dev",
+    "build-docs": "rm -rf ./dist-docs && cross-env node build/build.js --conf=docs-prod",
+    "deploy-docs": "gh-pages -d ./dist-docs"
   },
   "directories": {
     "lib": "dist",
@@ -132,6 +132,7 @@
     "url-loader": "^0.5.8",
     "vue": "^2.2.6",
     "vue-loader": "^11.3.4",
+    "vue-router": "^2.3.1",
     "vue-style-loader": "^2.0.5",
     "vue-template-compiler": "^2.2.6",
     "webpack": "^2.3.2",
