@@ -62,7 +62,7 @@ Then edit your `.babelrc`
 ```json
 {
   "presets": [
-    ["es2015", "latest"]
+    ["latest", "stage-2"]
   ],
   "plugins": [["component", [
     {
