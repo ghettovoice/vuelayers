@@ -84,5 +84,3 @@
     methods
   }
 </script>
-
-<style>/* stub styles */</style>

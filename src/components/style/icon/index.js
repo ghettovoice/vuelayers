@@ -1,7 +1,7 @@
-import StyleIcon from './icon.vue'
+import Icon from './icon.vue'
 
-StyleIcon.install = function (Vue) {
-  Vue.component(StyleIcon.name, StyleIcon)
+Icon.install = function (Vue) {
+  Vue.component(Icon.name, Icon)
 }
 
-export default StyleIcon
+export default Icon

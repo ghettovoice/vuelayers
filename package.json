@@ -16,7 +16,7 @@
     "build-comp-cjs": "cross-env BABEL_ENV=cjs NODE_ENV=production node build/build.js --conf=comp-cjs",
     "build-lib-cjs": "cross-env BABEL_ENV=cjs NODE_ENV=production node build/build.js --conf=lib-cjs",
     "build-lib-umd": "cross-env NODE_ENV=production node build/build.js --conf=lib-umd",
-    "build": "rm -rf ./dist && npm run build-lib-cjs && npm run build-comp-cjs && npm run build-lib-umd",
+    "build": "rm -rf ./dist && npm run build-lib-cjs && npm run build-lib-umd",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",

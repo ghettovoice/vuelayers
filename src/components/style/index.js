@@ -1,17 +1,42 @@
 import style from './style'
-import styleImage from './image'
-import styleTarget from './target'
+import imageStyle from './image'
+import styleTarget, { createStyleFunc } from './target'
+import StyleContainer from './container'
+import FillStyle from './fill'
+import StrokeStyle from './stroke'
+import CircleStyle from './circle'
+import IconStyle from './icon'
+import RegShapeStyle from './reg-shape'
+import StyleFunc from './func'
 
-export StyleContainer from './container'
-export StyleFill from './fill'
-export StyleStroke from './stroke'
-export StyleCircle from './circle'
-export StyleIcon from './icon'
-export StyleRegShape from './reg-shape'
-export StyleFunc from './func'
-
-export const mixins = {
+export {
+  // mixins
   style,
-  styleImage,
-  styleTarget
+  imageStyle,
+  styleTarget,
+  // helpers
+  createStyleFunc,
+  // components
+  StyleContainer,
+  FillStyle,
+  StrokeStyle,
+  CircleStyle,
+  IconStyle,
+  RegShapeStyle,
+  StyleFunc
+}
+
+export default {
+  // mixins
+  style,
+  imageStyle,
+  styleTarget,
+  // components
+  StyleContainer,
+  FillStyle,
+  StrokeStyle,
+  CircleStyle,
+  IconStyle,
+  RegShapeStyle,
+  StyleFunc
 }

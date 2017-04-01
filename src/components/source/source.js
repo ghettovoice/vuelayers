@@ -1,6 +1,8 @@
-import rxSubs from 'vl-mixins/rx-subs'
-import stubVNode from 'vl-mixins/stub-vnode'
-import { MAP_PROJECTION } from 'vl-ol/consts'
+import rxSubs from '../../mixins/rx-subs'
+import stubVNode from '../../mixins/stub-vnode'
+import { consts } from '../../ol'
+
+const { MAP_PROJECTION } = consts
 
 const props = {
   attributions: [ String, Array ],

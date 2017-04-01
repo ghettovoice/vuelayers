@@ -2,9 +2,11 @@ import proj from 'ol/proj'
 import tilegrid from 'ol/tilegrid'
 import { createTileUrlFunction } from 'ol-tilecache'
 import { pick } from 'lodash/fp'
-import { TILE_SIZE, CACHE_SIZE, MIN_ZOOM, MAX_ZOOM, PIXEL_RATIO } from 'vl-ol/consts'
-import replaceTokens from 'vl-utils/replace-tokens'
-import source from 'vl-components/source/source'
+import { consts } from '../../ol'
+import replaceTokens from '../../utils/replace-tokens'
+import source from './source'
+
+const { TILE_SIZE, CACHE_SIZE, MIN_ZOOM, MAX_ZOOM, PIXEL_RATIO } = consts
 
 const props = {
   url: {

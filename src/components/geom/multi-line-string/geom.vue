@@ -1,7 +1,10 @@
 <script>
   import MultiLineString from 'ol/geom/multilinestring'
+  import { consts } from '../../../ol'
   import { GEOMETRY_TYPE } from 'vl-ol/consts'
-  import geom from 'vl-components/geom/geom'
+  import geom from '../geom'
+
+  const { GEOMETRY_TYPE } = consts
 
   const props = {
     coordinates: {
@@ -29,5 +32,3 @@
     methods
   }
 </script>
-
-<style>/* stub styles */</style>

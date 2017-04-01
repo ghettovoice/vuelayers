@@ -5,10 +5,12 @@
 // import 'rxjs/add/operator/distinctUntilChanged'
 // import 'rxjs/add/operator/map'
 // import 'vl-rx/from-ol-event'
-import rxSubs from 'vl-mixins/rx-subs'
-import stubVNode from 'vl-mixins/stub-vnode'
-import { transforms } from 'vl-ol/coordinate'
-import { toLonLat as extentToLonLat } from 'vl-ol/extent'
+import rxSubs from '../../mixins/rx-subs'
+import stubVNode from '../../mixins/stub-vnode'
+import { coordinateHelper, extentHelper } from '../../ol'
+
+const { transforms } = coordinateHelper
+const { toLonLat: extentToLonLat } = extentHelper
 
 const props = {
   /**

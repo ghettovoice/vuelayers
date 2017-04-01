@@ -252,5 +252,3 @@
     )
   }
 </script>
-
-<style>/* stub style  */</style>

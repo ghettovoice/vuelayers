@@ -1,7 +1,16 @@
 import interaction from './interaction'
+import Select from './select'
 
-export InteractionSelect from './select'
+export {
+  // mixins
+  interaction,
+  // components
+  Select
+}
 
-export const mixins = {
-  interaction
+export default {
+  // mixins
+  interaction,
+  // components
+  Select
 }

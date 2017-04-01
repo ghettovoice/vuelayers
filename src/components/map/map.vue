@@ -8,14 +8,12 @@
 <script>
   import Map from 'ol/map'
   import { constant } from 'lodash/fp'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/operator/map'
-  import 'vl-rx/from-ol-event'
-  import plainProps from 'vl-utils/plain-props'
-  import { toLonLat } from 'vl-ol/coordinate'
-  import * as geoJson from 'vl-ol/geojson'
-  import rxSubs from 'vl-mixins/rx-subs'
+  import Observable from '../../rx'
+  import plainProps from '../../utils/plain-props'
+  import { coordinateHelper, geoJson } from '../../ol'
+  import rxSubs from '../../mixins/rx-subs'
 
+  const { toLonLat } = coordinateHelper
   const noop = () => {}
 
   const props = {

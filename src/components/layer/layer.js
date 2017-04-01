@@ -1,10 +1,10 @@
 import uuid from 'uuid/v4'
-import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/operator/map'
-import 'vl-rx/from-ol-event'
-import rxSubs from 'vl-mixins/rx-subs'
-import stubVNode from 'vl-mixins/stub-vnode'
-import { toLonLat } from 'vl-ol/coordinate'
+import Observable from '../../rx'
+import rxSubs from '../../mixins/rx-subs'
+import stubVNode from '../../mixins/stub-vnode'
+import { coordinateHelper } from '../../ol'
+
+const { toLonLat } = coordinateHelper
 
 const props = {
   id: {

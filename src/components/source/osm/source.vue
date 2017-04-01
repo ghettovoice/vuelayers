@@ -1,6 +1,6 @@
 <script>
   import OSMSource from 'ol/source/osm'
-  import xyzSource from 'vl-components/source/xyz-base'
+  import xyzSource from '../xyz/source.vue'
 
   const props = {
     attributions: {
@@ -40,5 +40,3 @@
     methods
   }
 </script>
-
-<style>/* stub style  */</style>

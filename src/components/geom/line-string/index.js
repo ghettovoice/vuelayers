@@ -1,7 +1,7 @@
-import GeomLineString from './geom.vue'
+import LineString from './geom.vue'
 
-GeomLineString.install = function (Vue) {
-  Vue.component(GeomLineString.name, GeomLineString)
+LineString.install = function (Vue) {
+  Vue.component(LineString.name, LineString)
 }
 
-export default GeomLineString
+export default LineString

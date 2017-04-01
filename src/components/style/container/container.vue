@@ -133,5 +133,3 @@
     }
   }
 </script>
-
-<style>/* stub styles */</style>

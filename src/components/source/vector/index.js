@@ -1,7 +1,7 @@
-import SourceVector from './source.vue'
+import Vector from './source.vue'
 
-SourceVector.install = function (Vue) {
-  Vue.component(SourceVector.name, SourceVector)
+Vector.install = function (Vue) {
+  Vue.component(Vector.name, Vector)
 }
 
-export default SourceVector
+export default Vector

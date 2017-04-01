@@ -77,5 +77,3 @@
     this.refresh()
   }
 </script>
-
-<style>/* stub style */</style>

@@ -1,6 +1,6 @@
-import StyleFunc from './func.vue'
+import Func from './func.vue'
 
-StyleFunc.install = function (Vue) {
-  Vue.component(StyleFunc.name, StyleFunc)
+Func.install = function (Vue) {
+  Vue.component(Func.name, Func)
 }
-export default StyleFunc
+export default Func

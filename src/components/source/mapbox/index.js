@@ -1,7 +1,7 @@
-import SourceMapbox from './source.vue'
+import Mapbox from './source.vue'
 
-SourceMapbox.install = function (Vue) {
-  Vue.component(SourceMapbox.name, SourceMapbox)
+Mapbox.install = function (Vue) {
+  Vue.component(Mapbox.name, Mapbox)
 }
 
-export default SourceMapbox
+export default Mapbox

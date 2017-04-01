@@ -1,18 +1,12 @@
 <script>
   import Geolocation from 'ol/geolocation'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/combineLatest'
-  import 'rxjs/add/observable/of'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/filter'
-  import 'rxjs/add/operator/merge'
-  import 'rxjs/add/operator/do'
-  import 'vl-rx/from-ol-event'
   import { isEqual } from 'lodash/fp'
-  import { DATA_PROJECTION } from 'vl-ol/consts'
-  import rxSubs from 'vl-mixins/rx-subs'
-  import stubVNode from 'vl-mixins/stub-vnode'
+  import Observable from '../../rx'
+  import { consts } from '../../ol'
+  import rxSubs from '../../mixins/rx-subs'
+  import stubVNode from '../../mixins/stub-vnode'
+
+  const { DATA_PROJECTION } = consts
 
   const props = {
     tracking: {
@@ -134,5 +128,3 @@
     )
   }
 </script>
-
-<style>/* stub style  */</style>

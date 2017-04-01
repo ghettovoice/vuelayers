@@ -1,7 +1,7 @@
-import LayerTile from './layer.vue'
+import Tile from './layer.vue'
 
-LayerTile.install = function (Vue) {
-  Vue.component(LayerTile.name, LayerTile)
+Tile.install = function (Vue) {
+  Vue.component(Tile.name, Tile)
 }
 
-export default LayerTile
+export default Tile
