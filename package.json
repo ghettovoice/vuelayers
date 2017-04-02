@@ -6,7 +6,6 @@
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "dist/index.js",
   "scripts": {
-    "prepublish": "npm run build",
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
     "demo": "node build/dev-server.js --conf=demo-dev",
