@@ -1,11 +1,10 @@
 {
   "name": "vuelayers",
   "fullname": "VueLayers",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "description": "Vue components to work with OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "dist/index.js",
-  "module": "src/index.js",
   "scripts": {
     "prepublish": "npm run build",
     "dev": "node build/dev-server.js",
