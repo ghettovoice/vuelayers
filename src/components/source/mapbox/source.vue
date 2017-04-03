@@ -1,5 +1,5 @@
 <script>
-  import coalesce from '../../utils/coalesce'
+  import coalesce from '../../../utils/coalesce'
   import { consts } from '../../../ol'
   import xyzSource from '../xyz/source.vue'
 

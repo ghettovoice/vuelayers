@@ -1,6 +1,6 @@
 <script>
   import RegularShape from 'ol/style/regularshape'
-  import imageStyle from 'vl-components/style/image'
+  import imageStyle from '../image'
 
   const props = {
     points: {

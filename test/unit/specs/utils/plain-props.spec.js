@@ -1,4 +1,4 @@
-import plainProps from 'vl-utils/plain-props'
+import plainProps from '../../../../src/utils/plain-props'
 
 describe('plain-props', () => {
   it('should clean the object from non-plain values', () => {

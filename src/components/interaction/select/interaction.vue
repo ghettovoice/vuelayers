@@ -8,7 +8,7 @@
   import interaction from '../interaction'
   import { styleTarget, createStyleFunc } from '../../style'
 
-  const { style, defaultStyle } = styleHelper
+  const { style, defaultEditStyle } = styleHelper
 
   // todo add other options, like event modifiers
   const props = {

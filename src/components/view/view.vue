@@ -2,19 +2,14 @@
   import Vue from 'vue'
   import View from 'ol/view'
   import { isEqual } from 'lodash/fp'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/combineLatest'
-  import 'rxjs/add/observable/of'
-  import 'rxjs/add/operator/merge'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/map'
-  import 'vl-rx/from-ol-event'
-  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } from 'vl-ol/consts'
-  import { toLonLat, fromLonLat } from 'vl-ol/coordinate'
-  import { warn } from 'vl-utils/debug'
-  import rxSubs from 'vl-mixins/rx-subs'
-  import stubVNode from 'vl-mixins/stub-vnode'
+  import Observable from '../../rx'
+  import { consts, coordinateHelper } from '../../ol'
+  import { warn } from '../../utils/debug'
+  import rxSubs from '../../mixins/rx-subs'
+  import stubVNode from '../../mixins/stub-vnode'
+
+  const { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } = consts
+  const { toLonLat, fromLonLat } = coordinateHelper
 
   const props = {
     zoom: {

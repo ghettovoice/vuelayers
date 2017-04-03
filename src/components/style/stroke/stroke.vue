@@ -1,6 +1,6 @@
 <script>
   import Stroke from 'ol/style/stroke'
-  import style from 'vl-components/style/style'
+  import style from '../style'
 
   const props = {
     color: [ Array, String ],

@@ -1,7 +1,7 @@
 /**
  * RxJS subscriptions manager.
  */
-import { errordbg } from 'vl-utils/debug'
+import { errordbg } from '../utils/debug'
 
 const noop = () => {}
 

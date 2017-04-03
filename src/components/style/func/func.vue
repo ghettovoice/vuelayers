@@ -4,11 +4,10 @@
    * Plays the role of both a style that mounts itself to style target (layer, feature & etc.)
    * and style target for inner style containers.
    */
-  import * as geoJson from 'vl-ol/geojson'
-  import * as styleHelper from 'vl-ol/style'
-  import { warn } from 'vl-utils/debug'
-  import style from 'vl-components/style/style'
-  import styleTarget, { createStyleFunc } from 'vl-components/style/target'
+  import { geoJson, styleHelper } from '../../../ol'
+  import { warn } from '../../../utils/debug'
+  import style from '../style'
+  import styleTarget, { createStyleFunc } from '../target'
 
   const props = {
     factory: {

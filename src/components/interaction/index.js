@@ -1,16 +1,16 @@
 import interaction from './interaction'
-import Select from './select'
+import SelectInteraction from './select'
 
 export {
   // mixins
   interaction,
   // components
-  Select
+  SelectInteraction
 }
 
 export default {
   // mixins
   interaction,
   // components
-  Select
+  SelectInteraction
 }

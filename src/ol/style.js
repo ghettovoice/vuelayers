@@ -12,9 +12,9 @@ import RegularShape from 'ol/style/regularshape'
 import Text from 'ol/style/text'
 import ImageStyle from 'ol/style/image'
 import { flow, isPlainObject, lowerFirst, pick, upperFirst } from 'lodash/fp'
-import isNumeric from 'vl-utils/is-numeric'
-import { GEOMETRY_TYPE } from 'vl-ol/consts'
-import * as geoJson from 'vl-ol/geojson'
+import isNumeric from '../utils/is-numeric'
+import { GEOMETRY_TYPE } from './consts'
+import * as geoJson from './geojson'
 const reduce = require('lodash/fp/reduce').convert({ cap: false })
 
 /**

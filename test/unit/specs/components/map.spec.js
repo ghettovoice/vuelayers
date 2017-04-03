@@ -1,6 +1,6 @@
 import OlMap from 'ol/map'
 import Vue from 'vue'
-import Map from 'vl-components/map'
+import Map from '../../../../src/components/map'
 
 describe('map component', () => {
   const Ctor = Vue.extend(Map)

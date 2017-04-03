@@ -8,47 +8,7 @@
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
 import {
-  CircleStyle,
-  Feature,
-  FillStyle,
-  Geoloc,
-  geom,
-  IconStyle,
-  imageStyle,
-  interaction,
-  layer,
-  LineStringGeom,
-  Map,
-  MapboxSource,
-  MultiLineStringGeom,
-  MultiPointGeom,
-  MultiPolygonGeom,
-  OSMSource,
-  PointGeom,
-  PolygonGeom,
-  RegShapeStyle,
-  SelectInteraction,
-  source,
-  StrokeStyle,
-  style,
-  StyleContainer,
-  StyleFunc,
-  styleTarget,
-  tileBaseLayer,
-  tileBaseSource,
-  TileLayer,
-  vectorBaseLayer,
-  vectorBaseSource,
-  VectorLayer,
-  VectorSource,
-  View,
-  wmsBaseSource,
-  WMSSource,
-  xyzBaseSource,
-  XYZSource
-} from './components'
-
-export {
+  // common
   Map,
   View,
   Feature,
@@ -66,21 +26,58 @@ export {
   SelectInteraction,
   // layers
   layer,
-  tileBaseLayer,
-  vectorBaseLayer,
   VectorLayer,
   TileLayer,
   // sources
   source,
-  vectorBaseSource,
-  tileBaseSource,
-  xyzBaseSource,
-  wmsBaseSource,
+  tileSource,
   VectorSource,
-  XYZSource,
-  OSMSource,
+  XyzSource,
+  OsmSource,
   MapboxSource,
-  WMSSource,
+  WmsSource,
+  // style
+  style,
+  imageStyle,
+  styleTarget,
+  StyleContainer,
+  FillStyle,
+  StrokeStyle,
+  CircleStyle,
+  IconStyle,
+  RegShapeStyle,
+  StyleFunc
+} from './components'
+
+export {
+  // common
+  Map,
+  View,
+  Feature,
+  Geoloc,
+  // geoms
+  geom,
+  PointGeom,
+  LineStringGeom,
+  PolygonGeom,
+  MultiPointGeom,
+  MultiLineStringGeom,
+  MultiPolygonGeom,
+  // interactions
+  interaction,
+  SelectInteraction,
+  // layers
+  layer,
+  VectorLayer,
+  TileLayer,
+  // sources
+  source,
+  tileSource,
+  VectorSource,
+  XyzSource,
+  OsmSource,
+  MapboxSource,
+  WmsSource,
   // style
   style,
   imageStyle,
@@ -95,6 +92,7 @@ export {
 }
 
 const components = {
+  // common
   Map,
   View,
   Feature,
@@ -112,21 +110,16 @@ const components = {
   SelectInteraction,
   // layers
   layer,
-  tileBaseLayer,
-  vectorBaseLayer,
   VectorLayer,
   TileLayer,
   // sources
   source,
-  vectorBaseSource,
-  tileBaseSource,
-  xyzBaseSource,
-  wmsBaseSource,
+  tileSource,
   VectorSource,
-  XYZSource,
-  OSMSource,
+  XyzSource,
+  OsmSource,
   MapboxSource,
-  WMSSource,
+  WmsSource,
   // style
   style,
   imageStyle,

@@ -1,5 +1,5 @@
 import GeoJSON from 'ol/format/geojson'
-import plainProps from 'vl-utils/plain-props'
+import plainProps from '../utils/plain-props'
 import { DATA_PROJECTION, MAP_PROJECTION } from './consts'
 
 const geoJson = new GeoJSON({
