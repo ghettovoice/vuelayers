@@ -8,8 +8,12 @@
     "stage-0"
   ],
   "plugins": [
-    "transform-runtime",
-    "lodash"
+    "lodash",
+    ["transform-runtime", {
+      "helpers": false,
+      "polyfill": false,
+      "regenerator": true
+    }]
   ],
   "env": {
     "test": {

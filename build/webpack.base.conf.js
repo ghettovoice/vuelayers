@@ -50,7 +50,7 @@ module.exports = {
         include: [
           resolve('src'),
           resolve('test'),
-          resolve('node_modules')
+          resolve('node_modules/ol-tilecache')
         ]
       },
       {
