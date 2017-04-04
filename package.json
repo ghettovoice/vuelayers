@@ -4,8 +4,8 @@
   "version": "0.5.2",
   "description": "Vue components to work with OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "main": "dist/vuelayers.umd.js",
+  "module": "dist/vuelayers.es.js",
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "npm run dev",

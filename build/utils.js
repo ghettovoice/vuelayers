@@ -3,6 +3,10 @@ const path = require('path')
 const config = require('../config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
+exports.resolve = function (relPath) {
+  return path.join(__dirname, '..', relPath)
+}
+
 exports.assetsPath = function (_path) {
   const assetsSubDirectory = process.env.NODE_ENV === 'production'
     ? config.build.assetsSubDirectory

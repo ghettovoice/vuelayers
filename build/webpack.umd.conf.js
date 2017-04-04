@@ -13,14 +13,14 @@ const env = isProduction ? config.build.env : config.dev.env
 
 const webpackConfig = merge(baseWebpackConfig, {
   output: {
-    filename: 'index.umd.js',
+    filename: isProduction ? '[name].umd.min.js' : '[name].umd.js',
     library: config.fullname,
     libraryTarget: 'umd'
   },
   module: {
     rules: utils.styleLoaders({
       sourceMap: config.build.productionSourceMap,
-      extract: true
+      extract: isProduction
     })
   },
   externals: {
@@ -35,6 +35,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
+      'process.env': JSON.stringify(env),
       PKG_NAME: `"${config.name}"`,
       PKG_FULLNAME: `"${config.fullname}"`,
       PKG_VERSION: `"${config.version}"`
@@ -48,7 +49,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     }) ] : [] ),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: 'style.umd.css'
+      filename: '[name].css'
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.

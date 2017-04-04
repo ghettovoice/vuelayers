@@ -1,31 +1,28 @@
 const path = require('path')
 const utils = require('./utils')
 const WebpackNotifierPlugin = require('webpack-notifier')
-const config = require('../config')
-const vueLoaderConfig = require('./vue-loader.conf')
+const config = require('./config')
 
-function resolve (dir) {
-  return path.join(__dirname, '..', dir)
-}
+const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
-  entry: config.build.entry,
+  entry: {
+    [ config.name ]: config.entry
+  },
   devtool: '#source-map',
   output: {
-    path: config.build.outPath,
+    path: config.outDir,
     filename: '[name].js',
-    publicPath: process.env.NODE_ENV === 'production'
-      ? config.build.publicPath
-      : config.dev.publicPath
+    publicPath: '/'
   },
   resolve: {
     extensions: [ '.js', '.vue', '.json' ],
     modules: [
-      resolve('src'),
-      resolve('node_modules')
+      utils.resolve('src'),
+      utils.resolve('node_modules')
     ],
     alias: {
-      [ config.name ]: resolve('')
+      [ packageJson.name ]: utils.resolve('')
     }
   },
   module: {
@@ -34,53 +31,28 @@ module.exports = {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         enforce: "pre",
-        include: [ resolve('src'), resolve('test') ],
+        include: [ utils.resolve('src'), utils.resolve('test') ],
         options: {
           formatter: require('eslint-friendly-formatter')
         }
       },
       {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: vueLoaderConfig
-      },
-      {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [
-          resolve('src'),
-          resolve('test'),
-          resolve('node_modules/ol-tilecache')
+          utils.resolve('src'),
+          utils.resolve('test'),
+          utils.resolve('node_modules/ol-tilecache')
         ]
-      },
-      {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'url-loader',
-        query: {
-          limit: 10000,
-          name: utils.assetsPath('img/[name].[hash:7].[ext]')
-        }
-      },
-      {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'url-loader',
-        query: {
-          limit: 10000,
-          name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
-        }
-      },
-      {
-        test: /\.(geo)?json$/,
-        loader: 'json-loader'
-      },
-      {
-        test: /\.ya?ml/,
-        loader: 'json-loader!yaml-loader'
       }
-    ],
-    noParse: [ /openlayers/ ]
+    ]
   },
   plugins: [
+    new webpack.Banner({
+      banner: config.banner,
+      raw: true,
+      entryOnly: true
+    }),
     new WebpackNotifierPlugin({
       title: config.fullname,
       alwaysNotify: true
