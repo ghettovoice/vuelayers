@@ -1,7 +1,7 @@
 /**
  * Shared config
  */
-const utils = require('./utils')
+const path = require('path')
 const packageJson = require('../package.json')
 
 const banner =
@@ -23,8 +23,8 @@ module.exports = {
   author: packageJson.author,
   version: packageJson.version,
   license: packageJson.license,
-  entry: utils.resolve('src/index.js'),
-  outDir: utils.resolve('dist'),
+  entry: path.join(__dirname, '../src/index.js'),
+  outDir: path.join(__dirname, '../dist'),
   publicPath: '/',
   assetsSubDir: 'static',
   host: 'localhost',

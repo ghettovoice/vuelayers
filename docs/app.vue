@@ -24,8 +24,7 @@
       </vl-layer-tile>
 
       <vl-layer-tile id="mapbox" :visible="layers.mapbox">
-        <vl-source-mapbox map-id="ghettovoice.nbm2olb0"
-                          access-token="pk.eyJ1IjoiZ2hldHRvdm9pY2UiLCJhIjoiMzMxYzMyMWQ3NTgzMTU4Nzk3ZTNmMmI3MmQ1NmVhMjgifQ._erAEzdvdB0jfYXXqzOJCg"/>
+        <vl-source-osm/>
       </vl-layer-tile>
       <!--// base layers -->
 

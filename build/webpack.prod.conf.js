@@ -14,10 +14,17 @@ const isProduction = process.env.NODE_ENV === 'production'
 const webpackConfig = merge(baseWebpackConfig, {
   devtool: '#source-map',
   module: {
-    rules: utils.styleLoaders({
-      sourceMap: true,
-      extract: isProduction
-    })
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: utils.vueLoaderConfig(true)
+      },
+      ...utils.styleLoaders({
+        sourceMap: true,
+        extract: isProduction
+      })
+    ]
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html

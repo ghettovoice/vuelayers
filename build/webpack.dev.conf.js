@@ -11,16 +11,21 @@ const webpackConfig = merge(baseWebpackConfig, {
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
   devServer: {
-    publicPath: baseConfig.output.publicPath,
+    publicPath: config.publicPath,
     host: config.host,
-    port: config.port,
-    hot: true,
-    inline: true
+    port: config.port
   },
   module: {
-    rules: utils.styleLoaders({
-      sourceMap: true
-    })
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: utils.vueLoaderConfig()
+      },
+      ...utils.styleLoaders({
+        sourceMap: true
+      })
+    ]
   },
   plugins: [
     new webpack.DefinePlugin({
