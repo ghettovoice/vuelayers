@@ -1,16 +1,15 @@
 const fs = require('fs')
 const path = require('path')
-const config = require('../config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const config = require('./config')
 
 exports.resolve = function (relPath) {
   return path.join(__dirname, '..', relPath)
 }
 
 exports.assetsPath = function (_path) {
-  const assetsSubDirectory = process.env.NODE_ENV === 'production'
-    ? config.build.assetsSubDirectory
-    : config.dev.assetsSubDirectory
+  const assetsSubDirectory = config.assetsSubDir
+
   return path.posix.join(assetsSubDirectory, _path)
 }
 

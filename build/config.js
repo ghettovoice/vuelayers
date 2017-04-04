@@ -25,5 +25,8 @@ module.exports = {
   license: packageJson.license,
   entry: utils.resolve('src/index.js'),
   outDir: utils.resolve('dist'),
+  publicPath: '/',
+  assetsSubDir: 'static',
+  host: 'localhost',
   port: 8081
 }

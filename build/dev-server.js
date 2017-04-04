@@ -1,5 +1,3 @@
-require('./check-versions')()
-
 const argv = require('yargs').argv
 
 const config = require('../config')

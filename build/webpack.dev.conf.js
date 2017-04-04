@@ -1,30 +1,33 @@
 // This is webpack config for hot mode
-const utils = require('./utils')
 const webpack = require('webpack')
-const config = require('../config')
 const merge = require('webpack-merge')
-const baseWebpackConfig = require('./webpack.base.conf')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+const utils = require('./utils')
+const config = require('./config')
+const baseWebpackConfig = require('./webpack.base.conf')
 
-baseWebpackConfig.entry = config.dev.entry
-// add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function (name) {
-  baseWebpackConfig.entry[ name ] = [ './build/dev-client' ].concat(baseWebpackConfig.entry[ name ])
-})
-
-module.exports = merge(baseWebpackConfig, {
-  module: {
-    rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
-  },
+const webpackConfig = merge(baseWebpackConfig, {
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
+  devServer: {
+    publicPath: baseConfig.output.publicPath,
+    host: config.host,
+    port: config.port,
+    hot: true,
+    inline: true
+  },
+  module: {
+    rules: utils.styleLoaders({
+      sourceMap: true
+    })
+  },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': config.dev.env,
-      PKG_NAME: `"${config.name}"`,
-      PKG_FULLNAME: `"${config.fullname}"`,
-      PKG_VERSION: `"${config.version}"`
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+      PKG_NAME: `'${config.name}'`,
+      PKG_FULLNAME: `'${config.fullname}'`,
+      PKG_VERSION: `'${config.version}'`
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
@@ -38,3 +41,9 @@ module.exports = merge(baseWebpackConfig, {
     new FriendlyErrorsPlugin()
   ]
 })
+
+webpackConfig.entry = {
+  app: utils.resolve('test/main.js')
+}
+
+module.exports = webpackConfig
