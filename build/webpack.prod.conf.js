@@ -29,21 +29,23 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
-      PKG_NAME: `'${config.name}'`,
-      PKG_FULLNAME: `'${config.fullname}'`,
-      PKG_VERSION: `'${config.version}'`
+      'process.env': {
+        NODE_ENV: `'${process.env.NODE_ENV}'`,
+        PKG_NAME: `'${config.name}'`,
+        PKG_FULLNAME: `'${config.fullname}'`,
+        PKG_VERSION: `'${config.version}'`
+      }
     }),
-    new webpack.optimize.UglifyJsPlugin({
+    ...( isProduction ? [ new webpack.optimize.UglifyJsPlugin({
       mangle: true,
+      sourceMap: true,
       compress: {
         warnings: false
-      },
-      sourceMap: true
-    }),
+      }
+    }) ] : [] ),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: '[name].css'
+      filename: isProduction ? '[name].min.css' : '[name].css'
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.

@@ -10,11 +10,6 @@ const baseWebpackConfig = require('./webpack.base.conf')
 const webpackConfig = merge(baseWebpackConfig, {
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
-  devServer: {
-    publicPath: config.publicPath,
-    host: config.host,
-    port: config.port
-  },
   module: {
     rules: [
       {
@@ -29,10 +24,12 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
-      PKG_NAME: `'${config.name}'`,
-      PKG_FULLNAME: `'${config.fullname}'`,
-      PKG_VERSION: `'${config.version}'`
+      'process.env': {
+        NODE_ENV: `'${process.env.NODE_ENV}'`,
+        PKG_NAME: `'${config.name}'`,
+        PKG_FULLNAME: `'${config.fullname}'`,
+        PKG_VERSION: `'${config.version}'`
+      }
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),

@@ -7,7 +7,7 @@
   "main": "dist/vuelayers.umd.js",
   "module": "dist/vuelayers.es.js",
   "scripts": {
-    "dev": "webpack-dev-server --config=build/webpack.dev.conf.js --hot --inline --progress",
+    "dev": "webpack-dev-server --config=build/webpack.dev.conf.js --hot --inline",
     "start": "npm run dev",
     "esm": "rollup --config=build/rollup.esm.conf.js",
     "umd": "webpack --config=build/webpack.umd.conf.js --progress",
@@ -65,6 +65,7 @@
     "chromedriver": "^2.28.0",
     "coveralls": "^2.12.0",
     "cross-env": "^3.2.4",
+    "cross-spawn": "^5.1.0",
     "css-loader": "^0.28.0",
     "eslint": "^3.18.0",
     "eslint-config-standard": "^7.1.0",

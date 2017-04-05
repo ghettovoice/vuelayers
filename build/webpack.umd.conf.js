@@ -13,9 +13,9 @@ const isProduction = process.env.NODE_ENV === 'production'
 const webpackConfig = merge(baseWebpackConfig, {
   devtool: '#source-map',
   output: {
-    filename: isProduction ? '[name].min.js' : '[name].js',
     library: config.fullname,
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   module: {
     rules: [
@@ -41,17 +41,19 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
-      PKG_NAME: `'${config.name}'`,
-      PKG_FULLNAME: `'${config.fullname}'`,
-      PKG_VERSION: `'${config.version}'`
+      'process.env': {
+        NODE_ENV: `'${process.env.NODE_ENV}'`,
+        PKG_NAME: `'${config.name}'`,
+        PKG_FULLNAME: `'${config.fullname}'`,
+        PKG_VERSION: `'${config.version}'`
+      }
     }),
     ...( isProduction ? [ new webpack.optimize.UglifyJsPlugin({
       mangle: true,
+      sourceMap: true,
       compress: {
         warnings: false
-      },
-      sourceMap: true
+      }
     }) ] : [] ),
     // extract css into its own file
     new ExtractTextPlugin({

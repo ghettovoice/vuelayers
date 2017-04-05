@@ -11,9 +11,14 @@ module.exports = {
     [ config.name ]: config.entry
   },
   devtool: '#source-map',
+  devServer: {
+    publicPath: config.publicPath,
+    host: config.host,
+    port: config.port
+  },
   output: {
     path: config.outDir,
-    filename: '[name].js',
+    filename: isProduction ? '[name].min.js' : '[name].js',
     publicPath: config.publicPath
   },
   resolve: {
@@ -32,7 +37,10 @@ module.exports = {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         enforce: "pre",
-        include: [ utils.resolve('src'), utils.resolve('test') ],
+        include: [
+          utils.resolve('src'),
+          utils.resolve('test')
+        ],
         options: {
           formatter: require('eslint-friendly-formatter')
         }

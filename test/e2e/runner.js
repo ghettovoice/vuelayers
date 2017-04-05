@@ -1,6 +1,11 @@
 // 1. start the dev server using production config
+const webpack = require('webpack')
+const WebpackDevServer = require('webpack-dev-server')
+const webpackConfig = require('../../build/webpack.prod.conf')
+
 process.env.NODE_ENV = 'testing'
-const server = require('.././dev-server.js')
+const compiler = webpack(webpackConfig())
+const server = new WebpackDevServer(compiler)
 
 // 2. run the nightwatch test suite against it
 // to run in additional browsers:

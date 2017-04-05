@@ -1,11 +1,9 @@
-/* global PKG_FULLNAME */
-
 export function warn (msg, ...args) {
-  console.warn(`[${PKG_FULLNAME}] WARNING: ${msg}`, ...args)
+  console.warn(`[${process.env.PKG_FULLNAME}] WARNING: ${msg}`, ...args)
 }
 
 export function error (msg, ...args) {
-  console.error(`[${PKG_FULLNAME}] WARNING: ${msg}`, ...args)
+  console.error(`[${process.env.PKG_FULLNAME}] WARNING: ${msg}`, ...args)
 }
 
 export function warndbg (...args) {
