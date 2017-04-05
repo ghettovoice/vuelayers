@@ -28,5 +28,11 @@ module.exports = {
   publicPath: '/',
   assetsSubDir: 'static',
   host: 'localhost',
-  port: 8081
+  port: 8081,
+  env: {
+    NODE_ENV: `'${process.env.NODE_ENV}'`,
+    PKG_NAME: `'${packageJson.name}'`,
+    PKG_FULLNAME: `'${packageJson.fullname}'`,
+    PKG_VERSION: `'${packageJson.version}'`
+  }
 }
