@@ -3,12 +3,9 @@ const path = require('path')
 const chalk = require('chalk')
 const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
-const uglify = require('rollup-plugin-uglify')
 const cjs = require('rollup-plugin-commonjs')
 const node = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
-const sass = require('rollup-plugin-sass')
-const postcss = require('postcss')
 const vue = require('rollup-plugin-vue')
 const ora = require('ora')
 const config = require('./config')
@@ -21,23 +18,9 @@ const replaces = Object.keys(config.env)
     {}
   )
 
-// todo add minification, postcss processing, source maps, node_modules include
 const vueConfig = {
   compileTemplate: true,
-  css: path.join(config.outDir, `${config.name}.esm.css`),
-  scss: {
-    sourceMap: true
-  }
-}
-
-const sassConfig = {
-  output: styles => console.log(styles),
-  processor: css => postcss([
-    require('autoprefixer')({
-      browsers: [ 'last 5 versions' ]
-    })
-  ]).process(css)
-    .then(result => result.css)
+  styleToImports: true
 }
 
 const rollupConfig = {
@@ -47,7 +30,6 @@ const rollupConfig = {
   plugins: [
     node(),
     vue(vueConfig),
-    sass(sassConfig),
     replace(replaces),
     babel(),
     cjs(),
