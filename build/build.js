@@ -1,10 +1,14 @@
+const fs = require('fs')
 const path = require('path')
+const chalk = require('chalk')
 const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
 const uglify = require('rollup-plugin-uglify')
 const cjs = require('rollup-plugin-commonjs')
 const node = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
+const sass = require('rollup-plugin-sass')
+const postcss = require('postcss')
 const vue = require('rollup-plugin-vue')
 const ora = require('ora')
 const config = require('./config')
@@ -17,34 +21,72 @@ const replaces = Object.keys(config.env)
     {}
   )
 
-// todo add minification, postcss processing, source maps
+// todo add minification, postcss processing, source maps, node_modules include
 const vueConfig = {
   compileTemplate: true,
-  css: path.join(config.outDir, `${config.name}.esm.css`)
+  css: path.join(config.outDir, `${config.name}.esm.css`),
+  scss: {
+    sourceMap: true
+  }
+}
+
+const sassConfig = {
+  output: styles => console.log(styles),
+  processor: css => postcss([
+    require('autoprefixer')({
+      browsers: [ 'last 5 versions' ]
+    })
+  ]).process(css)
+    .then(result => result.css)
 }
 
 const rollupConfig = {
   entry: config.entry,
-  banner: config.banner,
   moduleName: config.fullname,
   external: [ 'vue' ],
   plugins: [
     node(),
     vue(vueConfig),
+    sass(sassConfig),
     replace(replaces),
     babel(),
-    cjs()
+    cjs(),
   ]
 }
 
-const spinner = ora('Loading...').start()
+const spinner = ora('relax, your bundles are cooking...').start()
 
 // ES6
 rollup.rollup(rollupConfig)
-  .then(bundler => bundler.write({
-    format: 'es',
-    dest: path.join(config.outDir, `${config.name}.esm.js`),
-    sourceMap: true
-  }))
+  .then(bundler => {
+    const dest = path.join(config.outDir, `${config.name}.esm.js`)
+    const { code, map } = bundler.generate({
+      format: 'es',
+      banner: config.banner,
+      sourceMap: true,
+      sourceMapFile: path.join(config.outDir, `${config.name}.esm.js`)
+    })
+
+    return Promise.all([
+      write(dest, code),
+      write(path.join(config.outDir, `${config.name}.esm.js.map`), map.toString())
+    ])
+  })
   .catch(err => console.error(err.stack))
   .then(() => spinner.stop())
+
+// helpers
+function write (dest, data) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(dest, data, function (err) {
+      if (err) return reject(err)
+
+      console.log(chalk.bold(dest) + ' ' + chalk.gray(getSize(data)))
+      resolve()
+    })
+  })
+}
+
+function getSize (code) {
+  return (code.length / 1024).toFixed(2) + 'kb'
+}
