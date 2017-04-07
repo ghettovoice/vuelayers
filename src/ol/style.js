@@ -11,11 +11,12 @@ import Icon from 'ol/style/icon'
 import RegularShape from 'ol/style/regularshape'
 import Text from 'ol/style/text'
 import ImageStyle from 'ol/style/image'
-import { flow, isPlainObject, lowerFirst, pick, upperFirst } from 'lodash/fp'
+import { flow, isPlainObject, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
 import isNumeric from '../utils/is-numeric'
 import { GEOMETRY_TYPE } from './consts'
 import * as geoJson from './geojson'
-const reduce = require('lodash/fp/reduce').convert({ cap: false })
+
+const reduceWithKey = reduce.convert({ cap: false })
 
 /**
  * @typedef {Object} VlStyle
@@ -195,7 +196,7 @@ export function fill (vlStyle, prefix = '') {
 
   const transform = flow(
     pick(keys),
-    reduce(
+    reduceWithKey(
       (result, value, name) => {
         name = lowerFirst(name.replace(new RegExp(prefixKey('fill')), ''))
 
@@ -232,7 +233,7 @@ export function stroke (vlStyle, prefix = '') {
 
   const transform = flow(
     pick(keys),
-    reduce(
+    reduceWithKey(
       (result, value, name) => {
         switch (name) {
           case prefixKey('strokeColor'):

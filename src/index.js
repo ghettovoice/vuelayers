@@ -1,3 +1,4 @@
+/* global PKG_VERSION */
 /**
  * VueLayers
  * Vue components to work with OpenLayers.
@@ -96,7 +97,7 @@ function install (Vue) {
 export default {
   ...components,
   // meta
-  VERSION: process.env.PKG_VERSION,
+  VERSION: PKG_VERSION,
   // install
   install
 }

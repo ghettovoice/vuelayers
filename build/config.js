@@ -23,14 +23,14 @@ module.exports = {
   author: packageJson.author,
   version: packageJson.version,
   license: packageJson.license,
-  entry: path.join(__dirname, '../src/index.js'),
+  entry: path.join(__dirname, '../src/index.cjs.js'),
+  esEntry: path.join(__dirname, '../src/index.js'),
   outDir: path.join(__dirname, '../dist'),
   publicPath: '/',
   assetsSubDir: 'static',
   host: 'localhost',
   port: 8081,
-  env: {
-    NODE_ENV: `'${process.env.NODE_ENV}'`,
+  replaces: {
     PKG_NAME: `'${packageJson.name}'`,
     PKG_FULLNAME: `'${packageJson.fullname}'`,
     PKG_VERSION: `'${packageJson.version}'`

@@ -104,6 +104,12 @@ function writeFile (dest, data) {
   })
 }
 
+function ensureDir (dir) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir)
+  }
+}
+
 function getSize (data) {
   return (data.length / 1024).toFixed(2) + 'kb'
 }
@@ -116,5 +122,6 @@ module.exports = {
   vueLoaderConfig,
   postcssPlugins,
   writeFile,
+  ensureDir,
   getSize
 }

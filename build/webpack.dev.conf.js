@@ -23,9 +23,9 @@ const webpackConfig = merge(baseWebpackConfig, {
     ]
   },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': config.env
-    }),
+    new webpack.DefinePlugin(Object.assign(config.replaces, {
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
+    })),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
