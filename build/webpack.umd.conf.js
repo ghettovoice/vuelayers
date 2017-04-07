@@ -13,6 +13,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 const webpackConfig = merge(baseWebpackConfig, {
   devtool: '#source-map',
   output: {
+    filename: isProduction ? '[name].umd.min.js' : '[name].umd.js',
     library: config.fullname,
     libraryTarget: 'umd',
     umdNamedDefine: true
@@ -52,7 +53,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     }) ] : [] ),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: isProduction ? '[name].min.css' : '[name].css'
+      filename: isProduction ? '[name].umd.min.css' : '[name].umd.css'
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.

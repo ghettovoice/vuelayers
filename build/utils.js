@@ -73,18 +73,39 @@ function styleLoaders (options) {
   return output
 }
 
+function postcssPlugins () {
+  return [
+    require('autoprefixer')({
+      browsers: [ 'last 5 versions' ]
+    })
+  ]
+}
+
 function vueLoaderConfig (extract) {
   return {
     loaders: cssLoaders({
       sourceMap: true,
       extract
     }),
-    postcss: [
-      require('autoprefixer')({
-        browsers: [ 'last 5 versions' ]
-      })
-    ]
+    postcss: postcssPlugins()
   }
+}
+
+function writeFile (dest, data) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(dest, data, function (err) {
+      if (err) return reject(err)
+
+      resolve({
+        path: dest,
+        size: getSize(data)
+      })
+    })
+  })
+}
+
+function getSize (data) {
+  return (data.length / 1024).toFixed(2) + 'kb'
 }
 
 module.exports = {
@@ -92,5 +113,8 @@ module.exports = {
   assetsPath,
   cssLoaders,
   styleLoaders,
-  vueLoaderConfig
+  vueLoaderConfig,
+  postcssPlugins,
+  writeFile,
+  getSize
 }

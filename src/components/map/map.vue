@@ -167,7 +167,7 @@
 
 <style lang="scss" rel="stylesheet/scss">
   @import "../../styles/mixins";
-  @import "~ol/ol.css";
+  @import "~ol/ol";
 
   .vl-map, .vl-map .map {
     @include vl-wh(100%, 100%);
