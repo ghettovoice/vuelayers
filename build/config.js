@@ -34,5 +34,6 @@ module.exports = {
     PKG_NAME: `'${packageJson.name}'`,
     PKG_FULLNAME: `'${packageJson.fullname}'`,
     PKG_VERSION: `'${packageJson.version}'`
-  }
+  },
+  autoOpenBrowser: true
 }

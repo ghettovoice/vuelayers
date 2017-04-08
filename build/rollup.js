@@ -88,7 +88,7 @@ function bundle (opts = {}) {
     cjs()
   ]
 
-  if (opts.env === 'production') {
+  if (opts.env === 'production' && opts.format === 'cjs') {
     baseName += '.min'
 
     plugins.push(
@@ -99,7 +99,7 @@ function bundle (opts = {}) {
           warnings: false
         },
         output: {
-          comments: function(node, comment) {
+          comments: (node, comment) => {
             let text = comment.value
             let type = comment.type
             if (type == "comment2") {
@@ -133,15 +133,15 @@ function bundle (opts = {}) {
 
       return Promise.all([
         utils.writeFile(dest, code),
-        utils.writeFile(dest + '.map', map.toString()),
+        // utils.writeFile(dest + '.map', map.toString()),
         postcssPromise
       ])
     })
-    .then(([ jsSrc, jsMap, [ cssSrc, cssMap ] ]) => {
+    .then(([ jsSrc, /*jsMap,*/ [ cssSrc, cssMap ] ]) => {
       spinner.succeed(chalk.green(`${opts.format} bundle is ready`))
 
       console.log(jsSrc.path + ' ' + chalk.gray(jsSrc.size))
-      console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
+      // console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
 
       cssSrc && console.log(cssSrc.path + ' ' + chalk.gray(cssSrc.size))
       cssMap && console.log(cssMap.path + ' ' + chalk.gray(cssMap.size))

@@ -14,7 +14,9 @@ module.exports = {
   devServer: {
     publicPath: config.publicPath,
     host: config.host,
-    port: config.port
+    port: config.port,
+    hot: true,
+    inline: true
   },
   output: {
     path: config.outDir,
