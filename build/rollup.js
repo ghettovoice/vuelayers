@@ -6,8 +6,6 @@ const postcss = require('postcss')
 const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
 const resolve = require('rollup-plugin-node-resolve')
-const globals = require('rollup-plugin-node-globals')
-const builtins = require('rollup-plugin-node-builtins')
 const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
 const { dependencies, peerDependencies } = require('../package.json')
@@ -19,23 +17,22 @@ utils.ensureDir(utils.resolve('dist'))
 Promise.resolve()
   .then(() => bundle({
     format: 'es',
-    entry: config.esEntry,
+    entry: config.entry,
     replaces: replaces(),
     external: nodeExternal()
   }))
-  // fixme currently disabled due to errors when work with transform-runtime,
-  // .then(() => bundle({
-  //   format: 'cjs',
-  //   entry: config.entry,
-  //   replaces: replaces(),
-  //   external: nodeExternal()
-  // }))
-  // .then(() => bundle({
-  //   format: 'umd',
-  //   entry: config.entry,
-  //   replaces: replaces(),
-  //   external: [ 'vue' ]
-  // }))
+  .then(() => bundle({
+    format: 'cjs',
+    entry: config.defEntry,
+    replaces: replaces(),
+    external: nodeExternal()
+  }))
+  .then(() => bundle({
+    format: 'umd',
+    entry: config.defEntry,
+    replaces: replaces('development'),
+    external: [ 'vue' ]
+  }))
   .catch(err => {
     console.error(chalk.red(err.stack))
     process.exit(1)
@@ -45,6 +42,10 @@ Promise.resolve()
 function bundle (opts = {}) {
   const baseName = `${config.name}.${opts.format}`
   const dest = path.join(config.outDir, `${baseName}.js`)
+
+  if (opts.format === 'cjs') {
+    process.env.BABEL_ENV = 'cjs'
+  }
 
   const spinner = ora(chalk.bold.blue(`cook ${opts.format} bundle...`)).start()
   let postcssPromise = []
@@ -59,20 +60,32 @@ function bundle (opts = {}) {
           htmlMinifier: { collapseBooleanAttributes: false },
           scss: {
             outputStyle: 'compressed',
+            sourceMap: true,
+            sourceMapEmbed: true,
             includePaths: [
               utils.resolve('src'),
               utils.resolve('node_modules')
             ]
           },
-          css: style => {
+          // todo process each style with postcss, then concatenate sources and source maps
+          css: (style, styles) => {
             postcssPromise = postcssProcess(baseName, style)
           }
         }),
-        babel({ runtimeHelpers: true }),
-        resolve(),
-        cjs(),
-        globals(),
-        builtins()
+        babel({
+          runtimeHelpers: true,
+          include: [
+            'src/**/*',
+            'node_modules/ol-tilecache/**/*'
+          ]
+        }),
+        resolve({
+          main: true,
+          module: true,
+          jsnext: true,
+          browser: true
+        }),
+        cjs()
       ]
     })
     .then(bundler => {
@@ -80,7 +93,9 @@ function bundle (opts = {}) {
         format: opts.format,
         banner: config.banner,
         moduleName: config.fullname,
-        sourceMap: true
+        moduleId: config.name,
+        sourceMap: true,
+        sourceMapFile: dest
       })
 
       return Promise.all([
@@ -95,10 +110,8 @@ function bundle (opts = {}) {
       console.log(jsSrc.path + ' ' + chalk.gray(jsSrc.size))
       console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
 
-      if (cssSrc && cssMap) {
-        console.log(cssSrc.path + ' ' + chalk.gray(cssSrc.size))
-        console.log(cssMap.path + ' ' + chalk.gray(cssMap.size))
-      }
+      cssSrc && console.log(cssSrc.path + ' ' + chalk.gray(cssSrc.size))
+      cssMap && console.log(cssMap.path + ' ' + chalk.gray(cssMap.size))
     })
     .catch(err => {
       spinner.fail(chalk.red(`${opts.format} bundle is failed to create`))
@@ -110,13 +123,10 @@ function postcssProcess (baseName, style) {
   const dest = path.join(config.outDir, `${baseName}.css`)
 
   return postcss(utils.postcssPlugins())
-    .process(config.banner + style, {
-      from: 'src/index.css',
-      to: `dist/${baseName}.css`
-    })
-    .then(({ css, map }) => Promise.all([
+    .process(config.banner + style)
+    .then(({ css/*, map*/ }) => Promise.all([
       utils.writeFile(dest, css),
-      utils.writeFile(dest + '.map', css),
+      // utils.writeFile(dest + '.map', map.toString()),
     ]))
 }
 

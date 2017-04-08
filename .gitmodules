@@ -1,0 +1,3 @@
+[submodule "modules/babel-plugin-transform-nested-import"]
+	path = modules/babel-plugin-transform-nested-import
+	url = https://github.com/ghettovoice/babel-plugin-transform-nested-import.git

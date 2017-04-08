@@ -1,4 +1,3 @@
-/* global PKG_VERSION */
 /**
  * VueLayers
  * Vue components to work with OpenLayers.
@@ -7,43 +6,9 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
-import {
-  CircleStyle,
-  Feature,
-  FillStyle,
-  Geoloc,
-  geom,
-  IconStyle,
-  imageStyle,
-  interaction,
-  layer,
-  LineStringGeom,
-  Map,
-  MapboxSource,
-  MultiLineStringGeom,
-  MultiPointGeom,
-  MultiPolygonGeom,
-  OsmSource,
-  PointGeom,
-  PolygonGeom,
-  RegShapeStyle,
-  SelectInteraction,
-  source,
-  StrokeStyle,
-  style,
-  StyleContainer,
-  StyleFunc,
-  styleTarget,
-  TileLayer,
-  tileSource,
-  VectorLayer,
-  VectorSource,
-  View,
-  WmsSource,
-  XyzSource
-} from './components'
+import VueLayers from './index.def'
 
-const components = {
+const {
   // common
   Map,
   View,
@@ -83,25 +48,9 @@ const components = {
   IconStyle,
   RegShapeStyle,
   StyleFunc
-}
+} = VueLayers
 
-function install (Vue) {
-  Object.keys(components)
-    .forEach(key => {
-      if (typeof components[ key ].install === 'function') {
-        Vue.use(components[ key ])
-      }
-    })
-}
-
-export default {
-  ...components,
-  // meta
-  VERSION: PKG_VERSION,
-  // install
-  install
-}
-
+export default VueLayers
 export {
   // common
   Map,
