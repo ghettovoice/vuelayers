@@ -8,7 +8,8 @@ const cjs = require('rollup-plugin-commonjs')
 const resolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
-const { dependencies, peerDependencies } = require('../package.json')
+const uglify = require('rollup-plugin-uglify')
+const { dependencies, peerDependencies, devDependencies } = require('../package.json')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -18,19 +19,23 @@ Promise.resolve()
   .then(() => bundle({
     format: 'es',
     entry: config.entry,
-    replaces: replaces(),
     external: nodeExternal()
   }))
   .then(() => bundle({
     format: 'cjs',
     entry: config.defEntry,
-    replaces: replaces(),
     external: nodeExternal()
   }))
   .then(() => bundle({
     format: 'umd',
     entry: config.defEntry,
-    replaces: replaces('development'),
+    env: 'development',
+    external: [ 'vue' ]
+  }))
+  .then(() => bundle({
+    format: 'umd',
+    entry: config.defEntry,
+    env: 'production',
     external: [ 'vue' ]
   }))
   .catch(err => {
@@ -40,53 +45,81 @@ Promise.resolve()
 
 // helpers
 function bundle (opts = {}) {
-  const baseName = `${config.name}.${opts.format}`
-  const dest = path.join(config.outDir, `${baseName}.js`)
+  let baseName = `${config.name}.${opts.format}`
 
   if (opts.format === 'cjs') {
     process.env.BABEL_ENV = 'cjs'
+  } else {
+    delete process.env.BABEL_ENV
   }
 
+  const plugins = [
+    replace(replaces(opts.env)),
+    vue({
+      compileTemplate: true,
+      htmlMinifier: { collapseBooleanAttributes: false },
+      scss: {
+        outputStyle: 'compressed',
+        sourceMap: true,
+        sourceMapEmbed: true,
+        includePaths: [
+          utils.resolve('src'),
+          utils.resolve('node_modules')
+        ]
+      },
+      // todo process each style with postcss, then concatenate sources and source maps
+      css: (style, styles) => {
+        postcssPromise = postcssProcess(baseName, style)
+      }
+    }),
+    babel({
+      runtimeHelpers: true,
+      include: [
+        'src/**/*',
+        'node_modules/ol-tilecache/**/*'
+      ]
+    }),
+    resolve({
+      main: true,
+      module: true,
+      jsnext: true,
+      browser: true
+    }),
+    cjs()
+  ]
+
+  if (opts.env === 'production') {
+    baseName += '.min'
+
+    plugins.push(
+      uglify({
+        mangle: true,
+        sourceMap: true,
+        compress: {
+          warnings: false
+        },
+        output: {
+          comments: function(node, comment) {
+            let text = comment.value
+            let type = comment.type
+            if (type == "comment2") {
+              // multiline comment
+              return /@preserve|@license|@cc_on/i.test(text)
+            }
+          }
+        }
+      })
+    )
+  }
+
+  const dest = path.join(config.outDir, `${baseName}.js`)
   const spinner = ora(chalk.bold.blue(`cook ${opts.format} bundle...`)).start()
-  let postcssPromise = []
+  let postcssPromise
 
   return rollup.rollup({
       entry: opts.entry,
       external: opts.external,
-      plugins: [
-        replace(opts.replaces),
-        vue({
-          compileTemplate: true,
-          htmlMinifier: { collapseBooleanAttributes: false },
-          scss: {
-            outputStyle: 'compressed',
-            sourceMap: true,
-            sourceMapEmbed: true,
-            includePaths: [
-              utils.resolve('src'),
-              utils.resolve('node_modules')
-            ]
-          },
-          // todo process each style with postcss, then concatenate sources and source maps
-          css: (style, styles) => {
-            postcssPromise = postcssProcess(baseName, style)
-          }
-        }),
-        babel({
-          runtimeHelpers: true,
-          include: [
-            'src/**/*',
-            'node_modules/ol-tilecache/**/*'
-          ]
-        }),
-        resolve({
-          main: true,
-          module: true,
-          jsnext: true,
-          browser: true
-        }),
-        cjs()
-      ]
+      plugins
     })
     .then(bundler => {
       const { code, map } = bundler.generate({
@@ -124,7 +157,7 @@ function postcssProcess (baseName, style) {
 
   return postcss(utils.postcssPlugins())
     .process(config.banner + style)
-    .then(({ css/*, map*/ }) => Promise.all([
+    .then(({ css, map }) => Promise.all([
       utils.writeFile(dest, css),
       // utils.writeFile(dest + '.map', map.toString()),
     ]))
@@ -133,6 +166,7 @@ function postcssProcess (baseName, style) {
 function nodeExternal () {
   const deps = Object.keys(dependencies)
     .concat(Object.keys(peerDependencies))
+    .concat(Object.keys(devDependencies))
 
   return moduleId => deps.some(dep => new RegExp(`^${dep}.*$`, 'i').test(moduleId))
 }
