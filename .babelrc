@@ -17,7 +17,7 @@
     },
     "cjs": {
       "plugins": [
-        ["./modules/babel-plugin-transform-nested-import", {
+        ["./modules/babel-plugin-merge-imports", {
           "pkg": "openlayers",
           "pkgVar": "__ol",
           "regex": "^ol(?:\/(.*))?$",
