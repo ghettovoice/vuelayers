@@ -7,7 +7,7 @@
   import { geoJson, styleHelper } from '../../../ol'
   import { warn } from '../../../utils/debug'
   import style from '../style'
-  import styleTarget, { createStyleFunc } from '../target'
+  import styleTarget, { createStyleFunc } from '../../style-target'
 
   const props = {
     factory: {

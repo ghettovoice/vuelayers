@@ -15,7 +15,6 @@ const {
   Feature,
   Geoloc,
   // geoms
-  geom,
   PointGeom,
   LineStringGeom,
   PolygonGeom,
@@ -23,24 +22,17 @@ const {
   MultiLineStringGeom,
   MultiPolygonGeom,
   // interactions
-  interaction,
   SelectInteraction,
   // layers
-  layer,
   VectorLayer,
   TileLayer,
   // sources
-  source,
-  tileSource,
   VectorSource,
   XyzSource,
   OsmSource,
   MapboxSource,
   WmsSource,
   // style
-  style,
-  imageStyle,
-  styleTarget,
   StyleContainer,
   FillStyle,
   StrokeStyle,
@@ -58,7 +50,6 @@ export {
   Feature,
   Geoloc,
   // geoms
-  geom,
   PointGeom,
   LineStringGeom,
   PolygonGeom,
@@ -66,24 +57,17 @@ export {
   MultiLineStringGeom,
   MultiPolygonGeom,
   // interactions
-  interaction,
   SelectInteraction,
   // layers
-  layer,
   VectorLayer,
   TileLayer,
   // sources
-  source,
-  tileSource,
   VectorSource,
   XyzSource,
   OsmSource,
   MapboxSource,
   WmsSource,
   // style
-  style,
-  imageStyle,
-  styleTarget,
   StyleContainer,
   FillStyle,
   StrokeStyle,

@@ -217,33 +217,31 @@
       rotationChanges
     ).throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
-      .map(([ center, zoom, rotation ]) => {
-        return {
-          center: toLonLat(center, this.projection),
-          zoom: Math.ceil(this.view.getZoom()),
-          rotation
-        }
-      })
+      .map(([ center, zoom, rotation ]) => ({
+        center: toLonLat(center, this.projection),
+        zoom: Math.ceil(this.view.getZoom()),
+        rotation
+      }))
 
-    this.subscribeTo(
-      viewChanges,
-      ({ center, zoom, rotation }) => {
-        let changed = false
-        if (!isEqual(this.currentCenter, center)) {
-          this.currentCenter = center
-          changed = true
-        }
-        if (this.currentZoom !== zoom) {
-          this.currentZoom = zoom
-          changed = true
-        }
-        if (this.currentRotation !== rotation) {
-          this.currentRotation = rotation
-          changed = true
-        }
+    this.subscribeTo(viewChanges, ({ center, zoom, rotation }) => {
+      let changed = false
 
-        changed && this.$emit('change', { center, zoom, rotation })
+      if (!isEqual(this.currentCenter, center)) {
+        this.currentCenter = center
+        changed = true
       }
-    )
+
+      if (this.currentZoom !== zoom) {
+        this.currentZoom = zoom
+        changed = true
+      }
+
+      if (this.currentRotation !== rotation) {
+        this.currentRotation = rotation
+        changed = true
+      }
+
+      changed && this.$emit('change', { center, zoom, rotation })
+    })
   }
 </script>

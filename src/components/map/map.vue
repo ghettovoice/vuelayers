@@ -130,13 +130,14 @@
    * @return {Map}
    */
   function createMap () {
+    // todo disable all default interaction and controls and use custom if defined, wrap all
+    // todo render vl-view if not added by external code
     /**
      * @type {Map}
      * @protected
      */
     this.map = new Map({
       layers: [],
-      // todo disable all default interaction and controls and use custom if defined, wrap all
 //      interactions: [],
 //      controls: [],
       loadTilesWhileAnimating: this.loadTilesWhileAnimating,

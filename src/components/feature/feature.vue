@@ -7,7 +7,7 @@
   import rxSubs from '../../mixins/rx-subs'
   import stubVNode from '../../mixins/stub-vnode'
   import plainProps from '../../utils/plain-props'
-  import { styleTarget } from '../style'
+  import styleTarget from '../style-target'
   import { consts, coordinateHelper, geoJson } from '../../ol'
 
   const { LAYER_PROP } = consts

@@ -1,4 +1,4 @@
-import geom from './geom'
+// import geom from './geom'
 import PointGeom from './point'
 import LineStringGeom from './line-string'
 import PolygonGeom from './polygon'
@@ -8,7 +8,7 @@ import MultiPolygonGeom from './multi-polygon'
 
 export {
   // mixins
-  geom,
+  // geom,
   // components
   PointGeom,
   LineStringGeom,
@@ -20,7 +20,7 @@ export {
 
 export default {
   // mixins
-  geom,
+  // geom,
   // components
   PointGeom,
   LineStringGeom,

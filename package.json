@@ -17,6 +17,8 @@
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs",
+    "travis-test": "npm run unit && npm run e2e -- --env travis",
+    "travis-script": "npm run travis-test && npm run coveralls",
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls"
   },
   "directories": {
@@ -76,7 +78,9 @@
     "eslint-friendly-formatter": "^2.0.7",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-html": "^2.0.1",
+    "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-lodash-fp": "^2.1.3",
+    "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "eventsource-polyfill": "^0.9.6",

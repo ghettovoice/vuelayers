@@ -1,10 +1,10 @@
-import layer from './layer'
+// import layer from './layer'
 import VectorLayer from './vector'
 import TileLayer from './tile'
 
 export {
   // mixins
-  layer,
+  // layer,
   // components
   VectorLayer,
   TileLayer
@@ -12,7 +12,7 @@ export {
 
 export default {
   // mixins
-  layer,
+  // layer,
   // components
   VectorLayer,
   TileLayer

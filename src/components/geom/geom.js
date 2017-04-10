@@ -1,5 +1,5 @@
-// import { isEqual } from 'lodash/fp'
-// import Observable from '../../rx'
+import { isEqual } from 'lodash/fp'
+import Observable from '../../rx'
 import rxSubs from '../../mixins/rx-subs'
 import stubVNode from '../../mixins/stub-vnode'
 import { coordinateHelper, extentHelper } from '../../ol'
@@ -33,19 +33,19 @@ const methods = {
     const { toLonLat, fromLonLat } = transforms[ this.type ]
     /**
      * @param {Array} coordinates
-     * @returns {Array}
+     * @return {Array}
      * @protected
      */
     this.toLonLat = coordinates => toLonLat(coordinates, this.view.getProjection())
     /**
      * @param {Array} coordinates
-     * @param {Array}
+     * @return {Array}
      * @protected
      */
     this.fromLonLat = coordinates => fromLonLat(coordinates, this.view.getProjection())
     /**
      * @param {Array} extent
-     * @returns {Array}
+     * @return {Array}
      * @protected
      */
     this.extentToLonLat = extent => extentToLonLat(extent, this.view.getProjection())
@@ -65,14 +65,14 @@ const methods = {
     throw new Error('Not implemented method')
   },
   subscribeAll () {
-    // this::subscribeToGeomChanges()
+    this::subscribeToGeomChanges()
   },
   /**
    * @protected
    */
   mountGeometry () {
     if (!this.feature) {
-      throw new Error("Invalid usage of geometry component, should have feature component among it's ancestors")
+      throw new Error('Invalid usage of geometry component, should have feature component among it\'s ancestors')
     }
 
     this.feature.setGeometry(this.geometry)
@@ -89,10 +89,12 @@ const methods = {
     this.geometry.changed()
   }
 }
-// todo use turf.js to optimize geometry compare
 const watch = {
   coordinates (value) {
-    // this.geometry.setCoordinates(this.fromLonLat(value, this.view.getProjection()))
+    // todo use turf.js to optimize geometry compare
+    if (!isEqual(value, this.currentCoordinates)) {
+      this.geometry.setCoordinates(this.fromLonLat(value, this.view.getProjection()))
+    }
   }
 }
 
@@ -136,21 +138,28 @@ export default {
   }
 }
 
-// function subscribeToGeomChanges () {
-//   this.subscribeTo(
-//     Observable.fromOlEvent(this.geometry, 'change')
-//     .throttleTime(1000)
-//     .map(() => {
-//       return [
-//         this.toLonLat(this.geometry.getCoordinates(), this.view.getProjection()),
-//         extentHelper.toLonLat(this.geometry.getExtent(), this.view.getProjection())
-//       ]
-//     })
-//     .distinctUntilChanged((a, b) => isEqual(a, b)),
-//       ([ coordinates, extent ]) => {
-//         this.currentCoordinates = coordinates
-//         this.currentExtent = extent
-//         this.$emit('change', { coordinates, extent })
-//       }
-//     )
-// }
+function subscribeToGeomChanges () {
+  const geomChanges = Observable.fromOlEvent(this.geometry, 'change')
+    .throttleTime(300)
+    .distinctUntilChanged((a, b) => isEqual(a, b))
+    .map(() => ({
+      coordinates: this.toLonLat(this.geometry.getCoordinates(), this.view.getProjection()),
+      extent: extentHelper.toLonLat(this.geometry.getExtent(), this.view.getProjection())
+    }))
+
+  this.subscribeTo(geomChanges, ({ coordinates, extent }) => {
+    let changed = false
+
+    if (!isEqual(this.currentCoordinates, coordinates)) {
+      this.currentCoordinates = coordinates
+      changed = true
+    }
+
+    if (!isEqual(this.currentExtent, extent)) {
+      this.currentExtent = extent
+      changed = true
+    }
+
+    changed && this.$emit('change', { coordinates, extent })
+  })
+}

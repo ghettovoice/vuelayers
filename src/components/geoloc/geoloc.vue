@@ -110,21 +110,20 @@
       .throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
-    this.subscribeTo(
-      geolocChanges,
-      ([ position, accuracy ]) => {
-        let changed = false
-        if (!isEqual(position, this.currentPosition)) {
-          this.currentPosition = position
-          changed = true
-        }
-        if (accuracy !== this.currentAccuracy) {
-          this.currentAccuracy = accuracy
-          changed = true
-        }
+    this.subscribeTo(geolocChanges, ([ position, accuracy ]) => {
+      let changed = false
 
-        changed && this.$emit('change', { position, accuracy })
+      if (!isEqual(position, this.currentPosition)) {
+        this.currentPosition = position
+        changed = true
       }
-    )
+
+      if (accuracy !== this.currentAccuracy) {
+        this.currentAccuracy = accuracy
+        changed = true
+      }
+
+      changed && this.$emit('change', { position, accuracy })
+    })
   }
 </script>

@@ -1,5 +1,5 @@
-import source from './source'
-import tileSource from './tile'
+// import source from './source'
+// import tileSource from './tile'
 import VectorSource from './vector'
 import XyzSource from './xyz'
 import OsmSource from './osm'
@@ -8,8 +8,8 @@ import WmsSource from './wms'
 
 export {
   // mixins
-  source,
-  tileSource,
+  // source,
+  // tileSource,
   // components
   VectorSource,
   XyzSource,
@@ -19,8 +19,8 @@ export {
 }
 export default {
   // mixins
-  source,
-  tileSource,
+  // source,
+  // tileSource,
   // components
   VectorSource,
   XyzSource,

@@ -14,6 +14,7 @@ module.exports = {
   extends: 'standard',
   // required to lint *.vue files
   plugins: [
+    'import',
     'html',
     'lodash-fp'
   ],

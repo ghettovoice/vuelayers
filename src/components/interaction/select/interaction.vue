@@ -6,7 +6,7 @@
   import plainProps from '../../../utils/plain-props'
   import { styleHelper, geoJson } from '../../../ol'
   import interaction from '../interaction'
-  import { styleTarget, createStyleFunc } from '../../style'
+  import styleTarget, { createStyleFunc } from '../../style-target'
 
   const { style, defaultEditStyle } = styleHelper
 
