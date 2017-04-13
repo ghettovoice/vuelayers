@@ -7,6 +7,7 @@
 
 <script>
   import Map from 'ol/map'
+  import olControl from 'ol/control'
   import { constant } from 'lodash/fp'
   import Observable from '../../rx'
   import plainProps from '../../utils/plain-props'
@@ -35,6 +36,10 @@
     tabIndex: {
       type: Number,
       default: 0
+    },
+    defControls: {
+      type: Boolean,
+      default: true
     }
   }
 
@@ -139,7 +144,7 @@
     this.map = new Map({
       layers: [],
 //      interactions: [],
-//      controls: [],
+      controls: this.defControls ? olControl.defaults() : [],
       loadTilesWhileAnimating: this.loadTilesWhileAnimating,
       loadTilesWhileInteracting: this.loadTilesWhileInteracting,
       pixelRatio: this.pixelRatio,
