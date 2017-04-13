@@ -1,5 +1,5 @@
 import { filter, flow, map } from 'lodash/fp'
-import { geoJson, styleHelper } from '../../ol'
+import { geoJson, styleHelper } from '../ol'
 
 export default {
   provide () {

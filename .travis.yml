@@ -17,4 +17,4 @@ install:
   - npm --version
   - npm install
 script:
-  - npm run travis-script
+  - npm run travis
