@@ -53,5 +53,9 @@ export const GEOMETRY_TYPE = {
  * @type {string} Default WMS version
  */
 export const WMS_VERSION = '1.3.0'
+
+export const WMTS_VERSION = '1.0.0'
+export const WMTS_REQUEST_ENCODING = 'KVP'
+export const WMTS_FORMAT = 'image/jpeg'
 // todo try with Symbol to prevent conflicts with user provided properties
 export const LAYER_PROP = 'layer'
