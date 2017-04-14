@@ -2,7 +2,7 @@
   import VectorSource from 'ol/source/vector'
   import loadingstrategy from 'ol/loadingstrategy'
   import { merge, differenceWith } from 'lodash/fp'
-  import { consts, extentHelper, geoJson } from '../../../ol'
+  import { consts, extentHelper, geoJson } from '../../../ol-ext'
   import source from '../source'
 
   const { toLonLat: extentToLonLat } = extentHelper

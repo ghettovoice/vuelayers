@@ -43,6 +43,7 @@ const {
 } = VueLayers
 
 export default VueLayers
+
 export {
   // common
   Map,

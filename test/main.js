@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueLayers from '../src'
-import App from './app'
+import App from './app.vue'
 
 Vue.use(VueLayers)
 

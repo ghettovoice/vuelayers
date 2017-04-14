@@ -5,6 +5,7 @@ import XyzSource from './xyz'
 import OsmSource from './osm'
 import MapboxSource from './mapbox'
 import WmsSource from './wms'
+import WmtsSource from './wmts'
 
 export {
   // mixins
@@ -15,7 +16,8 @@ export {
   XyzSource,
   OsmSource,
   MapboxSource,
-  WmsSource
+  WmsSource,
+  WmtsSource
 }
 export default {
   // mixins
@@ -26,5 +28,6 @@ export default {
   XyzSource,
   OsmSource,
   MapboxSource,
-  WmsSource
+  WmsSource,
+  WmtsSource
 }

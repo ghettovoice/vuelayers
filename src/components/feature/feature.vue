@@ -3,12 +3,12 @@
    * Wrapper around ol.Feature.
    */
   import uuid from 'uuid/v4'
-  import Observable from '../../rx'
+  import Observable from '../../rx-ext'
   import rxSubs from '../../mixins/rx-subs'
   import stubVNode from '../../mixins/stub-vnode'
   import plainProps from '../../utils/plain-props'
   import styleTarget from '../style-target'
-  import { consts, coordinateHelper, geoJson } from '../../ol'
+  import { consts, coordinateHelper, geoJson } from '../../ol-ext'
 
   const { LAYER_PROP } = consts
   const { toLonLat } = coordinateHelper

@@ -2,9 +2,9 @@
   import SelectInteraction from 'ol/interaction/select'
   import VectorLayer from 'ol/layer/vector'
   import { forEach, mapValues, differenceWith } from 'lodash/fp'
-  import Observable from '../../../rx'
+  import Observable from '../../../rx-ext'
   import plainProps from '../../../utils/plain-props'
-  import { styleHelper, geoJson } from '../../../ol'
+  import { styleHelper, geoJson } from '../../../ol-ext'
   import interaction from '../interaction'
   import styleTarget, { createStyleFunc } from '../../style-target'
 

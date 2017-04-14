@@ -1,7 +1,7 @@
 <script>
   import TileWMSSource from 'ol/source/tilewms'
   import { omit } from 'lodash/fp'
-  import { consts, coordinateHelper } from '../../../ol'
+  import { consts, coordinateHelper } from '../../../ol-ext'
   import tileSource from '../tile'
 
   const { WMS_VERSION } = consts
@@ -43,7 +43,7 @@
 
   const upperCase = x => x.toUpperCase()
   const keysToUpperCase = x => Object.keys(x).map(upperCase)
-  const cleanExtParams = params => omit(['LAYERS', 'VERSION', 'STYLES'], keysToUpperCase(params))
+  const cleanExtParams = params => omit([ 'LAYERS', 'VERSION', 'STYLES' ], keysToUpperCase(params))
 
   const methods = {
     createSource () {
@@ -65,7 +65,7 @@
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         serverType: this.currentServerType,
         wrapX: this.wrapX,
-        url: this.replaceUrlTokens()
+        url: this.currentUrl
       })
     },
     /**

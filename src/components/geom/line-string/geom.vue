@@ -1,6 +1,6 @@
 <script>
   import LineString from 'ol/geom/linestring'
-  import { consts } from '../../../ol'
+  import { consts } from '../../../ol-ext'
   import geom from '../geom'
 
   const { GEOMETRY_TYPE } = consts

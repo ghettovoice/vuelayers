@@ -1,6 +1,6 @@
 import rxSubs from '../../mixins/rx-subs'
 import stubVNode from '../../mixins/stub-vnode'
-import { consts } from '../../ol'
+import { consts } from '../../ol-ext'
 
 const { MAP_PROJECTION } = consts
 

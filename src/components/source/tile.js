@@ -1,22 +1,16 @@
+import { isPlainObject, pick } from 'lodash/fp'
 import proj from 'ol/proj'
-import tilegrid from 'ol/tilegrid'
-import { createTileUrlFunction } from 'ol-tilecache'
-import { pick } from 'lodash/fp'
-import { consts } from '../../ol'
+import TileGrid from 'ol/tilegrid/tilegrid'
+import { consts, tileGridHelper } from '../../ol-ext'
 import replaceTokens from '../../utils/replace-tokens'
 import source from './source'
 
-const { TILE_SIZE, CACHE_SIZE, MIN_ZOOM, MAX_ZOOM, PIXEL_RATIO } = consts
+const { CACHE_SIZE, PIXEL_RATIO, MIN_ZOOM, MAX_ZOOM, TILE_SIZE } = consts
 
 const props = {
   url: {
     type: String,
     required: true
-  },
-  tileSize: {
-    type: Array,
-    default: () => [ TILE_SIZE, TILE_SIZE ],
-    validator: value => Array.isArray(value) && value.length === 2
   },
   tilePixelRatio: {
     type: Number,
@@ -31,6 +25,15 @@ const props = {
     default: CACHE_SIZE
   },
   opaque: Boolean,
+  reprojectionErrorThreshold: {
+    type: Number,
+    default: 0.5
+  },
+  tileSize: {
+    type: Array,
+    default: () => [ TILE_SIZE, TILE_SIZE ],
+    validator: value => Array.isArray(value) && value.length === 2
+  },
   minZoom: {
     type: Number,
     default: MIN_ZOOM
@@ -39,21 +42,26 @@ const props = {
     type: Number,
     default: MAX_ZOOM
   },
-  reprojectionErrorThreshold: {
-    type: Number,
-    default: 0.5
+  gridOpts: {
+    type: Object,
+    validator: value => isPlainObject(value) &&
+                        Array.isArray(value.resolutions) &&
+                        value.resolutions.length
   }
 }
 
 const computed = {
   currentUrl () {
-    return this.url
-  },
-  currentTileSize () {
-    return this.tileSize
+    return replaceTokens(this.url, pick(this.urlTokens, this))
   },
   currentTilePixelRatio () {
     return this.tilePixelRatio
+  },
+  urlTokens () {
+    return []
+  },
+  currentTileSize () {
+    return this.tileSize
   },
   currentMinZoom () {
     return this.minZoom
@@ -61,73 +69,42 @@ const computed = {
   currentMaxZoom () {
     return this.maxZoom
   },
-  urlTokens () {
-    return []
+  currentProjectionExtent () {
+    return proj.get(this.currentProjection).getExtent()
+  },
+  currentGridOpts () {
+    return {
+      resolutions: tileGridHelper.resolutionsFromExtent(
+        this.currentProjectionExtent,
+        this.currentMaxZoom,
+        this.currentTileSize
+      ),
+      minZoom: this.currentMinZoom,
+      extent: this.currentProjectionExtent,
+      ...this.gridOpts
+    }
   }
 }
 
-const { initialize: sourceInitialize } = source.methods
-
 const methods = {
-  initialize () {
-    // prepare tile grid and tile grid extent to use it in source / url function /... creation
-    this.createTileGrid()
-    this::sourceInitialize()
-  },
   /**
-   * @return {TileGrid}
-   * @protected
+   * @return {ol.tilegrid.TileGrid}
    */
   createTileGrid () {
-    /**
-     * @type {Extent}
-     * @protected
-     */
-    this.tileGridExtent = proj.get(this.currentProjection).getExtent()
-    /**
-     * @type {TileGrid}
-     * @protected
-     */
-    this.tileGrid = tilegrid.createXYZ({
-      extent: this.tileGridExtent,
-      minZoom: this.currentMinZoom,
-      maxZoom: this.currentMaxZoom,
-      tileSize: this.currentTileSize
-    })
+    return new TileGrid(this.currentGridOpts)
+  },
+  initialize () {
+    if (this.currentGridOpts) {
+      this.tileGrid = this.createTileGrid()
+    }
 
-    return this.tileGrid
-  },
-  /**
-   * @return {TileUrlFunction}
-   * @protected
-   */
-  createTileUrlFunction () {
-    return createTileUrlFunction(this.replaceUrlTokens(), this.tileGrid, this.tileGridExtent)
-  },
-  /**
-   * @return {string}
-   * @protected
-   */
-  replaceUrlTokens () {
-    return replaceTokens(this.currentUrl, pick(this.urlTokens, this))
+    this::source.methods.initialize()
   }
 }
 
 const watch = {
   currentUrl () {
-    this.source.setTileUrlFunction(this.createTileUrlFunction())
-  },
-  currentTileSize () {
-    this.source.setTileUrlFunction(this.createTileUrlFunction())
-  },
-  currentProjection () {
-    this.source.setTileUrlFunction(this.createTileUrlFunction())
-  },
-  currentMinZoom () {
-    this.source.setTileUrlFunction(this.createTileUrlFunction())
-  },
-  currentMaxZoom () {
-    this.source.setTileUrlFunction(this.createTileUrlFunction())
+    this.source.setUrl(this.currentUrl)
   }
 }
 
@@ -136,5 +113,8 @@ export default {
   props,
   computed,
   methods,
-  watch
+  watch,
+  destroyed () {
+    this.tileGrid = undefined
+  }
 }

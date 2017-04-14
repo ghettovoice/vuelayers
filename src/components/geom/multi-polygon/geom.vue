@@ -1,6 +1,6 @@
 <script>
   import MultiPolygon from 'ol/geom/multipolygon'
-  import { consts } from '../../../ol'
+  import { consts } from '../../../ol-ext'
   import geom from '../geom'
 
   const { GEOMETRY_TYPE } = consts

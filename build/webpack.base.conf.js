@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
-const utils = require('./utils')
 const WebpackNotifierPlugin = require('webpack-notifier')
+const utils = require('./utils')
 const config = require('./config')
 
 const isProduction = process.env.NODE_ENV === 'production'
@@ -11,13 +11,6 @@ module.exports = {
     [ config.name ]: config.entry
   },
   devtool: '#source-map',
-  devServer: {
-    publicPath: config.publicPath,
-    host: config.host,
-    port: config.port,
-    hot: true,
-    inline: true
-  },
   output: {
     path: config.outDir,
     filename: isProduction ? '[name].min.js' : '[name].js',
@@ -76,7 +69,8 @@ module.exports = {
         test: /\.(geo)?json$/,
         loader: 'json-loader'
       }
-    ]
+    ],
+    noParse: [ /openlayers/ ]
   },
   plugins: [
     new webpack.BannerPlugin({

@@ -1,6 +1,8 @@
 <script>
   import WMTSSource from 'ol/source/wmts'
-  import { consts } from '../../../ol'
+  import WMTSTileGrid from 'ol/tilegrid/wmts'
+  import { range } from 'lodash/fp'
+  import { consts, tileGridHelper } from '../../../ol-ext'
   import tileSource from '../tile'
 
   const { WMTS_VERSION, WMTS_REQUEST_ENCODING, WMTS_FORMAT } = consts
@@ -10,7 +12,7 @@
       type: String,
       required: true
     },
-    style: {
+    layerStyle: {
       type: String,
       required: true
     },
@@ -51,20 +53,58 @@
     },
     currentFormat () {
       return this.format
+    },
+    currentDimensions () {
+      return this.dimensions
+    },
+    currentGridOpts () {
+      const resolutions = tileGridHelper.resolutionsFromExtent(
+        this.currentProjectionExtent,
+        this.currentMaxZoom,
+        this.currentTileSize
+      )
+
+      return {
+        resolutions,
+        minZoom: this.currentMinZoom,
+        extent: this.currentProjectionExtent,
+        matrixIds: range(this.currentMinZoom, resolutions.length),
+        ...this.gridOpts
+      }
     }
   }
 
   const methods = {
+    /**
+     * @return {ol.tilegrid.WMTS}
+     */
+    createTileGrid () {
+      return new WMTSTileGrid(this.currentGridOpts)
+    },
     createSource () {
       return new WMTSSource({
         attributions: this.currentAttributions,
-        cacheSize: this.cacheSize
+        cacheSize: this.cacheSize,
+        crossOrigin: this.crossOrigin,
+        logo: this.logo,
+        projection: this.currentProjection,
+        reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+        requestEncoding: this.currentRequestEncoding,
+        layer: this.currentLayer,
+        style: this.currentStyle,
+        tilePixelRatio: this.currentTilePixelRatio,
+        tileGrid: this.tileGrid,
+        version: this.currentVersion,
+        format: this.currentFormat,
+        matrixSet: this.currentMatrixSet,
+        dimensions: this.currentDimensions,
+        url: this.currentUrl,
+        wrapX: this.wrapX
       })
     }
   }
 
-  const watch = {
-  }
+  const watch = {}
 
   export default {
     name: 'vl-source-wmts',

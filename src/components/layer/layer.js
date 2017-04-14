@@ -1,8 +1,8 @@
 import uuid from 'uuid/v4'
-import Observable from '../../rx'
+import Observable from '../../rx-ext'
 import rxSubs from '../../mixins/rx-subs'
 import stubVNode from '../../mixins/stub-vnode'
-import { coordinateHelper } from '../../ol'
+import { coordinateHelper } from '../../ol-ext'
 
 const { toLonLat } = coordinateHelper
 

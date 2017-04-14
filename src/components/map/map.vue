@@ -8,10 +8,10 @@
 <script>
   import Map from 'ol/map'
   import olControl from 'ol/control'
-  import { constant } from 'lodash/fp'
-  import Observable from '../../rx'
+  import { constant, pick } from 'lodash/fp'
+  import Observable from '../../rx-ext'
   import plainProps from '../../utils/plain-props'
-  import { coordinateHelper, geoJson } from '../../ol'
+  import { coordinateHelper, geoJson } from '../../ol-ext'
   import rxSubs from '../../mixins/rx-subs'
 
   const { toLonLat } = coordinateHelper
@@ -161,7 +161,7 @@
     const pointerEvents = Observable.fromOlEvent(
       this.map,
       [ 'click', 'dblclick', 'singleclick' ],
-      ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
+      evt => pick(['type', 'pixel', 'coordinate'], evt)
     ).map(evt => ({
       ...evt,
       coordinate: toLonLat(evt.coordinate, this.map.getView().getProjection())

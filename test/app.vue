@@ -37,6 +37,21 @@
 
         <vl-source-vector :features="points" />
       </vl-layer-vector>
+
+      <!-- Tile WMS -->
+      <vl-layer-tile id="wms">
+        <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
+                       :ext-params="{ TILED: true }" server-type="geoserver" />
+      </vl-layer-tile>
+      <!--// Tile WMS -->
+
+      <!-- WMTS -->
+      <vl-layer-tile id="wmts">
+        <vl-source-wmts
+          url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
+          layer="0" matrix-set="EPSG:3857" format="image/png" layer-style="default"/>
+      </vl-layer-tile>
+      <!--// WMTS -->
     </vl-map>
 
     <div class="controls">

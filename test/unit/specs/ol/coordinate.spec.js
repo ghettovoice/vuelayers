@@ -1,4 +1,4 @@
-import * as coordinateHelper from '../../../../src/ol/coordinate'
+import * as coordinateHelper from '../../../../src/ol-ext/coordinate'
 
 describe('ol coordinate helper', () => {
   const point3857 = [ 5565974.539663679, 7361866.113051185 ]

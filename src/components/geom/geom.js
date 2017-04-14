@@ -1,8 +1,8 @@
 import { isEqual } from 'lodash/fp'
-import Observable from '../../rx'
+import Observable from '../../rx-ext'
 import rxSubs from '../../mixins/rx-subs'
 import stubVNode from '../../mixins/stub-vnode'
-import { coordinateHelper, extentHelper } from '../../ol'
+import { coordinateHelper, extentHelper } from '../../ol-ext'
 
 const { transforms } = coordinateHelper
 const { toLonLat: extentToLonLat } = extentHelper

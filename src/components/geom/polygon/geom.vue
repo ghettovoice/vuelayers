@@ -1,6 +1,6 @@
 <script>
   import Polygon from 'ol/geom/polygon'
-  import { consts } from '../../../ol'
+  import { consts } from '../../../ol-ext'
   import geom from '../geom'
 
   const { GEOMETRY_TYPE } = consts

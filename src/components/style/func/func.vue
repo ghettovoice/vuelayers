@@ -4,7 +4,7 @@
    * Plays the role of both a style that mounts itself to style target (layer, feature & etc.)
    * and style target for inner style containers.
    */
-  import { geoJson, styleHelper } from '../../../ol'
+  import { geoJson, styleHelper } from '../../../ol-ext'
   import { warn } from '../../../utils/debug'
   import style from '../style'
   import styleTarget, { createStyleFunc } from '../../style-target'

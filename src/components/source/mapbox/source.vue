@@ -1,6 +1,6 @@
 <script>
   import coalesce from '../../../utils/coalesce'
-  import { consts } from '../../../ol'
+  import { consts } from '../../../ol-ext'
   import xyzSource from '../xyz/source.vue'
 
   const { TILE_SIZE, MAP_PROJECTION } = consts

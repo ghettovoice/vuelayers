@@ -1,8 +1,8 @@
 <script>
   import Geolocation from 'ol/geolocation'
   import { isEqual } from 'lodash/fp'
-  import Observable from '../../rx'
-  import { consts } from '../../ol'
+  import Observable from '../../rx-ext'
+  import { consts } from '../../ol-ext'
   import rxSubs from '../../mixins/rx-subs'
   import stubVNode from '../../mixins/stub-vnode'
 

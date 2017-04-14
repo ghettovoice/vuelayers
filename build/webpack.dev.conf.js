@@ -40,7 +40,10 @@ const webpackConfig = merge(baseWebpackConfig, {
 })
 
 webpackConfig.entry = {
-  app: utils.resolve('test/main.js')
+  app: [
+    './build/dev-client',
+    utils.resolve('test/main.js')
+  ]
 }
 
 module.exports = webpackConfig
