@@ -32,6 +32,7 @@ const {
   OsmSource,
   MapboxSource,
   WmsSource,
+  WmtsSource,
   // style
   StyleContainer,
   FillStyle,
@@ -39,7 +40,34 @@ const {
   CircleStyle,
   IconStyle,
   RegShapeStyle,
-  StyleFunc
+  StyleFunc,
+
+  // todo remove later, old style exports
+  // geoms
+  GeomPoint,
+  GeomLineString,
+  GeomPolygon,
+  GeomMultiPoint,
+  GeomMultiLineString,
+  GeomMultiPolygon,
+  // interactions
+  InteractionSelect,
+  // layers
+  LayerVector,
+  LayerTile,
+  // sources
+  SourceVector,
+  SourceXyz,
+  SourceOsm,
+  SourceMapbox,
+  SourceWms,
+  SourceWmts,
+  // style
+  StyleFill,
+  StyleStroke,
+  StyleCircle,
+  StyleIcon,
+  StyleRegShape
 } = VueLayers
 
 export default VueLayers
@@ -68,6 +96,7 @@ export {
   OsmSource,
   MapboxSource,
   WmsSource,
+  WmtsSource,
   // style
   StyleContainer,
   FillStyle,
@@ -75,5 +104,32 @@ export {
   CircleStyle,
   IconStyle,
   RegShapeStyle,
-  StyleFunc
+  StyleFunc,
+
+  // todo remove later, old style exports
+  // geoms
+  GeomPoint,
+  GeomLineString,
+  GeomPolygon,
+  GeomMultiPoint,
+  GeomMultiLineString,
+  GeomMultiPolygon,
+  // interactions
+  InteractionSelect,
+  // layers
+  LayerVector,
+  LayerTile,
+  // sources
+  SourceVector,
+  SourceXyz,
+  SourceOsm,
+  SourceMapbox,
+  SourceWms,
+  SourceWmts,
+  // style
+  StyleFill,
+  StyleStroke,
+  StyleCircle,
+  StyleIcon,
+  StyleRegShape
 }
