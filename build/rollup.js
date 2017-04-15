@@ -54,7 +54,7 @@ function bundle (opts = {}) {
   }
 
   const plugins = [
-    replace(replaces(opts.env)),
+    replace(replaces(opts)),
     vue({
       compileTemplate: true,
       htmlMinifier: { collapseBooleanAttributes: false },
@@ -88,7 +88,7 @@ function bundle (opts = {}) {
     cjs()
   ]
 
-  if (opts.env === 'production' && opts.format === 'cjs') {
+  if (opts.env === 'production' && opts.format === 'umd') {
     baseName += '.min'
 
     plugins.push(
@@ -133,15 +133,15 @@ function bundle (opts = {}) {
 
       return Promise.all([
         utils.writeFile(dest, code),
-        // utils.writeFile(dest + '.map', map.toString()),
+        utils.writeFile(dest + '.map', map.toString()),
         postcssPromise
       ])
     })
-    .then(([ jsSrc, /*jsMap,*/ [ cssSrc, cssMap ] ]) => {
+    .then(([ jsSrc, jsMap, [ cssSrc, cssMap ] ]) => {
       spinner.succeed(chalk.green(`${opts.format} bundle is ready`))
 
       console.log(jsSrc.path + ' ' + chalk.gray(jsSrc.size))
-      // console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
+      console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
 
       cssSrc && console.log(cssSrc.path + ' ' + chalk.gray(cssSrc.size))
       cssMap && console.log(cssMap.path + ' ' + chalk.gray(cssMap.size))
@@ -171,13 +171,17 @@ function nodeExternal () {
   return moduleId => deps.some(dep => new RegExp(`^${dep}.*$`, 'i').test(moduleId))
 }
 
-function replaces (env) {
+function replaces (opts = {}) {
   const obj = Object.assign({}, config.replaces, {
     '~': ''
   })
 
-  if (env) {
-    obj[ 'process.env.NODE_ENV' ] = env
+  if (opts.env) {
+    obj[ 'process.env.NODE_ENV' ] = opts.env
+  }
+
+  if (opts.format === 'cjs') {
+    obj['lodash-es'] = 'lodash'
   }
 
   return obj
