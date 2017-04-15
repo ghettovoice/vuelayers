@@ -13,7 +13,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 const webpackConfig = merge(baseWebpackConfig, {
   devtool: '#source-map',
   entry: {
-    [ config.name ]: config.defEntry
+    [ config.name ]: config.cjsEntry
   },
   output: {
     filename: isProduction ? '[name].umd.min.js' : '[name].umd.js',

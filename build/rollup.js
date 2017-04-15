@@ -1,6 +1,8 @@
 const path = require('path')
+const fs = require('fs-extra')
 const chalk = require('chalk')
 const ora = require('ora')
+const glob = require('glob')
 const rollup = require('rollup')
 const postcss = require('postcss')
 const babel = require('rollup-plugin-babel')
@@ -9,35 +11,97 @@ const resolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
 const uglify = require('rollup-plugin-uglify')
+const createFilter = require('rollup-pluginutils').createFilter
+const MagicString = require('magic-string')
+const notifier = require('node-notifier')
 const { dependencies, peerDependencies, devDependencies } = require('../package.json')
 const utils = require('./utils')
 const config = require('./config')
 
-utils.ensureDir(utils.resolve('dist'))
-
-Promise.resolve()
+Promise.resolve(utils.ensureDir(config.outDir))
+  // ES6
   .then(() => bundle({
     format: 'es',
+    bundleName: config.name + '.es',
     entry: config.entry,
     external: nodeExternal()
   }))
+  // CommonJS
   .then(() => bundle({
     format: 'cjs',
-    entry: config.defEntry,
+    bundleName: config.name + '.cjs',
+    entry: config.cjsEntry,
     external: nodeExternal()
   }))
+  // UMD
   .then(() => bundle({
     format: 'umd',
-    entry: config.defEntry,
+    bundleName: config.name + '.umd',
+    entry: config.cjsEntry,
     env: 'development',
     external: [ 'vue' ]
   }))
+  // UMD minified
   .then(() => bundle({
     format: 'umd',
-    entry: config.defEntry,
+    bundleName: config.name + '.umd.min',
+    entry: config.cjsEntry,
     env: 'production',
     external: [ 'vue' ]
   }))
+  // Separate CommonJS modules
+  .then(() => Promise.all([
+    getUtils(),
+    getCommons(),
+    getMixins(),
+    getComponents()
+  ]))
+  .then(([ utils, commons, mixins, components ]) => Promise.all(
+    [].concat(
+      utils.map(({ entry, bundleName }) => bundle({
+        format: 'cjs',
+        entry,
+        bundleName,
+        styleName: false,
+        external: nodeExternal(),
+        modules: true
+      }))
+    ).concat(
+      commons.map(({ entry, bundleName }) => bundle({
+        format: 'cjs',
+        entry,
+        bundleName,
+        styleName: false,
+        external: nodeExternal(),
+        modules: true
+      }))
+    ).concat(
+      mixins.map(({ entry, bundleName }) => bundle({
+        format: 'cjs',
+        entry,
+        bundleName,
+        styleName: false,
+        external: nodeExternal(),
+        modules: true
+      }))
+    ).concat(
+      components.map(({ entry, bundleName, styleName }) => bundle({
+        format: 'cjs',
+        entry,
+        bundleName,
+        styleName,
+        external: nodeExternal(),
+        modules: true
+      }))
+    )
+  ))
+  // All done
+  .then(() => {
+    notifier.notify({
+      title: config.fullname,
+      message: 'Great, all bundles are ready!'
+    })
+  })
   .catch(err => {
     console.error(chalk.red(err.stack))
     process.exit(1)
@@ -45,7 +109,7 @@ Promise.resolve()
 
 // helpers
 function bundle (opts = {}) {
-  let baseName = `${config.name}.${opts.format}`
+  let bundleName = opts.bundleName
 
   if (opts.format === 'cjs') {
     process.env.BABEL_ENV = 'cjs'
@@ -54,10 +118,14 @@ function bundle (opts = {}) {
   }
 
   const plugins = [
-    replace(replaces(opts)),
+    ...(opts.modules ? [ externalize() ] : []),
+    replace(Object.assign(replaces(opts), {
+      sourceMap: true
+    })),
     vue({
       compileTemplate: true,
       htmlMinifier: { collapseBooleanAttributes: false },
+      sourceMap: true,
       scss: {
         outputStyle: 'compressed',
         sourceMap: true,
@@ -68,12 +136,15 @@ function bundle (opts = {}) {
         ]
       },
       // todo process each style with postcss, then concatenate sources and source maps
-      css: (style, styles) => {
-        postcssPromise = postcssProcess(baseName, style)
+      css: style => {
+        postcssPromise = opts.styleName !== false
+          ? postcssProcess(opts.styleName || bundleName, style)
+          : Promise.resolve([])
       }
     }),
     babel({
       runtimeHelpers: true,
+      sourceMap: true,
       include: [
         'src/**/*',
         'node_modules/ol-tilecache/**/*'
@@ -89,8 +160,6 @@ function bundle (opts = {}) {
   ]
 
   if (opts.env === 'production' && opts.format === 'umd') {
-    baseName += '.min'
-
     plugins.push(
       uglify({
         mangle: true,
@@ -112,15 +181,16 @@ function bundle (opts = {}) {
     )
   }
 
-  const dest = path.join(config.outDir, `${baseName}.js`)
-  const spinner = ora(chalk.bold.blue(`cook ${opts.format} bundle...`)).start()
+  const dest = path.join(config.outDir, `${bundleName}.js`)
+  const spinner = ora(chalk.bold.blue(`cook ${bundleName} bundle...`)).start()
   let postcssPromise
 
-  return rollup.rollup({
+  return Promise.resolve(utils.ensureDir(path.dirname(dest)))
+    .then(() => rollup.rollup({
       entry: opts.entry,
       external: opts.external,
       plugins
-    })
+    }))
     .then(bundler => {
       const { code, map } = bundler.generate({
         format: opts.format,
@@ -138,7 +208,7 @@ function bundle (opts = {}) {
       ])
     })
     .then(([ jsSrc, jsMap, [ cssSrc, cssMap ] ]) => {
-      spinner.succeed(chalk.green(`${opts.format} bundle is ready`))
+      spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
       console.log(jsSrc.path + ' ' + chalk.gray(jsSrc.size))
       console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
@@ -147,16 +217,16 @@ function bundle (opts = {}) {
       cssMap && console.log(cssMap.path + ' ' + chalk.gray(cssMap.size))
     })
     .catch(err => {
-      spinner.fail(chalk.red(`${opts.format} bundle is failed to create`))
+      spinner.fail(chalk.red(`${bundleName} bundle is failed to create`))
       throw err
     })
 }
 
-function postcssProcess (baseName, style) {
-  const dest = path.join(config.outDir, `${baseName}.css`)
+function postcssProcess (bundleName, style) {
+  const dest = path.join(config.outDir, `${bundleName}.css`)
 
   return postcss(utils.postcssPlugins())
-    .process(config.banner + style)
+    .process(style ? config.banner + style : '')
     .then(({ css, map }) => Promise.all([
       utils.writeFile(dest, css),
       // utils.writeFile(dest + '.map', map.toString()),
@@ -164,7 +234,7 @@ function postcssProcess (baseName, style) {
 }
 
 function nodeExternal () {
-  const deps = Object.keys(dependencies)
+  const deps = [ config.name ].concat(Object.keys(dependencies))
     .concat(Object.keys(peerDependencies))
     .concat(Object.keys(devDependencies))
 
@@ -184,5 +254,126 @@ function replaces (opts = {}) {
     obj['lodash-es'] = 'lodash'
   }
 
+  Object.assign(obj, opts.customReplaces)
+
   return obj
+}
+
+function getComponents () {
+  const root = utils.resolve('src/components')
+
+  return new Promise((resolve, reject) => {
+    glob(root + '/**/*.{js,vue}', (err, files) => {
+      if (err) return reject(err)
+
+      resolve(files.reduce((files, file) => {
+        const fileName = path.basename(file)
+
+        if (fileName === 'index.js') return files
+
+        let entry, bundleName, styleName
+
+        if (/\.vue/.test(fileName)) {
+          const dir = path.dirname(file)
+          const relDir = dir.replace(root + '/', '')
+          const pathParts = relDir.split('/')
+
+          // reverse all expect some exclusions
+          if (
+            [
+              'style/container',
+              'style/func'
+            ].includes(relDir) === false
+          ) {
+            pathParts.reverse()
+          }
+
+          entry = path.join(dir, 'index.js')
+          bundleName = path.join('modules', pathParts.join('-'), 'index')
+          styleName = path.join('modules', pathParts.join('-'), 'style')
+        } else {
+          entry = file
+          bundleName = path.join('modules', path.basename(fileName, '.js'))
+          styleName = false
+        }
+
+        return files.concat({
+          entry,
+          bundleName,
+          styleName
+        })
+      }, []))
+    })
+  })
+}
+
+function getMixins () {
+  const root = utils.resolve('src/mixins')
+
+  return new Promise((resolve, reject) => {
+    glob(root + '/**/*.js', (err, files) => {
+      if (err) return reject(err)
+
+      resolve(files.map(file => ({
+        entry: file,
+        bundleName: path.join('modules/mixins', path.basename(file, '.js'))
+      })))
+    })
+  })
+}
+
+function getUtils () {
+  const root = utils.resolve('src/utils')
+
+  return new Promise((resolve, reject) => {
+    glob(root + '/**/*.js', (err, files) => {
+      if (err) return reject(err)
+
+      resolve(files.map(file => ({
+        entry: file,
+        bundleName: path.join('modules/utils', path.basename(file, '.js'))
+      })))
+    })
+  })
+}
+
+function getCommons () {
+  return Promise.resolve([ {
+    entry: utils.resolve('src/ol-ext/index.js'),
+    bundleName: 'modules/ol-ext'
+  }, {
+    entry: utils.resolve('src/rx-ext/index.js'),
+    bundleName: 'modules/rx-ext'
+  } ])
+}
+
+function externalize () {
+  const filter = createFilter('src/**', 'node_modules/**')
+  const regex = /'(\.{2}\/)+([^.'\n]+)'/g
+
+  return {
+    name: 'externalize',
+    transform (code, id) {
+      if (!filter(id)) return null
+
+      const ms = new MagicString(code)
+      let match, start, end, hasReplacements
+
+      while (match = regex.exec(code)) {
+        hasReplacements = true
+        // start, end without quotes
+        start = match.index + 1
+        end = start + match[ 0 ].length - 2
+
+        ms.overwrite(start, end, path.join('vuelayers/dist/modules', match[ 2 ]))
+      }
+
+      if (!hasReplacements) return null
+
+      return {
+        code: ms.toString(),
+        map: ms.generateMap({ hires: true })
+      }
+    }
+  }
 }

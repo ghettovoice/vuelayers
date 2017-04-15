@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const config = require('./config')
@@ -105,9 +105,13 @@ function writeFile (dest, data) {
 }
 
 function ensureDir (dir) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir)
-  }
+  return new Promise((resolve, reject) => {
+    fs.ensureDir(dir, err => {
+      if (err) return reject(err)
+
+      resolve()
+    })
+  })
 }
 
 function getSize (data) {

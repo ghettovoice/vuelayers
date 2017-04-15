@@ -6,7 +6,7 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
-import VueLayers from './index.def'
+import VueLayers from './index.cjs'
 
 const {
   // common
@@ -40,34 +40,7 @@ const {
   CircleStyle,
   IconStyle,
   RegShapeStyle,
-  StyleFunc,
-
-  // todo remove later, old style exports
-  // geoms
-  GeomPoint,
-  GeomLineString,
-  GeomPolygon,
-  GeomMultiPoint,
-  GeomMultiLineString,
-  GeomMultiPolygon,
-  // interactions
-  InteractionSelect,
-  // layers
-  LayerVector,
-  LayerTile,
-  // sources
-  SourceVector,
-  SourceXyz,
-  SourceOsm,
-  SourceMapbox,
-  SourceWms,
-  SourceWmts,
-  // style
-  StyleFill,
-  StyleStroke,
-  StyleCircle,
-  StyleIcon,
-  StyleRegShape
+  StyleFunc
 } = VueLayers
 
 export default VueLayers
@@ -104,32 +77,5 @@ export {
   CircleStyle,
   IconStyle,
   RegShapeStyle,
-  StyleFunc,
-
-  // todo remove later, old style exports
-  // geoms
-  GeomPoint,
-  GeomLineString,
-  GeomPolygon,
-  GeomMultiPoint,
-  GeomMultiLineString,
-  GeomMultiPolygon,
-  // interactions
-  InteractionSelect,
-  // layers
-  LayerVector,
-  LayerTile,
-  // sources
-  SourceVector,
-  SourceXyz,
-  SourceOsm,
-  SourceMapbox,
-  SourceWms,
-  SourceWmts,
-  // style
-  StyleFill,
-  StyleStroke,
-  StyleCircle,
-  StyleIcon,
-  StyleRegShape
+  StyleFunc
 }

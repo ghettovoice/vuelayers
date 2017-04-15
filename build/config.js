@@ -24,7 +24,7 @@ module.exports = {
   version: packageJson.version,
   license: packageJson.license,
   entry: path.join(__dirname, '../src/index.js'),
-  defEntry: path.join(__dirname, '../src/index.def.js'),
+  cjsEntry: path.join(__dirname, '../src/index.cjs.js'),
   outDir: path.join(__dirname, '../dist'),
   publicPath: '/',
   assetsSubDir: 'static',
