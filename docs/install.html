@@ -2,13 +2,13 @@
 <blockquote>
   <p>Vue components to work with <a href="https://openlayers.org">OpenLayers</a></p>
 </blockquote>
-<p><a href="https://travis-ci.org/ghettovoice/vuelayers"><img src="https://travis-ci.org/ghettovoice/vuelayers.svg?branch=master" alt="Build Status"></a><br>
-  <a href="https://coveralls.io/github/ghettovoice/vuelayers?branch=master"><img src="https://coveralls.io/repos/github/ghettovoice/vuelayers/badge.svg?branch=master" alt="Coverage Status"></a><br>
-  <a href="http://standardjs.com"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg" alt="js-standard-style"></a><br>
-  <a href="https://github.com/ghettovoice/vuelayers/releases"><img src="https://img.shields.io/github/tag/ghettovoice/vuelayers.svg" alt="GitHub tag"></a><br>
-  <a href="https://www.npmjs.com/package/vuelayers"><img src="https://img.shields.io/npm/v/vuelayers.svg" alt="NPM version"></a><br>
-  <a href="https://github.com/ghettovoice/vuelayers/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ghettovoice/vuelayers.svg" alt="License"></a><br>
-  <a href="https://david-dm.org/ghettovoice/vuelayers"><img src="https://img.shields.io/david/ghettovoice/vuelayers.svg" alt="Dependencies"></a><br>
+<p><a href="https://travis-ci.org/ghettovoice/vuelayers"><img src="https://travis-ci.org/ghettovoice/vuelayers.svg?branch=master" alt="Build Status"></a>
+  <a href="https://coveralls.io/github/ghettovoice/vuelayers?branch=master"><img src="https://coveralls.io/repos/github/ghettovoice/vuelayers/badge.svg?branch=master" alt="Coverage Status"></a>
+  <a href="http://standardjs.com"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg" alt="js-standard-style"></a>
+  <a href="https://github.com/ghettovoice/vuelayers/releases"><img src="https://img.shields.io/github/tag/ghettovoice/vuelayers.svg" alt="GitHub tag"></a>
+  <a href="https://www.npmjs.com/package/vuelayers"><img src="https://img.shields.io/npm/v/vuelayers.svg" alt="NPM version"></a>
+  <a href="https://github.com/ghettovoice/vuelayers/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ghettovoice/vuelayers.svg" alt="License"></a>
+  <a href="https://david-dm.org/ghettovoice/vuelayers"><img src="https://img.shields.io/david/ghettovoice/vuelayers.svg" alt="Dependencies"></a>
   <a href="https://david-dm.org/ghettovoice/vuelayers?type=dev"><img src="https://img.shields.io/david/dev/ghettovoice/vuelayers.svg" alt="Dev dependencies"></a></p>
 <p><strong><a href="https://ghettovoice.github.io/vuelayers/">Demo</a></strong></p>
 <h2><a id="Install_15"></a>Install</h2>
@@ -55,39 +55,39 @@ new Vue({
   render: h =&gt; h(App)
 })
 </code></pre>
-<pre><code class="language-vue vue">// App.vue
-&lt;template&gt;
-  &lt;div id=&quot;map&quot;&gt;
-    &lt;vl-map&gt;
-      &lt;vl-view /&gt;
+<pre><code class="language-html">// App.vue
+<span class="hljs-tag">&lt;<span class="hljs-title">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">id</span>=<span class="hljs-value">"map"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">vl-map</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-title">vl-view</span> /&gt;</span>
 
-      &lt;vl-layer-tile&gt;
-        &lt;vl-source-osm /&gt;
-      &lt;/vl-layer-tile&gt;
-    &lt;/vl-map&gt;
-  &lt;/div&gt;
-&lt;/template&gt;
-&lt;script&gt;
-  export default {}
-&lt;/script&gt;
-&lt;style&gt;
-  /* CSS file needs to be imported separately. */
-  @import &quot;~vuelayers/dist/vuelayers.&quot;;
-&lt;/style&gt;
+      <span class="hljs-tag">&lt;<span class="hljs-title">vl-layer-tile</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">vl-source-osm</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-title">vl-layer-tile</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-title">vl-map</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">template</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">script</span>&gt;</span><span class="javascript">
+  <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> {}
+</span><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">style</span>&gt;</span><span class="css">
+  <span class="hljs-comment">/* CSS file needs to be imported separately. */</span>
+  <span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"~vuelayers/dist/vuelayers."</span></span>;
+</span><span class="hljs-tag">&lt;/<span class="hljs-title">style</span>&gt;</span>
 </code></pre>
 <p><strong>Note about usage of different builds</strong></p>
 <ul>
   <li>
-    <p>In browser is available pre-build UMD version by simply including <code>dist/vuelayers.umd.min.js</code> and <code>vuelayers.umd.min.css</code> files<br>
+    <p>For browser is available pre-build UMD version by simply including <code>dist/vuelayers.umd.min.js</code> and <code>vuelayers.umd.min.css</code> files<br>
       on the page after VueJS.<br>
       Or use from CDN like <a href="https://unpkg.com">unpkg.org</a>.</p>
     <ul>
-      <li><a href="https://unpkg.com/vuelayers@latest">https://unpkg.com/vuelayers@latest</a></li>
+      <li><a href="https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.js">https://unpkg.com/vuelayers@latest</a></li>
       <li><a href="https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css">https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css</a></li>
     </ul>
   </li>
   <li>
-    <p>In NodeJS is available CommonJS version (it is included by default) from <code>dist/vuelayers.cjs.js</code> and<br>
+    <p>For NodeJS is available CommonJS version (it is included by default) from <code>dist/vuelayers.cjs.js</code> and<br>
       appropriate stylesheet <code>dist/vuelayers.cjs.css</code>.<br>
       See below for example of incremental loading of what you need with tools like <code>babel-plugin-component</code>.</p>
   </li>
