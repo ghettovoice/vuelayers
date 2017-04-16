@@ -1,69 +1,119 @@
-<h2 id="install">Install</h2>
-
-<pre><code class="bash"># install Vue and VueLayers
-npm install -S vue vuelayers</code></pre>
-
-<h2 id="usage">Usage</h2>
-
-<h4 id="fullimport">Full import</h4>
-
-<p>Import full library code with all components and mixins</p>
-
-<pre><code class="javascript jsx">import Vue from &apos;vue&apos;
-import VueLayers from &apos;vuelayers&apos;
+<h2><a id="Install_0"></a>Install</h2>
+<pre><code class="language-bash"><span class="hljs-comment"># install Vue and VueLayers</span>
+npm install -S vue vuelayers
+</code></pre>
+<h2><a id="Available_builds_7"></a>Available builds</h2>
+<ol>
+  <li><strong>UMD</strong></li>
+</ol>
+<ul>
+  <li>Full debug version: <code>dist/vuelayers.umd.js</code> and <code>dist/vuelayers.umd.css</code></li>
+  <li>Full production version: <code>dist/vuelayers.umd.min.js</code> and <code>dist/vuelayers.umd.min.css</code></li>
+</ul>
+<ol start="2">
+  <li><strong>CommonJS</strong></li>
+</ol>
+<ul>
+  <li>Full version: <code>dist/vuelayers.cjs.js</code> and <code>dist/vuelayers.cjs.css</code></li>
+</ul>
+<ol start="3">
+  <li><strong>CommonJS</strong> separate components (for plugins like <code>babel-plugin-component</code>)</li>
+</ol>
+<ul>
+  <li>Main: <code>dist/modules/index.js</code> and <code>dist/modules/style.css</code></li>
+  <li>Components: <code>dist/modules/%component-name%/index.js</code> and <code>dist/modules/%component-name%/style.css</code></li>
+</ul>
+<ol start="4">
+  <li><strong>ES6 module</strong></li>
+</ol>
+<ul>
+  <li>Full version: <code>dist/vuelayers.es.js</code> and <code>dist/vuelayers.es.css</code></li>
+</ul>
+<h1><a id="Usage_20"></a>Usage</h1>
+<h3><a id="Basic_example_with_full_import_22"></a>Basic example with full import</h3>
+<pre><code class="language-js"><span class="hljs-comment">// main.js</span>
+<span class="hljs-keyword">import</span> Vue <span class="hljs-keyword">from</span> <span class="hljs-string">'vue'</span>
+<span class="hljs-keyword">import</span> VueLayers <span class="hljs-keyword">from</span> <span class="hljs-string">'vuelayers'</span>
 
 Vue.use(VueLayers)
 // now all components installed and ready to use
 new Vue({
-  el: &apos;#app&apos;,
+  el: <span class="hljs-string">'#app'</span>,
   render: h =&gt; h(App)
-})</code></pre>
+})
+</code></pre>
+<pre><code class="vue">// App.vue
+&lt;template&gt;
+  &lt;div id=&quot;map&quot;&gt;
+    &lt;vl-map&gt;
+      &lt;vl-view /&gt;
 
-<p>
-  <strong>Note</strong>: CSS file needs to be imported separately. <br/>
-  Inside your App.vue
-</p>
-
-<pre><code class="vue">&lt;template&gt;...&lt;/template&gt;
-&lt;script&gt;...&lt;/script&gt;
+      &lt;vl-layer-tile&gt;
+        &lt;vl-source-osm /&gt;
+      &lt;/vl-layer-tile&gt;
+    &lt;/vl-map&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;
+  export default {}
+&lt;/script&gt;
 &lt;style&gt;
-  @import &apos;~vuelayers/dist/style.css&apos;;
-&lt;/style&gt;</code></pre>
-
-<h4 id="ondemand">On demand</h4>
-
-<p>First, install <a href="https://github.com/QingWei-Li/babel-plugin-component">babel-plugin-component</a></p>
-
-<pre><code class="bash">npm install babel-plugin-component -D</code></pre>
-
-<p>Then edit your <code>.babelrc</code></p>
-
-<pre><code class="json">{
-  &quot;presets&quot;: [
-    [&quot;es2015&quot;, &quot;latest&quot;]
-  ],
-  &quot;plugins&quot;: [[&quot;component&quot;, [
-    {
-      &quot;libraryName&quot;: &quot;vuelayers&quot;,
-      &quot;style&quot;: true,
-      &quot;libDir&quot;: &quot;dist&quot;
-    }
-  ]]]
-}</code></pre>
-
-<p>Now you can import only what you need</p>
-
-<pre><code class="javascript jsx">import Vue from &apos;vue&apos;
-import { Map, MapView, LayerTile, SourceOsm } from &apos;vuelayers&apos;
+  /* CSS file needs to be imported separately. */
+  @import &quot;~vuelayers/dist/vuelayers.&quot;;
+&lt;/style&gt;
+</code></pre>
+<p><strong>Note about usage of different builds</strong></p>
+<ul>
+  <li>
+    <p>In browser is available pre-build UMD version by simply including <code>dist/vuelayers.umd.min.js</code> and <code>vuelayers.umd.min.css</code> files<br>
+      on the page after VueJS.<br>
+      Or use from CDN like <a href="https://unpkg.com">unpkg.org</a>.</p>
+    <ul>
+      <li><a href="https://unpkg.com/vuelayers@latest">https://unpkg.com/vuelayers@latest</a></li>
+      <li><a href="https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css">https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>In NodeJS is available CommonJS version (it is included by default) from <code>dist/vuelayers.cjs.js</code> and<br>
+      appropriate stylesheet <code>dist/vuelayers.cjs.css</code>.<br>
+      See below for example of incremental loading of what you need with tools like <code>babel-plugin-component</code>.</p>
+  </li>
+  <li>
+    <p>For bundlers like Webpack 2 and Rollup is available ES6 module version from <code>dist/vuelayers.es.js</code> and<br>
+      appropriate stylesheet <code>dist/vuelayers.es.css</code>.</p>
+  </li>
+</ul>
+<h3><a id="Incremental_import_74"></a>Incremental import</h3>
+<p>With Webpack 2 or Rollup may be used without additional configuration, simply import what you need.<br>
+  Stylesheet should be imported manually (<code>dist/vuelayers.es.css</code>).</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> Vue <span class="hljs-keyword">from</span> <span class="hljs-string">'vue'</span>
+<span class="hljs-keyword">import</span> { Map, View, TileLayer, OsmSource } <span class="hljs-keyword">from</span> <span class="hljs-string">'vuelayers'</span>
 
 Vue.use(Map)
-Vue.use(MapView)
-Vue.use(LayerTile)
-Vue.use(SourceOsm)
+Vue.use(View)
+Vue.use(TileLayer)
+Vue.use(OsmSource)
 
 new Vue({
-  el: &apos;#app&apos;,
+  el: <span class="hljs-string">'#app'</span>,
   render: h =&gt; h(App)
-})</code></pre>
-
-<p><strong>Note</strong>: the above library setup automatically imports CSS files</p>
+})
+</code></pre>
+<p>For native CommonJS or bundlers that doesn’t support ES6 module system you can use tools like <code>babel-plugin-component</code><br>
+  for incremental loading.<br>
+  First, install <a href="https://github.com/QingWei-Li/babel-plugin-component">babel-plugin-component</a><br>
+  Example Babel config</p>
+<pre><code class="language-json">{
+  "<span class="hljs-attribute">presets</span>": <span class="hljs-value">[
+    [<span class="hljs-string">"latest"</span>, <span class="hljs-string">"stage-2"</span>]
+  ]</span>,
+  "<span class="hljs-attribute">plugins</span>": <span class="hljs-value">[[<span class="hljs-string">"component"</span>, [
+    {
+      "<span class="hljs-attribute">libraryName</span>": <span class="hljs-value"><span class="hljs-string">"vuelayers"</span></span>,
+      "<span class="hljs-attribute">style</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
+      "<span class="hljs-attribute">libDir</span>": <span class="hljs-value"><span class="hljs-string">"dist/modules"</span>
+    </span>}
+  ]]]
+</span>}
+</code></pre>
+<p>Now you can import only what you need, only that components will be included in final build.</p>

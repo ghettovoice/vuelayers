@@ -50,6 +50,13 @@ Promise.resolve(utils.ensureDir(config.outDir))
     external: [ 'vue' ]
   }))
   // Separate CommonJS modules
+  .then(() => bundle({
+    format: 'cjs',
+    bundleName: 'modules/index',
+    styleName: 'modules/style',
+    entry: config.cjsEntry,
+    external: nodeExternal()
+  }))
   .then(() => Promise.all([
     getUtils(),
     getCommons(),

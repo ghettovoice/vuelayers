@@ -51,6 +51,10 @@ app.use(devMiddleware)
 // compilation error display
 app.use(hotMiddleware)
 
+// serve pure static assets
+const staticPath = path.posix.join(config.publicPath, config.assetsSubDir)
+app.use(staticPath, express.static('./docs/static'))
+
 const uri = 'http://' + config.host + ':' + port
 
 devMiddleware.waitUntilValid(function () {

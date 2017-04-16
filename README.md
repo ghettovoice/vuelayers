@@ -20,13 +20,25 @@
 npm install -S vue vuelayers
 ```
 
-## Usage
+## Available builds
 
-#### Full import  
+1. **UMD**
+  - Full debug version: `dist/vuelayers.umd.js` and `dist/vuelayers.umd.css`
+  - Full production version: `dist/vuelayers.umd.min.js` and `dist/vuelayers.umd.min.css`
+2. **CommonJS**
+  - Full version: `dist/vuelayers.cjs.js` and `dist/vuelayers.cjs.css`
+3. **CommonJS** separate components (for plugins like `babel-plugin-component`)
+  - Main: `dist/modules/index.js` and `dist/modules/style.css`
+  - Components: `dist/modules/%component-name%/index.js` and `dist/modules/%component-name%/style.css`
+4. **ES6 module**
+  - Full version: `dist/vuelayers.es.js` and `dist/vuelayers.es.css`
 
-Import full library code with all components and mixins
+# Usage 
+
+### Basic example with full import 
 
 ```js
+// main.js
 import Vue from 'vue'
 import VueLayers from 'vuelayers'
 
@@ -36,29 +48,69 @@ new Vue({
   el: '#app',
   render: h => h(App)
 })
-```
-
-**Note**: CSS file needs to be imported separately.    
-Inside your App.vue
+````
 
 ```vue
-<template>...</template>
-<script>...</script>
+// App.vue
+<template>
+  <div id="map">
+    <vl-map>
+      <vl-view />
+      
+      <vl-layer-tile>
+        <vl-source-osm />
+      </vl-layer-tile>
+    </vl-map>
+  </div>
+</template>
+<script>
+  export default {}
+</script>
 <style>
-  @import "~vuelayers/dist/style.css";
+  /* CSS file needs to be imported separately. */
+  @import "~vuelayers/dist/vuelayers.";
 </style>
 ```
 
-#### On demand  
+**Note about usage of different builds**
 
-First, install [babel-plugin-component](https://github.com/QingWei-Li/babel-plugin-component)
+* In browser is available pre-build UMD version by simply including `dist/vuelayers.umd.min.js` and `vuelayers.umd.min.css` files 
+  on the page after VueJS.  
+  Or use from CDN like [unpkg.org](https://unpkg.com).  
+  * [https://unpkg.com/vuelayers@latest](https://unpkg.com/vuelayers@latest)
+  * [https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css](https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css)
+  
+* In NodeJS is available CommonJS version (it is included by default) from `dist/vuelayers.cjs.js` and
+  appropriate stylesheet `dist/vuelayers.cjs.css`.  
+  See below for example of incremental loading of what you need with tools like `babel-plugin-component`.
+  
+* For bundlers like Webpack 2 and Rollup is available ES6 module version from `dist/vuelayers.es.js` and 
+  appropriate stylesheet `dist/vuelayers.es.css`.
 
-```bash
-npm install babel-plugin-component -D
+### Incremental import  
+
+With Webpack 2 or Rollup may be used without additional configuration, simply import what you need.
+Stylesheet should be imported manually (`dist/vuelayers.es.css`).
+
+```js
+import Vue from 'vue'
+import { Map, View, TileLayer, OsmSource } from 'vuelayers'
+
+Vue.use(Map)
+Vue.use(View)
+Vue.use(TileLayer)
+Vue.use(OsmSource)
+
+new Vue({
+  el: '#app',
+  render: h => h(App)
+})
 ```
 
-Then edit your `.babelrc`
-
+For native CommonJS or bundlers that doesn't support ES6 module system you can use tools like `babel-plugin-component`
+for incremental loading.  
+First, install [babel-plugin-component](https://github.com/QingWei-Li/babel-plugin-component)
+Example Babel config 
 ```json
 {
   "presets": [
@@ -68,30 +120,12 @@ Then edit your `.babelrc`
     {
       "libraryName": "vuelayers",
       "style": true,
-      "libDir": "dist"
+      "libDir": "dist/modules"
     }
   ]]]
 }
 ```
-
-Now you can import only what you need
-
-```js
-import Vue from 'vue'
-import { Map, View, LayerTile, SourceOsm } from 'vuelayers'
-
-Vue.use(Map)
-Vue.use(View)
-Vue.use(LayerTile)
-Vue.use(SourceOsm)
-
-new Vue({
-  el: '#app',
-  render: h => h(App)
-})
-```
-
-**Note**: the above library setup automatically imports CSS files
+Now you can import only what you need, only that components will be included in final build.
 
 ## Documentation
 
@@ -103,11 +137,10 @@ TODO
 git clone https://gitlab.com/ghettovoice/vuelayers.git
 cd vuelayers
 
-# install Vue and VueLayers dependencies
-npm install vue && npm install
+# install dependencies
+npm install
 
 # serve with hot reload at localhost:8080
-npm run dev
 npm start
 
 # demo 
@@ -115,9 +148,6 @@ npm run demo
 
 # build
 npm run build
-
-# build and view the bundle analyzer report
-npm run build --report
 
 # run unit tests
 npm run unit
