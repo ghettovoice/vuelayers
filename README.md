@@ -33,7 +33,7 @@ npm install -S vue vuelayers
 4. **ES6 module**
   - Full version: `dist/vuelayers.es.js` and `dist/vuelayers.es.css`
 
-# Usage 
+## Usage 
 
 ### Basic example with full import 
 

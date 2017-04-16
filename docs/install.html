@@ -1,8 +1,21 @@
-<h2><a id="Install_0"></a>Install</h2>
+<h1><a id="VueLayers_0"></a>VueLayers</h1>
+<blockquote>
+  <p>Vue components to work with <a href="https://openlayers.org">OpenLayers</a></p>
+</blockquote>
+<p><a href="https://travis-ci.org/ghettovoice/vuelayers"><img src="https://travis-ci.org/ghettovoice/vuelayers.svg?branch=master" alt="Build Status"></a><br>
+  <a href="https://coveralls.io/github/ghettovoice/vuelayers?branch=master"><img src="https://coveralls.io/repos/github/ghettovoice/vuelayers/badge.svg?branch=master" alt="Coverage Status"></a><br>
+  <a href="http://standardjs.com"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg" alt="js-standard-style"></a><br>
+  <a href="https://github.com/ghettovoice/vuelayers/releases"><img src="https://img.shields.io/github/tag/ghettovoice/vuelayers.svg" alt="GitHub tag"></a><br>
+  <a href="https://www.npmjs.com/package/vuelayers"><img src="https://img.shields.io/npm/v/vuelayers.svg" alt="NPM version"></a><br>
+  <a href="https://github.com/ghettovoice/vuelayers/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ghettovoice/vuelayers.svg" alt="License"></a><br>
+  <a href="https://david-dm.org/ghettovoice/vuelayers"><img src="https://img.shields.io/david/ghettovoice/vuelayers.svg" alt="Dependencies"></a><br>
+  <a href="https://david-dm.org/ghettovoice/vuelayers?type=dev"><img src="https://img.shields.io/david/dev/ghettovoice/vuelayers.svg" alt="Dev dependencies"></a></p>
+<p><strong><a href="https://ghettovoice.github.io/vuelayers/">Demo</a></strong></p>
+<h2><a id="Install_15"></a>Install</h2>
 <pre><code class="language-bash"><span class="hljs-comment"># install Vue and VueLayers</span>
 npm install -S vue vuelayers
 </code></pre>
-<h2><a id="Available_builds_7"></a>Available builds</h2>
+<h2><a id="Available_builds_22"></a>Available builds</h2>
 <ol>
   <li><strong>UMD</strong></li>
 </ol>
@@ -29,8 +42,8 @@ npm install -S vue vuelayers
 <ul>
   <li>Full version: <code>dist/vuelayers.es.js</code> and <code>dist/vuelayers.es.css</code></li>
 </ul>
-<h1><a id="Usage_20"></a>Usage</h1>
-<h3><a id="Basic_example_with_full_import_22"></a>Basic example with full import</h3>
+<h2><a id="Usage_35"></a>Usage</h2>
+<h3><a id="Basic_example_with_full_import_37"></a>Basic example with full import</h3>
 <pre><code class="language-js"><span class="hljs-comment">// main.js</span>
 <span class="hljs-keyword">import</span> Vue <span class="hljs-keyword">from</span> <span class="hljs-string">'vue'</span>
 <span class="hljs-keyword">import</span> VueLayers <span class="hljs-keyword">from</span> <span class="hljs-string">'vuelayers'</span>
@@ -42,7 +55,7 @@ new Vue({
   render: h =&gt; h(App)
 })
 </code></pre>
-<pre><code class="vue">// App.vue
+<pre><code class="language-vue vue">// App.vue
 &lt;template&gt;
   &lt;div id=&quot;map&quot;&gt;
     &lt;vl-map&gt;
@@ -83,7 +96,7 @@ new Vue({
       appropriate stylesheet <code>dist/vuelayers.es.css</code>.</p>
   </li>
 </ul>
-<h3><a id="Incremental_import_74"></a>Incremental import</h3>
+<h3><a id="Incremental_import_89"></a>Incremental import</h3>
 <p>With Webpack 2 or Rollup may be used without additional configuration, simply import what you need.<br>
   Stylesheet should be imported manually (<code>dist/vuelayers.es.css</code>).</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> Vue <span class="hljs-keyword">from</span> <span class="hljs-string">'vue'</span>
@@ -117,3 +130,33 @@ new Vue({
 </span>}
 </code></pre>
 <p>Now you can import only what you need, only that components will be included in final build.</p>
+<h2><a id="Documentation_129"></a>Documentation</h2>
+<p>TODO</p>
+<h2><a id="Build_Setup_133"></a>Build Setup</h2>
+<pre><code class="language-bash">git <span class="hljs-built_in">clone</span> https://gitlab.com/ghettovoice/vuelayers.git
+<span class="hljs-built_in">cd</span> vuelayers
+
+<span class="hljs-comment"># install dependencies</span>
+npm install
+
+<span class="hljs-comment"># serve with hot reload at localhost:8080</span>
+npm start
+
+<span class="hljs-comment"># demo </span>
+npm run demo
+
+<span class="hljs-comment"># build</span>
+npm run build
+
+<span class="hljs-comment"># run unit tests</span>
+npm run unit
+
+<span class="hljs-comment"># run e2e tests</span>
+npm run e2e
+
+<span class="hljs-comment"># run all tests</span>
+npm <span class="hljs-built_in">test</span>
+</code></pre>
+<h2><a id="License_161"></a>License</h2>
+<p><strong>MIT</strong> © 2017, Vladimir Vershinin<br>
+  Based on <a href="https://vuejs.org/">Vue</a> and <a href="https://openlayers.org/">OpenLayers</a></p>
