@@ -49,7 +49,7 @@
       <vl-layer-tile id="wmts">
         <vl-source-wmts
           url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
-          layer="0" matrix-set="EPSG:3857" format="image/png" layer-style="default"/>
+          layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
       </vl-layer-tile>
       <!--// WMTS -->
     </vl-map>

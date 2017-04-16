@@ -34,6 +34,7 @@ module.exports = {
         enforce: "pre",
         include: [
           utils.resolve('src'),
+          utils.resolve('docs'),
           utils.resolve('test')
         ],
         options: {
@@ -45,6 +46,7 @@ module.exports = {
         loader: 'babel-loader',
         include: [
           utils.resolve('src'),
+          utils.resolve('docs'),
           utils.resolve('test'),
           utils.resolve('node_modules/ol-tilecache')
         ]
@@ -68,6 +70,10 @@ module.exports = {
       {
         test: /\.(geo)?json$/,
         loader: 'json-loader'
+      },
+      {
+        test: /\.html/,
+        loader: 'text-loader'
       }
     ],
     noParse: [ /openlayers/ ]

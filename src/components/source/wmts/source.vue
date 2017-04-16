@@ -8,11 +8,11 @@
   const { WMTS_VERSION, WMTS_REQUEST_ENCODING, WMTS_FORMAT } = consts
 
   const props = {
-    layer: {
+    layerName: {
       type: String,
       required: true
     },
-    layerStyle: {
+    styleName: {
       type: String,
       required: true
     },
@@ -36,14 +36,14 @@
   }
 
   const computed = {
-    currentLayer () {
-      return this.layer
+    currentLayerName () {
+      return this.layerName
     },
     currentVersion () {
       return this.version
     },
-    currentStyle () {
-      return this.style
+    currentStyleName () {
+      return this.styleName
     },
     currentMatrixSet () {
       return this.matrixSet
@@ -90,8 +90,8 @@
         projection: this.currentProjection,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         requestEncoding: this.currentRequestEncoding,
-        layer: this.currentLayer,
-        style: this.currentStyle,
+        layer: this.currentLayerName,
+        style: this.currentStyleName,
         tilePixelRatio: this.currentTilePixelRatio,
         tileGrid: this.tileGrid,
         version: this.currentVersion,
