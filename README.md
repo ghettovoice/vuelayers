@@ -77,7 +77,7 @@ new Vue({
 * For browser is available pre-build UMD version by simply including `dist/vuelayers.umd.min.js` and `vuelayers.umd.min.css` files 
   on the page after VueJS.  
   Or use from CDN like [unpkg.org](https://unpkg.com).  
-  * [https://unpkg.com/vuelayers@latest](https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.js)
+  * [https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.js](https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.js)
   * [https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css](https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css)
   
 * For NodeJS is available CommonJS version (it is included by default) from `dist/vuelayers.cjs.js` and
