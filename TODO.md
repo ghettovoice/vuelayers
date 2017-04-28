@@ -8,3 +8,4 @@
 - [x] ES2015 build version
 - [ ] `vl-view` shared between multiple maps
 - [ ] Add support of [ol-cesium](http://openlayers.org/ol-cesium/)
+- [ ] Featured Draw panel

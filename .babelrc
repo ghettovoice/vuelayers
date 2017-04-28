@@ -1,14 +1,16 @@
 {
   "presets": [
-    ["latest", {
-      "es2015": {
-        "modules": false
+    [ "env", {
+      "debug": true,
+      "modules": false,
+      "targets": {
+        "node": 6,
+        "browsers": [ "last 2 versions" ]
       }
-    }],
+    } ],
     "stage-0"
   ],
   "plugins": [
-    "transform-runtime",
     "lodash"
   ],
   "env": {
@@ -17,11 +19,11 @@
     },
     "cjs": {
       "plugins": [
-        ["./modules/babel-plugin-merge-imports", {
+        [ "./modules/babel-plugin-merge-imports", {
           "pkg": "openlayers",
           "pkgVar": "__ol",
-          "regex": "^ol(?:\/(.*))?$",
-        }]
+          "regex": "^ol(?:\/(.*))?$"
+        } ]
       ]
     }
   }

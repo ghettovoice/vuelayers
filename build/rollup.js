@@ -14,27 +14,32 @@ const uglify = require('rollup-plugin-uglify')
 const createFilter = require('rollup-pluginutils').createFilter
 const MagicString = require('magic-string')
 const notifier = require('node-notifier')
+const argv = require('yargs').argv
 const { dependencies, peerDependencies, devDependencies } = require('../package.json')
 const utils = require('./utils')
 const config = require('./config')
 
+const bundles = argv.bundles
+  ? argv.bundles.split(',').map(s => s.trim())
+  : [ 'es', 'umd', 'umd-min', 'cjs', 'comp' ]
+
 Promise.resolve(utils.ensureDir(config.outDir))
   // ES6
-  .then(() => bundle({
+  .then(() => bundles.includes('es') && bundle({
     format: 'es',
     bundleName: config.name + '.es',
     entry: config.entry,
     external: nodeExternal()
   }))
   // CommonJS
-  .then(() => bundle({
+  .then(() => bundles.includes('cjs') && bundle({
     format: 'cjs',
     bundleName: config.name + '.cjs',
     entry: config.cjsEntry,
     external: nodeExternal()
   }))
   // UMD
-  .then(() => bundle({
+  .then(() => bundles.includes('umd') && bundle({
     format: 'umd',
     bundleName: config.name + '.umd',
     entry: config.cjsEntry,
@@ -42,7 +47,7 @@ Promise.resolve(utils.ensureDir(config.outDir))
     external: [ 'vue' ]
   }))
   // UMD minified
-  .then(() => bundle({
+  .then(() => bundles.includes('umd-min') && bundle({
     format: 'umd',
     bundleName: config.name + '.umd.min',
     entry: config.cjsEntry,
@@ -50,58 +55,59 @@ Promise.resolve(utils.ensureDir(config.outDir))
     external: [ 'vue' ]
   }))
   // Separate CommonJS modules
-  .then(() => bundle({
-    format: 'cjs',
-    bundleName: 'modules/index',
-    styleName: 'modules/style',
-    entry: config.cjsEntry,
-    external: nodeExternal()
-  }))
-  .then(() => Promise.all([
-    getUtils(),
-    getCommons(),
-    getMixins(),
-    getComponents()
-  ]))
-  .then(([ utils, commons, mixins, components ]) => Promise.all(
-    [].concat(
-      utils.map(({ entry, bundleName }) => bundle({
+  .then(() => {
+    return bundles.includes('comp') && bundle({
         format: 'cjs',
-        entry,
-        bundleName,
-        styleName: false,
-        external: nodeExternal(),
-        modules: true
-      }))
-    ).concat(
-      commons.map(({ entry, bundleName }) => bundle({
-        format: 'cjs',
-        entry,
-        bundleName,
-        styleName: false,
-        external: nodeExternal(),
-        modules: true
-      }))
-    ).concat(
-      mixins.map(({ entry, bundleName }) => bundle({
-        format: 'cjs',
-        entry,
-        bundleName,
-        styleName: false,
-        external: nodeExternal(),
-        modules: true
-      }))
-    ).concat(
-      components.map(({ entry, bundleName, styleName }) => bundle({
-        format: 'cjs',
-        entry,
-        bundleName,
-        styleName,
-        external: nodeExternal(),
-        modules: true
-      }))
-    )
-  ))
+        bundleName: 'modules/index',
+        styleName: 'modules/style',
+        entry: config.cjsEntry,
+        external: nodeExternal()
+      }).then(() => Promise.all([
+          getUtils(),
+          getCommons(),
+          getMixins(),
+          getComponents()
+        ]))
+        .then(([ utils, commons, mixins, components ]) => Promise.all(
+          [].concat(
+            utils.map(({ entry, bundleName }) => bundle({
+              format: 'cjs',
+              entry,
+              bundleName,
+              styleName: false,
+              external: nodeExternal(),
+              modules: true
+            }))
+          ).concat(
+            commons.map(({ entry, bundleName }) => bundle({
+              format: 'cjs',
+              entry,
+              bundleName,
+              styleName: false,
+              external: nodeExternal(),
+              modules: true
+            }))
+          ).concat(
+            mixins.map(({ entry, bundleName }) => bundle({
+              format: 'cjs',
+              entry,
+              bundleName,
+              styleName: false,
+              external: nodeExternal(),
+              modules: true
+            }))
+          ).concat(
+            components.map(({ entry, bundleName, styleName }) => bundle({
+              format: 'cjs',
+              entry,
+              bundleName,
+              styleName,
+              external: nodeExternal(),
+              modules: true
+            }))
+          )
+        ))
+  })
   // All done
   .then(() => {
     notifier.notify({
