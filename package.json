@@ -35,8 +35,18 @@
   "keywords": [
     "vuelayers",
     "vue",
+    "vuejs",
+    "vue2",
+    "vuejs2",
+    "vue plugins",
+    "vue components",
     "openlayers",
-    "ol"
+    "ol",
+    "map",
+    "maps",
+    "mapping",
+    "tile layer",
+    "vector layer"
   ],
   "license": "MIT",
   "bugs": {
@@ -152,7 +162,7 @@
     "yargs": "^7.1.0"
   },
   "engines": {
-    "node": ">=6.0.0",
+    "node": ">=4.0.0",
     "npm": ">=3.0.0"
   },
   "files": [

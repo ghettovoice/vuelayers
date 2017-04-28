@@ -4,7 +4,7 @@
       "debug": true,
       "modules": false,
       "targets": {
-        "node": 6,
+        "node": 4,
         "browsers": [ "last 2 versions" ]
       }
     } ],
