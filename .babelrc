@@ -1,16 +1,10 @@
 {
   "presets": [
-    [ "env", {
-      "debug": true,
-      "modules": false,
-      "targets": {
-        "node": 4,
-        "browsers": [ "last 2 versions" ]
-      }
-    } ],
+    [ "env", { "modules": false } ],
     "stage-0"
   ],
   "plugins": [
+    "transform-runtime",
     "lodash"
   ],
   "env": {
