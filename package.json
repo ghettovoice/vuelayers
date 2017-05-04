@@ -20,12 +20,9 @@
     "travis": "npm run travis-test && npm run coveralls",
     "travis-test": "npm run unit && npm run e2e -- --env travis",
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls",
-    "demo": "node build/dev-server.js --conf=demo-dev",
-    "demo-build": "rm -rf ./dist-demo && cross-env NODE_ENV=production webpack --config=build/webpack.demo-prod.conf.js",
-    "demo-deploy": "gh-pages -d ./dist-demo",
-    "start-docs": "node build/dev-server.js --conf=docs-dev",
-    "build-docs": "rm -rf ./dist-docs && cross-env node build/build.js --conf=docs-prod",
-    "deploy-docs": "gh-pages -d ./dist-docs"
+    "docs-start": "node build/dev-server.js --conf=docs-dev",
+    "docs-build": "rm -rf ./dist-docs && cross-env NODE_ENV=production webpack --config=build/webpack.docs-prod.conf.js",
+    "docs-deploy": "gh-pages -d ./dist-docs"
   },
   "directories": {
     "lib": "dist",
