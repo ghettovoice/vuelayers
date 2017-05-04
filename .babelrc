@@ -1,32 +1,24 @@
 {
   "presets": [
-    "latest",
+    [ "env", { "modules": false } ],
     "stage-0"
   ],
   "plugins": [
-    "add-module-exports",
     "transform-runtime",
-    "transform-decorators-legacy",
-    "transform-class-properties",
-    "transform-es5-property-mutators",
-    "transform-flow-strip-types",
     "lodash"
   ],
   "env": {
-    "cjs": {
-      "plugins": [
-        [
-          "./modules/babel-plugin-transform-nested-import",
-          {
-            "pkg": "openlayers",
-            "pkgVar": "__ol__",
-            "regex": "^ol(?:\/(.*))?$"
-          }
-        ]
-      ]
-    },
     "test": {
       "plugins": [ "istanbul" ]
+    },
+    "cjs": {
+      "plugins": [
+        [ "./modules/babel-plugin-merge-imports", {
+          "pkg": "openlayers",
+          "pkgVar": "__ol",
+          "regex": "^ol(?:\/(.*))?$"
+        } ]
+      ]
     }
   }
 }

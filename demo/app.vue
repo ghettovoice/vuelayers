@@ -22,11 +22,6 @@
       <vl-layer-tile id="osm" :visible="layers.osm">
         <vl-source-osm/>
       </vl-layer-tile>
-
-      <vl-layer-tile id="mapbox" :visible="layers.mapbox">
-        <vl-source-mapbox map-id="ghettovoice.nbm2olb0"
-                          access-token="pk.eyJ1IjoiZ2hldHRvdm9pY2UiLCJhIjoiMzMxYzMyMWQ3NTgzMTU4Nzk3ZTNmMmI3MmQ1NmVhMjgifQ._erAEzdvdB0jfYXXqzOJCg"/>
-      </vl-layer-tile>
       <!--// base layers -->
 
       <!-- Tile WMS -->
@@ -35,6 +30,14 @@
                        :ext-params="{ TILED: true }" server-type="geoserver" />
       </vl-layer-tile>
       <!--// Tile WMS -->
+
+      <!-- WMTS -->
+      <vl-layer-tile id="wmts" :visible="layers.wmts">
+        <vl-source-wmts
+          url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
+          layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
+      </vl-layer-tile>
+      <!--// WMTS -->
 
       <!-- countries vector -->
       <vl-layer-vector id="countries" v-if="countries.length" :visible="layers.countries">
@@ -82,7 +85,8 @@
     </vl-map>
 
     <div class="controls">
-      <button v-for="layer in ['osm', 'mapbox', 'countries', 'pacman', 'wms']" :key="layer" @click="toggleLayer(layer)">
+      <button v-for="layer in [ 'osm', 'countries', 'pacman', 'wms', 'wmts' ]" :key="layer"
+              @click="toggleLayer(layer)">
         Toggle layer {{ layer }}
       </button>
 
@@ -133,10 +137,10 @@
       return this.selected.map(({ id }) => id)
     },
     installHTML () {
-      return require('text-loader!./install.html')
+      return require('./install.html')
     },
     demoSrcHTML () {
-      return require('text-loader!./demo-src.html')
+      return require('./demo-src.html')
     }
   }
 
@@ -180,15 +184,15 @@
       return this.countries
     },
     selectStyleFunc (s) {
+      // first argument is an style helper. See https://github.com/ghettovoice/vuelayers/blob/master/src/ol-ext/style.js
       const styleName = 'select'
       const styleByFeature = {}
-      const self = this
       const stroke = s.stroke({
         strokeColor: '#8856a7',
         strokeWidth: 4
       })
 
-      return function __selectStyleFunc ({ id, properties }, resolution) {
+      return function __selectStyleFunc ({ id, properties }) {
         if (properties.selectColor) {
           let styles = get([ id, styleName ], styleByFeature)
           if (!styles) {
@@ -207,13 +211,13 @@
       }
     },
     countriesStyleFunc (s) {
+      // first argument is an style helper. See https://github.com/ghettovoice/vuelayers/blob/master/src/ol-ext/style.js
       const stroke = s.stroke({
         strokeColor: '#8856a7',
         strokeWidth: 1
       })
       const styleName = 'default'
       const styleByFeature = {}
-      const self = this
 
       return function __countriesStyleFunc ({ id, properties }) {
         let styles = get([ id, styleName ], styleByFeature)
@@ -232,6 +236,7 @@
       }
     },
     pacmanStyleFunc (s) {
+      // first argument is an style helper. See https://github.com/ghettovoice/vuelayers/blob/master/src/ol-ext/style.js
       const pacman = [
         s.style({
           strokeColor: '#DE9147',
@@ -293,6 +298,13 @@
           forEach(::highlight.highlightBlock, this.$refs.sourceCode.querySelectorAll('pre > code'))
         })
       }
+    },
+    'layers.ani' (value) {
+      if (value) {
+        this.startAnimation()
+      } else {
+        this.stopAnimation()
+      }
     }
   }
 
@@ -308,14 +320,14 @@
         rotation: 0,
         selected: [],
         countries: [],
-        pacman: require('../static/pacman.geojson').features,
+        pacman: require('./static/pacman.geojson').features,
         position: [],
         layers: {
-          osm: false,
-          mapbox: true,
+          osm: true,
           countries: true,
           pacman: false,
-          wms: false
+          wms: false,
+          wmts: false
         },
         sourceCode: false
       }

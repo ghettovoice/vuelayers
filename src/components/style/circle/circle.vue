@@ -1,6 +1,6 @@
 <script>
   import Circle from 'ol/style/circle'
-  import imageStyle from 'vl-components/style/image'
+  import imageStyle from '../image'
 
   const props = {
     radius: {
@@ -65,5 +65,3 @@
     this.refresh()
   }
 </script>
-
-<style>/* stub styles */</style>

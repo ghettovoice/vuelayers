@@ -4,8 +4,8 @@
    * Acts as an style container that will be injected into "style" slot inside layer or feature components.
    */
   import Style from 'ol/style/style'
-  import { warn } from 'vl-utils/debug'
-  import style from 'vl-components/style/style'
+  import { warn } from '../../../utils/debug'
+  import style from '../style'
 
   const props = {
     zIndex: Number,
@@ -133,5 +133,3 @@
     }
   }
 </script>
-
-<style>/* stub styles */</style>

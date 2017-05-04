@@ -1,12 +1,19 @@
-import layer from './layer'
-import layerTileBase from './tile-base'
-import layerVectorBase from './vector-base'
+// import layer from './layer'
+import VectorLayer from './vector'
+import TileLayer from './tile'
 
-export LayerVector from './vector'
-export LayerTile from './tile'
+export {
+  // mixins
+  // layer,
+  // components
+  VectorLayer,
+  TileLayer
+}
 
-export const mixins = {
-  layer,
-  layerTile: layerTileBase,
-  layerVector: layerVectorBase
+export default {
+  // mixins
+  // layer,
+  // components
+  VectorLayer,
+  TileLayer
 }

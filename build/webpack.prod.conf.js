@@ -2,45 +2,45 @@
 const path = require('path')
 const utils = require('./utils')
 const webpack = require('webpack')
-const config = require('../config')
 const merge = require('webpack-merge')
-const baseWebpackConfig = require('./webpack.base.conf')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const config = require('./config')
+const baseWebpackConfig = require('./webpack.base.conf')
 
-const env = process.env.NODE_ENV === 'testing'
-  ? require('../config/test.env')
-  : config.build.env
-
-baseWebpackConfig.entry = config.dev.entry
+const isProduction = process.env.NODE_ENV === 'production'
+const isTesting = process.env.NODE_ENV === 'testing'
 
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
-    rules: utils.styleLoaders({
-      sourceMap: config.build.productionSourceMap,
-      extract: true,
-      minimize: process.env.NODE_ENV === 'production'
-    })
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: utils.vueLoaderConfig(true)
+      },
+      ...utils.styleLoaders({
+        sourceMap: true,
+        extract: isProduction
+      })
+    ]
   },
-  devtool: config.build.productionSourceMap ? '#source-map' : false,
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
-    new webpack.DefinePlugin({
-      'process.env': env,
-      PKG_NAME: `"${config.name}"`,
-      PKG_FULLNAME: `"${config.fullname}"`,
-      PKG_VERSION: `"${config.version}"`
-    }),
-    new webpack.optimize.UglifyJsPlugin({
+    new webpack.DefinePlugin(Object.assign(config.replaces, {
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
+    })),
+    ...( isProduction ? [ new webpack.optimize.UglifyJsPlugin({
+      mangle: true,
+      sourceMap: true,
       compress: {
         warnings: false
-      },
-      sourceMap: true
-    }),
+      }
+    }) ] : [] ),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: '[name].bundle.css'
+      filename: '[name].css'
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
@@ -49,7 +49,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
-      filename: 'index.html',
+      filename: isTesting ? 'index.html' : utils.resolve('dist/index.html'),
       template: 'test/index.html',
       inject: true,
       minify: {
@@ -61,14 +61,19 @@ const webpackConfig = merge(baseWebpackConfig, {
       },
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency'
-    }),
-    new webpack.BannerPlugin(config.banner)
+    })
   ]
 })
 
-if (config.build.bundleAnalyzerReport) {
-  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-  webpackConfig.plugins.push(new BundleAnalyzerPlugin())
+webpackConfig.entry = {
+  app: utils.resolve('test/main.js')
 }
 
-module.exports = webpackConfig
+module.exports = (env = {}) => {
+  if (env.report) {
+    const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+    webpackConfig.plugins.push(new BundleAnalyzerPlugin())
+  }
+
+  return webpackConfig
+}

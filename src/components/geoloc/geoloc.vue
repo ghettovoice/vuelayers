@@ -1,18 +1,12 @@
 <script>
   import Geolocation from 'ol/geolocation'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/combineLatest'
-  import 'rxjs/add/observable/of'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/filter'
-  import 'rxjs/add/operator/merge'
-  import 'rxjs/add/operator/do'
-  import 'vl-rx/from-ol-event'
   import { isEqual } from 'lodash/fp'
-  import { DATA_PROJECTION } from 'vl-ol/consts'
-  import rxSubs from 'vl-mixins/rx-subs'
-  import stubVNode from 'vl-mixins/stub-vnode'
+  import Observable from '../../rx-ext'
+  import { consts } from '../../ol-ext'
+  import rxSubs from '../../mixins/rx-subs'
+  import stubVNode from '../../mixins/stub-vnode'
+
+  const { DATA_PROJECTION } = consts
 
   const props = {
     tracking: {
@@ -116,23 +110,20 @@
       .throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
-    this.subscribeTo(
-      geolocChanges,
-      ([ position, accuracy ]) => {
-        let changed = false
-        if (!isEqual(position, this.currentPosition)) {
-          this.currentPosition = position
-          changed = true
-        }
-        if (accuracy !== this.currentAccuracy) {
-          this.currentAccuracy = accuracy
-          changed = true
-        }
+    this.subscribeTo(geolocChanges, ([ position, accuracy ]) => {
+      let changed = false
 
-        changed && this.$emit('change', { position, accuracy })
+      if (!isEqual(position, this.currentPosition)) {
+        this.currentPosition = position
+        changed = true
       }
-    )
+
+      if (accuracy !== this.currentAccuracy) {
+        this.currentAccuracy = accuracy
+        changed = true
+      }
+
+      changed && this.$emit('change', { position, accuracy })
+    })
   }
 </script>
-
-<style>/* stub style  */</style>

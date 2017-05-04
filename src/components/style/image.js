@@ -1,4 +1,4 @@
-import style from 'vl-components/style/style'
+import style from './style'
 
 const props = {
   snapToPixel: {

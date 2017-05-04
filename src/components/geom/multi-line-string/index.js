@@ -1,7 +1,7 @@
-import GeomMultiLineString from './geom.vue'
+import MultiLineString from './geom.vue'
 
-GeomMultiLineString.install = function (Vue) {
-  Vue.component(GeomMultiLineString.name, GeomMultiLineString)
+MultiLineString.install = function (Vue) {
+  Vue.component(MultiLineString.name, MultiLineString)
 }
 
-export default GeomMultiLineString
+export default MultiLineString

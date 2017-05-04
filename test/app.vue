@@ -18,8 +18,7 @@
       <!--// interactions -->
 
       <vl-layer-tile id="mapbox">
-        <vl-source-mapbox map-id="ghettovoice.nbm2olb0"
-                          access-token="pk.eyJ1IjoiZ2hldHRvdm9pY2UiLCJhIjoiMzMxYzMyMWQ3NTgzMTU4Nzk3ZTNmMmI3MmQ1NmVhMjgifQ._erAEzdvdB0jfYXXqzOJCg"/>
+        <vl-source-osm/>
       </vl-layer-tile>
       <!--// base layers -->
 
@@ -38,6 +37,21 @@
 
         <vl-source-vector :features="points" />
       </vl-layer-vector>
+
+      <!-- Tile WMS -->
+      <vl-layer-tile id="wms">
+        <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
+                       :ext-params="{ TILED: true }" server-type="geoserver" />
+      </vl-layer-tile>
+      <!--// Tile WMS -->
+
+      <!-- WMTS -->
+      <vl-layer-tile id="wmts">
+        <vl-source-wmts
+          url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
+          layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
+      </vl-layer-tile>
+      <!--// WMTS -->
     </vl-map>
 
     <div class="controls">

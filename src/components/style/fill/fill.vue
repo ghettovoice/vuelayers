@@ -1,6 +1,6 @@
 <script>
   import Fill from 'ol/style/fill'
-  import style from 'vl-components/style/style'
+  import style from '../style'
 
   const props = {
     color: [ String, Array ]
@@ -46,5 +46,3 @@
     watch
   }
 </script>
-
-<style>/* stub styles */</style>

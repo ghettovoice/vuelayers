@@ -1,6 +1,6 @@
 <script>
   import Icon from 'ol/style/icon'
-  import imageStyle from 'vl-components/style/image'
+  import imageStyle from '../image'
 
   const props = {
     src: {
@@ -107,5 +107,3 @@
     watch
   }
 </script>
-
-<style>/* stub styles */</style>

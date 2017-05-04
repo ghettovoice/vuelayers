@@ -1,7 +1,9 @@
 <script>
   import Point from 'ol/geom/point'
-  import { GEOMETRY_TYPE } from 'vl-ol/consts'
-  import geom from 'vl-components/geom/geom'
+  import { consts } from '../../../ol-ext'
+  import geom from '../geom'
+
+  const { GEOMETRY_TYPE } = consts
 
   const props = {
     coordinates: {
@@ -33,5 +35,3 @@
     methods
   }
 </script>
-
-<style>/* stub styles */</style>

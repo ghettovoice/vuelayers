@@ -11,11 +11,12 @@ import Icon from 'ol/style/icon'
 import RegularShape from 'ol/style/regularshape'
 import Text from 'ol/style/text'
 import ImageStyle from 'ol/style/image'
-import { flow, isPlainObject, lowerFirst, pick, upperFirst } from 'lodash/fp'
-import isNumeric from 'vl-utils/is-numeric'
-import { GEOMETRY_TYPE } from 'vl-ol/consts'
-import * as geoJson from 'vl-ol/geojson'
-const reduce = require('lodash/fp/reduce').convert({ cap: false })
+import { flow, isPlainObject, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
+import isNumeric from '../utils/is-numeric'
+import { GEOMETRY_TYPE } from './consts'
+import * as geoJson from './geojson'
+
+const reduceWithKey = reduce.convert({ cap: false })
 
 /**
  * @typedef {Object} VlStyle
@@ -28,11 +29,11 @@ const reduce = require('lodash/fp/reduce').convert({ cap: false })
  * @property {string|undefined} strokeCap
  * @property {string|undefined} strokeJoin
  * @property {number|undefined} zIndex
- * @property {ol.style.Fill|undefined} fill
- * @protected {ol.style.Stroke|undefined} stroke
+ * @property {Fill|undefined} fill
+ * @protected {Stroke|undefined} stroke
  *
  * Text only
- * @property {string|ol.style.Text|undefined} text
+ * @property {string|Text|undefined} text
  * @property {string|undefined} textFont
  * @property {number|undefined} textFontSize
  * @property {string|number[]|undefined} textFillColor
@@ -46,11 +47,11 @@ const reduce = require('lodash/fp/reduce').convert({ cap: false })
  * @property {number|undefined} textRotation
  * @property {number|undefined} textOffsetX
  * @property {number|undefined} textOffsetY
- * @protected {ol.style.Stroke|undefined} textStroke
- * @protected {ol.style.Fill|undefined} textFill
+ * @protected {Stroke|undefined} textStroke
+ * @protected {Fill|undefined} textFill
  *
  * Image only
- * @property {ol.style.Image|Image|undefined} image
+ * @property {Image|undefined} image
  * @property {string|undefined} imageSrc
  * @property {number[]|undefined} imageSize
  * @property {number[]|undefined} imageImgSize
@@ -70,11 +71,11 @@ const reduce = require('lodash/fp/reduce').convert({ cap: false })
  * @property {number[]|undefined} imageStrokeDash
  * @property {string|undefined} imageStrokeCap
  * @property {string|undefined} imageStrokeJoin
- * @property {ol.style.IconOrigin|undefined} imageAnchorOrigin
- * @property {ol.ColorLike|undefined} imageColor
- * @property {ol.style.IconOrigin|undefined} imageOffsetOrigin
- * @protected {ol.style.Stroke|undefined} imageStroke
- * @protected {ol.style.Fill|undefined} imageFill
+ * @property {IconOrigin|undefined} imageAnchorOrigin
+ * @property {ColorLike|undefined} imageColor
+ * @property {IconOrigin|undefined} imageOffsetOrigin
+ * @protected {Stroke|undefined} imageStroke
+ * @protected {Fill|undefined} imageFill
  */
 
 /**
@@ -195,7 +196,7 @@ export function fill (vlStyle, prefix = '') {
 
   const transform = flow(
     pick(keys),
-    reduce(
+    reduceWithKey(
       (result, value, name) => {
         name = lowerFirst(name.replace(new RegExp(prefixKey('fill')), ''))
 
@@ -232,7 +233,7 @@ export function stroke (vlStyle, prefix = '') {
 
   const transform = flow(
     pick(keys),
-    reduce(
+    reduceWithKey(
       (result, value, name) => {
         switch (name) {
           case prefixKey('strokeColor'):
@@ -267,7 +268,7 @@ export function stroke (vlStyle, prefix = '') {
 
 /**
  * @param {VlStyle} vlStyle
- * @returns {Icon|Circle|RegularShape|undefined}
+ * @returns {ImageStyle|undefined}
  * @todo split to separate circle, regShape, Icon
  */
 export function image (vlStyle) {
@@ -287,7 +288,7 @@ export function image (vlStyle) {
   if (!isEmpty(vlStyle.imageSrc) || !isEmpty(vlStyle.image)) {
     // icon construction
     Ctor = Icon
-    // then create ol.style.Icon options
+    // then create Icon options
     imageStyle = {
       ...vlStyle,
       anchor: vlStyle.imageAnchor,
@@ -307,7 +308,7 @@ export function image (vlStyle) {
   } else if (vlStyle.imagePoints != null) {
     // regular shape construction
     Ctor = RegularShape
-    // create ol.style.RegularShape options
+    // create RegularShape options
     imageStyle = {
       ...vlStyle,
       points: vlStyle.imagePoints,
@@ -320,7 +321,7 @@ export function image (vlStyle) {
   } else {
     // circle construction
     Ctor = Circle
-    // create ol.style.Circle options
+    // create Circle options
     imageStyle = {
       ...vlStyle,
       radius: vlStyle.imageRadius

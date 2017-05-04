@@ -1,14 +1,14 @@
 <script>
   import SelectInteraction from 'ol/interaction/select'
   import VectorLayer from 'ol/layer/vector'
-  import { Observable } from 'rxjs/Observable'
-  import 'vl-rx/from-ol-event'
   import { forEach, mapValues, differenceWith } from 'lodash/fp'
-  import plainProps from 'vl-utils/plain-props'
-  import { style, defaultEditStyle } from 'vl-ol/style'
-  import * as geoJson from 'vl-ol/geojson'
-  import interaction from 'vl-components/interaction/interaction'
-  import styleTarget, { createStyleFunc } from 'vl-components/style/target'
+  import Observable from '../../../rx-ext'
+  import plainProps from '../../../utils/plain-props'
+  import { styleHelper, geoJson } from '../../../ol-ext'
+  import interaction from '../interaction'
+  import styleTarget, { createStyleFunc } from '../../style-target'
+
+  const { style, defaultEditStyle } = styleHelper
 
   // todo add other options, like event modifiers
   const props = {
@@ -203,5 +203,3 @@
     )
   }
 </script>
-
-<style>/* stub styles */</style>

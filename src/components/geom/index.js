@@ -1,12 +1,31 @@
-import geom from './geom'
+// import geom from './geom'
+import PointGeom from './point'
+import LineStringGeom from './line-string'
+import PolygonGeom from './polygon'
+import MultiPointGeom from './multi-point'
+import MultiLineStringGeom from './multi-line-string'
+import MultiPolygonGeom from './multi-polygon'
 
-export GeomPoint from './point'
-export GeomLineString from './line-string'
-export GeomPolygon from './polygon'
-export GeomMultiPoint from './multi-point'
-export GeomMultiLineString from './multi-line-string'
-export GeomMultiPolygon from './multi-polygon'
+export {
+  // mixins
+  // geom,
+  // components
+  PointGeom,
+  LineStringGeom,
+  PolygonGeom,
+  MultiPointGeom,
+  MultiLineStringGeom,
+  MultiPolygonGeom
+}
 
-export const mixins = {
-  geom
+export default {
+  // mixins
+  // geom,
+  // components
+  PointGeom,
+  LineStringGeom,
+  PolygonGeom,
+  MultiPointGeom,
+  MultiLineStringGeom,
+  MultiPolygonGeom
 }

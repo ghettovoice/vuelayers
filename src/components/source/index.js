@@ -1,19 +1,33 @@
-import source from './source'
-import sourceVectorBase from './vector-base'
-import sourceTileBase from './tile-base'
-import sourceXyzBase from './xyz-base'
-import sourceWmsBase from './wms-base'
+// import source from './source'
+// import tileSource from './tile'
+import VectorSource from './vector'
+import XyzSource from './xyz'
+import OsmSource from './osm'
+import MapboxSource from './mapbox'
+import WmsSource from './wms'
+import WmtsSource from './wmts'
 
-export SourceVector from './vector'
-export SourceXyz from './xyz'
-export SourceOsm from './osm'
-export SourceMapbox from './mapbox'
-export SourceWms from './wms'
-
-export const mixins = {
-  source,
-  sourceVector: sourceVectorBase,
-  sourceTile: sourceTileBase,
-  sourceXyz: sourceXyzBase,
-  sourceWms: sourceWmsBase
+export {
+  // mixins
+  // source,
+  // tileSource,
+  // components
+  VectorSource,
+  XyzSource,
+  OsmSource,
+  MapboxSource,
+  WmsSource,
+  WmtsSource
+}
+export default {
+  // mixins
+  // source,
+  // tileSource,
+  // components
+  VectorSource,
+  XyzSource,
+  OsmSource,
+  MapboxSource,
+  WmsSource,
+  WmtsSource
 }

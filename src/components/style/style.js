@@ -1,4 +1,4 @@
-import stubVNode from 'vl-mixins/stub-vnode'
+import stubVNode from '../../mixins/stub-vnode'
 /**
  * Basic style mixin.
  * Exposes for children inner OpenLayer style object as styleTarget.

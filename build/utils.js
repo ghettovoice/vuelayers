@@ -1,16 +1,19 @@
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
-const config = require('../config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const config = require('./config')
 
-exports.assetsPath = function (_path) {
-  const assetsSubDirectory = process.env.NODE_ENV === 'production'
-    ? config.build.assetsSubDirectory
-    : config.dev.assetsSubDirectory
+function resolve (relPath) {
+  return path.join(__dirname, '..', relPath)
+}
+
+function assetsPath (_path) {
+  const assetsSubDirectory = config.assetsSubDir
+
   return path.posix.join(assetsSubDirectory, _path)
 }
 
-exports.cssLoaders = function (options) {
+function cssLoaders (options) {
   options = options || {}
 
   const cssLoader = {
@@ -57,9 +60,9 @@ exports.cssLoaders = function (options) {
 }
 
 // Generate loaders for standalone style files (outside of .vue)
-exports.styleLoaders = function (options) {
+function styleLoaders (options) {
   const output = []
-  const loaders = exports.cssLoaders(options)
+  const loaders = cssLoaders(options)
   for (let extension in loaders) {
     const loader = loaders[ extension ]
     output.push({
@@ -68,4 +71,61 @@ exports.styleLoaders = function (options) {
     })
   }
   return output
+}
+
+function postcssPlugins () {
+  return [
+    require('autoprefixer')({
+      browsers: [ 'last 5 versions' ]
+    })
+  ]
+}
+
+function vueLoaderConfig (extract) {
+  return {
+    loaders: cssLoaders({
+      sourceMap: true,
+      extract
+    }),
+    postcss: postcssPlugins()
+  }
+}
+
+function writeFile (dest, data) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(dest, data, function (err) {
+      if (err) return reject(err)
+
+      resolve({
+        path: dest,
+        size: getSize(data)
+      })
+    })
+  })
+}
+
+function ensureDir (dir) {
+  return new Promise((resolve, reject) => {
+    fs.ensureDir(dir, err => {
+      if (err) return reject(err)
+
+      resolve()
+    })
+  })
+}
+
+function getSize (data) {
+  return (data.length / 1024).toFixed(2) + 'kb'
+}
+
+module.exports = {
+  resolve,
+  assetsPath,
+  cssLoaders,
+  styleLoaders,
+  vueLoaderConfig,
+  postcssPlugins,
+  writeFile,
+  ensureDir,
+  getSize
 }

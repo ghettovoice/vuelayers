@@ -1,7 +1,7 @@
-import InteractionSelect from './interaction.vue'
+import Select from './interaction.vue'
 
-InteractionSelect.install = function (Vue) {
-  Vue.component(InteractionSelect.name, InteractionSelect)
+Select.install = function (Vue) {
+  Vue.component(Select.name, Select)
 }
 
-export default InteractionSelect
+export default Select

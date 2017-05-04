@@ -1,14 +1,14 @@
 // This the Webpack config for building docs prod
 const path = require('path')
-const utils = require('./utils')
 const webpack = require('webpack')
-const config = require('../config')
 const merge = require('webpack-merge')
-const baseWebpackConfig = require('./webpack.base.conf')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const utils = require('./utils')
+const config = require('./config')
+const baseWebpackConfig = require('./webpack.base.conf')
 
 const env = config.build.env
 
@@ -18,35 +18,35 @@ baseWebpackConfig.entry = {
 
 const webpackConfig = merge(baseWebpackConfig, {
   output: {
-    path: path.resolve(__dirname, '../dist-docs'),
+    path: utils.resolve('dist-docs'),
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
   },
   module: {
-    rules: utils.styleLoaders({
-      sourceMap: config.build.productionSourceMap,
-      extract: true,
-      minimize: process.env.NODE_ENV === 'production'
-    })
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: utils.vueLoaderConfig(true)
+      },
+      ...utils.styleLoaders({
+        sourceMap: true,
+        extract: isProduction
+      })
+    ]
   },
-  devtool: config.build.productionSourceMap ? '#source-map' : false,
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
-    new webpack.DefinePlugin({
-      'process.env': env,
-      PKG_NAME: `"${config.name}"`,
-      PKG_FULLNAME: `"${config.fullname}"`,
-      PKG_VERSION: `"${config.version}"`
-    }),
-    ...(process.env.NODE_ENV === 'production' ?
-      [ new webpack.optimize.UglifyJsPlugin({
-        comments: false,
-        compress: {
-          warnings: false
-        },
-        mangle: true,
-        sourceMap: true
-      }) ] : [] ),
+    new webpack.DefinePlugin(Object.assign(config.replaces, {
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
+    })),
+    ...( isProduction ? [ new webpack.optimize.UglifyJsPlugin({
+      mangle: true,
+      sourceMap: true,
+      compress: {
+        warnings: false
+      }
+    }) ] : [] ),
     // extract css into its own file
     new ExtractTextPlugin({
       filename: 'css/[name].[contenthash].css'
@@ -58,7 +58,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, '../dist-docs/index.html'),
+      filename: utils.resolve('dist-docs/index.html'),
       template: 'docs/index.html',
       inject: true,
       minify: {
@@ -74,14 +74,12 @@ const webpackConfig = merge(baseWebpackConfig, {
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      minChunks: function (module, count) {
+      minChunks: function (module) {
         // any required modules inside node_modules are extracted to vendor
         return (
           module.resource &&
           /\.js$/.test(module.resource) &&
-          module.resource.indexOf(
-            path.join(__dirname, '../node_modules')
-          ) === 0
+          module.resource.indexOf(utils.resolve('node_modules')) === 0
         )
       }
     }),
@@ -94,17 +92,23 @@ const webpackConfig = merge(baseWebpackConfig, {
     // copy custom static assets
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, '../static'),
-        to: config.build.assetsSubDirectory,
+        from: utils.resolve('docs/static'),
+        to: config.assetsSubDir,
         ignore: [ '.*' ]
       }
     ])
   ]
 })
 
-if (config.build.bundleAnalyzerReport) {
-  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-  webpackConfig.plugins.push(new BundleAnalyzerPlugin())
+webpackConfig.entry = {
+  app: utils.resolve('docs/main.js')
 }
 
-module.exports = webpackConfig
+module.exports = (env = {}) => {
+  if (env.report) {
+    const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+    webpackConfig.plugins.push(new BundleAnalyzerPlugin())
+  }
+
+  return webpackConfig
+}

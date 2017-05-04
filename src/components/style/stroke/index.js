@@ -1,7 +1,7 @@
-import StyleStroke from './stroke.vue'
+import Stroke from './stroke.vue'
 
-StyleStroke.install = function (Vue) {
-  Vue.component(StyleStroke.name, StyleStroke)
+Stroke.install = function (Vue) {
+  Vue.component(Stroke.name, Stroke)
 }
 
-export default StyleStroke
+export default Stroke

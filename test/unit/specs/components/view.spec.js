@@ -1,7 +1,7 @@
 // import OlView from 'ol/view'
 import Vue from 'vue'
 // import Map from 'vl-components/map'
-import View from 'vl-components/view'
+import View from '../../../../src/components/view'
 
 describe('view component', () => {
   // const MapCtor = Vue.extend(Map)

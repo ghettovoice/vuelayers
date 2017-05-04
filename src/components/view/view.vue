@@ -2,19 +2,14 @@
   import Vue from 'vue'
   import View from 'ol/view'
   import { isEqual } from 'lodash/fp'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/combineLatest'
-  import 'rxjs/add/observable/of'
-  import 'rxjs/add/operator/merge'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/map'
-  import 'vl-rx/from-ol-event'
-  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } from 'vl-ol/consts'
-  import { toLonLat, fromLonLat } from 'vl-ol/coordinate'
-  import { warn } from 'vl-utils/debug'
-  import rxSubs from 'vl-mixins/rx-subs'
-  import stubVNode from 'vl-mixins/stub-vnode'
+  import Observable from '../../rx-ext'
+  import { consts, coordinateHelper } from '../../ol-ext'
+  import { warn } from '../../utils/debug'
+  import rxSubs from '../../mixins/rx-subs'
+  import stubVNode from '../../mixins/stub-vnode'
+
+  const { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } = consts
+  const { toLonLat, fromLonLat } = coordinateHelper
 
   const props = {
     zoom: {
@@ -222,35 +217,31 @@
       rotationChanges
     ).throttleTime(300)
       .distinctUntilChanged((a, b) => isEqual(a, b))
-      .map(([ center, zoom, rotation ]) => {
-        return {
-          center: toLonLat(center, this.projection),
-          zoom: Math.ceil(this.view.getZoom()),
-          rotation
-        }
-      })
+      .map(([ center, zoom, rotation ]) => ({
+        center: toLonLat(center, this.projection),
+        zoom: Math.ceil(this.view.getZoom()),
+        rotation
+      }))
 
-    this.subscribeTo(
-      viewChanges,
-      ({ center, zoom, rotation }) => {
-        let changed = false
-        if (!isEqual(this.currentCenter, center)) {
-          this.currentCenter = center
-          changed = true
-        }
-        if (this.currentZoom !== zoom) {
-          this.currentZoom = zoom
-          changed = true
-        }
-        if (this.currentRotation !== rotation) {
-          this.currentRotation = rotation
-          changed = true
-        }
+    this.subscribeTo(viewChanges, ({ center, zoom, rotation }) => {
+      let changed = false
 
-        changed && this.$emit('change', { center, zoom, rotation })
+      if (!isEqual(this.currentCenter, center)) {
+        this.currentCenter = center
+        changed = true
       }
-    )
+
+      if (this.currentZoom !== zoom) {
+        this.currentZoom = zoom
+        changed = true
+      }
+
+      if (this.currentRotation !== rotation) {
+        this.currentRotation = rotation
+        changed = true
+      }
+
+      changed && this.$emit('change', { center, zoom, rotation })
+    })
   }
 </script>
-
-<style>/* stub style  */</style>

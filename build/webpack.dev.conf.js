@@ -1,31 +1,31 @@
 // This is webpack config for hot mode
-const utils = require('./utils')
 const webpack = require('webpack')
-const config = require('../config')
 const merge = require('webpack-merge')
-const baseWebpackConfig = require('./webpack.base.conf')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+const utils = require('./utils')
+const config = require('./config')
+const baseWebpackConfig = require('./webpack.base.conf')
 
-baseWebpackConfig.entry = config.dev.entry
-// add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function (name) {
-  baseWebpackConfig.entry[ name ] = [ './build/dev-client' ].concat(baseWebpackConfig.entry[ name ])
-})
-
-module.exports = merge(baseWebpackConfig, {
-  module: {
-    rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
-  },
+const webpackConfig = merge(baseWebpackConfig, {
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: utils.vueLoaderConfig()
+      },
+      ...utils.styleLoaders({
+        sourceMap: true
+      })
+    ]
+  },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': config.dev.env,
-      PKG_NAME: `"${config.name}"`,
-      PKG_FULLNAME: `"${config.fullname}"`,
-      PKG_VERSION: `"${config.version}"`
-    }),
+    new webpack.DefinePlugin(Object.assign(config.replaces, {
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
+    })),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
@@ -38,3 +38,12 @@ module.exports = merge(baseWebpackConfig, {
     new FriendlyErrorsPlugin()
   ]
 })
+
+webpackConfig.entry = {
+  app: [
+    './build/dev-client',
+    utils.resolve('test/main.js')
+  ]
+}
+
+module.exports = webpackConfig

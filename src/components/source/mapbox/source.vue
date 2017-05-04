@@ -1,8 +1,9 @@
 <script>
-  import coalesce from 'vl-utils/coalesce'
-  import { TILE_SIZE, MAP_PROJECTION } from 'vl-ol/consts'
-  import xyzSource from 'vl-components/source/xyz-base'
+  import coalesce from '../../../utils/coalesce'
+  import { consts } from '../../../ol-ext'
+  import xyzSource from '../xyz/source.vue'
 
+  const { TILE_SIZE, MAP_PROJECTION } = consts
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
 
@@ -75,5 +76,3 @@
     return ratio > 1 ? [ '@', ratio, 'x' ].join('') : ''
   }
 </script>
-
-<style>/* stub style  */</style>

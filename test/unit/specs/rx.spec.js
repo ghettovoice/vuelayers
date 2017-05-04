@@ -1,8 +1,7 @@
 import sinon from 'sinon'
 import OlObject from 'ol/object'
 import { identity } from 'lodash/fp'
-import { Observable } from 'rxjs/Observable'
-import 'vl-rx'
+import Observable from '../../../src/rx-ext'
 
 describe('RxJS extensions', () => {
   describe('fromOlEvent', () => {

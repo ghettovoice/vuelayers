@@ -3,16 +3,15 @@
    * Wrapper around ol.Feature.
    */
   import uuid from 'uuid/v4'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/operator/map'
-  import 'vl-rx/from-ol-event'
-  import rxSubs from 'vl-mixins/rx-subs'
-  import stubVNode from 'vl-mixins/stub-vnode'
-  import styleTarget from 'vl-components/style/target'
-  import plainProps from 'vl-utils/plain-props'
-  import * as geoJson from 'vl-ol/geojson'
-  import { LAYER_PROP } from 'vl-ol/consts'
-  import { toLonLat } from 'vl-ol/coordinate'
+  import Observable from '../../rx-ext'
+  import rxSubs from '../../mixins/rx-subs'
+  import stubVNode from '../../mixins/stub-vnode'
+  import plainProps from '../../utils/plain-props'
+  import styleTarget from '../style-target'
+  import { consts, coordinateHelper, geoJson } from '../../ol-ext'
+
+  const { LAYER_PROP } = consts
+  const { toLonLat } = coordinateHelper
 
   const props = {
     id: {
@@ -149,5 +148,3 @@
     })
   }
 </script>
-
-<style>/* stub style */</style>

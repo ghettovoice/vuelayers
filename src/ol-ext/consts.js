@@ -49,9 +49,29 @@ export const GEOMETRY_TYPE = {
   CIRCLE: 'Circle'
 }
 
+export const EXTENT_CORNER = {
+  BOTTOM_LEFT: 'bottom-left',
+  BOTTOM_RIGHT: 'bottom-right',
+  TOP_LEFT: 'top-left',
+  TOP_RIGHT: 'top-right'
+}
+
+export const PROJ_UNIT = {
+  DEGREES: 'degrees',
+  FEET: 'ft',
+  METERS: 'm',
+  PIXELS: 'pixels',
+  TILE_PIXELS: 'tile-pixels',
+  USFEET: 'us-ft'
+}
+
 /**
  * @type {string} Default WMS version
  */
 export const WMS_VERSION = '1.3.0'
+
+export const WMTS_VERSION = '1.0.0'
+export const WMTS_REQUEST_ENCODING = 'KVP'
+export const WMTS_FORMAT = 'image/jpeg'
 // todo try with Symbol to prevent conflicts with user provided properties
 export const LAYER_PROP = 'layer'

@@ -1,4 +1,3 @@
-/* global PKG_VERSION, PKG_FULLNAME */
 /**
  * VueLayers
  * Vue components to work with OpenLayers.
@@ -7,31 +6,76 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
-import { omit, merge } from 'lodash/fp'
-import * as components from './components'
+import VueLayers from './index.cjs'
 
-const keys = [
-  'geom',
-  'layer',
-  'source',
-  'style',
-  'interaction'
-]
+const {
+  // common
+  Map,
+  View,
+  Feature,
+  Geoloc,
+  // geoms
+  PointGeom,
+  LineStringGeom,
+  PolygonGeom,
+  MultiPointGeom,
+  MultiLineStringGeom,
+  MultiPolygonGeom,
+  // interactions
+  SelectInteraction,
+  // layers
+  VectorLayer,
+  TileLayer,
+  // sources
+  VectorSource,
+  XyzSource,
+  OsmSource,
+  MapboxSource,
+  WmsSource,
+  WmtsSource,
+  // style
+  StyleContainer,
+  FillStyle,
+  StrokeStyle,
+  CircleStyle,
+  IconStyle,
+  RegShapeStyle,
+  StyleFunc
+} = VueLayers
 
-const flatComponents = {
-  ...omit(keys, components),
-  ...keys.reduce((all, key) => merge(all, components[ key ]), {})
-}
+export default VueLayers
 
-export default {
-  PKG_NAME: PKG_FULLNAME,
-  VERSION: PKG_VERSION,
-  ...flatComponents,
-  install (Vue) {
-    Object.keys(flatComponents).forEach(key => {
-      if (flatComponents[ key ].install) {
-        Vue.use(flatComponents[ key ])
-      }
-    })
-  }
+export {
+  // common
+  Map,
+  View,
+  Feature,
+  Geoloc,
+  // geoms
+  PointGeom,
+  LineStringGeom,
+  PolygonGeom,
+  MultiPointGeom,
+  MultiLineStringGeom,
+  MultiPolygonGeom,
+  // interactions
+  SelectInteraction,
+  // layers
+  VectorLayer,
+  TileLayer,
+  // sources
+  VectorSource,
+  XyzSource,
+  OsmSource,
+  MapboxSource,
+  WmsSource,
+  WmtsSource,
+  // style
+  StyleContainer,
+  FillStyle,
+  StrokeStyle,
+  CircleStyle,
+  IconStyle,
+  RegShapeStyle,
+  StyleFunc
 }

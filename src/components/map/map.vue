@@ -7,15 +7,14 @@
 
 <script>
   import Map from 'ol/map'
-  import { constant } from 'lodash/fp'
-  import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/operator/map'
-  import 'vl-rx/from-ol-event'
-  import plainProps from 'vl-utils/plain-props'
-  import { toLonLat } from 'vl-ol/coordinate'
-  import * as geoJson from 'vl-ol/geojson'
-  import rxSubs from 'vl-mixins/rx-subs'
+  import olControl from 'ol/control'
+  import { constant, pick } from 'lodash/fp'
+  import Observable from '../../rx-ext'
+  import plainProps from '../../utils/plain-props'
+  import { coordinateHelper, geoJson } from '../../ol-ext'
+  import rxSubs from '../../mixins/rx-subs'
 
+  const { toLonLat } = coordinateHelper
   const noop = () => {}
 
   const props = {
@@ -37,6 +36,10 @@
     tabIndex: {
       type: Number,
       default: 0
+    },
+    defControls: {
+      type: Boolean,
+      default: true
     }
   }
 
@@ -132,15 +135,16 @@
    * @return {Map}
    */
   function createMap () {
+    // todo disable all default interaction and controls and use custom if defined, wrap all
+    // todo render vl-view if not added by external code
     /**
      * @type {Map}
      * @protected
      */
     this.map = new Map({
       layers: [],
-      // todo disable all default interaction and controls and use custom if defined, wrap all
 //      interactions: [],
-//      controls: [],
+      controls: this.defControls ? olControl.defaults() : [],
       loadTilesWhileAnimating: this.loadTilesWhileAnimating,
       loadTilesWhileInteracting: this.loadTilesWhileInteracting,
       pixelRatio: this.pixelRatio,
@@ -157,7 +161,7 @@
     const pointerEvents = Observable.fromOlEvent(
       this.map,
       [ 'click', 'dblclick', 'singleclick' ],
-      ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
+      evt => pick(['type', 'pixel', 'coordinate'], evt)
     ).map(evt => ({
       ...evt,
       coordinate: toLonLat(evt.coordinate, this.map.getView().getProjection())
@@ -169,7 +173,7 @@
 
 <style lang="scss" rel="stylesheet/scss">
   @import "../../styles/mixins";
-  @import "~ol/ol.css";
+  @import "~ol/ol";
 
   .vl-map, .vl-map .map {
     @include vl-wh(100%, 100%);

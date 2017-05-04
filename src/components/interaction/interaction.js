@@ -1,5 +1,5 @@
-import rxSubs from 'vl-mixins/rx-subs'
-import stubVNode from 'vl-mixins/stub-vnode'
+import rxSubs from '../../mixins/rx-subs'
+import stubVNode from '../../mixins/stub-vnode'
 
 const props = {}
 

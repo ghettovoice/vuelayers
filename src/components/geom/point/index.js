@@ -1,7 +1,7 @@
-import GeomPoint from './geom.vue'
+import Point from './geom.vue'
 
-GeomPoint.install = function (Vue) {
-  Vue.component(GeomPoint.name, GeomPoint)
+Point.install = function (Vue) {
+  Vue.component(Point.name, Point)
 }
 
-export default GeomPoint
+export default Point

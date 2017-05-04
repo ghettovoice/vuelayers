@@ -1,7 +1,7 @@
-import GeomPolygon from './geom.vue'
+import Polygon from './geom.vue'
 
-GeomPolygon.install = function (Vue) {
-  Vue.component(GeomPolygon.name, GeomPolygon)
+Polygon.install = function (Vue) {
+  Vue.component(Polygon.name, Polygon)
 }
 
-export default GeomPolygon
+export default Polygon

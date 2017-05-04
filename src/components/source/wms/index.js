@@ -1,7 +1,7 @@
-import SourceWMS from './source.vue'
+import WMS from './source.vue'
 
-SourceWMS.install = function (Vue) {
-  Vue.component(SourceWMS.name, SourceWMS)
+WMS.install = function (Vue) {
+  Vue.component(WMS.name, WMS)
 }
 
-export default SourceWMS
+export default WMS

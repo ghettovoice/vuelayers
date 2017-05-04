@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import VueLayers from '../src'
-import App from './app'
+import App from './app.vue'
 
 Vue.use(VueLayers)
+console.log(VueLayers)
 
 /* eslint-disable no-new */
 new Vue({

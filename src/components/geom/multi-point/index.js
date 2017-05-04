@@ -1,7 +1,7 @@
-import GeomMultiPoint from './geom.vue'
+import MultiPoint from './geom.vue'
 
-GeomMultiPoint.install = function (Vue) {
-  Vue.component(GeomMultiPoint.name, GeomMultiPoint)
+MultiPoint.install = function (Vue) {
+  Vue.component(MultiPoint.name, MultiPoint)
 }
 
-export default GeomMultiPoint
+export default MultiPoint

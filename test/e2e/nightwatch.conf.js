@@ -1,5 +1,5 @@
 require('babel-register')
-const config = require('../../config')
+const config = require('../../build/config')
 
 // http://nightwatchjs.org/guide#settings-file
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
       selenium_host: 'localhost',
       silent: true,
       globals: {
-        devServerURL: 'http://localhost:' + (process.env.PORT || config.dev.port)
+        devServerURL: 'http://localhost:' + (process.env.PORT || config.port)
       },
       desiredCapabilities: {
         browserName: 'firefox',
