@@ -1,5 +1,4 @@
-// This is webpack config for HMR running docs
-const path = require('path')
+// This is webpack config for hot mode
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -8,23 +7,21 @@ const utils = require('./utils')
 const config = require('./config')
 const baseWebpackConfig = require('./webpack.base.conf')
 
-baseWebpackConfig.entry = {
-  app: path.resolve(__dirname, '../docs/src/main.js')
-}
-// add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function (name) {
-  baseWebpackConfig.entry[ name ] = [ './build/dev-client' ].concat(baseWebpackConfig.entry[ name ])
-})
-
-module.exports = merge(baseWebpackConfig, {
-  output: {
-    path: path.resolve(__dirname, '../dist-docs')
-  },
-  module: {
-    rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
-  },
+const webpackConfig = merge(baseWebpackConfig, {
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: utils.vueLoaderConfig()
+      },
+      ...utils.styleLoaders({
+        sourceMap: true
+      })
+    ]
+  },
   plugins: [
     new webpack.DefinePlugin(Object.assign(config.replaces, {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
@@ -45,7 +42,7 @@ module.exports = merge(baseWebpackConfig, {
 webpackConfig.entry = {
   app: [
     './build/dev-client',
-    utils.resolve('docs/main.js')
+    utils.resolve('docs/src/main.js')
   ]
 }
 

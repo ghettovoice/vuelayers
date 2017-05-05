@@ -1,5 +1,4 @@
-// This the Webpack config for building docs prod
-const path = require('path')
+// This the Webpack config for running e2e tests
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -10,17 +9,15 @@ const utils = require('./utils')
 const config = require('./config')
 const baseWebpackConfig = require('./webpack.base.conf')
 
-const env = config.build.env
-
-baseWebpackConfig.entry = {
-  app: path.resolve(__dirname, '../docs/src/main.js')
-}
+const isProduction = process.env.NODE_ENV === 'production'
+const publicPath = ''
 
 const webpackConfig = merge(baseWebpackConfig, {
   output: {
     path: utils.resolve('dist-docs'),
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
-    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
+    chunkFilename: utils.assetsPath('js/[id].[chunkhash].js'),
+    publicPath
   },
   module: {
     rules: [
@@ -38,7 +35,8 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin(Object.assign(config.replaces, {
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+      BASE_URL: `'${publicPath}'`
     })),
     ...( isProduction ? [ new webpack.optimize.UglifyJsPlugin({
       mangle: true,
@@ -101,7 +99,7 @@ const webpackConfig = merge(baseWebpackConfig, {
 })
 
 webpackConfig.entry = {
-  app: utils.resolve('docs/main.js')
+  app: utils.resolve('docs/src/main.js')
 }
 
 module.exports = (env = {}) => {

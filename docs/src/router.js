@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import * as pages from './pages'
 
 Vue.use(VueRouter)
-console.log(pages)
+
 const routes = [ {
   path: '/',
   component: pages.Home,
@@ -21,6 +21,5 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  console.log(to, from)
   next()
 })

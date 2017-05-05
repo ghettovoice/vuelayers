@@ -33,7 +33,8 @@ module.exports = {
   replaces: {
     PKG_NAME: `'${packageJson.name}'`,
     PKG_FULLNAME: `'${packageJson.fullname}'`,
-    PKG_VERSION: `'${packageJson.version}'`
+    PKG_VERSION: `'${packageJson.version}'`,
+    BASE_URL: "'/'"
   },
   autoOpenBrowser: true
 }
