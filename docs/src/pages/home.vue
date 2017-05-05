@@ -1,16 +1,27 @@
 <template>
-  <div>Home page</div>
+  <section id="page">
+    <h1 class="title">{{ pageTitle }}</h1>
+    <h2 class="subtitle">{{ subTitle }}</h2>
+    <hr>
+  </section>
 </template>
 
 <script>
-  import packageJson from '../../../package.json'
+  /* global PKG_FULLNAME, PKG_DESCRIPTION */
+  import { constant } from 'lodash/fp'
+
+  const computed = {
+    pageTitle: constant(PKG_FULLNAME),
+    subTitle: constant(PKG_DESCRIPTION)
+  }
 
   export default {
     name: 'home',
     meta: {
       title: 'Home',
-      description: `${packageJson.description}`
-    }
+      description: PKG_DESCRIPTION
+    },
+    computed
   }
 </script>
 
