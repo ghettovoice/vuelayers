@@ -4,7 +4,7 @@ import * as pages from './pages'
 
 Vue.use(VueRouter)
 
-const routes = [ {
+export const routes = [ {
   path: '/',
   component: pages.Home,
   meta: pages.Home.meta

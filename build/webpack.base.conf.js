@@ -74,6 +74,10 @@ module.exports = {
       {
         test: /\.html/,
         loader: 'text-loader'
+      },
+      {
+        test: /\.ya?ml/,
+        loader: 'json-loader!yaml-loader'
       }
     ],
     noParse: [ /openlayers/ ]

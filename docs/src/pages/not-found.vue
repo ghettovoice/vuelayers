@@ -13,7 +13,7 @@
   }
 
   export default {
-    name: 'not-found',
+    name: 'page-not-found',
     meta: {
       title: '404 Not Found'
     },

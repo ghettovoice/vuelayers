@@ -34,6 +34,7 @@ module.exports = {
     PKG_NAME: `'${packageJson.name}'`,
     PKG_FULLNAME: `'${packageJson.fullname}'`,
     PKG_DESCRIPTION: `'${packageJson.description}'`,
+    PKG_KEYWORDS: JSON.stringify(packageJson.keywords),
     PKG_VERSION: `'${packageJson.version}'`,
     BASE_URL: "'/'"
   },

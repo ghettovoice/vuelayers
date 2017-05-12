@@ -3,26 +3,17 @@
     <header id="header">
       <nav class="nav">
         <div class="nav-left">
-          <router-link to="/" exact-active-class="is-active" exact class="nav-item">
-            {{ pkgName }}@{{ pkgVersion }}
-          </router-link>
-
-          <router-link to="/" exact-active-class="is-active" exact class="nav-item is-tab is-active">
-            Home
-          </router-link>
-
-          <router-link to="/usage" exact-active-class="is-active" class="nav-item is-tab">
-            Usage
-          </router-link>
+          render dynamically from routes
         </div>
         <div class="nav-center"></div>
         <div class="nav-right"></div>
       </nav>
     </header>
 
-    <section id="content" class="section">
+    <main id="content">
       <div class="columns">
         <div class="column is-2">
+          render dynamically from routes
           <aside class="menu">
             <p class="menu-label">Components</p>
             <ul class="menu-list">
@@ -36,7 +27,7 @@
           <router-view></router-view>
         </div>
       </div>
-    </section>
+    </main>
 
     <footer id="footer" class="footer">
 
