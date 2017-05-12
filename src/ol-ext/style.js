@@ -171,7 +171,7 @@ export function style (vlStyle) {
 
 const addPrefix = prefix => str => prefix + (prefix ? upperFirst(str) : str)
 
-export function normalizeColorValue (color) {
+export function normalizeColor (color) {
   let c = color
 
   if (typeof color === 'string') {
@@ -201,7 +201,7 @@ export function fill (vlStyle, prefix = '') {
         name = lowerFirst(name.replace(new RegExp(prefixKey('fill')), ''))
 
         if (name === 'color') {
-          value = normalizeColorValue(value)
+          value = normalizeColor(value)
         }
 
         result[ name ] = value
@@ -248,7 +248,7 @@ export function stroke (vlStyle, prefix = '') {
         }
 
         if (name === 'color') {
-          value = normalizeColorValue(value)
+          value = normalizeColor(value)
         }
 
         result[ name ] = value

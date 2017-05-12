@@ -17,8 +17,8 @@
       </vl-interaction-select>
       <!--// interactions -->
 
-      <vl-layer-tile id="mapbox">
-        <vl-source-osm/>
+      <vl-layer-tile>
+        <vl-source-sputnik/>
       </vl-layer-tile>
       <!--// base layers -->
 

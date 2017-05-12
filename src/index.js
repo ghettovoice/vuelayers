@@ -31,6 +31,7 @@ const {
   XyzSource,
   OsmSource,
   MapboxSource,
+  SputnikSource,
   WmsSource,
   WmtsSource,
   // style
@@ -68,6 +69,7 @@ export {
   XyzSource,
   OsmSource,
   MapboxSource,
+  SputnikSource,
   WmsSource,
   WmtsSource,
   // style

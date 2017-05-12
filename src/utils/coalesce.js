@@ -4,5 +4,5 @@
  * @return {*}
  */
 export default function coalesce (...args) {
-  return args.find(val => val != null)
+  return args.filter(val => val != null).shift()
 }

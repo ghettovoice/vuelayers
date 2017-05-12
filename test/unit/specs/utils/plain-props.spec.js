@@ -1,6 +1,8 @@
+/* global describe, it, expect */
 import plainProps from '../../../../src/utils/plain-props'
 
-describe('plain-props', () => {
+/** @test plainProps */
+describe('plainProps', () => {
   it('should clean the object from non-plain values', () => {
     const obj = {
       num: 123,
