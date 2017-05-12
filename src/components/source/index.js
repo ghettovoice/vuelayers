@@ -4,6 +4,7 @@ import VectorSource from './vector'
 import XyzSource from './xyz'
 import OsmSource from './osm'
 import MapboxSource from './mapbox'
+import SputnikSource from './sputnik'
 import WmsSource from './wms'
 import WmtsSource from './wmts'
 
@@ -17,7 +18,8 @@ export {
   OsmSource,
   MapboxSource,
   WmsSource,
-  WmtsSource
+  WmtsSource,
+  SputnikSource
 }
 export default {
   // mixins
@@ -29,5 +31,6 @@ export default {
   OsmSource,
   MapboxSource,
   WmsSource,
-  WmtsSource
+  WmtsSource,
+  SputnikSource
 }
