@@ -1,26 +1,24 @@
 <template>
-  <section id="page">
-    <h1 class="title">{{ pageTitle }}</h1>
-    <h2 class="subtitle">{{ subTitle }}</h2>
-    <hr>
-  </section>
+  <div class="page home">
+    map to background, content on front of map
+    VueLayers.js - Components ...
+    Based on VueJs and OpenLayers
+    <vl-map :def-controls="false">
+      <vl-view :zoom="2"/>
+
+      <vl-layer-tile>
+        <vl-source-sputnik/>
+      </vl-layer-tile>
+    </vl-map>
+  </div>
 </template>
 
 <script>
-  /* global PKG_FULLNAME, PKG_DESCRIPTION */
-  import { constant } from 'lodash/fp'
-
   const computed = {
-    pageTitle: constant(PKG_FULLNAME),
-    subTitle: constant(PKG_DESCRIPTION)
   }
 
   export default {
-    name: 'home',
-    meta: {
-      title: 'Home',
-      description: PKG_DESCRIPTION
-    },
+    name: 'page-home',
     computed
   }
 </script>

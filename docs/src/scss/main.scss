@@ -2,3 +2,27 @@
 // Import Bulma and Buefy styles
 @import "~bulma";
 @import "~buefy/src/scss/buefy";
+
+// Nav
+.nav-item {
+  &.is-primary {
+    //color : $nav-item-primary-color;
+  }
+}
+
+.nav-right {
+  @include desktop() {
+    .nav-item:last-child {
+      padding-right : 0;
+    }
+  }
+}
+
+// Menu
+.menu {
+  padding : 1rem .75rem;
+
+  @include desktop() {
+    padding : 1rem 0;
+  }
+}

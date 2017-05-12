@@ -109,6 +109,7 @@
     "gh-pages": "^1.0.0",
     "glob": "^7.1.1",
     "highlight.js": "^9.11.0",
+    "html-loader": "^0.4.5",
     "html-webpack-plugin": "^2.28.0",
     "js-yaml": "^3.8.4",
     "json-loader": "^0.5.4",
@@ -122,8 +123,8 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.3",
-    "lodash": "^4.17.4",
     "magic-string": "^0.19.1",
+    "markdown-loader": "^2.0.0",
     "mocha": "^3.3.0",
     "nightwatch": "^0.9.15",
     "node-notifier": "^5.1.2",
@@ -162,6 +163,7 @@
     "webpack-node-externals": "^1.6.0",
     "webpack-notifier": "^1.5.0",
     "whatwg-fetch": "^2.0.3",
+    "yaml-loader": "^0.4.0",
     "yargs": "^8.0.1"
   },
   "engines": {

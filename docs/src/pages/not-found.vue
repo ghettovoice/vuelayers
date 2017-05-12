@@ -1,22 +1,13 @@
 <template>
-  <section id="page" class="section">
-    <h1 class="title">{{ pageTitle }}</h1>
-    <hr>
-  </section>
+  <section></section>
 </template>
 
 <script>
-  import { constant } from 'lodash/fp'
-
   const computed = {
-    pageTitle: constant('404 Not Found')
   }
 
   export default {
-    name: 'not-found',
-    meta: {
-      title: '404 Not Found'
-    },
+    name: 'page-not-found',
     computed
   }
 </script>
