@@ -14,11 +14,21 @@
 </template>
 
 <script>
+  /* global PKG_FULLNAME, PKG_DESCRIPTION */
+  import { constant } from 'lodash/fp'
+  import common from './common.vue'
+
+  const props = {}
+
   const computed = {
+    currentTitle: constant(PKG_FULLNAME + '.js'),
+    currentSubtitle: constant(PKG_DESCRIPTION)
   }
 
   export default {
     name: 'page-home',
+    mixins: [ common ],
+    props,
     computed
   }
 </script>
