@@ -78,6 +78,21 @@ module.exports = {
       {
         test: /\.ya?ml/,
         loader: 'json-loader!yaml-loader'
+      },
+      {
+        test: /\.md/,
+        use: [
+          {
+            loader: 'html-loader'
+          },
+          {
+            loader: 'markdown-loader',
+            options: {
+              breaks: true,
+              smartypants: true
+            }
+          }
+        ]
       }
     ],
     noParse: [ /openlayers/ ]
