@@ -66,33 +66,6 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
-      },
-      {
-        test: /\.(geo)?json$/,
-        loader: 'json-loader'
-      },
-      {
-        test: /\.html/,
-        loader: 'text-loader'
-      },
-      {
-        test: /\.ya?ml/,
-        loader: 'json-loader!yaml-loader'
-      },
-      {
-        test: /\.md/,
-        use: [
-          {
-            loader: 'html-loader'
-          },
-          {
-            loader: 'markdown-loader',
-            options: {
-              breaks: true,
-              smartypants: true
-            }
-          }
-        ]
       }
     ],
     noParse: [ /openlayers/ ]

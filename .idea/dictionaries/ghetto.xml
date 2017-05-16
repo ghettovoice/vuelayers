@@ -12,6 +12,7 @@
       <w>eslint</w>
       <w>geolocchanged</w>
       <w>hashmap</w>
+      <w>hexo</w>
       <w>hidpi</w>
       <w>jsnext</w>
       <w>lodash</w>
@@ -27,6 +28,7 @@
       <w>reprojection</w>
       <w>singleclick</w>
       <w>uglify</w>
+      <w>unpkg</w>
       <w>viewchanged</w>
       <w>virt</w>
       <w>vnode</w>

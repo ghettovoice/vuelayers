@@ -1,0 +1,38 @@
+<% /* global theme, config, partial */ %>
+<footer id="footer" class="footer">
+  <div class="columns">
+    <div class="column">
+      <div class="content">
+        <p>
+          <b><%= theme.pkg.fullname %></b> by
+          <a href="<%= theme.pkg.author.homepage.url %>" title="<%= theme.pkg.author.homepage.name %>" target="_blank">
+            <%= theme.pkg.author.name %>
+          </a>
+        </p>
+        <p>
+          <small>
+            Licensed under
+            <a href="<%= theme.pkg.license.url %>" target="_blank" title="License text">
+              <%= theme.pkg.license.name %>
+            </a>
+          </small>
+          <br>
+          <small>
+            &copy; <a href="<%= theme.pkg.author.homepage.url %>" title="<%= theme.pkg.author.homepage.name %>"
+               target="_blank">
+              <%= theme.pkg.author.name %>
+            </a> <%= date(Date.now(), 'YYYY') %>
+          </small>
+        </p>
+      </div>
+    </div>
+    <div class="column has-text-right">
+      <a href="<%= theme.pkg.repo %>" target="_blank" title="View on GitHub" class="button">
+        <span class="icon">
+          <i class="fa fa-github"></i>
+        </span>
+        <span>GitHub</span>
+      </a>
+    </div>
+  </div>
+</footer>

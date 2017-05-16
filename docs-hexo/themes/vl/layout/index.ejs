@@ -1,0 +1,28 @@
+<%/* global config, theme, partial */%>
+<div class="page home">
+  map to background, content on front of map
+  VueLayers.js - Components ...
+  Based on VueJs and OpenLayers
+
+  <%- partial('partial/github-button', {
+    url: theme.pkg.repo,
+    size: 'large',
+    count: true,
+    label: `Star ${theme.pkg.author.user}/${theme.pkg.name} on GitHub`,
+    text: 'Start'
+  }) %>
+  <%- partial('partial/github-button', {
+    url: theme.pkg.download,
+    size: 'large',
+    label: `Download ${theme.pkg.author.user}/${theme.pkg.name} on GitHub`,
+    text: 'Download'
+  }) %>
+
+  <vl-map :def-controls="false">
+    <vl-view :zoom="2"/>
+
+    <vl-layer-tile>
+      <vl-source-sputnik/>
+    </vl-layer-tile>
+  </vl-map>
+</div>
