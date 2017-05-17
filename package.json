@@ -36,16 +36,11 @@
     "vuelayers",
     "vue",
     "vuejs",
-    "vue2",
-    "vuejs2",
-    "vue plugins",
     "vue components",
     "openlayers",
     "ol",
-    "openlayers 3",
-    "ol3",
-    "maps",
-    "mapping"
+    "web maps",
+    "vuejs maps"
   ],
   "license": "MIT",
   "bugs": {
