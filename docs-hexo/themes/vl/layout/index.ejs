@@ -1,28 +1,53 @@
 <%/* global config, theme, partial */%>
 <div class="page home">
+  <div id="map" inline>
+    <vl-map :def-controls="false">
+      <vl-view :zoom="2"></vl-view>
+
+      <vl-layer-tile>
+        <vl-source-sputnik></vl-source-sputnik>
+      </vl-layer-tile>
+    </vl-map>
+  </div>
+
+  <section class="section">
+    <h1 class="title"><%= page.title %></h1>
+    <h2 class="subtitle"><%= page.subtitle %></h2>
+
+    <div class="content">
+      <%- page.content %>
+    </div>
+
+    <div>
+      <a class="button is-success" href="<%= url_for('components') %>" title="Install / Usage guid">
+        Get started
+      </a>
+    </div>
+
+    <hr>
+
+    <div class="buttons">
+      <%- partial('partial/github-button', {
+        type: 'star',
+        user: theme.pkg.author.user,
+        repo: theme.pkg.name,
+        size: 'large',
+        count: true,
+        width: '120px',
+        height: '30px'
+      }) %>
+      <%- partial('partial/github-button', {
+        type: 'fork',
+        user: theme.pkg.author.user,
+        repo: theme.pkg.name,
+        count: true,
+        size: 'large',
+        width: '120px',
+        height: '30px'
+      }) %>
+    </div>
+  </section>
   map to background, content on front of map
   VueLayers.js - Components ...
   Based on VueJs and OpenLayers
-
-  <%- partial('partial/github-button', {
-    url: theme.pkg.repo,
-    size: 'large',
-    count: true,
-    label: `Star ${theme.pkg.author.user}/${theme.pkg.name} on GitHub`,
-    text: 'Start'
-  }) %>
-  <%- partial('partial/github-button', {
-    url: theme.pkg.download,
-    size: 'large',
-    label: `Download ${theme.pkg.author.user}/${theme.pkg.name} on GitHub`,
-    text: 'Download'
-  }) %>
-
-  <vl-map :def-controls="false">
-    <vl-view :zoom="2"/>
-
-    <vl-layer-tile>
-      <vl-source-sputnik/>
-    </vl-layer-tile>
-  </vl-map>
 </div>

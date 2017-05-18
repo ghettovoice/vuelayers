@@ -2,7 +2,7 @@
   "name": "vuelayers",
   "fullname": "VueLayers",
   "version": "0.6.2",
-  "description": "Vue.js components to work with OpenLayers",
+  "description": "Vue.js components for OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "dist/vuelayers.cjs.js",
   "module": "dist/vuelayers.es.js",

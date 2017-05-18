@@ -1,7 +1,7 @@
-<%
-var showCount = typeof count !== 'undefined' && count ? 'data-show-count="true"' : ''
-%>
-<a class="github-button" href="<%= url %>" data-size="<%= size %>" <%- showCount %>
-   aria-label="<%= label %>">
-  <%= text %>
-</a>
+<iframe
+  src="https://ghbtns.com/github-btn.html?user=<%= user %>&repo=<%= repo %>&type=<%= type %>&count=<%= String(!!count) %>&size=<%= size %>"
+  frameborder="0"
+  scrolling="0"
+  width="<%= width %>"
+  height="<%= height %>">
+</iframe>

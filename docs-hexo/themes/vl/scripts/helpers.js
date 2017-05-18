@@ -7,7 +7,7 @@ hexo.extend.helper.register('js', function (src, attrs = {}) {
   let scripts = Array.isArray(src) ? src : [ { src, attrs } ]
 
   return scripts.map(({ src, attrs }) => {
-    let attrsStr = _.reduce(attrs, function (str, name, value) {
+    let attrsStr = _.reduce(attrs, (str, value, name) => {
       if (_.isBoolean(value)) {
         str.push(name)
       } else {
