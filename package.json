@@ -20,9 +20,10 @@
     "travis": "npm run travis-test && npm run coveralls",
     "travis-test": "npm run unit && npm run e2e -- --env travis",
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls",
-    "docs-start": "cd docs-hexo && npm start",
-    "docs-build": "cd docs-hexo && rm -rf public && npm run build",
-    "docs-deploy": "cd docs-hexo && npm start"
+    "docs-start": "cd docs && npm start",
+    "docs-build": "cd docs && npm run build",
+    "docs-deploy": "cd docs && npm start",
+    "docs-clean": "cd docs && npm run clean"
   },
   "directories": {
     "lib": "dist",

@@ -10,16 +10,13 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/docs/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/modules/babel-plugin-merge-imports/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/dist-demo" />
-      <excludeFolder url="file://$MODULE_DIR$/docs-hexo/public" />
+      <excludeFolder url="file://$MODULE_DIR$/docs/public" />
       <excludeFolder url="file://$MODULE_DIR$/modules/babel-plugin-merge-imports/.idea" />
     </content>
-    <content url="file://$MODULE_DIR$/node_modules/openlayers" />
-    <content url="file://$MODULE_DIR$/node_modules/vue" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
