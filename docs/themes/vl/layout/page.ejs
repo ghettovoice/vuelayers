@@ -1,13 +1,11 @@
 <% /* global page */ %>
-<div class="page">
-  <section class="hero <%= page.heroCls || '' %>">
-    <div class="hero-body">
-      <h1 class="title"><%= page.title || '' %></h1>
-      <h2 class="subtitle"><%= page.subtitle || '' %></h2>
-    </div>
-  </section>
+<section class="hero <%= page.heroCls || '' %>">
+  <div class="hero-body">
+    <h1 class="title"><%= page.title || '' %></h1>
+    <h2 class="subtitle"><%= page.subtitle || '' %></h2>
+  </div>
+</section>
 
-  <section class="content">
-    <%- page.content %>
-  </section>
-</div>
+<section class="content">
+  <%- page.content %>
+</section>

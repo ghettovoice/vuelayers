@@ -1,20 +1,18 @@
-<%/* global config, theme */%>
-<header id="header">
-  <nav class="nav has-shadow">
-    <div class="container is-fluid">
-      <div class="nav-left">
-        <a href="<%= config.root %>" class="nav-item is-brand"><%= theme.pkg.fullname %>@<%= theme.pkg.version %></a>
-      </div>
-      <div class="nav-center">
-      </div>
-      <div class="nav-right">
-        <a href="<%= ghUrl(theme.pkg.author.user, theme.pkg.name) %>" target="_blank" title="View on GitHub"
-           class="nav-item">
-            <span class="icon is-medium">
-              <i class="fa fa-github"></i>
-            </span>
-        </a>
-      </div>
+<% /* global config, theme */ %>
+<nav class="nav has-shadow">
+  <div class="container is-fluid">
+    <div class="nav-left">
+      <a href="<%= config.root %>" class="nav-item is-brand"><%= theme.pkg.fullname %>@<%= theme.pkg.version %></a>
     </div>
-  </nav>
-</header>
+    <div class="nav-center">
+    </div>
+    <div class="nav-right">
+      <a href="<%= ghUrl(theme.pkg.author.user, theme.pkg.name) %>" target="_blank" title="View on GitHub"
+         class="nav-item">
+        <span class="icon is-medium">
+          <i class="fa fa-github"></i>
+        </span>
+      </a>
+    </div>
+  </div>
+</nav>

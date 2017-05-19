@@ -2,42 +2,9 @@
 @import "variables";
 // Import Bulma and Buefy styles
 @import "../../../../node_modules/bulma/bulma";
+@import "helpers";
+@import "base";
 @import "loader";
-
-html, body {
-  height   : 100%;
-  overflow : auto;
-}
-
-pre {
-  font-size : .8rem;
-
-  &.is-medium {
-    font-size : 1rem;
-  }
-
-  &.is-large {
-    font-size : 1.2rem;
-  }
-}
-
-.wh100 {
-  width  : 100%;
-  height : 100%;
-}
-
-.is-flex-column {
-  display   : flex;
-  flex-flow : column nowrap;
-}
-
-.is-flex-grow {
-  flex-grow : 1;
-}
-
-.is-relative {
-  position : relative;
-}
 
 // Page loader
 #page-loader {
@@ -64,6 +31,7 @@ pre {
   }
 }
 
+// header
 #header {
   position : absolute;
   z-index  : 100;
@@ -72,43 +40,18 @@ pre {
   top      : 0;
 }
 
-body {
-  > .container {
-    height  : 100%;
-    margin  : 0 !important;
-    padding : 50px 0 0 !important;
+// Sidebars
+.sidebar {
+}
 
-    > .columns {
-      margin : 0 !important;
+#left-sidebar {
+  // Menu
+  .menu {
+    padding : 1rem .75rem;
 
-      > .column {
-        padding : 0 !important;
-      }
+    @include desktop() {
+      padding : 1.25rem;
     }
-  }
-}
-
-// Nav
-.nav-item {
-  &.is-primary {
-    //color : $nav-item-primary-color;
-  }
-}
-
-.nav-right {
-  @include desktop() {
-    .nav-item:last-child {
-      padding-right : 0;
-    }
-  }
-}
-
-// Menu
-.menu {
-  padding : 1rem .75rem;
-
-  @include desktop() {
-    padding : 1.25rem;
   }
 }
 
@@ -117,4 +60,27 @@ body {
   position : relative;
 }
 
-@import "home";
+.page.is-home {
+  position : absolute;
+  top      : 0;
+  left     : 0;
+  right    : 0;
+  bottom   : 0;
+
+  #bg-map {
+    position : absolute;
+    top      : 0;
+    bottom   : 0;
+    left     : 0;
+    right    : 0;
+    z-index  : 0;
+  }
+
+  > .section {
+    position   : absolute;
+    top        : 50%;
+    left       : 50%;
+    transform  : translate3d(-50%, -50%, 0);
+    background : rgba(255, 255, 255, .6);
+  }
+}
