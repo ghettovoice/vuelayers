@@ -1,7 +1,11 @@
+/**
+ * @module components/geom/multi-line-string
+ */
 import MultiLineString from './geom.vue'
 
-MultiLineString.install = function (Vue) {
-  Vue.component(MultiLineString.name, MultiLineString)
+export default {
+  ...MultiLineString,
+  install (Vue) {
+    Vue.component(MultiLineString.name, MultiLineString)
+  }
 }
-
-export default MultiLineString

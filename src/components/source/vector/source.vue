@@ -4,72 +4,48 @@
   import { merge, differenceWith } from 'lodash/fp'
   import { consts, extentHelper, geoJson } from '../../../ol-ext'
   import source from '../source'
+  import { assertHasLayer, assertHasSource, assertHasView } from '../../../utils/assert'
 
   const { toLonLat: extentToLonLat } = extentHelper
-  const { LAYER_PROP } = consts
+  const { LAYER_PROP, DATA_PROJECTION } = consts
 
   const props = {
-    loader: Function,
-    useSpatialIndex: {
-      type: Boolean,
-      default: true
-    },
+    // for big datasets
     features: {
       type: Array,
       default: () => []
+    },
+    loader: Function,
+    projection: {
+      type: String,
+      default: DATA_PROJECTION
+    },
+    useSpatialIndex: {
+      type: Boolean,
+      default: true
     }
-    // todo implement options
+    // todo implement options (tiled loading strategy & etc)
     // format: String,
     // strategy: String
   }
 
-  const computed = {
-    currentLoader () {
-      return this.loader
-    },
-    currentFeatures () {
-      return this.features
-    }
-  }
-
-  const {
-    mountSource: sourceMountSource,
-    unmountSource: sourceUnmountSource
-  } = source.methods
-
   const methods = {
     /**
-     * @return {function|undefined}
+     * @return {void}
+     */
+    clear () {
+      assertHasSource(this)
+      this.source.clear()
+    },
+    // protected & private
+    /**
+     * @return {ol.source.Vector}
      * @protected
      */
-    sourceLoader () {
-      if (!this.currentLoader) return
-
-      const loader = this.currentLoader
-      const self = this
-
-      return async function __loader (extent, resolution, projection) {
-        projection = projection.getCode()
-        extent = extentToLonLat(extent, projection)
-
-        const features = await Promise.resolve(loader(extent, resolution, projection))
-
-        if (features && features.length) {
-          self.$nextTick(() => {
-            self.$emit('load', {
-              features,
-              extent,
-              resolution,
-              projection
-            })
-          })
-        }
-      }
-    },
     createSource () {
       return new VectorSource({
-        attributions: this.currentAttributions,
-        projection: this.currentProjection,
+        attributions: this.attributions,
+        projection: this.projection,
         loader: this.sourceLoader(),
         useSpatialIndex: this.useSpatialIndex,
         wrapX: this.wrapX,
@@ -78,28 +54,58 @@
         // url: this.url,
       })
     },
-    mountSource () {
-      this::sourceMountSource()
+    /**
+     * @return {function|undefined}
+     * @protected
+     */
+    sourceLoader () {
+      if (!this.loader) return
 
-      if (this.currentFeatures.length) {
-        this.source.addFeatures(this.currentFeatures.map(this::createFeature))
+      const loader = this.loader
+      const vm = this
+
+      return async function __loader (extent, resolution, projection) {
+        projection = projection.getCode()
+        extent = extentToLonLat(extent, projection)
+
+        const features = await Promise.resolve(loader(extent, resolution, projection))
+
+        if (features && features.length) {
+          vm.$emit('load', {
+            features,
+            extent,
+            resolution,
+            projection
+          })
+        }
       }
     },
-    unmountSource () {
-      this::sourceUnmountSource()
-      this.clear()
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      this::source.methods.mount()
+
+      if (this.features.length) {
+        this.source.addFeatures(this.features.map(this::createFeature))
+      }
     },
-    clear () {
-      this.source.clear()
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      this::source.methods.unmount()
+      this.clear()
     }
   }
 
   const diffById = differenceWith((a, b) => a.id === b.id)
   const watch = {
-    currentLoader () {
-      // todo
-    },
-    currentFeatures (value, oldValue) {
+    features (value, oldValue) {
+      assertHasSource(this)
+
       let forAdd = diffById(value, oldValue)
       let forRemove = diffById(oldValue, value)
 
@@ -117,9 +123,8 @@
 
   export default {
     name: 'vl-source-vector',
-    mixins: [ source ],
+    mixins: [source],
     props,
-    computed,
     methods,
     watch,
     stubVNode: {
@@ -132,11 +137,19 @@
     }
   }
 
+  /**
+   * @param {GeoJSONFeature} geoJsonFeature
+   * @return {ol.Feature}
+   */
   function createFeature (geoJsonFeature) {
+    assertHasSource(this)
+    assertHasView(this)
+    assertHasLayer(this)
+
     return geoJson.readFeature(merge(geoJsonFeature, {
       properties: {
-        [ LAYER_PROP ]: this.layer.get('id')
+        [LAYER_PROP]: this.layer.get('id')
       }
-    }), this.currentProjection)
+    }), this.view.getProjection())
   }
 </script>

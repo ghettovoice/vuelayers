@@ -6,67 +6,60 @@
 </template>
 
 <script>
+  import { constant } from 'lodash/fp'
   import Map from 'ol/map'
   import olControl from 'ol/control'
-  import { constant, pick } from 'lodash/fp'
+  import { SERVICE_CONTAINER_KEY } from '../../consts'
   import Observable from '../../rx-ext'
+  import { coordHelper, geoJson } from '../../ol-ext'
+  import rxSubs from '../rx-subs'
+  import { assertHasMap, assertHasView } from '../../utils/assert'
   import plainProps from '../../utils/plain-props'
-  import { coordinateHelper, geoJson } from '../../ol-ext'
-  import rxSubs from '../../mixins/rx-subs'
 
-  const { toLonLat } = coordinateHelper
-  const noop = () => {}
+  const { toLonLat } = coordHelper
 
   const props = {
-    loadTilesWhileAnimating: {
+    defControls: {
       type: Boolean,
-      default: false
+      default: true
     },
-    loadTilesWhileInteracting: {
-      type: Boolean,
-      default: false
-    },
+    keyboardEventTarget: [String, Element],
+    loadTilesWhileAnimating: Boolean,
+    loadTilesWhileInteracting: Boolean,
+    logo: [String, Object],
     pixelRatio: {
       type: Number,
       default: 1
     },
-    renderer: [ String, Array ],
-    logo: [ String, Object ],
-    keyboardEventTarget: [ String, Node ],
+    renderer: [String, Array],
     tabIndex: {
       type: Number,
       default: 0
-    },
-    defControls: {
-      type: Boolean,
-      default: true
     }
   }
 
   const methods = {
     /**
-     * Updates `ol.Map` view
-     */
-    refresh () {
-      this.map.updateSize()
-      this.map.render()
-    },
-    /**
      * Trigger focus on map container.
+     * @return {void}
      */
     focus () {
       this.$refs.map.focus()
     },
     /**
-     * @protected
+     * @param {number[]} pixel
+     * @param {function(feature: ol.Feature, layer: (ol.layer.Layer|undefined))} callback
+     * @param {Object} [opts]
+     * @return {T|undefined}
      */
-    subscribeAll () {
-      this::subscribeToMapEvents()
-    },
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
+      assertHasMap(this)
+
       const cb = (feature, layer) => {
+        assertHasView(this)
+
         return callback(
-          geoJson.writeFeature(feature),
+          geoJson.writeFeature(feature, this.view.getProjection()),
           layer && plainProps(layer.getProperties())
         )
       }
@@ -75,7 +68,15 @@
 
       return this.map.forEachFeatureAtPixel(pixel, cb, opts)
     },
-    forEachLayerAtPixel (pixel, callback, layerFilter = noop) {
+    /**
+     * @param {number[]} pixel
+     * @param {function(layer: ol.layer.Layer, rgba: (number[]|undefined))} callback
+     * @param {function(layer: ol.layer.Layer)} [layerFilter]
+     * @return {T|undefined}
+     */
+    forEachLayerAtPixel (pixel, callback, layerFilter = () => {}) {
+      assertHasMap(this)
+
       const cb = (layer, rgba) => {
         return callback(
           plainProps(layer.getProperties()),
@@ -86,62 +87,74 @@
 
       return this.map.forEachLayerAtPixel(pixel, cb, undefined, lf)
     },
+    /**
+     * @param {number[]} pixel
+     * @return {number[]} Coordinates in EPSG:4326
+     */
     getCoordinateFromPixel (pixel) {
-      return toLonLat(this.map.getCoordinateFromPixel(pixel), this.map.getView().getProjection())
+      assertHasMap(this)
+
+      return toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.getProjection())
     },
-    mountMap () {
-      this.map.setTarget(this.$refs.map)
-      this.refresh()
-      this.subscribeAll()
+    /**
+     * Triggers map re-render.
+     * @return {void}
+     */
+    refresh () {
+      assertHasMap(this)
+
+      this.map.updateSize()
+      this.map.render()
     },
-    unmountMap () {
-      this.unsubscribeAll()
-      this.map.setTarget(undefined)
+    // protected & private
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToMapEvents()
     }
   }
 
   export default {
     name: 'vl-map',
-    mixins: [ rxSubs ],
+    mixins: [rxSubs],
     props,
     methods,
     provide () {
-      return Object.defineProperties(Object.create(null), {
-        map: {
-          enumerable: true,
-          get: () => this.map
-        },
-        view: {
-          enumerable: true,
-          get: () => this.map.getView()
+      const vm = this
+
+      return {
+        [SERVICE_CONTAINER_KEY]: {
+          get map () { return vm.map },
+          get view () { return vm.view }
         }
-      })
+      }
     },
     created () {
-      this::createMap()
+      this::initialize()
     },
     mounted () {
-      this.$nextTick(this.mountMap)
+      this::mount()
+      this.$nextTick(this.refresh)
     },
     destroyed () {
-      this.$nextTick(() => {
-        this.unmountMap()
-        this.map = undefined
-      })
+      this::unmount()
+      this._map = undefined
     }
   }
 
   /**
-   * @return {Map}
+   * @return {void}
+   * @private
    */
-  function createMap () {
+  function initialize () {
     // todo disable all default interaction and controls and use custom if defined, wrap all
-    // todo render vl-view if not added by external code
     /**
-     * @type {Map}
-     * @protected
+     * @type {ol.Map}
+     * @private
      */
-    this.map = new Map({
+    this._map = new Map({
       layers: [],
 //      interactions: [],
       controls: this.defControls ? olControl.defaults() : [],
@@ -152,26 +165,87 @@
       logo: this.logo,
       keyboardEventTarget: this.keyboardEventTarget
     })
-    this.map.set('vm', this)
-
-    return this.map
+    this._map.set('vm', this)
+    this::defineAccessors()
   }
 
-  function subscribeToMapEvents () {
-    const pointerEvents = Observable.fromOlEvent(
-      this.map,
-      [ 'click', 'dblclick', 'singleclick' ],
-      evt => pick(['type', 'pixel', 'coordinate'], evt)
-    ).map(evt => ({
-      ...evt,
-      coordinate: toLonLat(evt.coordinate, this.map.getView().getProjection())
-    }))
+  /**
+   * @return {void}
+   * @private
+   */
+  function defineAccessors () {
+    Object.defineProperties(this, {
+      map: {
+        enumerable: true,
+        get: () => this._map
+      },
+      view: {
+        enumerable: true,
+        get: () => this._map.getView()
+      }
+    })
+  }
 
-    this.subscribeTo(pointerEvents, evt => this.$emit(evt.type, evt))
+  /**
+   * @return {void}
+   * @private
+   */
+  function mount () {
+    assertHasMap(this)
+
+    this.map.setTarget(this.$refs.map)
+    this.subscribeAll()
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function unmount () {
+    assertHasMap(this)
+
+    this.unsubscribeAll()
+    this.map.setTarget(undefined)
+  }
+
+  /**
+   * Subscribe to OL map events.
+   * @return {void}
+   * @private
+   */
+  function subscribeToMapEvents () {
+    assertHasMap(this)
+
+    const pointerEvents = Observable.fromOlEvent(this.map, [
+      'click',
+      'dblclick',
+      'singleclick',
+      'pointerdrag',
+      'pointermove'
+    ]).map(evt => ({
+      ...evt,
+      coordinate: toLonLat(evt.coordinate, this.view.getProjection())
+    }))
+    const mapEvents = Observable.fromOlEvent(this.map, [
+      'postrender',
+      'moveend'
+    ])
+    const renderEvents = Observable.fromOlEvent(this.map, [
+      'precompose',
+      'postcompose'
+    ])
+
+    const events = Observable.merge(
+      pointerEvents,
+      mapEvents,
+      renderEvents
+    )
+
+    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
+<style lang="scss">
   @import "../../styles/mixins";
   @import "~ol/ol";
 

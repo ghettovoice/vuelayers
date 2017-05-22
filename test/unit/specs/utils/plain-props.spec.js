@@ -3,6 +3,8 @@ import plainProps from '../../../../src/utils/plain-props'
 
 /** @test plainProps */
 describe('plainProps', () => {
+  function Ctor () {}
+
   it('should clean the object from non-plain values', () => {
     const obj = {
       num: 123,
@@ -20,5 +22,3 @@ describe('plainProps', () => {
     expect(plainProps(obj)).to.be.deep.equal(expected)
   })
 })
-
-function Ctor () {}

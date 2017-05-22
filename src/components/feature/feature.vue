@@ -1,21 +1,21 @@
 <script type="text/babel">
-  /**
-   * Wrapper around ol.Feature.
-   */
   import uuid from 'uuid/v4'
+  import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import Observable from '../../rx-ext'
-  import rxSubs from '../../mixins/rx-subs'
-  import stubVNode from '../../mixins/stub-vnode'
+  import rxSubs from '../rx-subs'
+  import stubVNode from '../stub-vnode'
   import plainProps from '../../utils/plain-props'
   import styleTarget from '../style-target'
-  import { consts, coordinateHelper, geoJson } from '../../ol-ext'
+  import { consts, coordHelper, geoJson } from '../../ol-ext'
+  import { assertHasFeature, assertHasMap, assertHasView, assertHasLayer, assertHasSource } from '../../utils/assert'
+  import { SERVICE_CONTAINER_KEY } from '../../consts'
 
   const { LAYER_PROP } = consts
-  const { toLonLat } = coordinateHelper
+  const { toLonLat } = coordHelper
 
   const props = {
     id: {
-      type: [ String, Number ],
+      type: [String, Number],
       default: () => uuid()
     },
     properties: {
@@ -25,116 +25,203 @@
   }
 
   const methods = {
+    /**
+     * @returns {ol.Feature|undefined}
+     */
+    getFeature () {
+      return this._feature
+    },
+    /**
+     * @param {number} pixel
+     * @return {boolean}
+     */
+    isAtPixel (pixel) {
+      assertHasFeature(this)
+      assertHasMap(this)
+
+      const cb = feature => feature === this.feature
+      const layerFilter = layer => layer === this.layer
+
+      return this.map.forEachFeatureAtPixel(pixel, cb, { layerFilter })
+    },
+    /**
+     * @return {void}
+     */
     refresh () {
+      assertHasFeature(this)
       this.feature.changed()
     },
-    styleTarget () {
+    // protected & private
+    /**
+     * @return {ol.Feature}
+     * @protected
+     */
+    getStyleTarget () {
       return this.feature
     },
-    mountFeature () {
-      if (!this.source) {
-        throw new Error("Invalid usage of feature component, should have source component among it's ancestors")
-      }
-
-      this.source.addFeature(this.feature)
-      this.feature.set(LAYER_PROP, this.layer.get('id'))
-      this.subscribeAll()
-    },
-    unmountFeature () {
-      this.unsubscribeAll()
-      if (this.source && this.source.getFeatureById(this.id)) {
-        this.source.removeFeature(this.feature)
-        this.feature.unset(LAYER_PROP)
-      }
-    },
+    /**
+     * @return {void}
+     * @protected
+     */
     subscribeAll () {
       this::subscribeToMapEvents()
-    },
-    isAtPixel (pixel) {
-      return this.map.forEachFeatureAtPixel(
-        pixel,
-        feature => feature === this.feature,
-        {
-          layerFilter: layer => layer === this.layer
-        }
-      )
     }
   }
 
   const watch = {
+    /**
+     * @param {string|number} value
+     */
     id (value) {
+      assertHasFeature(this)
       this.feature.setId(value)
     },
+    /**
+     * @param {Object} value
+     */
     properties (value) {
+      assertHasFeature(this)
       this.feature.setProperties(plainProps(value))
     }
   }
 
-  const { provide: styleTargetProvide } = styleTarget
-
   export default {
     name: 'vl-feature',
-    mixins: [ rxSubs, stubVNode, styleTarget ],
-    inject: [ 'map', 'view', 'layer', 'source' ],
+    mixins: [rxSubs, stubVNode, styleTarget],
     props,
     methods,
     watch,
     stubVNode: {
       attrs () {
         return {
-          id: [ this.$options.name, this.id ].join('-')
+          id: [this.$options.name, this.id].join('-')
         }
       }
     },
+    inject: {
+      serviceContainer: SERVICE_CONTAINER_KEY
+    },
+    /**
+     * @returns {Object}
+     */
     provide () {
-      return Object.assign(
-        Object.defineProperties(Object.create(null), {
-          feature: {
-            enumerable: true,
-            get: () => this.feature
+      const vm = this
+
+      return {
+        [SERVICE_CONTAINER_KEY]: mergeDescriptors(
+          {},
+          this::styleTarget.provide()[SERVICE_CONTAINER_KEY],
+          {
+            get feature () { return vm.feature },
+            get source () { return vm.source },
+            get layer () { return vm.layer },
+            get view () { return vm.view },
+            get map () { return vm.map }
           }
-        }),
-        this::styleTargetProvide()
-      )
+        )
+      }
     },
     created () {
-      this::createFeature()
+      this::initialize()
     },
     mounted () {
-      this.$nextTick(this.mountFeature)
+      this::mount()
     },
     destroyed () {
-      this.$nextTick(() => {
-        this.unmountFeature()
-        this.feature = undefined
-      })
+      this::unmount()
+      this._feature = undefined
     }
   }
 
   /**
    * Create feature without inner style applying, feature level style
    * will be applied in the layer level style function.
-   *
-   * @return {ol.Feature}
+   * @return {void}
+   * @private
    */
-  function createFeature () {
+  function initialize () {
     /**
      * @type {ol.Feature}
-     * @protected
+     * @private
      */
-    this.feature = geoJson.readFeature({
+    this._feature = geoJson.readFeature({
       id: this.id,
       properties: this.properties
     }, this.view.getProjection())
-    this.feature.set('vm', this)
-
-    return this.feature
+    this._feature.set('vm', this)
+    this::defineAccessors()
   }
 
+  /**
+   * @return {void}
+   * @private
+   */
+  function defineAccessors () {
+    Object.defineProperties(this, {
+      feature: {
+        enumerable: true,
+        get: this.getFeature
+      },
+      source: {
+        enumerable: true,
+        get: () => this.serviceContainer.source
+      },
+      layer: {
+        enumerable: true,
+        get: () => this.serviceContainer.layer
+      },
+      view: {
+        enumerable: true,
+        get: () => this.serviceContainer.view
+      },
+      map: {
+        enumerable: true,
+        get: () => this.serviceContainer.map
+      }
+    })
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function mount () {
+    assertHasFeature(this)
+    assertHasSource(this)
+    assertHasLayer(this)
+
+    this.source.addFeature(this.feature)
+    this.feature.set(LAYER_PROP, this.layer.get('id'))
+    this.subscribeAll()
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function unmount () {
+    assertHasFeature(this)
+    assertHasSource(this)
+
+    this.unsubscribeAll()
+
+    if (this.source.getFeatureById(this.id)) {
+      this.source.removeFeature(this.feature)
+      this.feature.unset(LAYER_PROP)
+    }
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
   function subscribeToMapEvents () {
+    assertHasMap(this)
+    assertHasView(this)
+
     const pointerEvents = Observable.fromOlEvent(
       this.map,
-      [ 'click', 'dblclick', 'singleclick' ],
+      ['click', 'dblclick', 'singleclick'],
       ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
     ).map(evt => ({
       ...evt,

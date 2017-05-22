@@ -3,20 +3,12 @@
   import { consts } from '../../../ol-ext'
   import xyzSource from '../xyz/source.vue'
 
-  const { TILE_SIZE, MAP_PROJECTION } = consts
+  const { TILE_FORMAT, MAP_PROJECTION } = consts
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
 
   const props = {
-    url: {
-      type: String,
-      default: MAPBOX_URL_TEMPLATE
-    },
     accessToken: {
-      type: String,
-      required: true
-    },
-    mapId: {
       type: String,
       required: true
     },
@@ -24,32 +16,42 @@
       type: String,
       default: MAPBOX_ATTRIBUTIONS
     },
+    mapId: {
+      type: String,
+      required: true
+    },
+    projection: {
+      type: String,
+      default: MAP_PROJECTION
+    },
     tileFormat: {
       type: String,
-      default: 'png'
+      default: TILE_FORMAT
+    },
+    url: {
+      type: String,
+      default: MAPBOX_URL_TEMPLATE
     }
   }
 
   const computed = {
-    // bind to constant values: projection and tile size
-    currentProjection: () => MAP_PROJECTION,
-    currentTileSize: () => [ TILE_SIZE, TILE_SIZE ],
+    /**
+     * @type {string}
+     */
     tileNameSuffix () {
       return tileNameSuffix(this.tilePixelRatio)
     },
+    /**
+     * @type {string[]}
+     */
     urlTokens () {
-      return [
-        'mapId',
-        'accessToken',
-        'tileNameSuffix',
-        'tileFormat'
-      ]
+      return ['mapId', 'accessToken', 'tileNameSuffix', 'tileFormat']
     }
   }
 
   export default {
     name: 'vl-source-mapbox',
-    mixins: [ xyzSource ],
+    mixins: [xyzSource],
     props,
     computed
   }
@@ -73,6 +75,6 @@
   function tileNameSuffix (ratio) {
     ratio = tileRatio(ratio)
 
-    return ratio > 1 ? [ '@', ratio, 'x' ].join('') : ''
+    return ratio > 1 ? ['@', ratio, 'x'].join('') : ''
   }
 </script>

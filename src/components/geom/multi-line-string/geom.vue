@@ -1,4 +1,5 @@
 <script>
+  import { constant } from 'lodash/fp'
   import MultiLineString from 'ol/geom/multilinestring'
   import { consts } from '../../../ol-ext'
   import geom from '../geom'
@@ -14,10 +15,14 @@
   }
 
   const computed = {
-    type: () => GEOMETRY_TYPE.MULTI_LINE_STRING
+    type: constant(GEOMETRY_TYPE.MULTI_LINE_STRING)
   }
 
   const methods = {
+    /**
+     * @returns {ol.geom.MultiLineString}
+     * @protected
+     */
     createGeometry () {
       return new MultiLineString(this.fromLonLat(this.currentCoordinates))
     }
@@ -25,7 +30,7 @@
 
   export default {
     name: 'vl-geom-multi-line-string',
-    mixins: [ geom ],
+    mixins: [geom],
     props,
     computed,
     methods

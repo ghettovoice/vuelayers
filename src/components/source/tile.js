@@ -4,83 +4,95 @@ import TileGrid from 'ol/tilegrid/tilegrid'
 import { consts, tileGridHelper } from '../../ol-ext'
 import replaceTokens from '../../utils/replace-tokens'
 import source from './source'
+import { assertHasSource } from '../../utils/assert'
 
-const { CACHE_SIZE, PIXEL_RATIO, MIN_ZOOM, MAX_ZOOM, TILE_SIZE } = consts
-
+const {
+  CACHE_SIZE,
+  PIXEL_RATIO,
+  MIN_ZOOM,
+  MAX_ZOOM,
+  TILE_SIZE,
+  CROSS_ORIGIN,
+  REPROJ_ERR_THRESHOLD,
+  MAP_PROJECTION
+} = consts
+// todo extract tileGrid into separate component!
 const props = {
-  url: {
-    type: String,
-    required: true
-  },
-  tilePixelRatio: {
-    type: Number,
-    default: PIXEL_RATIO
-  },
-  crossOrigin: {
-    type: String,
-    default: 'anonymous'
-  },
   cacheSize: {
     type: Number,
     default: CACHE_SIZE
   },
-  opaque: Boolean,
-  reprojectionErrorThreshold: {
-    type: Number,
-    default: 0.5
+  crossOrigin: {
+    type: String,
+    default: CROSS_ORIGIN
   },
-  tileSize: {
-    type: Array,
-    default: () => [ TILE_SIZE, TILE_SIZE ],
-    validator: value => Array.isArray(value) && value.length === 2
-  },
-  minZoom: {
-    type: Number,
-    default: MIN_ZOOM
+  gridOpts: {
+    type: Object,
+    validator: value => isPlainObject(value) &&
+    Array.isArray(value.resolutions) &&
+    value.resolutions.length
   },
   maxZoom: {
     type: Number,
     default: MAX_ZOOM
   },
-  gridOpts: {
-    type: Object,
-    validator: value => isPlainObject(value) &&
-                        Array.isArray(value.resolutions) &&
-                        value.resolutions.length
+  minZoom: {
+    type: Number,
+    default: MIN_ZOOM
+  },
+  opaque: Boolean,
+  projection: {
+    type: String,
+    default: MAP_PROJECTION
+  },
+  reprojectionErrorThreshold: {
+    type: Number,
+    default: REPROJ_ERR_THRESHOLD
+  },
+  tilePixelRatio: {
+    type: Number,
+    default: PIXEL_RATIO
+  },
+  tileSize: {
+    type: Array,
+    default: () => [TILE_SIZE, TILE_SIZE],
+    validator: value => Array.isArray(value) && value.length === 2
+  },
+  url: {
+    type: String,
+    required: true
   }
 }
 
 const computed = {
-  currentUrl () {
+  /**
+   * @type {string}
+   */
+  urlTmpl () {
     return replaceTokens(this.url, pick(this.urlTokens, this))
   },
-  currentTilePixelRatio () {
-    return this.tilePixelRatio
+  /**
+   * @type {string[]}
+   */
+  urlTokens () { return [] },
+  /**
+   * @type {number[]|ol.Extent}
+   */
+  projectionExtent () {
+    return proj.get(this.projection).getExtent()
   },
-  urlTokens () {
-    return []
-  },
-  currentTileSize () {
-    return this.tileSize
-  },
-  currentMinZoom () {
-    return this.minZoom
-  },
-  currentMaxZoom () {
-    return this.maxZoom
-  },
-  currentProjectionExtent () {
-    return proj.get(this.currentProjection).getExtent()
-  },
-  currentGridOpts () {
+  /**
+   * @type {Object}
+   */
+  preparedGridOpts () {
     return {
       resolutions: tileGridHelper.resolutionsFromExtent(
-        this.currentProjectionExtent,
-        this.currentMaxZoom,
-        this.currentTileSize
+        this.projectionExtent,
+        this.maxZoom,
+        this.tileSize
       ),
-      minZoom: this.currentMinZoom,
-      extent: this.currentProjectionExtent,
+      minZoom: this.minZoom,
+      extent: this.projectionExtent,
       ...this.gridOpts
     }
   }
@@ -89,12 +101,20 @@ const computed = {
 const methods = {
   /**
    * @return {ol.tilegrid.TileGrid}
+   * @protected
    */
   createTileGrid () {
-    return new TileGrid(this.currentGridOpts)
+    return new TileGrid(this.preparedGridOpts)
   },
+  /**
+   * @protected
+   */
   initialize () {
-    if (this.currentGridOpts) {
+    if (this.preparedGridOpts) {
+      /**
+       * @type {ol.tilegrid.TileGrid}
+       * @protected
+       */
       this.tileGrid = this.createTileGrid()
     }
 
@@ -103,13 +123,14 @@ const methods = {
 }
 
 const watch = {
-  currentUrl () {
-    this.source.setUrl(this.currentUrl)
+  urlTmpl (value) {
+    assertHasSource(this)
+    this.source.setUrl(value)
   }
 }
 
 export default {
-  mixins: [ source ],
+  mixins: [source],
   props,
   computed,
   methods,

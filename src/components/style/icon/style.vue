@@ -13,7 +13,7 @@
     },
     anchor: {
       type: Array,
-      default: () => [ 0.5, 0.5 ]
+      default: () => [0.5, 0.5]
     },
     anchorOrigin: {
       type: String,
@@ -27,14 +27,14 @@
       type: String,
       default: 'fraction' // pixels, fraction
     },
-    color: [ Array, String ],
+    color: [Array, String],
     crossOrigin: {
       type: String,
       default: 'anonymous'
     },
     offset: {
       type: Array,
-      default: () => [ 0, 0 ]
+      default: () => [0, 0]
     },
     offsetOrigin: {
       type: String,
@@ -60,7 +60,7 @@
 
   const methods = {
     /**
-     * @return {Icon}
+     * @return {ol.style.Icon}
      * @protected
      */
     createStyle () {
@@ -86,22 +86,22 @@
   // todo other watchers
   const watch = {
     src () {
-      this.refresh()
+      this.deferRefresh()
     },
     size () {
-      this.refresh()
+      this.deferRefresh()
     },
     anchor () {
-      this.refresh()
+      this.deferRefresh()
     },
     scale () {
-      this.refresh()
+      this.deferRefresh()
     }
   }
 
   export default {
     name: 'vl-style-icon',
-    mixins: [ imageStyle ],
+    mixins: [imageStyle],
     props,
     methods,
     watch

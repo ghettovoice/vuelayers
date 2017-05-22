@@ -1,6 +1,7 @@
 <script>
   import Circle from 'ol/style/circle'
   import imageStyle from '../image'
+  import { SERVICE_CONTAINER_KEY } from '../../../consts'
 
   const props = {
     radius: {
@@ -11,7 +12,8 @@
 
   const methods = {
     /**
-     * @return {Circle}
+     * Partially initialize builder with currently available values.
+     * @return {ol.style.Circle}
      * @protected
      */
     createStyle () {
@@ -26,42 +28,35 @@
 
   const watch = {
     radius () {
-      this.refresh()
-    },
-    snapToPixel () {
-      this.refresh()
+      this.deferRefresh()
     }
   }
 
   export default {
     name: 'vl-style-circle',
-    mixins: [ imageStyle ],
+    mixins: [imageStyle],
     props,
     methods,
     watch,
     provide () {
+      const vm = this
+
       return {
-        setFill: this::setFill,
-        setStroke: this::setStroke
+        [SERVICE_CONTAINER_KEY]: {
+          get styleTarget () {
+            return {
+              setFill (fill) {
+                vm.fill = fill
+                vm.deferRefresh()
+              },
+              setStroke (stroke) {
+                vm.stroke = stroke
+                vm.deferRefresh()
+              }
+            }
+          }
+        }
       }
     }
-  }
-  // todo do not recreate if already create and has fill/stroke, use setters instead
-  function setFill (fill) {
-    /**
-     * @type {Fill}
-     * @private
-     */
-    this.fill = fill
-    this.refresh()
-  }
-
-  function setStroke (stroke) {
-    /**
-     * @type {Stroke}
-     * @private
-     */
-    this.stroke = stroke
-    this.refresh()
   }
 </script>

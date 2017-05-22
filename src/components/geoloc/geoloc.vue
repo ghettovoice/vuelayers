@@ -3,8 +3,9 @@
   import { isEqual } from 'lodash/fp'
   import Observable from '../../rx-ext'
   import { consts } from '../../ol-ext'
-  import rxSubs from '../../mixins/rx-subs'
-  import stubVNode from '../../mixins/stub-vnode'
+  import rxSubs from '../rx-subs'
+  import stubVNode from '../stub-vnode'
+  import { assertHasGeoloc } from '../../utils/assert'
 
   const { DATA_PROJECTION } = consts
 
@@ -16,30 +17,42 @@
   }
 
   const methods = {
+    /**
+     * @returns {ol.Geolocation|undefined}
+     */
+    getGeoloc () {
+      return this._geoloc
+    },
+    /**
+     * @return {void}
+     */
     refresh () {
+      assertHasGeoloc(this)
       this.geoloc.changed()
     },
+    // protected & private
+    /**
+     * @return {void}
+     * @protected
+     */
     subscribeAll () {
       this::subscribeToGeolocation()
-    },
-    mountGeoloc () {
-      this.subscribeAll()
-    },
-    unmountGeoloc () {
-      this.unsubscribeAll()
-      this.geoloc.setTracking(false)
     }
   }
 
   const watch = {
+    /**
+     * @param {boolean} value
+     */
     tracking (value) {
+      assertHasGeoloc(this)
       this.geoloc.setTracking(value)
     }
   }
 
   export default {
     name: 'vl-geoloc',
-    mixins: [ rxSubs, stubVNode ],
+    mixins: [rxSubs, stubVNode],
     props,
     watch,
     methods,
@@ -55,37 +68,73 @@
       }
     },
     created () {
-      this::createGeolocApi()
+      this::initialize()
     },
     mounted () {
-      this.$nextTick(this.mountGeoloc)
+      this::mount()
     },
     destroyed () {
-      this.$nextTick(() => {
-        this.unmountGeoloc()
-        this.geoloc = undefined
-      })
+      this::unmount()
+      this._geoloc = undefined
     }
   }
 
   /**
-   * @return {Geolocation}
+   * @return {void}
+   * @private
    */
-  function createGeolocApi () {
+  function initialize () {
     /**
-     * @type {Geolocation}
+     * @type {ol.Geolocation}
      * @protected
      */
-    this.geoloc = new Geolocation({
+    this._geoloc = new Geolocation({
       tracking: this.tracking,
       projection: DATA_PROJECTION
     })
-    this.geoloc.set('vm', this)
-
-    return this.geoloc
+    this._geoloc.set('vm', this)
+    this::defineAccessors()
   }
 
+  /**
+   * @return {void}
+   * @private
+   */
+  function defineAccessors () {
+    Object.defineProperties(this, {
+      geoloc: {
+        enumerable: true,
+        get: this.getGeoloc
+      }
+    })
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function mount () {
+    this.subscribeAll()
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function unmount () {
+    assertHasGeoloc(this)
+
+    this.unsubscribeAll()
+    this.geoloc.setTracking(false)
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
   function subscribeToGeolocation () {
+    assertHasGeoloc(this)
+
     const positionChanges = Observable.of(this.geoloc.getPosition())
       .merge(
         Observable.fromOlEvent(
@@ -107,23 +156,19 @@
       .filter(x => x != null)
 
     const geolocChanges = Observable.combineLatest(positionChanges, accuracyChanges)
-      .throttleTime(300)
+      .throttleTime(60)
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
-    this.subscribeTo(geolocChanges, ([ position, accuracy ]) => {
-      let changed = false
-
+    this.subscribeTo(geolocChanges, ([position, accuracy]) => {
       if (!isEqual(position, this.currentPosition)) {
         this.currentPosition = position
-        changed = true
       }
 
       if (accuracy !== this.currentAccuracy) {
         this.currentAccuracy = accuracy
-        changed = true
       }
 
-      changed && this.$emit('change', { position, accuracy })
+      this.$emit('change', { position, accuracy })
     })
   }
 </script>

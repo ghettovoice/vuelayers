@@ -9,5 +9,5 @@
 export default function replaceTokens (string, replaces) {
   const regExp = new RegExp(Object.keys(replaces).map(field => '(\\{' + field + '\\})').join('|'), 'ig')
 
-  return string.replace(regExp, match => replaces[ match.substr(1, match.length - 2) ] || '')
+  return string.replace(regExp, match => replaces[match.substr(1, match.length - 2)] || '')
 }

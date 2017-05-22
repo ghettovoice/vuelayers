@@ -2,50 +2,52 @@
   import { createTileUrlFunction } from 'ol-tilecache'
   import XYZSource from 'ol/source/xyz'
   import tileSource from '../tile'
+  import { assertHasSource } from '../../../utils/assert'
 
   const props = {}
 
-  const computed = {}
-
   const methods = {
+    /**
+     * @return {ol.source.XYZ}
+     * @protected
+     */
     createSource () {
       return new XYZSource({
-        attributions: this.currentAttributions,
-        tileUrlFunction: this.createTileUrlFunction(this.tileGrid),
-        crossOrigin: this.crossOrigin,
-        projection: this.currentProjection,
-        tileGrid: this.tileGrid,
-        tilePixelRatio: this.currentTilePixelRatio,
-        minZoom: this.currentMinZoom,
-        maxZoom: this.currentMaxZoom,
-        wrapX: this.wrapX,
-        opaque: this.opaque,
+        attributions: this.attributions,
         cacheSize: this.cacheSize,
-        reprojectionErrorThreshold: this.reprojectionErrorThreshold
+        crossOrigin: this.crossOrigin,
+        maxZoom: this.maxZoom,
+        minZoom: this.minZoom,
+        opaque: this.opaque,
+        projection: this.projection,
+        reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+        tileGrid: this.tileGrid,
+        tilePixelRatio: this.tilePixelRatio,
+        tileUrlFunction: this.createTileUrlFunction(),
+        wrapX: this.wrapX
       })
     },
     /**
-     * @param {ol.tilegrid.TileGrid} tileGrid
      * @return {ol.TileUrlFunction}
      * @protected
      */
-    createTileUrlFunction (tileGrid) {
-      return createTileUrlFunction(this.currentUrl, tileGrid, this.currentProjectionExtent)
+    createTileUrlFunction () {
+      return createTileUrlFunction(this.urlTmpl, this.tileGrid, this.projectionExtent)
     }
   }
 
   // watch only url changes, other settings (like tileGrid) can't be changed at runtime
   const watch = {
-    currentUrl () {
-      this.source.setTileUrlFunction(this.createTileUrlFunction(this.tileGrid))
+    urlTmpl () {
+      assertHasSource(this)
+      this.source.setTileUrlFunction(this.createTileUrlFunction())
     }
   }
 
   export default {
     name: 'vl-source-xyz',
-    mixins: [ tileSource ],
+    mixins: [tileSource],
     props,
-    computed,
     methods,
     watch
   }

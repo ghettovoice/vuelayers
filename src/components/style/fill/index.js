@@ -1,7 +1,11 @@
-import Fill from './fill.vue'
+/**
+ * @module components/style/fill
+ */
+import Fill from './style.vue'
 
-Fill.install = function (Vue) {
-  Vue.component(Fill.name, Fill)
+export default {
+  ...Fill,
+  install (Vue) {
+    Vue.component(Fill.name, Fill)
+  }
 }
-
-export default Fill

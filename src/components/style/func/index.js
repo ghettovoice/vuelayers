@@ -1,6 +1,8 @@
-import Func from './func.vue'
+import Func from './style.vue'
 
-Func.install = function (Vue) {
-  Vue.component(Func.name, Func)
+export default {
+  ...Func,
+  install (Vue) {
+    Vue.component(Func.name, Func)
+  }
 }
-export default Func

@@ -2,7 +2,7 @@
  * Coordinate extensions
  */
 import proj from 'ol/proj'
-import { MAP_PROJECTION, GEOMETRY_TYPE } from './consts'
+import { GEOMETRY_TYPE, MAP_PROJECTION } from './consts'
 
 const { fromLonLat, toLonLat } = proj
 export {

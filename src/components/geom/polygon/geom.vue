@@ -1,4 +1,5 @@
 <script>
+  import { constant } from 'lodash/fp'
   import Polygon from 'ol/geom/polygon'
   import { consts } from '../../../ol-ext'
   import geom from '../geom'
@@ -14,10 +15,14 @@
   }
 
   const computed = {
-    type: () => GEOMETRY_TYPE.POLYGON
+    type: constant(GEOMETRY_TYPE.POLYGON)
   }
 
   const methods = {
+    /**
+     * @returns {ol.geom.Polygon}
+     * @protected
+     */
     createGeometry () {
       return new Polygon(this.fromLonLat(this.currentCoordinates))
     }
@@ -25,7 +30,7 @@
 
   export default {
     name: 'vl-geom-polygon',
-    mixins: [ geom ],
+    mixins: [geom],
     props,
     computed,
     methods

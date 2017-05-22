@@ -5,7 +5,7 @@ export function warn (msg, ...args) {
 }
 
 export function error (msg, ...args) {
-  console.error(`[${PKG_FULLNAME}] WARNING: ${msg}`, ...args)
+  console.error(`[${PKG_FULLNAME}] ERROR: ${msg}`, ...args)
 }
 
 export function warndbg (...args) {

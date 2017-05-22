@@ -22,16 +22,23 @@ npm install -S vue vuelayers
 
 ## Available builds
 
-1. **UMD**
-  - Full debug version: `dist/vuelayers.umd.js` and `dist/vuelayers.umd.css`
-  - Full production version: `dist/vuelayers.umd.min.js` and `dist/vuelayers.umd.min.css`
-2. **CommonJS**
-  - Full version: `dist/vuelayers.cjs.js` and `dist/vuelayers.cjs.css`
-3. **CommonJS** separate components (for plugins like `babel-plugin-component`)
-  - Main: `dist/modules/index.js` and `dist/modules/style.css`
-  - Components: `dist/modules/%component-name%/index.js` and `dist/modules/%component-name%/style.css`
-4. **ES6 module**
-  - Full version: `dist/vuelayers.es.js` and `dist/vuelayers.es.css`
+#### UMD
+
+- Full debug version: `dist/vuelayers.umd.js` and `dist/vuelayers.umd.css`
+- Full production version: `dist/vuelayers.umd.min.js` and `dist/vuelayers.umd.min.css`
+
+#### CommonJS
+
+- Full version: `dist/vuelayers.cjs.js` and `dist/vuelayers.cjs.css`
+
+#### CommonJS separate components (for plugins like `babel-plugin-component`)
+
+- Main: `dist/modules/index.js` and `dist/modules/style.css`
+- Components: `dist/modules/%component-name%/index.js` and `dist/modules/%component-name%/style.css`
+
+#### ES6 module
+
+- Full version: `dist/vuelayers.es.js` and `dist/vuelayers.es.css`
 
 ## Usage 
 
@@ -76,7 +83,8 @@ new Vue({
 
 * For browser is available pre-build UMD version by simply including `dist/vuelayers.umd.min.js` and `vuelayers.umd.min.css` files 
   on the page after VueJS.  
-  Or use from CDN like [unpkg.org](https://unpkg.com).  
+  Or use from CDN like [unpkg.org](https://unpkg.com).
+    
   * [https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.js](https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.js)
   * [https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css](https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css)
   
@@ -110,7 +118,9 @@ new Vue({
 For native CommonJS or bundlers that doesn't support ES6 module system you can use tools like `babel-plugin-component`
 for incremental loading.  
 First, install [babel-plugin-component](https://github.com/QingWei-Li/babel-plugin-component)
-Example Babel config 
+
+Example Babel config
+ 
 ```json
 {
   "presets": [
@@ -125,6 +135,7 @@ Example Babel config
   ]]]
 }
 ```
+
 Now you can import only what you need, only that components will be included in final build.
 
 ## Documentation
@@ -134,7 +145,7 @@ TODO
 ## Build Setup
 
 ``` bash
-git clone https://gitlab.com/ghettovoice/vuelayers.git
+git clone https://github.com/ghettovoice/vuelayers.git
 cd vuelayers
 
 # install dependencies

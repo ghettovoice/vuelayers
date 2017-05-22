@@ -1,7 +1,11 @@
-import Stroke from './stroke.vue'
+/**
+ * @module components/style/stroke
+ */
+import Stroke from './style.vue'
 
-Stroke.install = function (Vue) {
-  Vue.component(Stroke.name, Stroke)
+export default {
+  ...Stroke,
+  install (Vue) {
+    Vue.component(Stroke.name, Stroke)
+  }
 }
-
-export default Stroke

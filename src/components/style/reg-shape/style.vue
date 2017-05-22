@@ -1,6 +1,7 @@
 <script>
   import RegularShape from 'ol/style/regularshape'
   import imageStyle from '../image'
+  import { SERVICE_CONTAINER_KEY } from '../../../consts'
 
   const props = {
     points: {
@@ -26,11 +27,11 @@
 
   const methods = {
     /**
-     * @return {RegularShape}
+     * @return {ol.style.RegularShape}
      * @protected
      */
     createStyle () {
-      return new RegularShape({
+      return RegularShape({
         points: this.points,
         radius: this.radius,
         radius1: this.radius1,
@@ -47,33 +48,28 @@
 
   export default {
     name: 'vl-style-reg-shape',
-    mixins: [ imageStyle ],
+    mixins: [imageStyle],
     props,
     methods,
     provide () {
+      const vm = this
+
       return {
-        setFill: this::setFill,
-        setStroke: this::setStroke
+        [SERVICE_CONTAINER_KEY]: {
+          get styleTarget () {
+            return {
+              setFill (fill) {
+                vm.fill = fill
+                vm.deferRefresh()
+              },
+              setStroke (stroke) {
+                vm.stroke = stroke
+                vm.deferRefresh()
+              }
+            }
+          }
+        }
       }
     }
-  }
-
-  // todo do not recreate if already create and has fill/stroke, use setters instead
-  function setFill (fill) {
-    /**
-     * @type {Fill}
-     * @private
-     */
-    this.fill = fill
-    this.refresh()
-  }
-
-  function setStroke (stroke) {
-    /**
-     * @type {Stroke}
-     * @private
-     */
-    this.stroke = stroke
-    this.refresh()
   }
 </script>

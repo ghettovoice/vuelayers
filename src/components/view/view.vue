@@ -1,30 +1,31 @@
 <script>
   import Vue from 'vue'
   import View from 'ol/view'
-  import { isEqual } from 'lodash/fp'
+  import { isEqual, isPlainObject } from 'lodash/fp'
+  import { SERVICE_CONTAINER_KEY } from '../../consts'
   import Observable from '../../rx-ext'
-  import { consts, coordinateHelper } from '../../ol-ext'
-  import { warn } from '../../utils/debug'
-  import rxSubs from '../../mixins/rx-subs'
-  import stubVNode from '../../mixins/stub-vnode'
+  import { consts, coordHelper, geoJson } from '../../ol-ext'
+  import rxSubs from '../rx-subs'
+  import stubVNode from '../stub-vnode'
+  import { assertHasMap, assertHasView } from '../../utils/assert'
 
   const { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } = consts
-  const { toLonLat, fromLonLat } = coordinateHelper
+  const { toLonLat, fromLonLat } = coordHelper
 
   const props = {
-    zoom: {
-      type: Number,
-      default: MIN_ZOOM
-    },
     center: {
       type: Array,
-      default: () => [ 0, 0 ],
+      default: () => [0, 0],
       validator: value => Array.isArray(value) && value.length === 2
     },
-    rotation: {
-      type: Number,
-      default: 0
+    constrainRotation: Boolean,
+    enableRotation: Boolean,
+    extent: {
+      type: Array,
+      validator: value => Array.isArray(value) && value.length === 4
     },
+    maxResolution: Number,
+    minResolution: Number,
     maxZoom: {
       type: Number,
       default: MAX_ZOOM
@@ -37,17 +38,13 @@
       type: String,
       default: MAP_PROJECTION
     },
-    enableRotation: {
-      type: Boolean,
-      default: true
+    resolution: Number,
+    resolutions: Array,
+    rotation: Number,
+    zoom: {
+      type: Number,
+      default: MIN_ZOOM
     },
-    extent: {
-      type: Array,
-      validator: value => Array.isArray(value) && value.length === 4
-    },
-    maxResolution: Number,
-    minResolution: Number,
-    resolution: Array,
     zoomFactor: {
       type: Number,
       default: ZOOM_FACTOR
@@ -56,17 +53,13 @@
 
   const methods = {
     /**
-     * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
-     */
-    fit (geometryOrExtent, options) {
-      this.view.fit(geometryOrExtent, options)
-    },
-    /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
-     * @param {...Object} args
-     * @return {Promise}
+     * @param {...(olx.AnimationOptions|function(boolean))} args
+     * @return {Promise} Resolves when animation completes
      */
     animate (...args) {
+      assertHasView(this)
+
       let cb = args.reverse().find(x => typeof x === 'function')
 
       return new Promise(
@@ -76,63 +69,112 @@
         })
       )
     },
+    /**
+     * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
+     * @param {GeoJSONFeature|ol.Extent|ol.Feature|Component} geometryOrExtent
+     * @param {olx.view.FitOptions} [options]
+     * @return {Promise} Resolves when view changes
+     */
+    fit (geometryOrExtent, options) {
+      assertHasView(this)
+
+      // transform to GeoJSON, vl-feature to ol.Feature
+      if (isPlainObject(geometryOrExtent)) {
+        geometryOrExtent = geoJson.readGeometry(geometryOrExtent, this.view.getProjection())
+      } else if (geometryOrExtent instanceof Vue) {
+        geometryOrExtent = geometryOrExtent.feature
+      }
+
+      let duration = (options && options.duration) || 0
+
+      return new Promise(resolve => {
+        this.view.fit(geometryOrExtent, options)
+        setTimeout(resolve, duration)
+      })
+    },
+    /**
+     * Shared value getter for vl-share directive.
+     * @return {ol.View|undefined}
+     */
+    getSharedValue () {
+      return this.view
+    },
+    /**
+     * @return {ol.View|undefined} OpenLayers `ol.View` instance
+     */
+    getView () {
+      return this._view
+    },
+    /**
+     * @return {void}
+     */
     refresh () {
+      assertHasView(this)
       this.view.changed()
     },
-    setCurrentView ({ center, zoom, rotation }) {
-      if (center != null && !isEqual(center, this.currentCenter)) {
-        this.view.setCenter(fromLonLat(center, this.projection))
+    /**
+     * @param {olx.ViewOptions} viewOptions
+     * @return {void}
+     */
+    updateView (viewOptions) {
+      assertHasView(this)
+      // center
+      if (viewOptions.center != null && !isEqual(viewOptions.center, this.currentCenter)) {
+        this.view.setCenter(fromLonLat(viewOptions.center, this.projection))
       }
-      if (zoom != null && zoom !== this.currentZoom) {
-        this.view.setZoom(zoom)
+      // resolution & zoom
+      if (viewOptions.resolution != null && viewOptions.resolution !== this.currentResolution) {
+        this.view.setResolution(viewOptions.resolution)
+      } else if (viewOptions.zoom != null && viewOptions.zoom !== this.currentZoom) {
+        this.view.setZoom(viewOptions.zoom)
       }
-      if (rotation != null && rotation !== this.currentRotation) {
-        this.view.setRotation(rotation)
+      // rotation
+      if (viewOptions.rotation != null && viewOptions.rotation !== this.currentRotation) {
+        this.view.setRotation(viewOptions.rotation)
+      }
+      // minZoom
+      if (viewOptions.minZoom != null && viewOptions.minZoom !== this.view.getMinZoom()) {
+        this.view.setMinZoom(viewOptions.minZoom)
+      }
+      // maxZoom
+      if (viewOptions.maxZoom != null && viewOptions.maxZoom !== this.view.getMaxZoom()) {
+        this.view.setMaxZoom(viewOptions.maxZoom)
       }
     },
+    // protected & private
+    /**
+     * @return {void}
+     * @protected
+     */
     subscribeAll () {
       this::subscribeToViewChanges()
-    },
-    mountView () {
-      if (!this.map) {
-        throw new Error("Invalid usage of view component, should have map component among it's ancestors")
-      }
-
-      let view = this.map.getView()
-
-      if (view && view.get('vm') instanceof Vue) {
-        if (process.env.NODE_ENV !== 'production') {
-          warn('Map already has mounted vl-view component. ' +
-               'It will be replaced with new.')
-        }
-        view.get('vm').unmountView()
-      }
-
-      this.map.setView(this.view)
-      this.subscribeAll()
-    },
-    unmountView () {
-      this.unsubscribeAll()
-      this.map && this.map.setView(undefined)
     }
   }
-  // todo watch other props
+
   const watch = {
     center (center) {
-      this.setCurrentView({ center })
+      this.updateView({ center })
+    },
+    resolution (resolution) {
+      this.updateView({ resolution })
     },
     zoom (zoom) {
-      this.setCurrentView({ zoom })
+      this.updateView({ zoom })
     },
     rotation (rotation) {
-      this.setCurrentView({ rotation })
+      this.updateView({ rotation })
+    },
+    minZoom (minZoom) {
+      this.updateView({ minZoom })
+    },
+    maxZoom (maxZoom) {
+      this.updateView({ maxZoom })
     }
   }
 
   export default {
     name: 'vl-view',
-    inject: [ 'map' ],
-    mixins: [ rxSubs, stubVNode ],
+    mixins: [rxSubs, stubVNode],
     props,
     methods,
     watch,
@@ -141,51 +183,117 @@
         return this.$options.name
       }
     },
+    inject: {
+      serviceContainer: SERVICE_CONTAINER_KEY
+    },
+    provide () {
+      const vm = this
+
+      return {
+        [SERVICE_CONTAINER_KEY]: {
+          get view () { return vm.view },
+          get map () { return vm.map }
+        }
+      }
+    },
     data () {
       return {
-        currentZoom: this.zoom,
-        currentCenter: this.center.slice(),
+        currentCenter: this.center.splice(),
+        currentZoom: Math.ceil(this.zoom),
+        currentResolution: this.resolution,
         currentRotation: this.rotation
       }
     },
     created () {
-      this::createView()
+      this::initialize()
     },
     mounted () {
-      this.$nextTick(this.mountView)
+      this::mount()
     },
     destroyed () {
-      this.$nextTick(() => {
-        this.unmountView()
-        this.view = undefined
-      })
+      this::unmount()
+      this._view = undefined
     }
   }
 
   /**
-   * @return {View}
+   * @return {void}
+   * @private
    */
-  function createView () {
+  function initialize () {
     /**
-     * @type {View}
+     * @type {ol.View}
      * @protected
      */
-    this.view = new View({
-      center: fromLonLat(this.currentCenter, this.projection),
-      zoom: this.currentZoom,
+    this._view = new View({
+      center: fromLonLat(this.center, this.projection),
+      constrainRotation: this.constrainRotation,
+      enableRotation: this.enableRotation,
+      extent: this.extent,
+      maxResolution: this.maxResolution,
+      minResolution: this.minResolution,
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
-      projection: this.projection
+      projection: this.projection,
+      resolution: this.resolution,
+      resolutions: this.resolutions,
+      rotation: this.rotation,
+      zoom: this.zoom,
+      zoomFactor: this.zoomFactor
     })
-    this.view.set('vm', this)
+    this._view.set('vm', this)
+    this::defineAccessors()
+  }
 
-    return this.view
+  /**
+   * @return {void}
+   * @private
+   */
+  function defineAccessors () {
+    // define getters
+    Object.defineProperties(this, {
+      view: {
+        enumerable: true,
+        get: () => this._view
+      },
+      map: {
+        enumerable: true,
+        get: () => this.serviceContainer.map
+      }
+    })
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function mount () {
+    assertHasMap(this)
+    assertHasView(this)
+
+    this.map.setView(this.view)
+    this.subscribeAll()
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function unmount () {
+    assertHasMap(this)
+
+    this.unsubscribeAll()
+    this.map.setView(undefined)
   }
 
   /**
    * Subscribe to OpenLayers significant events
+   * @return {void}
+   * @private
    */
   function subscribeToViewChanges () {
+    assertHasView(this)
+
     const centerChanges = Observable.of(this.view.getCenter())
       .merge(
         Observable.fromOlEvent(
@@ -194,12 +302,12 @@
           () => this.view.getCenter()
         )
       )
-    const resolutionChanges = Observable.of(this.view.getZoom())
+    const resolutionChanges = Observable.of(this.view.getResolution())
       .merge(
         Observable.fromOlEvent(
           this.view,
           'change:resolution',
-          () => this.view.getZoom()
+          () => this.view.getResolution()
         )
       )
     const rotationChanges = Observable.of(this.view.getRotation())
@@ -215,33 +323,34 @@
       centerChanges,
       resolutionChanges,
       rotationChanges
-    ).throttleTime(300)
+    ).throttleTime(60)
       .distinctUntilChanged((a, b) => isEqual(a, b))
-      .map(([ center, zoom, rotation ]) => ({
-        center: toLonLat(center, this.projection),
-        zoom: Math.ceil(this.view.getZoom()),
+      .map(([center, resolution, rotation]) => ({
+        center: toLonLat(center, this.view.getProjection()),
+        resolution: resolution,
         rotation
       }))
 
-    this.subscribeTo(viewChanges, ({ center, zoom, rotation }) => {
-      let changed = false
-
+    this.subscribeTo(viewChanges, ({ center, resolution, rotation }) => {
       if (!isEqual(this.currentCenter, center)) {
         this.currentCenter = center
-        changed = true
       }
 
-      if (this.currentZoom !== zoom) {
-        this.currentZoom = zoom
-        changed = true
+      if (this.currentResolution !== resolution) {
+        this.currentResolution = resolution
+        this.currentZoom = Math.ceil(this.view.getZoom())
       }
 
       if (this.currentRotation !== rotation) {
         this.currentRotation = rotation
-        changed = true
       }
 
-      changed && this.$emit('change', { center, zoom, rotation })
+      this.$emit('change', {
+        center,
+        resolution,
+        rotation,
+        zoom: this.currentZoom
+      })
     })
   }
 </script>

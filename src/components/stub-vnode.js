@@ -1,7 +1,12 @@
 /**
  * Renders stub VNode for component.
+ * @module mixins/stub-vnode
  */
 export default {
+  /**
+   * @param {function} h
+   * @returns {VNode}
+   */
   render (h) {
     const options = this.$options.stubVNode || {}
     // render as HTML comment
@@ -41,7 +46,7 @@ export default {
 function extractChildren (slots, slotNames = []) {
   return Object.keys(slots).reduce((all, name) => {
     if (!slotNames.length || slotNames.includes(name)) {
-      all = all.concat(slots[ name ])
+      all = all.concat(slots[name])
     }
 
     return all

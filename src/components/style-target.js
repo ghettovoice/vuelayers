@@ -1,29 +1,58 @@
-import { filter, flow, map } from 'lodash/fp'
-import { geoJson, styleHelper } from '../ol-ext'
+/**
+ * @module components/style-target
+ */
+import { filter, flow, map, partialRight } from 'lodash/fp'
+import { geoJson, styleHelper, coordHelper, geomHelper } from '../ol-ext'
+import { SERVICE_CONTAINER_KEY } from '../consts'
+import { assertHasView } from '../utils/assert'
 
 export default {
-  provide () {
-    return {
-      setStyle: ::this.setStyle,
-      getStyle: ::this.getStyle
-    }
-  },
   beforeCreate () {
     /**
-     * @type {Style[]|StyleFunction|undefined}
+     * @type {ol.style.Style[]|ol.StyleFunction|undefined}
+     * @private
      */
     this.styles = this.defaultStyles = undefined
   },
+  provide () {
+    // export to inner components style target object (object with getStyle/setStyle methods)
+    return {
+      [SERVICE_CONTAINER_KEY]: {
+        get styleTarget () {
+          return {
+            getStyle: this.getStyle,
+            setStyle: this.setStyle
+          }
+        }
+      }
+    }
+  },
   methods: {
     /**
-     * Returns styleable OpenLayers object
-     *
-     * @protected
+     * Returns object that can be styled, i.e. have setStyle/getStyle methods
+     * @return {*}
+     * @abstract
      */
-    styleTarget () { },
-    setStyle (style) {
-      this.styles = style
-      const styleTarget = this.styleTarget()
+    getStyleTarget () { },
+    /**
+     * @returns {ol.style.Style[]|ol.StyleFunction|undefined}
+     */
+    getStyle () {
+      return this.styles
+    },
+    /**
+     * @returns {ol.style.Style[]|ol.StyleFunction|undefined}
+     */
+    getDefaultStyle () {
+      return this.defaultStyles
+    },
+    /**
+     * @param {ol.style.Style[]|ol.StyleFunction|undefined} styles
+     * @return {void}
+     */
+    setStyle (styles) {
+      this.styles = styles
+      const styleTarget = this.getStyleTarget()
 
       if (styleTarget) {
         if (this.styles === null || this.styles) {
@@ -32,31 +61,44 @@ export default {
           styleTarget.setStyle(undefined)
         }
       }
-    },
-    getStyle () {
-      return this.styles
     }
   }
 }
 
+/**
+ * @param {Object} vm
+ * @returns {ol.StyleFunction}
+ */
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
+    assertHasView(vm)
+
     if (!feature.getGeometry()) return
 
-    let styles = vm.styles
+    let styles = vm.getStyle()
     let geoJsonFeature = geoJson.writeFeature(feature, vm.view.getProjection())
 
     if (typeof styles === 'function') {
-      styles = styles(feature, resolution, styleHelper)
+      styles = styles(
+        feature,
+        resolution,
+        {
+          ...styleHelper,
+          ...geomHelper,
+          ...coordHelper,
+          geom: partialRight(styleHelper.geom, [vm.view.getProjection()]),
+          geoJson
+        }
+      )
     } else if (Array.isArray(styles)) {
       styles = flow(
-        filter(({ style, condition }) => {
+        filter(({ condition }) => {
           return condition == null ||
-                 (condition === true) ||
-                 (
-                   typeof condition === 'function' &&
-                   condition(geoJsonFeature, resolution)
-                 )
+            (condition === true) ||
+            (
+              typeof condition === 'function' &&
+              condition(geoJsonFeature, resolution)
+            )
         }),
         map('style')
       )(styles)
@@ -64,10 +106,11 @@ export function createStyleFunc (vm) {
     // null style
     if (styles === null || (Array.isArray(styles) && styles.length)) return styles
 
-    if (vm.defaultStyles) {
-      return typeof vm.defaultStyles === 'function'
-        ? vm.defaultStyles(feature, resolution, styleHelper)
-        : vm.defaultStyles
+    let defaultStyles = vm.getDefaultStyle()
+    if (defaultStyles) {
+      return typeof defaultStyles === 'function'
+        ? vm::defaultStyles(feature, resolution, styleHelper)
+        : defaultStyles
     }
   }
 }

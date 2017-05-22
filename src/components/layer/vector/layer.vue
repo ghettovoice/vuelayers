@@ -1,32 +1,30 @@
 <script>
   import VectorLayer from 'ol/layer/vector'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
+  import { SERVICE_CONTAINER_KEY } from '../../../consts'
   import layer from '../layer'
   import styleTarget from '../../style-target'
 
   const props = {
-    updateWhileAnimating: {
-      type: Boolean,
-      default: false
-    },
-    updateWhileInteracting: {
-      type: Boolean,
-      default: false
-    }
+    updateWhileAnimating: Boolean,
+    updateWhileInteracting: Boolean
     // todo implement options
     // renderOrder: Function,
     // renderBuffer: Number
   }
 
   const methods = {
+    // protected & private
     /**
-     * @return {VectorLayer}
+     * @return {ol.layer.Vector}
+     * @protected
      */
     createLayer () {
       return new VectorLayer({
-        id: this.currentId,
-        minResolution: this.currentMinResolution,
-        maxResolution: this.currentMaxResolution,
-        opacity: this.currentOpacity,
+        id: this.id,
+        minResolution: this.minResolution,
+        maxResolution: this.maxResolution,
+        opacity: this.opacity,
         visible: this.visible,
         preload: this.preload,
         extent: this.currentExtent,
@@ -35,21 +33,28 @@
         updateWhileInteracting: this.updateWhileInteracting
       })
     },
-    styleTarget () {
+    /**
+     * @return {ol.layer.Vector}
+     * @protected
+     */
+    getStyleTarget () {
       return this.layer
     }
   }
 
-  const { provide: layerProvide } = layer
-  const { provide: styleTargetProvide } = styleTarget
-
   export default {
     name: 'vl-layer-vector',
-    mixins: [ layer, styleTarget ],
+    mixins: [layer, styleTarget],
     props,
     methods,
     provide () {
-      return Object.assign(this::layerProvide(), this::styleTargetProvide())
+      return {
+        [SERVICE_CONTAINER_KEY]: mergeDescriptors(
+          {},
+          this::layer.provide()[SERVICE_CONTAINER_KEY],
+          this::styleTarget.provide()[SERVICE_CONTAINER_KEY]
+        )
+      }
     }
   }
 </script>

@@ -8,11 +8,12 @@
   const { WMTS_VERSION, WMTS_REQUEST_ENCODING, WMTS_FORMAT } = consts
 
   const props = {
-    layerName: {
+    dimensions: Object,
+    format: {
       type: String,
-      required: true
+      default: WMTS_FORMAT
     },
-    styleName: {
+    layerName: {
       type: String,
       required: true
     },
@@ -20,98 +21,82 @@
       type: String,
       required: true
     },
-    version: {
-      type: String,
-      default: WMTS_VERSION
-    },
     requestEncoding: {
       type: String,
       default: WMTS_REQUEST_ENCODING
     },
-    format: {
+    styleName: {
       type: String,
-      default: WMTS_FORMAT
+      required: true
     },
-    dimensions: Object
+    version: {
+      type: String,
+      default: WMTS_VERSION
+    }
   }
 
   const computed = {
-    currentLayerName () {
-      return this.layerName
-    },
-    currentVersion () {
-      return this.version
-    },
-    currentStyleName () {
-      return this.styleName
-    },
-    currentMatrixSet () {
-      return this.matrixSet
-    },
-    currentRequestEncoding () {
-      return this.requestEncoding
-    },
-    currentFormat () {
-      return this.format
-    },
-    currentDimensions () {
-      return this.dimensions
-    },
-    currentGridOpts () {
+    /**
+     * @type {Object}
+     */
+    preparedGridOpts () {
       const resolutions = tileGridHelper.resolutionsFromExtent(
-        this.currentProjectionExtent,
-        this.currentMaxZoom,
-        this.currentTileSize
+        this.projectionExtent,
+        this.maxZoom,
+        this.tileSize
       )
 
       return {
         resolutions,
-        minZoom: this.currentMinZoom,
-        extent: this.currentProjectionExtent,
-        matrixIds: range(this.currentMinZoom, resolutions.length),
+        minZoom: this.minZoom,
+        extent: this.projectionExtent,
+        matrixIds: range(this.minZoom, resolutions.length),
         ...this.gridOpts
       }
     }
   }
 
   const methods = {
+    // protected & private
     /**
      * @return {ol.tilegrid.WMTS}
+     * @protected
      */
     createTileGrid () {
-      return new WMTSTileGrid(this.currentGridOpts)
+      return new WMTSTileGrid(this.preparedGridOpts)
     },
+    /**
+     * @returns {ol.source.WMTS}
+     * @protected
+     */
     createSource () {
       return new WMTSSource({
-        attributions: this.currentAttributions,
+        attributions: this.attributions,
         cacheSize: this.cacheSize,
         crossOrigin: this.crossOrigin,
+        dimensions: this.dimensions,
+        format: this.format,
+        layer: this.layerName,
         logo: this.logo,
-        projection: this.currentProjection,
+        matrixSet: this.matrixSet,
+        projection: this.projection,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
-        requestEncoding: this.currentRequestEncoding,
-        layer: this.currentLayerName,
-        style: this.currentStyleName,
-        tilePixelRatio: this.currentTilePixelRatio,
+        requestEncoding: this.requestEncoding,
         tileGrid: this.tileGrid,
-        version: this.currentVersion,
-        format: this.currentFormat,
-        matrixSet: this.currentMatrixSet,
-        dimensions: this.currentDimensions,
-        url: this.currentUrl,
+        tilePixelRatio: this.tilePixelRatio,
+        style: this.styleName,
+        version: this.version,
+        url: this.urlTmpl,
         wrapX: this.wrapX
       })
     }
   }
 
-  const watch = {}
-
   export default {
     name: 'vl-source-wmts',
-    mixins: [ tileSource ],
+    mixins: [tileSource],
     props,
     computed,
-    methods,
-    watch
+    methods
   }
 </script>

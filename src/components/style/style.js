@@ -1,67 +1,130 @@
-import stubVNode from '../../mixins/stub-vnode'
 /**
  * Basic style mixin.
  * Exposes for children inner OpenLayer style object as styleTarget.
  * Injects styleTarget from parent to apply self style.
  */
+import { debounce } from 'lodash/fp'
+import stubVNode from '../stub-vnode'
+import { SERVICE_CONTAINER_KEY } from '../../consts'
 
 const methods = {
   /**
-   * @protected
+   * Inner ol style instance getter
+   * @return {OlStyle|undefined}
    */
-  initialize () {
-    /**
-     * @type {Style|Image|Fill|Stroke|Text}
-     * @protected
-     */
-    this.style = this.createStyle()
+  getStyle () {
+    return this._style
   },
   /**
-   * @return {Style|Image|Fill|Stroke|Text}
+   * @return {void}
+   */
+  refresh () {
+    this.unmount()
+    this.mount()
+  },
+  /**
+   * @param {number} [wait]
+   * @returns {Promise}
+   */
+  deferRefresh (wait = 100) {
+    return new Promise(resolve => {
+      if (!this.__deferRefresh) {
+        this.__deferRefresh = debounce(wait, () => {
+          this.refresh()
+          resolve()
+        })
+      }
+
+      this.__deferRefresh()
+    })
+  },
+  // protected & private
+  /**
+   * @return {OlStyle}
    * @protected
+   * @abstract
    */
   createStyle () {
     throw new Error('Not implemented method')
   },
   /**
+   * @return {void}
    * @protected
    */
-  mountStyle () {
+  initialize () {
+    /**
+     * @type {OlStyle|undefined}
+     * @private
+     */
+    this._style = this.createStyle()
+    this::defineAccessors()
+  },
+  /**
+   * @return {void}
+   * @protected
+   * @abstract
+   */
+  mount () {
     throw new Error('Not implemented method')
   },
   /**
+   * @return {void}
    * @protected
+   * @abstract
    */
-  unmountStyle () {
+  unmount () {
     throw new Error('Not implemented method')
-  },
-  refresh () {
-    this.$nextTick(() => {
-      this.unmountStyle()
-      this.mountStyle()
-    })
   }
 }
 
 export default {
-  mixins: [ stubVNode ],
-  inject: [ 'view' ],
+  mixins: [stubVNode],
   methods,
   stubVNode: {
     empty () {
       return this.$options.name
     }
   },
-  mounted () {
-    // Create style in  mounted hook because of some ol style classes doesn't have
-    // setters for all inner objects. This setters are emulated through method: getStyleTarget
+  inject: {
+    serviceContainer: SERVICE_CONTAINER_KEY
+  },
+  created () {
     this.initialize()
-    this.$nextTick(this.mountStyle)
+  },
+  mounted () {
+    this.mount()
   },
   destroyed () {
-    this.$nextTick(() => {
-      this.unmountStyle()
-      this.style = undefined
-    })
+    this.unmount()
+    this._style = undefined
   }
 }
+
+/**
+ * @return {void}
+ * @private
+ */
+function defineAccessors () {
+  Object.defineProperties(this, {
+    style: {
+      enumerable: true,
+      get: this.getStyle
+    },
+    styleTarget: {
+      enumerable: true,
+      get: () => this.serviceContainer.styleTarget
+    },
+    map: {
+      enumerable: true,
+      get: () => this.serviceContainer.map
+    },
+    view: {
+      enumerable: true,
+      get: () => this.serviceContainer.view
+    }
+  })
+}
+
+/**
+ * @typedef {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text|ol.StyleFunction} OlStyle
+ */

@@ -1,4 +1,5 @@
 <script>
+  import { constant } from 'lodash/fp'
   import Point from 'ol/geom/point'
   import { consts } from '../../../ol-ext'
   import geom from '../geom'
@@ -14,12 +15,12 @@
   }
 
   const computed = {
-    type: () => GEOMETRY_TYPE.POINT
+    type: constant(GEOMETRY_TYPE.POINT)
   }
 
   const methods = {
     /**
-     * @return {Point}
+     * @return {ol.geom.Point}
      * @protected
      */
     createGeometry () {
@@ -29,7 +30,7 @@
 
   export default {
     name: 'vl-geom-point',
-    mixins: [ geom ],
+    mixins: [geom],
     props,
     computed,
     methods

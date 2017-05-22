@@ -1,7 +1,11 @@
+/**
+ * @module components/layer/tile
+ */
 import Tile from './layer.vue'
 
-Tile.install = function (Vue) {
-  Vue.component(Tile.name, Tile)
+export default {
+  ...Tile,
+  install (Vue) {
+    Vue.component(Tile.name, Tile)
+  }
 }
-
-export default Tile

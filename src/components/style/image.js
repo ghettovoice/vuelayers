@@ -1,4 +1,5 @@
 import style from './style'
+import { assertHasStyleTarget } from '../../utils/assert'
 
 const props = {
   snapToPixel: {
@@ -7,33 +8,46 @@ const props = {
   }
 }
 
-const { refresh: styleRefresh } = style.methods
 const methods = {
   /**
+   * @return {void}
+   */
+  refresh () {
+    this.unmount()
+    // recreate style
+    this.initialize()
+    this.mount()
+  },
+  // protected & private
+  /**
+   * @return {void}
    * @protected
    */
-  mountStyle () {
-    this.setImage(this.style)
+  mount () {
+    assertHasStyleTarget(this)
+    this.styleTarget.setImage(this.style)
   },
   /**
+   * @return {void}
    * @protected
    */
-  unmountStyle () {
-    this.setImage(undefined)
-  },
-  refresh () {
-    this.$nextTick(() => {
-      this.initialize()
-      this::styleRefresh()
-    })
+  unmount () {
+    assertHasStyleTarget(this)
+    this.styleTarget.setImage(undefined)
+  }
+}
+
+const watch = {
+  snapToPixel () {
+    this.deferRefresh()
   }
 }
 
 export default {
-  mixins: [ style ],
-  inject: style.inject.concat([ 'setImage' ]),
+  mixins: [style],
   props,
   methods,
+  watch,
   stubVNode: {
     empty: false,
     attrs () {

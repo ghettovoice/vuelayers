@@ -13,7 +13,7 @@ import Text from 'ol/style/text'
 import ImageStyle from 'ol/style/image'
 import { flow, isPlainObject, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
 import isNumeric from '../utils/is-numeric'
-import { GEOMETRY_TYPE } from './consts'
+import { DATA_PROJECTION, GEOMETRY_TYPE, MAP_PROJECTION } from './consts'
 import * as geoJson from './geojson'
 
 const reduceWithKey = reduce.convert({ cap: false })
@@ -29,11 +29,11 @@ const reduceWithKey = reduce.convert({ cap: false })
  * @property {string|undefined} strokeCap
  * @property {string|undefined} strokeJoin
  * @property {number|undefined} zIndex
- * @property {Fill|undefined} fill
- * @protected {Stroke|undefined} stroke
+ * @property {ol.style.Fill|undefined} fill
+ * @property {ol.style.Stroke|undefined} stroke
  *
  * Text only
- * @property {string|Text|undefined} text
+ * @property {string|ol.style.Text|undefined} text
  * @property {string|undefined} textFont
  * @property {number|undefined} textFontSize
  * @property {string|number[]|undefined} textFillColor
@@ -47,11 +47,11 @@ const reduceWithKey = reduce.convert({ cap: false })
  * @property {number|undefined} textRotation
  * @property {number|undefined} textOffsetX
  * @property {number|undefined} textOffsetY
- * @protected {Stroke|undefined} textStroke
- * @protected {Fill|undefined} textFill
+ * @property {ol.style.Stroke|undefined} textStroke
+ * @property {ol.style.Fill|undefined} textFill
  *
  * Image only
- * @property {Image|undefined} image
+ * @property {ol.style.Image|undefined} image
  * @property {string|undefined} imageSrc
  * @property {number[]|undefined} imageSize
  * @property {number[]|undefined} imageImgSize
@@ -74,67 +74,77 @@ const reduceWithKey = reduce.convert({ cap: false })
  * @property {IconOrigin|undefined} imageAnchorOrigin
  * @property {ColorLike|undefined} imageColor
  * @property {IconOrigin|undefined} imageOffsetOrigin
- * @protected {Stroke|undefined} imageStroke
- * @protected {Fill|undefined} imageFill
+ * @property {ol.style.Stroke|undefined} imageStroke
+ * @property {ol.style.Fill|undefined} imageFill
+ *
+ * @property {GeoJSONGeometry|ol.geom.Geometry|ol.StyleGeometryFunction|undefined} geom Coordinates should be in EPSG:4326
  */
 
 /**
  * @return {VlStyle[]}
  */
 export function defaultStyle () {
-  return [ {
-    fillColor: [ 255, 255, 255, 0.4 ],
-    strokeColor: '#3399CC',
-    strokeWidth: 1.25,
-    imageRadius: 5
-  } ]
+  return [
+    {
+      fillColor: [255, 255, 255, 0.4],
+      strokeColor: '#3399CC',
+      strokeWidth: 1.25,
+      imageRadius: 5
+    }
+  ]
 }
 
 /**
- * @return {Object<GEOMETRY_TYPE, Array<VlStyle>>}
+ * @return {Object<GEOMETRY_TYPE, VlStyle[]>}
  */
 export function defaultEditStyle () {
-  /** @type {Object<GEOMETRY_TYPE, Array<VlStyle>>} */
+  /** @type {Object<GEOMETRY_TYPE, VlStyle[]>} */
   let styles = {}
-  let white = [ 255, 255, 255, 1 ]
-  let blue = [ 0, 153, 255, 1 ]
+  let white = [255, 255, 255, 1]
+  let blue = [0, 153, 255, 1]
   let width = 3
 
-  styles[ GEOMETRY_TYPE.LINE_STRING ] = [ {
-    strokeColor: white,
-    strokeWidth: width + 2
-  }, {
-    strokeColor: blue,
-    strokeWidth: width
-  } ]
-  styles[ GEOMETRY_TYPE.MULTI_LINE_STRING ] =
-    styles[ GEOMETRY_TYPE.LINE_STRING ]
+  styles[GEOMETRY_TYPE.LINE_STRING] = [
+    {
+      strokeColor: white,
+      strokeWidth: width + 2
+    }, {
+      strokeColor: blue,
+      strokeWidth: width
+    }
+  ]
+  styles[GEOMETRY_TYPE.MULTI_LINE_STRING] =
+    styles[GEOMETRY_TYPE.LINE_STRING]
 
-  styles[ GEOMETRY_TYPE.POLYGON ] = [ {
-    fillColor: [ 255, 255, 255, 0.5 ]
-  } ].concat(styles[ GEOMETRY_TYPE.LINE_STRING ])
-  styles[ GEOMETRY_TYPE.MULTI_POLYGON ] =
-    styles[ GEOMETRY_TYPE.POLYGON ]
+  styles[GEOMETRY_TYPE.POLYGON] = [
+    {
+      fillColor: [255, 255, 255, 0.5]
+    }
+  ].concat(styles[GEOMETRY_TYPE.LINE_STRING])
+  styles[GEOMETRY_TYPE.MULTI_POLYGON] =
+    styles[GEOMETRY_TYPE.POLYGON]
 
-  styles[ GEOMETRY_TYPE.CIRCLE ] =
-    styles[ GEOMETRY_TYPE.POLYGON ].concat(
-      styles[ GEOMETRY_TYPE.LINE_STRING ]
+  styles[GEOMETRY_TYPE.CIRCLE] =
+    styles[GEOMETRY_TYPE.POLYGON].concat(
+      styles[GEOMETRY_TYPE.LINE_STRING]
     )
 
-  styles[ GEOMETRY_TYPE.POINT ] = [ {
-    imageRadius: width * 2,
-    fillColor: blue,
-    strokeColor: white,
-    strokeWidth: width / 2,
-    zIndex: Infinity
-  } ]
-  styles[ GEOMETRY_TYPE.MULTI_POINT ] =
-    styles[ GEOMETRY_TYPE.POINT ]
+  styles[GEOMETRY_TYPE.POINT] = [
+    {
+      imageRadius: width * 2,
+      fillColor: blue,
+      strokeColor: white,
+      strokeWidth: width / 2,
+      zIndex: Infinity
+    }
+  ]
+  styles[GEOMETRY_TYPE.MULTI_POINT] =
+    styles[GEOMETRY_TYPE.POINT]
 
-  styles[ GEOMETRY_TYPE.GEOMETRY_COLLECTION ] =
-    styles[ GEOMETRY_TYPE.POLYGON ].concat(
-      styles[ GEOMETRY_TYPE.LINE_STRING ],
-      styles[ GEOMETRY_TYPE.POINT ]
+  styles[GEOMETRY_TYPE.GEOMETRY_COLLECTION] =
+    styles[GEOMETRY_TYPE.POLYGON].concat(
+      styles[GEOMETRY_TYPE.LINE_STRING],
+      styles[GEOMETRY_TYPE.POINT]
     )
 
   return styles
@@ -145,12 +155,12 @@ const isEmpty = x => {
   if (typeof x === 'number') return false
 
   return ((typeof x === 'string' || Array.isArray(x)) && !x.length) ||
-         !Object.keys(x).length
+    !Object.keys(x).length
 }
 
 /**
  * @param {VlStyle} vlStyle
- * @return {Style|undefined}
+ * @return {ol.style.Style|undefined}
  */
 export function style (vlStyle) {
   if (isEmpty(vlStyle)) return
@@ -171,6 +181,10 @@ export function style (vlStyle) {
 
 const addPrefix = prefix => str => prefix + (prefix ? upperFirst(str) : str)
 
+/**
+ * @param {*} color
+ * @returns {*}
+ */
 export function normalizeColor (color) {
   let c = color
 
@@ -184,15 +198,15 @@ export function normalizeColor (color) {
 /**
  * @param {VlStyle} vlStyle
  * @param {string} [prefix]
- * @returns {Fill|undefined}
+ * @returns {ol.style.Fill|undefined}
  */
 export function fill (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
-  const keys = [ 'fillColor' ].map(prefixKey)
+  const keys = ['fillColor'].map(prefixKey)
   const compiledKey = prefixKey('fill')
 
   // check on already compiled style existence
-  if (vlStyle[ compiledKey ] instanceof Fill) return vlStyle[ compiledKey ]
+  if (vlStyle[compiledKey] instanceof Fill) return vlStyle[compiledKey]
 
   const transform = flow(
     pick(keys),
@@ -204,7 +218,7 @@ export function fill (vlStyle, prefix = '') {
           value = normalizeColor(value)
         }
 
-        result[ name ] = value
+        result[name] = value
 
         return result
       },
@@ -222,14 +236,14 @@ export function fill (vlStyle, prefix = '') {
 /**
  * @param {VlStyle} vlStyle
  * @param {string} [prefix]
- * @returns {Stroke|undefined}
+ * @returns {ol.style.Stroke|undefined}
  */
 export function stroke (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
-  const keys = [ 'strokeColor', 'strokeWidth', 'strokeDash', 'strokeCap', 'strokeJoin' ].map(prefixKey)
+  const keys = ['strokeColor', 'strokeWidth', 'strokeDash', 'strokeCap', 'strokeJoin'].map(prefixKey)
   const compiledKey = prefixKey('stroke')
 
-  if (vlStyle[ compiledKey ] instanceof Stroke) return vlStyle[ compiledKey ]
+  if (vlStyle[compiledKey] instanceof Stroke) return vlStyle[compiledKey]
 
   const transform = flow(
     pick(keys),
@@ -251,7 +265,7 @@ export function stroke (vlStyle, prefix = '') {
           value = normalizeColor(value)
         }
 
-        result[ name ] = value
+        result[name] = value
 
         return result
       },
@@ -268,7 +282,7 @@ export function stroke (vlStyle, prefix = '') {
 
 /**
  * @param {VlStyle} vlStyle
- * @returns {ImageStyle|undefined}
+ * @returns {ol.style.Image|undefined}
  * @todo split to separate circle, regShape, Icon
  */
 export function image (vlStyle) {
@@ -342,7 +356,7 @@ export function image (vlStyle) {
 
 /**
  * @param {VlStyle} vlStyle
- * @returns {Text|undefined}
+ * @returns {ol.style.Text|undefined}
  */
 export function text (vlStyle) {
   // noinspection JSValidateTypes
@@ -354,11 +368,11 @@ export function text (vlStyle) {
   }
 
   let fontSize = vlStyle.textFontSize ? vlStyle.textFontSize + 'px' : undefined
-  let font = [ 'normal', fontSize, vlStyle.textFont ].filter(x => !!x).join(' ')
+  let font = ['normal', fontSize, vlStyle.textFont].filter(x => !!x).join(' ')
 
   Object.assign(
     textStyle,
-    pick([ 'textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign' ], vlStyle),
+    pick(['textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign'], vlStyle),
     {
       font,
       fill: fill(vlStyle, 'text') || fill(vlStyle),
@@ -373,22 +387,18 @@ export function text (vlStyle) {
 
 /**
  * @param {VlStyle} vlStyle
+ * @param {string|ol.ProjectionLike} [mapProj=MAP_PROJECTION]
  * @return {ol.geom.Geometry|ol.StyleGeometryFunction|undefined}
  */
-export function geom (vlStyle) {
-  // todo how to transform to current map projection? now is assumed EPSG:3857
+export function geom (vlStyle, mapProj = MAP_PROJECTION) {
   const processGeom = geom => {
-    if (geom == null) return
-    if (geom instanceof Geometry) return geom
-    if (isPlainObject(geom)) return geoJson.readGeometry(geom)
+    if (geom instanceof Geometry) return geom.transform(DATA_PROJECTION, mapProj)
+    if (isPlainObject(geom)) return geoJson.readGeometry(geom, mapProj)
   }
 
   if (typeof vlStyle.geom === 'function') {
     return function __styleGeomFunc (feature) {
-      const geomFn = vlStyle.geom || (() => {})
-      const geom = geomFn(geoJson.writeFeature(feature))
-
-      return processGeom(geom)
+      return processGeom(vlStyle.geom(geoJson.writeFeature(feature, mapProj)))
     }
   }
 

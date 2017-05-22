@@ -65,48 +65,22 @@ Promise.resolve(utils.ensureDir(config.outDir))
       }).then(() => Promise.all([
           getUtils(),
           getCommons(),
-          getMixins(),
           getComponents()
         ]))
-        .then(([ utils, commons, mixins, components ]) => Promise.all(
-          [].concat(
-            utils.map(({ entry, bundleName }) => bundle({
-              format: 'cjs',
-              entry,
-              bundleName,
-              styleName: false,
-              external: nodeExternal(),
-              modules: true
-            }))
-          ).concat(
-            commons.map(({ entry, bundleName }) => bundle({
-              format: 'cjs',
-              entry,
-              bundleName,
-              styleName: false,
-              external: nodeExternal(),
-              modules: true
-            }))
-          ).concat(
-            mixins.map(({ entry, bundleName }) => bundle({
-              format: 'cjs',
-              entry,
-              bundleName,
-              styleName: false,
-              external: nodeExternal(),
-              modules: true
-            }))
-          ).concat(
-            components.map(({ entry, bundleName, styleName }) => bundle({
-              format: 'cjs',
-              entry,
-              bundleName,
-              styleName,
-              external: nodeExternal(),
-              modules: true
-            }))
-          )
-        ))
+        .then(result => {
+          let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
+          let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
+
+          return Promise.all(bundles.map(opts => bundle({
+            format: 'cjs',
+            entry: opts.entry,
+            bundleName: opts.bundleName,
+            styleName: opts.styleName,
+            external: nodeExternal(),
+            modules: true,
+            bundlesMap
+          })))
+        })
   })
   // All done
   .then(() => {
@@ -131,7 +105,7 @@ function bundle (opts = {}) {
   }
 
   const plugins = [
-    ...(opts.modules ? [ externalize() ] : []),
+    ...(opts.modules ? [ externalize(opts.bundlesMap) ] : []),
     replace(Object.assign(replaces(opts), {
       sourceMap: true
     })),
@@ -184,7 +158,7 @@ function bundle (opts = {}) {
           comments: (node, comment) => {
             let text = comment.value
             let type = comment.type
-            if (type == "comment2") {
+            if (type === "comment2") {
               // multiline comment
               return /@preserve|@license|@cc_on/i.test(text)
             }
@@ -276,63 +250,78 @@ function getComponents () {
   const root = utils.resolve('src/components')
 
   return new Promise((resolve, reject) => {
-    glob(root + '/**/*.{js,vue}', (err, files) => {
+    glob(root + '/**/*.js', (err, files) => {
       if (err) return reject(err)
 
       resolve(files.reduce((files, file) => {
-        const fileName = path.basename(file)
-
-        if (fileName === 'index.js') return files
-
-        let entry, bundleName, styleName
-
-        if (/\.vue/.test(fileName)) {
-          const dir = path.dirname(file)
-          const relDir = dir.replace(root + '/', '')
-          const pathParts = relDir.split('/')
-
-          // reverse all expect some exclusions
-          if (
-            [
-              'style/container',
-              'style/func'
-            ].includes(relDir) === false
-          ) {
-            pathParts.reverse()
-          }
-
-          entry = path.join(dir, 'index.js')
-          bundleName = path.join('modules', pathParts.join('-'), 'index')
-          styleName = path.join('modules', pathParts.join('-'), 'style')
-        } else {
-          entry = file
-          bundleName = path.join('modules', path.basename(fileName, '.js'))
-          styleName = false
+        // skip main index and internal files
+        let mainIndexRegex = /components\/index\.js$/
+        let pkgIndex = path.join(path.dirname(file), 'index.js')
+        let isInPkg = file !== pkgIndex && !mainIndexRegex.test(pkgIndex) && fs.existsSync(pkgIndex)
+        if (mainIndexRegex.test(file) || isInPkg) {
+          return files
         }
 
+        let relPath = file.replace('.js', '').replace(root + '/', '')
+        let pathParts = relPath.split('/')
+        pathParts = pathParts.filter((x, i) => pathParts.indexOf(x) === i)
+
+        // reverse all except some exclusions
+        if (
+          [
+            'style/container/index',
+            'style/func/index'
+          ].includes(relPath) === false
+        ) {
+          pathParts.reverse()
+        }
+
+        // component package
+        if (/index$/.test(relPath)) {
+          pathParts = pathParts.filter(x => x !== 'index')
+
+          return files.concat({
+            entry: file,
+            bundleName: path.join('modules', pathParts.join('-'), 'index'),
+            styleName: path.join('modules', pathParts.join('-'), 'style'),
+            src: path.join('components', relPath).replace('/index', ''),
+            dest: path.join('modules', pathParts.join('-'))
+          })
+        }
+
+        // base mixins and helpers
         return files.concat({
-          entry,
-          bundleName,
-          styleName
+          entry: file,
+          bundleName: path.join('modules', pathParts.join('-')),
+          styleName: false,
+          src: path.join('components', relPath),
+          dest: path.join('modules', pathParts.join('-'))
         })
       }, []))
     })
   })
 }
 
-function getMixins () {
-  const root = utils.resolve('src/mixins')
-
-  return new Promise((resolve, reject) => {
-    glob(root + '/**/*.js', (err, files) => {
-      if (err) return reject(err)
-
-      resolve(files.map(file => ({
-        entry: file,
-        bundleName: path.join('modules/mixins', path.basename(file, '.js'))
-      })))
-    })
-  })
+function getCommons () {
+  return Promise.resolve([ {
+    entry: utils.resolve('src/ol-ext/index.js'),
+    bundleName: 'modules/ol-ext',
+    styleName: false,
+    src: 'ol-ext',
+    dest: 'modules/ol-ext'
+  }, {
+    entry: utils.resolve('src/rx-ext/index.js'),
+    bundleName: 'modules/rx-ext',
+    styleName: false,
+    src: 'rx-ext',
+    dest: 'modules/rx-ext'
+  }, {
+    entry: utils.resolve('src/consts.js'),
+    bundleName: 'modules/consts',
+    styleName: false,
+    src: 'consts',
+    dest: 'modules/consts'
+  } ])
 }
 
 function getUtils () {
@@ -342,25 +331,22 @@ function getUtils () {
     glob(root + '/**/*.js', (err, files) => {
       if (err) return reject(err)
 
-      resolve(files.map(file => ({
-        entry: file,
-        bundleName: path.join('modules/utils', path.basename(file, '.js'))
-      })))
+      resolve(files.map(file => {
+        let bundleName = path.join('modules/utils', path.basename(file, '.js'))
+
+        return {
+          entry: file,
+          bundleName,
+          styleName: false,
+          src: file.replace('.js', '').replace(utils.resolve('src') + '/', ''),
+          dest: bundleName
+        }
+      }))
     })
   })
 }
 
-function getCommons () {
-  return Promise.resolve([ {
-    entry: utils.resolve('src/ol-ext/index.js'),
-    bundleName: 'modules/ol-ext'
-  }, {
-    entry: utils.resolve('src/rx-ext/index.js'),
-    bundleName: 'modules/rx-ext'
-  } ])
-}
-
-function externalize () {
+function externalize (modulesMap) {
   const filter = createFilter('src/**', 'node_modules/**')
   const regex = /'(\.{2}\/)+([^.'\n]+)'/g
 
@@ -378,7 +364,11 @@ function externalize () {
         start = match.index + 1
         end = start + match[ 0 ].length - 2
 
-        ms.overwrite(start, end, path.join('vuelayers/dist/modules', match[ 2 ]))
+        let extModulePath = path.resolve(path.dirname(id), match[0].slice(1, -1))
+        let extModuleRelPath = extModulePath.replace(utils.resolve('src') + '/', '')
+        let extModuleMap = modulesMap.find(({ src }) => src === extModuleRelPath)
+
+        ms.overwrite(start, end, path.join('vuelayers/dist', extModuleMap.dest))
       }
 
       if (!hasReplacements) return null

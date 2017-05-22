@@ -1,7 +1,8 @@
-import RegShape from './reg-shape.vue'
+import RegShape from './style.vue'
 
-RegShape.install = function (Vue) {
-  Vue.component(RegShape.name, RegShape)
+export default {
+  ...RegShape,
+  install (Vue) {
+    Vue.component(RegShape.name, RegShape)
+  }
 }
-
-export default RegShape

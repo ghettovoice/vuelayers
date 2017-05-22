@@ -12,19 +12,6 @@ describe('map component', () => {
       expect(vm.map).to.be.instanceof(OlMap)
       expect(vm.map.get('vm')).to.be.equal(vm)
       expect(vm.map.getTargetElement()).to.be.equal(vm.$refs.map)
-      expect(vm.map.getLayers().getLength()).to.be.equal(0)
-
-      vm.$destroy()
-      Vue.nextTick(done)
-    })
-  })
-
-  it('should provide correct ol instances', done => {
-    const vm = new Ctor().$mount()
-
-    Vue.nextTick(() => {
-      expect(vm._provided.map).to.be.equal(vm.map)
-      expect(vm._provided.view).to.be.equal(vm.map.getView())
 
       vm.$destroy()
       Vue.nextTick(done)

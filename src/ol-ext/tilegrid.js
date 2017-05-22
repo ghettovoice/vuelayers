@@ -18,13 +18,13 @@ export function resolutionsFromExtent (extent, maxZoom = MAX_ZOOM, tileSize = TI
   const width = getWidth(extent)
 
   const maxResolution = Math.max(
-    width / tileSize[ 0 ], height / tileSize[ 1 ])
+    width / tileSize[0], height / tileSize[1])
 
   const length = maxZoom + 1
   const resolutions = new Array(length)
 
   for (let z = 0; z < length; ++z) {
-    resolutions[ z ] = maxResolution / Math.pow(2, z)
+    resolutions[z] = maxResolution / Math.pow(2, z)
   }
 
   return resolutions
@@ -41,7 +41,12 @@ export function createForExtent (extent, maxZoom = MAX_ZOOM, tileSize = TILE_SIZ
   })
 }
 
-export function createForProjection (projection, maxZoom = MAX_ZOOM, tileSize = TILE_SIZE, corner = EXTENT_CORNER.BOTTOM_LEFT) {
+export function createForProjection (
+  projection,
+  maxZoom = MAX_ZOOM,
+  tileSize = TILE_SIZE,
+  corner = EXTENT_CORNER.BOTTOM_LEFT
+) {
   const extent = extentFromProjection(projection)
 
   return createForExtent(extent, maxZoom, tileSize, corner)
@@ -52,8 +57,8 @@ export function extentFromProjection (projection) {
   let extent = projection.getExtent()
 
   if (!extent) {
-    let half = 180 * proj.METERS_PER_UNIT[ PROJ_UNIT.DEGREES ] /
-               projection.getMetersPerUnit()
+    let half = 180 * proj.METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
+      projection.getMetersPerUnit()
     extent = createOrUpdate(-half, -half, half, half)
   }
   return extent

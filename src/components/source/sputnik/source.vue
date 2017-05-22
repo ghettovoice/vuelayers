@@ -2,15 +2,13 @@
   /**
    * Layer source to work with Sputnik.ru tile server.
    */
-  import { consts } from '../../../ol-ext'
   import xyzSource from '../xyz/source.vue'
 
-  const { TILE_SIZE, MAP_PROJECTION } = consts
   const SPUTNIK_URL_TEMPLATE = 'http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png?apikey={apikey}'
   const SPUTNIK_ATTRIBUTIONS = '<a href="http://maps.sputnik.ru/">Спутник</a> ' +
-                               '&copy; <a href="http://rt.ru/">Ростелеком</a> ' +
-                               '&copy; <a href="https://openstreetmap.org/">Openstreetmap</a>, ' +
-                               (new Date().getFullYear())
+    '&copy; <a href="http://rt.ru/">Ростелеком</a> ' +
+    '&copy; <a href="https://openstreetmap.org/">Openstreetmap</a>, ' +
+    (new Date().getFullYear())
 
   const props = {
     url: {
@@ -27,19 +25,17 @@
   }
 
   const computed = {
-    // bind to constant values: projection and tile size
-    currentProjection: () => MAP_PROJECTION,
-    currentTileSize: () => [ TILE_SIZE, TILE_SIZE ],
+    /**
+     * @type {string[]}
+     */
     urlTokens () {
-      return [
-        'apiKey'
-      ]
+      return ['apiKey']
     }
   }
 
   export default {
     name: 'vl-source-sputnik',
-    mixins: [ xyzSource ],
+    mixins: [xyzSource],
     props,
     computed
   }

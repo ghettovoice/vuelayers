@@ -1,5 +1,6 @@
 /**
  * RxJS extensions.
+ * @module rx-ext
  */
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/fromEventPattern'

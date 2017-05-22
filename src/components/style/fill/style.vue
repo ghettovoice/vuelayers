@@ -1,14 +1,15 @@
 <script>
   import Fill from 'ol/style/fill'
   import style from '../style'
+  import { assertHasStyleTarget } from '../../../utils/assert'
 
   const props = {
-    color: [ String, Array ]
+    color: [String, Array]
   }
 
   const methods = {
     /**
-     * @return {Fill}
+     * @return {ol.style.Fill}
      * @protected
      */
     createStyle () {
@@ -17,30 +18,33 @@
       })
     },
     /**
+     * @return {void}
      * @protected
      */
-    mountStyle () {
-      this.setFill(this.style)
+    mount () {
+      assertHasStyleTarget(this)
+      this.styleTarget.setFill(this.style)
     },
     /**
+     * @return {void}
      * @protected
      */
-    unmountStyle () {
-      this.setFill(undefined)
+    unmount () {
+      assertHasStyleTarget(this)
+      this.styleTarget.setFill(undefined)
     }
   }
 
   const watch = {
     color (value) {
       this.style.setColor(value)
-      this.refresh()
+      this.deferRefresh()
     }
   }
 
   export default {
     name: 'vl-style-fill',
-    mixins: [ style ],
-    inject: [ 'setFill' ],
+    mixins: [style],
     props,
     methods,
     watch

@@ -1,7 +1,11 @@
+/**
+ * @module components/geom/multi-polygon
+ */
 import MultiPolygon from './geom.vue'
 
-MultiPolygon.install = function (Vue) {
-  Vue.component(MultiPolygon.name, MultiPolygon)
+export default {
+  ...MultiPolygon,
+  install (Vue) {
+    Vue.component(MultiPolygon.name, MultiPolygon)
+  }
 }
-
-export default MultiPolygon

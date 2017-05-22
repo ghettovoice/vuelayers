@@ -1,95 +1,82 @@
 <script>
+  import Vue from 'vue'
   import SelectInteraction from 'ol/interaction/select'
   import VectorLayer from 'ol/layer/vector'
-  import { forEach, mapValues, differenceWith } from 'lodash/fp'
+  import Feature from 'ol/feature'
+  import { forEach, mapValues, differenceWith, isPlainObject } from 'lodash/fp'
   import Observable from '../../../rx-ext'
-  import plainProps from '../../../utils/plain-props'
   import { styleHelper, geoJson } from '../../../ol-ext'
   import interaction from '../interaction'
   import styleTarget, { createStyleFunc } from '../../style-target'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
+  import { assertHasInteraction, assertHasMap, assertHasView } from '../../../utils/assert'
+  import { SERVICE_CONTAINER_KEY } from '../../../consts'
+  import plainProps from '../../../utils/plain-props'
 
   const { style, defaultEditStyle } = styleHelper
 
   // todo add other options, like event modifiers
   const props = {
-    multi: {
-      type: Boolean,
-      default: false
+    filter: {
+      type: Function,
+      default: () => true
     },
-    wrapX: {
-      type: Boolean,
-      default: true
-    },
+    hitTolerance: Number,
+    multi: Boolean,
     selected: {
       type: Array,
       default: () => []
     },
-    filter: {
-      type: Function,
-      default: () => true
+    wrapX: {
+      type: Boolean,
+      default: true
     }
   }
 
   const computed = {
+    /**
+     * @type {Array}
+     */
     selectedIds () {
-      return this.currentSelected.map(x => x.id)
+      return this.currentSelected.map(f => f.id)
     }
   }
 
-  const {
-    refresh: interactionRefresh,
-    mountInteraction: interactionMountInteraction,
-    unmountInteraction: interactionUnmountInteraction
-  } = interaction.methods
   const defaultStyles = mapValues(style, defaultEditStyle())
 
   const methods = {
     /**
-     * @protected
+     * @return {void}
      */
-    subscribeAll () {
-      this::subscribeToInteractionChanges()
-    },
-    /**
-     * @return {SelectInteraction}
-     * @protected
-     */
-    createInteraction () {
-      // define default select style, will be used by styleTarget style function
-      this.defaultStyles = function __selectDefaultStyleFunc (feature) {
-        if (feature.getGeometry()) {
-          return defaultStyles[ feature.getGeometry().getType() ]
-        }
-      }
-      const style = createStyleFunc(this)
-      const view = this.view
-      const filterFunc = this.filter
-      const filter = function __selectFilter (feature, layer) {
-        return filterFunc(geoJson.writeFeature(feature, view.getProjection()), layer && plainProps(layer.getProperties()))
-      }
-
-      return new SelectInteraction({
-        multi: this.multi,
-        wrapX: this.wrapX,
-        filter,
-        style
-      })
-    },
     refresh () {
+      assertHasInteraction(this)
       this.interaction.getFeatures().changed()
-      this::interactionRefresh()
+      this::interaction.methods.refresh()
     },
     /**
-     * @param {Object} geoJsonFeature
-     * @param {string|number} geoJsonFeature.id
+     * @param {GeoJSONFeature|Component|ol.Feature} feature
+     * @return {void}
      */
-    select ({ id }) {
-      if (!this.map || this.selectedIds.includes(id)) return
+    select (feature) {
+      assertHasMap(this)
+      assertHasInteraction(this)
+
+      let id
+      if (isPlainObject(feature) || feature instanceof Vue) {
+        id = feature.id
+      } else if (feature instanceof Feature) {
+        id = feature.getId()
+      } else {
+        throw new Error('Illegal first argument')
+      }
+      // skip if already added
+      if (this.selectedIds.includes(id)) return
 
       const selection = this.interaction.getFeatures()
-      let feature
 
-      if (id) {
+      if (!(feature instanceof Feature)) {
+        if (!id) throw new Error('Undefined feature id')
+
         const layers = this.map.getLayers().getArray()
 
         forEach(layer => {
@@ -103,37 +90,107 @@
       feature && selection.push(feature)
     },
     /**
-     * @param {Object} geoJsonFeature
-     * @param {string|number} geoJsonFeature.id
+     * @param {GeoJSONFeature|Component|ol.Feature} feature
+     * @return {void}
      */
-    unselect ({ id }) {
-      if (!this.map || !this.selectedIds.includes(id)) return
+    unselect (feature) {
+      assertHasInteraction(this)
+
+      let id
+      if (isPlainObject(feature) || feature instanceof Vue) {
+        id = feature.id
+      } else if (feature instanceof Feature) {
+        id = feature.getId()
+      } else {
+        throw new Error('Illegal first argument')
+      }
+
+      if (!this.selectedIds.includes(id)) return
 
       const selection = this.interaction.getFeatures()
       const selectionArray = selection.getArray()
-      const idx = selectionArray.findIndex(x => x.id === id)
+      const idx = selectionArray.findIndex(f => f.id === id)
 
       if (idx !== -1) {
         selection.removeAt(idx)
       }
     },
+    /**
+     * Removes all features from selection.
+     * @return {void}
+     */
     unselectAll () {
+      assertHasInteraction(this)
       this.interaction.getFeatures().clear()
     },
-    styleTarget () {
+    // protected & private
+    /**
+     * @return {ol.interaction.Select}
+     * @protected
+     */
+    createInteraction () {
+      // define default select style, will be used by styleTarget style function
+      this.defaultStyles = function __selectDefaultStyleFunc (feature) {
+        if (feature.getGeometry()) {
+          return defaultStyles[feature.getGeometry().getType()]
+        }
+      }
+      const style = createStyleFunc(this)
+      const vm = this
+      const filter = function __selectFilter (feature, layer) {
+        assertHasView(vm)
+
+        return vm.filter(
+          geoJson.writeFeature(feature, vm.view.getProjection()),
+          layer && plainProps(layer.getProperties())
+        )
+      }
+
+      return new SelectInteraction({
+        multi: this.multi,
+        wrapX: this.wrapX,
+        filter,
+        style
+      })
+    },
+    /**
+     * @return {ol.interaction.Interaction}
+     * @protected
+     */
+    getStyleTarget () {
       return this.interaction
     },
-    setStyle (style) {
-      this.styles = style
-      this.interaction && this.refresh()
-    },
-    mountInteraction () {
-      this::interactionMountInteraction()
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      this::interaction.method.mount()
       this.currentSelected.forEach(this.select)
     },
-    unmountInteraction () {
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
       this.currentSelected.forEach(this.unselect)
-      this::interactionUnmountInteraction()
+      this::interaction.methods.unmount()
+    },
+    /**
+     * @param {*} style
+     * @return {void}
+     * @protected
+     */
+    setStyle (style) {
+      this::styleTarget.methods.setStyle(style)
+      this.refresh()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToInteractionChanges()
     }
   }
 
@@ -148,12 +205,9 @@
     }
   }
 
-  const { provide: interactionProvide } = interaction
-  const { provide: styleTargetProvide } = styleTarget
-
   export default {
     name: 'vl-interaction-select',
-    mixins: [ interaction, styleTarget ],
+    mixins: [interaction, styleTarget],
     props,
     computed,
     methods,
@@ -167,7 +221,13 @@
       }
     },
     provide () {
-      return Object.assign(this::interactionProvide(), this::styleTargetProvide())
+      return {
+        [SERVICE_CONTAINER_KEY]: mergeDescriptors(
+          {},
+          this::interaction.provide()[SERVICE_CONTAINER_KEY],
+          this::styleTarget.provide()[SERVICE_CONTAINER_KEY]
+        )
+      }
     },
     data () {
       return {
@@ -176,9 +236,16 @@
     }
   }
 
+  /**
+   * @return {void}
+   * @private
+   */
   function subscribeToInteractionChanges () {
-    const selection = this.interaction.getFeatures()
+    assertHasInteraction(this)
+    assertHasView(this)
 
+    const selection = this.interaction.getFeatures()
+    // select event
     this.subscribeTo(
       Observable.fromOlEvent(
         selection,
@@ -190,6 +257,7 @@
         this.$emit('select', feature)
       }
     )
+    // unselect event
     this.subscribeTo(
       Observable.fromOlEvent(
         selection,
@@ -197,7 +265,8 @@
         ({ element }) => geoJson.writeFeature(element, this.view.getProjection())
       ),
       feature => {
-        this.currentSelected = this.currentSelected.filter(({ id }) => id !== feature.id)
+        let idx = this.currentSelected.findIndex(({ id }) => id === feature.id)
+        this.currentSelected.splice(idx, 1)
         this.$emit('unselect', feature)
       }
     )

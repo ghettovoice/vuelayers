@@ -1,6 +1,9 @@
 {
   "env": {
-    "mocha": true
+    "mocha": true,
+    "browser": true,
+    "es6": true,
+    "node": true
   },
   "globals": {
     "expect": true,

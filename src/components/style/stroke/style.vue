@@ -1,9 +1,10 @@
 <script>
   import Stroke from 'ol/style/stroke'
   import style from '../style'
+  import { assertHasStyleTarget } from '../../../utils/assert'
 
   const props = {
-    color: [ Array, String ],
+    color: [Array, String],
     lineCap: {
       type: String,
       default: 'round' // round, butt, square
@@ -23,7 +24,7 @@
 
   const methods = {
     /**
-     * @return {Stroke}
+     * @return {ol.style.Stroke}
      * @protected
      */
     createStyle () {
@@ -38,47 +39,49 @@
       })
     },
     /**
+     * @return {void}
      * @protected
      */
-    mountStyle () {
-      this.setStroke(this.style)
+    mount () {
+      assertHasStyleTarget(this)
+      this.styleTarget.setStroke(this.style)
     },
     /**
+     * @return {void}
      * @protected
      */
-    unmountStyle () {
-      this.setStroke(undefined)
+    unmount () {
+      assertHasStyleTarget(this)
+      this.styleTarget.setStroke(undefined)
     }
   }
 
   const watch = {
     color (value) {
       this.style.setColor(value)
-      this.refresh()
+      this.deferRefresh()
     },
     lineCap (value) {
       this.style.setLineCap(value)
-      this.refresh()
+      this.deferRefresh()
     },
     lineDash (value) {
       this.style.setLineDash(value)
-      this.refresh()
+      this.deferRefresh()
     },
     lineJoin (value) {
       this.style.setLineJoin(value)
-      this.refresh()
+      this.deferRefresh()
     },
     width (value) {
       this.style.setWidth(value)
-      this.refresh()
+      this.deferRefresh()
     }
-    // todo добавить остальный вотчеры
   }
 
   export default {
     name: 'vl-style-stroke',
-    mixins: [ style ],
-    inject: style.inject.concat([ 'setStroke' ]),
+    mixins: [style],
     props,
     watch,
     methods

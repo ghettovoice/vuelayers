@@ -1,10 +1,12 @@
 import { isEqual } from 'lodash/fp'
 import Observable from '../../rx-ext'
-import rxSubs from '../../mixins/rx-subs'
-import stubVNode from '../../mixins/stub-vnode'
-import { coordinateHelper, extentHelper } from '../../ol-ext'
+import rxSubs from '../rx-subs'
+import stubVNode from '../stub-vnode'
+import { coordHelper, extentHelper } from '../../ol-ext'
+import { assertHasFeature, assertHasGeom, assertHasView } from '../../utils/assert'
+import { SERVICE_CONTAINER_KEY } from '../../consts'
 
-const { transforms } = coordinateHelper
+const { transforms } = coordHelper
 const { toLonLat: extentToLonLat } = extentHelper
 
 const props = {
@@ -19,6 +21,11 @@ const props = {
 }
 
 const computed = {
+  /**
+   * @type {string}
+   * @abstract
+   * @readonly
+   */
   type () {
     throw new Error('Not implemented computed property')
   }
@@ -26,81 +33,113 @@ const computed = {
 
 const methods = {
   /**
+   * @returns {ol.geom.Geometry|undefined}
+   */
+  getGeom () {
+    return this._geom
+  },
+  /**
+   * @return {void}
+   */
+  refresh () {
+    assertHasGeom(this)
+    this.geom.changed()
+  },
+  /**
+   * @param {Object} opts
+   * @return {void}
+   */
+  updateGeom (opts) {
+    // todo use turf.js to optimize geometry compare
+    if (opts.coordinates && !isEqual(opts.coordinates, this.currentCoordinates)) {
+      this.geom.setCoordinates(this.fromLonLat(opts.coordinates))
+    }
+  },
+  // protected & private
+  /**
+   * @return {ol.geom.Geometry}
+   * @protected
+   * @abstract
+   */
+  createGeom () {
+    throw new Error('Not implemented method')
+  },
+  /**
+   * @return {void}
    * @protected
    */
   initialize () {
     // define helper methods based on geometry type
-    const { toLonLat, fromLonLat } = transforms[ this.type ]
+    const { toLonLat, fromLonLat } = transforms[this.type]
     /**
-     * @param {Array} coordinates
-     * @return {Array}
+     * @method
+     * @param {number[]} coordinates
+     * @return {number[]}
      * @protected
      */
     this.toLonLat = coordinates => toLonLat(coordinates, this.view.getProjection())
     /**
-     * @param {Array} coordinates
-     * @return {Array}
+     * @method
+     * @param {number[]} coordinates
+     * @return {number[]}
      * @protected
      */
     this.fromLonLat = coordinates => fromLonLat(coordinates, this.view.getProjection())
     /**
-     * @param {Array} extent
-     * @return {Array}
+     * @method
+     * @param {number[]} extent
+     * @return {number[]}
      * @protected
      */
     this.extentToLonLat = extent => extentToLonLat(extent, this.view.getProjection())
+    // create ol.geom.Geometry instance
     /**
-     * @type {SimpleGeometry}
+     * @type {ol.geom.Geometry}
      * @protected
      */
-    this.geometry = this.createGeometry()
-    this.geometry.set('vm', this)
-    this.currentExtent = this.extentToLonLat(this.geometry.getExtent())
+    this._geom = this.createGeom()
+    this._geom.set('vm', this)
+    this::defineAccessors()
   },
   /**
-   * @return {SimpleGeometry}
+   * @return {void}
    * @protected
    */
-  createGeometry () {
-    throw new Error('Not implemented method')
-  },
-  subscribeAll () {
-    this::subscribeToGeomChanges()
-  },
-  /**
-   * @protected
-   */
-  mountGeometry () {
-    if (!this.feature) {
-      throw new Error('Invalid usage of geometry component, should have feature component among it\'s ancestors')
-    }
+  mount () {
+    assertHasFeature(this)
+    assertHasGeom(this)
 
-    this.feature.setGeometry(this.geometry)
+    this.feature.setGeometry(this.geom)
     this.subscribeAll()
   },
   /**
+   * @return {void}
    * @protected
    */
-  unmountGeometry () {
+  unmount () {
+    assertHasFeature(this)
+
     this.unsubscribeAll()
-    this.feature && this.feature.setGeometry(undefined)
+    this.feature.setGeometry(undefined)
   },
-  refresh () {
-    this.geometry.changed()
+  /**
+   * @return {void}
+   * @protected
+   */
+  subscribeAll () {
+    this::subscribeToGeomChanges()
   }
 }
 const watch = {
-  coordinates (value) {
-    // todo use turf.js to optimize geometry compare
-    if (!isEqual(value, this.currentCoordinates)) {
-      this.geometry.setCoordinates(this.fromLonLat(value, this.view.getProjection()))
-    }
+  coordinates (coordinates) {
+    assertHasGeom(this)
+    assertHasView(this)
+    this.updateGeom({ coordinates })
   }
 }
 
 export default {
-  mixins: [ rxSubs, stubVNode ],
-  inject: [ 'view', 'feature' ],
+  mixins: [rxSubs, stubVNode],
   props,
   computed,
   watch,
@@ -110,13 +149,25 @@ export default {
       return this.$options.name
     }
   },
+  inject: {
+    serviceContainer: SERVICE_CONTAINER_KEY
+  },
+  /**
+   * @returns {Object}
+   */
   provide () {
-    return Object.defineProperties(Object.create(null), {
-      geometry: {
-        enumerable: true,
-        get: () => this.geometry
+    let vm = this
+
+    return {
+      [SERVICE_CONTAINER_KEY]: {
+        get geom () { return vm.geom },
+        get feature () { return vm.feature },
+        get source () { return vm.source },
+        get layer () { return vm.layer },
+        get view () { return vm.view },
+        get map () { return vm.map }
       }
-    })
+    }
   },
   data () {
     return {
@@ -126,40 +177,71 @@ export default {
   },
   created () {
     this.initialize()
+    this.currentExtent = this.extentToLonLat(this.geom.getExtent())
   },
   mounted () {
-    this.$nextTick(this.mountGeometry)
+    this.mount()
   },
   destroyed () {
-    this.$nextTick(() => {
-      this.unmountGeometry()
-      this.geometry = undefined
-    })
+    this.unmount()
+    this._geom = undefined
   }
 }
 
+/**
+ * @return {void}
+ * @private
+ */
+function defineAccessors () {
+  Object.defineProperties(this, {
+    geom: {
+      enumerable: true,
+      get: this.getGeom
+    },
+    feature: {
+      enumerable: true,
+      get: () => this.serviceContainer.feature
+    },
+    source: {
+      enumerable: true,
+      get: () => this.serviceContainer.source
+    },
+    layer: {
+      enumerable: true,
+      get: () => this.serviceContainer.layer
+    },
+    view: {
+      enumerable: true,
+      get: () => this.serviceContainer.view
+    },
+    map: {
+      enumerable: true,
+      get: () => this.serviceContainer.map
+    }
+  })
+}
+
+/**
+ * @return {void}
+ * @private
+ */
 function subscribeToGeomChanges () {
-  const geomChanges = Observable.fromOlEvent(this.geometry, 'change')
-    .throttleTime(300)
+  assertHasView(this)
+  assertHasGeom(this)
+
+  const geomChanges = Observable.fromOlEvent(this.geom, 'change')
+    .throttleTime(60)
     .distinctUntilChanged((a, b) => isEqual(a, b))
     .map(() => ({
-      coordinates: this.toLonLat(this.geometry.getCoordinates(), this.view.getProjection()),
-      extent: extentHelper.toLonLat(this.geometry.getExtent(), this.view.getProjection())
+      coordinates: this.toLonLat(this.geom.getCoordinates())
     }))
 
   this.subscribeTo(geomChanges, ({ coordinates, extent }) => {
-    let changed = false
-
     if (!isEqual(this.currentCoordinates, coordinates)) {
       this.currentCoordinates = coordinates
-      changed = true
+      this.currentExtent = extentHelper.toLonLat(this.geom.getExtent(), this.view.getProjection())
     }
 
-    if (!isEqual(this.currentExtent, extent)) {
-      this.currentExtent = extent
-      changed = true
-    }
-
-    changed && this.$emit('change', { coordinates, extent })
+    this.$emit('change', { coordinates, extent })
   })
 }

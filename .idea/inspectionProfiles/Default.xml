@@ -1,0 +1,52 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Default" />
+    <inspection_tool class="BadExpressionStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CheckEmptyScriptTag" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CssUnknownTarget" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="Eslint" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="14">
+            <item index="0" class="java.lang.String" itemvalue="inject-view-key" />
+            <item index="1" class="java.lang.String" itemvalue="color" />
+            <item index="2" class="java.lang.String" itemvalue="url" />
+            <item index="3" class="java.lang.String" itemvalue="layers" />
+            <item index="4" class="java.lang.String" itemvalue="server-type" />
+            <item index="5" class="java.lang.String" itemvalue="layer-name" />
+            <item index="6" class="java.lang.String" itemvalue="matrix-set" />
+            <item index="7" class="java.lang.String" itemvalue="format" />
+            <item index="8" class="java.lang.String" itemvalue="style-name" />
+            <item index="9" class="java.lang.String" itemvalue="view-name" />
+            <item index="10" class="java.lang.String" itemvalue="share" />
+            <item index="11" class="java.lang.String" itemvalue="v-share" />
+            <item index="12" class="java.lang.String" itemvalue="v-vl-share" />
+            <item index="13" class="java.lang.String" itemvalue="key" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="7">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="slot" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="JSEqualityComparisonWithCoercion" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="mySeverity" value="All except when comparing with null" />
+    </inspection_tool>
+    <inspection_tool class="ReservedWordUsedAsNameJS" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>

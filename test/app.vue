@@ -1,68 +1,69 @@
 <template>
   <div id="app">
-    <vl-map>
-      <vl-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
+    <table style="width: 100%; table-layout: fixed">
+      <tr>
+        <td style="width: 50%">
+          <vl-map>
+            <vl-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
 
-      <!-- interactions -->
-      <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
-        <vl-style-container>
-          <vl-style-stroke color="#f03b20" :width="3"/>
-          <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+            <!--<vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
+              <vl-style-container>
+                <vl-style-stroke color="#f03b20" :width="3"/>
+                <vl-style-fill :color="[254, 178, 76, 0.7]"/>
 
-          <vl-style-circle>
-            <vl-style-stroke color="#f03b20" :width="3"/>
-            <vl-style-fill :color="[254, 178, 76, 0.7]"/>
-          </vl-style-circle>
-        </vl-style-container>
-      </vl-interaction-select>
-      <!--// interactions -->
+                <vl-style-circle>
+                  <vl-style-stroke color="#f03b20" :width="3"/>
+                  <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+                </vl-style-circle>
+              </vl-style-container>
+            </vl-interaction-select>-->
 
-      <vl-layer-tile>
-        <vl-source-sputnik/>
-      </vl-layer-tile>
-      <!--// base layers -->
+            <vl-layer-tile>
+              <vl-source-sputnik/>
+            </vl-layer-tile>
 
-      <vl-layer-vector id="points" v-if="pointsLayer">
-        <!-- layer level style -->
-        <vl-style-container>
-          <vl-style-stroke color="#8856a7" :width="2"/>
-          <vl-style-fill :color="[158, 188, 218, 0.5]"/>
+            <!--<vl-layer-vector id="points" v-if="pointsLayer">
+              <vl-style-container>
+                <vl-style-stroke color="#8856a7" :width="2"/>
+                <vl-style-fill :color="[158, 188, 218, 0.5]"/>
 
-          <vl-style-circle>
-            <vl-style-stroke color="#8856a7" :width="2"/>
-            <vl-style-fill :color="[158, 188, 218, 0.5]"/>
-          </vl-style-circle>
-        </vl-style-container>
-        <!--// layer level style -->
+                <vl-style-circle>
+                  <vl-style-stroke color="#8856a7" :width="2"/>
+                  <vl-style-fill :color="[158, 188, 218, 0.5]"/>
+                </vl-style-circle>
+              </vl-style-container>
 
-        <vl-source-vector :features="points" />
-      </vl-layer-vector>
+              <vl-source-vector :features="points" />
+            </vl-layer-vector>
 
-      <!-- Tile WMS -->
-      <vl-layer-tile id="wms">
-        <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
-                       :ext-params="{ TILED: true }" server-type="geoserver" />
-      </vl-layer-tile>
-      <!--// Tile WMS -->
+            <vl-layer-tile id="wms">
+              <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
+                             :ext-params="{ TILED: true }" server-type="geoserver" />
+            </vl-layer-tile>
 
-      <!-- WMTS -->
-      <vl-layer-tile id="wmts">
-        <vl-source-wmts
-          url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
-          layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
-      </vl-layer-tile>
-      <!--// WMTS -->
-    </vl-map>
+            <vl-layer-tile id="wmts">
+              <vl-source-wmts
+                url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
+                layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
+            </vl-layer-tile>-->
+          </vl-map>
+        </td>
+        <td>
+          <vl-map>
+            <vl-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
 
-    <div class="controls">
-      <button @click="pointsLayer = !pointsLayer">Toggle</button>
-      <button @click="points = points.slice(1)">Remove</button>
-    </div>
+            <vl-layer-tile>
+              <vl-source-sputnik/>
+            </vl-layer-tile>
+          </vl-map>
+        </td>
+      </tr>
+    </table>
   </div>
 </template>
 
 <script>
-  import { kebabCase, range, random } from 'lodash/fp'
+  import { range, random } from 'lodash/fp'
 
   const computed = {
     selectedIds () {
@@ -71,9 +72,6 @@
   }
 
   const methods = {
-    geometryTypeToCompName (type) {
-      return 'vl-geom-' + kebabCase(type)
-    },
     updateMapView ({ center, zoom, rotation }) {
       this.center = center
       this.zoom = zoom
@@ -128,10 +126,6 @@
         points: [],
         pointsLayer: true
       }
-    },
-    created () {
-      this.loadData()
-        .catch(::console.error)
     }
   }
 </script>

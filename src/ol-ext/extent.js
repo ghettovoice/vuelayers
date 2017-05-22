@@ -3,7 +3,7 @@
  */
 import proj from 'ol/proj'
 import extentHelper from 'ol/extent'
-import { DATA_PROJECTION, MAP_PROJECTION, EXTENT_CORNER } from './consts'
+import { DATA_PROJECTION, EXTENT_CORNER, MAP_PROJECTION } from './consts'
 
 const { transformExtent } = proj
 const { getWidth, getHeight, boundingExtent } = extentHelper
@@ -35,14 +35,14 @@ export function toLonLat (extent, projection = MAP_PROJECTION) {
 
 export function createOrUpdate (minX, minY, maxX, maxY, extent) {
   if (extent) {
-    extent[ 0 ] = minX
-    extent[ 1 ] = minY
-    extent[ 2 ] = maxX
-    extent[ 3 ] = maxY
+    extent[0] = minX
+    extent[1] = minY
+    extent[2] = maxX
+    extent[3] = maxY
 
     return extent
   } else {
-    return [ minX, minY, maxX, maxY ]
+    return [minX, minY, maxX, maxY]
   }
 }
 

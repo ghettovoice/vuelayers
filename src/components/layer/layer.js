@@ -1,180 +1,206 @@
 import uuid from 'uuid/v4'
+import { SERVICE_CONTAINER_KEY } from '../../consts'
 import Observable from '../../rx-ext'
-import rxSubs from '../../mixins/rx-subs'
-import stubVNode from '../../mixins/stub-vnode'
-import { coordinateHelper } from '../../ol-ext'
+import rxSubs from '../rx-subs'
+import stubVNode from '../stub-vnode'
+import { coordHelper } from '../../ol-ext'
+import { assertHasLayer, assertHasMap, assertHasView } from '../../utils/assert'
 
-const { toLonLat } = coordinateHelper
+const { toLonLat } = coordHelper
 
 const props = {
-  id: {
-    type: [ String, Number ],
-    default: () => uuid()
-  },
-  opacity: {
-    type: Number,
-    default: 1
-  },
-  minResolution: Number,
-  maxResolution: Number,
-  visible: {
-    type: Boolean,
-    default: true
-  },
   extent: {
     type: Array,
     validator: value => Array.isArray(value) && value.length === 4
   },
-  zIndex: {
-    type: Number,
-    default: 0
+  id: {
+    type: [String, Number],
+    default: () => uuid()
   },
-  overlay: {
+  minResolution: Number,
+  maxResolution: Number,
+  opacity: Number,
+  overlay: Boolean,
+  visible: {
     type: Boolean,
-    default: false
-  }
-}
-
-const computed = {
-  currentId () {
-    return this.id
+    default: true
   },
-  currentMinResolution () {
-    return this.minResolution
-  },
-  currentMaxResolution () {
-    return this.maxResolution
-  },
-  currentExtent () {
-    return this.extent
-  },
-  currentOpacity () {
-    return this.opacity
-  }
+  zIndex: Number
 }
 
 const methods = {
   /**
-   * Updates layer state
+   * @return {ol.layer.Layer|undefined}
    */
-  refresh () {
-    this.layer && this.layer.changed()
-  },
-  initialize () {
-    /**
-     * @type {Layer}
-     * @protected
-     */
-    this.layer = this.createLayer()
-    this.layer.setProperties({
-      id: this.currentId,
-      vm: this
-    })
+  getLayer () {
+    return this._layer
   },
   /**
-   * @return {Layer}
+   * @return {ol.source.Source}
+   */
+  getSource () {
+    assertHasLayer(this)
+    return this.layer.getSource()
+  },
+  /**
+   * @param {number[]} pixel
+   * @return {boolean}
+   */
+  isAtPixel (pixel) {
+    assertHasMap(this)
+    assertHasLayer(this)
+
+    return this.map.forEachLayerAtPixel(pixel, layer => layer === this.layer)
+  },
+  /**
+   * Updates layer state
+   * @return {void}
+   */
+  refresh () {
+    assertHasLayer(this)
+    this.layer.changed()
+  },
+  // protected & private
+  /**
+   * @return {ol.layer.Layer}
    * @protected
+   * @abstract
    */
   createLayer () {
     throw new Error('Not implemented method')
   },
   /**
+   * @return {void}
    * @protected
    */
-  mountLayer () {
-    if (!this.map) {
-      throw new Error("Invalid usage of layer component, should have map component among it's ancestors")
-    }
+  initialize () {
+    /**
+     * @type {ol.layer.Layer}
+     * @protected
+     */
+    this._layer = this.createLayer()
+    this._layer.setProperties({
+      id: this.id,
+      vm: this
+    })
+    this::defineAccessors()
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  mount () {
+    assertHasMap(this)
+    assertHasLayer(this)
 
     if (this.overlay) {
       this.layer.setMap(this.map)
     } else {
       this.map.addLayer(this.layer)
     }
+
     this.subscribeAll()
   },
   /**
+   * @return {void}
    * @protected
    */
-  unmountLayer () {
+  unmount () {
+    assertHasMap(this)
+    assertHasLayer(this)
+
     this.unsubscribeAll()
-    if (this.map) {
-      if (this.overlay) {
-        this.layer.setMap(undefined)
-      } else {
-        this.map.removeLayer(this.layer)
-      }
+
+    if (this.overlay) {
+      this.layer.setMap(undefined)
+    } else {
+      this.map.removeLayer(this.layer)
     }
   },
+  /**
+   * @return {void}
+   */
   subscribeAll () {
     this::subscribeToMapEvents()
-  },
-  isAtPixel (pixel) {
-    return this.map.forEachLayerAtPixel(pixel, layer => layer === this.layer)
   }
 }
 
 const watch = {
-  currentId (value) {
+  id (value) {
+    assertHasLayer(this)
     return this.layer.set('id', value)
   },
-  currentMaxResolution (value) {
+  maxResolution (value) {
+    assertHasLayer(this)
     this.layer.setMaxResolution(value)
   },
-  currentMinResolution (value) {
+  minResolution (value) {
+    assertHasLayer(this)
     this.layer.setMinResolution(value)
   },
-  currentOpacity (value) {
+  opacity (value) {
+    assertHasLayer(this)
     this.layer.setOpacity(value)
   },
   visible (value) {
+    assertHasLayer(this)
     this.layer.setVisible(value)
   },
   zIndex (value) {
+    assertHasLayer(this)
     this.layer.setZIndex(value)
   }
 }
 
 export default {
-  mixins: [ rxSubs, stubVNode ],
-  inject: [ 'map', 'view' ],
+  mixins: [rxSubs, stubVNode],
   props,
-  computed,
   methods,
   watch,
   stubVNode: {
     attrs () {
       return {
-        id: [ this.$options.name, this.currentId ].join('-')
+        id: [this.$options.name, this.id].join('-')
       }
     }
   },
+  inject: {
+    serviceContainer: SERVICE_CONTAINER_KEY
+  },
   provide () {
-    return Object.defineProperties(Object.create(null), {
-      layer: {
-        enumerable: true,
-        get: () => this.layer
+    const vm = this
+
+    return {
+      [SERVICE_CONTAINER_KEY]: {
+        get layer () { return vm.layer },
+        get map () { return vm.map },
+        get view () { return vm.view }
       }
-    })
+    }
   },
   created () {
     this.initialize()
   },
   mounted () {
-    this.$nextTick(this.mountLayer)
+    this.mount()
   },
   destroyed () {
-    this.$nextTick(() => {
-      this.unmountLayer()
-      this.layer = undefined
-    })
+    this.unmount()
+    this._layer = undefined
   }
 }
 
+/**
+ * @return {void}
+ * @private
+ */
 function subscribeToMapEvents () {
+  assertHasMap(this)
+  assertHasView(this)
+
   const pointerEvents = Observable.fromOlEvent(
     this.map,
-    [ 'click', 'dblclick', 'singleclick' ],
+    ['click', 'dblclick', 'singleclick'],
     ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
   ).map(evt => ({
     ...evt,
@@ -184,6 +210,27 @@ function subscribeToMapEvents () {
   this.subscribeTo(pointerEvents, evt => {
     if (this.isAtPixel(evt.pixel)) {
       this.$emit(evt.type, evt)
+    }
+  })
+}
+
+/**
+ * @return {void}
+ * @private
+ */
+function defineAccessors () {
+  Object.defineProperties(this, {
+    layer: {
+      enumerable: true,
+      get: this.getLayer
+    },
+    map: {
+      enumerable: true,
+      get: () => this.serviceContainer.map
+    },
+    view: {
+      enumerable: true,
+      get: () => this.serviceContainer.view
     }
   })
 }

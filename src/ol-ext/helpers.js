@@ -1,6 +1,6 @@
 import ol from 'openlayers'
 import { isEqual } from 'lodash/fp'
-import { EARTH_RADIUS, WGS84_SPHERE, TILE_SIZE } from './consts'
+import { EARTH_RADIUS, TILE_SIZE, WGS84_SPHERE } from './consts'
 
 /**
  * @param {number} zoom
@@ -70,5 +70,5 @@ export function flyTo (view, coordinate, zoom) {
     )
   }
 
-  return Promise.all([ centerPromise, zoomPromise ])
+  return Promise.all([centerPromise, zoomPromise])
 }

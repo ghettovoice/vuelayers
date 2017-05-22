@@ -1,7 +1,11 @@
+/**
+ * @module components/geom/point
+ */
 import Point from './geom.vue'
 
-Point.install = function (Vue) {
-  Vue.component(Point.name, Point)
+export default {
+  ...Point,
+  install (Vue) {
+    Vue.component(Point.name, Point)
+  }
 }
-
-export default Point

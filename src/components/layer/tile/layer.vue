@@ -7,15 +7,17 @@
   }
 
   const methods = {
+    // protected & private
     /**
-     * @return {TileLayer}
+     * @return {ol.layer.Tile}
+     * @protected
      */
     createLayer () {
       return new TileLayer({
-        id: this.currentId,
-        minResolution: this.currentMinResolution,
-        maxResolution: this.currentMaxResolution,
-        opacity: this.currentOpacity,
+        id: this.id,
+        minResolution: this.minResolution,
+        maxResolution: this.maxResolution,
+        opacity: this.opacity,
         visible: this.visible,
         preload: this.preload,
         extent: this.currentExtent,
@@ -26,7 +28,7 @@
 
   export default {
     name: 'vl-layer-tile',
-    mixins: [ layer ],
+    mixins: [layer],
     props,
     methods
   }

@@ -1,7 +1,11 @@
-import Circle from './circle.vue'
+/**
+ * @module components/style/circle
+ */
+import Circle from './style.vue'
 
-Circle.install = function (Vue) {
-  Vue.component(Circle.name, Circle)
+export default {
+  ...Circle,
+  install (Vue) {
+    Vue.component(Circle.name, Circle)
+  }
 }
-
-export default Circle

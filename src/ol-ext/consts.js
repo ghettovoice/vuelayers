@@ -21,6 +21,10 @@ export const MIN_ZOOM = 0
  */
 export const TILE_SIZE = 256
 /**
+ * @type {string}
+ */
+export const TILE_FORMAT = 'png'
+/**
  * @type {number} Default zoom factor
  */
 export const ZOOM_FACTOR = 2
@@ -32,6 +36,14 @@ export const CACHE_SIZE = 2048
  * @type {number}
  */
 export const PIXEL_RATIO = 1
+/**
+ * @type {string}
+ */
+export const CROSS_ORIGIN = 'anonymous'
+/**
+ * @type {number}
+ */
+export const REPROJ_ERR_THRESHOLD = 0.5
 /**
  * @type {number} Earth radius in meters
  */

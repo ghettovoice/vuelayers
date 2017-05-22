@@ -1,3 +1,4 @@
+/* global describe, it, beforeEach, afterEach */
 import sinon from 'sinon'
 import OlObject from 'ol/object'
 import { identity } from 'lodash/fp'
