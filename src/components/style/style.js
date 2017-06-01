@@ -23,7 +23,7 @@ const methods = {
     this.mount()
   },
   /**
-   * @param {number} [wait]
+   * @param {number} [wait=100]
    * @returns {Promise}
    */
   deferRefresh (wait = 100) {
