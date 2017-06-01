@@ -23,6 +23,24 @@
         fill: this.fill,
         stroke: this.stroke
       })
+    },
+    /**
+     * @param {ol.style.Fill} fill
+     * @return {void}
+     * @protected
+     */
+    setFill (fill) {
+      this.fill = fill
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.style.Stroke} stroke
+     * @return {void}
+     * @protected
+     */
+    setStroke (stroke) {
+      this.stroke = stroke
+      this.deferRefresh()
     }
   }
 
@@ -39,21 +57,11 @@
     methods,
     watch,
     provide () {
-      const vm = this
-
       return {
         [SERVICE_CONTAINER_KEY]: {
-          get styleTarget () {
-            return {
-              setFill (fill) {
-                vm.fill = fill
-                vm.deferRefresh()
-              },
-              setStroke (stroke) {
-                vm.stroke = stroke
-                vm.deferRefresh()
-              }
-            }
+          styleTarget: {
+            setFill: this.setFill,
+            setStroke: this.setStroke
           }
         }
       }

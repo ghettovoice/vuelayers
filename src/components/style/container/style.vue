@@ -70,6 +70,56 @@
       currentStyle = currentStyle.filter(x => x.style !== this.style)
       currentStyle.length || (currentStyle = undefined)
       this.styleTarget.setStyle(currentStyle)
+    },
+    /**
+     * @param {ol.style.Fill} fill
+     * @return {void}
+     * @protected
+     */
+    setFill (fill) {
+      assertHasStyle(this)
+      this.style.setFill(fill)
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.geom.Geometry|ol.StyleGeometryFunction} geom
+     * @return {void}
+     * @protected
+     */
+    setGeometry (geom) {
+      assertHasStyle(this)
+      this.style.setGeometry(geom)
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.style.Image} image
+     * @return {void}
+     * @protected
+     */
+    setImage (image) {
+      assertHasStyle(this)
+      this.style.setImage(image)
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.style.Stroke} stroke
+     * @return {void}
+     * @protected
+     */
+    setStroke (stroke) {
+      assertHasStyle(this)
+      this.style.setStroke(stroke)
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.style.Text} text
+     * @return {void}
+     * @protected
+     */
+    setText (text) {
+      assertHasStyle(this)
+      this.style.setText(text)
+      this.deferRefresh()
     }
   }
 
@@ -99,34 +149,15 @@
       serviceContainer: SERVICE_CONTAINER_KEY
     },
     provide () {
-      const vm = this
-
       return {
         [SERVICE_CONTAINER_KEY]: {
           // style container provides style target as an object with setters for it's own props
-          get styleTarget () {
-            return {
-              setFill (fill) {
-                vm.style.setFill(fill)
-                vm.deferRefresh()
-              },
-              setGeometry (geom) {
-                vm.style.setGeometry(geom)
-                vm.deferRefresh()
-              },
-              setImage (image) {
-                vm.style.setImage(image)
-                vm.deferRefresh()
-              },
-              setStroke (stroke) {
-                vm.style.setStroke(stroke)
-                vm.deferRefresh()
-              },
-              setText (text) {
-                vm.style.setText(text)
-                vm.deferRefresh()
-              }
-            }
+          styleTarget:  {
+            setFill: this.setFill,
+            setGeometry: this.setGeometry,
+            setImage: this.setImage,
+            setStroke: this.setStroke,
+            setText: this.setText
           }
         }
       }

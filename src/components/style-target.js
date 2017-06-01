@@ -15,15 +15,12 @@ export default {
     this.styles = this.defaultStyles = undefined
   },
   provide () {
-    const vm = this
     // export to inner components style target object (object with getStyle/setStyle methods)
     return {
       [SERVICE_CONTAINER_KEY]: {
-        get styleTarget () {
-          return {
-            getStyle: vm.getStyle,
-            setStyle: vm.setStyle
-          }
+        styleTarget: {
+          getStyle: this.getStyle,
+          setStyle: this.setStyle
         }
       }
     }

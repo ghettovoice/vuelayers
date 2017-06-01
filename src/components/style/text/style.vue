@@ -58,6 +58,26 @@
     unmount () {
       assertHasStyleTarget(this)
       this.styleTarget.setText(undefined)
+    },
+    /**
+     * @param {ol.style.Fill} fill
+     * @return {void}
+     * @protected
+     */
+    setFill (fill) {
+      assertHasStyle(this)
+      this.style.setFill(fill)
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.style.Stroke} stroke
+     * @return {void}
+     * @protected
+     */
+    setStroke (stroke) {
+      assertHasStyle(this)
+      this.style.setStroke(stroke)
+      this.deferRefresh()
     }
   }
 
@@ -119,21 +139,11 @@
       }
     },
     provide () {
-      const vm = this
-
       return {
         [SERVICE_CONTAINER_KEY]: {
-          get styleTarget () {
-            return {
-              setFill (fill) {
-                vm.style.setFill(fill)
-                vm.deferRefresh()
-              },
-              setStroke (stroke) {
-                vm.style.setStroke(stroke)
-                vm.deferRefresh()
-              }
-            }
+          styleTarget: {
+            setFill: this.setFill,
+            setStroke: this.setStroke
           }
         }
       }
