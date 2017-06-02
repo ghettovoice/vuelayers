@@ -9,11 +9,12 @@
     },
     size: {
       type: Array,
-      validator: value => Array.isArray(value) && value.length === 2
+      validator: value => value.length === 2
     },
     anchor: {
       type: Array,
-      default: () => [0.5, 0.5]
+      default: () => [0.5, 0.5],
+      validator: value => value.length === 2
     },
     anchorOrigin: {
       type: String,
@@ -34,7 +35,8 @@
     },
     offset: {
       type: Array,
-      default: () => [0, 0]
+      default: () => [0, 0],
+      validator: value => value.length === 2
     },
     offsetOrigin: {
       type: String,

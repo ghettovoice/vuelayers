@@ -1,27 +1,12 @@
 /**
  * Basic style mixin.
- * Exposes for children inner OpenLayer style object as styleTarget.
- * Injects styleTarget from parent to apply self style.
  */
 import { debounce } from 'lodash/fp'
+import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import stubVNode from '../stub-vnode'
-import { SERVICE_CONTAINER_KEY } from '../../consts'
+import services from '../services'
 
 const methods = {
-  /**
-   * Inner ol style instance getter
-   * @return {OlStyle|undefined}
-   */
-  getStyle () {
-    return this._style
-  },
-  /**
-   * @return {void}
-   */
-  refresh () {
-    this.unmount()
-    this.mount()
-  },
   /**
    * @param {number} [wait=100]
    * @returns {Promise}
@@ -38,14 +23,19 @@ const methods = {
       this.__deferRefresh()
     })
   },
-  // protected & private
   /**
-   * @return {OlStyle}
-   * @protected
-   * @abstract
+   * @return {void}
    */
-  createStyle () {
-    throw new Error('Not implemented method')
+  refresh () {
+    this.unmount()
+    this.mount()
+  },
+  /**
+   * Inner ol style instance getter
+   * @return {OlStyle|undefined}
+   */
+  getStyle () {
+    return this._style
   },
   /**
    * @return {void}
@@ -58,6 +48,23 @@ const methods = {
      */
     this._style = this.createStyle()
     this::defineAccessors()
+  },
+  /**
+   * @return {OlStyle}
+   * @protected
+   * @abstract
+   */
+  createStyle () {
+    throw new Error('Not implemented method')
+  },
+  /**
+   * @return {Object}
+   * @protected
+   */
+  getServices () {
+    return mergeDescriptors(this::services.methods.getServices(), {
+      style: this
+    })
   },
   /**
    * @return {void}
@@ -78,15 +85,12 @@ const methods = {
 }
 
 export default {
-  mixins: [stubVNode],
+  mixins: [stubVNode, services],
   methods,
   stubVNode: {
     empty () {
       return this.$options.name
     }
-  },
-  inject: {
-    serviceContainer: SERVICE_CONTAINER_KEY
   },
   created () {
     this.initialize()
@@ -110,21 +114,9 @@ function defineAccessors () {
       enumerable: true,
       get: this.getStyle
     },
-    styleTarget: {
-      enumerable: true,
-      get: () => this.serviceContainer.styleTarget
-    },
     map: {
       enumerable: true,
-      get: () => this.serviceContainer.map
-    },
-    view: {
-      enumerable: true,
-      get: () => this.serviceContainer.view
+      get: () => this.services.map
     }
   })
 }
-
-/**
- * @typedef {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text|ol.StyleFunction} OlStyle
- */

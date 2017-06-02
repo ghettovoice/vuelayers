@@ -1,7 +1,5 @@
 <script>
   import VectorLayer from 'ol/layer/vector'
-  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
-  import { SERVICE_CONTAINER_KEY } from '../../../consts'
   import layer from '../layer'
   import styleTarget from '../../style-target'
 
@@ -34,7 +32,7 @@
       })
     },
     /**
-     * @return {ol.layer.Vector}
+     * @return {ol.layer.Vector|undefined}
      * @protected
      */
     getStyleTarget () {
@@ -46,15 +44,6 @@
     name: 'vl-layer-vector',
     mixins: [layer, styleTarget],
     props,
-    methods,
-    provide () {
-      return {
-        [SERVICE_CONTAINER_KEY]: mergeDescriptors(
-          {},
-          this::layer.provide()[SERVICE_CONTAINER_KEY],
-          this::styleTarget.provide()[SERVICE_CONTAINER_KEY]
-        )
-      }
-    }
+    methods
   }
 </script>

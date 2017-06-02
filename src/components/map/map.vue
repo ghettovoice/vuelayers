@@ -6,13 +6,16 @@
 </template>
 
 <script>
-  import { constant } from 'lodash/fp'
+  import Vue from 'vue'
+  import { constant, isEqual } from 'lodash/fp'
   import Map from 'ol/map'
   import olControl from 'ol/control'
-  import { SERVICE_CONTAINER_KEY } from '../../consts'
+  import { VM_PROP } from '../../consts'
+  import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import Observable from '../../rx-ext'
   import { coordHelper, geoJson } from '../../ol-ext'
   import rxSubs from '../rx-subs'
+  import services from '../services'
   import { assertHasMap, assertHasView } from '../../utils/assert'
   import plainProps from '../../utils/plain-props'
 
@@ -27,10 +30,7 @@
     loadTilesWhileAnimating: Boolean,
     loadTilesWhileInteracting: Boolean,
     logo: [String, Object],
-    pixelRatio: {
-      type: Number,
-      default: 1
-    },
+    pixelRatio: Number,
     renderer: [String, Array],
     tabIndex: {
       type: Number,
@@ -40,6 +40,46 @@
 
   const methods = {
     /**
+     * @param {ol.layer.Layer|Vue} layer
+     * @return {void}
+     */
+    addLayer (layer) {
+      assertHasMap(this)
+
+      layer = layer instanceof Vue ? layer.layer : layer
+      this.map.addLayer(layer)
+    },
+    /**
+     * @param {ol.layer.Layer|Vue} layer
+     * @return {void}
+     */
+    removeLayer (layer) {
+      assertHasMap(this)
+
+      layer = layer instanceof Vue ? layer.layer : layer
+      this.map.removeLayer(layer)
+    },
+    /**
+     * @param {ol.interaction.Interaction|Vue} interaction
+     * @return {void}
+     */
+    addInteraction (interaction) {
+      assertHasMap(this)
+
+      interaction = interaction instanceof Vue ? interaction.interaction : interaction
+      this.map.addInteraction(interaction)
+    },
+    /**
+     * @param {ol.interaction.Interaction|Vue} interaction
+     * @return {void}
+     */
+    removeInteraction (interaction) {
+      assertHasMap(this)
+
+      interaction = interaction instanceof Vue ? interaction.interaction : interaction
+      this.map.removeInteraction(interaction)
+    },
+    /**
      * Trigger focus on map container.
      * @return {void}
      */
@@ -48,7 +88,7 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function(feature: ol.Feature, layer: (ol.layer.Layer|undefined))} callback
+     * @param {function(feature: GeoJSONFeature, layer: (Object|undefined))} callback
      * @param {Object} [opts]
      * @return {T|undefined}
      */
@@ -70,8 +110,8 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function(layer: ol.layer.Layer, rgba: (number[]|undefined))} callback
-     * @param {function(layer: ol.layer.Layer)} [layerFilter]
+     * @param {function(layer: Object, rgba: (number[]|undefined))} callback
+     * @param {function(layer: Object)} [layerFilter]
      * @return {T|undefined}
      */
     forEachLayerAtPixel (pixel, callback, layerFilter = () => {}) {
@@ -93,8 +133,41 @@
      */
     getCoordinateFromPixel (pixel) {
       assertHasMap(this)
+      assertHasView(this)
 
       return toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.getProjection())
+    },
+    /**
+     * @return {ol.Map|undefined}
+     */
+    getMap () {
+      return this._map
+    },
+    /**
+     * @return {ol.View|undefined}
+     */
+    getView () {
+      assertHasMap(this)
+      return this.map.getView()
+    },
+    /**
+     * @param {ol.View|Vue|undefined} view
+     * @return {void}
+     */
+    setView (view) {
+      assertHasMap(this)
+
+      view = view instanceof Vue ? view.view : view
+      this.map.setView(view)
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(this::services.methods.getServices(), {
+        map: this
+      })
     },
     /**
      * Triggers map re-render.
@@ -118,19 +191,9 @@
 
   export default {
     name: 'vl-map',
-    mixins: [rxSubs],
+    mixins: [rxSubs, services],
     props,
     methods,
-    provide () {
-      const vm = this
-
-      return {
-        [SERVICE_CONTAINER_KEY]: {
-          get map () { return vm.map },
-          get view () { return vm.view }
-        }
-      }
-    },
     created () {
       this::initialize()
     },
@@ -165,7 +228,7 @@
       logo: this.logo,
       keyboardEventTarget: this.keyboardEventTarget
     })
-    this._map.set('vm', this)
+    this._map.set(VM_PROP, this)
     this::defineAccessors()
   }
 
@@ -177,11 +240,11 @@
     Object.defineProperties(this, {
       map: {
         enumerable: true,
-        get: () => this._map
+        get: this.getMap
       },
       view: {
         enumerable: true,
-        get: () => this._map.getView()
+        get: this.getView
       }
     })
   }
@@ -215,14 +278,20 @@
    */
   function subscribeToMapEvents () {
     assertHasMap(this)
+    assertHasView(this)
 
-    const pointerEvents = Observable.fromOlEvent(this.map, [
-      'click',
-      'dblclick',
-      'singleclick',
-      'pointerdrag',
-      'pointermove'
-    ]).map(evt => ({
+    const pointerEvents = Observable.merge(
+      Observable.fromOlEvent(this.map, [
+        'click',
+        'dblclick',
+        'singleclick'
+      ]),
+      Observable.fromOlEvent(this.map, [
+        'pointerdrag',
+        'pointermove'
+      ]).throttleTime(1000 / 30)
+        .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
+    ).map(evt => ({
       ...evt,
       coordinate: toLonLat(evt.coordinate, this.view.getProjection())
     }))

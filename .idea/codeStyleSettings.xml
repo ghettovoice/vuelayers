@@ -20,6 +20,9 @@
           <option name="LOWER_CASE_NULL_CONST" value="true" />
           <option name="KEEP_RPAREN_AND_LBRACE_ON_ONE_LINE" value="true" />
         </PHPCodeStyleSettings>
+        <SqlCodeStyleSettings>
+          <option name="KEYWORD_CASE" value="2" />
+        </SqlCodeStyleSettings>
         <codeStyleSettings language="JavaScript">
           <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
           <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />

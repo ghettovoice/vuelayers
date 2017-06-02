@@ -1,11 +1,7 @@
 import style from './style'
-import { assertHasStyleTarget } from '../../utils/assert'
 
 const props = {
-  snapToPixel: {
-    type: Boolean,
-    default: true
-  }
+  snapToPixel: Boolean // default true
 }
 
 const methods = {
@@ -18,22 +14,19 @@ const methods = {
     this.initialize()
     this.mount()
   },
-  // protected & private
   /**
    * @return {void}
    * @protected
    */
   mount () {
-    assertHasStyleTarget(this)
-    this.styleTarget.setImage(this.style)
+    this.$parent.setImage(this)
   },
   /**
    * @return {void}
    * @protected
    */
   unmount () {
-    assertHasStyleTarget(this)
-    this.styleTarget.setImage(undefined)
+    this.$parent.setImage(undefined)
   }
 }
 

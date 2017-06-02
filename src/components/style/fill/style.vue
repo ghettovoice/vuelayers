@@ -1,7 +1,7 @@
 <script>
   import Fill from 'ol/style/fill'
   import style from '../style'
-  import { assertHasStyle, assertHasStyleTarget } from '../../../utils/assert'
+  import { assertHasStyle } from '../../../utils/assert'
 
   const props = {
     color: [String, Array]
@@ -22,16 +22,14 @@
      * @protected
      */
     mount () {
-      assertHasStyleTarget(this)
-      this.styleTarget.setFill(this.style)
+      this.$parent.setFill(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      assertHasStyleTarget(this)
-      this.styleTarget.setFill(undefined)
+      this.$parent.setFill(undefined)
     }
   }
 

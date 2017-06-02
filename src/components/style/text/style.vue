@@ -1,19 +1,34 @@
 <script>
   import Text from 'ol/style/text'
   import style from '../style'
-  import { SERVICE_CONTAINER_KEY } from '../../../consts'
-  import { assertHasStyle, assertHasStyleTarget } from '../../../utils/assert'
+  import withFillStroke from '../with-fill-stroke'
+  import { assertHasStyle } from '../../../utils/assert'
 
   const props = {
     font: {
       type: String,
       default: '10px sans-serif' // css font format https://developer.mozilla.org/en-US/docs/Web/CSS/font?v=control
     },
-    offsetX: Number,
-    offsetY: Number,
-    rotateWithView: Boolean,
-    rotation: Number,
-    scale: Number,
+    offsetX: {
+      type: Number,
+      default: 0
+    },
+    offsetY: {
+      type: Number,
+      default: 0
+    },
+    rotateWithView: {
+      type: Boolean,
+      default: false
+    },
+    rotation: {
+      type: Number,
+      default: 0
+    },
+    scale: {
+      type: Number,
+      default: 1
+    },
     text: String,
     textAlign: {
       type: String,
@@ -48,36 +63,14 @@
      * @protected
      */
     mount () {
-      assertHasStyleTarget(this)
-      this.styleTarget.setText(this.style)
+      this.$parent.setText(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      assertHasStyleTarget(this)
-      this.styleTarget.setText(undefined)
-    },
-    /**
-     * @param {ol.style.Fill} fill
-     * @return {void}
-     * @protected
-     */
-    setFill (fill) {
-      assertHasStyle(this)
-      this.style.setFill(fill)
-      this.deferRefresh()
-    },
-    /**
-     * @param {ol.style.Stroke} stroke
-     * @return {void}
-     * @protected
-     */
-    setStroke (stroke) {
-      assertHasStyle(this)
-      this.style.setStroke(stroke)
-      this.deferRefresh()
+      this.$parent.setText(undefined)
     }
   }
 
@@ -126,7 +119,7 @@
 
   export default {
     name: 'vl-style-text',
-    mixins: [style],
+    mixins: [style, withFillStroke],
     props,
     methods,
     watch,
@@ -135,16 +128,6 @@
       attrs () {
         return {
           id: this.$options.name
-        }
-      }
-    },
-    provide () {
-      return {
-        [SERVICE_CONTAINER_KEY]: {
-          styleTarget: {
-            setFill: this.setFill,
-            setStroke: this.setStroke
-          }
         }
       }
     }

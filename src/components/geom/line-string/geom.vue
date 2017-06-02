@@ -6,13 +6,7 @@
 
   const { GEOMETRY_TYPE } = consts
 
-  const props = {
-    coordinates: {
-      type: Array,
-      required: true,
-      validator: value => Array.isArray(value) && value.length
-    }
-  }
+  const props = {}
 
   const computed = {
     type: constant(GEOMETRY_TYPE.LINE_STRING)

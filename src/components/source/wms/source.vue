@@ -3,7 +3,7 @@
   import { omit } from 'lodash/fp'
   import { consts, coordHelper } from '../../../ol-ext'
   import tileSource from '../tile'
-  import { assertHasSource, assertHasView } from '../../../utils/assert'
+  import { assertHasSource, assertHasMap } from '../../../utils/assert'
 
   const { WMS_VERSION } = consts
   const { toLonLat } = coordHelper
@@ -44,10 +44,10 @@
       projection,
       params = {}
     ) {
+      assertHasMap(this)
       assertHasSource(this)
-      assertHasView(this)
 
-      resolution || (resolution = this.view.getResolution())
+      resolution || (resolution = this.map.view.getResolution())
       projection || (projection = this.projection)
 
       return this.source.getFeatureInfoUrl(

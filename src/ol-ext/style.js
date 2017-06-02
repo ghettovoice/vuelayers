@@ -11,74 +11,12 @@ import Icon from 'ol/style/icon'
 import RegularShape from 'ol/style/regularshape'
 import Text from 'ol/style/text'
 import ImageStyle from 'ol/style/image'
-import { flow, isPlainObject, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
+import { flow, isPlainObject, isFunction, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
 import isNumeric from '../utils/is-numeric'
 import { DATA_PROJECTION, GEOMETRY_TYPE, MAP_PROJECTION } from './consts'
 import * as geoJson from './geojson'
 
 const reduceWithKey = reduce.convert({ cap: false })
-
-/**
- * @typedef {Object} VlStyle
- *
- * Shared
- * @property {string|number[]|undefined} fillColor
- * @property {string|number[]|undefined} strokeColor
- * @property {number|undefined} strokeWidth
- * @property {number[]|undefined} strokeDash
- * @property {string|undefined} strokeCap
- * @property {string|undefined} strokeJoin
- * @property {number|undefined} zIndex
- * @property {ol.style.Fill|undefined} fill
- * @property {ol.style.Stroke|undefined} stroke
- *
- * Text only
- * @property {string|ol.style.Text|undefined} text
- * @property {string|undefined} textFont
- * @property {number|undefined} textFontSize
- * @property {string|number[]|undefined} textFillColor
- * @property {string|number[]|undefined} textStrokeColor
- * @property {number|undefined} textStrokeWidth
- * @property {number[]|undefined} textStrokeDash
- * @property {string|undefined} textStrokeCap
- * @property {string|undefined} textStrokeJoin
- * @property {number|undefined} textScale
- * @property {string|undefined} textAlign
- * @property {number|undefined} textRotation
- * @property {number|undefined} textOffsetX
- * @property {number|undefined} textOffsetY
- * @property {ol.style.Stroke|undefined} textStroke
- * @property {ol.style.Fill|undefined} textFill
- *
- * Image only
- * @property {ol.style.Image|undefined} image
- * @property {string|undefined} imageSrc
- * @property {number[]|undefined} imageSize
- * @property {number[]|undefined} imageImgSize
- * @property {number|undefined} imageOffset
- * @property {number[]|undefined} imageAnchor
- * @property {number|undefined} imageScale
- * @property {number|undefined} imageRotation
- * @property {number|undefined} imageRadius
- * @property {number|undefined} imageRadius1
- * @property {number|undefined} imageRadius2
- * @property {number|undefined} imagePoints
- * @property {number|undefined} imageAngle
- * @property {number|undefined} imageOpacity
- * @property {string|number[]|undefined} imageFillColor
- * @property {string|number[]|undefined} imageStrokeColor
- * @property {number|undefined} imageStrokeWidth
- * @property {number[]|undefined} imageStrokeDash
- * @property {string|undefined} imageStrokeCap
- * @property {string|undefined} imageStrokeJoin
- * @property {IconOrigin|undefined} imageAnchorOrigin
- * @property {ColorLike|undefined} imageColor
- * @property {IconOrigin|undefined} imageOffsetOrigin
- * @property {ol.style.Stroke|undefined} imageStroke
- * @property {ol.style.Fill|undefined} imageFill
- *
- * @property {GeoJSONGeometry|ol.geom.Geometry|ol.StyleGeometryFunction|undefined} geom Coordinates should be in EPSG:4326
- */
 
 /**
  * @return {VlStyle[]}
@@ -396,7 +334,7 @@ export function geom (vlStyle, mapProj = MAP_PROJECTION) {
     if (isPlainObject(geom)) return geoJson.readGeometry(geom, mapProj)
   }
 
-  if (typeof vlStyle.geom === 'function') {
+  if (isFunction(vlStyle.geom)) {
     return function __styleGeomFunc (feature) {
       return processGeom(vlStyle.geom(geoJson.writeFeature(feature, mapProj)))
     }
@@ -404,3 +342,69 @@ export function geom (vlStyle, mapProj = MAP_PROJECTION) {
 
   return processGeom(vlStyle.geom)
 }
+
+/**
+ * @typedef {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text|ol.StyleFunction} OlStyle
+ */
+
+/**
+ * @typedef {Object} VlStyle
+ *
+ * Shared
+ * @property {string|number[]|undefined} fillColor
+ * @property {string|number[]|undefined} strokeColor
+ * @property {number|undefined} strokeWidth
+ * @property {number[]|undefined} strokeDash
+ * @property {string|undefined} strokeCap
+ * @property {string|undefined} strokeJoin
+ * @property {number|undefined} zIndex
+ * @property {ol.style.Fill|undefined} fill
+ * @property {ol.style.Stroke|undefined} stroke
+ *
+ * Text only
+ * @property {string|ol.style.Text|undefined} text
+ * @property {string|undefined} textFont
+ * @property {number|undefined} textFontSize
+ * @property {string|number[]|undefined} textFillColor
+ * @property {string|number[]|undefined} textStrokeColor
+ * @property {number|undefined} textStrokeWidth
+ * @property {number[]|undefined} textStrokeDash
+ * @property {string|undefined} textStrokeCap
+ * @property {string|undefined} textStrokeJoin
+ * @property {number|undefined} textScale
+ * @property {string|undefined} textAlign
+ * @property {number|undefined} textRotation
+ * @property {number|undefined} textOffsetX
+ * @property {number|undefined} textOffsetY
+ * @property {ol.style.Stroke|undefined} textStroke
+ * @property {ol.style.Fill|undefined} textFill
+ *
+ * Image only
+ * @property {ol.style.Image|undefined} image
+ * @property {string|undefined} imageSrc
+ * @property {number[]|undefined} imageSize
+ * @property {number[]|undefined} imageImgSize
+ * @property {number|undefined} imageOffset
+ * @property {number[]|undefined} imageAnchor
+ * @property {number|undefined} imageScale
+ * @property {number|undefined} imageRotation
+ * @property {number|undefined} imageRadius
+ * @property {number|undefined} imageRadius1
+ * @property {number|undefined} imageRadius2
+ * @property {number|undefined} imagePoints
+ * @property {number|undefined} imageAngle
+ * @property {number|undefined} imageOpacity
+ * @property {string|number[]|undefined} imageFillColor
+ * @property {string|number[]|undefined} imageStrokeColor
+ * @property {number|undefined} imageStrokeWidth
+ * @property {number[]|undefined} imageStrokeDash
+ * @property {string|undefined} imageStrokeCap
+ * @property {string|undefined} imageStrokeJoin
+ * @property {IconOrigin|undefined} imageAnchorOrigin
+ * @property {ColorLike|undefined} imageColor
+ * @property {IconOrigin|undefined} imageOffsetOrigin
+ * @property {ol.style.Stroke|undefined} imageStroke
+ * @property {ol.style.Fill|undefined} imageFill
+ *
+ * @property {GeoJSONGeometry|ol.geom.Geometry|ol.StyleGeometryFunction|undefined} geom Coordinates should be in EPSG:4326
+ */

@@ -1,17 +1,16 @@
+import Vue from 'vue'
 import uuid from 'uuid/v4'
-import { SERVICE_CONTAINER_KEY } from '../../consts'
-import Observable from '../../rx-ext'
+import { VM_PROP } from '../../consts'
+import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import rxSubs from '../rx-subs'
 import stubVNode from '../stub-vnode'
-import { coordHelper } from '../../ol-ext'
-import { assertHasLayer, assertHasMap, assertHasView } from '../../utils/assert'
-
-const { toLonLat } = coordHelper
+import services from '../services'
+import { assertHasLayer, assertHasMap } from '../../utils/assert'
 
 const props = {
   extent: {
     type: Array,
-    validator: value => Array.isArray(value) && value.length === 4
+    validator: value => value.length === 4
   },
   id: {
     type: [String, Number],
@@ -30,27 +29,19 @@ const props = {
 
 const methods = {
   /**
-   * @return {ol.layer.Layer|undefined}
-   */
-  getLayer () {
-    return this._layer
-  },
-  /**
-   * @return {ol.source.Source}
-   */
-  getSource () {
-    assertHasLayer(this)
-    return this.layer.getSource()
-  },
-  /**
    * @param {number[]} pixel
    * @return {boolean}
    */
   isAtPixel (pixel) {
     assertHasMap(this)
-    assertHasLayer(this)
 
-    return this.map.forEachLayerAtPixel(pixel, layer => layer === this.layer)
+    return this.map.forEachLayerAtPixel(pixel, layer => layer === this)
+  },
+  /**
+   * @return {ol.layer.Layer|undefined}
+   */
+  getLayer () {
+    return this._layer
   },
   /**
    * Updates layer state
@@ -59,6 +50,25 @@ const methods = {
   refresh () {
     assertHasLayer(this)
     this.layer.changed()
+  },
+  /**
+   * @param {ol.Map|Vue|undefined} map
+   */
+  setMap (map) {
+    assertHasLayer(this)
+
+    map = map instanceof Vue ? map.map : map
+    this.layer.setMap(map)
+  },
+  /**
+   * @param {ol.source.Source|Vue|undefined} source
+   * @return {void}
+   */
+  setSource (source) {
+    assertHasLayer(this.layer)
+
+    source = source instanceof Vue ? source.source : source
+    this.layer.setSource(source)
   },
   // protected & private
   /**
@@ -81,22 +91,28 @@ const methods = {
     this._layer = this.createLayer()
     this._layer.setProperties({
       id: this.id,
-      vm: this
+      [VM_PROP]: this
     })
     this::defineAccessors()
+  },
+  /**
+   * @returns {Object}
+   * @protected
+   */
+  getServices () {
+    return mergeDescriptors(this::services.methods.getServices(), {
+      layer: this
+    })
   },
   /**
    * @return {void}
    * @protected
    */
   mount () {
-    assertHasMap(this)
-    assertHasLayer(this)
-
     if (this.overlay) {
-      this.layer.setMap(this.map)
+      this.setMap(this.$parent)
     } else {
-      this.map.addLayer(this.layer)
+      this.$parent.addLayer(this)
     }
 
     this.subscribeAll()
@@ -106,22 +122,18 @@ const methods = {
    * @protected
    */
   unmount () {
-    assertHasMap(this)
-    assertHasLayer(this)
-
     this.unsubscribeAll()
 
     if (this.overlay) {
-      this.layer.setMap(undefined)
+      this.setMap(undefined)
     } else {
-      this.map.removeLayer(this.layer)
+      this.$parent.removeLayer(this)
     }
   },
   /**
    * @return {void}
    */
   subscribeAll () {
-    this::subscribeToMapEvents()
   }
 }
 
@@ -153,7 +165,7 @@ const watch = {
 }
 
 export default {
-  mixins: [rxSubs, stubVNode],
+  mixins: [rxSubs, stubVNode, services],
   props,
   methods,
   watch,
@@ -161,20 +173,6 @@ export default {
     attrs () {
       return {
         id: [this.$options.name, this.id].join('-')
-      }
-    }
-  },
-  inject: {
-    serviceContainer: SERVICE_CONTAINER_KEY
-  },
-  provide () {
-    const vm = this
-
-    return {
-      [SERVICE_CONTAINER_KEY]: {
-        get layer () { return vm.layer },
-        get map () { return vm.map },
-        get view () { return vm.view }
       }
     }
   },
@@ -194,30 +192,6 @@ export default {
  * @return {void}
  * @private
  */
-function subscribeToMapEvents () {
-  assertHasMap(this)
-  assertHasView(this)
-
-  const pointerEvents = Observable.fromOlEvent(
-    this.map,
-    ['click', 'dblclick', 'singleclick'],
-    ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
-  ).map(evt => ({
-    ...evt,
-    coordinate: toLonLat(evt.coordinate, this.view.getProjection())
-  }))
-
-  this.subscribeTo(pointerEvents, evt => {
-    if (this.isAtPixel(evt.pixel)) {
-      this.$emit(evt.type, evt)
-    }
-  })
-}
-
-/**
- * @return {void}
- * @private
- */
 function defineAccessors () {
   Object.defineProperties(this, {
     layer: {
@@ -226,11 +200,7 @@ function defineAccessors () {
     },
     map: {
       enumerable: true,
-      get: () => this.serviceContainer.map
-    },
-    view: {
-      enumerable: true,
-      get: () => this.serviceContainer.view
+      get: () => this.services && this.services.map
     }
   })
 }

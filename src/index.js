@@ -43,6 +43,7 @@ export const {
   IconStyle,
   RegShapeStyle,
   StrokeStyle,
+  StyleBox,
   StyleContainer,
   StyleFunc
 } = VueLayers

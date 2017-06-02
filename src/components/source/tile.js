@@ -1,4 +1,4 @@
-import { isPlainObject, pick } from 'lodash/fp'
+import { pick } from 'lodash/fp'
 import proj from 'ol/proj'
 import TileGrid from 'ol/tilegrid/tilegrid'
 import { consts, tileGridHelper } from '../../ol-ext'
@@ -28,9 +28,7 @@ const props = {
   },
   gridOpts: {
     type: Object,
-    validator: value => isPlainObject(value) &&
-    Array.isArray(value.resolutions) &&
-    value.resolutions.length
+    validator: value => Array.isArray(value.resolutions) && value.resolutions.length
   },
   maxZoom: {
     type: Number,
@@ -56,7 +54,7 @@ const props = {
   tileSize: {
     type: Array,
     default: () => [TILE_SIZE, TILE_SIZE],
-    validator: value => Array.isArray(value) && value.length === 2
+    validator: value => value.length === 2
   },
   url: {
     type: String,

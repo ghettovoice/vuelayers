@@ -1,7 +1,8 @@
 <script>
+  import Vue from 'vue'
   import RegularShape from 'ol/style/regularshape'
   import imageStyle from '../image'
-  import { SERVICE_CONTAINER_KEY } from '../../../consts'
+  import withFillStroke from '../with-fill-stroke'
 
   const props = {
     points: {
@@ -27,6 +28,24 @@
 
   const methods = {
     /**
+     * @param {ol.style.Fill|Vue|undefined} fill
+     * @return {void}
+     */
+    setFill (fill) {
+      fill = fill instanceof Vue ? fill.style : fill
+      this.fill = fill
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.style.Stroke|Vue|undefined} stroke
+     * @return {void}
+     */
+    setStroke (stroke) {
+      stroke = stroke instanceof Vue ? stroke.style : stroke
+      this.stroke = stroke
+      this.deferRefresh()
+    },
+    /**
      * @return {ol.style.RegularShape}
      * @protected
      */
@@ -43,41 +62,13 @@
         fill: this.fill,
         stroke: this.stroke
       })
-    },
-    /**
-     * @param {ol.style.Fill} fill
-     * @return {void}
-     * @protected
-     */
-    setFill (fill) {
-      this.fill = fill
-      this.deferRefresh()
-    },
-    /**
-     * @param {ol.style.Stroke} stroke
-     * @return {void}
-     * @protected
-     */
-    setStroke (stroke) {
-      this.stroke = stroke
-      this.deferRefresh()
     }
   }
 
   export default {
     name: 'vl-style-reg-shape',
-    mixins: [imageStyle],
+    mixins: [imageStyle, withFillStroke],
     props,
-    methods,
-    provide () {
-      return {
-        [SERVICE_CONTAINER_KEY]: {
-          styleTarget: {
-            setFill: this.setFill,
-            setStroke: this.setStroke
-          }
-        }
-      }
-    }
+    methods
   }
 </script>

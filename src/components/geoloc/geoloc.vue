@@ -1,6 +1,7 @@
 <script>
   import Geolocation from 'ol/geolocation'
   import { isEqual } from 'lodash/fp'
+  import { VM_PROP } from '../../consts'
   import Observable from '../../rx-ext'
   import { consts } from '../../ol-ext'
   import rxSubs from '../rx-subs'
@@ -92,7 +93,7 @@
       tracking: this.tracking,
       projection: DATA_PROJECTION
     })
-    this._geoloc.set('vm', this)
+    this._geoloc.set(VM_PROP, this)
     this::defineAccessors()
   }
 
@@ -144,7 +145,6 @@
         )
       )
       .filter(x => x != null)
-
     const accuracyChanges = Observable.of(this.geoloc.getAccuracy())
       .merge(
         Observable.fromOlEvent(
@@ -154,9 +154,10 @@
         )
       )
       .filter(x => x != null)
-
-    const geolocChanges = Observable.combineLatest(positionChanges, accuracyChanges)
-      .throttleTime(60)
+    const geolocChanges = Observable.combineLatest(
+      positionChanges,
+      accuracyChanges
+    ).throttleTime(60)
       .distinctUntilChanged((a, b) => isEqual(a, b))
 
     this.subscribeTo(geolocChanges, ([position, accuracy]) => {
@@ -168,7 +169,10 @@
         this.currentAccuracy = accuracy
       }
 
-      this.$emit('change', { position, accuracy })
+      this.$emit('change', {
+        position: this.currentPosition,
+        accuracy: this.currentAccuracy
+      })
     })
   }
 </script>

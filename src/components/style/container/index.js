@@ -1,5 +1,6 @@
 /**
  * @module components/style/container
+ * @deprecated
  */
 import Container from './style.vue'
 

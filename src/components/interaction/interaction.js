@@ -1,7 +1,9 @@
+import { VM_PROP } from '../../consts'
+import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import rxSubs from '../rx-subs'
 import stubVNode from '../stub-vnode'
-import { assertHasInteraction, assertHasMap } from '../../utils/assert'
-import { SERVICE_CONTAINER_KEY } from '../../consts'
+import services from '../services'
+import { assertHasInteraction } from '../../utils/assert'
 
 const props = {}
 
@@ -38,18 +40,24 @@ const methods = {
      * @protected
      */
     this._interaction = this.createInteraction()
-    this._interaction.set('vm', this)
+    this._interaction.set(VM_PROP, this)
     this::defineAccessors()
+  },
+  /**
+   * @returns {Object}
+   * @protected
+   */
+  getServices () {
+    return mergeDescriptors(this::services.methods.getServices(), {
+      interaction: this
+    })
   },
   /**
    * @return {void}
    * @protected
    */
   mount () {
-    assertHasMap(this)
-    assertHasInteraction(this)
-
-    this.map.addInteraction(this.interaction)
+    this.$parent.addInteraction(this)
     this.subscribeAll()
   },
   /**
@@ -57,35 +65,18 @@ const methods = {
    * @protected
    */
   unmount () {
-    assertHasMap(this)
-    assertHasInteraction(this)
-
     this.unsubscribeAll()
-    this.map.removeInteraction(this.interaction)
+    this.$parent.removeInteraction(this)
   }
 }
 
 export default {
-  mixins: [rxSubs, stubVNode],
+  mixins: [rxSubs, stubVNode, services],
   props,
   methods,
   stubVNode: {
     empty () {
       return this.$options.name
-    }
-  },
-  inject: {
-    serviceContainer: SERVICE_CONTAINER_KEY
-  },
-  provide () {
-    const vm = this
-
-    return {
-      [SERVICE_CONTAINER_KEY]: {
-        get interaction () { return vm.interaction },
-        get view () { return vm.view },
-        get map () { return vm.map }
-      }
     }
   },
   created () {
@@ -112,11 +103,7 @@ function defineAccessors () {
     },
     map: {
       enumerable: true,
-      get: () => this.serviceContainer.map
-    },
-    view: {
-      enumerable: true,
-      get: () => this.serviceContainer.view
+      get: () => this.services && this.services.map
     }
   })
 }

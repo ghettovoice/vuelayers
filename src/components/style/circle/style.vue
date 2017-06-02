@@ -1,7 +1,8 @@
 <script>
+  import Vue from 'vue'
   import Circle from 'ol/style/circle'
   import imageStyle from '../image'
-  import { SERVICE_CONTAINER_KEY } from '../../../consts'
+  import withFillStroke from '../with-fill-stroke'
 
   const props = {
     radius: {
@@ -12,7 +13,24 @@
 
   const methods = {
     /**
-     * Partially initialize builder with currently available values.
+     * @param {ol.style.Fill|Vue|undefined} fill
+     * @return {void}
+     */
+    setFill (fill) {
+      fill = fill instanceof Vue ? fill.style : fill
+      this.fill = fill
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.style.Stroke|Vue|undefined} stroke
+     * @return {void}
+     */
+    setStroke (stroke) {
+      stroke = stroke instanceof Vue ? stroke.style : stroke
+      this.stroke = stroke
+      this.deferRefresh()
+    },
+    /**
      * @return {ol.style.Circle}
      * @protected
      */
@@ -23,24 +41,6 @@
         fill: this.fill,
         stroke: this.stroke
       })
-    },
-    /**
-     * @param {ol.style.Fill} fill
-     * @return {void}
-     * @protected
-     */
-    setFill (fill) {
-      this.fill = fill
-      this.deferRefresh()
-    },
-    /**
-     * @param {ol.style.Stroke} stroke
-     * @return {void}
-     * @protected
-     */
-    setStroke (stroke) {
-      this.stroke = stroke
-      this.deferRefresh()
     }
   }
 
@@ -52,19 +52,9 @@
 
   export default {
     name: 'vl-style-circle',
-    mixins: [imageStyle],
+    mixins: [imageStyle, withFillStroke],
     props,
     methods,
-    watch,
-    provide () {
-      return {
-        [SERVICE_CONTAINER_KEY]: {
-          styleTarget: {
-            setFill: this.setFill,
-            setStroke: this.setStroke
-          }
-        }
-      }
-    }
+    watch
   }
 </script>

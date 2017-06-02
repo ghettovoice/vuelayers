@@ -8,12 +8,8 @@
   import { styleHelper, geoJson } from '../../../ol-ext'
   import interaction from '../interaction'
   import styleTarget, { createStyleFunc } from '../../style-target'
-  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
-  import { assertHasInteraction, assertHasMap, assertHasView } from '../../../utils/assert'
-  import { SERVICE_CONTAINER_KEY } from '../../../consts'
+  import { assertHasInteraction, assertHasMap } from '../../../utils/assert'
   import plainProps from '../../../utils/plain-props'
-
-  const { style, defaultEditStyle } = styleHelper
 
   // todo add other options, like event modifiers
   const props = {
@@ -21,16 +17,13 @@
       type: Function,
       default: () => true
     },
-    hitTolerance: Number,
-    multi: Boolean,
+    hitTolerance: Number, // default 0
+    multi: Boolean, // default false
     selected: {
       type: Array,
       default: () => []
     },
-    wrapX: {
-      type: Boolean,
-      default: true
-    }
+    wrapX: Boolean // default true
   }
 
   const computed = {
@@ -42,7 +35,7 @@
     }
   }
 
-  const defaultStyles = mapValues(style, defaultEditStyle())
+  const defaultStyles = mapValues(styleHelper.style, styleHelper.defaultEditStyle())
 
   const methods = {
     /**
@@ -54,7 +47,7 @@
       this::interaction.methods.refresh()
     },
     /**
-     * @param {GeoJSONFeature|Component|ol.Feature} feature
+     * @param {GeoJSONFeature|Vue|ol.Feature} feature
      * @return {void}
      */
     select (feature) {
@@ -62,8 +55,11 @@
       assertHasInteraction(this)
 
       let id
-      if (isPlainObject(feature) || feature instanceof Vue) {
+      if (isPlainObject(feature)) {
         id = feature.id
+      } else if (feature instanceof Vue) {
+        id = feature.id
+        feature = feature.feature
       } else if (feature instanceof Feature) {
         id = feature.getId()
       } else {
@@ -77,7 +73,7 @@
       if (!(feature instanceof Feature)) {
         if (!id) throw new Error('Undefined feature id')
 
-        const layers = this.map.getLayers().getArray()
+        const layers = this.map.map.getLayers().getArray()
 
         forEach(layer => {
           if (layer instanceof VectorLayer) {
@@ -90,15 +86,18 @@
       feature && selection.push(feature)
     },
     /**
-     * @param {GeoJSONFeature|Component|ol.Feature} feature
+     * @param {GeoJSONFeature|Vue|ol.Feature} feature
      * @return {void}
      */
     unselect (feature) {
       assertHasInteraction(this)
 
       let id
-      if (isPlainObject(feature) || feature instanceof Vue) {
+      if (isPlainObject(feature)) {
         id = feature.id
+      } else if (feature instanceof Vue) {
+        id = feature.id
+        feature = feature.feature
       } else if (feature instanceof Feature) {
         id = feature.getId()
       } else {
@@ -129,19 +128,13 @@
      * @protected
      */
     createInteraction () {
-      // define default select style, will be used by styleTarget style function
-      this.defaultStyles = function __selectDefaultStyleFunc (feature) {
-        if (feature.getGeometry()) {
-          return defaultStyles[feature.getGeometry().getType()]
-        }
-      }
-      const style = createStyleFunc(this)
       const vm = this
+      const style = createStyleFunc(this)
       const filter = function __selectFilter (feature, layer) {
-        assertHasView(vm)
+        assertHasMap(vm)
 
         return vm.filter(
-          geoJson.writeFeature(feature, vm.view.getProjection()),
+          geoJson.writeFeature(feature, vm.map.view.getProjection()),
           layer && plainProps(layer.getProperties())
         )
       }
@@ -152,6 +145,17 @@
         filter,
         style
       })
+    },
+    /**
+     * @return {ol.StyleFunction}
+     * @protected
+     */
+    getDefaultStyles () {
+      return function __selectDefaultStyleFunc (feature) {
+        if (feature.getGeometry()) {
+          return defaultStyles[feature.getGeometry().getType()]
+        }
+      }
     },
     /**
      * @return {ol.interaction.Interaction}
@@ -173,7 +177,7 @@
      * @protected
      */
     unmount () {
-      this.currentSelected.forEach(this.unselect)
+      this.unselectAll()
       this::interaction.methods.unmount()
     },
     /**
@@ -220,15 +224,6 @@
         }
       }
     },
-    provide () {
-      return {
-        [SERVICE_CONTAINER_KEY]: mergeDescriptors(
-          {},
-          this::interaction.provide()[SERVICE_CONTAINER_KEY],
-          this::styleTarget.provide()[SERVICE_CONTAINER_KEY]
-        )
-      }
-    },
     data () {
       return {
         currentSelected: this.selected.slice()
@@ -241,8 +236,8 @@
    * @private
    */
   function subscribeToInteractionChanges () {
+    assertHasMap(this)
     assertHasInteraction(this)
-    assertHasView(this)
 
     const selection = this.interaction.getFeatures()
     // select event
@@ -250,7 +245,7 @@
       Observable.fromOlEvent(
         selection,
         'add',
-        ({ element }) => geoJson.writeFeature(element, this.view.getProjection())
+        ({ element }) => geoJson.writeFeature(element, this.map.view.getProjection())
       ),
       feature => {
         this.currentSelected.push(feature)
@@ -262,7 +257,7 @@
       Observable.fromOlEvent(
         selection,
         'remove',
-        ({ element }) => geoJson.writeFeature(element, this.view.getProjection())
+        ({ element }) => geoJson.writeFeature(element, this.map.view.getProjection())
       ),
       feature => {
         let idx = this.currentSelected.findIndex(({ id }) => id === feature.id)

@@ -1,7 +1,7 @@
 <script>
   import Stroke from 'ol/style/stroke'
   import style from '../style'
-  import { assertHasStyle, assertHasStyleTarget } from '../../../utils/assert'
+  import { assertHasStyle } from '../../../utils/assert'
 
   const props = {
     color: [Array, String],
@@ -14,8 +14,14 @@
       default: 'round' // round, bevel, miter
     },
     lineDash: Array,
-    lineDashOffset: Number,
-    miterLimit: Number,
+    lineDashOffset: {
+      type: Number,
+      default: 0
+    },
+    miterLimit: {
+      type: Number,
+      default: 10
+    },
     width: {
       type: Number,
       default: 1.25
@@ -43,16 +49,14 @@
      * @protected
      */
     mount () {
-      assertHasStyleTarget(this)
-      this.styleTarget.setStroke(this.style)
+      this.$parent.setStroke(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      assertHasStyleTarget(this)
-      this.styleTarget.setStroke(undefined)
+      this.$parent.setStroke(undefined)
     }
   }
 

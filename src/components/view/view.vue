@@ -2,12 +2,13 @@
   import Vue from 'vue'
   import View from 'ol/view'
   import { isEqual, isPlainObject } from 'lodash/fp'
-  import { SERVICE_CONTAINER_KEY } from '../../consts'
+  import { VM_PROP } from '../../consts'
   import Observable from '../../rx-ext'
   import { consts, coordHelper, geoJson } from '../../ol-ext'
+  import services from '../services'
   import rxSubs from '../rx-subs'
   import stubVNode from '../stub-vnode'
-  import { assertHasMap, assertHasView } from '../../utils/assert'
+  import { assertHasView } from '../../utils/assert'
 
   const { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } = consts
   const { toLonLat, fromLonLat } = coordHelper
@@ -16,13 +17,13 @@
     center: {
       type: Array,
       default: () => [0, 0],
-      validator: value => Array.isArray(value) && value.length === 2
+      validator: value => value.length === 2
     },
     constrainRotation: Boolean,
     enableRotation: Boolean,
     extent: {
       type: Array,
-      validator: value => Array.isArray(value) && value.length === 4
+      validator: value => value.length === 4
     },
     maxResolution: Number,
     minResolution: Number,
@@ -71,7 +72,7 @@
     },
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
-     * @param {GeoJSONFeature|ol.Extent|ol.Feature|Component} geometryOrExtent
+     * @param {GeoJSONFeature|ol.Extent|ol.Geometry|Vue} geometryOrExtent
      * @param {olx.view.FitOptions} [options]
      * @return {Promise} Resolves when view changes
      */
@@ -82,7 +83,7 @@
       if (isPlainObject(geometryOrExtent)) {
         geometryOrExtent = geoJson.readGeometry(geometryOrExtent, this.view.getProjection())
       } else if (geometryOrExtent instanceof Vue) {
-        geometryOrExtent = geometryOrExtent.feature
+        geometryOrExtent = geometryOrExtent.geom
       }
 
       let duration = (options && options.duration) || 0
@@ -91,13 +92,6 @@
         this.view.fit(geometryOrExtent, options)
         setTimeout(resolve, duration)
       })
-    },
-    /**
-     * Shared value getter for vl-share directive.
-     * @return {ol.View|undefined}
-     */
-    getSharedValue () {
-      return this.view
     },
     /**
      * @return {ol.View|undefined} OpenLayers `ol.View` instance
@@ -112,9 +106,18 @@
       assertHasView(this)
       this.view.changed()
     },
+    // protected & private
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToViewChanges()
+    },
     /**
      * @param {olx.ViewOptions} viewOptions
      * @return {void}
+     * @protected
      */
     updateView (viewOptions) {
       assertHasView(this)
@@ -140,14 +143,6 @@
       if (viewOptions.maxZoom != null && viewOptions.maxZoom !== this.view.getMaxZoom()) {
         this.view.setMaxZoom(viewOptions.maxZoom)
       }
-    },
-    // protected & private
-    /**
-     * @return {void}
-     * @protected
-     */
-    subscribeAll () {
-      this::subscribeToViewChanges()
     }
   }
 
@@ -174,26 +169,13 @@
 
   export default {
     name: 'vl-view',
-    mixins: [rxSubs, stubVNode],
+    mixins: [rxSubs, stubVNode, services],
     props,
     methods,
     watch,
     stubVNode: {
       empty () {
         return this.$options.name
-      }
-    },
-    inject: {
-      serviceContainer: SERVICE_CONTAINER_KEY
-    },
-    provide () {
-      const vm = this
-
-      return {
-        [SERVICE_CONTAINER_KEY]: {
-          get view () { return vm.view },
-          get map () { return vm.map }
-        }
       }
     },
     data () {
@@ -241,7 +223,7 @@
       zoom: this.zoom,
       zoomFactor: this.zoomFactor
     })
-    this._view.set('vm', this)
+    this._view.set(VM_PROP, this)
     this::defineAccessors()
   }
 
@@ -254,11 +236,7 @@
     Object.defineProperties(this, {
       view: {
         enumerable: true,
-        get: () => this._view
-      },
-      map: {
-        enumerable: true,
-        get: () => this.serviceContainer.map
+        get: this.getView
       }
     })
   }
@@ -268,10 +246,7 @@
    * @private
    */
   function mount () {
-    assertHasMap(this)
-    assertHasView(this)
-
-    this.map.setView(this.view)
+    this.$parent.setView(this)
     this.subscribeAll()
   }
 
@@ -280,10 +255,8 @@
    * @private
    */
   function unmount () {
-    assertHasMap(this)
-
     this.unsubscribeAll()
-    this.map.setView(undefined)
+    this.$parent.setView(undefined)
   }
 
   /**
@@ -318,12 +291,11 @@
           () => this.view.getRotation()
         )
       )
-
     const viewChanges = Observable.combineLatest(
       centerChanges,
       resolutionChanges,
       rotationChanges
-    ).throttleTime(60)
+    ).throttleTime(1000 / 30)
       .distinctUntilChanged((a, b) => isEqual(a, b))
       .map(([center, resolution, rotation]) => ({
         center: toLonLat(center, this.view.getProjection()),
@@ -346,9 +318,9 @@
       }
 
       this.$emit('change', {
-        center,
-        resolution,
-        rotation,
+        center: this.currentCenter,
+        resolution: this.currentResolution,
+        rotation: this.currentRotation,
         zoom: this.currentZoom
       })
     })

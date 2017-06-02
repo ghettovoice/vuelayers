@@ -10,7 +10,7 @@
     coordinates: {
       type: Array,
       required: true,
-      validator: value => Array.isArray(value) && value.length === 2
+      validator: value => value.length === 2
     }
   }
 

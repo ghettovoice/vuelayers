@@ -1,13 +1,14 @@
 <script>
+  import Vue from 'vue'
   import VectorSource from 'ol/source/vector'
   import loadingstrategy from 'ol/loadingstrategy'
-  import { merge, differenceWith } from 'lodash/fp'
+  import { differenceWith, isPlainObject } from 'lodash/fp'
   import { consts, extentHelper, geoJson } from '../../../ol-ext'
   import source from '../source'
-  import { assertHasLayer, assertHasSource, assertHasView } from '../../../utils/assert'
+  import { assertHasSource, assertHasMap } from '../../../utils/assert'
 
   const { toLonLat: extentToLonLat } = extentHelper
-  const { LAYER_PROP, DATA_PROJECTION } = consts
+  const { DATA_PROJECTION } = consts
 
   const props = {
     // for big datasets
@@ -20,10 +21,7 @@
       type: String,
       default: DATA_PROJECTION
     },
-    useSpatialIndex: {
-      type: Boolean,
-      default: true
-    }
+    useSpatialIndex: Boolean // default true
     // todo implement options (tiled loading strategy & etc)
     // format: String,
     // strategy: String
@@ -31,11 +29,69 @@
 
   const methods = {
     /**
+     * @param {ol.Feature|Vue|GeoJSONFeature} feature
+     * @return {void}
+     */
+    addFeature (feature) {
+      assertHasMap(this)
+      assertHasSource(this)
+
+      if (feature instanceof Vue) {
+        feature = feature.feature
+      } else if (isPlainObject(feature)) {
+        feature = geoJson.readFeature(feature, this.map.view.getProjection())
+      }
+      this.source.addFeature(feature)
+    },
+    /**
+     * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
+     * @return {void}
+     */
+    addFeatures (features) {
+      features.forEach(this.addFeature)
+    },
+    /**
+     * @param {ol.Feature|Vue|GeoJSONFeature} feature
+     * @return {void}
+     */
+    removeFeature (feature) {
+      assertHasSource(this)
+
+      if (feature instanceof Vue) {
+        feature = feature.feature
+      } else if (isPlainObject(feature)) {
+        feature = this.source.getFeatureById(feature.id)
+      }
+      this.source.removeFeature(feature)
+    },
+    /**
+     * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
+     * @return {void}
+     */
+    removeFeatures (features) {
+      features.forEach(this.removeFeature)
+    },
+    /**
      * @return {void}
      */
     clear () {
       assertHasSource(this)
       this.source.clear()
+    },
+    /**
+     * @param {string|number} id
+     * @return {GeoJSONFeature|undefined}
+     */
+    getFeatureById (id) {
+      assertHasMap(this)
+      assertHasSource(this)
+
+      let feature = this.source.getFeatureById(id)
+      if (feature) {
+        feature = geoJson.writeFeature(feature, this.map.view.getProjection())
+      }
+
+      return feature
     },
     // protected & private
     /**
@@ -86,38 +142,26 @@
      */
     mount () {
       this::source.methods.mount()
-
-      if (this.features.length) {
-        this.source.addFeatures(this.features.map(this::createFeature))
-      }
+      this.addFeatures(this.features)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this::source.methods.unmount()
       this.clear()
+      this::source.methods.unmount()
     }
   }
 
   const diffById = differenceWith((a, b) => a.id === b.id)
   const watch = {
     features (value, oldValue) {
-      assertHasSource(this)
-
       let forAdd = diffById(value, oldValue)
       let forRemove = diffById(oldValue, value)
 
-      this.source.addFeatures(forAdd.map(this::createFeature))
-      forRemove.map(geoJsonFeature => {
-        const feature = this.source.getFeatureById(geoJsonFeature.id)
-
-        if (feature) {
-          this.source.removeFeature(feature)
-          feature.unset(LAYER_PROP)
-        }
-      })
+      this.addFeatures(forAdd)
+      this.removeFeatures(forRemove)
     }
   }
 
@@ -135,21 +179,5 @@
         }
       }
     }
-  }
-
-  /**
-   * @param {GeoJSONFeature} geoJsonFeature
-   * @return {ol.Feature}
-   */
-  function createFeature (geoJsonFeature) {
-    assertHasSource(this)
-    assertHasView(this)
-    assertHasLayer(this)
-
-    return geoJson.readFeature(merge(geoJsonFeature, {
-      properties: {
-        [LAYER_PROP]: this.layer.get('id')
-      }
-    }), this.view.getProjection())
   }
 </script>

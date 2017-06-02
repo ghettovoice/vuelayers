@@ -1,17 +1,17 @@
 <script type="text/babel">
+  import Vue from 'vue'
   import uuid from 'uuid/v4'
+  import Feature from 'ol/feature'
+  import { isPlainObject } from 'lodash/fp'
+  import { VM_PROP } from '../../consts'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
-  import Observable from '../../rx-ext'
+  import plainProps from '../../utils/plain-props'
   import rxSubs from '../rx-subs'
   import stubVNode from '../stub-vnode'
-  import plainProps from '../../utils/plain-props'
   import styleTarget from '../style-target'
-  import { consts, coordHelper, geoJson } from '../../ol-ext'
-  import { assertHasFeature, assertHasMap, assertHasView, assertHasLayer, assertHasSource } from '../../utils/assert'
-  import { SERVICE_CONTAINER_KEY } from '../../consts'
-
-  const { LAYER_PROP } = consts
-  const { toLonLat } = coordHelper
+  import services from '../services'
+  import { geoJson } from '../../ol-ext'
+  import { assertHasFeature, assertHasMap } from '../../utils/assert'
 
   const props = {
     id: {
@@ -36,10 +36,9 @@
      * @return {boolean}
      */
     isAtPixel (pixel) {
-      assertHasFeature(this)
       assertHasMap(this)
 
-      const cb = feature => feature === this.feature
+      const cb = feature => feature === this
       const layerFilter = layer => layer === this.layer
 
       return this.map.forEachFeatureAtPixel(pixel, cb, { layerFilter })
@@ -51,7 +50,31 @@
       assertHasFeature(this)
       this.feature.changed()
     },
+    /**
+     * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
+     * @return {void}
+     */
+    setGeometry (geom) {
+      assertHasMap(this)
+      assertHasFeature(this)
+
+      if (geom instanceof Vue) {
+        geom = geom.geom
+      } else if (isPlainObject(geom)) {
+        geom = geoJson.readGeometry(geom, this.map.view.getProjection())
+      }
+      this.feature.setGeometry(geom)
+    },
     // protected & private
+    /**
+     * @return {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(this::services.methods.getServices(), {
+        feature: this
+      })
+    },
     /**
      * @return {ol.Feature}
      * @protected
@@ -64,7 +87,6 @@
      * @protected
      */
     subscribeAll () {
-      this::subscribeToMapEvents()
     }
   }
 
@@ -87,7 +109,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [rxSubs, stubVNode, styleTarget],
+    mixins: [rxSubs, stubVNode, services, styleTarget],
     props,
     methods,
     watch,
@@ -96,29 +118,6 @@
         return {
           id: [this.$options.name, this.id].join('-')
         }
-      }
-    },
-    inject: {
-      serviceContainer: SERVICE_CONTAINER_KEY
-    },
-    /**
-     * @returns {Object}
-     */
-    provide () {
-      const vm = this
-
-      return {
-        [SERVICE_CONTAINER_KEY]: mergeDescriptors(
-          {},
-          this::styleTarget.provide()[SERVICE_CONTAINER_KEY],
-          {
-            get feature () { return vm.feature },
-            get source () { return vm.source },
-            get layer () { return vm.layer },
-            get view () { return vm.view },
-            get map () { return vm.map }
-          }
-        )
       }
     },
     created () {
@@ -144,11 +143,12 @@
      * @type {ol.Feature}
      * @private
      */
-    this._feature = geoJson.readFeature({
+    this._feature = new Feature({
       id: this.id,
-      properties: this.properties
-    }, this.view.getProjection())
-    this._feature.set('vm', this)
+      properties: this.properties,
+      [VM_PROP]: this
+    })
+    this._feature.setId(this.id)
     this::defineAccessors()
   }
 
@@ -162,21 +162,13 @@
         enumerable: true,
         get: this.getFeature
       },
-      source: {
-        enumerable: true,
-        get: () => this.serviceContainer.source
-      },
       layer: {
         enumerable: true,
-        get: () => this.serviceContainer.layer
-      },
-      view: {
-        enumerable: true,
-        get: () => this.serviceContainer.view
+        get: () => this.services && this.services.layer
       },
       map: {
         enumerable: true,
-        get: () => this.serviceContainer.map
+        get: () => this.services && this.services.map
       }
     })
   }
@@ -186,12 +178,7 @@
    * @private
    */
   function mount () {
-    assertHasFeature(this)
-    assertHasSource(this)
-    assertHasLayer(this)
-
-    this.source.addFeature(this.feature)
-    this.feature.set(LAYER_PROP, this.layer.get('id'))
+    this.$parent.addFeature(this)
     this.subscribeAll()
   }
 
@@ -200,38 +187,7 @@
    * @private
    */
   function unmount () {
-    assertHasFeature(this)
-    assertHasSource(this)
-
     this.unsubscribeAll()
-
-    if (this.source.getFeatureById(this.id)) {
-      this.source.removeFeature(this.feature)
-      this.feature.unset(LAYER_PROP)
-    }
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function subscribeToMapEvents () {
-    assertHasMap(this)
-    assertHasView(this)
-
-    const pointerEvents = Observable.fromOlEvent(
-      this.map,
-      ['click', 'dblclick', 'singleclick'],
-      ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
-    ).map(evt => ({
-      ...evt,
-      coordinate: toLonLat(evt.coordinate, this.view.getProjection())
-    }))
-
-    this.subscribeTo(pointerEvents, evt => {
-      if (this.isAtPixel(evt.pixel)) {
-        this.$emit(evt.type, evt)
-      }
-    })
+    this.$parent.removeFeature(this)
   }
 </script>

@@ -86,7 +86,7 @@ Promise.resolve(utils.ensureDir(config.outDir))
   .then(() => {
     notifier.notify({
       title: config.fullname,
-      message: 'Great, all bundles are ready!'
+      message: 'Excellent, all bundles are ready!'
     })
   })
   .catch(err => {
@@ -269,6 +269,7 @@ function getComponents () {
         // reverse all except some exclusions
         if (
           [
+            'style/box/index',
             'style/container/index',
             'style/func/index'
           ].includes(relPath) === false

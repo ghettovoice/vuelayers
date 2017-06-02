@@ -1,64 +1,101 @@
 /**
  * @module components/style-target
  */
-import { filter, flow, map, partialRight } from 'lodash/fp'
-import { geoJson, styleHelper, coordHelper, geomHelper } from '../ol-ext'
-import { SERVICE_CONTAINER_KEY } from '../consts'
-import { assertHasView } from '../utils/assert'
+import Vue from 'vue'
+import { filter, flow, isFunction, map, partialRight } from 'lodash/fp'
+import { geoJson, styleHelper } from '../ol-ext'
+import { assertHasMap } from '../utils/assert'
+import { warndbg } from '../utils/debug'
 
 export default {
   beforeCreate () {
     /**
-     * @type {ol.style.Style[]|ol.StyleFunction|undefined}
+     * @type {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
      * @private
      */
-    this.styles = this.defaultStyles = undefined
-  },
-  provide () {
-    // export to inner components style target object (object with getStyle/setStyle methods)
-    return {
-      [SERVICE_CONTAINER_KEY]: {
-        styleTarget: {
-          getStyle: this.getStyle,
-          setStyle: this.setStyle
-        }
-      }
-    }
+    this.styles = undefined
   },
   methods: {
     /**
-     * Returns object that can be styled, i.e. have setStyle/getStyle methods
-     * @return {*}
-     * @abstract
+     * @return {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
      */
-    getStyleTarget () { },
-    /**
-     * @returns {ol.style.Style[]|ol.StyleFunction|undefined}
-     */
-    getStyle () {
+    getStyles () {
       return this.styles
     },
     /**
-     * @returns {ol.style.Style[]|ol.StyleFunction|undefined}
+     * @return {ol.style.Style[]|ol.StyleFunction|undefined}
+     * @protected
      */
-    getDefaultStyle () {
-      return this.defaultStyles
+    getDefaultStyles () {},
+    /**
+     * @param {ol.style.Style|ol.StyleFunction|Vue|undefined} style
+     * @return {void}
+     */
+    addStyle (style) {
+      let currentStyles = this.getStyles()
+      let olStyle = style instanceof Vue ? style.style : style
+
+      if (isFunction(olStyle)) {
+        if (currentStyles) {
+          warndbg('Component already has style components among it\'s descendants. ' +
+            'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level')
+        }
+        currentStyles = style
+      } else {
+        if (currentStyles && !Array.isArray(currentStyles)) {
+          warndbg('Component already has style components among it\'s descendants. ' +
+            'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level')
+          currentStyles = []
+        }
+        currentStyles = currentStyles.concat(style instanceof Vue ? style : { style, condition: true })
+      }
+
+      this.setStyle(currentStyles)
     },
     /**
-     * @param {ol.style.Style[]|ol.StyleFunction|undefined} styles
+     * @param {Array<{style: ol.style.Style, condition: (function|boolean|undefined)}>|ol.StyleFunction|Vue|undefined} styles
      * @return {void}
      */
     setStyle (styles) {
       this.styles = styles
-      const styleTarget = this.getStyleTarget()
 
-      if (styleTarget) {
-        if (this.styles === null || this.styles) {
-          styleTarget.setStyle(createStyleFunc(this))
-        } else {
-          styleTarget.setStyle(undefined)
-        }
+      const styleTarget = this.getStyleTarget()
+      if (!styleTarget) return
+
+      if (this.styles === null || this.styles) {
+        styleTarget.setStyle(createStyleFunc(this))
+      } else {
+        styleTarget.setStyle(undefined)
       }
+    },
+    /**
+     * @param {ol.style.Style|ol.StyleFunction|Vue|undefined} style
+     * @return {void}
+     */
+    removeStyle (style) {
+      let currentStyles = this.getStyles()
+
+      if (currentStyles === style) {
+        currentStyles = undefined
+      } else if (Array.isArray(currentStyles)) {
+        currentStyles = currentStyles.filter(s => {
+          return style instanceof Vue
+            ? s !== style
+            : s.style !== style
+        })
+        currentStyles.length || (currentStyles = undefined)
+      }
+
+      this.setStyle(currentStyles)
+    },
+    /**
+     * Returns OL object that can be styled (i.e. has setStyle/getStyle methods) or undefined
+     * @return {*}
+     * @protected
+     * @abstract
+     */
+    getStyleTarget () {
+      throw new Error('Not implemented method')
     }
   }
 }
@@ -69,46 +106,51 @@ export default {
  */
 export function createStyleFunc (vm) {
   return function __styleTargetStyleFunc (feature, resolution) {
-    assertHasView(vm)
+    assertHasMap(vm)
 
     if (!feature.getGeometry()) return
 
-    let styles = vm.getStyle()
-    let geoJsonFeature = geoJson.writeFeature(feature, vm.view.getProjection())
-
-    if (typeof styles === 'function') {
-      styles = styles(
-        feature,
-        resolution,
-        {
-          ...styleHelper,
-          ...geomHelper,
-          ...coordHelper,
-          geom: partialRight(styleHelper.geom, [vm.view.getProjection()]),
-          geoJson
-        }
-      )
-    } else if (Array.isArray(styles)) {
+    let styles = vm.getStyles()
+    let plainFeature = geoJson.writeFeature(feature, vm.map.view.getProjection())
+    let helper = {
+      ...styleHelper,
+      geom: partialRight(styleHelper.geom, [vm.map.view.getProjection()])
+    }
+    /* eslint-disable brace-style */
+    // handle provided styles
+    // styles - ol.StyleFunction or vl-style-func
+    if (isFunction(styles) || isFunction(styles.style)) {
+      let styleFunc = isFunction(styles) ? styles : styles.style
+      styles = styleFunc(feature, resolution, helper)
+    }
+    // styles is array of ol.style.Style or vl-style-box
+    else if (Array.isArray(styles)) {
       styles = flow(
         filter(({ condition }) => {
           return condition == null ||
             (condition === true) ||
             (
-              typeof condition === 'function' &&
-              condition(geoJsonFeature, resolution)
+              isFunction(condition) &&
+              condition(plainFeature, resolution)
             )
         }),
         map('style')
       )(styles)
     }
-    // null style
-    if (styles === null || (Array.isArray(styles) && styles.length)) return styles
-
-    let defaultStyles = vm.getDefaultStyle()
-    if (defaultStyles) {
-      return typeof defaultStyles === 'function'
-        ? vm::defaultStyles(feature, resolution, styleHelper)
-        : defaultStyles
+    /* eslint-enable brace-style */
+    // not empty or null style
+    if (
+      styles === null ||
+      (Array.isArray(styles) && styles.length)
+    ) {
+      return styles
+    }
+    // fallback to default style
+    styles = vm.getDefaultStyles()
+    if (styles) {
+      return isFunction(styles)
+        ? styles(feature, resolution, helper)
+        : styles
     }
   }
 }

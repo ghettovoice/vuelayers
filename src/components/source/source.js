@@ -1,17 +1,16 @@
-import { SERVICE_CONTAINER_KEY } from '../../consts'
+import { VM_PROP } from '../../consts'
+import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import rxSubs from '../rx-subs'
 import stubVNode from '../stub-vnode'
-import { assertHasLayer, assertHasSource } from '../../utils/assert'
+import services from '../services'
+import { assertHasSource } from '../../utils/assert'
 
 // todo extract attributions into separate component
 const props = {
   attributions: [String, Array],
   logo: String,
   projection: String,
-  wrapX: {
-    type: Boolean,
-    default: true
-  }
+  wrapX: Boolean
 }
 
 const methods = {
@@ -47,18 +46,24 @@ const methods = {
      * @protected
      */
     this._source = this.createSource()
-    this._source.set('vm', this)
+    this._source.set(VM_PROP, this)
     this::defineAccessors()
+  },
+  /**
+   * @return {Object}
+   * @protected
+   */
+  getServices () {
+    return mergeDescriptors(this::services.methods.getServices(), {
+      source: this
+    })
   },
   /**
    * @return {void}
    * @protected
    */
   mount () {
-    assertHasSource(this)
-    assertHasLayer(this)
-
-    this.layer.setSource(this.source)
+    this.$parent.setSource(this)
     this.subscribeAll()
   },
   /**
@@ -66,10 +71,8 @@ const methods = {
    * @protected
    */
   unmount () {
-    assertHasLayer(this)
-
     this.unsubscribeAll()
-    this.layer.setSource(undefined)
+    this.$parent.setSource(undefined)
   }
 }
 
@@ -81,28 +84,13 @@ const watch = {
 }
 
 export default {
-  mixins: [rxSubs, stubVNode],
+  mixins: [rxSubs, stubVNode, services],
   props,
   methods,
   watch,
   stubVNode: {
     empty () {
       return this.$options.name
-    }
-  },
-  inject: {
-    serviceContainer: SERVICE_CONTAINER_KEY
-  },
-  provide () {
-    const vm = this
-
-    return {
-      [SERVICE_CONTAINER_KEY]: {
-        get source () { return vm.source },
-        get layer () { return vm.layer },
-        get map () { return vm.map },
-        get view () { return vm.view }
-      }
     }
   },
   created () {
@@ -127,17 +115,9 @@ function defineAccessors () {
       enumerable: true,
       get: this.getSource
     },
-    layer: {
-      enumerable: true,
-      get: () => this.serviceContainer.layer
-    },
     map: {
       enumerable: true,
-      get: () => this.serviceContainer.map
-    },
-    view: {
-      enumerable: true,
-      get: () => this.serviceContainer.view
+      get: () => this.services && this.services.map
     }
   })
 }
