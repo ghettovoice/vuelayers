@@ -1,5 +1,6 @@
-import OlMap from 'ol/map'
+import olMap from 'ol/map'
 import Vue from 'vue'
+import { VM_PROP } from '../../../../src/consts'
 import Map from '../../../../src/components/map'
 
 describe('map component', () => {
@@ -9,8 +10,8 @@ describe('map component', () => {
     const vm = new Ctor().$mount()
 
     Vue.nextTick(() => {
-      expect(vm.map).to.be.instanceof(OlMap)
-      expect(vm.map.get('vm')).to.be.equal(vm)
+      expect(vm.map).to.be.instanceof(olMap)
+      expect(vm.map[VM_PROP]).to.be.equal(vm)
       expect(vm.map.getTargetElement()).to.be.equal(vm.$refs.map)
 
       vm.$destroy()

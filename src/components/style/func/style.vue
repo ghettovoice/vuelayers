@@ -4,8 +4,8 @@
    * Plays the role of both a style that mounts itself to style target component (vl-layer-vector, vl-feature & etc.)
    * and style target for inner style containers (vl-style-box) as fallback style.
    */
-  import { partialRight, isFunction, noop } from 'lodash/fp'
-  import { styleHelper, geoJson } from '../../../ol-ext'
+  import { isFunction, noop } from 'lodash/fp'
+  import { style as styleHelper } from '../../../ol-ext'
   import { warndbg } from '../../../utils/debug'
   import style from '../style'
   import styleTarget, { createStyleFunc } from '../../style-target'
@@ -20,13 +20,31 @@
 
   const methods = {
     /**
-     * @return {void}
+     * @return {ol.StyleFunction}
+     * @protected
      */
-    refresh () {
-      this.unmount()
-      // recreate style function
-      this.initialize()
-      this.mount()
+    createStyle () {
+      assertHasMap(this)
+      // user provided style function
+      let providedStyleFunc = this.factory(styleHelper)
+      if (!isFunction(providedStyleFunc)) {
+        warndbg(`Factory returned a value not of Function type, fallback style will be used`)
+        providedStyleFunc = noop
+      }
+      // fallback style function made from inner style containers
+      const fallbackStyleFunc = createStyleFunc(this)
+
+      return function __styleFunc (feature, resolution, helper) {
+        const styles = providedStyleFunc(feature, resolution, helper)
+        // not empty or null style
+        if (
+          styles === null ||
+          (Array.isArray(styles) && styles.length)
+        ) {
+          return styles
+        }
+        return fallbackStyleFunc(feature, resolution)
+      }
     },
     /**
      * @return {void}
@@ -53,42 +71,13 @@
       this.deferRefresh()
     },
     /**
-     * @return {ol.StyleFunction}
-     * @protected
+     * @return {void}
      */
-    createStyle () {
-      assertHasMap(this)
-
-      const vm = this
-      // replace styleHelper.geom method with partially applied version
-      const helper = {
-        ...styleHelper,
-        geom: partialRight(styleHelper.geom, [this.map.view.getProjection()])
-      }
-      // user provided style function
-      let providedStyleFunc = this.factory(helper)
-      if (!isFunction(providedStyleFunc)) {
-        warndbg(`Factory returned a value not of Function type, fallback style will be used`)
-        providedStyleFunc = noop
-      }
-      // fallback style function made from inner style containers
-      const fallbackStyleFunc = createStyleFunc(this)
-
-      return function __styleFunc (feature, resolution, helper) {
-        const styles = providedStyleFunc(
-          geoJson.writeFeature(feature, vm.map.view.getProjection()),
-          resolution,
-          helper
-        )
-        // not empty or null style
-        if (
-          styles === null ||
-          (Array.isArray(styles) && styles.length)
-        ) {
-          return styles
-        }
-        return fallbackStyleFunc(feature, resolution)
-      }
+    refresh () {
+      this.unmount()
+      // recreate style function
+      this.initialize()
+      this.mount()
     }
   }
 

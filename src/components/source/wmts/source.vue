@@ -2,10 +2,8 @@
   import WMTSSource from 'ol/source/wmts'
   import WMTSTileGrid from 'ol/tilegrid/wmts'
   import { range } from 'lodash/fp'
-  import { consts, tileGridHelper } from '../../../ol-ext'
+  import { WMTS_VERSION, WMTS_REQUEST_ENCODING, WMTS_FORMAT, tileGrid as tileGridHelper } from '../../../ol-ext'
   import tileSource from '../tile'
-
-  const { WMTS_VERSION, WMTS_REQUEST_ENCODING, WMTS_FORMAT } = consts
 
   const props = {
     dimensions: Object,
@@ -57,14 +55,6 @@
   }
 
   const methods = {
-    // protected & private
-    /**
-     * @return {ol.tilegrid.WMTS}
-     * @protected
-     */
-    createTileGrid () {
-      return new WMTSTileGrid(this.preparedGridOpts)
-    },
     /**
      * @returns {ol.source.WMTS}
      * @protected
@@ -89,6 +79,13 @@
         url: this.urlTmpl,
         wrapX: this.wrapX
       })
+    },
+    /**
+     * @return {ol.tilegrid.WMTS}
+     * @protected
+     */
+    createTileGrid () {
+      return new WMTSTileGrid(this.preparedGridOpts)
     }
   }
 

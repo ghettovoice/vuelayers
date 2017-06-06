@@ -5,37 +5,16 @@ import { debounce } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import stubVNode from '../stub-vnode'
 import services from '../services'
+import { VM_PROP } from '../../consts'
 
 const methods = {
   /**
-   * @param {number} [wait=100]
-   * @returns {Promise}
+   * @return {OlStyle}
+   * @protected
+   * @abstract
    */
-  deferRefresh (wait = 100) {
-    return new Promise(resolve => {
-      if (!this.__deferRefresh) {
-        this.__deferRefresh = debounce(wait, () => {
-          this.refresh()
-          resolve()
-        })
-      }
-
-      this.__deferRefresh()
-    })
-  },
-  /**
-   * @return {void}
-   */
-  refresh () {
-    this.unmount()
-    this.mount()
-  },
-  /**
-   * Inner ol style instance getter
-   * @return {OlStyle|undefined}
-   */
-  getStyle () {
-    return this._style
+  createStyle () {
+    throw new Error('Not implemented method')
   },
   /**
    * @return {void}
@@ -47,15 +26,21 @@ const methods = {
      * @private
      */
     this._style = this.createStyle()
+    this._style[VM_PROP] = this
     this::defineAccessors()
   },
   /**
-   * @return {OlStyle}
-   * @protected
-   * @abstract
+   * @type {function():void}
    */
-  createStyle () {
-    throw new Error('Not implemented method')
+  deferRefresh: debounce(100, function () {
+    this.refresh()
+  }),
+  /**
+   * Inner ol style instance getter
+   * @return {OlStyle|undefined}
+   */
+  getStyle () {
+    return this._style
   },
   /**
    * @return {Object}
@@ -81,6 +66,13 @@ const methods = {
    */
   unmount () {
     throw new Error('Not implemented method')
+  },
+  /**
+   * @return {void}
+   */
+  refresh () {
+    this.unmount()
+    this.mount()
   }
 }
 

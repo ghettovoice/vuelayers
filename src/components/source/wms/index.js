@@ -1,11 +1,11 @@
 /**
  * @module components/source/wms
  */
-import WMS from './source.vue'
+import Source from './source.vue'
 
 export default {
-  ...WMS,
+  ...Source,
   install (Vue) {
-    Vue.component(WMS.name, WMS)
+    Vue.component(Source.name, Source)
   }
 }

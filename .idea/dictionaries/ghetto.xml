@@ -28,11 +28,14 @@
       <w>loadingstrategy</w>
       <w>lodash</w>
       <w>mapbox</w>
+      <w>minified</w>
       <w>minifier</w>
       <w>mixins</w>
       <w>multiline</w>
       <w>mutators</w>
       <w>noop</w>
+      <w>olcontrol</w>
+      <w>olextent</w>
       <w>openstreetmap</w>
       <w>overriden</w>
       <w>pacman</w>

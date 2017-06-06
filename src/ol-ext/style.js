@@ -2,7 +2,6 @@
  * Style helpers
  */
 import parseColor from 'parse-color'
-import Geometry from 'ol/geom/geometry'
 import Style from 'ol/style/style'
 import Fill from 'ol/style/fill'
 import Stroke from 'ol/style/stroke'
@@ -11,10 +10,10 @@ import Icon from 'ol/style/icon'
 import RegularShape from 'ol/style/regularshape'
 import Text from 'ol/style/text'
 import ImageStyle from 'ol/style/image'
-import { flow, isPlainObject, isFunction, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
+import { flow, isFunction, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
 import isNumeric from '../utils/is-numeric'
-import { DATA_PROJECTION, GEOMETRY_TYPE, MAP_PROJECTION } from './consts'
-import * as geoJson from './geojson'
+import { GEOMETRY_TYPE } from './consts'
+import * as geomHelper from './geom'
 
 const reduceWithKey = reduce.convert({ cap: false })
 
@@ -325,22 +324,16 @@ export function text (vlStyle) {
 
 /**
  * @param {VlStyle} vlStyle
- * @param {string|ol.ProjectionLike} [mapProj=MAP_PROJECTION]
  * @return {ol.geom.Geometry|ol.StyleGeometryFunction|undefined}
  */
-export function geom (vlStyle, mapProj = MAP_PROJECTION) {
-  const processGeom = geom => {
-    if (geom instanceof Geometry) return geom.transform(DATA_PROJECTION, mapProj)
-    if (isPlainObject(geom)) return geoJson.readGeometry(geom, mapProj)
-  }
-
+export function geom (vlStyle) {
   if (isFunction(vlStyle.geom)) {
     return function __styleGeomFunc (feature) {
-      return processGeom(vlStyle.geom(geoJson.writeFeature(feature, mapProj)))
+      return vlStyle.geom(feature, geomHelper)
     }
   }
 
-  return processGeom(vlStyle.geom)
+  return vlStyle.geom
 }
 
 /**
@@ -406,5 +399,5 @@ export function geom (vlStyle, mapProj = MAP_PROJECTION) {
  * @property {ol.style.Stroke|undefined} imageStroke
  * @property {ol.style.Fill|undefined} imageFill
  *
- * @property {GeoJSONGeometry|ol.geom.Geometry|ol.StyleGeometryFunction|undefined} geom Coordinates should be in EPSG:4326
+ * @property {ol.geom.Geometry|ol.StyleGeometryFunction|undefined} geom Coordinates should be in map projection
  */

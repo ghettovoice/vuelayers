@@ -9,20 +9,6 @@ const props = {}
 
 const methods = {
   /**
-   * @return {ol.interaction.Interaction|undefined}
-   */
-  getInteraction () {
-    return this._interaction
-  },
-  /**
-   * @return {void}
-   */
-  refresh () {
-    assertHasInteraction(this)
-    this.interaction.changed()
-  },
-  // protected & private
-  /**
    * @return {ol.interaction.Interaction}
    * @protected
    * @abstract
@@ -40,8 +26,14 @@ const methods = {
      * @protected
      */
     this._interaction = this.createInteraction()
-    this._interaction.set(VM_PROP, this)
+    this._interaction[VM_PROP] = this
     this::defineAccessors()
+  },
+  /**
+   * @return {ol.interaction.Interaction|undefined}
+   */
+  getInteraction () {
+    return this._interaction
   },
   /**
    * @returns {Object}
@@ -67,6 +59,13 @@ const methods = {
   unmount () {
     this.unsubscribeAll()
     this.$parent.removeInteraction(this)
+  },
+  /**
+   * @return {void}
+   */
+  refresh () {
+    assertHasInteraction(this)
+    this.interaction.changed()
   }
 }
 

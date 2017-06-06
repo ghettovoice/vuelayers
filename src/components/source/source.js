@@ -5,29 +5,17 @@ import stubVNode from '../stub-vnode'
 import services from '../services'
 import { assertHasSource } from '../../utils/assert'
 
-// todo extract attributions into separate component
 const props = {
   attributions: [String, Array],
   logo: String,
   projection: String,
-  wrapX: Boolean
+  wrapX: {
+    type: Boolean,
+    default: true
+  }
 }
 
 const methods = {
-  /**
-   * @return {ol.source.Source}
-   */
-  getSource () {
-    return this._source
-  },
-  /**
-   * @return {void}
-   */
-  refresh () {
-    assertHasSource(this)
-    this.source.changed()
-  },
-  // protected & private
   /**
    * @return {ol.source.Source}
    * @protected
@@ -46,7 +34,7 @@ const methods = {
      * @protected
      */
     this._source = this.createSource()
-    this._source.set(VM_PROP, this)
+    this._source[VM_PROP] = this
     this::defineAccessors()
   },
   /**
@@ -57,6 +45,12 @@ const methods = {
     return mergeDescriptors(this::services.methods.getServices(), {
       source: this
     })
+  },
+  /**
+   * @return {ol.source.Source|undefined}
+   */
+  getSource () {
+    return this._source
   },
   /**
    * @return {void}
@@ -73,6 +67,13 @@ const methods = {
   unmount () {
     this.unsubscribeAll()
     this.$parent.setSource(undefined)
+  },
+  /**
+   * @return {void}
+   */
+  refresh () {
+    assertHasSource(this)
+    this.source.changed()
   }
 }
 

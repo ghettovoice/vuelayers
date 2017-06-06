@@ -4,14 +4,11 @@
   import { isEqual, isPlainObject } from 'lodash/fp'
   import { VM_PROP } from '../../consts'
   import Observable from '../../rx-ext'
-  import { consts, coordHelper, geoJson } from '../../ol-ext'
+  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJ, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
   import services from '../services'
   import rxSubs from '../rx-subs'
   import stubVNode from '../stub-vnode'
   import { assertHasView } from '../../utils/assert'
-
-  const { MIN_ZOOM, MAX_ZOOM, MAP_PROJECTION, ZOOM_FACTOR } = consts
-  const { toLonLat, fromLonLat } = coordHelper
 
   const props = {
     center: {
@@ -37,11 +34,14 @@
     },
     projection: {
       type: String,
-      default: MAP_PROJECTION
+      default: MAP_PROJ
     },
     resolution: Number,
     resolutions: Array,
-    rotation: Number,
+    rotation: {
+      type: Number,
+      default: 0
+    },
     zoom: {
       type: Number,
       default: MIN_ZOOM
@@ -106,7 +106,6 @@
       assertHasView(this)
       this.view.changed()
     },
-    // protected & private
     /**
      * @return {void}
      * @protected
@@ -123,7 +122,7 @@
       assertHasView(this)
       // center
       if (viewOptions.center != null && !isEqual(viewOptions.center, this.currentCenter)) {
-        this.view.setCenter(fromLonLat(viewOptions.center, this.projection))
+        this.view.setCenter(proj.fromLonLat(viewOptions.center, this.projection))
       }
       // resolution & zoom
       if (viewOptions.resolution != null && viewOptions.resolution !== this.currentResolution) {
@@ -208,7 +207,7 @@
      * @protected
      */
     this._view = new View({
-      center: fromLonLat(this.center, this.projection),
+      center: proj.fromLonLat(this.center, this.projection),
       constrainRotation: this.constrainRotation,
       enableRotation: this.enableRotation,
       extent: this.extent,
@@ -298,7 +297,7 @@
     ).throttleTime(1000 / 30)
       .distinctUntilChanged((a, b) => isEqual(a, b))
       .map(([center, resolution, rotation]) => ({
-        center: toLonLat(center, this.view.getProjection()),
+        center: proj.toLonLat(center, this.view.getProjection()),
         resolution: resolution,
         rotation
       }))

@@ -1,21 +1,21 @@
 import { pick } from 'lodash/fp'
 import proj from 'ol/proj'
 import TileGrid from 'ol/tilegrid/tilegrid'
-import { consts, tileGridHelper } from '../../ol-ext'
+import {
+  CACHE_SIZE,
+  CROSS_ORIGIN,
+  MAP_PROJ,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  PIXEL_RATIO,
+  REPROJ_ERR_THRESHOLD,
+  TILE_SIZE,
+  tileGrid as tileGridHelper
+} from '../../ol-ext'
 import replaceTokens from '../../utils/replace-tokens'
 import source from './source'
 import { assertHasSource } from '../../utils/assert'
 
-const {
-  CACHE_SIZE,
-  PIXEL_RATIO,
-  MIN_ZOOM,
-  MAX_ZOOM,
-  TILE_SIZE,
-  CROSS_ORIGIN,
-  REPROJ_ERR_THRESHOLD,
-  MAP_PROJECTION
-} = consts
 // todo extract tileGrid into separate component!
 const props = {
   cacheSize: {
@@ -41,7 +41,7 @@ const props = {
   opaque: Boolean,
   projection: {
     type: String,
-    default: MAP_PROJECTION
+    default: MAP_PROJ
   },
   reprojectionErrorThreshold: {
     type: Number,

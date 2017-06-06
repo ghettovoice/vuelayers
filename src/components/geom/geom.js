@@ -5,7 +5,7 @@ import Observable from '../../rx-ext'
 import rxSubs from '../rx-subs'
 import stubVNode from '../stub-vnode'
 import services from '../services'
-import { coordHelper, extentHelper } from '../../ol-ext'
+import { proj, extent } from '../../ol-ext'
 import { assertHasGeom, assertHasMap } from '../../utils/assert'
 
 const props = {
@@ -31,20 +31,6 @@ const computed = {
 
 const methods = {
   /**
-   * @returns {ol.geom.Geometry|undefined}
-   */
-  getGeom () {
-    return this._geom
-  },
-  /**
-   * @return {void}
-   */
-  refresh () {
-    assertHasGeom(this)
-    this.geom.changed()
-  },
-  // protected & private
-  /**
    * @return {ol.geom.Geometry}
    * @protected
    * @abstract
@@ -59,7 +45,7 @@ const methods = {
   initialize () {
     assertHasMap(this)
     // define helper methods based on geometry type
-    const { toLonLat, fromLonLat } = coordHelper.transforms[this.type]
+    const { toLonLat, fromLonLat } = proj.transforms[this.type]
     /**
      * @method
      * @param {number[]} coordinates
@@ -80,17 +66,30 @@ const methods = {
      * @return {number[]}
      * @protected
      */
-    this.extentToLonLat = extent => extentHelper.toLonLat(extent, this.map.view.getProjection())
+    this.extentToLonLat = extent => proj.extentToLonLat(extent, this.map.view.getProjection())
     // create ol.geom.Geometry instance
     /**
      * @type {ol.geom.Geometry}
      * @protected
      */
     this._geom = this.createGeom()
-    this._geom.set(VM_PROP, this)
+    this._geom[VM_PROP] = this
     this::defineAccessors()
     // initialize additional props
     this.currentExtent = this.extentToLonLat(this._geom.getExtent())
+  },
+  /**
+   * @returns {ol.geom.Geometry|undefined}
+   */
+  getGeom () {
+    return this._geom
+  },
+  /**
+   * @return {void}
+   */
+  refresh () {
+    assertHasGeom(this)
+    this.geom.changed()
   },
   /**
    * @return {Object}
@@ -138,7 +137,7 @@ const methods = {
         extent: this.currentExtent
       }, {
         coordinates: opts.coordinates,
-        extent: extentHelper.boundingExtent(opts.coordinates)
+        extent: extent.boundingExtent(opts.coordinates)
       })
 
       if (!isEq) {

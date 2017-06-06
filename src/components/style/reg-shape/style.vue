@@ -28,24 +28,6 @@
 
   const methods = {
     /**
-     * @param {ol.style.Fill|Vue|undefined} fill
-     * @return {void}
-     */
-    setFill (fill) {
-      fill = fill instanceof Vue ? fill.style : fill
-      this.fill = fill
-      this.deferRefresh()
-    },
-    /**
-     * @param {ol.style.Stroke|Vue|undefined} stroke
-     * @return {void}
-     */
-    setStroke (stroke) {
-      stroke = stroke instanceof Vue ? stroke.style : stroke
-      this.stroke = stroke
-      this.deferRefresh()
-    },
-    /**
      * @return {ol.style.RegularShape}
      * @protected
      */
@@ -62,6 +44,24 @@
         fill: this.fill,
         stroke: this.stroke
       })
+    },
+    /**
+     * @param {ol.style.Fill|Vue|undefined} fill
+     * @return {void}
+     */
+    setFill (fill) {
+      fill = fill instanceof Vue ? fill.style : fill
+      this.fill = fill
+      this.deferRefresh()
+    },
+    /**
+     * @param {ol.style.Stroke|Vue|undefined} stroke
+     * @return {void}
+     */
+    setStroke (stroke) {
+      stroke = stroke instanceof Vue ? stroke.style : stroke
+      this.stroke = stroke
+      this.deferRefresh()
     }
   }
 

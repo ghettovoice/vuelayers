@@ -7,15 +7,6 @@ const props = {
 const methods = {
   /**
    * @return {void}
-   */
-  refresh () {
-    this.unmount()
-    // recreate style
-    this.initialize()
-    this.mount()
-  },
-  /**
-   * @return {void}
    * @protected
    */
   mount () {
@@ -27,6 +18,15 @@ const methods = {
    */
   unmount () {
     this.$parent.setImage(undefined)
+  },
+  /**
+   * @return {void}
+   */
+  refresh () {
+    this.unmount()
+    // recreate style
+    this.initialize()
+    this.mount()
   }
 }
 

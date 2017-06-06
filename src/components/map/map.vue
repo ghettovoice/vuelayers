@@ -7,19 +7,16 @@
 
 <script>
   import Vue from 'vue'
-  import { constant, isEqual } from 'lodash/fp'
+  import { noop, isEqual } from 'lodash/fp'
   import Map from 'ol/map'
-  import olControl from 'ol/control'
+  import olcontrol from 'ol/control'
   import { VM_PROP } from '../../consts'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import Observable from '../../rx-ext'
-  import { coordHelper, geoJson } from '../../ol-ext'
+  import { proj } from '../../ol-ext'
   import rxSubs from '../rx-subs'
   import services from '../services'
   import { assertHasMap, assertHasView } from '../../utils/assert'
-  import plainProps from '../../utils/plain-props'
-
-  const { toLonLat } = coordHelper
 
   const props = {
     defControls: {
@@ -27,10 +24,19 @@
       default: true
     },
     keyboardEventTarget: [String, Element],
-    loadTilesWhileAnimating: Boolean,
-    loadTilesWhileInteracting: Boolean,
+    loadTilesWhileAnimating: {
+      type: Boolean,
+      default: false
+    },
+    loadTilesWhileInteracting: {
+      type: Boolean,
+      default: false
+    },
     logo: [String, Object],
-    pixelRatio: Number,
+    pixelRatio: {
+      type: Number,
+      default: 1
+    },
     renderer: [String, Array],
     tabIndex: {
       type: Number,
@@ -88,44 +94,23 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function(feature: GeoJSONFeature, layer: (Object|undefined))} callback
+     * @param {function(feature: ol.Feature, layer: (ol.layer.Layer|undefined))} callback
      * @param {Object} [opts]
      * @return {T|undefined}
      */
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       assertHasMap(this)
-
-      const cb = (feature, layer) => {
-        assertHasView(this)
-
-        return callback(
-          geoJson.writeFeature(feature, this.view.getProjection()),
-          layer && plainProps(layer.getProperties())
-        )
-      }
-      const layerFilter = opts.layerFilter || constant(true)
-      opts.layerFilter = layer => layerFilter(plainProps(layer.getProperties()))
-
-      return this.map.forEachFeatureAtPixel(pixel, cb, opts)
+      return this.map.forEachFeatureAtPixel(pixel, callback, opts)
     },
     /**
      * @param {number[]} pixel
-     * @param {function(layer: Object, rgba: (number[]|undefined))} callback
-     * @param {function(layer: Object)} [layerFilter]
+     * @param {function(layer: ol.layer.Layer, rgba: (number[]|undefined))} callback
+     * @param {function(layer: ol.layer.Layer)} [layerFilter]
      * @return {T|undefined}
      */
-    forEachLayerAtPixel (pixel, callback, layerFilter = () => {}) {
+    forEachLayerAtPixel (pixel, callback, layerFilter = noop) {
       assertHasMap(this)
-
-      const cb = (layer, rgba) => {
-        return callback(
-          plainProps(layer.getProperties()),
-          rgba
-        )
-      }
-      const lf = layer => layerFilter(plainProps(layer.getProperties()))
-
-      return this.map.forEachLayerAtPixel(pixel, cb, undefined, lf)
+      return this.map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
      * @param {number[]} pixel
@@ -135,30 +120,13 @@
       assertHasMap(this)
       assertHasView(this)
 
-      return toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.getProjection())
+      return proj.toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.getProjection())
     },
     /**
      * @return {ol.Map|undefined}
      */
     getMap () {
       return this._map
-    },
-    /**
-     * @return {ol.View|undefined}
-     */
-    getView () {
-      assertHasMap(this)
-      return this.map.getView()
-    },
-    /**
-     * @param {ol.View|Vue|undefined} view
-     * @return {void}
-     */
-    setView (view) {
-      assertHasMap(this)
-
-      view = view instanceof Vue ? view.view : view
-      this.map.setView(view)
     },
     /**
      * @returns {Object}
@@ -170,6 +138,13 @@
       })
     },
     /**
+     * @return {ol.View|undefined}
+     */
+    getView () {
+      assertHasMap(this)
+      return this.map.getView()
+    },
+    /**
      * Triggers map re-render.
      * @return {void}
      */
@@ -179,7 +154,16 @@
       this.map.updateSize()
       this.map.render()
     },
-    // protected & private
+    /**
+     * @param {ol.View|Vue|undefined} view
+     * @return {void}
+     */
+    setView (view) {
+      assertHasMap(this)
+
+      view = view instanceof Vue ? view.view : view
+      this.map.setView(view)
+    },
     /**
      * @return {void}
      * @protected
@@ -220,7 +204,7 @@
     this._map = new Map({
       layers: [],
 //      interactions: [],
-      controls: this.defControls ? olControl.defaults() : [],
+      controls: this.defControls ? olcontrol.defaults() : [],
       loadTilesWhileAnimating: this.loadTilesWhileAnimating,
       loadTilesWhileInteracting: this.loadTilesWhileInteracting,
       pixelRatio: this.pixelRatio,
@@ -228,7 +212,7 @@
       logo: this.logo,
       keyboardEventTarget: this.keyboardEventTarget
     })
-    this._map.set(VM_PROP, this)
+    this._map[VM_PROP] = this
     this::defineAccessors()
   }
 
@@ -293,7 +277,7 @@
         .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
     ).map(evt => ({
       ...evt,
-      coordinate: toLonLat(evt.coordinate, this.view.getProjection())
+      coordinate: proj.toLonLat(evt.coordinate, this.view.getProjection())
     }))
     const mapEvents = Observable.fromOlEvent(this.map, [
       'postrender',
@@ -316,7 +300,6 @@
 
 <style lang="scss">
   @import "../../styles/mixins";
-  @import "~ol/ol";
 
   .vl-map, .vl-map .map {
     @include vl-wh(100%, 100%);

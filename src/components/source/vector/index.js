@@ -1,11 +1,11 @@
 /**
  * @module components/source/vector
  */
-import Vector from './source.vue'
+import Source from './source.vue'
 
 export default {
-  ...Vector,
+  ...Source,
   install (Vue) {
-    Vue.component(Vector.name, Vector)
+    Vue.component(Source.name, Source)
   }
 }

@@ -1,9 +1,8 @@
 <script>
   import coalesce from '../../../utils/coalesce'
-  import { consts } from '../../../ol-ext'
+  import { TILE_FORMAT, MAP_PROJ } from '../../../ol-ext'
   import xyzSource from '../xyz/source.vue'
 
-  const { TILE_FORMAT, MAP_PROJECTION } = consts
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
 
@@ -22,7 +21,7 @@
     },
     projection: {
       type: String,
-      default: MAP_PROJECTION
+      default: MAP_PROJ
     },
     tileFormat: {
       type: String,

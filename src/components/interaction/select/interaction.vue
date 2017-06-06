@@ -3,13 +3,12 @@
   import SelectInteraction from 'ol/interaction/select'
   import VectorLayer from 'ol/layer/vector'
   import Feature from 'ol/feature'
-  import { forEach, mapValues, differenceWith, isPlainObject } from 'lodash/fp'
+  import { forEach, mapValues, difference, isPlainObject, isNumber, isString } from 'lodash/fp'
   import Observable from '../../../rx-ext'
-  import { styleHelper, geoJson } from '../../../ol-ext'
+  import { style as styleHelper } from '../../../ol-ext'
   import interaction from '../interaction'
   import styleTarget, { createStyleFunc } from '../../style-target'
   import { assertHasInteraction, assertHasMap } from '../../../utils/assert'
-  import plainProps from '../../../utils/plain-props'
 
   // todo add other options, like event modifiers
   const props = {
@@ -17,21 +16,24 @@
       type: Function,
       default: () => true
     },
-    hitTolerance: Number, // default 0
-    multi: Boolean, // default false
+    hitTolerance: {
+      type: Number,
+      default: 0
+    },
+    multi: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * @type {number[]} Array of ids
+     */
     selected: {
       type: Array,
       default: () => []
     },
-    wrapX: Boolean // default true
-  }
-
-  const computed = {
-    /**
-     * @type {Array}
-     */
-    selectedIds () {
-      return this.currentSelected.map(f => f.id)
+    wrapX: {
+      type: Boolean,
+      default: true
     }
   }
 
@@ -39,111 +41,19 @@
 
   const methods = {
     /**
-     * @return {void}
-     */
-    refresh () {
-      assertHasInteraction(this)
-      this.interaction.getFeatures().changed()
-      this::interaction.methods.refresh()
-    },
-    /**
-     * @param {GeoJSONFeature|Vue|ol.Feature} feature
-     * @return {void}
-     */
-    select (feature) {
-      assertHasMap(this)
-      assertHasInteraction(this)
-
-      let id
-      if (isPlainObject(feature)) {
-        id = feature.id
-      } else if (feature instanceof Vue) {
-        id = feature.id
-        feature = feature.feature
-      } else if (feature instanceof Feature) {
-        id = feature.getId()
-      } else {
-        throw new Error('Illegal first argument')
-      }
-      // skip if already added
-      if (this.selectedIds.includes(id)) return
-
-      const selection = this.interaction.getFeatures()
-
-      if (!(feature instanceof Feature)) {
-        if (!id) throw new Error('Undefined feature id')
-
-        const layers = this.map.map.getLayers().getArray()
-
-        forEach(layer => {
-          if (layer instanceof VectorLayer) {
-            feature = layer.getSource().getFeatureById(id)
-          }
-          return !feature
-        }, layers)
-      }
-
-      feature && selection.push(feature)
-    },
-    /**
-     * @param {GeoJSONFeature|Vue|ol.Feature} feature
-     * @return {void}
-     */
-    unselect (feature) {
-      assertHasInteraction(this)
-
-      let id
-      if (isPlainObject(feature)) {
-        id = feature.id
-      } else if (feature instanceof Vue) {
-        id = feature.id
-        feature = feature.feature
-      } else if (feature instanceof Feature) {
-        id = feature.getId()
-      } else {
-        throw new Error('Illegal first argument')
-      }
-
-      if (!this.selectedIds.includes(id)) return
-
-      const selection = this.interaction.getFeatures()
-      const selectionArray = selection.getArray()
-      const idx = selectionArray.findIndex(f => f.id === id)
-
-      if (idx !== -1) {
-        selection.removeAt(idx)
-      }
-    },
-    /**
-     * Removes all features from selection.
-     * @return {void}
-     */
-    unselectAll () {
-      assertHasInteraction(this)
-      this.interaction.getFeatures().clear()
-    },
-    // protected & private
-    /**
      * @return {ol.interaction.Select}
      * @protected
      */
     createInteraction () {
-      const vm = this
-      const style = createStyleFunc(this)
-      const filter = function __selectFilter (feature, layer) {
-        assertHasMap(vm)
-
-        return vm.filter(
-          geoJson.writeFeature(feature, vm.map.view.getProjection()),
-          layer && plainProps(layer.getProperties())
-        )
-      }
+      const filter = this.filter
 
       return new SelectInteraction({
         multi: this.multi,
         wrapX: this.wrapX,
-        filter,
-        style
+        filter: function __selectFilter (feature, layer) {
+          return filter(feature.getId(), layer && layer.get('id'))
+        },
+        style: createStyleFunc(this)
       })
     },
     /**
@@ -181,6 +91,67 @@
       this::interaction.methods.unmount()
     },
     /**
+     * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
+     * @return {void}
+     * @throws {Error}
+     */
+    select (feature) {
+      assertHasMap(this)
+      assertHasInteraction(this)
+
+      let id = extractId(feature)
+      if (!id) {
+        throw new Error('Undefined feature id')
+      }
+      if (feature instanceof Vue) {
+        feature = feature.feature
+      }
+
+      const selection = this.interaction.getFeatures()
+      // skip if already added
+      const selectedIds = selection.getArray().map(f => f.getId())
+      if (selectedIds.includes(id)) return
+
+      if (!(feature instanceof Feature)) {
+        const layers = this.map.map.getLayers().getArray()
+
+        forEach(layer => {
+          if (layer instanceof VectorLayer) {
+            feature = layer.getSource().getFeatureById(id)
+          }
+          return !feature
+        }, layers)
+      }
+
+      feature && selection.push(feature)
+    },
+    /**
+     * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
+     * @return {void}
+     */
+    unselect (feature) {
+      assertHasInteraction(this)
+
+      let id = extractId(feature)
+      if (!id) {
+        throw new Error('Undefined feature id')
+      }
+      if (feature instanceof Vue) {
+        feature = feature.feature
+      }
+
+      const selection = this.interaction.getFeatures()
+      // skip if already added
+      const selectedIds = selection.getArray().map(f => f.getId())
+      if (!selectedIds.includes(id)) return
+
+      const idx = selectedIds.findIndex(x => x === id)
+
+      if (idx !== -1) {
+        selection.removeAt(idx)
+      }
+    },
+    /**
      * @param {*} style
      * @return {void}
      * @protected
@@ -191,18 +162,33 @@
     },
     /**
      * @return {void}
+     */
+    refresh () {
+      assertHasInteraction(this)
+      this.interaction.getFeatures().changed()
+      this::interaction.methods.refresh()
+    },
+    /**
+     * @return {void}
      * @protected
      */
     subscribeAll () {
       this::subscribeToInteractionChanges()
+    },
+    /**
+     * Removes all features from selection.
+     * @return {void}
+     */
+    unselectAll () {
+      assertHasInteraction(this)
+      this.interaction.getFeatures().clear()
     }
   }
 
-  const diffById = differenceWith((a, b) => a.id === b.id)
   const watch = {
     selected (selected) {
-      let forSelect = diffById(selected, this.currentSelected)
-      let forUnselect = diffById(this.currentSelected, selected)
+      let forSelect = difference(selected, this.currentSelected)
+      let forUnselect = difference(this.currentSelected, selected)
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)
@@ -213,7 +199,6 @@
     name: 'vl-interaction-select',
     mixins: [interaction, styleTarget],
     props,
-    computed,
     methods,
     watch,
     stubVNode: {
@@ -245,11 +230,13 @@
       Observable.fromOlEvent(
         selection,
         'add',
-        ({ element }) => geoJson.writeFeature(element, this.map.view.getProjection())
+        ({ element }) => element.getId()
       ),
-      feature => {
-        this.currentSelected.push(feature)
-        this.$emit('select', feature)
+      id => {
+        if (!this.currentSelected.includes(id)) {
+          this.currentSelected.push(id)
+          this.$emit('select', { id })
+        }
       }
     )
     // unselect event
@@ -257,13 +244,35 @@
       Observable.fromOlEvent(
         selection,
         'remove',
-        ({ element }) => geoJson.writeFeature(element, this.map.view.getProjection())
+        ({ element }) => element.getId()
       ),
-      feature => {
-        let idx = this.currentSelected.findIndex(({ id }) => id === feature.id)
-        this.currentSelected.splice(idx, 1)
-        this.$emit('unselect', feature)
+      id => {
+        let idx = this.currentSelected.findIndex(x => x === id)
+        if (idx !== -1) {
+          this.currentSelected.splice(idx, 1)
+          this.$emit('unselect', { id })
+        }
       }
     )
+  }
+
+  /**
+   * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
+   * @return {string|number}
+   * @throws {Error}
+   */
+  function extractId (feature) {
+    let id
+    if (isPlainObject(feature) || feature instanceof Vue) {
+      id = feature.id
+    } else if (feature instanceof Feature) {
+      id = feature.getId()
+    } else if (isString(feature) || isNumber(feature)) {
+      id = feature
+    } else {
+      throw new Error('Illegal feature format')
+    }
+
+    return id
   }
 </script>

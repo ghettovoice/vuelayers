@@ -1,10 +1,8 @@
 <script>
   import { constant } from 'lodash/fp'
   import MultiPolygon from 'ol/geom/multipolygon'
-  import { consts } from '../../../ol-ext'
+  import { GEOMETRY_TYPE } from '../../../ol-ext'
   import geom from '../geom'
-
-  const { GEOMETRY_TYPE } = consts
 
   const props = {}
 

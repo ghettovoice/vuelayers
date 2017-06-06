@@ -18,7 +18,10 @@ const props = {
   },
   minResolution: Number,
   maxResolution: Number,
-  opacity: Number,
+  opacity: {
+    type: Number,
+    default: 1
+  },
   overlay: Boolean,
   visible: {
     type: Boolean,
@@ -28,49 +31,6 @@ const props = {
 }
 
 const methods = {
-  /**
-   * @param {number[]} pixel
-   * @return {boolean}
-   */
-  isAtPixel (pixel) {
-    assertHasMap(this)
-
-    return this.map.forEachLayerAtPixel(pixel, layer => layer === this)
-  },
-  /**
-   * @return {ol.layer.Layer|undefined}
-   */
-  getLayer () {
-    return this._layer
-  },
-  /**
-   * Updates layer state
-   * @return {void}
-   */
-  refresh () {
-    assertHasLayer(this)
-    this.layer.changed()
-  },
-  /**
-   * @param {ol.Map|Vue|undefined} map
-   */
-  setMap (map) {
-    assertHasLayer(this)
-
-    map = map instanceof Vue ? map.map : map
-    this.layer.setMap(map)
-  },
-  /**
-   * @param {ol.source.Source|Vue|undefined} source
-   * @return {void}
-   */
-  setSource (source) {
-    assertHasLayer(this.layer)
-
-    source = source instanceof Vue ? source.source : source
-    this.layer.setSource(source)
-  },
-  // protected & private
   /**
    * @return {ol.layer.Layer}
    * @protected
@@ -90,10 +50,25 @@ const methods = {
      */
     this._layer = this.createLayer()
     this._layer.setProperties({
-      id: this.id,
-      [VM_PROP]: this
+      id: this.id
     })
+    this._layer[VM_PROP] = this
     this::defineAccessors()
+  },
+  /**
+   * @param {number[]} pixel
+   * @return {boolean}
+   */
+  isAtPixel (pixel) {
+    assertHasMap(this)
+
+    return this.map.forEachLayerAtPixel(pixel, l => l === this.layer)
+  },
+  /**
+   * @return {ol.layer.Layer|undefined}
+   */
+  getLayer () {
+    return this._layer
   },
   /**
    * @returns {Object}
@@ -131,9 +106,31 @@ const methods = {
     }
   },
   /**
+   * Updates layer state
    * @return {void}
    */
-  subscribeAll () {
+  refresh () {
+    assertHasLayer(this)
+    this.layer.changed()
+  },
+  /**
+   * @param {ol.Map|Vue|undefined} map
+   */
+  setMap (map) {
+    assertHasLayer(this)
+
+    map = map instanceof Vue ? map.map : map
+    this.layer.setMap(map)
+  },
+  /**
+   * @param {ol.source.Source|Vue|undefined} source
+   * @return {void}
+   */
+  setSource (source) {
+    assertHasLayer(this)
+
+    source = source instanceof Vue ? source.source : source
+    this.layer.setSource(source)
   }
 }
 

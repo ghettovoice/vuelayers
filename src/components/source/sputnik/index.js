@@ -1,11 +1,11 @@
 /**
  * @module components/source/sputnik
  */
-import Sputnik from './source.vue'
+import Source from './source.vue'
 
 export default {
-  ...Sputnik,
+  ...Source,
   install (Vue) {
-    Vue.component(Sputnik.name, Sputnik)
+    Vue.component(Source.name, Source)
   }
 }

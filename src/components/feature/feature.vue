@@ -32,16 +32,33 @@
       return this._feature
     },
     /**
+     * @return {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(this::services.methods.getServices(), {
+        feature: this
+      })
+    },
+    /**
+     * @return {ol.Feature}
+     * @protected
+     */
+    getStyleTarget () {
+      return this.feature
+    },
+    /**
      * @param {number} pixel
      * @return {boolean}
      */
     isAtPixel (pixel) {
       assertHasMap(this)
 
-      const cb = feature => feature === this
-      const layerFilter = layer => layer === this.layer
-
-      return this.map.forEachFeatureAtPixel(pixel, cb, { layerFilter })
+      return this.map.forEachFeatureAtPixel(
+        pixel,
+        f => f === this.feature,
+        { layerFilter: l => l === this.layer }
+      )
     },
     /**
      * @return {void}
@@ -64,29 +81,6 @@
         geom = geoJson.readGeometry(geom, this.map.view.getProjection())
       }
       this.feature.setGeometry(geom)
-    },
-    // protected & private
-    /**
-     * @return {Object}
-     * @protected
-     */
-    getServices () {
-      return mergeDescriptors(this::services.methods.getServices(), {
-        feature: this
-      })
-    },
-    /**
-     * @return {ol.Feature}
-     * @protected
-     */
-    getStyleTarget () {
-      return this.feature
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    subscribeAll () {
     }
   }
 
@@ -143,12 +137,9 @@
      * @type {ol.Feature}
      * @private
      */
-    this._feature = new Feature({
-      id: this.id,
-      properties: this.properties,
-      [VM_PROP]: this
-    })
+    this._feature = new Feature(this.properties)
     this._feature.setId(this.id)
+    this._feature[VM_PROP] = this
     this::defineAccessors()
   }
 

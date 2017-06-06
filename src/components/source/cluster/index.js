@@ -1,5 +1,5 @@
 /**
- * @module components/source/mapbox
+ * @module components/source/cluster
  */
 import Source from './source.vue'
 

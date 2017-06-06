@@ -1,11 +1,11 @@
 /**
  * @module components/source/xyz
  */
-import XYZ from './source.vue'
+import Source from './source.vue'
 
 export default {
-  ...XYZ,
+  ...Source,
   install (Vue) {
-    Vue.component(XYZ.name, XYZ)
+    Vue.component(Source.name, Source)
   }
 }

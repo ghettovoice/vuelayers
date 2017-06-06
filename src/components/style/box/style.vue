@@ -23,6 +23,29 @@
 
   const methods = {
     /**
+     * @return {ol.style.Style}
+     * @protected
+     */
+    createStyle () {
+      return new Style({
+        zIndex: this.zIndex
+      })
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      this.$parent.addStyle(this)
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      this.$parent.removeStyle(this)
+    },
+    /**
      * @param {ol.style.Image|Vue|undefined} image
      * @return {void}
      */
@@ -54,29 +77,6 @@
       text = text instanceof Vue ? text.style : text
       this.style.setText(text)
       this.deferRefresh()
-    },
-    /**
-     * @return {ol.style.Style}
-     * @protected
-     */
-    createStyle () {
-      return new Style({
-        zIndex: this.zIndex
-      })
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    mount () {
-      this.$parent.addStyle(this)
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    unmount () {
-      this.$parent.removeStyle(this)
     }
   }
 

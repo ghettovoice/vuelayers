@@ -1,5 +1,5 @@
 /* global describe, it, expect */
-import * as coordinateHelper from '../../../../src/ol-ext/coord'
+import * as proj from '../../../../src/ol-ext/proj'
 
 describe('ol coordinate helper', () => {
   const point3857 = [5565974.539663679, 7361866.113051185]
@@ -10,28 +10,28 @@ describe('ol coordinate helper', () => {
   /** @test pointToLonLat */
   describe('pointToLonLat', () => {
     it('should transform point coordinate to EPSG:4326', () => {
-      expect(coordinateHelper.pointToLonLat(point3857, 'EPSG:3857')).to.be.deep.equal(point4326)
+      expect(proj.pointToLonLat(point3857, 'EPSG:3857')).to.be.deep.equal(point4326)
     })
   })
 
   /** @test pointFromLonLat */
   describe('pointFromLonLat', () => {
     it('should transform point coordinate from EPSG:4326', () => {
-      expect(coordinateHelper.pointFromLonLat(point4326, 'EPSG:3857')).to.be.deep.equal(point3857)
+      expect(proj.pointFromLonLat(point4326, 'EPSG:3857')).to.be.deep.equal(point3857)
     })
   })
 
   /** @test lineToLonLat */
   describe('lineToLonLat', () => {
     it('should transform line coordinate to EPSG:4326', () => {
-      expect(coordinateHelper.lineToLonLat(line3857, 'EPSG:3857')).to.be.deep.equal(line4326)
+      expect(proj.lineToLonLat(line3857, 'EPSG:3857')).to.be.deep.equal(line4326)
     })
   })
 
   /** @test lineFromLonLat */
   describe('lineFromLonLat', () => {
     it('should transform line coordinate from EPSG:4326', () => {
-      expect(coordinateHelper.lineFromLonLat(line4326, 'EPSG:3857')).to.be.deep.equal(line3857)
+      expect(proj.lineFromLonLat(line4326, 'EPSG:3857')).to.be.deep.equal(line3857)
     })
   })
 })

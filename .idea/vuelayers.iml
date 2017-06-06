@@ -12,10 +12,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/test/e2e/reports" />
+      <excludeFolder url="file://$MODULE_DIR$/test/unit/coverage" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="es6-promise-DefinitelyTyped" level="application" />
-    <orderEntry type="library" name="es6-shim-DefinitelyTyped" level="application" />
   </component>
 </module>

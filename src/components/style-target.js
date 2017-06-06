@@ -2,8 +2,8 @@
  * @module components/style-target
  */
 import Vue from 'vue'
-import { filter, flow, isFunction, map, partialRight } from 'lodash/fp'
-import { geoJson, styleHelper } from '../ol-ext'
+import { filter, flow, isFunction, map } from 'lodash/fp'
+import { style as styleHelper } from '../ol-ext'
 import { assertHasMap } from '../utils/assert'
 import { warndbg } from '../utils/debug'
 
@@ -111,17 +111,12 @@ export function createStyleFunc (vm) {
     if (!feature.getGeometry()) return
 
     let styles = vm.getStyles()
-    let plainFeature = geoJson.writeFeature(feature, vm.map.view.getProjection())
-    let helper = {
-      ...styleHelper,
-      geom: partialRight(styleHelper.geom, [vm.map.view.getProjection()])
-    }
     /* eslint-disable brace-style */
     // handle provided styles
     // styles - ol.StyleFunction or vl-style-func
     if (isFunction(styles) || isFunction(styles.style)) {
       let styleFunc = isFunction(styles) ? styles : styles.style
-      styles = styleFunc(feature, resolution, helper)
+      styles = styleFunc(feature, resolution, styleHelper)
     }
     // styles is array of ol.style.Style or vl-style-box
     else if (Array.isArray(styles)) {
@@ -131,7 +126,7 @@ export function createStyleFunc (vm) {
             (condition === true) ||
             (
               isFunction(condition) &&
-              condition(plainFeature, resolution)
+              condition(feature, resolution)
             )
         }),
         map('style')
@@ -149,7 +144,7 @@ export function createStyleFunc (vm) {
     styles = vm.getDefaultStyles()
     if (styles) {
       return isFunction(styles)
-        ? styles(feature, resolution, helper)
+        ? styles(feature, resolution, styleHelper)
         : styles
     }
   }

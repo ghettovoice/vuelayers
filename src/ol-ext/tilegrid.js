@@ -1,8 +1,8 @@
 import size from 'ol/size'
 import proj from 'ol/proj'
 import tilegrid from 'ol/tilegrid'
-import { createOrUpdate, getCorner, getHeight, getWidth } from './extent'
 import TileGrid from 'ol/tilegrid/tilegrid'
+import { createOrUpdate, getCorner, getHeight, getWidth } from './extent'
 import { EXTENT_CORNER, MAX_ZOOM, PROJ_UNIT, TILE_SIZE } from './consts'
 
 const { createXYZ } = tilegrid

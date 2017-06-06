@@ -44,7 +44,11 @@ Promise.resolve(utils.ensureDir(config.outDir))
     bundleName: config.name + '.umd',
     entry: config.cjsEntry,
     env: 'development',
-    external: [ 'vue' ]
+    external: [ 'vue', 'openlayers', 'ol' ],
+    globals: {
+      vue: 'Vue',
+      openlayers: 'ol'
+    }
   }))
   // UMD minified
   .then(() => bundles.includes('umd-min') && bundle({
@@ -52,7 +56,11 @@ Promise.resolve(utils.ensureDir(config.outDir))
     bundleName: config.name + '.umd.min',
     entry: config.cjsEntry,
     env: 'production',
-    external: [ 'vue' ]
+    external: [ 'vue', 'openlayers', 'ol' ],
+    globals: {
+      vue: 'Vue',
+      openlayers: 'ol'
+    }
   }))
   // Separate CommonJS modules
   .then(() => {
@@ -98,7 +106,7 @@ Promise.resolve(utils.ensureDir(config.outDir))
 function bundle (opts = {}) {
   let bundleName = opts.bundleName
 
-  if (opts.format === 'cjs') {
+  if (['cjs', 'umd'].includes(opts.format)) {
     process.env.BABEL_ENV = 'cjs'
   } else {
     delete process.env.BABEL_ENV
@@ -183,9 +191,10 @@ function bundle (opts = {}) {
         format: opts.format,
         banner: config.banner,
         moduleName: config.fullname,
-        moduleId: config.name,
+        // moduleId: config.name,
         sourceMap: true,
-        sourceMapFile: dest
+        sourceMapFile: dest,
+        globals: opts.globals
       })
 
       return Promise.all([

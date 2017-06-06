@@ -3,12 +3,9 @@
   import VectorSource from 'ol/source/vector'
   import loadingstrategy from 'ol/loadingstrategy'
   import { differenceWith, isPlainObject } from 'lodash/fp'
-  import { consts, extentHelper, geoJson } from '../../../ol-ext'
+  import { DATA_PROJ, geoJson } from '../../../ol-ext'
   import source from '../source'
   import { assertHasSource, assertHasMap } from '../../../utils/assert'
-
-  const { toLonLat: extentToLonLat } = extentHelper
-  const { DATA_PROJECTION } = consts
 
   const props = {
     // for big datasets
@@ -19,15 +16,25 @@
     loader: Function,
     projection: {
       type: String,
-      default: DATA_PROJECTION
+      default: DATA_PROJ
     },
-    useSpatialIndex: Boolean // default true
+    useSpatialIndex: {
+      type: Boolean,
+      default: true
+    }
     // todo implement options (tiled loading strategy & etc)
     // format: String,
     // strategy: String
   }
 
   const methods = {
+    /**
+     * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
+     * @return {void}
+     */
+    addFeatures (features) {
+      features.forEach(this.addFeature)
+    },
     /**
      * @param {ol.Feature|Vue|GeoJSONFeature} feature
      * @return {void}
@@ -47,8 +54,8 @@
      * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
      * @return {void}
      */
-    addFeatures (features) {
-      features.forEach(this.addFeature)
+    removeFeatures (features) {
+      features.forEach(this.removeFeature)
     },
     /**
      * @param {ol.Feature|Vue|GeoJSONFeature} feature
@@ -65,35 +72,12 @@
       this.source.removeFeature(feature)
     },
     /**
-     * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
-     * @return {void}
-     */
-    removeFeatures (features) {
-      features.forEach(this.removeFeature)
-    },
-    /**
      * @return {void}
      */
     clear () {
       assertHasSource(this)
       this.source.clear()
     },
-    /**
-     * @param {string|number} id
-     * @return {GeoJSONFeature|undefined}
-     */
-    getFeatureById (id) {
-      assertHasMap(this)
-      assertHasSource(this)
-
-      let feature = this.source.getFeatureById(id)
-      if (feature) {
-        feature = geoJson.writeFeature(feature, this.map.view.getProjection())
-      }
-
-      return feature
-    },
-    // protected & private
     /**
      * @return {ol.source.Vector}
      * @protected
@@ -121,20 +105,24 @@
       const vm = this
 
       return async function __loader (extent, resolution, projection) {
-        projection = projection.getCode()
-        extent = extentToLonLat(extent, projection)
-
-        const features = await Promise.resolve(loader(extent, resolution, projection))
-
-        if (features && features.length) {
-          vm.$emit('load', {
-            features,
-            extent,
-            resolution,
-            projection
-          })
-        }
+        // todo закидывать хелпер
+        await Promise.resolve(loader(extent, resolution, projection))
+        vm.$emit('load', {
+          extent,
+          resolution,
+          projection
+        })
       }
+    },
+    /**
+     * @param {string|number} id
+     * @return {ol.Feature|undefined}
+     */
+    getFeatureById (id) {
+      assertHasMap(this)
+      assertHasSource(this)
+
+      return this.source.getFeatureById(id)
     },
     /**
      * @return {void}

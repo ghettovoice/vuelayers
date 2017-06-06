@@ -1,12 +1,9 @@
 <script>
   import TileWMSSource from 'ol/source/tilewms'
   import { omit } from 'lodash/fp'
-  import { consts, coordHelper } from '../../../ol-ext'
+  import { WMS_VERSION, proj } from '../../../ol-ext'
   import tileSource from '../tile'
   import { assertHasSource, assertHasMap } from '../../../utils/assert'
-
-  const { WMS_VERSION } = consts
-  const { toLonLat } = coordHelper
 
   const props = {
     extParams: Object, // Additional WMS Request params
@@ -29,35 +26,6 @@
   const cleanExtParams = params => omit(['LAYERS', 'VERSION', 'STYLES'], keysToUpperCase(params))
 
   const methods = {
-    /**
-     * @param {number[]} coordinate Coordinate in EPSG:4326
-     * @param {number} [resolution]
-     * @param {string} [projection]
-     * @param {Object} [params] GetFeatureInfo params. `info_format` at least should be provided.
-     *                          If `query_layers` is not provided then the layers specified in the `layers` prop will be used.
-     *                          `version` should not be specified here (value from `version` prop will be used).
-     * @return {string|undefined}
-     */
-    getGetFeatureInfoUrl (
-      coordinate,
-      resolution,
-      projection,
-      params = {}
-    ) {
-      assertHasMap(this)
-      assertHasSource(this)
-
-      resolution || (resolution = this.map.view.getResolution())
-      projection || (projection = this.projection)
-
-      return this.source.getFeatureInfoUrl(
-        toLonLat(coordinate, projection),
-        resolution,
-        projection,
-        cleanExtParams(params)
-      )
-    },
-    // protected & private
     /**
      * @returns {ol.source.TileWMS}
      * @protected
@@ -83,6 +51,34 @@
         wrapX: this.wrapX,
         url: this.urlTmpl
       })
+    },
+    /**
+     * @param {number[]} coordinate Coordinate in EPSG:4326
+     * @param {number} [resolution]
+     * @param {string} [projection]
+     * @param {Object} [params] GetFeatureInfo params. `info_format` at least should be provided.
+     *                          If `query_layers` is not provided then the layers specified in the `layers` prop will be used.
+     *                          `version` should not be specified here (value from `version` prop will be used).
+     * @return {string|undefined}
+     */
+    getGetFeatureInfoUrl (
+      coordinate,
+      resolution,
+      projection,
+      params = {}
+    ) {
+      assertHasMap(this)
+      assertHasSource(this)
+
+      resolution || (resolution = this.map.view.getResolution())
+      projection || (projection = this.projection)
+
+      return this.source.getFeatureInfoUrl(
+        proj.toLonLat(coordinate, projection),
+        resolution,
+        projection,
+        cleanExtParams(params)
+      )
     }
   }
 

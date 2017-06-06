@@ -1,11 +1,11 @@
 /**
  * @module components/source/osm
  */
-import OSM from './source.vue'
+import Source from './source.vue'
 
 export default {
-  ...OSM,
+  ...Source,
   install (Vue) {
-    Vue.component(OSM.name, OSM)
+    Vue.component(Source.name, Source)
   }
 }

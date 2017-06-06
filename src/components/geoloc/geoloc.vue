@@ -3,12 +3,10 @@
   import { isEqual } from 'lodash/fp'
   import { VM_PROP } from '../../consts'
   import Observable from '../../rx-ext'
-  import { consts } from '../../ol-ext'
+  import { DATA_PROJ } from '../../ol-ext'
   import rxSubs from '../rx-subs'
   import stubVNode from '../stub-vnode'
   import { assertHasGeoloc } from '../../utils/assert'
-
-  const { DATA_PROJECTION } = consts
 
   const props = {
     tracking: {
@@ -31,7 +29,6 @@
       assertHasGeoloc(this)
       this.geoloc.changed()
     },
-    // protected & private
     /**
      * @return {void}
      * @protected
@@ -91,9 +88,9 @@
      */
     this._geoloc = new Geolocation({
       tracking: this.tracking,
-      projection: DATA_PROJECTION
+      projection: DATA_PROJ
     })
-    this._geoloc.set(VM_PROP, this)
+    this._geoloc[VM_PROP] = this
     this::defineAccessors()
   }
 

@@ -13,6 +13,18 @@
 
   const methods = {
     /**
+     * @return {ol.style.Circle}
+     * @protected
+     */
+    createStyle () {
+      return new Circle({
+        radius: this.radius,
+        snapToPixel: this.snapToPixel,
+        fill: this.fill,
+        stroke: this.stroke
+      })
+    },
+    /**
      * @param {ol.style.Fill|Vue|undefined} fill
      * @return {void}
      */
@@ -29,18 +41,6 @@
       stroke = stroke instanceof Vue ? stroke.style : stroke
       this.stroke = stroke
       this.deferRefresh()
-    },
-    /**
-     * @return {ol.style.Circle}
-     * @protected
-     */
-    createStyle () {
-      return new Circle({
-        radius: this.radius,
-        snapToPixel: this.snapToPixel,
-        fill: this.fill,
-        stroke: this.stroke
-      })
     }
   }
 

@@ -18,3 +18,6 @@ import fromOlEvent from './from-ol-event'
 Observable.fromOlEvent = fromOlEvent
 
 export default Observable
+export {
+  fromOlEvent
+}

@@ -1,36 +1,15 @@
 /**
  * Extent extensions
  */
-import proj from 'ol/proj'
-import extentHelper from 'ol/extent'
-import { DATA_PROJECTION, EXTENT_CORNER, MAP_PROJECTION } from './consts'
+import olextent from 'ol/extent'
+import { EXTENT_CORNER } from './consts'
 
-const { transformExtent } = proj
-const { getWidth, getHeight, boundingExtent } = extentHelper
+const { getWidth, getHeight, boundingExtent } = olextent
 
 export {
-  transformExtent as transform,
   getHeight,
   getWidth,
   boundingExtent
-}
-
-/**
- * @param {ol.Extent} extent
- * @param {ol.ProjectionLike} projection
- * @return {ol.Extent}
- */
-export function fromLonLat (extent, projection = MAP_PROJECTION) {
-  return transformExtent(extent, DATA_PROJECTION, projection)
-}
-
-/**
- * @param {ol.Extent} extent
- * @param {ol.ProjectionLike} projection
- * @return {ol.Extent}
- */
-export function toLonLat (extent, projection = MAP_PROJECTION) {
-  return transformExtent(extent, projection, DATA_PROJECTION)
 }
 
 export function createOrUpdate (minX, minY, maxX, maxY, extent) {
@@ -49,13 +28,13 @@ export function createOrUpdate (minX, minY, maxX, maxY, extent) {
 export function getCorner (extent, corner) {
   let coordinate
   if (corner === EXTENT_CORNER.BOTTOM_LEFT) {
-    coordinate = extentHelper.getBottomLeft(extent)
+    coordinate = olextent.getBottomLeft(extent)
   } else if (corner === EXTENT_CORNER.BOTTOM_RIGHT) {
-    coordinate = extentHelper.getBottomRight(extent)
+    coordinate = olextent.getBottomRight(extent)
   } else if (corner === EXTENT_CORNER.TOP_LEFT) {
-    coordinate = extentHelper.getTopLeft(extent)
+    coordinate = olextent.getTopLeft(extent)
   } else if (corner === EXTENT_CORNER.TOP_RIGHT) {
-    coordinate = extentHelper.getTopRight(extent)
+    coordinate = olextent.getTopRight(extent)
   } else {
     throw new Error('Invalid corner')
   }
