@@ -14,8 +14,7 @@
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import Observable from '../../rx-ext'
   import { proj } from '../../ol-ext'
-  import rxSubs from '../rx-subs'
-  import services from '../services'
+  import cmp from '../cmp'
   import { assertHasMap, assertHasView } from '../../utils/assert'
 
   const props = {
@@ -86,6 +85,52 @@
       this.map.removeInteraction(interaction)
     },
     /**
+     * @return {void}
+     * @protected
+     */
+    init () {
+      // todo disable all default interaction and controls and use custom if defined, wrap all
+      /**
+       * @type {ol.Map}
+       * @private
+       */
+      this._map = new Map({
+        layers: [],
+//      interactions: [],
+        controls: this.defControls ? olcontrol.defaults() : [],
+        loadTilesWhileAnimating: this.loadTilesWhileAnimating,
+        loadTilesWhileInteracting: this.loadTilesWhileInteracting,
+        pixelRatio: this.pixelRatio,
+        renderer: this.renderer,
+        logo: this.logo,
+        keyboardEventTarget: this.keyboardEventTarget
+      })
+      this._map[VM_PROP] = this
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    deinit () {
+      this._map = undefined
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    defineAccessors () {
+      Object.defineProperties(this, {
+        map: {
+          enumerable: true,
+          get: this.getMap
+        },
+        view: {
+          enumerable: true,
+          get: this.getView
+        }
+      })
+    },
+    /**
      * Trigger focus on map container.
      * @return {void}
      */
@@ -133,7 +178,7 @@
      * @protected
      */
     getServices () {
-      return mergeDescriptors(this::services.methods.getServices(), {
+      return mergeDescriptors(this::cmp.methods.getServices(), {
         map: this
       })
     },
@@ -145,12 +190,29 @@
       return this.map.getView()
     },
     /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      assertHasMap(this)
+      this.map.setTarget(this.$refs.map)
+      this.subscribeAll()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      assertHasMap(this)
+      this.unsubscribeAll()
+      this.map.setTarget(undefined)
+    },
+    /**
      * Triggers map re-render.
      * @return {void}
      */
     refresh () {
       assertHasMap(this)
-
       this.map.updateSize()
       this.map.render()
     },
@@ -175,84 +237,12 @@
 
   export default {
     name: 'vl-map',
-    mixins: [rxSubs, services],
+    mixins: [cmp],
     props,
     methods,
-    created () {
-      this::initialize()
-    },
     mounted () {
-      this::mount()
       this.$nextTick(this.refresh)
-    },
-    destroyed () {
-      this::unmount()
-      this._map = undefined
     }
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function initialize () {
-    // todo disable all default interaction and controls and use custom if defined, wrap all
-    /**
-     * @type {ol.Map}
-     * @private
-     */
-    this._map = new Map({
-      layers: [],
-//      interactions: [],
-      controls: this.defControls ? olcontrol.defaults() : [],
-      loadTilesWhileAnimating: this.loadTilesWhileAnimating,
-      loadTilesWhileInteracting: this.loadTilesWhileInteracting,
-      pixelRatio: this.pixelRatio,
-      renderer: this.renderer,
-      logo: this.logo,
-      keyboardEventTarget: this.keyboardEventTarget
-    })
-    this._map[VM_PROP] = this
-    this::defineAccessors()
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function defineAccessors () {
-    Object.defineProperties(this, {
-      map: {
-        enumerable: true,
-        get: this.getMap
-      },
-      view: {
-        enumerable: true,
-        get: this.getView
-      }
-    })
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function mount () {
-    assertHasMap(this)
-
-    this.map.setTarget(this.$refs.map)
-    this.subscribeAll()
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function unmount () {
-    assertHasMap(this)
-
-    this.unsubscribeAll()
-    this.map.setTarget(undefined)
   }
 
   /**

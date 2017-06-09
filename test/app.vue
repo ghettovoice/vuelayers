@@ -6,7 +6,7 @@
           <vl-map>
             <vl-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
 
-            <!--<vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
+            <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
               <vl-style-container>
                 <vl-style-stroke color="#f03b20" :width="3"/>
                 <vl-style-fill :color="[254, 178, 76, 0.7]"/>
@@ -16,13 +16,13 @@
                   <vl-style-fill :color="[254, 178, 76, 0.7]"/>
                 </vl-style-circle>
               </vl-style-container>
-            </vl-interaction-select>-->
+            </vl-interaction-select>
 
             <vl-layer-tile>
               <vl-source-sputnik/>
             </vl-layer-tile>
 
-            <!--<vl-layer-vector id="points" v-if="pointsLayer">
+            <vl-layer-vector id="points" v-if="pointsLayer">
               <vl-style-container>
                 <vl-style-stroke color="#8856a7" :width="2"/>
                 <vl-style-fill :color="[158, 188, 218, 0.5]"/>
@@ -45,7 +45,7 @@
               <vl-source-wmts
                 url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
                 layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
-            </vl-layer-tile>-->
+            </vl-layer-tile>
           </vl-map>
         </td>
         <td>
@@ -65,33 +65,27 @@
 <script>
   import { range, random } from 'lodash/fp'
 
-  const computed = {
-    selectedIds () {
-      return this.selected.map(feature => feature.id)
-    }
-  }
-
   const methods = {
     updateMapView ({ center, zoom, rotation }) {
       this.center = center
       this.zoom = zoom
       this.rotation = rotation
     },
-    select (feature) {
-      const i = this.selectedIds.indexOf(feature.id)
+    select ({ id }) {
+      const i = this.selected.indexOf(id)
       if (i === -1) {
-        this.selected.push(feature)
+        this.selected.push(id)
       }
     },
     unselect ({ id }) {
-      const i = this.selectedIds.indexOf(id)
+      const i = this.selected.indexOf(id)
       if (i !== -1) {
         this.selected.splice(i, 1)
       }
     },
     loadData () {
       const points = []
-      range(1, 100).forEach(i => {
+      range(1, 1000).forEach(i => {
         points.push({
           id: i,
           properties: {
@@ -115,7 +109,6 @@
 
   export default {
     name: 'app',
-    computed,
     methods,
     data () {
       return {
@@ -131,6 +124,8 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+  @import "~ol/ol.css";
+
   html, body, #app {
     width       : 100%;
     height      : 100%;

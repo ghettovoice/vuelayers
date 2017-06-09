@@ -102,16 +102,9 @@
       if (!this.loader) return
 
       const loader = this.loader
-      const vm = this
-
-      return async function __loader (extent, resolution, projection) {
-        // todo закидывать хелпер
-        await Promise.resolve(loader(extent, resolution, projection))
-        vm.$emit('load', {
-          extent,
-          resolution,
-          projection
-        })
+      // todo implement vl-format-* components or add format property, read loaded features
+      return function __vectorSourceLoader (extent, resolution, projection) {
+        loader(extent, resolution, projection)
       }
     },
     /**

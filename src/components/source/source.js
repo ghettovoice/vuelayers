@@ -1,8 +1,6 @@
 import { VM_PROP } from '../../consts'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import rxSubs from '../rx-subs'
-import stubVNode from '../stub-vnode'
-import services from '../services'
+import cmp from '../virt-cmp'
 import { assertHasSource } from '../../utils/assert'
 
 const props = {
@@ -17,6 +15,18 @@ const props = {
 
 const methods = {
   /**
+   * @return {void}
+   * @protected
+   */
+  init () {
+    /**
+     * @type {ol.source.Source}
+     * @protected
+     */
+    this._source = this.createSource()
+    this._source[VM_PROP] = this
+  },
+  /**
    * @return {ol.source.Source}
    * @protected
    * @abstract
@@ -28,21 +38,31 @@ const methods = {
    * @return {void}
    * @protected
    */
-  initialize () {
-    /**
-     * @type {ol.source.Source}
-     * @protected
-     */
-    this._source = this.createSource()
-    this._source[VM_PROP] = this
-    this::defineAccessors()
+  deinit () {
+    this._source = undefined
+  },
+  /**
+   * @return {void}
+   * @private
+   */
+  defineAccessors () {
+    Object.defineProperties(this, {
+      source: {
+        enumerable: true,
+        get: this.getSource
+      },
+      map: {
+        enumerable: true,
+        get: () => this.services && this.services.map
+      }
+    })
   },
   /**
    * @return {Object}
    * @protected
    */
   getServices () {
-    return mergeDescriptors(this::services.methods.getServices(), {
+    return mergeDescriptors(this::cmp.methods.getServices(), {
       source: this
     })
   },
@@ -85,7 +105,7 @@ const watch = {
 }
 
 export default {
-  mixins: [rxSubs, stubVNode, services],
+  mixins: [cmp],
   props,
   methods,
   watch,
@@ -93,32 +113,5 @@ export default {
     empty () {
       return this.$options.name
     }
-  },
-  created () {
-    this.initialize()
-  },
-  mounted () {
-    this.mount()
-  },
-  destroyed () {
-    this.unmount()
-    this._source = undefined
   }
-}
-
-/**
- * @return {void}
- * @private
- */
-function defineAccessors () {
-  Object.defineProperties(this, {
-    source: {
-      enumerable: true,
-      get: this.getSource
-    },
-    map: {
-      enumerable: true,
-      get: () => this.services && this.services.map
-    }
-  })
 }

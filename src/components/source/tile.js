@@ -105,9 +105,10 @@ const methods = {
     return new TileGrid(this.preparedGridOpts)
   },
   /**
+   * @return {void}
    * @protected
    */
-  initialize () {
+  init () {
     if (this.preparedGridOpts) {
       /**
        * @type {ol.tilegrid.TileGrid}
@@ -116,7 +117,15 @@ const methods = {
       this.tileGrid = this.createTileGrid()
     }
 
-    this::source.methods.initialize()
+    this::source.methods.init()
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  deinit () {
+    this.tileGrid = undefined
+    this::source.methods.deinit()
   }
 }
 
@@ -132,8 +141,5 @@ export default {
   props,
   computed,
   methods,
-  watch,
-  destroyed () {
-    this.tileGrid = undefined
-  }
+  watch
 }

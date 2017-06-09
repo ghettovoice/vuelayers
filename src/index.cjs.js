@@ -11,10 +11,16 @@
 import install from './install'
 import * as components from './components'
 
-export default {
+const VueLayers = {
   // meta & consts
   VERSION: PKG_VERSION,
   // install
   install,
   ...components
+}
+export default VueLayers
+// auto install for Browser env
+/* istanbul ignore if */
+if (typeof window !== 'undefined' && window.Vue) {
+  window.Vue.use(VueLayers)
 }

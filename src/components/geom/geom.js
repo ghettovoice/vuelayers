@@ -2,10 +2,8 @@ import { isEqual } from 'lodash/fp'
 import { VM_PROP } from '../../consts'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import Observable from '../../rx-ext'
-import rxSubs from '../rx-subs'
-import stubVNode from '../stub-vnode'
-import services from '../services'
-import { proj, extent } from '../../ol-ext'
+import cmp from '../rx-subs'
+import { extent, proj } from '../../ol-ext'
 import { assertHasGeom, assertHasMap } from '../../utils/assert'
 
 const props = {
@@ -31,18 +29,10 @@ const computed = {
 
 const methods = {
   /**
-   * @return {ol.geom.Geometry}
-   * @protected
-   * @abstract
-   */
-  createGeom () {
-    throw new Error('Not implemented method')
-  },
-  /**
    * @return {void}
    * @protected
    */
-  initialize () {
+  init () {
     assertHasMap(this)
     // define helper methods based on geometry type
     const { toLonLat, fromLonLat } = proj.transforms[this.type]
@@ -74,9 +64,40 @@ const methods = {
      */
     this._geom = this.createGeom()
     this._geom[VM_PROP] = this
-    this::defineAccessors()
     // initialize additional props
     this.currentExtent = this.extentToLonLat(this._geom.getExtent())
+  },
+  /**
+   * @return {ol.geom.Geometry}
+   * @protected
+   * @abstract
+   */
+  createGeom () {
+    throw new Error('Not implemented method')
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  deinit () {
+    this.unmount()
+    this._geom = undefined
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  defineAccessors () {
+    Object.defineProperties(this, {
+      geom: {
+        enumerable: true,
+        get: this.getGeom
+      },
+      map: {
+        enumerable: true,
+        get: () => this.services && this.services.map
+      }
+    })
   },
   /**
    * @returns {ol.geom.Geometry|undefined}
@@ -96,7 +117,7 @@ const methods = {
    * @protected
    */
   getServices () {
-    return mergeDescriptors(this::services.methods.getServices(), {
+    return mergeDescriptors(this::cmp.methods.getServices(), {
       geom: this
     })
   },
@@ -153,7 +174,7 @@ const watch = {
 }
 
 export default {
-  mixins: [rxSubs, stubVNode, services],
+  mixins: [cmp],
   props,
   computed,
   watch,
@@ -168,34 +189,7 @@ export default {
       currentCoordinates: this.coordinates.slice(),
       currentExtent: []
     }
-  },
-  created () {
-    this.initialize()
-  },
-  mounted () {
-    this.mount()
-  },
-  destroyed () {
-    this.unmount()
-    this._geom = undefined
   }
-}
-
-/**
- * @return {void}
- * @private
- */
-function defineAccessors () {
-  Object.defineProperties(this, {
-    geom: {
-      enumerable: true,
-      get: this.getGeom
-    },
-    map: {
-      enumerable: true,
-      get: () => this.services.map
-    }
-  })
 }
 
 /**

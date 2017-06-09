@@ -358,7 +358,7 @@ function getUtils () {
 
 function externalize (modulesMap) {
   const filter = createFilter('src/**', 'node_modules/**')
-  const regex = /'(\.{2}\/)+([^.'\n]+)'/g
+  const regex = /'(\.{1,2}\/)+([^.'\n]+)'/g
 
   return {
     name: 'externalize',
@@ -369,7 +369,6 @@ function externalize (modulesMap) {
       let match, start, end, hasReplacements
 
       while (match = regex.exec(code)) {
-        hasReplacements = true
         // start, end without quotes
         start = match.index + 1
         end = start + match[ 0 ].length - 2
@@ -378,7 +377,10 @@ function externalize (modulesMap) {
         let extModuleRelPath = extModulePath.replace(utils.resolve('src') + '/', '')
         let extModuleMap = modulesMap.find(({ src }) => src === extModuleRelPath)
 
-        ms.overwrite(start, end, path.join('vuelayers/dist', extModuleMap.dest))
+        if (extModuleMap) {
+          ms.overwrite(start, end, path.join('vuelayers/dist', extModuleMap.dest))
+          hasReplacements = true
+        }
       }
 
       if (!hasReplacements) return null

@@ -37,7 +37,7 @@
     color (value) {
       assertHasStyle(this)
       this.style.setColor(value)
-      this.deferRefresh()
+      this.requestRefresh()
     }
   }
 

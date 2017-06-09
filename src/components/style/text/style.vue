@@ -78,42 +78,42 @@
     font (value) {
       assertHasStyle(this)
       this.style.setFont(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     offsetX (value) {
       assertHasStyle(this)
       this.style.setOffsetX(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     offsetY (value) {
       assertHasStyle(this)
       this.style.setOffsetY(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     rotation (value) {
       assertHasStyle(this)
       this.style.setRotation(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     scale (value) {
       assertHasStyle(this)
       this.style.setScale(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     text (value) {
       assertHasStyle(this)
       this.style.setText(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     textAlign (value) {
       assertHasStyle(this)
       this.style.setTextAlign(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     textBaseline (value) {
       assertHasStyle(this)
       this.style.setTextBaseline(value)
-      this.deferRefresh()
+      this.requestRefresh()
     }
   }
 

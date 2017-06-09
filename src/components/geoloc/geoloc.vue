@@ -4,8 +4,7 @@
   import { VM_PROP } from '../../consts'
   import Observable from '../../rx-ext'
   import { DATA_PROJ } from '../../ol-ext'
-  import rxSubs from '../rx-subs'
-  import stubVNode from '../stub-vnode'
+  import cmp from '../virt-cmp'
   import { assertHasGeoloc } from '../../utils/assert'
 
   const props = {
@@ -17,10 +16,61 @@
 
   const methods = {
     /**
+     * @return {void}
+     * @private
+     */
+    init () {
+      /**
+       * @type {ol.Geolocation}
+       * @protected
+       */
+      this._geoloc = new Geolocation({
+        tracking: this.tracking,
+        projection: DATA_PROJ
+      })
+      this._geoloc[VM_PROP] = this
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    deinit () {
+      this._geoloc = undefined
+    },
+    /**
+     * @return {void}
+     * @private
+     */
+    defineAccessors () {
+      Object.defineProperties(this, {
+        geoloc: {
+          enumerable: true,
+          get: this.getGeoloc
+        }
+      })
+    },
+    /**
      * @returns {ol.Geolocation|undefined}
      */
     getGeoloc () {
       return this._geoloc
+    },
+    /**
+     * @return {void}
+     * @private
+     */
+    mount () {
+      this.subscribeAll()
+    },
+    /**
+     * @return {void}
+     * @private
+     */
+    unmount () {
+      assertHasGeoloc(this)
+
+      this.unsubscribeAll()
+      this.geoloc.setTracking(false)
     },
     /**
      * @return {void}
@@ -50,7 +100,7 @@
 
   export default {
     name: 'vl-geoloc',
-    mixins: [rxSubs, stubVNode],
+    mixins: [cmp],
     props,
     watch,
     methods,
@@ -64,66 +114,7 @@
         currentPosition: undefined,
         currentAccuracy: undefined
       }
-    },
-    created () {
-      this::initialize()
-    },
-    mounted () {
-      this::mount()
-    },
-    destroyed () {
-      this::unmount()
-      this._geoloc = undefined
     }
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function initialize () {
-    /**
-     * @type {ol.Geolocation}
-     * @protected
-     */
-    this._geoloc = new Geolocation({
-      tracking: this.tracking,
-      projection: DATA_PROJ
-    })
-    this._geoloc[VM_PROP] = this
-    this::defineAccessors()
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function defineAccessors () {
-    Object.defineProperties(this, {
-      geoloc: {
-        enumerable: true,
-        get: this.getGeoloc
-      }
-    })
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function mount () {
-    this.subscribeAll()
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function unmount () {
-    assertHasGeoloc(this)
-
-    this.unsubscribeAll()
-    this.geoloc.setTracking(false)
   }
 
   /**

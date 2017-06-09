@@ -1,7 +1,10 @@
 import style from './style'
 
 const props = {
-  snapToPixel: Boolean // default true
+  snapToPixel: {
+    type: Boolean,
+    default: true
+  }
 }
 
 const methods = {
@@ -25,14 +28,14 @@ const methods = {
   refresh () {
     this.unmount()
     // recreate style
-    this.initialize()
+    this.init()
     this.mount()
   }
 }
 
 const watch = {
   snapToPixel () {
-    this.deferRefresh()
+    this.requestRefresh()
   }
 }
 

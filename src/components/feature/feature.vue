@@ -1,23 +1,16 @@
 <script type="text/babel">
   import Vue from 'vue'
-  import uuid from 'uuid/v4'
   import Feature from 'ol/feature'
   import { isPlainObject } from 'lodash/fp'
   import { VM_PROP } from '../../consts'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import plainProps from '../../utils/plain-props'
-  import rxSubs from '../rx-subs'
-  import stubVNode from '../stub-vnode'
+  import cmp from '../virt-cmp'
   import styleTarget from '../style-target'
-  import services from '../services'
   import { geoJson } from '../../ol-ext'
   import { assertHasFeature, assertHasMap } from '../../utils/assert'
 
   const props = {
-    id: {
-      type: [String, Number],
-      default: () => uuid()
-    },
     properties: {
       type: Object,
       default: () => Object.create(null)
@@ -25,6 +18,48 @@
   }
 
   const methods = {
+    /**
+     * Create feature without inner style applying, feature level style
+     * will be applied in the layer level style function.
+     * @return {void}
+     * @protected
+     */
+    init () {
+      /**
+       * @type {ol.Feature}
+       * @private
+       */
+      this._feature = new Feature(this.properties)
+      this._feature.setId(this.id)
+      this._feature[VM_PROP] = this
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    defineAccessors () {
+      Object.defineProperties(this, {
+        feature: {
+          enumerable: true,
+          get: this.getFeature
+        },
+        layer: {
+          enumerable: true,
+          get: () => this.services && this.services.layer
+        },
+        map: {
+          enumerable: true,
+          get: () => this.services && this.services.map
+        }
+      })
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    denit () {
+      this._feature = undefined
+    },
     /**
      * @returns {ol.Feature|undefined}
      */
@@ -36,7 +71,7 @@
      * @protected
      */
     getServices () {
-      return mergeDescriptors(this::services.methods.getServices(), {
+      return mergeDescriptors(this::cmp.methods.getServices(), {
         feature: this
       })
     },
@@ -59,6 +94,22 @@
         f => f === this.feature,
         { layerFilter: l => l === this.layer }
       )
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      this.$parent.addFeature(this)
+      this.subscribeAll()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      this.unsubscribeAll()
+      this.$parent.removeFeature(this)
     },
     /**
      * @return {void}
@@ -103,7 +154,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [rxSubs, stubVNode, services, styleTarget],
+    mixins: [cmp, styleTarget],
     props,
     methods,
     watch,
@@ -113,72 +164,6 @@
           id: [this.$options.name, this.id].join('-')
         }
       }
-    },
-    created () {
-      this::initialize()
-    },
-    mounted () {
-      this::mount()
-    },
-    destroyed () {
-      this::unmount()
-      this._feature = undefined
     }
-  }
-
-  /**
-   * Create feature without inner style applying, feature level style
-   * will be applied in the layer level style function.
-   * @return {void}
-   * @private
-   */
-  function initialize () {
-    /**
-     * @type {ol.Feature}
-     * @private
-     */
-    this._feature = new Feature(this.properties)
-    this._feature.setId(this.id)
-    this._feature[VM_PROP] = this
-    this::defineAccessors()
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function defineAccessors () {
-    Object.defineProperties(this, {
-      feature: {
-        enumerable: true,
-        get: this.getFeature
-      },
-      layer: {
-        enumerable: true,
-        get: () => this.services && this.services.layer
-      },
-      map: {
-        enumerable: true,
-        get: () => this.services && this.services.map
-      }
-    })
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function mount () {
-    this.$parent.addFeature(this)
-    this.subscribeAll()
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function unmount () {
-    this.unsubscribeAll()
-    this.$parent.removeFeature(this)
   }
 </script>

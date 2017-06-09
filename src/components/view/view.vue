@@ -5,9 +5,7 @@
   import { VM_PROP } from '../../consts'
   import Observable from '../../rx-ext'
   import { MIN_ZOOM, MAX_ZOOM, MAP_PROJ, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
-  import services from '../services'
-  import rxSubs from '../rx-subs'
-  import stubVNode from '../stub-vnode'
+  import cmp from '../virt-cmp'
   import { assertHasView } from '../../utils/assert'
 
   const props = {
@@ -71,6 +69,53 @@
       )
     },
     /**
+     * @return {void}
+     * @protected
+     */
+    init () {
+      /**
+       * @type {ol.View}
+       * @protected
+       */
+      this._view = new View({
+        center: proj.fromLonLat(this.center, this.projection),
+        constrainRotation: this.constrainRotation,
+        enableRotation: this.enableRotation,
+        extent: this.extent,
+        maxResolution: this.maxResolution,
+        minResolution: this.minResolution,
+        maxZoom: this.maxZoom,
+        minZoom: this.minZoom,
+        projection: this.projection,
+        resolution: this.resolution,
+        resolutions: this.resolutions,
+        rotation: this.rotation,
+        zoom: this.zoom,
+        zoomFactor: this.zoomFactor
+      })
+      this._view[VM_PROP] = this
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    deinit () {
+      this._view = undefined
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    defineAccessors () {
+      // define getters
+      Object.defineProperties(this, {
+        view: {
+          enumerable: true,
+          get: this.getView
+        }
+      })
+    },
+    /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
      * @param {GeoJSONFeature|ol.Extent|ol.Geometry|Vue} geometryOrExtent
      * @param {olx.view.FitOptions} [options]
@@ -98,6 +143,22 @@
      */
     getView () {
       return this._view
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      this.$parent.setView(this)
+      this.subscribeAll()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      this.unsubscribeAll()
+      this.$parent.setView(undefined)
     },
     /**
      * @return {void}
@@ -168,7 +229,7 @@
 
   export default {
     name: 'vl-view',
-    mixins: [rxSubs, stubVNode, services],
+    mixins: [cmp],
     props,
     methods,
     watch,
@@ -184,78 +245,7 @@
         currentResolution: this.resolution,
         currentRotation: this.rotation
       }
-    },
-    created () {
-      this::initialize()
-    },
-    mounted () {
-      this::mount()
-    },
-    destroyed () {
-      this::unmount()
-      this._view = undefined
     }
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function initialize () {
-    /**
-     * @type {ol.View}
-     * @protected
-     */
-    this._view = new View({
-      center: proj.fromLonLat(this.center, this.projection),
-      constrainRotation: this.constrainRotation,
-      enableRotation: this.enableRotation,
-      extent: this.extent,
-      maxResolution: this.maxResolution,
-      minResolution: this.minResolution,
-      maxZoom: this.maxZoom,
-      minZoom: this.minZoom,
-      projection: this.projection,
-      resolution: this.resolution,
-      resolutions: this.resolutions,
-      rotation: this.rotation,
-      zoom: this.zoom,
-      zoomFactor: this.zoomFactor
-    })
-    this._view.set(VM_PROP, this)
-    this::defineAccessors()
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function defineAccessors () {
-    // define getters
-    Object.defineProperties(this, {
-      view: {
-        enumerable: true,
-        get: this.getView
-      }
-    })
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function mount () {
-    this.$parent.setView(this)
-    this.subscribeAll()
-  }
-
-  /**
-   * @return {void}
-   * @private
-   */
-  function unmount () {
-    this.unsubscribeAll()
-    this.$parent.setView(undefined)
   }
 
   /**

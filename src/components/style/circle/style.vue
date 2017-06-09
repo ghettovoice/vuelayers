@@ -31,7 +31,7 @@
     setFill (fill) {
       fill = fill instanceof Vue ? fill.style : fill
       this.fill = fill
-      this.deferRefresh()
+      this.requestRefresh()
     },
     /**
      * @param {ol.style.Stroke|Vue|undefined} stroke
@@ -40,13 +40,13 @@
     setStroke (stroke) {
       stroke = stroke instanceof Vue ? stroke.style : stroke
       this.stroke = stroke
-      this.deferRefresh()
+      this.requestRefresh()
     }
   }
 
   const watch = {
     radius () {
-      this.deferRefresh()
+      this.requestRefresh()
     }
   }
 

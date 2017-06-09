@@ -42,9 +42,11 @@ export default {
         }
         currentStyles = style
       } else {
-        if (currentStyles && !Array.isArray(currentStyles)) {
-          warndbg('Component already has style components among it\'s descendants. ' +
-            'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level')
+        if (!Array.isArray(currentStyles)) {
+          if (currentStyles) {
+            warndbg('Component already has style components among it\'s descendants. ' +
+              'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level')
+          }
           currentStyles = []
         }
         currentStyles = currentStyles.concat(style instanceof Vue ? style : { style, condition: true })
@@ -63,7 +65,7 @@ export default {
       if (!styleTarget) return
 
       if (this.styles === null || this.styles) {
-        styleTarget.setStyle(createStyleFunc(this))
+        styleTarget.setStyle(this.createStyleFunc())
       } else {
         styleTarget.setStyle(undefined)
       }
@@ -96,56 +98,58 @@ export default {
      */
     getStyleTarget () {
       throw new Error('Not implemented method')
-    }
-  }
-}
+    },
+    /**
+     * Style function factory
+     * @returns {ol.StyleFunction}
+     * @protected
+     */
+    createStyleFunc () {
+      const vm = this
 
-/**
- * @param {Object} vm
- * @returns {ol.StyleFunction}
- */
-export function createStyleFunc (vm) {
-  return function __styleTargetStyleFunc (feature, resolution) {
-    assertHasMap(vm)
+      return function __styleTargetStyleFunc (feature, resolution) {
+        assertHasMap(vm)
 
-    if (!feature.getGeometry()) return
+        if (!feature.getGeometry()) return
 
-    let styles = vm.getStyles()
-    /* eslint-disable brace-style */
-    // handle provided styles
-    // styles - ol.StyleFunction or vl-style-func
-    if (isFunction(styles) || isFunction(styles.style)) {
-      let styleFunc = isFunction(styles) ? styles : styles.style
-      styles = styleFunc(feature, resolution, styleHelper)
-    }
-    // styles is array of ol.style.Style or vl-style-box
-    else if (Array.isArray(styles)) {
-      styles = flow(
-        filter(({ condition }) => {
-          return condition == null ||
-            (condition === true) ||
-            (
-              isFunction(condition) &&
-              condition(feature, resolution)
-            )
-        }),
-        map('style')
-      )(styles)
-    }
-    /* eslint-enable brace-style */
-    // not empty or null style
-    if (
-      styles === null ||
-      (Array.isArray(styles) && styles.length)
-    ) {
-      return styles
-    }
-    // fallback to default style
-    styles = vm.getDefaultStyles()
-    if (styles) {
-      return isFunction(styles)
-        ? styles(feature, resolution, styleHelper)
-        : styles
+        let styles = vm.getStyles()
+        /* eslint-disable brace-style */
+        // handle provided styles
+        // styles - ol.StyleFunction or vl-style-func
+        if (isFunction(styles) || isFunction(styles.style)) {
+          let styleFunc = isFunction(styles) ? styles : styles.style
+          styles = styleFunc(feature, resolution, styleHelper)
+        }
+        // styles is array of ol.style.Style or vl-style-box
+        else if (Array.isArray(styles)) {
+          styles = flow(
+            filter(({ condition }) => {
+              return condition == null ||
+                (condition === true) ||
+                (
+                  isFunction(condition) &&
+                  condition(feature, resolution)
+                )
+            }),
+            map('style')
+          )(styles)
+        }
+        /* eslint-enable brace-style */
+        // not empty or null style
+        if (
+          styles === null ||
+          (Array.isArray(styles) && styles.length)
+        ) {
+          return styles
+        }
+        // fallback to default style
+        styles = vm.getDefaultStyles()
+        if (styles) {
+          return isFunction(styles)
+            ? styles(feature, resolution, styleHelper)
+            : styles
+        }
+      }
     }
   }
 }

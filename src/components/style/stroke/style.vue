@@ -64,27 +64,27 @@
     color (value) {
       assertHasStyle(this)
       this.style.setColor(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     lineCap (value) {
       assertHasStyle(this)
       this.style.setLineCap(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     lineDash (value) {
       assertHasStyle(this)
       this.style.setLineDash(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     lineJoin (value) {
       assertHasStyle(this)
       this.style.setLineJoin(value)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     width (value) {
       assertHasStyle(this)
       this.style.setWidth(value)
-      this.deferRefresh()
+      this.requestRefresh()
     }
   }
 

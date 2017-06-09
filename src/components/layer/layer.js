@@ -1,20 +1,13 @@
 import Vue from 'vue'
-import uuid from 'uuid/v4'
 import { VM_PROP } from '../../consts'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import rxSubs from '../rx-subs'
-import stubVNode from '../stub-vnode'
-import services from '../services'
+import cmp from '../virt-cmp'
 import { assertHasLayer, assertHasMap } from '../../utils/assert'
 
 const props = {
   extent: {
     type: Array,
     validator: value => value.length === 4
-  },
-  id: {
-    type: [String, Number],
-    default: () => uuid()
   },
   minResolution: Number,
   maxResolution: Number,
@@ -32,6 +25,21 @@ const props = {
 
 const methods = {
   /**
+   * @return {void}
+   * @protected
+   */
+  init () {
+    /**
+     * @type {ol.layer.Layer}
+     * @protected
+     */
+    this._layer = this.createLayer()
+    this._layer.setProperties({
+      id: this.id
+    })
+    this._layer[VM_PROP] = this
+  },
+  /**
    * @return {ol.layer.Layer}
    * @protected
    * @abstract
@@ -43,17 +51,24 @@ const methods = {
    * @return {void}
    * @protected
    */
-  initialize () {
-    /**
-     * @type {ol.layer.Layer}
-     * @protected
-     */
-    this._layer = this.createLayer()
-    this._layer.setProperties({
-      id: this.id
+  deinit () {
+    this._layer = undefined
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  defineAccessors () {
+    Object.defineProperties(this, {
+      layer: {
+        enumerable: true,
+        get: this.getLayer
+      },
+      map: {
+        enumerable: true,
+        get: () => this.services && this.services.map
+      }
     })
-    this._layer[VM_PROP] = this
-    this::defineAccessors()
   },
   /**
    * @param {number[]} pixel
@@ -75,7 +90,7 @@ const methods = {
    * @protected
    */
   getServices () {
-    return mergeDescriptors(this::services.methods.getServices(), {
+    return mergeDescriptors(this::cmp.methods.getServices(), {
       layer: this
     })
   },
@@ -162,7 +177,7 @@ const watch = {
 }
 
 export default {
-  mixins: [rxSubs, stubVNode, services],
+  mixins: [cmp],
   props,
   methods,
   watch,
@@ -172,32 +187,5 @@ export default {
         id: [this.$options.name, this.id].join('-')
       }
     }
-  },
-  created () {
-    this.initialize()
-  },
-  mounted () {
-    this.mount()
-  },
-  destroyed () {
-    this.unmount()
-    this._layer = undefined
   }
-}
-
-/**
- * @return {void}
- * @private
- */
-function defineAccessors () {
-  Object.defineProperties(this, {
-    layer: {
-      enumerable: true,
-      get: this.getLayer
-    },
-    map: {
-      enumerable: true,
-      get: () => this.services && this.services.map
-    }
-  })
 }

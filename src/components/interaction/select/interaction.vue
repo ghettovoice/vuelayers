@@ -3,18 +3,18 @@
   import SelectInteraction from 'ol/interaction/select'
   import VectorLayer from 'ol/layer/vector'
   import Feature from 'ol/feature'
-  import { forEach, mapValues, difference, isPlainObject, isNumber, isString } from 'lodash/fp'
+  import { forEach, mapValues, difference, isPlainObject, isNumber, isString, constant, stubArray } from 'lodash/fp'
   import Observable from '../../../rx-ext'
   import { style as styleHelper } from '../../../ol-ext'
   import interaction from '../interaction'
-  import styleTarget, { createStyleFunc } from '../../style-target'
+  import styleTarget from '../../style-target'
   import { assertHasInteraction, assertHasMap } from '../../../utils/assert'
 
   // todo add other options, like event modifiers
   const props = {
     filter: {
       type: Function,
-      default: () => true
+      default: constant(true)
     },
     hitTolerance: {
       type: Number,
@@ -29,7 +29,7 @@
      */
     selected: {
       type: Array,
-      default: () => []
+      default: stubArray
     },
     wrapX: {
       type: Boolean,
@@ -45,15 +45,11 @@
      * @protected
      */
     createInteraction () {
-      const filter = this.filter
-
       return new SelectInteraction({
         multi: this.multi,
         wrapX: this.wrapX,
-        filter: function __selectFilter (feature, layer) {
-          return filter(feature.getId(), layer && layer.get('id'))
-        },
-        style: createStyleFunc(this)
+        filter: this.filter,
+        style: this.createStyleFunc()
       })
     },
     /**
@@ -79,7 +75,7 @@
      * @protected
      */
     mount () {
-      this::interaction.method.mount()
+      this::interaction.methods.mount()
       this.currentSelected.forEach(this.select)
     },
     /**
@@ -157,7 +153,7 @@
      * @protected
      */
     setStyle (style) {
-      this::styleTarget.methods.setStyle(style)
+      this.styles = style
       this.refresh()
     },
     /**

@@ -54,7 +54,7 @@
 
       image = image instanceof Vue ? image.style : image
       this.style.setImage(image)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     /**
      * @param {ol.geom.Geometry|Vue|undefined} geom
@@ -65,7 +65,7 @@
 
       geom = geom instanceof Vue ? geom.geom : geom
       this.style.setGeometry(geom)
-      this.deferRefresh()
+      this.requestRefresh()
     },
     /**
      * @param {ol.style.Text|undefined} text
@@ -76,7 +76,7 @@
 
       text = text instanceof Vue ? text.style : text
       this.style.setText(text)
-      this.deferRefresh()
+      this.requestRefresh()
     }
   }
 
@@ -84,7 +84,7 @@
     zIndex (value) {
       assertHasStyle(this)
       this.style.setZIndex(value)
-      this.deferRefresh()
+      this.requestRefresh()
     }
   }
 

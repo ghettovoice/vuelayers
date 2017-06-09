@@ -1,13 +1,23 @@
 /**
  * Basic style mixin.
  */
-import { debounce } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import stubVNode from '../stub-vnode'
-import services from '../services'
+import cmp from '../virt-cmp'
 import { VM_PROP } from '../../consts'
 
 const methods = {
+  /**
+   * @return {void}
+   * @protected
+   */
+  init () {
+    /**
+     * @type {OlStyle|undefined}
+     * @private
+     */
+    this._style = this.createStyle()
+    this._style[VM_PROP] = this
+  },
   /**
    * @return {OlStyle}
    * @protected
@@ -20,21 +30,25 @@ const methods = {
    * @return {void}
    * @protected
    */
-  initialize () {
-    /**
-     * @type {OlStyle|undefined}
-     * @private
-     */
-    this._style = this.createStyle()
-    this._style[VM_PROP] = this
-    this::defineAccessors()
+  deinit () {
+    this._style = undefined
   },
   /**
-   * @type {function():void}
+   * @return {void}
+   * @protected
    */
-  deferRefresh: debounce(100, function () {
-    this.refresh()
-  }),
+  defineAccessors () {
+    Object.defineProperties(this, {
+      style: {
+        enumerable: true,
+        get: this.getStyle
+      },
+      map: {
+        enumerable: true,
+        get: () => this.services.map
+      }
+    })
+  },
   /**
    * Inner ol style instance getter
    * @return {OlStyle|undefined}
@@ -47,25 +61,9 @@ const methods = {
    * @protected
    */
   getServices () {
-    return mergeDescriptors(this::services.methods.getServices(), {
+    return mergeDescriptors(this::cmp.methods.getServices(), {
       style: this
     })
-  },
-  /**
-   * @return {void}
-   * @protected
-   * @abstract
-   */
-  mount () {
-    throw new Error('Not implemented method')
-  },
-  /**
-   * @return {void}
-   * @protected
-   * @abstract
-   */
-  unmount () {
-    throw new Error('Not implemented method')
   },
   /**
    * @return {void}
@@ -77,38 +75,11 @@ const methods = {
 }
 
 export default {
-  mixins: [stubVNode, services],
+  mixins: [cmp],
   methods,
   stubVNode: {
     empty () {
       return this.$options.name
     }
-  },
-  created () {
-    this.initialize()
-  },
-  mounted () {
-    this.mount()
-  },
-  destroyed () {
-    this.unmount()
-    this._style = undefined
   }
-}
-
-/**
- * @return {void}
- * @private
- */
-function defineAccessors () {
-  Object.defineProperties(this, {
-    style: {
-      enumerable: true,
-      get: this.getStyle
-    },
-    map: {
-      enumerable: true,
-      get: () => this.services.map
-    }
-  })
 }

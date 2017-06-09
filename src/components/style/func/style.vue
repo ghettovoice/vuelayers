@@ -8,7 +8,7 @@
   import { style as styleHelper } from '../../../ol-ext'
   import { warndbg } from '../../../utils/debug'
   import style from '../style'
-  import styleTarget, { createStyleFunc } from '../../style-target'
+  import styleTarget from '../../style-target'
   import { assertHasMap } from '../../../utils/assert'
 
   const props = {
@@ -32,7 +32,7 @@
         providedStyleFunc = noop
       }
       // fallback style function made from inner style containers
-      const fallbackStyleFunc = createStyleFunc(this)
+      const fallbackStyleFunc = this.createStyleFunc()
 
       return function __styleFunc (feature, resolution, helper) {
         const styles = providedStyleFunc(feature, resolution, helper)
@@ -68,7 +68,7 @@
       // simply save all inner styles and
       // use them later in style function as fallback
       this.styles = style
-      this.deferRefresh()
+      this.requestRefresh()
     },
     /**
      * @return {void}
@@ -76,14 +76,14 @@
     refresh () {
       this.unmount()
       // recreate style function
-      this.initialize()
+      this.init()
       this.mount()
     }
   }
 
   const watch = {
     factory () {
-      this.deferRefresh()
+      this.requestRefresh()
     }
   }
 
