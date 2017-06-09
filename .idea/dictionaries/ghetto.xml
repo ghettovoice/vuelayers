@@ -12,6 +12,7 @@
       <w>datasets</w>
       <w>dblclick</w>
       <w>debounce</w>
+      <w>deinit</w>
       <w>deinitilize</w>
       <w>denit</w>
       <w>deps</w>
@@ -46,6 +47,7 @@
       <w>positionchange</w>
       <w>positionchanged</w>
       <w>postcss</w>
+      <w>prepatch</w>
       <w>proj</w>
       <w>regenerator</w>
       <w>reproj</w>

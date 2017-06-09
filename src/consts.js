@@ -5,8 +5,12 @@
 /**
  * @const {Symbol<string>}
  */
-export const SERVICES_KEY = Symbol(PKG_NAME)
+export const SERVICES_PROP = Symbol(PKG_NAME)
 /**
  * @const {Symbol<string>}
  */
 export const VM_PROP = Symbol('vm')
+/**
+ * @const {Symbol<string>}
+ */
+export const CACHE_PROP = Symbol('cache')

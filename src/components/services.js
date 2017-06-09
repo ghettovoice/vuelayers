@@ -2,16 +2,16 @@
  * Service container mixin
  * @module components/services
  */
-import { SERVICES_KEY } from '../consts'
+import { SERVICES_PROP } from '../consts'
 import mergeDescriptors from '../utils/multi-merge-descriptors'
 
 export default {
   inject: {
-    services: SERVICES_KEY
+    services: SERVICES_PROP
   },
   provide () {
     return {
-      [SERVICES_KEY]: this.getServices()
+      [SERVICES_PROP]: this.getServices()
     }
   },
   methods: {

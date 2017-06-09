@@ -1,8 +1,9 @@
 import * as components from './components'
-/**
- * @param Vue
- */
+
 export default function install (Vue) {
+  if (install.installed) return
+  install.installed = true
+
   // install all components
   Object.keys(components)
     .forEach(key => {
