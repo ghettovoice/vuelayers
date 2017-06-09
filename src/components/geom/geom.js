@@ -200,11 +200,15 @@ function subscribeToGeomChanges () {
   assertHasMap(this)
   assertHasGeom(this)
 
-  const geomChanges = Observable.fromOlEvent(this.geom, 'change', () => ({
-    coordinates: this.geom.getCoordinates(),
-    extent: this.geom.getExtent()
-  }))
-    .throttleTime(1000 / 30)
+  const ft = 1000 / 30
+  const geomChanges = Observable.fromOlEvent(
+    this.geom,
+    'change',
+    () => ({
+      coordinates: this.geom.getCoordinates(),
+      extent: this.geom.getExtent()
+    })
+  ).throttleTime(ft)
     .distinctUntilChanged(isEqualGeom)
     .map(evt => ({
       ...evt,

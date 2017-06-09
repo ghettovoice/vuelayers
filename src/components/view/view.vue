@@ -185,11 +185,13 @@
       if (viewOptions.center != null && !isEqual(viewOptions.center, this.currentCenter)) {
         this.view.setCenter(proj.fromLonLat(viewOptions.center, this.projection))
       }
-      // resolution & zoom
+      // resolution
       if (viewOptions.resolution != null && viewOptions.resolution !== this.currentResolution) {
         this.view.setResolution(viewOptions.resolution)
-      } else if (viewOptions.zoom != null && viewOptions.zoom !== this.currentZoom) {
-        this.view.setZoom(viewOptions.zoom)
+      }
+      // zoom
+      if (viewOptions.zoom != null && Math.ceil(viewOptions.zoom) !== this.currentZoom) {
+        this.view.setZoom(Math.ceil(viewOptions.zoom))
       }
       // rotation
       if (viewOptions.rotation != null && viewOptions.rotation !== this.currentRotation) {
@@ -256,62 +258,69 @@
   function subscribeToViewChanges () {
     assertHasView(this)
 
-    const centerChanges = Observable.of(this.view.getCenter())
-      .merge(
-        Observable.fromOlEvent(
+    const ft = 1000 / 30
+    const getZoom = () => Math.ceil(this.view.getZoom())
+    // center
+    this.subscribeTo(
+      Observable.of(this.view.getCenter())
+        .merge(Observable.fromOlEvent(
           this.view,
           'change:center',
           () => this.view.getCenter()
-        )
-      )
-    const resolutionChanges = Observable.of(this.view.getResolution())
-      .merge(
-        Observable.fromOlEvent(
+        ))
+        .throttleTime(ft)
+        .distinctUntilChanged(isEqual)
+        .map(coordinate => proj.toLonLat(coordinate, this.view.getProjection())),
+      coordinate => {
+        if (!isEqual(this.currentCenter, coordinate)) {
+          this.currentCenter = coordinate
+          this.$emit('changecenter', { coordinate })
+        }
+      }
+    )
+    // resolution
+    this.subscribeTo(
+      Observable.of(this.view.getResolution())
+        .merge(Observable.fromOlEvent(
           this.view,
           'change:resolution',
           () => this.view.getResolution()
-        )
-      )
-    const rotationChanges = Observable.of(this.view.getRotation())
-      .merge(
-        Observable.fromOlEvent(
+        ))
+        // 30fps change resolution
+        .throttleTime(ft)
+        .distinctUntilChanged(isEqual)
+        .map(resolution => ({ resolution, zoom: getZoom() }))
+        .do(({ resolution }) => {
+          if (this.currentResolution !== resolution) {
+            this.currentResolution = resolution
+            this.$emit('changeresolution', { resolution })
+          }
+        })
+        // zoom change at the end
+        .debounceTime(ft * 2),
+      ({ zoom }) => {
+        if (this.currentZoom !== zoom) {
+          this.currentZoom = zoom
+          this.$emit('changezoom', { zoom })
+        }
+      }
+    )
+    // rotation
+    this.subscribeTo(
+      Observable.of(this.view.getRotation())
+        .merge(Observable.fromOlEvent(
           this.view,
           'change:rotation',
           () => this.view.getRotation()
-        )
-      )
-    const viewChanges = Observable.combineLatest(
-      centerChanges,
-      resolutionChanges,
-      rotationChanges
-    ).throttleTime(1000 / 30)
-      .distinctUntilChanged((a, b) => isEqual(a, b))
-      .map(([center, resolution, rotation]) => ({
-        center: proj.toLonLat(center, this.view.getProjection()),
-        resolution: resolution,
-        rotation
-      }))
-
-    this.subscribeTo(viewChanges, ({ center, resolution, rotation }) => {
-      if (!isEqual(this.currentCenter, center)) {
-        this.currentCenter = center
+        ))
+        .throttleTime(ft)
+        .distinctUntilChanged(isEqual),
+      rotation => {
+        if (this.currentRotation !== rotation) {
+          this.currentRotation = rotation
+          this.$emit('changerotation', { rotation })
+        }
       }
-
-      if (this.currentResolution !== resolution) {
-        this.currentResolution = resolution
-        this.currentZoom = Math.ceil(this.view.getZoom())
-      }
-
-      if (this.currentRotation !== rotation) {
-        this.currentRotation = rotation
-      }
-
-      this.$emit('change', {
-        center: this.currentCenter,
-        resolution: this.currentResolution,
-        rotation: this.currentRotation,
-        zoom: this.currentZoom
-      })
-    })
+    )
   }
 </script>

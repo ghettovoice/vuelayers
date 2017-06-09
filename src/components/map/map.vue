@@ -254,6 +254,8 @@
     assertHasMap(this)
     assertHasView(this)
 
+    const ft = 1000 / 30
+    // pointer
     const pointerEvents = Observable.merge(
       Observable.fromOlEvent(this.map, [
         'click',
@@ -263,25 +265,23 @@
       Observable.fromOlEvent(this.map, [
         'pointerdrag',
         'pointermove'
-      ]).throttleTime(1000 / 30)
+      ]).throttleTime(ft)
         .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
     ).map(evt => ({
       ...evt,
       coordinate: proj.toLonLat(evt.coordinate, this.view.getProjection())
     }))
-    const mapEvents = Observable.fromOlEvent(this.map, [
+    // other
+    const otherEvents = Observable.fromOlEvent(this.map, [
       'postrender',
-      'moveend'
-    ])
-    const renderEvents = Observable.fromOlEvent(this.map, [
+      'moveend',
       'precompose',
       'postcompose'
-    ])
+    ]).throttleTime(ft)
 
     const events = Observable.merge(
       pointerEvents,
-      mapEvents,
-      renderEvents
+      otherEvents
     )
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))

@@ -124,43 +124,42 @@
   function subscribeToGeolocation () {
     assertHasGeoloc(this)
 
-    const positionChanges = Observable.of(this.geoloc.getPosition())
-      .merge(
-        Observable.fromOlEvent(
+    const ft = 1000 / 30
+    // pos
+    this.subscribeTo(
+      Observable.of(this.geoloc.getPosition())
+        .merge(Observable.fromOlEvent(
           this.geoloc,
           'change:position',
           () => this.geoloc.getPosition()
-        )
-      )
-      .filter(x => x != null)
-    const accuracyChanges = Observable.of(this.geoloc.getAccuracy())
-      .merge(
-        Observable.fromOlEvent(
+        ))
+        .filter(x => x != null)
+        .throttleTime(ft)
+        .distinctUntilChanged(isEqual),
+      position => {
+        if (!isEqual(position, this.currentPosition)) {
+          this.currentPosition = position
+          this.$emit('changeposition', { position })
+        }
+      }
+    )
+    // acc
+    this.subscribeTo(
+      Observable.of(this.geoloc.getAccuracy())
+        .merge(Observable.fromOlEvent(
           this.geoloc,
           'change:accuracy',
           () => this.geoloc.getAccuracy()
-        )
-      )
-      .filter(x => x != null)
-    const geolocChanges = Observable.combineLatest(
-      positionChanges,
-      accuracyChanges
-    ).throttleTime(60)
-      .distinctUntilChanged((a, b) => isEqual(a, b))
-
-    this.subscribeTo(geolocChanges, ([position, accuracy]) => {
-      if (!isEqual(position, this.currentPosition)) {
-        this.currentPosition = position
+        ))
+        .filter(x => x != null)
+        .throttleTime(ft)
+        .distinctUntilChanged(isEqual),
+      accuracy => {
+        if (accuracy !== this.currentAccuracy) {
+          this.currentAccuracy = accuracy
+          this.$emit('changeaccuracy', { accuracy })
+        }
       }
-
-      if (accuracy !== this.currentAccuracy) {
-        this.currentAccuracy = accuracy
-      }
-
-      this.$emit('change', {
-        position: this.currentPosition,
-        accuracy: this.currentAccuracy
-      })
-    })
+    )
   }
 </script>
