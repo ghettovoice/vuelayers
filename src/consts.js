@@ -7,9 +7,9 @@
  */
 export const SERVICES_PROP = Symbol(PKG_NAME)
 /**
- * @const {Symbol<string>}
+ * @const {string}
  */
-export const VM_PROP = Symbol('vm')
+export const VM_PROP = 'vm'
 /**
  * @const {Symbol<string>}
  */
