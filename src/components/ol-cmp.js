@@ -1,30 +1,56 @@
 /**
- * Basic component mixin
+ * Basic ol component mixin
  * @module components/cmp
  */
-import uuid from 'uuid/v4'
 import { debounce } from 'lodash/fp'
 import rxSubs from './rx-subs'
 import services from './services'
+import identMap from './ident-map'
+import { VM_PROP } from '../consts'
 
-const props = {
-  id: {
-    type: [String, Number],
-    default: () => uuid()
-  }
-}
+const props = {}
 
 const methods = {
   /**
    * @return {void}
    * @protected
    */
-  init () {},
+  init () {
+    this.olObject = undefined
+    if (this.ident && this.identMap.has(this.ident)) {
+      this.olObject = this.identMap.get(this.ident)
+    } else {
+      /**
+       * @type {*}
+       * @protected
+       */
+      this.olObject = this.createOlObject()
+      if (this.ident) {
+        this.identMap.set(this.ident, this.olObject)
+      }
+    }
+    this.olObject[VM_PROP] || (this.olObject[VM_PROP] = [])
+    this.olObject[VM_PROP].push(this)
+  },
+  /**
+   * @return {*}
+   * @protected
+   * @abstract
+   */
+  createOlObject () {
+    throw new Error('Not implemented method')
+  },
   /**
    * @return {void}
    * @protected
    */
-  deinit () {},
+  deinit () {
+    if (this.ident) {
+      this.identMap.unset(this.ident)
+    }
+    this.olObject[VM_PROP] = this.olObject[VM_PROP].filter(vm => vm !== this)
+    this.olObject = undefined
+  },
   /**
    * @protected
    * @return {void}
@@ -42,7 +68,7 @@ const methods = {
    * @protected
    */
   getServices () {
-    return services.methods.getServices()
+    return this::services.methods.getServices()
   },
   /**
    * @return {void}
@@ -72,7 +98,7 @@ const methods = {
 }
 
 export default {
-  mixins: [rxSubs, services],
+  mixins: [identMap, rxSubs, services],
   props,
   methods,
   created () {

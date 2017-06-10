@@ -2,10 +2,9 @@
   import Vue from 'vue'
   import Feature from 'ol/feature'
   import { isPlainObject } from 'lodash/fp'
-  import { VM_PROP } from '../../consts'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import plainProps from '../../utils/plain-props'
-  import cmp from '../virt-cmp'
+  import cmp from '../ol-virt-cmp'
   import styleTarget from '../style-target'
   import { geoJson } from '../../ol-ext'
   import { assertHasFeature, assertHasMap } from '../../utils/assert'
@@ -21,17 +20,18 @@
     /**
      * Create feature without inner style applying, feature level style
      * will be applied in the layer level style function.
-     * @return {void}
+     * @return {ol.Feature}
      * @protected
      */
-    init () {
+    createOlObject () {
       /**
        * @type {ol.Feature}
        * @private
        */
-      this._feature = new Feature(this.properties)
-      this._feature.setId(this.id)
-      this._feature[VM_PROP] = this
+      let feature = new Feature(this.properties)
+      feature.setId(this.id)
+
+      return feature
     },
     /**
      * @return {void}
@@ -54,17 +54,10 @@
       })
     },
     /**
-     * @return {void}
-     * @protected
-     */
-    denit () {
-      this._feature = undefined
-    },
-    /**
      * @returns {ol.Feature|undefined}
      */
     getFeature () {
-      return this._feature
+      return this.olObject
     },
     /**
      * @return {Object}

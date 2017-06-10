@@ -10,11 +10,10 @@
   import { noop, isEqual } from 'lodash/fp'
   import Map from 'ol/map'
   import olcontrol from 'ol/control'
-  import { VM_PROP } from '../../consts'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import Observable from '../../rx-ext'
   import { proj } from '../../ol-ext'
-  import cmp from '../cmp'
+  import cmp from '../ol-cmp'
   import { assertHasMap, assertHasView } from '../../utils/assert'
 
   const props = {
@@ -85,16 +84,16 @@
       this.map.removeInteraction(interaction)
     },
     /**
-     * @return {void}
+     * @return {ol.Map}
      * @protected
      */
-    init () {
+    createOlObject () {
       // todo disable all default interaction and controls and use custom if defined, wrap all
       /**
        * @type {ol.Map}
        * @private
        */
-      this._map = new Map({
+      return new Map({
         layers: [],
 //      interactions: [],
         controls: this.defControls ? olcontrol.defaults() : [],
@@ -105,20 +104,13 @@
         logo: this.logo,
         keyboardEventTarget: this.keyboardEventTarget
       })
-      this._map[VM_PROP] = this
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    deinit () {
-      this._map = undefined
     },
     /**
      * @return {void}
      * @protected
      */
     defineAccessors () {
+      this::cmp.methods.defineAccessors()
       Object.defineProperties(this, {
         map: {
           enumerable: true,
@@ -171,7 +163,7 @@
      * @return {ol.Map|undefined}
      */
     getMap () {
-      return this._map
+      return this.olObject
     },
     /**
      * @returns {Object}

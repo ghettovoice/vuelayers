@@ -15,7 +15,7 @@
      * @returns {ol.geom.MultiPolygon}
      * @protected
      */
-    createGeometry () {
+    createGeom () {
       return new MultiPolygon(this.fromLonLat(this.currentCoordinates))
     }
   }

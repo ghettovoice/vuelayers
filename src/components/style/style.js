@@ -2,21 +2,15 @@
  * Basic style mixin.
  */
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import cmp from '../virt-cmp'
-import { VM_PROP } from '../../consts'
+import cmp from '../ol-virt-cmp'
 
 const methods = {
   /**
-   * @return {void}
+   * @return {OlStyle}
    * @protected
    */
-  init () {
-    /**
-     * @type {OlStyle|undefined}
-     * @private
-     */
-    this._style = this.createStyle()
-    this._style[VM_PROP] = this
+  createOlObject () {
+    return this.createStyle()
   },
   /**
    * @return {OlStyle}
@@ -30,8 +24,15 @@ const methods = {
    * @return {void}
    * @protected
    */
+  init () {
+    this::cmp.methods.init()
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
   deinit () {
-    this._style = undefined
+    this::cmp.methods.deinit()
   },
   /**
    * @return {void}
@@ -54,7 +55,7 @@ const methods = {
    * @return {OlStyle|undefined}
    */
   getStyle () {
-    return this._style
+    return this.olObject
   },
   /**
    * @return {Object}

@@ -1,10 +1,9 @@
 <script>
   import Geolocation from 'ol/geolocation'
   import { isEqual } from 'lodash/fp'
-  import { VM_PROP } from '../../consts'
   import Observable from '../../rx-ext'
   import { DATA_PROJ } from '../../ol-ext'
-  import cmp from '../virt-cmp'
+  import cmp from '../ol-virt-cmp'
   import { assertHasGeoloc } from '../../utils/assert'
 
   const props = {
@@ -16,26 +15,14 @@
 
   const methods = {
     /**
-     * @return {void}
+     * @return {ol.Geolocation}
      * @private
      */
-    init () {
-      /**
-       * @type {ol.Geolocation}
-       * @protected
-       */
-      this._geoloc = new Geolocation({
+    createOlObject () {
+      return new Geolocation({
         tracking: this.tracking,
         projection: DATA_PROJ
       })
-      this._geoloc[VM_PROP] = this
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    deinit () {
-      this._geoloc = undefined
     },
     /**
      * @return {void}
@@ -53,7 +40,7 @@
      * @returns {ol.Geolocation|undefined}
      */
     getGeoloc () {
-      return this._geoloc
+      return this.olObject
     },
     /**
      * @return {void}

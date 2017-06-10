@@ -2,10 +2,9 @@
   import Vue from 'vue'
   import View from 'ol/view'
   import { isEqual, isPlainObject } from 'lodash/fp'
-  import { VM_PROP } from '../../consts'
   import Observable from '../../rx-ext'
   import { MIN_ZOOM, MAX_ZOOM, MAP_PROJ, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
-  import cmp from '../virt-cmp'
+  import cmp from '../ol-virt-cmp'
   import { assertHasView } from '../../utils/assert'
 
   const props = {
@@ -69,15 +68,11 @@
       )
     },
     /**
-     * @return {void}
+     * @return {ol.View}
      * @protected
      */
-    init () {
-      /**
-       * @type {ol.View}
-       * @protected
-       */
-      this._view = new View({
+    createOlObject () {
+      return new View({
         center: proj.fromLonLat(this.center, this.projection),
         constrainRotation: this.constrainRotation,
         enableRotation: this.enableRotation,
@@ -93,21 +88,12 @@
         zoom: this.zoom,
         zoomFactor: this.zoomFactor
       })
-      this._view[VM_PROP] = this
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    deinit () {
-      this._view = undefined
     },
     /**
      * @return {void}
      * @protected
      */
     defineAccessors () {
-      // define getters
       Object.defineProperties(this, {
         view: {
           enumerable: true,
@@ -142,7 +128,7 @@
      * @return {ol.View|undefined} OpenLayers `ol.View` instance
      */
     getView () {
-      return this._view
+      return this.olObject
     },
     /**
      * @return {void}

@@ -74,8 +74,9 @@
      * @return {void}
      */
     refresh () {
+      // recreate style
       this.unmount()
-      // recreate style function
+      this.deinit()
       this.init()
       this.mount()
     }

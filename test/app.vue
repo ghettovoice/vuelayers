@@ -7,9 +7,9 @@
     <div style="height: 50%">
       <vl-map>
         <!--<vl-share-item id="view"/>-->
-        <vl-view id="view" :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
+        <vl-view ident="view" :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
 
-        <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
+        <!--<vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
           <vl-style-container>
             <vl-style-stroke color="#f03b20" :width="3"/>
             <vl-style-fill :color="[254, 178, 76, 0.7]"/>
@@ -19,13 +19,13 @@
               <vl-style-fill :color="[254, 178, 76, 0.7]"/>
             </vl-style-circle>
           </vl-style-container>
-        </vl-interaction-select>
+        </vl-interaction-select>-->
 
         <vl-layer-tile>
           <vl-source-sputnik/>
         </vl-layer-tile>
 
-        <!--<vl-layer-vector id="points" v-if="pointsLayer">
+        <vl-layer-vector id="points" v-if="pointsLayer">
           <vl-style-container>
             <vl-style-stroke color="#8856a7" :width="2"/>
             <vl-style-fill :color="[158, 188, 218, 0.5]"/>
@@ -37,29 +37,28 @@
           </vl-style-container>
 
           <vl-source-vector :features="points"/>
-        </vl-layer-vector>-->
+        </vl-layer-vector>
+
+        <vl-layer-tile id="wmts">
+          <vl-source-wmts
+            url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
+            layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
+        </vl-layer-tile>
+      </vl-map>
+    </div>
+    <div style="height: 50%">
+      <vl-map>
+        <vl-view ident="view" :center="center" :zoom="zoom" :rotation="rotation"/>
+
+        <vl-layer-tile>
+          <vl-source-sputnik/>
+        </vl-layer-tile>
 
         <vl-layer-tile id="wms">
           <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
                          :ext-params="{ TILED: true }" server-type="geoserver"/>
         </vl-layer-tile>
-
-        <!--<vl-layer-tile id="wmts">
-          <vl-source-wmts
-            url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
-            layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
-        </vl-layer-tile>-->
       </vl-map>
-    </div>
-    <div style="height: 50%">
-      <!--<vl-map>
-        <vl-share-item id="view"/>
-        &lt;!&ndash;<vl-view id="view" :center="center" :zoom="zoom" :rotation="rotation"/>&ndash;&gt;
-
-        <vl-layer-tile>
-          <vl-source-sputnik/>
-        </vl-layer-tile>
-      </vl-map>-->
     </div>
   </div>
 </template>

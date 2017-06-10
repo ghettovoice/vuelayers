@@ -26,8 +26,9 @@ const methods = {
    * @return {void}
    */
   refresh () {
-    this.unmount()
     // recreate style
+    this.unmount()
+    this.deinit()
     this.init()
     this.mount()
   }

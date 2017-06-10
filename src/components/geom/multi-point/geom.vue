@@ -15,7 +15,7 @@
      * @returns {ol.geom.MultiPoint}
      * @protected
      */
-    createGeometry () {
+    createGeom () {
       return new MultiPoint(this.fromLonLat(this.currentCoordinates))
     }
   }

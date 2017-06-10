@@ -1,7 +1,6 @@
 import Vue from 'vue'
-import { VM_PROP } from '../../consts'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import cmp from '../virt-cmp'
+import cmp from '../ol-virt-cmp'
 import { assertHasLayer, assertHasMap } from '../../utils/assert'
 
 const props = {
@@ -25,19 +24,14 @@ const props = {
 
 const methods = {
   /**
-   * @return {void}
+   * @return {ol.layer.Layer}
    * @protected
    */
-  init () {
-    /**
-     * @type {ol.layer.Layer}
-     * @protected
-     */
-    this._layer = this.createLayer()
-    this._layer.setProperties({
-      id: this.id
-    })
-    this._layer[VM_PROP] = this
+  createOlObject () {
+    let layer = this.createLayer()
+    layer.set('id', this.id)
+
+    return layer
   },
   /**
    * @return {ol.layer.Layer}
@@ -51,8 +45,15 @@ const methods = {
    * @return {void}
    * @protected
    */
+  init () {
+    this::cmp.methods.init()
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
   deinit () {
-    this._layer = undefined
+    this::cmp.methods.deinit()
   },
   /**
    * @return {void}
@@ -83,7 +84,7 @@ const methods = {
    * @return {ol.layer.Layer|undefined}
    */
   getLayer () {
-    return this._layer
+    return this.olObject
   },
   /**
    * @returns {Object}

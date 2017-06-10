@@ -1,22 +1,16 @@
-import { VM_PROP } from '../../consts'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import cmp from '../virt-cmp'
+import cmp from '../ol-virt-cmp'
 import { assertHasInteraction } from '../../utils/assert'
 
 const props = {}
 
 const methods = {
   /**
-   * @return {void}
+   * @return {ol.interaction.Interaction}
    * @protected
    */
-  init () {
-    /**
-     * @type {ol.interaction.Interaction}
-     * @protected
-     */
-    this._interaction = this.createInteraction()
-    this._interaction[VM_PROP] = this
+  createOlObject () {
+    return this.createInteraction()
   },
   /**
    * @return {ol.interaction.Interaction}
@@ -25,13 +19,6 @@ const methods = {
    */
   createInteraction () {
     throw new Error('Not implemented method')
-  },
-  /**
-   * @return {void}
-   * @protected
-   */
-  deinit () {
-    this._interaction = undefined
   },
   /**
    * @return {void}
@@ -53,7 +40,7 @@ const methods = {
    * @return {ol.interaction.Interaction|undefined}
    */
   getInteraction () {
-    return this._interaction
+    return this.olObject
   },
   /**
    * @returns {Object}

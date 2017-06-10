@@ -1,5 +1,4 @@
 import { isEqual } from 'lodash/fp'
-import { VM_PROP } from '../../consts'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import Observable from '../../rx-ext'
 import cmp from '../rx-subs'
@@ -29,11 +28,28 @@ const computed = {
 
 const methods = {
   /**
+   * @return {ol.geom.Geometry}
+   * @protected
+   */
+  createOlObject () {
+    let geom = this.createGeom()
+    // initialize additional props
+    this.currentExtent = this.extentToLonLat(geom.getExtent())
+    return geom
+  },
+  /**
+   * @return {ol.geom.Geometry}
+   * @protected
+   * @abstract
+   */
+  createGeom () {
+    throw new Error('Not implemented method')
+  },
+  /**
    * @return {void}
    * @protected
    */
   init () {
-    assertHasMap(this)
     // define helper methods based on geometry type
     const { toLonLat, fromLonLat } = proj.transforms[this.type]
     /**
@@ -57,31 +73,15 @@ const methods = {
      * @protected
      */
     this.extentToLonLat = extent => proj.extentToLonLat(extent, this.map.view.getProjection())
-    // create ol.geom.Geometry instance
-    /**
-     * @type {ol.geom.Geometry}
-     * @protected
-     */
-    this._geom = this.createGeom()
-    this._geom[VM_PROP] = this
-    // initialize additional props
-    this.currentExtent = this.extentToLonLat(this._geom.getExtent())
-  },
-  /**
-   * @return {ol.geom.Geometry}
-   * @protected
-   * @abstract
-   */
-  createGeom () {
-    throw new Error('Not implemented method')
+
+    this::cmp.methods.init()
   },
   /**
    * @return {void}
    * @protected
    */
   deinit () {
-    this.unmount()
-    this._geom = undefined
+    this::cmp.methods.deinit()
   },
   /**
    * @return {void}
@@ -103,7 +103,7 @@ const methods = {
    * @returns {ol.geom.Geometry|undefined}
    */
   getGeom () {
-    return this._geom
+    return this.olObject
   },
   /**
    * @return {void}

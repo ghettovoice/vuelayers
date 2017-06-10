@@ -1,6 +1,5 @@
-import { VM_PROP } from '../../consts'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import cmp from '../virt-cmp'
+import cmp from '../ol-virt-cmp'
 import { assertHasSource } from '../../utils/assert'
 
 const props = {
@@ -15,16 +14,11 @@ const props = {
 
 const methods = {
   /**
-   * @return {void}
+   * @return {ol.source.Source}
    * @protected
    */
-  init () {
-    /**
-     * @type {ol.source.Source}
-     * @protected
-     */
-    this._source = this.createSource()
-    this._source[VM_PROP] = this
+  createOlObject () {
+    return this.createSource()
   },
   /**
    * @return {ol.source.Source}
@@ -33,13 +27,6 @@ const methods = {
    */
   createSource () {
     throw new Error('Not implemented method')
-  },
-  /**
-   * @return {void}
-   * @protected
-   */
-  deinit () {
-    this._source = undefined
   },
   /**
    * @return {void}
@@ -58,6 +45,20 @@ const methods = {
     })
   },
   /**
+   * @return {void}
+   * @protected
+   */
+  init () {
+    this::cmp.methods.init()
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  deinit () {
+    this::cmp.methods.deinit()
+  },
+  /**
    * @return {Object}
    * @protected
    */
@@ -70,7 +71,7 @@ const methods = {
    * @return {ol.source.Source|undefined}
    */
   getSource () {
-    return this._source
+    return this.olObject
   },
   /**
    * @return {void}

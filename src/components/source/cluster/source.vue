@@ -25,13 +25,17 @@
 
   const methods = {
     /**
-     * @return {SourceBuilder}
+     * @return {null}
      * @protected
      */
     createSource () {
       const geomFunc = this.geomFunc
       // partial setup of ol.source.Cluster with the help of SourceBuilder class
-      return new SourceBuilder()
+      /**
+       * @type {SourceBuilder}
+       * @private
+       */
+      this.sourceBuilder = new SourceBuilder()
         .setAttributions(this.attributions)
         .setDistance(this.distance)
         .setGeometryFunction(function __geomFunc (feature) {
@@ -40,17 +44,19 @@
         .setLogo(this.logo)
         .setProjection(this.projection)
         .setWrapX(this.wrapX)
+
+      return null
     },
     /**
      * @return {ol.source.Cluster|undefined}
      */
     getSource () {
       // lazy ol.source.Cluster instantiating
-      if (!this._clusterSource) {
-        this._clusterSource = this._source.build()
+      if (!this.olObject) {
+        this.olObject = this.sourceBuilder.build()
       }
 
-      return this._clusterSource
+      return this.olObject
     },
     /**
      * Set inner vector source
@@ -61,7 +67,7 @@
       assertHasSource(this)
 
       source = source instanceof Vue ? source.source : source
-      this._source.setSource(source)
+      this.source.setSource(source)
       // todo check if remount need
     }
   }

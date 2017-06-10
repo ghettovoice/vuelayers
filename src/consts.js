@@ -13,4 +13,4 @@ export const VM_PROP = 'vm'
 /**
  * @const {Symbol<string>}
  */
-export const CACHE_PROP = Symbol('cache')
+export const IDENTITY_MAP_PROP = Symbol('identityMap')
