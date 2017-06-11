@@ -5,7 +5,7 @@
   import { differenceWith, isPlainObject } from 'lodash/fp'
   import { DATA_PROJ, geoJson, extent as extentHelper, proj as projHelper } from '../../../ol-ext'
   import source from '../source'
-  import { assertHasSource, assertHasMap } from '../../../utils/assert'
+  import * as assert from '../../../utils/assert'
 
   const props = {
     // for big datasets
@@ -48,8 +48,8 @@
      * @return {void}
      */
     addFeature (feature) {
-      assertHasMap(this)
-      assertHasSource(this)
+      assert.hasMap(this)
+      assert.hasSource(this)
 
       if (feature instanceof Vue) {
         feature = feature.feature
@@ -70,7 +70,7 @@
      * @return {void}
      */
     removeFeature (feature) {
-      assertHasSource(this)
+      assert.hasSource(this)
 
       if (feature instanceof Vue) {
         feature = feature.feature
@@ -83,7 +83,7 @@
      * @return {void}
      */
     clear () {
-      assertHasSource(this)
+      assert.hasSource(this)
       this.source.clear()
     },
     /**
@@ -124,8 +124,8 @@
      * @return {ol.Feature|undefined}
      */
     getFeatureById (id) {
-      assertHasMap(this)
-      assertHasSource(this)
+      assert.hasMap(this)
+      assert.hasSource(this)
 
       return this.source.getFeatureById(id)
     },

@@ -1,6 +1,6 @@
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import { assertHasInteraction } from '../../utils/assert'
+import * as assert from '../../utils/assert'
 
 const props = {}
 
@@ -71,7 +71,7 @@ const methods = {
    * @return {void}
    */
   refresh () {
-    assertHasInteraction(this)
+    assert.hasInteraction(this)
     this.interaction.changed()
   }
 }

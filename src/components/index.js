@@ -15,6 +15,7 @@ export SelectInteraction from './interaction/select'
 export TileLayer from './layer/tile'
 export VectorLayer from './layer/vector'
 // sources
+export ClusterSource from './source/cluster'
 export MapboxSource from './source/mapbox'
 export OsmSource from './source/osm'
 export SputnikSource from './source/sputnik'

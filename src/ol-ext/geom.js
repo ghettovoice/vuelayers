@@ -10,9 +10,8 @@ import MultiPoint from 'ol/geom/multipoint'
 import MultiLineString from 'ol/geom/multilinestring'
 import MultiPolygon from 'ol/geom/multipolygon'
 import GeometryCollection from 'ol/geom/geometrycollection'
-import tPointOnSurface from '@turf/point-on-surface'
+import turfPointOnSurface from '@turf/point-on-surface'
 import { GEOMETRY_TYPE } from './consts'
-import * as geoJson from './geojson'
 
 export function point (lonOrCoordinates, lat) {
   const coordinates = Array.isArray(lonOrCoordinates)
@@ -71,8 +70,9 @@ export function collection (geoms) {
 }
 
 /**
- * @param {ol.geom.Geometry} geom
+ * @param {ol.geom.Geometry|GeoJSONGeometry} geom
  * @return {boolean}
+ * @throws {Error}
  */
 export function isMulti (geom) {
   let multiTypes = [
@@ -82,35 +82,49 @@ export function isMulti (geom) {
     GEOMETRY_TYPE.GEOMETRY_COLLECTION
   ]
 
-  return multiTypes.includes(geom.getType())
+  return multiTypes.includes(geom.type || geom.getType())
 }
 
 /**
- * @param {ol.geom.SimpleGeometry|ol.geom.GeometryCollection} geom
- * @return {ol.geom.SimpleGeometry}
+ * @param {ol.geom.Geometry|GeoJSONGeometry} geom
+ * @return {ol.geom.SimpleGeometry|GeoJSONGeometry}
  * @throws {Error}
  */
 export function reduceToSingle (geom) {
   if (!isMulti(geom)) return geom
 
-  switch (geom.getType()) {
+  let type = geom.type || geom.getType()
+
+  if (type === GEOMETRY_TYPE.GEOMETRY_COLLECTION) {
+    let geometries = geom.geometries || geom.getGeometries()
+    return reduceToSingle(geometries[0])
+  }
+
+  if (geom.coordinates) {
+    return geom.coordinates[0]
+  }
+
+  switch (type) {
     case GEOMETRY_TYPE.MULTI_POINT:
       return geom.getPoint(0)
     case GEOMETRY_TYPE.MULTI_LINE_STRING:
       return geom.getLineString(0)
     case GEOMETRY_TYPE.MULTI_POLYGON:
       return geom.getPolygon(0)
-    case GEOMETRY_TYPE.GEOMETRY_COLLECTION:
-      return reduceToSingle(geom.getGeometries()[0])
   }
 }
 
 /**
- * @param {ol.geom.Geometry} geom
+ * @param {ol.geom.Geometry|GeoJSONGeometry} geom
  * @return {ol.geom.Point|undefined}
  */
 export function pointOnSurface (geom) {
-  const pointFeature = tPointOnSurface(geoJson.writeGeometry(reduceToSingle(geom)))
+  const singleGeom = reduceToSingle(geom)
+  const pointFeature = turfPointOnSurface({
+    type: singleGeom.type || singleGeom.getType(),
+    coordinates: singleGeom.coordinates || singleGeom.getCoordinates()
+  })
+
   if (pointFeature) {
     return point(pointFeature.geometry.coordinates)
   }

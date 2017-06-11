@@ -1,4 +1,5 @@
 import Cluster from 'ol/source/cluster'
+import * as assert from '../../../utils/assert'
 
 export default class Builder {
   /**
@@ -78,6 +79,8 @@ export default class Builder {
    * @return {ol.source.Cluster}
    */
   build () {
+    assert.ok(this.source, 'source is provided')
+
     const source = new Cluster({
       attributions: this.attributions,
       distance: this.distance,

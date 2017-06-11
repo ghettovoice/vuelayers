@@ -2,7 +2,7 @@
   import Text from 'ol/style/text'
   import style from '../style'
   import withFillStroke from '../with-fill-stroke'
-  import { assertHasStyle } from '../../../utils/assert'
+  import * as assert from '../../../utils/assert'
 
   const props = {
     font: {
@@ -76,42 +76,42 @@
 
   const watch = {
     font (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setFont(value)
       this.requestRefresh()
     },
     offsetX (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setOffsetX(value)
       this.requestRefresh()
     },
     offsetY (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setOffsetY(value)
       this.requestRefresh()
     },
     rotation (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setRotation(value)
       this.requestRefresh()
     },
     scale (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setScale(value)
       this.requestRefresh()
     },
     text (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setText(value)
       this.requestRefresh()
     },
     textAlign (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setTextAlign(value)
       this.requestRefresh()
     },
     textBaseline (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setTextBaseline(value)
       this.requestRefresh()
     }

@@ -4,7 +4,7 @@
   import Observable from '../../rx-ext'
   import { DATA_PROJ } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
-  import { assertHasGeoloc } from '../../utils/assert'
+  import * as assert from '../../utils/assert'
 
   const props = {
     tracking: {
@@ -54,7 +54,7 @@
      * @private
      */
     unmount () {
-      assertHasGeoloc(this)
+      assert.hasGeoloc(this)
 
       this.unsubscribeAll()
       this.geoloc.setTracking(false)
@@ -63,7 +63,7 @@
      * @return {void}
      */
     refresh () {
-      assertHasGeoloc(this)
+      assert.hasGeoloc(this)
       this.geoloc.changed()
     },
     /**
@@ -80,7 +80,7 @@
      * @param {boolean} value
      */
     tracking (value) {
-      assertHasGeoloc(this)
+      assert.hasGeoloc(this)
       this.geoloc.setTracking(value)
     }
   }
@@ -109,7 +109,7 @@
    * @private
    */
   function subscribeToGeolocation () {
-    assertHasGeoloc(this)
+    assert.hasGeoloc(this)
 
     const ft = 1000 / 30
     // pos

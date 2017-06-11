@@ -9,34 +9,14 @@
         <!--<vl-share-item id="view"/>-->
         <vl-view ident="view" :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
 
-        <!--<vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
-          <vl-style-container>
-            <vl-style-stroke color="#f03b20" :width="3"/>
-            <vl-style-fill :color="[254, 178, 76, 0.7]"/>
-
-            <vl-style-circle>
-              <vl-style-stroke color="#f03b20" :width="3"/>
-              <vl-style-fill :color="[254, 178, 76, 0.7]"/>
-            </vl-style-circle>
-          </vl-style-container>
-        </vl-interaction-select>-->
-
-        <vl-layer-tile>
+        <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
         </vl-layer-tile>
 
         <vl-layer-vector id="points" v-if="pointsLayer">
-          <vl-style-container>
-            <vl-style-stroke color="#8856a7" :width="2"/>
-            <vl-style-fill :color="[158, 188, 218, 0.5]"/>
-
-            <vl-style-circle>
-              <vl-style-stroke color="#8856a7" :width="2"/>
-              <vl-style-fill :color="[158, 188, 218, 0.5]"/>
-            </vl-style-circle>
-          </vl-style-container>
-
-          <vl-source-vector :features="points"/>
+          <vl-source-cluster>
+            <vl-source-vector :features="points"/>
+          </vl-source-cluster>
         </vl-layer-vector>
 
         <vl-layer-tile id="wmts">
@@ -65,6 +45,7 @@
 
 <script>
   import { range, random } from 'lodash/fp'
+  import VlSourceCluster from '../src/components/source/cluster/source'
 
   const methods = {
     updateMapView ({ center, zoom, rotation }) {
@@ -86,7 +67,7 @@
     },
     loadData () {
       const points = []
-      range(1, 1000).forEach(i => {
+      range(1, 100).forEach(i => {
         points.push({
           id: i,
           properties: {
@@ -109,6 +90,7 @@
   }
 
   export default {
+    components: { VlSourceCluster },
     name: 'app',
     methods,
     data () {

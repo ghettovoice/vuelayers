@@ -8,7 +8,7 @@
   import Style from 'ol/style/style'
   import style from '../style'
   import withFillStroke from '../with-fill-stroke'
-  import { assertHasStyle } from '../../../utils/assert'
+  import * as assert from '../../../utils/assert'
 
   const props = {
     zIndex: {
@@ -50,7 +50,7 @@
      * @return {void}
      */
     setImage (image) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
 
       image = image instanceof Vue ? image.style : image
       this.style.setImage(image)
@@ -61,7 +61,7 @@
      * @return {void}
      */
     setGeometry (geom) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
 
       geom = geom instanceof Vue ? geom.geom : geom
       this.style.setGeometry(geom)
@@ -72,7 +72,7 @@
      * @return {void}
      */
     setText (text) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
 
       text = text instanceof Vue ? text.style : text
       this.style.setText(text)
@@ -82,7 +82,7 @@
 
   const watch = {
     zIndex (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setZIndex(value)
       this.requestRefresh()
     }

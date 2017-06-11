@@ -1,7 +1,7 @@
 <script>
   import Stroke from 'ol/style/stroke'
   import style from '../style'
-  import { assertHasStyle } from '../../../utils/assert'
+  import * as assert from '../../../utils/assert'
 
   const props = {
     color: [Array, String],
@@ -62,27 +62,27 @@
 
   const watch = {
     color (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setColor(value)
       this.requestRefresh()
     },
     lineCap (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setLineCap(value)
       this.requestRefresh()
     },
     lineDash (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setLineDash(value)
       this.requestRefresh()
     },
     lineJoin (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setLineJoin(value)
       this.requestRefresh()
     },
     width (value) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
       this.style.setWidth(value)
       this.requestRefresh()
     }

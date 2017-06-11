@@ -1,9 +1,14 @@
 import Vue from 'vue'
+import uuid from 'uuid/v4'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import { assertHasLayer, assertHasMap } from '../../utils/assert'
+import * as assert from '../../utils/assert'
 
 const props = {
+  id: {
+    type: [String, Number],
+    default: () => uuid()
+  },
   extent: {
     type: Array,
     validator: value => value.length === 4
@@ -76,7 +81,7 @@ const methods = {
    * @return {boolean}
    */
   isAtPixel (pixel) {
-    assertHasMap(this)
+    assert.hasMap(this)
 
     return this.map.forEachLayerAtPixel(pixel, l => l === this.layer)
   },
@@ -126,14 +131,14 @@ const methods = {
    * @return {void}
    */
   refresh () {
-    assertHasLayer(this)
+    assert.hasLayer(this)
     this.layer.changed()
   },
   /**
    * @param {ol.Map|Vue|undefined} map
    */
   setMap (map) {
-    assertHasLayer(this)
+    assert.hasLayer(this)
 
     map = map instanceof Vue ? map.map : map
     this.layer.setMap(map)
@@ -143,7 +148,7 @@ const methods = {
    * @return {void}
    */
   setSource (source) {
-    assertHasLayer(this)
+    assert.hasLayer(this)
 
     source = source instanceof Vue ? source.source : source
     this.layer.setSource(source)
@@ -152,27 +157,27 @@ const methods = {
 
 const watch = {
   id (value) {
-    assertHasLayer(this)
+    assert.hasLayer(this)
     return this.layer.set('id', value)
   },
   maxResolution (value) {
-    assertHasLayer(this)
+    assert.hasLayer(this)
     this.layer.setMaxResolution(value)
   },
   minResolution (value) {
-    assertHasLayer(this)
+    assert.hasLayer(this)
     this.layer.setMinResolution(value)
   },
   opacity (value) {
-    assertHasLayer(this)
+    assert.hasLayer(this)
     this.layer.setOpacity(value)
   },
   visible (value) {
-    assertHasLayer(this)
+    assert.hasLayer(this)
     this.layer.setVisible(value)
   },
   zIndex (value) {
-    assertHasLayer(this)
+    assert.hasLayer(this)
     this.layer.setZIndex(value)
   }
 }

@@ -3,7 +3,7 @@
   import { omit } from 'lodash/fp'
   import { WMS_VERSION, proj } from '../../../ol-ext'
   import tileSource from '../tile'
-  import { assertHasSource, assertHasMap } from '../../../utils/assert'
+  import * as assert from '../../../utils/assert'
 
   const props = {
     extParams: Object, // Additional WMS Request params
@@ -67,8 +67,8 @@
       projection,
       params = {}
     ) {
-      assertHasMap(this)
-      assertHasSource(this)
+      assert.hasMap(this)
+      assert.hasSource(this)
 
       resolution || (resolution = this.map.view.getResolution())
       projection || (projection = this.projection)
@@ -84,19 +84,19 @@
 
   const watch = {
     layers (LAYERS) {
-      assertHasSource(this)
+      assert.hasSource(this)
       this.source.updateParams({ LAYERS })
     },
     version (VERSION) {
-      assertHasSource(this)
+      assert.hasSource(this)
       this.source.updateParams({ VERSION })
     },
     styles (STYLES) {
-      assertHasSource(this)
+      assert.hasSource(this)
       this.source.updateParams({ STYLES })
     },
     extParams (value) {
-      assertHasSource(this)
+      assert.hasSource(this)
       this.source.updateParams(cleanExtParams(value))
     }
   }

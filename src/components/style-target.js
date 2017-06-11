@@ -4,7 +4,7 @@
 import Vue from 'vue'
 import { filter, flow, isFunction, map } from 'lodash/fp'
 import { style as styleHelper } from '../ol-ext'
-import { assertHasMap } from '../utils/assert'
+import { hasMap } from '../utils/assert'
 import { warndbg } from '../utils/debug'
 
 export default {
@@ -108,7 +108,7 @@ export default {
       const vm = this
 
       return function __styleTargetStyleFunc (feature, resolution) {
-        assertHasMap(vm)
+        hasMap(vm)
 
         if (!feature.getGeometry()) return
 

@@ -1,9 +1,10 @@
 <script>
   import Vue from 'vue'
+  import Cluster from 'ol/source/cluster'
   import SourceBuilder from './builder'
   import source from '../source'
   import { DATA_PROJ, geom as geomHelper } from '../../../ol-ext'
-  import { assertHasSource } from '../../../utils/assert'
+  import * as assert from '../../../utils/assert'
 
   const props = {
     distance: {
@@ -25,12 +26,13 @@
 
   const methods = {
     /**
-     * @return {null}
+     * @return {Object}
      * @protected
      */
     createSource () {
       const geomFunc = this.geomFunc
       // partial setup of ol.source.Cluster with the help of SourceBuilder class
+      // todo проброс ident map в билдер и нормальная подмена для род. миксина
       /**
        * @type {SourceBuilder}
        * @private
@@ -45,14 +47,14 @@
         .setProjection(this.projection)
         .setWrapX(this.wrapX)
 
-      return null
+      return {}
     },
     /**
      * @return {ol.source.Cluster|undefined}
      */
     getSource () {
       // lazy ol.source.Cluster instantiating
-      if (!this.olObject) {
+      if (!(this.olObject instanceof Cluster)) {
         this.olObject = this.sourceBuilder.build()
       }
 
@@ -64,17 +66,15 @@
      * @return {void}
      */
     setSource (source) {
-      assertHasSource(this)
-
       source = source instanceof Vue ? source.source : source
-      this.source.setSource(source)
+      this.sourceBuilder.setSource(source)
       // todo check if remount need
     }
   }
 
   const watch = {
     distance (value) {
-      assertHasSource(this)
+      assert.hasSource(this)
       this.source.setDistance(value)
     }
   }
@@ -84,7 +84,15 @@
     mixins: [source],
     props,
     methods,
-    watch
+    watch,
+    stubVNode: {
+      empty: false,
+      attrs () {
+        return {
+          id: this.$options.name
+        }
+      }
+    }
   }
 
   /**

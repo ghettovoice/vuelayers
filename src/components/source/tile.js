@@ -14,7 +14,7 @@ import {
 } from '../../ol-ext'
 import replaceTokens from '../../utils/replace-tokens'
 import source from './source'
-import { assertHasSource } from '../../utils/assert'
+import * as assert from '../../utils/assert'
 
 // todo extract tileGrid into separate component!
 const props = {
@@ -131,7 +131,7 @@ const methods = {
 
 const watch = {
   urlTmpl (value) {
-    assertHasSource(this)
+    assert.hasSource(this)
     this.source.setUrl(value)
   }
 }

@@ -14,7 +14,7 @@
   import Observable from '../../rx-ext'
   import { proj } from '../../ol-ext'
   import cmp from '../ol-cmp'
-  import { assertHasMap, assertHasView } from '../../utils/assert'
+  import * as assert from '../../utils/assert'
 
   const props = {
     defControls: {
@@ -48,7 +48,7 @@
      * @return {void}
      */
     addLayer (layer) {
-      assertHasMap(this)
+      assert.hasMap(this)
 
       layer = layer instanceof Vue ? layer.layer : layer
       this.map.addLayer(layer)
@@ -58,7 +58,7 @@
      * @return {void}
      */
     removeLayer (layer) {
-      assertHasMap(this)
+      assert.hasMap(this)
 
       layer = layer instanceof Vue ? layer.layer : layer
       this.map.removeLayer(layer)
@@ -68,7 +68,7 @@
      * @return {void}
      */
     addInteraction (interaction) {
-      assertHasMap(this)
+      assert.hasMap(this)
 
       interaction = interaction instanceof Vue ? interaction.interaction : interaction
       this.map.addInteraction(interaction)
@@ -78,7 +78,7 @@
      * @return {void}
      */
     removeInteraction (interaction) {
-      assertHasMap(this)
+      assert.hasMap(this)
 
       interaction = interaction instanceof Vue ? interaction.interaction : interaction
       this.map.removeInteraction(interaction)
@@ -136,7 +136,7 @@
      * @return {T|undefined}
      */
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
-      assertHasMap(this)
+      assert.hasMap(this)
       return this.map.forEachFeatureAtPixel(pixel, callback, opts)
     },
     /**
@@ -146,7 +146,7 @@
      * @return {T|undefined}
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
-      assertHasMap(this)
+      assert.hasMap(this)
       return this.map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
@@ -154,8 +154,8 @@
      * @return {number[]} Coordinates in EPSG:4326
      */
     getCoordinateFromPixel (pixel) {
-      assertHasMap(this)
-      assertHasView(this)
+      assert.hasMap(this)
+      assert.hasView(this)
 
       return proj.toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.getProjection())
     },
@@ -178,7 +178,7 @@
      * @return {ol.View|undefined}
      */
     getView () {
-      assertHasMap(this)
+      assert.hasMap(this)
       return this.map.getView()
     },
     /**
@@ -186,7 +186,7 @@
      * @protected
      */
     mount () {
-      assertHasMap(this)
+      assert.hasMap(this)
       this.map.setTarget(this.$refs.map)
       this.subscribeAll()
     },
@@ -195,7 +195,7 @@
      * @protected
      */
     unmount () {
-      assertHasMap(this)
+      assert.hasMap(this)
       this.unsubscribeAll()
       this.map.setTarget(undefined)
     },
@@ -204,7 +204,7 @@
      * @return {void}
      */
     refresh () {
-      assertHasMap(this)
+      assert.hasMap(this)
       this.map.updateSize()
       this.map.render()
     },
@@ -213,7 +213,7 @@
      * @return {void}
      */
     setView (view) {
-      assertHasMap(this)
+      assert.hasMap(this)
 
       view = view instanceof Vue ? view.view : view
       this.map.setView(view)
@@ -243,8 +243,8 @@
    * @private
    */
   function subscribeToMapEvents () {
-    assertHasMap(this)
-    assertHasView(this)
+    assert.hasMap(this)
+    assert.hasView(this)
 
     const ft = 1000 / 30
     // pointer

@@ -8,7 +8,7 @@
   import { style as styleHelper } from '../../../ol-ext'
   import interaction from '../interaction'
   import styleTarget from '../../style-target'
-  import { assertHasInteraction, assertHasMap } from '../../../utils/assert'
+  import * as assert from '../../../utils/assert'
 
   // todo add other options, like event modifiers
   const props = {
@@ -92,8 +92,8 @@
      * @throws {Error}
      */
     select (feature) {
-      assertHasMap(this)
-      assertHasInteraction(this)
+      assert.hasMap(this)
+      assert.hasInteraction(this)
 
       let id = extractId(feature)
       if (!id) {
@@ -126,7 +126,7 @@
      * @return {void}
      */
     unselect (feature) {
-      assertHasInteraction(this)
+      assert.hasInteraction(this)
 
       let id = extractId(feature)
       if (!id) {
@@ -160,7 +160,7 @@
      * @return {void}
      */
     refresh () {
-      assertHasInteraction(this)
+      assert.hasInteraction(this)
       this.interaction.getFeatures().changed()
       this::interaction.methods.refresh()
     },
@@ -176,7 +176,7 @@
      * @return {void}
      */
     unselectAll () {
-      assertHasInteraction(this)
+      assert.hasInteraction(this)
       this.interaction.getFeatures().clear()
     }
   }
@@ -217,8 +217,8 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    assertHasMap(this)
-    assertHasInteraction(this)
+    assert.hasMap(this)
+    assert.hasInteraction(this)
 
     const selection = this.interaction.getFeatures()
     // select event

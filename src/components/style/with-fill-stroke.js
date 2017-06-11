@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { assertHasStyle } from '../../utils/assert'
+import * as assert from '../../utils/assert'
 
 export default {
   stubVNode: {
@@ -17,7 +17,7 @@ export default {
      * @protected
      */
     setFill (fill) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
 
       fill = fill instanceof Vue ? fill.style : fill
       this.style.setFill(fill)
@@ -29,7 +29,7 @@ export default {
      * @protected
      */
     setStroke (stroke) {
-      assertHasStyle(this)
+      assert.hasStyle(this)
 
       stroke = stroke instanceof Vue ? stroke.style : stroke
       this.style.setStroke(stroke)

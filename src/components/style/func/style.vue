@@ -9,7 +9,7 @@
   import { warndbg } from '../../../utils/debug'
   import style from '../style'
   import styleTarget from '../../style-target'
-  import { assertHasMap } from '../../../utils/assert'
+  import * as assert from '../../../utils/assert'
 
   const props = {
     factory: {
@@ -24,7 +24,7 @@
      * @protected
      */
     createStyle () {
-      assertHasMap(this)
+      assert.hasMap(this)
       // user provided style function
       let providedStyleFunc = this.factory(styleHelper)
       if (!isFunction(providedStyleFunc)) {

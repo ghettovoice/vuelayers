@@ -2,124 +2,110 @@
  * Assertion helpers
  * @module utils/assert
  */
+import assert from 'assert'
 import isNumeric from './is-numeric'
 
+const { ok, fail, equal, notEqual } = assert
+export {
+  ok,
+  fail,
+  equal,
+  notEqual
+}
 /**
  * @param {*} value
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertNumeric (value) {
-  if (!isNumeric(value)) {
-    throw new Error('Assertion failed: value is a number')
-  }
+export function numeric (value) {
+  assert(isNumeric(value), 'value is a number')
 }
 
 /**
  * @param {*} value
  * @param {Function} Ctor
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertInstance (value, Ctor) {
-  if (!(value instanceof Ctor)) {
-    throw new Error('Assertion failed: value is an instance of ' + Ctor.name)
-  }
+export function instanceOf (value, Ctor) {
+  assert(value instanceof Ctor, `value is an instance of ${Ctor.name}`)
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasMap (vm) {
-  if (!vm.map) {
-    throw new Error('Assertion failed: component has "map" field')
-  }
+export function hasMap (vm) {
+  assert(vm.map, 'component has "map" field')
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasView (vm) {
-  if (!vm.view) {
-    throw new Error('Assertion failed: component has "view" field')
-  }
+export function hasView (vm) {
+  assert(vm.view, 'component has "view" field')
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasGeoloc (vm) {
-  if (!vm.geoloc) {
-    throw new Error('Assertion failed: component has "geoloc" field')
-  }
+export function hasGeoloc (vm) {
+  assert(vm.geoloc, 'component has "geoloc" field')
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasFeature (vm) {
-  if (!vm.feature) {
-    throw new Error('Assertion failed: component has "feature" field')
-  }
+export function hasFeature (vm) {
+  assert(vm.feature, 'component has "feature" field')
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasLayer (vm) {
-  if (!vm.layer) {
-    throw new Error('Assertion failed: component has "layer" field')
-  }
+export function hasLayer (vm) {
+  assert(vm.layer, 'component has "layer" field')
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasSource (vm) {
-  if (!vm.source) {
-    throw new Error('Assertion failed: component has "source" field')
-  }
+export function hasSource (vm) {
+  assert(vm.source, 'component has "source" field')
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasGeom (vm) {
-  if (!vm.geom) {
-    throw new Error('Assertion failed: component has "geom" field')
-  }
+export function hasGeom (vm) {
+  assert(vm.geom, 'component has "geom" field')
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasInteraction (vm) {
-  if (!vm.interaction) {
-    throw new Error('Assertion failed: component has "interaction" field')
-  }
+export function hasInteraction (vm) {
+  assert(vm.interaction, 'component has "interaction" field')
 }
 
 /**
  * @param {Object} vm
  * @return {void}
- * @throws {Error}
+ * @throws {AssertionError}
  */
-export function assertHasStyle (vm) {
-  if (!vm.style) {
-    throw new Error('Assertion failed: component has "style" field')
-  }
+export function hasStyle (vm) {
+  assert(vm.style, 'component has "style" field')
 }

@@ -5,7 +5,7 @@
   import Observable from '../../rx-ext'
   import { MIN_ZOOM, MAX_ZOOM, MAP_PROJ, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
-  import { assertHasView } from '../../utils/assert'
+  import * as assert from '../../utils/assert'
 
   const props = {
     center: {
@@ -56,7 +56,7 @@
      * @return {Promise} Resolves when animation completes
      */
     animate (...args) {
-      assertHasView(this)
+      assert.hasView(this)
 
       let cb = args.reverse().find(x => typeof x === 'function')
 
@@ -108,7 +108,7 @@
      * @return {Promise} Resolves when view changes
      */
     fit (geometryOrExtent, options) {
-      assertHasView(this)
+      assert.hasView(this)
 
       // transform to GeoJSON, vl-feature to ol.Feature
       if (isPlainObject(geometryOrExtent)) {
@@ -150,7 +150,7 @@
      * @return {void}
      */
     refresh () {
-      assertHasView(this)
+      assert.hasView(this)
       this.view.changed()
     },
     /**
@@ -166,7 +166,7 @@
      * @protected
      */
     updateView (viewOptions) {
-      assertHasView(this)
+      assert.hasView(this)
       // center
       if (viewOptions.center != null && !isEqual(viewOptions.center, this.currentCenter)) {
         this.view.setCenter(proj.fromLonLat(viewOptions.center, this.projection))
@@ -242,7 +242,7 @@
    * @private
    */
   function subscribeToViewChanges () {
-    assertHasView(this)
+    assert.hasView(this)
 
     const ft = 1000 / 30
     const getZoom = () => Math.ceil(this.view.getZoom())

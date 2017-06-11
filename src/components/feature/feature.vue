@@ -1,5 +1,6 @@
 <script type="text/babel">
   import Vue from 'vue'
+  import uuid from 'uuid/v4'
   import Feature from 'ol/feature'
   import { isPlainObject } from 'lodash/fp'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
@@ -7,9 +8,13 @@
   import cmp from '../ol-virt-cmp'
   import styleTarget from '../style-target'
   import { geoJson } from '../../ol-ext'
-  import { assertHasFeature, assertHasMap } from '../../utils/assert'
+  import * as assert from '../../utils/assert'
 
   const props = {
+    id: {
+      type: [String, Number],
+      default: () => uuid()
+    },
     properties: {
       type: Object,
       default: () => Object.create(null)
@@ -80,7 +85,7 @@
      * @return {boolean}
      */
     isAtPixel (pixel) {
-      assertHasMap(this)
+      assert.hasMap(this)
 
       return this.map.forEachFeatureAtPixel(
         pixel,
@@ -108,7 +113,7 @@
      * @return {void}
      */
     refresh () {
-      assertHasFeature(this)
+      assert.hasFeature(this)
       this.feature.changed()
     },
     /**
@@ -116,8 +121,8 @@
      * @return {void}
      */
     setGeometry (geom) {
-      assertHasMap(this)
-      assertHasFeature(this)
+      assert.hasMap(this)
+      assert.hasFeature(this)
 
       if (geom instanceof Vue) {
         geom = geom.geom
@@ -133,14 +138,14 @@
      * @param {string|number} value
      */
     id (value) {
-      assertHasFeature(this)
+      assert.hasFeature(this)
       this.feature.setId(value)
     },
     /**
      * @param {Object} value
      */
     properties (value) {
-      assertHasFeature(this)
+      assert.hasFeature(this)
       this.feature.setProperties(plainProps(value))
     }
   }

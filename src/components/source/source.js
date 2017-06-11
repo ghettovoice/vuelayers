@@ -1,6 +1,6 @@
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import { assertHasSource } from '../../utils/assert'
+import * as assert from '../../utils/assert'
 
 const props = {
   attributions: [String, Array],
@@ -93,14 +93,14 @@ const methods = {
    * @return {void}
    */
   refresh () {
-    assertHasSource(this)
+    assert.hasSource(this)
     this.source.changed()
   }
 }
 
 const watch = {
   attributions (value) {
-    assertHasSource(this)
+    assert.hasSource(this)
     this.source.setAttributions(value)
   }
 }

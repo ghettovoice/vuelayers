@@ -30,6 +30,7 @@ export const {
   TileLayer,
   VectorLayer,
   // sources
+  ClusterSource,
   MapboxSource,
   OsmSource,
   SputnikSource,

@@ -3,7 +3,7 @@ import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import Observable from '../../rx-ext'
 import cmp from '../rx-subs'
 import { extent, proj } from '../../ol-ext'
-import { assertHasGeom, assertHasMap } from '../../utils/assert'
+import * as assert from '../../utils/assert'
 
 const props = {
   /**
@@ -109,7 +109,7 @@ const methods = {
    * @return {void}
    */
   refresh () {
-    assertHasGeom(this)
+    assert.hasGeom(this)
     this.geom.changed()
   },
   /**
@@ -150,7 +150,7 @@ const methods = {
    * @protected
    */
   updateGeom (opts) {
-    assertHasGeom(this)
+    assert.hasGeom(this)
 
     if (opts.coordinates) {
       let isEq = isEqualGeom({
@@ -197,8 +197,8 @@ export default {
  * @private
  */
 function subscribeToGeomChanges () {
-  assertHasMap(this)
-  assertHasGeom(this)
+  assert.hasMap(this)
+  assert.hasGeom(this)
 
   const ft = 1000 / 30
   const geomChanges = Observable.fromOlEvent(
