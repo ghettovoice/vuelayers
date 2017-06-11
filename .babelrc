@@ -1,6 +1,6 @@
 {
   "presets": [
-    [ "env", { "modules": false } ],
+    ["env", { "modules": false }],
     "stage-0"
   ],
   "plugins": [
@@ -9,15 +9,15 @@
   ],
   "env": {
     "test": {
-      "plugins": [ "istanbul" ]
+      "plugins": ["istanbul"]
     },
     "cjs": {
       "plugins": [
-        [ "./modules/babel-plugin-merge-imports", {
+        ["./modules/babel-plugin-merge-imports", {
           "pkg": "openlayers",
           "pkgVar": "__ol",
           "regex": "^ol(?:\/(.*))?$"
-        } ]
+        }]
       ]
     }
   }

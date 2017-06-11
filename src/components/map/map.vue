@@ -7,7 +7,7 @@
 
 <script>
   import Vue from 'vue'
-  import { noop, isEqual } from 'lodash/fp'
+  import { isEqual } from 'lodash/fp'
   import Map from 'ol/map'
   import olcontrol from 'ol/control'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
@@ -145,7 +145,7 @@
      * @param {function(layer: ol.layer.Layer)} [layerFilter]
      * @return {T|undefined}
      */
-    forEachLayerAtPixel (pixel, callback, layerFilter = noop) {
+    forEachLayerAtPixel (pixel, callback, layerFilter) {
       assertHasMap(this)
       return this.map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },

@@ -40,6 +40,12 @@ const webpackConfig = merge(baseWebpackConfig, {
       amd: 'vue',
       commonjs: 'vue',
       commonjs2: 'vue'
+    },
+    openlayers: {
+      root: 'ol',
+      amd: 'openlayers',
+      commonjs: 'openlayers',
+      commonjs2: 'openlayers'
     }
   },
   plugins: [

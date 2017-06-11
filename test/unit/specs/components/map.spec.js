@@ -11,7 +11,7 @@ describe('map component', () => {
 
     Vue.nextTick(() => {
       expect(vm.map).to.be.instanceof(olMap)
-      expect(vm.map[VM_PROP]).to.be.equal(vm)
+      expect(vm.map[VM_PROP].includes(vm)).to.be.true
       expect(vm.map.getTargetElement()).to.be.equal(vm.$refs.map)
 
       vm.$destroy()

@@ -13,6 +13,10 @@
           <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
           <option name="SPACES_WITHIN_IMPORTS" value="true" />
         </JSCodeStyleSettings>
+        <JSON>
+          <option name="OBJECT_WRAPPING" value="1" />
+          <option name="ARRAY_WRAPPING" value="1" />
+        </JSON>
         <PHPCodeStyleSettings>
           <option name="ALIGN_PHPDOC_PARAM_NAMES" value="true" />
           <option name="ALIGN_PHPDOC_COMMENTS" value="true" />
