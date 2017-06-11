@@ -3,7 +3,7 @@
   import VectorSource from 'ol/source/vector'
   import loadingstrategy from 'ol/loadingstrategy'
   import { differenceWith, isPlainObject } from 'lodash/fp'
-  import { DATA_PROJ, geoJson } from '../../../ol-ext'
+  import { DATA_PROJ, geoJson, extent as extentHelper, proj as projHelper } from '../../../ol-ext'
   import source from '../source'
   import { assertHasSource, assertHasMap } from '../../../utils/assert'
 
@@ -14,6 +14,14 @@
       default: () => []
     },
     loader: Function,
+    /**
+     * Loading strategy factory
+     * @type {function(helper: Object): ol.LoadingStrategy}
+     */
+    strategyFactory: {
+      type: Function,
+      default: defaultStrategyFactory
+    },
     projection: {
       type: String,
       default: DATA_PROJ
@@ -90,7 +98,11 @@
         useSpatialIndex: this.useSpatialIndex,
         wrapX: this.wrapX,
         logo: this.logo,
-        strategy: loadingstrategy.bbox
+        strategy: this.strategyFactory({
+          ...loadingstrategy,
+          ...extentHelper,
+          ...projHelper
+        })
         // url: this.url,
       })
     },
@@ -102,7 +114,7 @@
       if (!this.loader) return
 
       const loader = this.loader
-      // todo implement vl-format-* components or add format property, read loaded features
+      // todo add format property, read loaded features
       return function __vectorSourceLoader (extent, resolution, projection) {
         loader(extent, resolution, projection)
       }
@@ -160,5 +172,13 @@
         }
       }
     }
+  }
+
+  /**
+   * @param {Object} h Helper
+   * @return {ol.LoadingStrategy}
+   */
+  function defaultStrategyFactory (h) {
+    return h.bbox
   }
 </script>

@@ -120,6 +120,9 @@
         points: [],
         pointsLayer: true
       }
+    },
+    created () {
+      this.loadData()
     }
   }
 </script>
