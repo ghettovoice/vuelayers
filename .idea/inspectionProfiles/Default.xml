@@ -8,7 +8,7 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="15">
+          <list size="16">
             <item index="0" class="java.lang.String" itemvalue="inject-view-key" />
             <item index="1" class="java.lang.String" itemvalue="color" />
             <item index="2" class="java.lang.String" itemvalue="url" />
@@ -24,6 +24,7 @@
             <item index="12" class="java.lang.String" itemvalue="v-vl-share" />
             <item index="13" class="java.lang.String" itemvalue="key" />
             <item index="14" class="java.lang.String" itemvalue="ident" />
+            <item index="15" class="java.lang.String" itemvalue="attributions" />
           </list>
         </value>
       </option>

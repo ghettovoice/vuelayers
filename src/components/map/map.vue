@@ -110,7 +110,6 @@
      * @protected
      */
     defineAccessors () {
-      this::cmp.methods.defineAccessors()
       Object.defineProperties(this, {
         map: {
           enumerable: true,
@@ -121,14 +120,6 @@
           get: this.getView
         }
       })
-    },
-    /**
-     * @return {Promise}
-     * @protected
-     */
-    async init () {
-      await this::cmp.methods.init()
-      this.refresh()
     },
     /**
      * Trigger focus on map container.
@@ -194,7 +185,6 @@
      * @return {void}
      */
     setView (view) {
-      console.log('set')
       assert.hasMap(this)
 
       view = view instanceof Vue ? view.view : view
@@ -207,6 +197,7 @@
     mount () {
       assert.hasMap(this)
       this.map.setTarget(this.$refs.map)
+      this.refresh()
       this.subscribeAll()
     },
     /**

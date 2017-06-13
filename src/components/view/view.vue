@@ -199,19 +199,19 @@
       this.updateView({ center })
     },
     resolution (resolution) {
-      this.updateView({ resolution })
+      this.readyPromise.then(() => this.updateView({ resolution }))
     },
     zoom (zoom) {
-      this.updateView({ zoom })
+      this.readyPromise.then(() => this.updateView({ zoom }))
     },
     rotation (rotation) {
-      this.updateView({ rotation })
+      this.readyPromise.then(() => this.updateView({ rotation }))
     },
     minZoom (minZoom) {
-      this.updateView({ minZoom })
+      this.readyPromise.then(() => this.updateView({ minZoom }))
     },
     maxZoom (maxZoom) {
-      this.updateView({ maxZoom })
+      this.readyPromise.then(() => this.updateView({ maxZoom }))
     }
   }
 
