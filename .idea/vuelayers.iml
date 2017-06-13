@@ -19,6 +19,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/docs/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/modules" />
       <excludeFolder url="file://$MODULE_DIR$/test/e2e/reports" />
       <excludeFolder url="file://$MODULE_DIR$/test/unit/coverage" />
     </content>

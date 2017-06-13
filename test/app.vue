@@ -16,9 +16,9 @@
         </vl-layer-tile>
 
         <vl-layer-vector id="points" v-if="pointsLayer">
-          <vl-source-cluster>
+          <!--<vl-source-cluster>-->
             <vl-source-vector :features="points"/>
-          </vl-source-cluster>
+          <!--</vl-source-cluster>-->
         </vl-layer-vector>
 
         <vl-layer-tile id="wmts">
