@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs'
 import Cluster from 'ol/source/cluster'
 import * as assert from '../../../utils/assert'
 
@@ -95,14 +96,14 @@ export default class Builder {
     return source
   }
 
+  /**
+   * @return {Promise<ol.source.Cluster>}
+   */
   promise () {
-    return new Promise(resolve => {
-      let i = setInterval(() => {
-        if (this.source) {
-          clearInterval(i)
-          resolve(this.build())
-        }
-      }, 1000 / 30)
-    })
+    return Observable.interval(100)
+      .skipWhile(() => !this.source)
+      .first()
+      .map(::this.build)
+      .toPromise()
   }
 }

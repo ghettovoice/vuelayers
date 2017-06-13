@@ -160,59 +160,33 @@
      */
     subscribeAll () {
       this::subscribeToViewChanges()
-    },
-    /**
-     * @param {olx.ViewOptions} viewOptions
-     * @return {void}
-     * @protected
-     */
-    updateView (viewOptions) {
-      assert.hasView(this)
-      // center
-      if (viewOptions.center != null && !isEqual(viewOptions.center, this.currentCenter)) {
-        this.view.setCenter(proj.fromLonLat(viewOptions.center, this.projection))
-      }
-      // resolution
-      if (viewOptions.resolution != null && viewOptions.resolution !== this.currentResolution) {
-        this.view.setResolution(viewOptions.resolution)
-      }
-      // zoom
-      if (viewOptions.zoom != null && Math.ceil(viewOptions.zoom) !== this.currentZoom) {
-        this.view.setZoom(Math.ceil(viewOptions.zoom))
-      }
-      // rotation
-      if (viewOptions.rotation != null && viewOptions.rotation !== this.currentRotation) {
-        this.view.setRotation(viewOptions.rotation)
-      }
-      // minZoom
-      if (viewOptions.minZoom != null && viewOptions.minZoom !== this.view.getMinZoom()) {
-        this.view.setMinZoom(viewOptions.minZoom)
-      }
-      // maxZoom
-      if (viewOptions.maxZoom != null && viewOptions.maxZoom !== this.view.getMaxZoom()) {
-        this.view.setMaxZoom(viewOptions.maxZoom)
-      }
     }
   }
 
   const watch = {
-    center (center) {
-      this.updateView({ center })
+    center (value) {
+      assert.hasView(this)
+      this.view.setCenter(proj.fromLonLat(value, this.projection))
     },
-    resolution (resolution) {
-      this.readyPromise.then(() => this.updateView({ resolution }))
+    resolution (value) {
+      assert.hasView(this)
+      this.view.setResolution(value)
     },
-    zoom (zoom) {
-      this.readyPromise.then(() => this.updateView({ zoom }))
+    zoom (value) {
+      assert.hasView(this)
+      this.view.setZoom(Math.ceil(value))
     },
-    rotation (rotation) {
-      this.readyPromise.then(() => this.updateView({ rotation }))
+    rotation (value) {
+      assert.hasView(this)
+      this.view.setRotation(value)
     },
-    minZoom (minZoom) {
-      this.readyPromise.then(() => this.updateView({ minZoom }))
+    minZoom (value) {
+      assert.hasView(this)
+      this.view.setMinZoom(value)
     },
-    maxZoom (maxZoom) {
-      this.readyPromise.then(() => this.updateView({ maxZoom }))
+    maxZoom (value) {
+      assert.hasView(this)
+      this.view.setMaxZoom(value)
     }
   }
 
@@ -229,7 +203,7 @@
     },
     data () {
       return {
-        currentCenter: this.center.splice(),
+        currentCenter: this.center.slice(),
         currentZoom: Math.ceil(this.zoom),
         currentResolution: this.resolution,
         currentRotation: this.rotation
@@ -249,12 +223,11 @@
     const getZoom = () => Math.ceil(this.view.getZoom())
     // center
     this.subscribeTo(
-      Observable.of(this.view.getCenter())
-        .merge(Observable.fromOlEvent(
+      Observable.fromOlEvent(
           this.view,
           'change:center',
           () => this.view.getCenter()
-        ))
+        )
         .throttleTime(ft)
         .distinctUntilChanged(isEqual)
         .map(coordinate => proj.toLonLat(coordinate, this.view.getProjection())),
@@ -267,12 +240,11 @@
     )
     // resolution
     this.subscribeTo(
-      Observable.of(this.view.getResolution())
-        .merge(Observable.fromOlEvent(
+      Observable.fromOlEvent(
           this.view,
           'change:resolution',
           () => this.view.getResolution()
-        ))
+        )
         // 30fps change resolution
         .throttleTime(ft)
         .distinctUntilChanged(isEqual)
@@ -294,12 +266,11 @@
     )
     // rotation
     this.subscribeTo(
-      Observable.of(this.view.getRotation())
-        .merge(Observable.fromOlEvent(
+      Observable.fromOlEvent(
           this.view,
           'change:rotation',
           () => this.view.getRotation()
-        ))
+        )
         .throttleTime(ft)
         .distinctUntilChanged(isEqual),
       rotation => {

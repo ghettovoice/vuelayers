@@ -115,12 +115,11 @@
     const ft = 1000 / 30
     // pos
     this.subscribeTo(
-      Observable.of(this.geoloc.getPosition())
-        .merge(Observable.fromOlEvent(
+      Observable.fromOlEvent(
           this.geoloc,
           'change:position',
           () => this.geoloc.getPosition()
-        ))
+        )
         .filter(x => x != null)
         .throttleTime(ft)
         .distinctUntilChanged(isEqual),
@@ -133,12 +132,11 @@
     )
     // acc
     this.subscribeTo(
-      Observable.of(this.geoloc.getAccuracy())
-        .merge(Observable.fromOlEvent(
+      Observable.fromOlEvent(
           this.geoloc,
           'change:accuracy',
           () => this.geoloc.getAccuracy()
-        ))
+        )
         .filter(x => x != null)
         .throttleTime(ft)
         .distinctUntilChanged(isEqual),

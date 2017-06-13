@@ -108,16 +108,16 @@ export default {
      * @type {Promise}
      * @protected
      */
-    this.readyPromise = this.init().then(this.defineAccessors)
+    this.cmpReadPromise = this.init().then(this.defineAccessors)
   },
   mounted () {
-    this.readyPromise.then(this.mount)
+    this.cmpReadPromise.then(this.mount)
   },
   destroyed () {
-    this.readyPromise.then(() => {
+    this.cmpReadPromise.then(() => {
       this.unmount()
       this.deinit()
-      this.readyPromise = undefined
+      this.cmpReadPromise = undefined
     })
   }
 }

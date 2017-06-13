@@ -84,28 +84,20 @@
 
   const watch = {
     layers (LAYERS) {
-      this.readyPromise.then(() => {
-        assert.hasSource(this)
-        this.source.updateParams({ LAYERS })
-      })
+      assert.hasSource(this)
+      this.source.updateParams({ LAYERS })
     },
     version (VERSION) {
-      this.readyPromise.then(() => {
-        assert.hasSource(this)
-        this.source.updateParams({ VERSION })
-      })
+      assert.hasSource(this)
+      this.source.updateParams({ VERSION })
     },
     styles (STYLES) {
-      this.readyPromise.then(() => {
-        assert.hasSource(this)
-        this.source.updateParams({ STYLES })
-      })
+      assert.hasSource(this)
+      this.source.updateParams({ STYLES })
     },
     extParams (value) {
-      this.readyPromise.then(() => {
-        assert.hasSource(this)
-        this.source.updateParams(cleanExtParams(value))
-      })
+      assert.hasSource(this)
+      this.source.updateParams(cleanExtParams(value))
     }
   }
 
