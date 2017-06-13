@@ -123,6 +123,14 @@
       })
     },
     /**
+     * @return {Promise}
+     * @protected
+     */
+    async init () {
+      await this::cmp.methods.init()
+      this.refresh()
+    },
+    /**
      * Trigger focus on map container.
      * @return {void}
      */
@@ -182,6 +190,17 @@
       return this.map.getView()
     },
     /**
+     * @param {ol.View|Vue|undefined} view
+     * @return {void}
+     */
+    setView (view) {
+      console.log('set')
+      assert.hasMap(this)
+
+      view = view instanceof Vue ? view.view : view
+      this.map.setView(view)
+    },
+    /**
      * @return {void}
      * @protected
      */
@@ -209,16 +228,6 @@
       this.map.render()
     },
     /**
-     * @param {ol.View|Vue|undefined} view
-     * @return {void}
-     */
-    setView (view) {
-      assert.hasMap(this)
-
-      view = view instanceof Vue ? view.view : view
-      this.map.setView(view)
-    },
-    /**
      * @return {void}
      * @protected
      */
@@ -231,10 +240,7 @@
     name: 'vl-map',
     mixins: [cmp],
     props,
-    methods,
-    mounted () {
-      this.$nextTick(this.refresh)
-    }
+    methods
   }
 
   /**

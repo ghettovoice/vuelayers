@@ -9,6 +9,8 @@
         <!--<vl-share-item id="view"/>-->
         <vl-view ident="view" :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
 
+        <vl-interaction-select @select="select" @unselect="unselect"></vl-interaction-select>
+
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
         </vl-layer-tile>
@@ -53,17 +55,11 @@
       this.zoom = zoom
       this.rotation = rotation
     },
-    select ({ id }) {
-      const i = this.selected.indexOf(id)
-      if (i === -1) {
-        this.selected.push(id)
-      }
+    select (feature) {
+      console.log('select', feature)
     },
-    unselect ({ id }) {
-      const i = this.selected.indexOf(id)
-      if (i !== -1) {
-        this.selected.splice(i, 1)
-      }
+    unselect (feature) {
+      console.log('unselect', feature)
     },
     loadData () {
       const points = []
@@ -98,7 +94,6 @@
         zoom: 2,
         center: [ 0, 0 ],
         rotation: 0,
-        selected: [],
         points: [],
         pointsLayer: true
       }

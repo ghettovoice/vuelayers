@@ -105,7 +105,7 @@ const methods = {
     return new TileGrid(this.preparedGridOpts)
   },
   /**
-   * @return {void}
+   * @return {Promise}
    * @protected
    */
   init () {
@@ -117,7 +117,7 @@ const methods = {
       this.tileGrid = this.createTileGrid()
     }
 
-    this::source.methods.init()
+    return this::source.methods.init()
   },
   /**
    * @return {void}

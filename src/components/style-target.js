@@ -23,10 +23,12 @@ export default {
       return this.styles
     },
     /**
+     * Default style factory
+     * @param {Object} h Style helper
      * @return {ol.style.Style[]|ol.StyleFunction|undefined}
      * @protected
      */
-    getDefaultStyles () {},
+    getDefaultStyles (h) {},
     /**
      * @param {ol.style.Style|ol.StyleFunction|Vue|undefined} style
      * @return {void}
@@ -106,17 +108,17 @@ export default {
      */
     createStyleFunc () {
       const vm = this
+      const defaultStyles = this.getDefaultStyles(styleHelper)
 
       return function __styleTargetStyleFunc (feature, resolution) {
         hasMap(vm)
 
         if (!feature.getGeometry()) return
-
         let styles = vm.getStyles()
         /* eslint-disable brace-style */
         // handle provided styles
         // styles - ol.StyleFunction or vl-style-func
-        if (isFunction(styles) || isFunction(styles.style)) {
+        if (styles && (isFunction(styles) || isFunction(styles.style))) {
           let styleFunc = isFunction(styles) ? styles : styles.style
           styles = styleFunc(feature, resolution, styleHelper)
         }
@@ -143,7 +145,7 @@ export default {
           return styles
         }
         // fallback to default style
-        styles = vm.getDefaultStyles()
+        styles = defaultStyles
         if (styles) {
           return isFunction(styles)
             ? styles(feature, resolution, styleHelper)

@@ -21,11 +21,11 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {void}
+   * @return {Promise}
    * @protected
    */
   init () {
-    this::cmp.methods.init()
+    return this::cmp.methods.init()
   },
   /**
    * @return {void}

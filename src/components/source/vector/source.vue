@@ -1,9 +1,10 @@
 <script>
   import Vue from 'vue'
+  import uuid from 'uuid/v4'
   import VectorSource from 'ol/source/vector'
   import loadingstrategy from 'ol/loadingstrategy'
   import { differenceWith, isPlainObject } from 'lodash/fp'
-  import { DATA_PROJ, geoJson, extent as extentHelper, proj as projHelper } from '../../../ol-ext'
+  import { DATA_PROJ, geoJson, extent, proj, tileGrid } from '../../../ol-ext'
   import source from '../source'
   import * as assert from '../../../utils/assert'
 
@@ -56,6 +57,9 @@
       } else if (isPlainObject(feature)) {
         feature = geoJson.readFeature(feature, this.map.view.getProjection())
       }
+      if (feature.getId() == null) {
+        feature.setId(uuid())
+      }
       this.source.addFeature(feature)
     },
     /**
@@ -99,9 +103,10 @@
         wrapX: this.wrapX,
         logo: this.logo,
         strategy: this.strategyFactory({
-          ...loadingstrategy,
-          ...extentHelper,
-          ...projHelper
+          strategy: loadingstrategy,
+          extent,
+          proj,
+          tileGrid
         })
         // url: this.url,
       })
@@ -175,10 +180,10 @@
   }
 
   /**
-   * @param {Object} h Helper
+   * @param {{strategy: Object, extent: Object, proj: Object, tileGrid: Object}} h Helper
    * @return {ol.LoadingStrategy}
    */
-  function defaultStrategyFactory (h) {
-    return h.bbox
+  function defaultStrategyFactory ({ strategy }) {
+    return strategy.bbox
   }
 </script>

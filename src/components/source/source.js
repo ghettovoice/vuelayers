@@ -14,7 +14,7 @@ const props = {
 
 const methods = {
   /**
-   * @return {ol.source.Source}
+   * @return {ol.source.Source|Promise<ol.source.Source>}
    * @protected
    */
   createOlObject () {
@@ -45,11 +45,11 @@ const methods = {
     })
   },
   /**
-   * @return {void}
+   * @return {Promise}
    * @protected
    */
   init () {
-    this::cmp.methods.init()
+    return this::cmp.methods.init()
   },
   /**
    * @return {void}

@@ -1,6 +1,5 @@
 <script>
   import Vue from 'vue'
-  import Cluster from 'ol/source/cluster'
   import SourceBuilder from './builder'
   import source from '../source'
   import { DATA_PROJ, geom as geomHelper } from '../../../ol-ext'
@@ -26,13 +25,13 @@
 
   const methods = {
     /**
-     * @return {Object}
+     * @return {Promise<ol.source.Cluster>}
      * @protected
      */
     createSource () {
       const geomFunc = this.geomFunc
-      // partial setup of ol.source.Cluster with the help of SourceBuilder class
       // todo проброс ident map в билдер и нормальная подмена для род. миксина
+      // partial setup of ol.source.Cluster with the help of SourceBuilder class
       /**
        * @type {SourceBuilder}
        * @private
@@ -47,18 +46,7 @@
         .setProjection(this.projection)
         .setWrapX(this.wrapX)
 
-      return {}
-    },
-    /**
-     * @return {ol.source.Cluster|undefined}
-     */
-    getSource () {
-      // lazy ol.source.Cluster instantiating
-      if (!(this.olObject instanceof Cluster)) {
-        this.olObject = this.sourceBuilder.build()
-      }
-
-      return this.olObject
+      return this.sourceBuilder.promise()
     },
     /**
      * Set inner vector source
@@ -68,7 +56,6 @@
     setSource (source) {
       source = source instanceof Vue ? source.source : source
       this.sourceBuilder.setSource(source)
-      // todo check if remount need
     }
   }
 

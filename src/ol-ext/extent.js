@@ -2,16 +2,28 @@
  * Extent extensions
  */
 import olextent from 'ol/extent'
-import { EXTENT_CORNER } from './consts'
+import proj from 'ol/proj'
+import { EXTENT_CORNER, PROJ_UNIT } from './consts'
 
-const { getWidth, getHeight, boundingExtent } = olextent
-
-export {
-  getHeight,
+export const {
   getWidth,
-  boundingExtent
-}
+  getHeight,
+  boundingExtent,
+  buffer,
+  equals,
+  extend
+} = olextent
 
+/**
+ * Create a new extent or update the provided extent.
+ * @param {number} minX Minimum X.
+ * @param {number} minY Minimum Y.
+ * @param {number} maxX Maximum X.
+ * @param {number} maxY Maximum Y.
+ * @param {ol.Extent=} extent Destination extent.
+ * @return {ol.Extent} Extent.
+ * @see https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L208
+ */
 export function createOrUpdate (minX, minY, maxX, maxY, extent) {
   if (extent) {
     extent[0] = minX
@@ -25,6 +37,13 @@ export function createOrUpdate (minX, minY, maxX, maxY, extent) {
   }
 }
 
+/**
+ * Get a corner coordinate of an extent.
+ * @param {ol.Extent} extent Extent.
+ * @param {ol.extent.Corner} corner Corner.
+ * @return {ol.Coordinate} Corner coordinate.
+ * @see https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L482
+ */
 export function getCorner (extent, corner) {
   let coordinate
   if (corner === EXTENT_CORNER.BOTTOM_LEFT) {
@@ -39,4 +58,23 @@ export function getCorner (extent, corner) {
     throw new Error('Invalid corner')
   }
   return coordinate
+}
+
+/**
+ * Generate a tile grid extent from a projection.  If the projection has an
+ * extent, it is used.  If not, a global extent is assumed.
+ * @param {ol.ProjectionLike} projection Projection.
+ * @return {ol.Extent} Extent.
+ * @see https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L148
+ */
+export function extentFromProjection (projection) {
+  projection = proj.get(projection)
+  let extent = projection.getExtent()
+
+  if (!extent) {
+    let half = 180 * proj.METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
+      projection.getMetersPerUnit()
+    extent = createOrUpdate(-half, -half, half, half)
+  }
+  return extent
 }

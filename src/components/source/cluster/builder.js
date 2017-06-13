@@ -94,4 +94,15 @@ export default class Builder {
 
     return source
   }
+
+  promise () {
+    return new Promise(resolve => {
+      let i = setInterval(() => {
+        if (this.source) {
+          clearInterval(i)
+          resolve(this.build())
+        }
+      }, 1000 / 30)
+    })
+  }
 }

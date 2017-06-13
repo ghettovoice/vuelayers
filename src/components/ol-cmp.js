@@ -12,10 +12,10 @@ const props = {}
 
 const methods = {
   /**
-   * @return {void}
+   * @return {Promise} Resolves when initialization completes
    * @protected
    */
-  init () {
+  async init () {
     this.olObject = undefined
     if (this.ident && this.identMap.has(this.ident)) {
       this.olObject = this.identMap.get(this.ident)
@@ -24,16 +24,18 @@ const methods = {
        * @type {*}
        * @protected
        */
-      this.olObject = this.createOlObject()
+      this.olObject = await Promise.resolve(this.createOlObject())
       if (this.ident) {
         this.identMap.set(this.ident, this.olObject)
       }
     }
     this.olObject[VM_PROP] || (this.olObject[VM_PROP] = [])
-    this.olObject[VM_PROP].push(this)
+    if (!this.olObject[VM_PROP].includes(this)) { // for loaded from IdentityMap
+      this.olObject[VM_PROP].push(this)
+    }
   },
   /**
-   * @return {*}
+   * @return {*|Promise}
    * @protected
    * @abstract
    */
@@ -102,14 +104,20 @@ export default {
   props,
   methods,
   created () {
-    this.init()
-    this.defineAccessors()
+    /**
+     * @type {Promise}
+     * @protected
+     */
+    this.readyPromise = this.init().then(this.defineAccessors)
   },
   mounted () {
-    this.mount()
+    this.readyPromise.then(this.mount)
   },
   destroyed () {
-    this.unmount()
-    this.deinit()
+    this.readyPromise.then(() => {
+      this.unmount()
+      this.deinit()
+      this.readyPromise = undefined
+    })
   }
 }

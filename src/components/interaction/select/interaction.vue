@@ -5,7 +5,6 @@
   import Feature from 'ol/feature'
   import { forEach, mapValues, difference, isPlainObject, isNumber, isString, constant, stubArray } from 'lodash/fp'
   import Observable from '../../../rx-ext'
-  import { style as styleHelper } from '../../../ol-ext'
   import interaction from '../interaction'
   import styleTarget from '../../style-target'
   import * as assert from '../../../utils/assert'
@@ -25,9 +24,10 @@
       default: false
     },
     /**
-     * @type {number[]} Array of ids
+     * Initial selection
+     * @type {Array<(GeoJSONFeature|Vue|ol.Feature|string|number)>} Array of ids, GeoJSON's objects, vl-feature, ol.Feature
      */
-    selected: {
+    features: {
       type: Array,
       default: stubArray
     },
@@ -36,8 +36,6 @@
       default: true
     }
   }
-
-  const defaultStyles = mapValues(styleHelper.style, styleHelper.defaultEditStyle())
 
   const methods = {
     /**
@@ -53,10 +51,13 @@
       })
     },
     /**
+     * @param {Object} h
      * @return {ol.StyleFunction}
      * @protected
      */
-    getDefaultStyles () {
+    getDefaultStyles (h) {
+      const defaultStyles = mapValues(styles => styles.map(h.style), h.defaultEditStyle())
+
       return function __selectDefaultStyleFunc (feature) {
         if (feature.getGeometry()) {
           return defaultStyles[feature.getGeometry().getType()]
@@ -76,7 +77,7 @@
      */
     mount () {
       this::interaction.methods.mount()
-      this.currentSelected.forEach(this.select)
+      this.features.forEach(this.select)
     },
     /**
      * @return {void}
@@ -182,9 +183,9 @@
   }
 
   const watch = {
-    selected (selected) {
-      let forSelect = difference(selected, this.currentSelected)
-      let forUnselect = difference(this.currentSelected, selected)
+    features (features) {
+      let forSelect = difference(features, this.currentFeatures)
+      let forUnselect = difference(this.currentFeatures, features)
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)
@@ -207,7 +208,7 @@
     },
     data () {
       return {
-        currentSelected: this.selected.slice()
+        currentFeatures: []
       }
     }
   }
@@ -226,12 +227,12 @@
       Observable.fromOlEvent(
         selection,
         'add',
-        ({ element }) => element.getId()
+        ({ element }) => element
       ),
-      id => {
-        if (!this.currentSelected.includes(id)) {
-          this.currentSelected.push(id)
-          this.$emit('select', { id })
+      feature => {
+        if (!this.currentFeatures.includes(feature)) {
+          this.currentFeatures.push(Object.seal(feature))
+          this.$emit('select', { feature })
         }
       }
     )
@@ -240,13 +241,13 @@
       Observable.fromOlEvent(
         selection,
         'remove',
-        ({ element }) => element.getId()
+        ({ element }) => element
       ),
-      id => {
-        let idx = this.currentSelected.findIndex(x => x === id)
+      feature => {
+        let idx = this.currentFeatures.findIndex(f => f === feature)
         if (idx !== -1) {
-          this.currentSelected.splice(idx, 1)
-          this.$emit('unselect', { id })
+          this.currentFeatures.splice(idx, 1)
+          this.$emit('unselect', { feature })
         }
       }
     )

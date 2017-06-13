@@ -13,6 +13,11 @@ import GeometryCollection from 'ol/geom/geometrycollection'
 import turfPointOnSurface from '@turf/point-on-surface'
 import { GEOMETRY_TYPE } from './consts'
 
+/**
+ * @param {number|number[]} lonOrCoordinates
+ * @param {number} [lat]
+ * @return {ol.geom.Point}
+ */
 export function point (lonOrCoordinates, lat) {
   const coordinates = Array.isArray(lonOrCoordinates)
     ? lonOrCoordinates

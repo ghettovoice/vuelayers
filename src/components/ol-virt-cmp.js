@@ -9,11 +9,11 @@ export default {
   mixins: [stubVNode, cmp],
   methods: {
     /**
-     * @return {void}
+     * @return {Promise}
      * @protected
      */
     init () {
-      this::cmp.methods.init()
+      return this::cmp.methods.init()
     },
     /**
      * @return {void}
