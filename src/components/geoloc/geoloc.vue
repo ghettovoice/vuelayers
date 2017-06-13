@@ -1,7 +1,8 @@
 <script>
   import Geolocation from 'ol/geolocation'
   import { isEqual } from 'lodash/fp'
-  import Observable from '../../rx-ext'
+  import { Observable } from 'rxjs'
+  import '../../rx-ext'
   import { DATA_PROJ } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
   import * as assert from '../../utils/assert'

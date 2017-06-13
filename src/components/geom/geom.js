@@ -1,6 +1,7 @@
 import { isEqual } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import Observable from '../../rx-ext'
+import { Observable } from 'rxjs'
+import '../../rx-ext'
 import cmp from '../rx-subs'
 import { extent, proj } from '../../ol-ext'
 import * as assert from '../../utils/assert'
