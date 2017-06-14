@@ -25,6 +25,7 @@ const methods = {
        * @protected
        */
       this.olObject = await Promise.resolve(this.createOlObject())
+      console.log('inited', this.$options.name)
       if (this.ident) {
         this.identMap.set(this.ident, this.olObject)
       }
@@ -35,7 +36,7 @@ const methods = {
     }
   },
   /**
-   * @return {*|Promise}
+   * @return {*|Promise<T>}
    * @protected
    * @abstract
    */
@@ -104,11 +105,12 @@ export default {
   props,
   methods,
   created () {
+    this.defineAccessors()
     /**
      * @type {Promise}
      * @protected
      */
-    this.cmpReadPromise = this.init().then(this.defineAccessors)
+    this.cmpReadPromise = this.init()
   },
   mounted () {
     this.cmpReadPromise.then(this.mount)

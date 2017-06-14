@@ -3,7 +3,16 @@
   import SelectInteraction from 'ol/interaction/select'
   import VectorLayer from 'ol/layer/vector'
   import Feature from 'ol/feature'
-  import { forEach, mapValues, difference, isPlainObject, isNumber, isString, constant, stubArray } from 'lodash/fp'
+  import {
+    forEach,
+    mapValues,
+    differenceWith,
+    isPlainObject,
+    isNumber,
+    isString,
+    constant,
+    stubArray
+  } from 'lodash/fp'
   import { Observable } from 'rxjs'
   import '../../../rx-ext'
   import interaction from '../interaction'
@@ -35,6 +44,12 @@
     wrapX: {
       type: Boolean,
       default: true
+    }
+  }
+
+  const computed = {
+    selected () {
+      return this.interaction ? this.interaction.getFeatures().getArray() : []
     }
   }
 
@@ -183,10 +198,11 @@
     }
   }
 
+  const diffById = differenceWith((a, b) => extractId(a) === extractId(b))
   const watch = {
     features (features) {
-      let forSelect = difference(features, this.currentFeatures)
-      let forUnselect = difference(this.currentFeatures, features)
+      let forSelect = diffById(features, this.selected)
+      let forUnselect = diffById(this.selected, features)
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)
@@ -197,6 +213,7 @@
     name: 'vl-interaction-select',
     mixins: [interaction, styleTarget],
     props,
+    computed,
     methods,
     watch,
     stubVNode: {
@@ -205,11 +222,6 @@
         return {
           id: this.$options.name
         }
-      }
-    },
-    data () {
-      return {
-        currentFeatures: []
       }
     }
   }
@@ -222,34 +234,11 @@
     assert.hasMap(this)
     assert.hasInteraction(this)
 
-    const selection = this.interaction.getFeatures()
-    // select event
     this.subscribeTo(
-      Observable.fromOlEvent(
-        selection,
-        'add',
-        ({ element }) => element
-      ),
-      feature => {
-        if (!this.currentFeatures.includes(feature)) {
-          this.currentFeatures.push(Object.seal(feature))
-          this.$emit('select', { feature })
-        }
-      }
-    )
-    // unselect event
-    this.subscribeTo(
-      Observable.fromOlEvent(
-        selection,
-        'remove',
-        ({ element }) => element
-      ),
-      feature => {
-        let idx = this.currentFeatures.findIndex(f => f === feature)
-        if (idx !== -1) {
-          this.currentFeatures.splice(idx, 1)
-          this.$emit('unselect', { feature })
-        }
+      Observable.fromOlEvent(this.interaction, 'select'),
+      ({ selected, deselected, mapBrowserEvent }) => {
+        deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
+        selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
       }
     )
   }

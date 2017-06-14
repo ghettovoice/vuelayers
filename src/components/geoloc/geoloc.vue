@@ -11,6 +11,28 @@
     tracking: {
       type: Boolean,
       default: true
+    },
+    trackingOptions: Object
+  }
+
+  const computed = {
+    accuracy () {
+      return this.geoloc && this.geoloc.getAccuracy()
+    },
+    altitude () {
+      return this.geoloc && this.geoloc.getAltitude()
+    },
+    altitudeAccuracy () {
+      return this.geoloc && this.geoloc.getAltitudeAccuracy()
+    },
+    heading () {
+      return this.geoloc && this.geoloc.getHeading()
+    },
+    position () {
+      return this.geoloc && this.geoloc.getPosition()
+    },
+    speed () {
+      return this.geoloc && this.geoloc.getSpeed()
     }
   }
 
@@ -22,6 +44,7 @@
     createOlObject () {
       return new Geolocation({
         tracking: this.tracking,
+        trackingOptions: this.trackingOptions,
         projection: DATA_PROJ
       })
     },
@@ -83,6 +106,10 @@
     tracking (value) {
       assert.hasGeoloc(this)
       this.geoloc.setTracking(value)
+    },
+    tracingOptions (value) {
+      assert.hasGeoloc(this)
+      this.geoloc.setTrackingOptions(value)
     }
   }
 
@@ -90,17 +117,12 @@
     name: 'vl-geoloc',
     mixins: [cmp],
     props,
-    watch,
+    computed,
     methods,
+    watch,
     stubVNode: {
       empty () {
         return this.$options.name
-      }
-    },
-    data () {
-      return {
-        currentPosition: undefined,
-        currentAccuracy: undefined
       }
     }
   }
@@ -113,39 +135,22 @@
     assert.hasGeoloc(this)
 
     const ft = 1000 / 30
-    // pos
-    this.subscribeTo(
-      Observable.fromOlEvent(
-          this.geoloc,
-          'change:position',
-          () => this.geoloc.getPosition()
-        )
-        .filter(x => x != null)
-        .throttleTime(ft)
-        .distinctUntilChanged(isEqual),
-      position => {
-        if (!isEqual(position, this.currentPosition)) {
-          this.currentPosition = position
-          this.$emit('changeposition', { position })
-        }
-      }
-    )
-    // acc
-    this.subscribeTo(
-      Observable.fromOlEvent(
-          this.geoloc,
-          'change:accuracy',
-          () => this.geoloc.getAccuracy()
-        )
-        .filter(x => x != null)
-        .throttleTime(ft)
-        .distinctUntilChanged(isEqual),
-      accuracy => {
-        if (accuracy !== this.currentAccuracy) {
-          this.currentAccuracy = accuracy
-          this.$emit('changeaccuracy', { accuracy })
-        }
-      }
-    )
+    const events = Observable.fromOlEvent(this.geoloc, [
+      'change:accuracy',
+//      'change:accuracygeometry',
+      'change:altitude',
+      'change:altitudeaccuracy',
+      'change:heading',
+      'change:position',
+      'change:projection',
+      'change:speed'
+    ]).map(({ key, type }) => ({
+      type: type.replace(':', ''),
+      value: this[key],
+      key
+    })).throttleTime(ft)
+      .distinctUntilChanged(isEqual)
+
+    this.subscribeTo(events, ({ type, key, value }) => this.$emit(type, { [key]: value }))
   }
 </script>

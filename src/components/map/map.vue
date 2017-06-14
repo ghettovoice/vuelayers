@@ -121,6 +121,7 @@
           get: this.getView
         }
       })
+      console.log('map accessors')
     },
     /**
      * Trigger focus on map container.
@@ -178,8 +179,8 @@
      * @return {ol.View|undefined}
      */
     getView () {
-      assert.hasMap(this)
-      return this.map.getView()
+      console.log('map getView')
+      return this.map && this.map.getView()
     },
     /**
      * @param {ol.View|Vue|undefined} view

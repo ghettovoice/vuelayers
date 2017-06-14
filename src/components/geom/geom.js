@@ -2,7 +2,7 @@ import { isEqual } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import { Observable } from 'rxjs'
 import '../../rx-ext'
-import cmp from '../rx-subs'
+import cmp from '../ol-virt-cmp'
 import { extent, proj } from '../../ol-ext'
 import * as assert from '../../utils/assert'
 
@@ -12,7 +12,8 @@ const props = {
    */
   coordinates: {
     type: Array,
-    required: true
+    required: true,
+    validator: val => val.length
   }
 }
 
@@ -24,22 +25,23 @@ const computed = {
    */
   type () {
     throw new Error('Not implemented computed property')
+  },
+  extent () {
+    return this.geom && this.extentToLonLat(this.geom.getExtent())
   }
 }
 
 const methods = {
   /**
-   * @return {ol.geom.Geometry}
+   * @return {ol.geom.Geometry|Promise<ol.geom.Geometry>}
    * @protected
    */
   createOlObject () {
-    let geom = this.createGeom()
-    // initialize additional props
-    this.currentExtent = this.extentToLonLat(geom.getExtent())
-    return geom
+    console.log('create geom')
+    return this.createGeom()
   },
   /**
-   * @return {ol.geom.Geometry}
+   * @return {ol.geom.Geometry|Promise<ol.geom.Geometry>}
    * @protected
    * @abstract
    */
@@ -51,6 +53,7 @@ const methods = {
    * @protected
    */
   init () {
+    // todo await map
     // define helper methods based on geometry type
     const { toLonLat, fromLonLat } = proj.transforms[this.type]
     /**
@@ -144,33 +147,23 @@ const methods = {
    */
   subscribeAll () {
     this::subscribeToGeomChanges()
-  },
-  /**
-   * @param {Object} opts
-   * @return {void}
-   * @protected
-   */
-  updateGeom (opts) {
-    assert.hasGeom(this)
-
-    if (opts.coordinates) {
-      let isEq = isEqualGeom({
-        coordinates: this.currentCoordinates,
-        extent: this.currentExtent
-      }, {
-        coordinates: opts.coordinates,
-        extent: extent.boundingExtent(opts.coordinates)
-      })
-
-      if (!isEq) {
-        this.geom.setCoordinates(this.fromLonLat(opts.coordinates))
-      }
-    }
   }
 }
 const watch = {
   coordinates (coordinates) {
-    this.updateGeom({ coordinates })
+    assert.hasGeom(this)
+
+    let isEq = isEqualGeom({
+      coordinates: this.currentCoordinates,
+      extent: this.extent
+    }, {
+      coordinates,
+      extent: extent.boundingExtent(coordinates)
+    })
+
+    if (!isEq) {
+      this.geom.setCoordinates(this.fromLonLat(coordinates))
+    }
   }
 }
 
@@ -187,8 +180,7 @@ export default {
   },
   data () {
     return {
-      currentCoordinates: this.coordinates.slice(),
-      currentExtent: []
+      currentCoordinates: this.coordinates.slice()
     }
   }
 }
@@ -202,28 +194,19 @@ function subscribeToGeomChanges () {
   assert.hasGeom(this)
 
   const ft = 1000 / 30
-  const geomChanges = Observable.fromOlEvent(
-    this.geom,
-    'change',
-    () => ({
-      coordinates: this.geom.getCoordinates(),
-      extent: this.geom.getExtent()
-    })
-  ).throttleTime(ft)
+  const changes = Observable.fromOlEvent(this.geom, 'change', () => ({
+    coordinates: this.geom.getCoordinates(),
+    extent: this.geom.getExtent()
+  })).throttleTime(ft)
     .distinctUntilChanged(isEqualGeom)
-    .map(evt => ({
-      ...evt,
-      coordinates: this.toLonLat(evt.coordinates),
-      extent: this.extentToLonLat(evt.extent)
-    }))
+    .map(({ coordinates }) => this.toLonLat(coordinates))
 
-  this.subscribeTo(geomChanges, ({ coordinates, extent }) => {
+  this.subscribeTo(changes, coordinates => {
     this.currentCoordinates = coordinates
-    this.currentExtent = extent
 
     this.$emit('change', {
       coordinates: this.currentCoordinates,
-      extent: this.currentExtent
+      extent: this.extent
     })
   })
 }

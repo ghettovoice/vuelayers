@@ -4,9 +4,9 @@
       <vl-view id="view" :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
     </vl-share>-->
 
-    <div style="height: 50%">
+    <!--<div style="height: 50%">
       <vl-map>
-        <!--<vl-share-item id="view"/>-->
+        &lt;!&ndash;<vl-share-item id="view"/>&ndash;&gt;
         <vl-view ident="view" :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
 
         <vl-interaction-select @select="select" @unselect="unselect"></vl-interaction-select>
@@ -16,9 +16,9 @@
         </vl-layer-tile>
 
         <vl-layer-vector id="points" v-if="pointsLayer">
-          <!--<vl-source-cluster>-->
+          &lt;!&ndash;<vl-source-cluster>&ndash;&gt;
             <vl-source-vector :features="points"/>
-          <!--</vl-source-cluster>-->
+          &lt;!&ndash;</vl-source-cluster>&ndash;&gt;
         </vl-layer-vector>
 
         <vl-layer-tile id="wmts">
@@ -27,7 +27,7 @@
             layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
         </vl-layer-tile>
       </vl-map>
-    </div>
+    </div>-->
     <div style="height: 50%">
       <vl-map>
         <vl-view ident="view" :center="center" :zoom="zoom" :rotation="rotation"/>
@@ -40,6 +40,16 @@
           <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
                          :ext-params="{ TILED: true }" server-type="geoserver"/>
         </vl-layer-tile>
+
+        <vl-layer-vector>
+          <!--<vl-source-cluster>-->
+          <vl-source-vector>
+            <vl-feature>
+              <vl-geom-polygon :coordinates="polygonCoords" />
+            </vl-feature>
+          </vl-source-vector>
+          <!--</vl-source-cluster>-->
+        </vl-layer-vector>
       </vl-map>
     </div>
   </div>
@@ -48,6 +58,8 @@
 <script>
   import { range, random } from 'lodash/fp'
   import VlSourceCluster from '../src/components/source/cluster/source'
+  import VlFeature from '../src/components/feature/feature'
+  import VlGeomPolygon from '../src/components/geom/polygon/geom'
 
   const methods = {
     updateMapView ({ center, zoom, rotation }) {
@@ -86,7 +98,10 @@
   }
 
   export default {
-    components: { VlSourceCluster },
+    components: {
+      VlGeomPolygon,
+      VlFeature,
+      VlSourceCluster },
     name: 'app',
     methods,
     data () {
@@ -95,7 +110,8 @@
         center: [ 0, 0 ],
         rotation: 0,
         points: [],
-        pointsLayer: true
+        pointsLayer: true,
+        polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]]
       }
     },
     created () {

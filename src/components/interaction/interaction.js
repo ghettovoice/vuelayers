@@ -2,18 +2,26 @@ import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
 import * as assert from '../../utils/assert'
 
-const props = {}
+const props = {
+  active: {
+    type: Boolean,
+    default: true
+  }
+}
 
 const methods = {
   /**
-   * @return {ol.interaction.Interaction}
+   * @return {Promise<ol.interaction.Interaction>}
    * @protected
    */
-  createOlObject () {
-    return this.createInteraction()
+  async createOlObject () {
+    const interaction = await Promise.resolve(this.createInteraction())
+    interaction.setActive(this.active)
+
+    return interaction
   },
   /**
-   * @return {ol.interaction.Interaction}
+   * @return {ol.interaction.Interaction|Promise<ol.interaction.Interaction>}
    * @protected
    * @abstract
    */
@@ -76,10 +84,18 @@ const methods = {
   }
 }
 
+const watch = {
+  active (value) {
+    assert.hasInteraction(this)
+    this.interaction.setActive(value)
+  }
+}
+
 export default {
   mixins: [cmp],
   props,
   methods,
+  watch,
   stubVNode: {
     empty () {
       return this.$options.name
