@@ -25,7 +25,6 @@ const methods = {
        * @protected
        */
       this.olObject = await Promise.resolve(this.createOlObject())
-      console.log('inited', this.$options.name)
       if (this.ident) {
         this.identMap.set(this.ident, this.olObject)
       }
@@ -110,16 +109,17 @@ export default {
      * @type {Promise}
      * @protected
      */
-    this.cmpReadPromise = this.init()
+    this.cmpReadyPromise = Promise.resolve(this.$parent && this.$parent.cmpReadyPromise)
+      .then(this.init)
   },
   mounted () {
-    this.cmpReadPromise.then(this.mount)
+    this.cmpReadyPromise.then(this.mount)
   },
   destroyed () {
-    this.cmpReadPromise.then(() => {
+    this.cmpReadyPromise.then(() => {
       this.unmount()
       this.deinit()
-      this.cmpReadPromise = undefined
+      this.cmpReadyPromise = undefined
     })
   }
 }

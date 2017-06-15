@@ -37,7 +37,6 @@ const methods = {
    * @protected
    */
   createOlObject () {
-    console.log('create geom')
     return this.createGeom()
   },
   /**
