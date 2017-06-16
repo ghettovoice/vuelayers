@@ -7,7 +7,7 @@ const rollup = require('rollup')
 const postcss = require('postcss')
 const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
-const resolve = require('rollup-plugin-node-resolve')
+const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
 const uglify = require('rollup-plugin-uglify')
@@ -145,11 +145,12 @@ function bundle (opts = {}) {
         'node_modules/ol-tilecache/**/*'
       ]
     }),
-    resolve({
+    nodeResolve({
       main: true,
       module: true,
       jsnext: true,
-      browser: true
+      browser: true,
+      preferBuiltins: false
     }),
     cjs()
   ]

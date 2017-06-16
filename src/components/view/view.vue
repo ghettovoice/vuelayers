@@ -1,8 +1,13 @@
 <script>
   import Vue from 'vue'
   import View from 'ol/view'
-  import { isEqual, isPlainObject } from 'lodash/fp'
-  import { Observable } from 'rxjs'
+  import { isEqual, isPlainObject, noop } from 'lodash/fp'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/observable/merge'
+  import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/debounceTime'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/map'
   import '../../rx-ext'
   import { MIN_ZOOM, MAX_ZOOM, MAP_PROJ, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
@@ -59,11 +64,11 @@
     animate (...args) {
       assert.hasView(this)
 
-      let cb = args.reverse().find(x => typeof x === 'function')
+      let cb = args.reverse().find(x => typeof x === 'function') || noop
 
       return new Promise(
         resolve => this.view.animate(...args, complete => {
-          cb && cb(complete)
+          cb(complete)
           resolve(complete)
         })
       )
@@ -104,11 +109,11 @@
     },
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
-     * @param {GeoJSONFeature|ol.Extent|ol.Geometry|Vue} geometryOrExtent
+     * @param {GeoJSONFeature|ol.Extent|ol.geom.Geometry|Vue} geometryOrExtent
      * @param {olx.view.FitOptions} [options]
      * @return {Promise} Resolves when view changes
      */
-    fit (geometryOrExtent, options) {
+    fit (geometryOrExtent, options = {}) {
       assert.hasView(this)
 
       // transform to GeoJSON, vl-feature to ol.Feature
@@ -118,11 +123,16 @@
         geometryOrExtent = geometryOrExtent.geom
       }
 
-      let duration = (options && options.duration) || 0
+      let cb = options.callback || noop
 
       return new Promise(resolve => {
-        this.view.fit(geometryOrExtent, options)
-        setTimeout(resolve, duration)
+        this.view.fit(geometryOrExtent, {
+          ...options,
+          callback: complete => {
+            cb(complete)
+            resolve(complete)
+          }
+        })
       })
     },
     /**
@@ -166,27 +176,46 @@
   const watch = {
     center (value) {
       assert.hasView(this)
-      this.view.setCenter(proj.fromLonLat(value, this.projection))
+
+      if (!isEqual(value, proj.toLonLat(this.view.getCenter()))) {
+        this.view.setCenter(proj.fromLonLat(value, this.projection))
+      }
     },
     resolution (value) {
       assert.hasView(this)
-      this.view.setResolution(value)
+
+      if (!value !== this.view.getResolution()) {
+        this.view.setResolution(value)
+      }
     },
     zoom (value) {
       assert.hasView(this)
-      this.view.setZoom(Math.ceil(value))
+
+      value = Math.round(value)
+      if (value !== Math.round(this.view.getZoom())) {
+        this.view.setZoom(value)
+      }
     },
     rotation (value) {
       assert.hasView(this)
-      this.view.setRotation(value)
+
+      if (value !== this.view.getRotation()) {
+        this.view.setRotation(value)
+      }
     },
     minZoom (value) {
       assert.hasView(this)
-      this.view.setMinZoom(value)
+
+      if (value !== this.view.getMinZoom()) {
+        this.view.setMinZoom(value)
+      }
     },
     maxZoom (value) {
       assert.hasView(this)
-      this.view.setMaxZoom(value)
+
+      if (value !== this.view.getMaxZoom()) {
+        this.view.setMaxZoom(value)
+      }
     }
   }
 
@@ -200,14 +229,6 @@
       empty () {
         return this.$options.name
       }
-    },
-    data () {
-      return {
-        currentCenter: this.center.slice(),
-        currentZoom: Math.ceil(this.zoom),
-        currentResolution: this.resolution,
-        currentRotation: this.rotation
-      }
     }
   }
 
@@ -219,66 +240,40 @@
   function subscribeToViewChanges () {
     assert.hasView(this)
 
-    const ft = 1000 / 30
-    const getZoom = () => Math.ceil(this.view.getZoom())
-    // center
-    this.subscribeTo(
-      Observable.fromOlEvent(
-          this.view,
-          'change:center',
-          () => this.view.getCenter()
-        )
-        .throttleTime(ft)
-        .distinctUntilChanged(isEqual)
-        .map(coordinate => proj.toLonLat(coordinate, this.view.getProjection())),
-      coordinate => {
-        if (!isEqual(this.currentCenter, coordinate)) {
-          this.currentCenter = coordinate
-          this.$emit('changecenter', { coordinate })
-        }
-      }
-    )
-    // resolution
-    this.subscribeTo(
-      Observable.fromOlEvent(
-          this.view,
-          'change:resolution',
-          () => this.view.getResolution()
-        )
-        // 30fps change resolution
-        .throttleTime(ft)
-        .distinctUntilChanged(isEqual)
-        .map(resolution => ({ resolution, zoom: getZoom() }))
-        .do(({ resolution }) => {
-          if (this.currentResolution !== resolution) {
-            this.currentResolution = resolution
-            this.$emit('changeresolution', { resolution })
-          }
-        })
-        // zoom change at the end
-        .debounceTime(ft * 2),
-      ({ zoom }) => {
-        if (this.currentZoom !== zoom) {
-          this.currentZoom = zoom
-          this.$emit('changezoom', { zoom })
-        }
-      }
-    )
-    // rotation
-    this.subscribeTo(
-      Observable.fromOlEvent(
-          this.view,
-          'change:rotation',
-          () => this.view.getRotation()
-        )
-        .throttleTime(ft)
-        .distinctUntilChanged(isEqual),
-      rotation => {
-        if (this.currentRotation !== rotation) {
-          this.currentRotation = rotation
-          this.$emit('changerotation', { rotation })
-        }
-      }
-    )
+    const ft = 100
+    const getCenter = () => proj.toLonLat(this.view.getCenter())
+    const getZoom = () => Math.round(this.view.getZoom())
+
+    const center = Observable.fromOlEvent(this.view, 'change:center', getCenter)
+      .throttleTime(ft)
+      .distinctUntilChanged(isEqual)
+      .map(value => ({
+        name: 'update:center',
+        value
+      }))
+    const resolution = Observable.fromOlEvent(this.view, 'change:resolution', () => this.view.getResolution())
+      .throttleTime(ft)
+      .distinctUntilChanged(isEqual)
+      .map(value => ({
+        name: 'update:resolution',
+        value
+      }))
+    const zoom = resolution.map(getZoom)
+      .debounceTime(ft)
+      .distinctUntilChanged(isEqual)
+      .map(value => ({
+        name: 'update:zoom',
+        value
+      }))
+    const rotation = Observable.fromOlEvent(this.view, 'change:rotation', () => this.view.getRotation())
+      .throttleTime(ft)
+      .distinctUntilChanged(isEqual)
+      .map(value => ({
+        name: 'update:rotation',
+        value
+      }))
+    const events = Observable.merge(center, resolution, zoom, rotation)
+
+    this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
   }
 </script>

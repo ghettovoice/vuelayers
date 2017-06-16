@@ -1,4 +1,9 @@
-import { Observable } from 'rxjs'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/observable/interval'
+import 'rxjs/add/operator/skipWhile'
+import 'rxjs/add/operator/first'
+import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/toPromise'
 import Cluster from 'ol/source/cluster'
 import * as assert from '../../../utils/assert'
 

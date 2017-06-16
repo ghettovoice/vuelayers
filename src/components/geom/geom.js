@@ -1,6 +1,9 @@
 import { isEqual } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
-import { Observable } from 'rxjs'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/operator/throttleTime'
+import 'rxjs/add/operator/distinctUntilChanged'
+import 'rxjs/add/operator/map'
 import '../../rx-ext'
 import cmp from '../ol-virt-cmp'
 import { extent, proj } from '../../ol-ext'
@@ -52,7 +55,6 @@ const methods = {
    * @protected
    */
   init () {
-    // todo await map
     // define helper methods based on geometry type
     const { toLonLat, fromLonLat } = proj.transforms[this.type]
     /**
@@ -149,19 +151,19 @@ const methods = {
   }
 }
 const watch = {
-  coordinates (coordinates) {
+  coordinates (value) {
     assert.hasGeom(this)
 
     let isEq = isEqualGeom({
-      coordinates: this.currentCoordinates,
-      extent: this.extent
+      coordinates: value,
+      extent: extent.boundingExtent(value)
     }, {
-      coordinates,
-      extent: extent.boundingExtent(coordinates)
+      coordinates: this.toLonLat(this.geom.getCoordinates()),
+      extent: this.extent
     })
 
     if (!isEq) {
-      this.geom.setCoordinates(this.fromLonLat(coordinates))
+      this.geom.setCoordinates(this.fromLonLat(value))
     }
   }
 }
@@ -176,11 +178,6 @@ export default {
     empty () {
       return this.$options.name
     }
-  },
-  data () {
-    return {
-      currentCoordinates: this.coordinates.slice()
-    }
   }
 }
 
@@ -192,22 +189,18 @@ function subscribeToGeomChanges () {
   assert.hasMap(this)
   assert.hasGeom(this)
 
-  const ft = 1000 / 30
-  const changes = Observable.fromOlEvent(this.geom, 'change', () => ({
-    coordinates: this.geom.getCoordinates(),
-    extent: this.geom.getExtent()
+  const ft = 100
+  const events = Observable.fromOlEvent(this.geom, 'change', () => ({
+    coordinates: this.toLonLat(this.geom.getCoordinates()),
+    extent: this.extentToLonLat(this.geom.getExtent())
   })).throttleTime(ft)
     .distinctUntilChanged(isEqualGeom)
-    .map(({ coordinates }) => this.toLonLat(coordinates))
+    .map(({ coordinates }) => ({
+      name: 'update:coordinates',
+      value: coordinates
+    }))
 
-  this.subscribeTo(changes, coordinates => {
-    this.currentCoordinates = coordinates
-
-    this.$emit('change', {
-      coordinates: this.currentCoordinates,
-      extent: this.extent
-    })
-  })
+  this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
 }
 
 /**

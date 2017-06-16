@@ -16,7 +16,7 @@
      * @protected
      */
     createGeom () {
-      return new LineString(this.fromLonLat(this.currentCoordinates))
+      return new LineString(this.fromLonLat(this.coordinates))
     }
   }
 

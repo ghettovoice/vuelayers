@@ -22,7 +22,7 @@
      * @protected
      */
     createGeom () {
-      return new Point(this.fromLonLat(this.currentCoordinates))
+      return new Point(this.fromLonLat(this.coordinates))
     }
   }
 

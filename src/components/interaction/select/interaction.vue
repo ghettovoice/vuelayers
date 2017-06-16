@@ -4,20 +4,24 @@
   import VectorLayer from 'ol/layer/vector'
   import Feature from 'ol/feature'
   import {
-    forEach,
     mapValues,
     differenceWith,
     isPlainObject,
     isNumber,
     isString,
     constant,
-    stubArray
+    stubArray,
+    last,
+    identity,
+    negate,
+    findLast
   } from 'lodash/fp'
-  import { Observable } from 'rxjs'
+  import { Observable } from 'rxjs/Observable'
   import '../../../rx-ext'
   import interaction from '../interaction'
   import styleTarget from '../../style-target'
   import * as assert from '../../../utils/assert'
+  import { VM_PROP } from '../../../consts'
 
   // todo add other options, like event modifiers
   const props = {
@@ -44,12 +48,6 @@
     wrapX: {
       type: Boolean,
       default: true
-    }
-  }
-
-  const computed = {
-    selected () {
-      return this.interaction ? this.interaction.getFeatures().getArray() : []
     }
   }
 
@@ -125,18 +123,30 @@
       const selectedIds = selection.getArray().map(f => f.getId())
       if (selectedIds.includes(id)) return
 
-      if (!(feature instanceof Feature)) {
+      if (feature instanceof Feature) {
+        selection.push(feature)
+      } else {
+        feature = undefined
         const layers = this.map.map.getLayers().getArray()
 
-        forEach(layer => {
-          if (layer instanceof VectorLayer) {
-            feature = layer.getSource().getFeatureById(id)
-          }
-          return !feature
-        }, layers)
+        Observable.from(layers)
+          .filter(layer => (layer instanceof VectorLayer))
+          .map(layer => {
+            // take always last, if ol layer used with IdentityMap then layer has source from last added vl-source
+            const sourceCmp = findLast(
+              c => Object.getOwnPropertyNames(c).includes('source'),
+              last(layer[VM_PROP]).$children
+            )
+            return Observable.fromPromise(sourceCmp.cmpReadyPromise.then(() => {
+              return sourceCmp.source
+            }))
+          })
+          .mergeAll()
+          .map(source => source.getFeatureById(id))
+          .skipWhile(negate(identity))
+          .first()
+          .subscribe(feature => selection.push(feature))
       }
-
-      feature && selection.push(feature)
     },
     /**
      * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
@@ -201,8 +211,11 @@
   const diffById = differenceWith((a, b) => extractId(a) === extractId(b))
   const watch = {
     features (features) {
-      let forSelect = diffById(features, this.selected)
-      let forUnselect = diffById(this.selected, features)
+      assert.hasInteraction(this)
+
+      const selected = this.interaction.getFeatures().getArray()
+      let forSelect = diffById(features, selected)
+      let forUnselect = diffById(selected, features)
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)
@@ -213,7 +226,6 @@
     name: 'vl-interaction-select',
     mixins: [interaction, styleTarget],
     props,
-    computed,
     methods,
     watch,
     stubVNode: {
@@ -239,6 +251,8 @@
       ({ selected, deselected, mapBrowserEvent }) => {
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
+
+        this.$emit('update:features', this.interaction.getFeatures().getArray())
       }
     )
   }

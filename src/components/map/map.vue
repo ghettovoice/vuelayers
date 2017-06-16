@@ -11,7 +11,11 @@
   import Map from 'ol/map'
   import olcontrol from 'ol/control'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
-  import { Observable } from 'rxjs'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/observable/merge'
+  import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/map'
   import '../../rx-ext'
   import { proj } from '../../ol-ext'
   import cmp from '../ol-cmp'
@@ -32,6 +36,7 @@
       default: false
     },
     logo: [String, Object],
+    moveTolerance: Number,
     pixelRatio: {
       type: Number,
       default: 1
@@ -96,7 +101,7 @@
        */
       return new Map({
         layers: [],
-//      interactions: [],
+        // interactions: [],
         controls: this.defControls ? olcontrol.defaults() : [],
         loadTilesWhileAnimating: this.loadTilesWhileAnimating,
         loadTilesWhileInteracting: this.loadTilesWhileInteracting,
@@ -243,7 +248,7 @@
     assert.hasMap(this)
     assert.hasView(this)
 
-    const ft = 1000 / 30
+    const ft = 100
     // pointer
     const pointerEvents = Observable.merge(
       Observable.fromOlEvent(this.map, [
@@ -262,8 +267,9 @@
     }))
     // other
     const otherEvents = Observable.fromOlEvent(this.map, [
-      'postrender',
+      'movestart',
       'moveend',
+      'postrender',
       'precompose',
       'postcompose'
     ]).throttleTime(ft)

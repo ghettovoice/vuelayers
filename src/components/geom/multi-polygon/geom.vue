@@ -16,7 +16,7 @@
      * @protected
      */
     createGeom () {
-      return new MultiPolygon(this.fromLonLat(this.currentCoordinates))
+      return new MultiPolygon(this.fromLonLat(this.coordinates))
     }
   }
 

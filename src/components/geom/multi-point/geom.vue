@@ -16,7 +16,7 @@
      * @protected
      */
     createGeom () {
-      return new MultiPoint(this.fromLonLat(this.currentCoordinates))
+      return new MultiPoint(this.fromLonLat(this.coordinates))
     }
   }
 

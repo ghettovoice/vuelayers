@@ -1,7 +1,12 @@
 <script>
   import Geolocation from 'ol/geolocation'
   import { isEqual } from 'lodash/fp'
-  import { Observable } from 'rxjs'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/observable/from'
+  import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/mergeMap'
   import '../../rx-ext'
   import { DATA_PROJ } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
@@ -134,23 +139,25 @@
   function subscribeToGeolocation () {
     assert.hasGeoloc(this)
 
-    const ft = 1000 / 30
-    const events = Observable.fromOlEvent(this.geoloc, [
-      'change:accuracy',
-//      'change:accuracygeometry',
-      'change:altitude',
-      'change:altitudeaccuracy',
-      'change:heading',
-      'change:position',
-      'change:projection',
-      'change:speed'
-    ]).map(({ key, type }) => ({
-      type: type.replace(':', ''),
-      value: this[key],
-      key
-    })).throttleTime(ft)
-      .distinctUntilChanged(isEqual)
+    const ft = 100
+    const getObservable = field => {
+      return Observable.fromOlEvent(this.geoloc, `change:${field}`, () => this[field])
+        .throttleTime(ft)
+        .distinctUntilChanged(isEqual)
+        .map(value => ({
+          name: `update:${field}`,
+          value
+        }))
+    }
+    const events = Observable.from([
+      'accuracy',
+      'altitude',
+      'altitudeaccuracy',
+      'heading',
+      'position',
+      'speed'
+    ]).mergeMap(getObservable)
 
-    this.subscribeTo(events, ({ type, key, value }) => this.$emit(type, { [key]: value }))
+    this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
   }
 </script>

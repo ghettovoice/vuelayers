@@ -1,24 +1,19 @@
 <template>
   <div id="app">
-    <!--<vl-share>
-      <vl-view id="view" :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
-    </vl-share>-->
-
-    <!--<div style="height: 50%">
+    <div style="height: 50%">
       <vl-map>
-        &lt;!&ndash;<vl-share-item id="view"/>&ndash;&gt;
-        <vl-view ident="view" :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
+        <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
-        <vl-interaction-select @select="select" @unselect="unselect"></vl-interaction-select>
+        <vl-interaction-select @select="select" @unselect="unselect" :features.sync="selected"></vl-interaction-select>
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
         </vl-layer-tile>
 
         <vl-layer-vector id="points" v-if="pointsLayer">
-          &lt;!&ndash;<vl-source-cluster>&ndash;&gt;
+          <!--<vl-source-cluster>-->
             <vl-source-vector :features="points"/>
-          &lt;!&ndash;</vl-source-cluster>&ndash;&gt;
+          <!--</vl-source-cluster>-->
         </vl-layer-vector>
 
         <vl-layer-tile id="wmts">
@@ -27,10 +22,10 @@
             layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
         </vl-layer-tile>
       </vl-map>
-    </div>-->
-    <div style="height: 50%">
+    </div>
+    <!--<div style="height: 50%">
       <vl-map>
-        <vl-view ident="view" :center="center" :zoom="zoom" :rotation="rotation"/>
+        <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
         <vl-layer-tile>
           <vl-source-sputnik/>
@@ -42,16 +37,16 @@
         </vl-layer-tile>
 
         <vl-layer-vector>
-          <!--<vl-source-cluster>-->
+          &lt;!&ndash;<vl-source-cluster>&ndash;&gt;
           <vl-source-vector>
             <vl-feature>
-              <vl-geom-polygon :coordinates="polygonCoords" />
+              <vl-geom-polygon :coordinates.sync="polygonCoords" />
             </vl-feature>
           </vl-source-vector>
-          <!--</vl-source-cluster>-->
+          &lt;!&ndash;</vl-source-cluster>&ndash;&gt;
         </vl-layer-vector>
       </vl-map>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -62,11 +57,6 @@
   import VlGeomPolygon from '../src/components/geom/polygon/geom'
 
   const methods = {
-    updateMapView ({ center, zoom, rotation }) {
-      this.center = center
-      this.zoom = zoom
-      this.rotation = rotation
-    },
     select (feature) {
       console.log('select', feature)
     },
@@ -111,7 +101,8 @@
         rotation: 0,
         points: [],
         pointsLayer: true,
-        polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]]
+        polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
+        selected: [10, 20, 30]
       }
     },
     created () {
