@@ -2,7 +2,7 @@
   import Vue from 'vue'
   import SourceBuilder from './builder'
   import source from '../source'
-  import { DATA_PROJ, geom as geomHelper } from '../../../ol-ext'
+  import { EPSG_4326, geom as geomHelper } from '../../../ol-ext'
   import * as assert from '../../../utils/assert'
 
   const props = {
@@ -19,7 +19,7 @@
     },
     projection: {
       type: String,
-      default: DATA_PROJ
+      default: EPSG_4326
     }
   }
 

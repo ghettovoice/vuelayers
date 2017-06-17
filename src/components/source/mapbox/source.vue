@@ -1,6 +1,6 @@
 <script>
   import coalesce from '../../../utils/coalesce'
-  import { TILE_FORMAT, MAP_PROJ } from '../../../ol-ext'
+  import { TILE_FORMAT, EPSG_3857 } from '../../../ol-ext'
   import xyzSource from '../xyz/source.vue'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
@@ -21,7 +21,7 @@
     },
     projection: {
       type: String,
-      default: MAP_PROJ
+      default: EPSG_3857
     },
     tileFormat: {
       type: String,

@@ -8,7 +8,7 @@
   import 'rxjs/add/operator/map'
   import 'rxjs/add/operator/mergeMap'
   import '../../rx-ext'
-  import { DATA_PROJ } from '../../ol-ext'
+  import { EPSG_4326 } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
   import * as assert from '../../utils/assert'
 
@@ -50,7 +50,7 @@
       return new Geolocation({
         tracking: this.tracking,
         trackingOptions: this.trackingOptions,
-        projection: DATA_PROJ
+        projection: EPSG_4326
       })
     },
     /**

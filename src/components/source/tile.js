@@ -4,7 +4,7 @@ import TileGrid from 'ol/tilegrid/tilegrid'
 import {
   CACHE_SIZE,
   CROSS_ORIGIN,
-  MAP_PROJ,
+  EPSG_3857,
   MAX_ZOOM,
   MIN_ZOOM,
   PIXEL_RATIO,
@@ -41,7 +41,7 @@ const props = {
   opaque: Boolean,
   projection: {
     type: String,
-    default: MAP_PROJ
+    default: EPSG_3857
   },
   reprojectionErrorThreshold: {
     type: Number,

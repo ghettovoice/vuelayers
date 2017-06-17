@@ -67,6 +67,7 @@
       const points = []
       range(1, 100).forEach(i => {
         points.push({
+          type: 'Feature',
           id: i,
           properties: {
             id: i

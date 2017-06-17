@@ -9,7 +9,7 @@
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
   import '../../rx-ext'
-  import { MIN_ZOOM, MAX_ZOOM, MAP_PROJ, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
+  import { MIN_ZOOM, MAX_ZOOM, EPSG_3857, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
   import * as assert from '../../utils/assert'
 
@@ -37,7 +37,7 @@
     },
     projection: {
       type: String,
-      default: MAP_PROJ
+      default: EPSG_3857
     },
     resolution: Number,
     resolutions: Array,

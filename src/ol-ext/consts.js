@@ -3,14 +3,6 @@ import Sphere from 'ol/sphere'
 export const EPSG_4326 = 'EPSG:4326'
 export const EPSG_3857 = 'EPSG:3857'
 /**
- * @type {string} Default map projection.
- */
-export const MAP_PROJ = EPSG_3857
-/**
- * @type {string} Default data source projection.
- */
-export const DATA_PROJ = EPSG_4326
-/**
  * @type {number} Default map max zoom
  */
 export const MAX_ZOOM = 28

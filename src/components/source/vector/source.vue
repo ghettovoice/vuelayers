@@ -4,7 +4,7 @@
   import VectorSource from 'ol/source/vector'
   import loadingstrategy from 'ol/loadingstrategy'
   import { differenceWith, isPlainObject } from 'lodash/fp'
-  import { DATA_PROJ, geoJson, extent, proj, tileGrid } from '../../../ol-ext'
+  import { EPSG_4326, geoJson, extent, proj, tileGrid } from '../../../ol-ext'
   import source from '../source'
   import * as assert from '../../../utils/assert'
 
@@ -25,7 +25,7 @@
     },
     projection: {
       type: String,
-      default: DATA_PROJ
+      default: EPSG_4326
     },
     useSpatialIndex: {
       type: Boolean,

@@ -11,17 +11,13 @@
     isString,
     constant,
     stubArray,
-    last,
-    identity,
-    negate,
-    findLast
+    forEach
   } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import '../../../rx-ext'
   import interaction from '../interaction'
   import styleTarget from '../../style-target'
   import * as assert from '../../../utils/assert'
-  import { VM_PROP } from '../../../consts'
 
   // todo add other options, like event modifiers
   const props = {
@@ -123,30 +119,19 @@
       const selectedIds = selection.getArray().map(f => f.getId())
       if (selectedIds.includes(id)) return
 
-      if (feature instanceof Feature) {
-        selection.push(feature)
-      } else {
+      if (!(feature instanceof Feature)) {
         feature = undefined
         const layers = this.map.map.getLayers().getArray()
 
-        Observable.from(layers)
-          .filter(layer => (layer instanceof VectorLayer))
-          .map(layer => {
-            // take always last, if ol layer used with IdentityMap then layer has source from last added vl-source
-            const sourceCmp = findLast(
-              c => Object.getOwnPropertyNames(c).includes('source'),
-              last(layer[VM_PROP]).$children
-            )
-            return Observable.fromPromise(sourceCmp.cmpReadyPromise.then(() => {
-              return sourceCmp.source
-            }))
-          })
-          .mergeAll()
-          .map(source => source.getFeatureById(id))
-          .skipWhile(negate(identity))
-          .first()
-          .subscribe(feature => selection.push(feature))
+        forEach(layer => {
+          if (layer instanceof VectorLayer && layer.getSource()) {
+            feature = layer.getSource().getFeatureById(id)
+          }
+          return !feature
+        }, layers)
       }
+
+      feature && selection.push(feature)
     },
     /**
      * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature

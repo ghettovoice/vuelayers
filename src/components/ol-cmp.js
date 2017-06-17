@@ -104,22 +104,25 @@ export default {
   props,
   methods,
   created () {
+    // todo исправить асинхронную инициализацию и монтирование (см google keep)
+    console.log('create', this.$options.name)
     this.defineAccessors()
     /**
-     * @type {Promise}
+     * @type {Promise<void>}
      * @protected
      */
-    this.cmpReadyPromise = Promise.resolve(this.$parent && this.$parent.cmpReadyPromise)
+    this.readyPromise = Promise.resolve(this.$parent && this.$parent.readyPromise)
       .then(this.init)
   },
   mounted () {
-    this.cmpReadyPromise.then(this.mount)
+    console.log('mount', this.$options.name)
+    this.readyPromise.then(this.mount)
   },
   destroyed () {
-    this.cmpReadyPromise.then(() => {
+    this.readyPromise.then(() => {
       this.unmount()
       this.deinit()
-      this.cmpReadyPromise = undefined
+      this.readyPromise = undefined
     })
   }
 }

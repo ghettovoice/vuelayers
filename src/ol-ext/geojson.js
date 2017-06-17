@@ -1,5 +1,4 @@
 import GeoJSON from 'ol/format/geojson'
-import plainProps from '../utils/plain-props'
 import { EPSG_4326, EPSG_3857 } from './consts'
 
 const geoJson = new GeoJSON()
@@ -21,11 +20,8 @@ export function writeFeature (feature, featureProjection = EPSG_3857, dataProjec
  * @return {ol.Feature}
  */
 export function readFeature (geoJsonFeature, featureProjection = EPSG_3857, dataProjection = EPSG_4326) {
-  return geoJson.readFeature({
-    ...geoJsonFeature,
-    type: 'Feature',
-    properties: plainProps(geoJsonFeature.properties)
-  }, { featureProjection, dataProjection })
+  dataProjection = readProjection(geoJsonFeature, dataProjection)
+  return geoJson.readFeature(geoJsonFeature, { featureProjection, dataProjection })
 }
 
 /**
@@ -48,8 +44,13 @@ export function writeGeometry (geometry, geometryProjection = EPSG_3857, dataPro
  * @return {ol.geom.Geometry}
  */
 export function readGeometry (geoJsonGeometry, geometryProjection = EPSG_3857, dataProjection = EPSG_4326) {
+  dataProjection = readProjection(geoJsonGeometry, dataProjection)
   return geoJson.readGeometry(geoJsonGeometry, {
     featureProjection: geometryProjection,
     dataProjection
   })
+}
+
+export function readProjection (geoJsonObj, defaultProjection = EPSG_4326) {
+  return geoJson.readProjection(geoJsonObj) || defaultProjection
 }

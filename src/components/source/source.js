@@ -21,7 +21,7 @@ const methods = {
     return this.createSource()
   },
   /**
-   * @return {ol.source.Source}
+   * @return {ol.source.Source|Promise<ol.source.Source>}
    * @protected
    * @abstract
    */
