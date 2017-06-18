@@ -3,6 +3,11 @@
  * @module components/cmp
  */
 import { debounce } from 'lodash/fp'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/observable/interval'
+import 'rxjs/add/operator/skipWhile'
+import 'rxjs/add/operator/first'
+import 'rxjs/add/operator/toPromise'
 import rxSubs from './rx-subs'
 import services from './services'
 import identMap from './ident-map'
@@ -59,12 +64,6 @@ const methods = {
    */
   defineAccessors () {},
   /**
-   * @type {function():void}
-   */
-  requestRefresh: debounce(100, function () {
-    this.refresh()
-  }),
-  /**
    * Redefine for easy call in child components
    * @returns {Object}
    * @protected
@@ -89,6 +88,12 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
+   * @type {function():void}
+   */
+  requestRefresh: debounce(100, function () {
+    this.refresh()
+  }),
+  /**
    * @return {void}
    */
   refresh () {},
@@ -104,25 +109,54 @@ export default {
   props,
   methods,
   created () {
-    // todo исправить асинхронную инициализацию и монтирование (см google keep)
-    console.log('create', this.$options.name)
     this.defineAccessors()
+    let parentReady = Promise.resolve(this.$parent && this.$parent.readyPromise)
     /**
      * @type {Promise<void>}
      * @protected
      */
-    this.readyPromise = Promise.resolve(this.$parent && this.$parent.readyPromise)
-      .then(this.init)
+    this._readyPromise = parentReady.then(this.init)
+    /**
+     * @type {Promise<void>}
+     * @protected
+     */
+    this._mountPromise = Observable.interval(100)
+      .skipWhile(() => !this._mounted)
+      .first()
+      .toPromise()
+
+    Object.defineProperties(this, {
+      readyPromise: {
+        enumerable: true,
+        get: () => this._readyPromise
+      },
+      mountPromise: {
+        enumerable: true,
+        get: () => this._mountPromise
+      }
+    })
   },
   mounted () {
-    console.log('mount', this.$options.name)
-    this.readyPromise.then(this.mount)
+    // wait for children
+    let childrenMount = Promise.all(this.$children.reduce((all, child) => {
+      if (child.mountPromise) {
+        all.push(child.mountPromise)
+      }
+
+      return all
+    }, []))
+
+    this.readyPromise.then(childrenMount)
+      .then(this.mount)
+      .then(() => {
+        this._mounted = true
+      })
   },
   destroyed () {
-    this.readyPromise.then(() => {
-      this.unmount()
-      this.deinit()
-      this.readyPromise = undefined
-    })
+    this.mountPromise.then(this.unmount)
+      .then(this.deinit)
+      .then(() => {
+        this._readyPromise = this._mountPromise = undefined
+      })
   }
 }

@@ -3,7 +3,6 @@
   import SourceBuilder from './builder'
   import source from '../source'
   import { EPSG_4326, geom as geomHelper } from '../../../ol-ext'
-  import * as assert from '../../../utils/assert'
 
   const props = {
     distance: {
@@ -61,8 +60,7 @@
 
   const watch = {
     distance (value) {
-      assert.hasSource(this)
-      this.source.setDistance(value)
+      this.source && this.source.setDistance(value)
     }
   }
 

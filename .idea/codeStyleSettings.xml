@@ -12,11 +12,8 @@
           <option name="FORCE_QUOTE_STYlE" value="true" />
           <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
           <option name="SPACES_WITHIN_IMPORTS" value="true" />
+          <option name="USE_CHAINED_CALLS_GROUP_INDENTS" value="true" />
         </JSCodeStyleSettings>
-        <JSON>
-          <option name="OBJECT_WRAPPING" value="1" />
-          <option name="ARRAY_WRAPPING" value="1" />
-        </JSON>
         <PHPCodeStyleSettings>
           <option name="ALIGN_PHPDOC_PARAM_NAMES" value="true" />
           <option name="ALIGN_PHPDOC_COMMENTS" value="true" />
@@ -27,7 +24,17 @@
         <SqlCodeStyleSettings>
           <option name="KEYWORD_CASE" value="2" />
         </SqlCodeStyleSettings>
+        <codeStyleSettings language="CoffeeScript">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+        </codeStyleSettings>
+        <codeStyleSettings language="ECMA Script Level 4">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+        </codeStyleSettings>
+        <codeStyleSettings language="JAVA">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+        </codeStyleSettings>
         <codeStyleSettings language="JavaScript">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
           <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
           <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
           <option name="SPACE_BEFORE_METHOD_PARENTHESES" value="true" />
@@ -48,6 +55,7 @@
           </indentOptions>
         </codeStyleSettings>
         <codeStyleSettings language="PHP">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
           <option name="BLANK_LINES_AFTER_PACKAGE" value="1" />
           <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
           <option name="CALL_PARAMETERS_WRAP" value="1" />
@@ -64,6 +72,12 @@
           <option name="DOWHILE_BRACE_FORCE" value="3" />
           <option name="WHILE_BRACE_FORCE" value="3" />
           <option name="FOR_BRACE_FORCE" value="3" />
+        </codeStyleSettings>
+        <codeStyleSettings language="TypeScript">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+        </codeStyleSettings>
+        <codeStyleSettings language="kotlin">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
         </codeStyleSettings>
       </value>
     </option>

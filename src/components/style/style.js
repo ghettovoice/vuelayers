@@ -6,14 +6,14 @@ import cmp from '../ol-virt-cmp'
 
 const methods = {
   /**
-   * @return {OlStyle}
+   * @return {OlStyle|Promise<OlStyle>}
    * @protected
    */
   createOlObject () {
     return this.createStyle()
   },
   /**
-   * @return {OlStyle}
+   * @return {OlStyle|Promise<OlStyle>}
    * @protected
    * @abstract
    */

@@ -100,8 +100,7 @@ const methods = {
 
 const watch = {
   attributions (value) {
-    assert.hasSource(this)
-    this.source.setAttributions(value)
+    this.source && this.source.setAttributions(value)
   }
 }
 

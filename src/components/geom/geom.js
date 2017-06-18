@@ -152,7 +152,7 @@ const methods = {
 }
 const watch = {
   coordinates (value) {
-    assert.hasGeom(this)
+    if (!this.geom) return
 
     let isEq = isEqualGeom({
       coordinates: value,

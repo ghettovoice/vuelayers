@@ -29,7 +29,7 @@ const props = {
 
 const methods = {
   /**
-   * @return {ol.layer.Layer}
+   * @return {ol.layer.Layer|Promise<ol.layer.Layer>}
    * @protected
    */
   createOlObject () {
@@ -39,7 +39,7 @@ const methods = {
     return layer
   },
   /**
-   * @return {ol.layer.Layer}
+   * @return {ol.layer.Layer|Promise<ol.layer.Layer>}
    * @protected
    * @abstract
    */
@@ -157,28 +157,22 @@ const methods = {
 
 const watch = {
   id (value) {
-    assert.hasLayer(this)
-    return this.layer.set('id', value)
+    this.layer && this.layer.set('id', value)
   },
   maxResolution (value) {
-    assert.hasLayer(this)
-    this.layer.setMaxResolution(value)
+    this.layer && this.layer.setMaxResolution(value)
   },
   minResolution (value) {
-    assert.hasLayer(this)
-    this.layer.setMinResolution(value)
+    this.layer && this.layer.setMinResolution(value)
   },
   opacity (value) {
-    assert.hasLayer(this)
-    this.layer.setOpacity(value)
+    this.layer && this.layer.setOpacity(value)
   },
   visible (value) {
-    assert.hasLayer(this)
-    this.layer.setVisible(value)
+    this.layer && this.layer.setVisible(value)
   },
   zIndex (value) {
-    assert.hasLayer(this)
-    this.layer.setZIndex(value)
+    this.layer && this.layer.setZIndex(value)
   }
 }
 

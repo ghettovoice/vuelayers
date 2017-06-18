@@ -82,7 +82,8 @@
 
   const watch = {
     zIndex (value) {
-      assert.hasStyle(this)
+      if (!this.style) return
+
       this.style.setZIndex(value)
       this.requestRefresh()
     }

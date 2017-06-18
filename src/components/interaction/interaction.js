@@ -86,8 +86,7 @@ const methods = {
 
 const watch = {
   active (value) {
-    assert.hasInteraction(this)
-    this.interaction.setActive(value)
+    this.interaction && this.interaction.setActive(value)
   }
 }
 

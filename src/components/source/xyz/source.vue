@@ -2,7 +2,6 @@
   import { createTileUrlFunction } from 'ol-tilecache'
   import XYZSource from 'ol/source/xyz'
   import tileSource from '../tile'
-  import * as assert from '../../../utils/assert'
 
   const props = {}
 
@@ -39,8 +38,7 @@
   // watch only url changes, other settings (like tileGrid) can't be changed at runtime
   const watch = {
     urlTmpl () {
-      assert.hasSource(this)
-      this.source.setTileUrlFunction(this.createTileUrlFunction())
+      this.source && this.source.setTileUrlFunction(this.createTileUrlFunction())
     }
   }
 

@@ -175,21 +175,21 @@
 
   const watch = {
     center (value) {
-      assert.hasView(this)
+      if (!this.view) return
 
       if (!isEqual(value, proj.toLonLat(this.view.getCenter()))) {
         this.view.setCenter(proj.fromLonLat(value, this.projection))
       }
     },
     resolution (value) {
-      assert.hasView(this)
+      if (!this.view) return
 
       if (!value !== this.view.getResolution()) {
         this.view.setResolution(value)
       }
     },
     zoom (value) {
-      assert.hasView(this)
+      if (!this.view) return
 
       value = Math.round(value)
       if (value !== Math.round(this.view.getZoom())) {
@@ -197,21 +197,21 @@
       }
     },
     rotation (value) {
-      assert.hasView(this)
+      if (!this.view) return
 
       if (value !== this.view.getRotation()) {
         this.view.setRotation(value)
       }
     },
     minZoom (value) {
-      assert.hasView(this)
+      if (!this.view) return
 
       if (value !== this.view.getMinZoom()) {
         this.view.setMinZoom(value)
       }
     },
     maxZoom (value) {
-      assert.hasView(this)
+      if (!this.view) return
 
       if (value !== this.view.getMaxZoom()) {
         this.view.setMaxZoom(value)
@@ -259,7 +259,7 @@
         value
       }))
     const zoom = resolution.map(getZoom)
-      .debounceTime(ft)
+      .debounceTime(ft * 2)
       .distinctUntilChanged(isEqual)
       .map(value => ({
         name: 'update:zoom',

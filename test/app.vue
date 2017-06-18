@@ -21,6 +21,14 @@
             url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
             layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
         </vl-layer-tile>
+
+        <vl-layer-vector>
+          <vl-source-vector>
+            <vl-feature :id="polyId" ref="poly">
+              <vl-geom-polygon :coordinates.sync="polygonCoords" />
+            </vl-feature>
+          </vl-source-vector>
+        </vl-layer-vector>
       </vl-map>
     </div>
     <!--<div style="height: 50%">
@@ -102,11 +110,12 @@
         rotation: 0,
         points: [],
         pointsLayer: true,
+        polyId: '123',
         polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
         selected: [10, 20, 30]
       }
     },
-    created () {
+    mounted () {
       this.loadData()
     }
   }

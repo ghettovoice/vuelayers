@@ -138,15 +138,13 @@
      * @param {string|number} value
      */
     id (value) {
-      assert.hasFeature(this)
-      this.feature.setId(value)
+      this.feature && this.feature.setId(value)
     },
     /**
      * @param {Object} value
      */
     properties (value) {
-      assert.hasFeature(this)
-      this.feature.setProperties(plainProps(value))
+      this.feature && this.feature.setProperties(plainProps(value))
     }
   }
 

@@ -196,7 +196,7 @@
   const diffById = differenceWith((a, b) => extractId(a) === extractId(b))
   const watch = {
     features (features) {
-      assert.hasInteraction(this)
+      if (!this.interaction) return
 
       const selected = this.interaction.getFeatures().getArray()
       let forSelect = diffById(features, selected)

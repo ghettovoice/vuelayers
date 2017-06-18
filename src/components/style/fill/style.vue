@@ -1,7 +1,6 @@
 <script>
   import Fill from 'ol/style/fill'
   import style from '../style'
-  import * as assert from '../../../utils/assert'
 
   const props = {
     color: [String, Array]
@@ -35,7 +34,8 @@
 
   const watch = {
     color (value) {
-      assert.hasStyle(this)
+      if (!this.style) return
+
       this.style.setColor(value)
       this.requestRefresh()
     }

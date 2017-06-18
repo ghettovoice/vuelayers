@@ -109,12 +109,10 @@
      * @param {boolean} value
      */
     tracking (value) {
-      assert.hasGeoloc(this)
-      this.geoloc.setTracking(value)
+      this.geoloc && this.geoloc.setTracking(value)
     },
     tracingOptions (value) {
-      assert.hasGeoloc(this)
-      this.geoloc.setTrackingOptions(value)
+      this.geoloc && this.geoloc.setTrackingOptions(value)
     }
   }
 

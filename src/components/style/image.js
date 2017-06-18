@@ -27,10 +27,10 @@ const methods = {
    */
   refresh () {
     // recreate style
-    this.unmount()
-    this.deinit()
-    this.init()
-    this.mount()
+    Promise.resolve(this.unmount)
+      .then(this.deinit)
+      .then(this.init)
+      .then(this.mount)
   }
 }
 
