@@ -60,9 +60,6 @@
 
 <script>
   import { range, random } from 'lodash/fp'
-  import VlSourceCluster from '../src/components/source/cluster/source'
-  import VlFeature from '../src/components/feature/feature'
-  import VlGeomPolygon from '../src/components/geom/polygon/geom'
 
   const methods = {
     select (feature) {
@@ -97,10 +94,6 @@
   }
 
   export default {
-    components: {
-      VlGeomPolygon,
-      VlFeature,
-      VlSourceCluster },
     name: 'app',
     methods,
     data () {
