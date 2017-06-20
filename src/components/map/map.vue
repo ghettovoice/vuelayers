@@ -57,7 +57,9 @@
       assert.hasMap(this)
 
       layer = layer instanceof Vue ? layer.layer : layer
-      this.map.addLayer(layer)
+      if (layer && !this.map.getLayers().getArray().includes(layer)) {
+        this.map.addLayer(layer)
+      }
     },
     /**
      * @param {ol.layer.Layer|Vue} layer
@@ -70,6 +72,18 @@
       this.map.removeLayer(layer)
     },
     /**
+     * @return {ol.layer.Layer[]}
+     */
+    getLayers () {
+      return (this.map && this.map.getLayers().getArray()) || []
+    },
+    /**
+     * @return {Vue<ol.layer.Layer>[]}
+     */
+    getLayersCmp () {
+      return this.$children.filter(c => c.hasOwnProperty('layer'))
+    },
+    /**
      * @param {ol.interaction.Interaction|Vue} interaction
      * @return {void}
      */
@@ -77,7 +91,9 @@
       assert.hasMap(this)
 
       interaction = interaction instanceof Vue ? interaction.interaction : interaction
-      this.map.addInteraction(interaction)
+      if (interaction && !this.map.getInteractions().getArray().includes(interaction)) {
+        this.map.addInteraction(interaction)
+      }
     },
     /**
      * @param {ol.interaction.Interaction|Vue} interaction
@@ -88,6 +104,18 @@
 
       interaction = interaction instanceof Vue ? interaction.interaction : interaction
       this.map.removeInteraction(interaction)
+    },
+    /**
+     * @return {ol.interaction.Interaction[]}
+     */
+    getInteractions () {
+      return (this.map && this.map.getInteractions().getArray()) || []
+    },
+    /**
+     * @return {Vue<ol.interaction.Interaction>[]}
+     */
+    getInteractionsCmp () {
+      return this.$children.filter(c => c.hasOwnProperty('interaction'))
     },
     /**
      * @return {ol.Map}
@@ -193,7 +221,9 @@
       assert.hasMap(this)
 
       view = view instanceof Vue ? view.view : view
-      this.map.setView(view)
+      if (view !== this.map.getView()) {
+        this.map.setView(view)
+      }
     },
     /**
      * @return {void}

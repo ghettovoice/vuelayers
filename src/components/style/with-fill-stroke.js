@@ -20,8 +20,10 @@ export default {
       assert.hasStyle(this)
 
       fill = fill instanceof Vue ? fill.style : fill
-      this.style.setFill(fill)
-      this.requestRefresh()
+      if (fill !== this.style.getFill()) {
+        this.style.setFill(fill)
+        this.requestRefresh()
+      }
     },
     /**
      * @param {ol.style.Stroke|Vue|undefined} stroke
@@ -32,8 +34,10 @@ export default {
       assert.hasStyle(this)
 
       stroke = stroke instanceof Vue ? stroke.style : stroke
-      this.style.setStroke(stroke)
-      this.requestRefresh()
+      if (stroke !== this.style.getStroke()) {
+        this.style.setStroke(stroke)
+        this.requestRefresh()
+      }
     }
   }
 }

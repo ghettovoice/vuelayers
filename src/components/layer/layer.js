@@ -101,6 +101,30 @@ const methods = {
     })
   },
   /**
+   * @return {ol.source.Source|undefined}
+   */
+  getSource () {
+    return this.layer && this.layer.getSource()
+  },
+  /**
+   * @return {Vue|undefined}
+   */
+  getSourceCmp () {
+    return this.$children.slice().reverse().find(c => c.hasOwnProperty('source'))
+  },
+  /**
+   * @param {ol.source.Source|Vue|undefined} source
+   * @return {void}
+   */
+  setSource (source) {
+    assert.hasLayer(this)
+
+    source = source instanceof Vue ? source.source : source
+    if (source !== this.layer.getSource()) {
+      this.layer.setSource(source)
+    }
+  },
+  /**
    * @return {void}
    * @protected
    */
@@ -142,16 +166,6 @@ const methods = {
 
     map = map instanceof Vue ? map.map : map
     this.layer.setMap(map)
-  },
-  /**
-   * @param {ol.source.Source|Vue|undefined} source
-   * @return {void}
-   */
-  setSource (source) {
-    assert.hasLayer(this)
-
-    source = source instanceof Vue ? source.source : source
-    this.layer.setSource(source)
   }
 }
 

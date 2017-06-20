@@ -9,6 +9,21 @@ import * as assert from '../../../utils/assert'
 
 export default class Builder {
   /**
+   * @return {ol.source.Vector|undefined}
+   */
+  getSource () {
+    return this.source
+  }
+  /**
+   * @param {ol.source.Vector} value
+   * @returns {Builder}
+   */
+  setSource (value) {
+    this.source = value
+    return this
+  }
+
+  /**
    * @param value
    * @returns {Builder}
    */
@@ -50,15 +65,6 @@ export default class Builder {
    */
   setProjection (value) {
     this.projection = value
-    return this
-  }
-
-  /**
-   * @param value
-   * @returns {Builder}
-   */
-  setSource (value) {
-    this.source = value
     return this
   }
 

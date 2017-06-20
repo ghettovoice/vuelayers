@@ -51,7 +51,10 @@ export default {
           }
           currentStyles = []
         }
-        currentStyles = currentStyles.concat(style instanceof Vue ? style : { style, condition: true })
+        style = style instanceof Vue ? style : { style, condition: true }
+        if (!currentStyles.includes(style)) {
+          currentStyles = currentStyles.concat(style)
+        }
       }
 
       this.setStyle(currentStyles)
@@ -61,6 +64,7 @@ export default {
      * @return {void}
      */
     setStyle (styles) {
+      if (styles === this.styles) return
       this.styles = styles
 
       const styleTarget = this.getStyleTarget()

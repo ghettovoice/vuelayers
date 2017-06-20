@@ -22,6 +22,7 @@
       <w>dirname</w>
       <w>doesn</w>
       <w>epsg</w>
+      <w>errordbg</w>
       <w>eslint</w>
       <w>geoloc</w>
       <w>geolocation</w>
@@ -74,6 +75,7 @@
       <w>virt</w>
       <w>vnode</w>
       <w>vuelayers</w>
+      <w>warndbg</w>
       <w>whatwg</w>
       <w>wmts</w>
       <w>yargs</w>

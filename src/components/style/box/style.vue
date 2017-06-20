@@ -53,8 +53,10 @@
       assert.hasStyle(this)
 
       image = image instanceof Vue ? image.style : image
-      this.style.setImage(image)
-      this.requestRefresh()
+      if (image !== this.style.getImage()) {
+        this.style.setImage(image)
+        this.requestRefresh()
+      }
     },
     /**
      * @param {ol.geom.Geometry|Vue|undefined} geom
@@ -64,8 +66,10 @@
       assert.hasStyle(this)
 
       geom = geom instanceof Vue ? geom.geom : geom
-      this.style.setGeometry(geom)
-      this.requestRefresh()
+      if (geom !== this.style.getGeometry()) {
+        this.style.setGeometry(geom)
+        this.requestRefresh()
+      }
     },
     /**
      * @param {ol.style.Text|undefined} text
@@ -75,8 +79,10 @@
       assert.hasStyle(this)
 
       text = text instanceof Vue ? text.style : text
-      this.style.setText(text)
-      this.requestRefresh()
+      if (text !== this.style.getText()) {
+        this.style.setText(text)
+        this.requestRefresh()
+      }
     }
   }
 

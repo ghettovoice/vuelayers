@@ -62,13 +62,16 @@
     },
     /**
      * Overrides style-target `setStyle` method
+     * @param {Array<{ style: ol.style.Style, condition: (function|boolean|undefined) }>|ol.StyleFunction|Vue|undefined} styles
      * @return {void}
      */
-    setStyle (style) {
-      // simply save all inner styles and
-      // use them later in style function as fallback
-      this.styles = style
-      this.requestRefresh()
+    setStyle (styles) {
+      if (styles !== this.styles) {
+        // simply save all inner styles and
+        // use them later in style function as fallback
+        this.styles = styles
+        this.requestRefresh()
+      }
     },
     /**
      * @return {void}

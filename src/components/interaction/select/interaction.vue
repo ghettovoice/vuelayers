@@ -1,14 +1,15 @@
 <script>
   import Vue from 'vue'
   import SelectInteraction from 'ol/interaction/select'
-  import VectorLayer from 'ol/layer/vector'
   import Feature from 'ol/feature'
+  import Collection from 'ol/collection'
   import {
     mapValues,
     differenceWith,
     isPlainObject,
     isNumber,
     isString,
+    isFunction,
     constant,
     stubArray,
     forEach
@@ -57,7 +58,8 @@
         multi: this.multi,
         wrapX: this.wrapX,
         filter: this.filter,
-        style: this.createStyleFunc()
+        style: this.createStyleFunc(),
+        features: new Collection([], { unique: true })
       })
     },
     /**
@@ -87,7 +89,9 @@
      */
     mount () {
       this::interaction.methods.mount()
-      this.features.forEach(this.select)
+      // todo wait for source loaded, or make it in select ?
+      Promise.all(this.map.getLayersCmp().map(l => l.getSourceCmp().mountPromise))
+        .then(() => this.features.forEach(this.select))
     },
     /**
      * @return {void}
@@ -115,7 +119,6 @@
       }
 
       const selection = this.interaction.getFeatures()
-      // skip if already added
       const selectedIds = selection.getArray().map(f => f.getId())
       if (selectedIds.includes(id)) return
 
@@ -124,7 +127,8 @@
         const layers = this.map.map.getLayers().getArray()
 
         forEach(layer => {
-          if (layer instanceof VectorLayer && layer.getSource()) {
+          const source = layer.getSource()
+          if (isFunction(source.getFeatureById)) {
             feature = layer.getSource().getFeatureById(id)
           }
           return !feature
@@ -149,10 +153,7 @@
       }
 
       const selection = this.interaction.getFeatures()
-      // skip if already added
       const selectedIds = selection.getArray().map(f => f.getId())
-      if (!selectedIds.includes(id)) return
-
       const idx = selectedIds.findIndex(x => x === id)
 
       if (idx !== -1) {
@@ -160,13 +161,15 @@
       }
     },
     /**
-     * @param {*} style
+     * @param {Array<{style: ol.style.Style, condition: (function|boolean|undefined)}>|ol.StyleFunction|Vue|undefined} styles
      * @return {void}
      * @protected
      */
-    setStyle (style) {
-      this.styles = style
-      this.refresh()
+    setStyle (styles) {
+      if (styles !== this.styles) {
+        this.styles = styles
+        this.requestRefresh()
+      }
     },
     /**
      * @return {void}

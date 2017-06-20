@@ -12,6 +12,7 @@ import rxSubs from './rx-subs'
 import services from './services'
 import identMap from './ident-map'
 import { VM_PROP } from '../consts'
+import { logdbg } from '../utils/debug'
 
 const props = {}
 
@@ -112,17 +113,22 @@ export default {
     this.defineAccessors()
     let parentReady = Promise.resolve(this.$parent && this.$parent.readyPromise)
     /**
-     * @type {Promise<void>}
+     * @type {Promise<Vue<T>>}
      * @protected
      */
     this._readyPromise = parentReady.then(this.init)
+      .then(() => {
+        logdbg('created', this.$options.name)
+        return this
+      })
     /**
-     * @type {Promise<void>}
+     * @type {Promise<Vue<T>>}
      * @protected
      */
     this._mountPromise = Observable.interval(100)
       .skipWhile(() => !this._mounted)
       .first()
+      .map(() => this)
       .toPromise()
 
     Object.defineProperties(this, {
@@ -137,19 +143,10 @@ export default {
     })
   },
   mounted () {
-    // wait for children
-    let childrenMount = Promise.all(this.$children.reduce((all, child) => {
-      if (child.mountPromise) {
-        all.push(child.mountPromise)
-      }
-
-      return all
-    }, []))
-
-    this.readyPromise.then(childrenMount)
-      .then(this.mount)
+    this.readyPromise.then(this.mount)
       .then(() => {
         this._mounted = true
+        logdbg('mounted', this.$options.name)
       })
   },
   destroyed () {
@@ -157,6 +154,7 @@ export default {
       .then(this.deinit)
       .then(() => {
         this._readyPromise = this._mountPromise = undefined
+        logdbg('destroyed', this.$options.name)
       })
   }
 }

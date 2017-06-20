@@ -129,7 +129,9 @@
       } else if (isPlainObject(geom)) {
         geom = geoJson.readGeometry(geom, this.map.view.getProjection())
       }
-      this.feature.setGeometry(geom)
+      if (geom !== this.feature.getGeometry()) {
+        this.feature.setGeometry(geom)
+      }
     }
   }
 

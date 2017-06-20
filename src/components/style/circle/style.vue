@@ -30,8 +30,10 @@
      */
     setFill (fill) {
       fill = fill instanceof Vue ? fill.style : fill
-      this.fill = fill
-      this.requestRefresh()
+      if (fill !== this.fill) {
+        this.fill = fill
+        this.requestRefresh()
+      }
     },
     /**
      * @param {ol.style.Stroke|Vue|undefined} stroke
@@ -39,8 +41,10 @@
      */
     setStroke (stroke) {
       stroke = stroke instanceof Vue ? stroke.style : stroke
-      this.stroke = stroke
-      this.requestRefresh()
+      if (stroke !== this.stroke) {
+        this.stroke = stroke
+        this.requestRefresh()
+      }
     }
   }
 

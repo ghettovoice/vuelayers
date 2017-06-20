@@ -54,7 +54,9 @@
      */
     setSource (source) {
       source = source instanceof Vue ? source.source : source
-      this.sourceBuilder.setSource(source)
+      if (source !== this.sourceBuilder.getSource()) {
+        this.sourceBuilder.setSource(source)
+      }
     }
   }
 
