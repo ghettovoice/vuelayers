@@ -55,6 +55,10 @@
         map: {
           enumerable: true,
           get: () => this.services && this.services.map
+        },
+        geometry: {
+          enumerable: true,
+          get: this.getGeometryCmp
         }
       })
     },
@@ -63,6 +67,35 @@
      */
     getFeature () {
       return this.olObject
+    },
+    /**
+     * @return {ol.geom.Geometry|undefined}
+     */
+    getGeometry () {
+      return this.feature && this.feature.getGeometry()
+    },
+    /**
+     * @return {Vue<ol.geom.Geometry>|undefined}
+     */
+    getGeometryCmp () {
+      return this.$children.slice().find(c => c.hasOwnProperty('geom'))
+    },
+    /**
+     * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
+     * @return {void}
+     */
+    setGeometry (geom) {
+      assert.hasMap(this)
+      assert.hasFeature(this)
+
+      if (geom instanceof Vue) {
+        geom = geom.geom
+      } else if (isPlainObject(geom)) {
+        geom = geoJson.readGeometry(geom, this.map.view.projection)
+      }
+      if (geom !== this.feature.getGeometry()) {
+        this.feature.setGeometry(geom)
+      }
     },
     /**
      * @return {Object}
@@ -115,23 +148,6 @@
     refresh () {
       assert.hasFeature(this)
       this.feature.changed()
-    },
-    /**
-     * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
-     * @return {void}
-     */
-    setGeometry (geom) {
-      assert.hasMap(this)
-      assert.hasFeature(this)
-
-      if (geom instanceof Vue) {
-        geom = geom.geom
-      } else if (isPlainObject(geom)) {
-        geom = geoJson.readGeometry(geom, this.map.view.getProjection())
-      }
-      if (geom !== this.feature.getGeometry()) {
-        this.feature.setGeometry(geom)
-      }
     }
   }
 

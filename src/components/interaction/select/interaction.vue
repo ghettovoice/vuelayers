@@ -89,9 +89,7 @@
      */
     mount () {
       this::interaction.methods.mount()
-      // todo wait for source loaded, or make it in select ?
-      Promise.all(this.map.getLayersCmp().map(l => l.getSourceCmp().mountPromise))
-        .then(() => this.features.forEach(this.select))
+      this.features.forEach(this.select)
     },
     /**
      * @return {void}
@@ -124,15 +122,12 @@
 
       if (!(feature instanceof Feature)) {
         feature = undefined
-        const layers = this.map.map.getLayers().getArray()
-
         forEach(layer => {
-          const source = layer.getSource()
-          if (isFunction(source.getFeatureById)) {
-            feature = layer.getSource().getFeatureById(id)
+          if (isFunction(layer.source.getFeatureById)) {
+            feature = layer.source.getFeatureById(id)
           }
           return !feature
-        }, layers)
+        }, this.map.layers)
       }
 
       feature && selection.push(feature)

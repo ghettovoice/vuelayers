@@ -8,6 +8,7 @@
   import source from '../source'
   import * as assert from '../../../utils/assert'
 
+  // todo add support of format, url and default xhr loader
   const props = {
     // for big datasets
     features: {
@@ -31,9 +32,7 @@
       type: Boolean,
       default: true
     }
-    // todo implement options (tiled loading strategy & etc)
-    // format: String,
-    // strategy: String
+    // format: String
   }
 
   const methods = {

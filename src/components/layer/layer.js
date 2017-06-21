@@ -47,7 +47,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {Promise}
+   * @return {Promise<Vue<ol.layer.Layer>>}
    * @protected
    */
   init () {
@@ -73,6 +73,10 @@ const methods = {
       map: {
         enumerable: true,
         get: () => this.services && this.services.map
+      },
+      source: {
+        enumerable: true,
+        get: this.getSourceCmp
       }
     })
   },
@@ -107,7 +111,7 @@ const methods = {
     return this.layer && this.layer.getSource()
   },
   /**
-   * @return {Vue|undefined}
+   * @return {Vue<ol.source.Source>|undefined}
    */
   getSourceCmp () {
     return this.$children.slice().reverse().find(c => c.hasOwnProperty('source'))

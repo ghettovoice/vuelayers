@@ -151,7 +151,15 @@
         },
         view: {
           enumerable: true,
-          get: this.getView
+          get: this.getViewCmp
+        },
+        layers: {
+          enumerable: true,
+          get: this.getLayersCmp
+        },
+        interactions: {
+          enumerable: true,
+          get: this.getInteractionsCmp
         }
       })
     },
@@ -190,7 +198,7 @@
       assert.hasMap(this)
       assert.hasView(this)
 
-      return proj.toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.getProjection())
+      return proj.toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.projection)
     },
     /**
      * @return {ol.Map|undefined}
@@ -212,6 +220,12 @@
      */
     getView () {
       return this.map && this.map.getView()
+    },
+    /**
+     * @return {Vue<ol.View>|undefined}
+     */
+    getViewCmp () {
+      return this.$children.slice().reverse().find(c => c.hasOwnProperty('view'))
     },
     /**
      * @param {ol.View|Vue|undefined} view
@@ -293,7 +307,7 @@
         .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
     ).map(evt => ({
       ...evt,
-      coordinate: proj.toLonLat(evt.coordinate, this.view.getProjection())
+      coordinate: proj.toLonLat(evt.coordinate, this.view.projection)
     }))
     // other
     const otherEvents = Observable.fromOlEvent(this.map, [

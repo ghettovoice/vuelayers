@@ -4,6 +4,7 @@
   import source from '../source'
   import { EPSG_4326, geom as geomHelper } from '../../../ol-ext'
 
+  // todo make inherit from vector
   const props = {
     distance: {
       type: Number,
@@ -29,7 +30,6 @@
      */
     createSource () {
       const geomFunc = this.geomFunc
-      // todo проброс ident map в билдер и нормальная подмена для род. миксина
       // partial setup of ol.source.Cluster with the help of SourceBuilder class
       /**
        * @type {SourceBuilder}
@@ -46,6 +46,18 @@
         .setWrapX(this.wrapX)
 
       return this.sourceBuilder.promise()
+    },
+    /**
+     * @return {ol.source.Vector|undefined}
+     */
+    getSource () {
+      return this.sourceBuilder && this.sourceBuilder.getSource()
+    },
+    /**
+     * @return {Vue<ol.source.Vector>|undefined}
+     */
+    getSourceCmp () {
+      return this.$children.slice().reverse().find(c => c.hasOwnProperty('source'))
     },
     /**
      * Set inner vector source
@@ -84,12 +96,13 @@
 
   /**
    * @param {ol.Feature} feature
+   * @param {Object} h
    * @returns {ol.geom.Point|undefined}
    */
-  function defaultGeomFunc (feature) {
+  function defaultGeomFunc (feature, { pointOnSurface }) {
     let geom = feature.getGeometry()
     if (!geom) return
 
-    return geomHelper.pointOnSurface(geom)
+    return pointOnSurface(geom)
   }
 </script>

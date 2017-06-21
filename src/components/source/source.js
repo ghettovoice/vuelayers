@@ -45,7 +45,7 @@ const methods = {
     })
   },
   /**
-   * @return {Promise}
+   * @return {Promise<Vue<ol.source.Source>>}
    * @protected
    */
   init () {

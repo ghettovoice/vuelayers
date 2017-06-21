@@ -15,7 +15,7 @@ import {
 import replaceTokens from '../../utils/replace-tokens'
 import source from './source'
 
-// todo extract tileGrid into separate component!
+// todo extract tileGrid into separate component or mixin?
 const props = {
   cacheSize: {
     type: Number,

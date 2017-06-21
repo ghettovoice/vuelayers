@@ -63,21 +63,21 @@ const methods = {
      * @return {number[]}
      * @protected
      */
-    this.toLonLat = coordinates => toLonLat(coordinates, this.map.view.getProjection())
+    this.toLonLat = coordinates => toLonLat(coordinates, this.map.view.projection)
     /**
      * @method
      * @param {number[]} coordinates
      * @return {number[]}
      * @protected
      */
-    this.fromLonLat = coordinates => fromLonLat(coordinates, this.map.view.getProjection())
+    this.fromLonLat = coordinates => fromLonLat(coordinates, this.map.view.projection)
     /**
      * @method
      * @param {number[]} extent
      * @return {number[]}
      * @protected
      */
-    this.extentToLonLat = extent => proj.extentToLonLat(extent, this.map.view.getProjection())
+    this.extentToLonLat = extent => proj.extentToLonLat(extent, this.map.view.projection)
 
     return this::cmp.methods.init()
   },
