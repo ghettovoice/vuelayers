@@ -1,11 +1,11 @@
 /**
  * @module components/geom/multi-point
  */
-import MultiPoint from './geom.vue'
+import Geom from './geom.vue'
 
 export default {
-  ...MultiPoint,
+  Geom,
   install (Vue) {
-    Vue.component(MultiPoint.name, MultiPoint)
+    Vue.component(Geom.name, Geom)
   }
 }

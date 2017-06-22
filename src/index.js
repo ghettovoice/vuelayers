@@ -12,6 +12,7 @@ import VueLayers from './index.cjs'
 export default VueLayers
 export const {
   install,
+  mixins,
   // common
   Map,
   View,

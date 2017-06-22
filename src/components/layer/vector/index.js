@@ -1,11 +1,11 @@
 /**
  * @module components/layer/vector
  */
-import Vector from './layer.vue'
+import Layer from './layer.vue'
 
 export default {
-  ...Vector,
+  Layer,
   install (Vue) {
-    Vue.component(Vector.name, Vector)
+    Vue.component(Layer.name, Layer)
   }
 }

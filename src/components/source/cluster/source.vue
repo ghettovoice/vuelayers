@@ -1,8 +1,8 @@
 <script>
   import Vue from 'vue'
   import SourceBuilder from './builder'
-  import source from '../source'
-  import { EPSG_4326, geom as geomHelper } from '../../../ol-ext'
+  import vectSource from '../vect'
+  import { geom as geomHelper } from '../../../ol-ext'
 
   // todo make inherit from vector
   const props = {
@@ -16,10 +16,6 @@
     geomFunc: {
       type: Function,
       default: defaultGeomFunc
-    },
-    projection: {
-      type: String,
-      default: EPSG_4326
     }
   }
 
@@ -48,15 +44,17 @@
       return this.sourceBuilder.promise()
     },
     /**
+     * Returns inner wrapped vector source
      * @return {ol.source.Vector|undefined}
      */
-    getSource () {
+    getInnerSource () {
       return this.sourceBuilder && this.sourceBuilder.getSource()
     },
     /**
+     * Returns inner wrapped vector source component
      * @return {Vue<ol.source.Vector>|undefined}
      */
-    getSourceCmp () {
+    getInnerSourceCmp () {
       return this.$children.slice().reverse().find(c => c.hasOwnProperty('source'))
     },
     /**
@@ -80,18 +78,10 @@
 
   export default {
     name: 'vl-source-cluster',
-    mixins: [source],
+    mixins: [vectSource],
     props,
     methods,
-    watch,
-    stubVNode: {
-      empty: false,
-      attrs () {
-        return {
-          id: this.$options.name
-        }
-      }
-    }
+    watch
   }
 
   /**

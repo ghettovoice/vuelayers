@@ -1,3 +1,18 @@
+import identMap from './ident-map'
+import olCmp from './ol-cmp'
+import olVirtCmp from './ol-virt-cmp'
+import rxSubs from './rx-subs'
+import services from './services'
+import stubVNode from './stub-vnode'
+import styleTarget from './style-target'
+import interaction from './interaction/interaction'
+import layer from './layer/layer'
+import source from './source/source'
+import tileSource from './source/tile'
+import style from './style/style'
+import imageStyle from './style/image'
+import withFillStrokeStyle from './style/with-fill-stroke'
+
 export Map from './map'
 export View from './view'
 export Feature from './feature'
@@ -33,3 +48,20 @@ export StyleBox from './style/box'
 export StyleContainer from './style/container'
 export StyleFunc from './style/func'
 export TextStyle from './style/text'
+
+export const mixins = {
+  identMap,
+  olCmp,
+  olVirtCmp,
+  rxSubs,
+  services,
+  stubVNode,
+  styleTarget,
+  interaction,
+  layer,
+  source,
+  tileSource,
+  style,
+  imageStyle,
+  withFillStrokeStyle
+}

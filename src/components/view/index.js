@@ -4,7 +4,7 @@
 import View from './view.vue'
 
 export default {
-  ...View,
+  View,
   install (Vue) {
     Vue.component(View.name, View)
   }

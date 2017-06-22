@@ -2,11 +2,11 @@
  * @module components/style/container
  * @deprecated
  */
-import Container from './style.vue'
+import Style from './style.vue'
 
 export default {
-  ...Container,
+  Style,
   install (Vue) {
-    Vue.component(Container.name, Container)
+    Vue.component(Style.name, Style)
   }
 }

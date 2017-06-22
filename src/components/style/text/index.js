@@ -1,11 +1,11 @@
 /**
  * @module components/style/text
  */
-import Text from './style.vue'
+import Style from './style.vue'
 
 export default {
-  ...Text,
+  Style,
   install (Vue) {
-    Vue.component(Text.name, Text)
+    Vue.component(Style.name, Style)
   }
 }

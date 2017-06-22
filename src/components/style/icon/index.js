@@ -1,8 +1,8 @@
-import Icon from './style.vue'
+import Style from './style.vue'
 
 export default {
-  ...Icon,
+  Style,
   install (Vue) {
-    Vue.component(Icon.name, Icon)
+    Vue.component(Style.name, Style)
   }
 }

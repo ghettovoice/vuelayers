@@ -1,11 +1,11 @@
 /**
  * @module components/geom/polygon
  */
-import Polygon from './geom.vue'
+import Geom from './geom.vue'
 
 export default {
-  ...Polygon,
+  Geom,
   install (Vue) {
-    Vue.component(Polygon.name, Polygon)
+    Vue.component(Geom.name, Geom)
   }
 }

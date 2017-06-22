@@ -1,11 +1,11 @@
 /**
  * @module components/style/fill
  */
-import Fill from './style.vue'
+import Style from './style.vue'
 
 export default {
-  ...Fill,
+  Style,
   install (Vue) {
-    Vue.component(Fill.name, Fill)
+    Vue.component(Style.name, Style)
   }
 }

@@ -1,8 +1,8 @@
-import RegShape from './style.vue'
+import Style from './style.vue'
 
 export default {
-  ...RegShape,
+  Style,
   install (Vue) {
-    Vue.component(RegShape.name, RegShape)
+    Vue.component(Style.name, Style)
   }
 }

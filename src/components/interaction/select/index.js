@@ -1,11 +1,11 @@
 /**
  * @module components/interaction/select
  */
-import Select from './interaction.vue'
+import Geom from './interaction.vue'
 
 export default {
-  ...Select,
+  Geom,
   install (Vue) {
-    Vue.component(Select.name, Select)
+    Vue.component(Geom.name, Geom)
   }
 }

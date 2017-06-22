@@ -5,7 +5,7 @@
 import Map from './map.vue'
 
 export default {
-  ...Map,
+  Map,
   install (Vue) {
     Vue.component(Map.name, Map)
   }

@@ -1,11 +1,11 @@
 /**
  * @module components/geom/line-string
  */
-import LineString from './geom.vue'
+import Geom from './geom.vue'
 
 export default {
-  ...LineString,
+  Geom,
   install (Vue) {
-    Vue.component(LineString.name, LineString)
+    Vue.component(Geom.name, Geom)
   }
 }

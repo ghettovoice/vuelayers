@@ -1,11 +1,11 @@
 /**
  * @module components/style/container
  */
-import Box from './style.vue'
+import Style from './style.vue'
 
 export default {
-  ...Box,
+  Style,
   install (Vue) {
-    Vue.component(Box.name, Box)
+    Vue.component(Style.name, Style)
   }
 }

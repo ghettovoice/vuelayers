@@ -1,11 +1,11 @@
 /**
  * @module components/style/stroke
  */
-import Stroke from './style.vue'
+import Style from './style.vue'
 
 export default {
-  ...Stroke,
+  Style,
   install (Vue) {
-    Vue.component(Stroke.name, Stroke)
+    Vue.component(Style.name, Style)
   }
 }

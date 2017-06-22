@@ -303,10 +303,10 @@ function getComponents () {
         // base mixins and helpers
         return files.concat({
           entry: file,
-          bundleName: path.join('modules', pathParts.join('-')),
+          bundleName: path.join('modules', 'mixins', pathParts.join('-')),
           styleName: false,
           src: path.join('components', relPath),
-          dest: path.join('modules', pathParts.join('-'))
+          dest: path.join('modules', 'mixins', pathParts.join('-'))
         })
       }, []))
     })
