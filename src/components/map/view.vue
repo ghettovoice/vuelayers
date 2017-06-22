@@ -241,7 +241,7 @@
     assert.hasView(this)
 
     const ft = 100
-    const getCenter = () => proj.toLonLat(this.view.getCenter())
+    const getCenter = () => proj.toLonLat(this.view.getCenter(), this.view.getProjection())
     const getZoom = () => Math.round(this.view.getZoom())
 
     const center = Observable.fromOlEvent(this.view, 'change:center', getCenter)

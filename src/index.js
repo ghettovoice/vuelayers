@@ -15,7 +15,6 @@ export const {
   mixins,
   // common
   Map,
-  View,
   Feature,
   Geoloc,
   // geoms

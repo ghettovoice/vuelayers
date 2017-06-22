@@ -14,7 +14,6 @@ import imageStyle from './style/image'
 import withFillStrokeStyle from './style/with-fill-stroke'
 
 export Map from './map'
-export View from './view'
 export Feature from './feature'
 export Geoloc from './geoloc'
 // geoms
