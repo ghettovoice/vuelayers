@@ -1,6 +1,4 @@
 import { pick } from 'lodash/fp'
-import proj from 'ol/proj'
-import TileGrid from 'ol/tilegrid/tilegrid'
 import {
   CACHE_SIZE,
   CROSS_ORIGIN,
@@ -10,12 +8,13 @@ import {
   PIXEL_RATIO,
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
-  tileGrid as tileGridHelper
+  tileGrid as tileGridHelper,
+  extent as extentHelper
 } from '../../ol-ext'
 import replaceTokens from '../../utils/replace-tokens'
 import source from './source'
+import * as assert from '../../utils/assert'
 
-// todo extract tileGrid into separate component or mixin?
 const props = {
   cacheSize: {
     type: Number,
@@ -24,10 +23,6 @@ const props = {
   crossOrigin: {
     type: String,
     default: CROSS_ORIGIN
-  },
-  gridOpts: {
-    type: Object,
-    validator: value => Array.isArray(value.resolutions) && value.resolutions.length
   },
   maxZoom: {
     type: Number,
@@ -71,28 +66,7 @@ const computed = {
   /**
    * @type {string[]}
    */
-  urlTokens () { return [] },
-  /**
-   * @type {number[]|ol.Extent}
-   */
-  projectionExtent () {
-    return proj.get(this.projection).getExtent()
-  },
-  /**
-   * @type {Object}
-   */
-  preparedGridOpts () {
-    return {
-      resolutions: tileGridHelper.resolutionsFromExtent(
-        this.projectionExtent,
-        this.maxZoom,
-        this.tileSize
-      ),
-      minZoom: this.minZoom,
-      extent: this.projectionExtent,
-      ...this.gridOpts
-    }
-  }
+  urlTokens () { return [] }
 }
 
 const methods = {
@@ -101,20 +75,25 @@ const methods = {
    * @protected
    */
   createTileGrid () {
-    return new TileGrid(this.preparedGridOpts)
+    assert.hasMap(this)
+
+    return tileGridHelper.createXYZ({
+      extent: extentHelper.fromProjection(this.map.getView().getProjection()),
+      maxZoom: this.maxZoom,
+      minZoom: this.minZoom,
+      tileSize: this.tileSize
+    })
   },
   /**
    * @return {Promise}
    * @protected
    */
   init () {
-    if (this.preparedGridOpts) {
-      /**
-       * @type {ol.tilegrid.TileGrid}
-       * @protected
-       */
-      this.tileGrid = this.createTileGrid()
-    }
+    /**
+     * @type {ol.tilegrid.TileGrid}
+     * @protected
+     */
+    this.tileGrid = this.createTileGrid()
 
     return this::source.methods.init()
   },

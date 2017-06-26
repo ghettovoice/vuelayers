@@ -56,9 +56,9 @@
           enumerable: true,
           get: () => this.services && this.services.map
         },
-        geometry: {
+        geom: {
           enumerable: true,
-          get: this.getGeometryCmp
+          get: this.getGeom
         }
       })
     },
@@ -71,29 +71,23 @@
     /**
      * @return {ol.geom.Geometry|undefined}
      */
-    getGeometry () {
+    getGeom () {
       return this.feature && this.feature.getGeometry()
-    },
-    /**
-     * @return {Vue<ol.geom.Geometry>|undefined}
-     */
-    getGeometryCmp () {
-      return this.$children.slice().find(c => c.hasOwnProperty('geom'))
     },
     /**
      * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
      * @return {void}
      */
-    setGeometry (geom) {
+    setGeom (geom) {
       assert.hasMap(this)
       assert.hasFeature(this)
 
       if (geom instanceof Vue) {
         geom = geom.geom
       } else if (isPlainObject(geom)) {
-        geom = geoJson.readGeometry(geom, this.map.view.projection)
+        geom = geoJson.readGeometry(geom, this.map.getView().getProjection())
       }
-      if (geom !== this.feature.getGeometry()) {
+      if (geom !== this.geom) {
         this.feature.setGeometry(geom)
       }
     },
@@ -102,8 +96,10 @@
      * @protected
      */
     getServices () {
+      const vm = this
+
       return mergeDescriptors(this::cmp.methods.getServices(), {
-        feature: this
+        get feature () { return vm.feature }
       })
     },
     /**

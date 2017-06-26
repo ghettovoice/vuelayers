@@ -36,7 +36,7 @@ const methods = {
     if (feature instanceof Vue) {
       feature = feature.feature
     } else if (isPlainObject(feature)) {
-      feature = geoJson.readFeature(feature, this.map.view.getProjection())
+      feature = geoJson.readFeature(feature, this.map.getView().getProjection())
     }
     if (feature.getId() == null) {
       feature.setId(uuid())
@@ -98,7 +98,6 @@ const methods = {
 }
 
 export default {
-  name: 'vl-source-vector',
   mixins: [source],
   props,
   methods,

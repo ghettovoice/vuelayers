@@ -1,7 +1,9 @@
 <script>
   import { createTileUrlFunction } from 'ol-tilecache'
   import XYZSource from 'ol/source/xyz'
+  import { extent as extentHelper } from '../../../ol-ext'
   import tileSource from '../tile'
+  import * as assert from '../../../utils/assert'
 
   const props = {}
 
@@ -31,7 +33,13 @@
      * @protected
      */
     createTileUrlFunction () {
-      return createTileUrlFunction(this.urlTmpl, this.tileGrid, this.projectionExtent)
+      assert.hasMap(this)
+
+      return createTileUrlFunction(
+        this.urlTmpl,
+        this.tileGrid,
+        extentHelper.fromProjection(this.map.getView().getProjection())
+      )
     }
   }
 

@@ -2,7 +2,7 @@
  * Extent extensions
  */
 import olextent from 'ol/extent'
-import proj from 'ol/proj'
+import olproj from 'ol/proj'
 import { EXTENT_CORNER, PROJ_UNIT } from './consts'
 
 export const {
@@ -67,12 +67,12 @@ export function getCorner (extent, corner) {
  * @return {ol.Extent} Extent.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L148
  */
-export function extentFromProjection (projection) {
-  projection = proj.get(projection)
+export function fromProjection (projection) {
+  projection = olproj.get(projection)
   let extent = projection.getExtent()
 
   if (!extent) {
-    let half = 180 * proj.METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
+    let half = 180 * olproj.METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
       projection.getMetersPerUnit()
     extent = createOrUpdate(-half, -half, half, half)
   }

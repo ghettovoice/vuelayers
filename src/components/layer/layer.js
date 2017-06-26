@@ -70,13 +70,13 @@ const methods = {
         enumerable: true,
         get: this.getLayer
       },
+      source: {
+        enumerable: true,
+        get: this.getSource
+      },
       map: {
         enumerable: true,
         get: () => this.services && this.services.map
-      },
-      source: {
-        enumerable: true,
-        get: this.getSourceCmp
       }
     })
   },
@@ -100,8 +100,10 @@ const methods = {
    * @protected
    */
   getServices () {
+    const vm = this
+
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      layer: this
+      get layer () { return vm.layer }
     })
   },
   /**
@@ -111,12 +113,6 @@ const methods = {
     return this.layer && this.layer.getSource()
   },
   /**
-   * @return {Vue<ol.source.Source>|undefined}
-   */
-  getSourceCmp () {
-    return this.$children.slice().reverse().find(c => c.hasOwnProperty('source'))
-  },
-  /**
    * @param {ol.source.Source|Vue|undefined} source
    * @return {void}
    */
@@ -124,7 +120,7 @@ const methods = {
     assert.hasLayer(this)
 
     source = source instanceof Vue ? source.source : source
-    if (source !== this.layer.getSource()) {
+    if (source !== this.source) {
       this.layer.setSource(source)
     }
   },

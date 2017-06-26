@@ -17,7 +17,7 @@
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
   import '../../rx-ext'
-  import { proj } from '../../ol-ext'
+  import { proj as projHelper } from '../../ol-ext'
   import cmp from '../ol-cmp'
   import * as assert from '../../utils/assert'
 
@@ -57,7 +57,7 @@
       assert.hasMap(this)
 
       layer = layer instanceof Vue ? layer.layer : layer
-      if (layer && !this.map.getLayers().getArray().includes(layer)) {
+      if (layer && !this.layers.includes(layer)) {
         this.map.addLayer(layer)
       }
     },
@@ -78,12 +78,6 @@
       return (this.map && this.map.getLayers().getArray()) || []
     },
     /**
-     * @return {Vue<ol.layer.Layer>[]}
-     */
-    getLayersCmp () {
-      return this.$children.filter(c => c.hasOwnProperty('layer'))
-    },
-    /**
      * @param {ol.interaction.Interaction|Vue} interaction
      * @return {void}
      */
@@ -91,7 +85,7 @@
       assert.hasMap(this)
 
       interaction = interaction instanceof Vue ? interaction.interaction : interaction
-      if (interaction && !this.map.getInteractions().getArray().includes(interaction)) {
+      if (interaction && !this.interactions.includes(interaction)) {
         this.map.addInteraction(interaction)
       }
     },
@@ -110,12 +104,6 @@
      */
     getInteractions () {
       return (this.map && this.map.getInteractions().getArray()) || []
-    },
-    /**
-     * @return {Vue<ol.interaction.Interaction>[]}
-     */
-    getInteractionsCmp () {
-      return this.$children.filter(c => c.hasOwnProperty('interaction'))
     },
     /**
      * @return {ol.Map}
@@ -151,15 +139,15 @@
         },
         view: {
           enumerable: true,
-          get: this.getViewCmp
+          get: this.getView
         },
         layers: {
           enumerable: true,
-          get: this.getLayersCmp
+          get: this.getLayers
         },
         interactions: {
           enumerable: true,
-          get: this.getInteractionsCmp
+          get: this.getInteractions
         }
       })
     },
@@ -178,6 +166,7 @@
      */
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       assert.hasMap(this)
+
       return this.map.forEachFeatureAtPixel(pixel, callback, opts)
     },
     /**
@@ -188,6 +177,7 @@
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
       assert.hasMap(this)
+
       return this.map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
@@ -198,7 +188,7 @@
       assert.hasMap(this)
       assert.hasView(this)
 
-      return proj.toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.projection)
+      return projHelper.toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.getProjection())
     },
     /**
      * @return {ol.Map|undefined}
@@ -211,8 +201,10 @@
      * @protected
      */
     getServices () {
+      const vm = this
+
       return mergeDescriptors(this::cmp.methods.getServices(), {
-        map: this
+        get map () { return vm.map }
       })
     },
     /**
@@ -222,12 +214,6 @@
       return this.map && this.map.getView()
     },
     /**
-     * @return {Vue<ol.View>|undefined}
-     */
-    getViewCmp () {
-      return this.$children.slice().reverse().find(c => c.hasOwnProperty('view'))
-    },
-    /**
      * @param {ol.View|Vue|undefined} view
      * @return {void}
      */
@@ -235,7 +221,7 @@
       assert.hasMap(this)
 
       view = view instanceof Vue ? view.view : view
-      if (view !== this.map.getView()) {
+      if (view !== this.view) {
         this.map.setView(view)
       }
     },
@@ -246,7 +232,6 @@
     mount () {
       assert.hasMap(this)
       this.map.setTarget(this.$refs.map)
-      this.refresh()
       this.subscribeAll()
     },
     /**
@@ -307,7 +292,7 @@
         .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
     ).map(evt => ({
       ...evt,
-      coordinate: proj.toLonLat(evt.coordinate, this.view.projection)
+      coordinate: projHelper.toLonLat(evt.coordinate, this.view.getProjection())
     }))
     // other
     const otherEvents = Observable.fromOlEvent(this.map, [

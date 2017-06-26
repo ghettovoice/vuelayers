@@ -25,7 +25,7 @@
         opacity: this.opacity,
         visible: this.visible,
         preload: this.preload,
-        extent: this.currentExtent,
+        extent: this.extent,
         zIndex: this.zIndex,
         updateWhileAnimating: this.updateWhileAnimating,
         updateWhileInteracting: this.updateWhileInteracting

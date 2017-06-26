@@ -111,7 +111,7 @@ export default {
   methods,
   created () {
     this.defineAccessors()
-    let parentReady = Promise.resolve(this.$parent && this.$parent.readyPromise)
+    const parentReady = Promise.resolve(this.$parent && this.$parent.readyPromise)
     /**
      * @type {Promise<Vue<T>>}
      * @protected

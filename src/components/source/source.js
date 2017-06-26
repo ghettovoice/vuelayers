@@ -63,8 +63,10 @@ const methods = {
    * @protected
    */
   getServices () {
+    const vm = this
+
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      source: this
+      get source () { return vm.source }
     })
   },
   /**

@@ -51,13 +51,6 @@
       return this.sourceBuilder && this.sourceBuilder.getSource()
     },
     /**
-     * Returns inner wrapped vector source component
-     * @return {Vue<ol.source.Vector>|undefined}
-     */
-    getInnerSourceCmp () {
-      return this.$children.slice().reverse().find(c => c.hasOwnProperty('source'))
-    },
-    /**
      * Set inner vector source
      * @param {ol.source.Vector|Vue|undefined} source
      * @return {void}

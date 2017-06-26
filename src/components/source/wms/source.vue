@@ -61,7 +61,7 @@
      *                          `version` should not be specified here (value from `version` prop will be used).
      * @return {string|undefined}
      */
-    getGetFeatureInfoUrl (
+    getFeatureInfoUrl (
       coordinate,
       resolution,
       projection,
@@ -70,7 +70,7 @@
       assert.hasMap(this)
       assert.hasSource(this)
 
-      resolution || (resolution = this.map.view.getResolution())
+      resolution || (resolution = this.map.getView().getResolution())
       projection || (projection = this.projection)
 
       return this.source.getFeatureInfoUrl(

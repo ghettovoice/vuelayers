@@ -1,7 +1,7 @@
 /**
  * Projection transform helpers
  */
-import proj from 'ol/proj'
+import olproj from 'ol/proj'
 import { EPSG_3857, EPSG_4326, GEOMETRY_TYPE } from './consts'
 
 export const {
@@ -12,7 +12,7 @@ export const {
   getPointResolution,
   get,
   equivalent
-} = proj
+} = olproj
 
 /**
  * @param {number[]} coordinate

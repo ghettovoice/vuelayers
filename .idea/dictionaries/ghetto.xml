@@ -43,6 +43,9 @@
       <w>noop</w>
       <w>olcontrol</w>
       <w>olextent</w>
+      <w>olproj</w>
+      <w>olsize</w>
+      <w>oltilegrid</w>
       <w>openstreetmap</w>
       <w>overriden</w>
       <w>pacman</w>

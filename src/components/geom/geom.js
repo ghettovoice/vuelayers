@@ -6,7 +6,7 @@ import 'rxjs/add/operator/distinctUntilChanged'
 import 'rxjs/add/operator/map'
 import '../../rx-ext'
 import cmp from '../ol-virt-cmp'
-import { extent, proj } from '../../ol-ext'
+import { extent as extentHelper, proj as projHelper } from '../../ol-ext'
 import * as assert from '../../utils/assert'
 
 const props = {
@@ -56,28 +56,28 @@ const methods = {
    */
   init () {
     // define helper methods based on geometry type
-    const { toLonLat, fromLonLat } = proj.transforms[this.type]
+    const { toLonLat, fromLonLat } = projHelper.transforms[this.type]
     /**
      * @method
      * @param {number[]} coordinates
      * @return {number[]}
      * @protected
      */
-    this.toLonLat = coordinates => toLonLat(coordinates, this.map.view.projection)
+    this.toLonLat = coordinates => toLonLat(coordinates, this.map.getView().getProjection())
     /**
      * @method
      * @param {number[]} coordinates
      * @return {number[]}
      * @protected
      */
-    this.fromLonLat = coordinates => fromLonLat(coordinates, this.map.view.projection)
+    this.fromLonLat = coordinates => fromLonLat(coordinates, this.map.getView().getProjection())
     /**
      * @method
      * @param {number[]} extent
      * @return {number[]}
      * @protected
      */
-    this.extentToLonLat = extent => proj.extentToLonLat(extent, this.map.view.projection)
+    this.extentToLonLat = extent => projHelper.extentToLonLat(extent, this.map.getView().getProjection())
 
     return this::cmp.methods.init()
   },
@@ -122,8 +122,10 @@ const methods = {
    * @protected
    */
   getServices () {
+    const vm = this
+
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      geom: this
+      get geom () { return vm.geom }
     })
   },
   /**
@@ -131,7 +133,7 @@ const methods = {
    * @protected
    */
   mount () {
-    this.$parent.setGeometry(this)
+    this.$parent.setGeom(this)
     this.subscribeAll()
   },
   /**
@@ -140,7 +142,7 @@ const methods = {
    */
   unmount () {
     this.unsubscribeAll()
-    this.$parent.setGeometry(undefined)
+    this.$parent.setGeom(undefined)
   },
   /**
    * @return {void}
@@ -156,7 +158,7 @@ const watch = {
 
     let isEq = isEqualGeom({
       coordinates: value,
-      extent: extent.boundingExtent(value)
+      extent: extentHelper.boundingExtent(value)
     }, {
       coordinates: this.toLonLat(this.geom.getCoordinates()),
       extent: this.extent
