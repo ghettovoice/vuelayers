@@ -30,13 +30,13 @@ const methods = {
    * @return {void}
    */
   addFeature (feature) {
-    assert.hasMap(this)
+    assert.hasView(this)
     assert.hasSource(this)
 
     if (feature instanceof Vue) {
       feature = feature.feature
     } else if (isPlainObject(feature)) {
-      feature = geoJson.readFeature(feature, this.map.getView().getProjection())
+      feature = geoJson.readFeature(feature, this.view.getProjection())
     }
     if (feature.getId() == null) {
       feature.setId(uuid())
@@ -76,7 +76,6 @@ const methods = {
    * @return {ol.Feature|undefined}
    */
   getFeatureById (id) {
-    assert.hasMap(this)
     assert.hasSource(this)
 
     return this.source.getFeatureById(id)

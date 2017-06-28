@@ -129,10 +129,12 @@ const methods = {
    * @protected
    */
   mount () {
-    if (this.overlay) {
-      this.setMap(this.$parent)
-    } else {
-      this.$parent.addLayer(this)
+    if (this.$parent) {
+      if (this.overlay) {
+        this.setMap(this.$parent)
+      } else {
+        this.$parent.addLayer(this)
+      }
     }
 
     this.subscribeAll()
@@ -144,10 +146,12 @@ const methods = {
   unmount () {
     this.unsubscribeAll()
 
-    if (this.overlay) {
-      this.setMap(undefined)
-    } else {
-      this.$parent.removeLayer(this)
+    if (this.$parent) {
+      if (this.overlay) {
+        this.setMap(undefined)
+      } else {
+        this.$parent.removeLayer(this)
+      }
     }
   },
   /**
@@ -171,22 +175,34 @@ const methods = {
 
 const watch = {
   id (value) {
-    this.layer && this.layer.set('id', value)
+    if (this.layer && value !== this.layer.get('id')) {
+      this.layer.set('id', value)
+    }
   },
   maxResolution (value) {
-    this.layer && this.layer.setMaxResolution(value)
+    if (this.layer && value !== this.layer.getMaxResolution()) {
+      this.layer.setMaxResolution(value)
+    }
   },
   minResolution (value) {
-    this.layer && this.layer.setMinResolution(value)
+    if (this.layer && value !== this.layer.getMinResolution()) {
+      this.layer.setMinResolution(value)
+    }
   },
   opacity (value) {
-    this.layer && this.layer.setOpacity(value)
+    if (this.layer && value !== this.layer.getOpacity()) {
+      this.layer.setOpacity(value)
+    }
   },
   visible (value) {
-    this.layer && this.layer.setVisible(value)
+    if (this.layer && value !== this.layer.getVisible()) {
+      this.layer.setVisible(value)
+    }
   },
   zIndex (value) {
-    this.layer && this.layer.setZIndex(value)
+    if (this.layer && value !== this.layer.getZIndex()) {
+      this.layer.setZIndex(value)
+    }
   }
 }
 

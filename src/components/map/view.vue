@@ -146,7 +146,7 @@
      * @protected
      */
     mount () {
-      this.$parent.setView(this)
+      this.$parent && this.$parent.setView(this)
       this.subscribeAll()
     },
     /**
@@ -155,7 +155,7 @@
      */
     unmount () {
       this.unsubscribeAll()
-      this.$parent.setView(undefined)
+      this.$parent && this.$parent.setView(undefined)
     },
     /**
      * @return {void}
@@ -175,45 +175,33 @@
 
   const watch = {
     center (value) {
-      if (!this.view) return
-
-      if (!isEqual(value, proj.toLonLat(this.view.getCenter()))) {
+      if (this.view && !isEqual(value, proj.toLonLat(this.view.getCenter()))) {
         this.view.setCenter(proj.fromLonLat(value, this.projection))
       }
     },
     resolution (value) {
-      if (!this.view) return
-
-      if (!value !== this.view.getResolution()) {
+      if (this.view && value !== this.view.getResolution()) {
         this.view.setResolution(value)
       }
     },
     zoom (value) {
-      if (!this.view) return
-
       value = Math.round(value)
-      if (value !== Math.round(this.view.getZoom())) {
+      if (this.view && value !== Math.round(this.view.getZoom())) {
         this.view.setZoom(value)
       }
     },
     rotation (value) {
-      if (!this.view) return
-
-      if (value !== this.view.getRotation()) {
+      if (this.view && value !== this.view.getRotation()) {
         this.view.setRotation(value)
       }
     },
     minZoom (value) {
-      if (!this.view) return
-
-      if (value !== this.view.getMinZoom()) {
+      if (this.view && value !== this.view.getMinZoom()) {
         this.view.setMinZoom(value)
       }
     },
     maxZoom (value) {
-      if (!this.view) return
-
-      if (value !== this.view.getMaxZoom()) {
+      if (this.view && value !== this.view.getMaxZoom()) {
         this.view.setMaxZoom(value)
       }
     }

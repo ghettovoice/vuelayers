@@ -56,9 +56,13 @@
           enumerable: true,
           get: () => this.services && this.services.map
         },
-        geom: {
+        view: {
           enumerable: true,
-          get: this.getGeom
+          get: () => this.services && this.services.view
+        },
+        geometry: {
+          enumerable: true,
+          get: this.getGeometry
         }
       })
     },
@@ -71,23 +75,23 @@
     /**
      * @return {ol.geom.Geometry|undefined}
      */
-    getGeom () {
+    getGeometry () {
       return this.feature && this.feature.getGeometry()
     },
     /**
      * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
      * @return {void}
      */
-    setGeom (geom) {
-      assert.hasMap(this)
+    setGeometry (geom) {
+      assert.hasView(this)
       assert.hasFeature(this)
 
       if (geom instanceof Vue) {
         geom = geom.geom
       } else if (isPlainObject(geom)) {
-        geom = geoJson.readGeometry(geom, this.map.getView().getProjection())
+        geom = geoJson.readGeometry(geom, this.view.getProjection())
       }
-      if (geom !== this.geom) {
+      if (geom !== this.geometry) {
         this.feature.setGeometry(geom)
       }
     },
@@ -127,7 +131,7 @@
      * @protected
      */
     mount () {
-      this.$parent.addFeature(this)
+      this.$parent && this.$parent.addFeature(this)
       this.subscribeAll()
     },
     /**
@@ -136,7 +140,7 @@
      */
     unmount () {
       this.unsubscribeAll()
-      this.$parent.removeFeature(this)
+      this.$parent && this.$parent.removeFeature(this)
     },
     /**
      * @return {void}
@@ -152,7 +156,9 @@
      * @param {string|number} value
      */
     id (value) {
-      this.feature && this.feature.setId(value)
+      if (this.feature && value !== this.feature.getId()) {
+        this.feature.setId(value)
+      }
     },
     /**
      * @param {Object} value

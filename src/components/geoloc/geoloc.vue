@@ -109,7 +109,9 @@
      * @param {boolean} value
      */
     tracking (value) {
-      this.geoloc && this.geoloc.setTracking(value)
+      if (this.geoloc && value !== this.geoloc.getTracking()) {
+        this.geoloc.setTracking(value)
+      }
     },
     tracingOptions (value) {
       this.geoloc && this.geoloc.setTrackingOptions(value)

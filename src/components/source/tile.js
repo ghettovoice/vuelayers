@@ -75,10 +75,10 @@ const methods = {
    * @protected
    */
   createTileGrid () {
-    assert.hasMap(this)
+    assert.hasView(this)
 
     return tileGridHelper.createXYZ({
-      extent: extentHelper.fromProjection(this.map.getView().getProjection()),
+      extent: extentHelper.fromProjection(this.view.getProjection()),
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
       tileSize: this.tileSize
@@ -109,7 +109,9 @@ const methods = {
 
 const watch = {
   urlTmpl (value) {
-    this.source && this.source.setUrl(value)
+    if (this.source && !this.source.getUrls().includes(value)) {
+      this.source.setUrl(value)
+    }
   }
 }
 

@@ -204,7 +204,8 @@
       const vm = this
 
       return mergeDescriptors(this::cmp.methods.getServices(), {
-        get map () { return vm.map }
+        get map () { return vm.map },
+        get view () { return vm.view }
       })
     },
     /**

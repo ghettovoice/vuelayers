@@ -41,6 +41,10 @@ const methods = {
       map: {
         enumerable: true,
         get: () => this.services && this.services.map
+      },
+      view: {
+        enumerable: true,
+        get: () => this.services && this.services.view
       }
     })
   },
@@ -80,7 +84,7 @@ const methods = {
    * @protected
    */
   mount () {
-    this.$parent.setSource(this)
+    this.$parent && this.$parent.setSource(this)
     this.subscribeAll()
   },
   /**
@@ -89,7 +93,7 @@ const methods = {
    */
   unmount () {
     this.unsubscribeAll()
-    this.$parent.setSource(undefined)
+    this.$parent && this.$parent.setSource(undefined)
   },
   /**
    * @return {void}
