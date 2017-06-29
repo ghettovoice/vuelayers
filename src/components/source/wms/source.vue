@@ -1,7 +1,7 @@
 <script>
   import TileWMSSource from 'ol/source/tilewms'
   import { omit } from 'lodash/fp'
-  import { WMS_VERSION, proj } from '../../../ol-ext'
+  import { WMS_VERSION } from '../../../ol-ext'
   import tileSource from '../tile'
   import * as assert from '../../../utils/assert'
 
@@ -53,7 +53,7 @@
       })
     },
     /**
-     * @param {number[]} coordinate Coordinate in EPSG:4326
+     * @param {number[]} coordinate
      * @param {number} [resolution]
      * @param {string} [projection]
      * @param {Object} [params] GetFeatureInfo params. `info_format` at least should be provided.
@@ -67,14 +67,14 @@
       projection,
       params = {}
     ) {
-      assert.hasMap(this)
+      assert.hasView(this)
       assert.hasSource(this)
 
-      resolution || (resolution = this.map.getView().getResolution())
+      resolution || (resolution = this.view.getResolution())
       projection || (projection = this.projection)
 
       return this.source.getFeatureInfoUrl(
-        proj.toLonLat(coordinate, projection),
+        coordinate,
         resolution,
         projection,
         cleanExtParams(params)

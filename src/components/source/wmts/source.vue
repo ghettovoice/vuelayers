@@ -71,11 +71,11 @@
      * @protected
      */
     createTileGrid () {
-      assert.hasMap(this)
+      assert.hasView(this)
 
-      const extent = extentHelper.fromProjection(this.map.getView().getProjection())
+      const extent = extentHelper.fromProjection(this.view.getProjection())
       const resolutions = tileGridHelper.resolutionsFromExtent(
-        this.projectionExtent,
+        extents,
         this.maxZoom,
         this.tileSize
       )

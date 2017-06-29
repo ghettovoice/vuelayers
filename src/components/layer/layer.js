@@ -77,6 +77,10 @@ const methods = {
       map: {
         enumerable: true,
         get: () => this.services && this.services.map
+      },
+      view: {
+        enumerable: true,
+        get: () => this.services && this.services.view
       }
     })
   },

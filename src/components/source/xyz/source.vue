@@ -33,12 +33,12 @@
      * @protected
      */
     createTileUrlFunction () {
-      assert.hasMap(this)
+      assert.hasView(this)
 
       return createTileUrlFunction(
         this.urlTmpl,
         this.tileGrid,
-        extentHelper.fromProjection(this.map.getView().getProjection())
+        extentHelper.fromProjection(this.view.getProjection())
       )
     }
   }

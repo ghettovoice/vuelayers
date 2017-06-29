@@ -65,7 +65,9 @@
 
   const watch = {
     distance (value) {
-      this.source && this.source.setDistance(value)
+      if (this.source && value !== this.source.getDistance()) {
+        this.source.setDistance(value)
+      }
     }
   }
 

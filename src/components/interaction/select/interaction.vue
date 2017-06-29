@@ -58,8 +58,7 @@
         multi: this.multi,
         wrapX: this.wrapX,
         filter: this.filter,
-        style: this.createStyleFunc(),
-        features: new Collection([], { unique: true })
+        style: this.createStyleFunc()
       })
     },
     /**
@@ -123,11 +122,12 @@
       if (!(feature instanceof Feature)) {
         feature = undefined
         forEach(layer => {
-          if (isFunction(layer.source.getFeatureById)) {
-            feature = layer.source.getFeatureById(id)
+          const source = layer.getSource()
+          if (source && isFunction(source.getFeatureById)) {
+            feature = source.getFeatureById(id)
           }
           return !feature
-        }, this.map.layers)
+        }, this.map.getLayers().getArray())
       }
 
       feature && selection.push(feature)
@@ -226,7 +226,6 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    assert.hasMap(this)
     assert.hasInteraction(this)
 
     this.subscribeTo(

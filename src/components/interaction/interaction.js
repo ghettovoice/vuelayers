@@ -41,6 +41,10 @@ const methods = {
       map: {
         enumerable: true,
         get: () => this.services && this.services.map
+      },
+      view: {
+        enumerable: true,
+        get: () => this.services && this.services.view
       }
     })
   },
@@ -55,8 +59,10 @@ const methods = {
    * @protected
    */
   getServices () {
+    const vm = this
+
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      interaction: this
+      get interaction () { return vm.interaction }
     })
   },
   /**
@@ -64,7 +70,7 @@ const methods = {
    * @protected
    */
   mount () {
-    this.$parent.addInteraction(this)
+    this.$parent && this.$parent.addInteraction(this)
     this.subscribeAll()
   },
   /**
@@ -73,7 +79,7 @@ const methods = {
    */
   unmount () {
     this.unsubscribeAll()
-    this.$parent.removeInteraction(this)
+    this.$parent && this.$parent.removeInteraction(this)
   },
   /**
    * @return {void}
@@ -86,7 +92,9 @@ const methods = {
 
 const watch = {
   active (value) {
-    this.interaction && this.interaction.setActive(value)
+    if (this.interaction && value !== this.interaction.getActive()) {
+      this.interaction.setActive(value)
+    }
   }
 }
 
