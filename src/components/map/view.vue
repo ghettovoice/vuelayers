@@ -67,7 +67,7 @@
       let cb = args.reverse().find(x => typeof x === 'function') || noop
 
       return new Promise(
-        resolve => this.view.animate(...args, complete => {
+        resolve => this.$view.animate(...args, complete => {
           cb(complete)
           resolve(complete)
         })
@@ -101,7 +101,7 @@
      */
     defineAccessors () {
       Object.defineProperties(this, {
-        view: {
+        $view: {
           enumerable: true,
           get: this.getView
         }
@@ -118,15 +118,15 @@
 
       // transform to GeoJSON, vl-feature to ol.Feature
       if (isPlainObject(geometryOrExtent)) {
-        geometryOrExtent = geoJson.readGeometry(geometryOrExtent, this.view.getProjection())
+        geometryOrExtent = geoJson.readGeometry(geometryOrExtent, this.$view.getProjection())
       } else if (geometryOrExtent instanceof Vue) {
-        geometryOrExtent = geometryOrExtent.geom
+        geometryOrExtent = geometryOrExtent.$geometry
       }
 
       let cb = options.callback || noop
 
       return new Promise(resolve => {
-        this.view.fit(geometryOrExtent, {
+        this.$view.fit(geometryOrExtent, {
           ...options,
           callback: complete => {
             cb(complete)
@@ -139,7 +139,7 @@
      * @return {ol.View|undefined} OpenLayers `ol.View` instance
      */
     getView () {
-      return this.olObject
+      return this.$olObject
     },
     /**
      * @return {void}
@@ -162,7 +162,7 @@
      */
     refresh () {
       assert.hasView(this)
-      this.view.changed()
+      this.$view.changed()
     },
     /**
      * @return {void}
@@ -175,34 +175,34 @@
 
   const watch = {
     center (value) {
-      if (this.view && !isEqual(value, proj.toLonLat(this.view.getCenter()))) {
-        this.view.setCenter(proj.fromLonLat(value, this.projection))
+      if (this.$view && !isEqual(value, proj.toLonLat(this.$view.getCenter()))) {
+        this.$view.setCenter(proj.fromLonLat(value, this.projection))
       }
     },
     resolution (value) {
-      if (this.view && value !== this.view.getResolution()) {
-        this.view.setResolution(value)
+      if (this.$view && value !== this.$view.getResolution()) {
+        this.$view.setResolution(value)
       }
     },
     zoom (value) {
       value = Math.round(value)
-      if (this.view && value !== Math.round(this.view.getZoom())) {
-        this.view.setZoom(value)
+      if (this.$view && value !== Math.round(this.$view.getZoom())) {
+        this.$view.setZoom(value)
       }
     },
     rotation (value) {
-      if (this.view && value !== this.view.getRotation()) {
-        this.view.setRotation(value)
+      if (this.$view && value !== this.$view.getRotation()) {
+        this.$view.setRotation(value)
       }
     },
     minZoom (value) {
-      if (this.view && value !== this.view.getMinZoom()) {
-        this.view.setMinZoom(value)
+      if (this.$view && value !== this.$view.getMinZoom()) {
+        this.$view.setMinZoom(value)
       }
     },
     maxZoom (value) {
-      if (this.view && value !== this.view.getMaxZoom()) {
-        this.view.setMaxZoom(value)
+      if (this.$view && value !== this.$view.getMaxZoom()) {
+        this.$view.setMaxZoom(value)
       }
     }
   }
@@ -229,17 +229,17 @@
     assert.hasView(this)
 
     const ft = 100
-    const getCenter = () => proj.toLonLat(this.view.getCenter(), this.view.getProjection())
-    const getZoom = () => Math.round(this.view.getZoom())
+    const getCenter = () => proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
+    const getZoom = () => Math.round(this.$view.getZoom())
 
-    const center = Observable.fromOlEvent(this.view, 'change:center', getCenter)
+    const center = Observable.fromOlEvent(this.$view, 'change:center', getCenter)
       .throttleTime(ft)
       .distinctUntilChanged(isEqual)
       .map(value => ({
         name: 'update:center',
         value
       }))
-    const resolution = Observable.fromOlEvent(this.view, 'change:resolution', () => this.view.getResolution())
+    const resolution = Observable.fromOlEvent(this.$view, 'change:resolution', () => this.$view.getResolution())
       .throttleTime(ft)
       .distinctUntilChanged(isEqual)
       .map(value => ({
@@ -253,7 +253,7 @@
         name: 'update:zoom',
         value
       }))
-    const rotation = Observable.fromOlEvent(this.view, 'change:rotation', () => this.view.getRotation())
+    const rotation = Observable.fromOlEvent(this.$view, 'change:rotation', () => this.$view.getRotation())
       .throttleTime(ft)
       .distinctUntilChanged(isEqual)
       .map(value => ({

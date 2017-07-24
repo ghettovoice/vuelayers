@@ -1,11 +1,10 @@
-/* global PKG_NAME */
 /**
  * @module consts
  */
 /**
  * @const {Symbol<string>}
  */
-export const SERVICES_PROP = Symbol(PKG_NAME)
+export const SERVICES_PROP = Symbol('services')
 /**
  * @const {string}
  */

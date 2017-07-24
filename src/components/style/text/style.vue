@@ -62,64 +62,64 @@
      * @protected
      */
     mount () {
-      this.$parent.setText(this)
+      this.$parent && this.$parent.setText(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent.setText(undefined)
+      this.$parent && this.$parent.setText(undefined)
     }
   }
 
   const watch = {
     font (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setFont(value)
+      this.$style.setFont(value)
       this.requestRefresh()
     },
     offsetX (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setOffsetX(value)
+      this.$style.setOffsetX(value)
       this.requestRefresh()
     },
     offsetY (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setOffsetY(value)
+      this.$style.setOffsetY(value)
       this.requestRefresh()
     },
     rotation (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setRotation(value)
+      this.$style.setRotation(value)
       this.requestRefresh()
     },
     scale (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setScale(value)
+      this.$style.setScale(value)
       this.requestRefresh()
     },
     text (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setText(value)
+      this.$style.setText(value)
       this.requestRefresh()
     },
     textAlign (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setTextAlign(value)
+      this.$style.setTextAlign(value)
       this.requestRefresh()
     },
     textBaseline (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setTextBaseline(value)
+      this.$style.setTextBaseline(value)
       this.requestRefresh()
     }
   }

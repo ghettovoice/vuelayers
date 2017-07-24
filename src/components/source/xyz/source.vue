@@ -22,7 +22,7 @@
         opaque: this.opaque,
         projection: this.projection,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
-        tileGrid: this.tileGrid,
+        tileGrid: this._tileGrid,
         tilePixelRatio: this.tilePixelRatio,
         tileUrlFunction: this.createTileUrlFunction(),
         wrapX: this.wrapX
@@ -37,8 +37,8 @@
 
       return createTileUrlFunction(
         this.urlTmpl,
-        this.tileGrid,
-        extentHelper.fromProjection(this.view.getProjection())
+        this._tileGrid,
+        extentHelper.fromProjection(this.$view.getProjection())
       )
     }
   }
@@ -46,7 +46,7 @@
   // watch only url changes, other settings (like tileGrid) can't be changed at runtime
   const watch = {
     urlTmpl () {
-      this.source && this.source.setTileUrlFunction(this.createTileUrlFunction())
+      this.$source && this.$source.setTileUrlFunction(this.createTileUrlFunction())
     }
   }
 

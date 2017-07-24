@@ -40,13 +40,13 @@ const methods = {
    */
   defineAccessors () {
     Object.defineProperties(this, {
-      style: {
+      $style: {
         enumerable: true,
         get: this.getStyle
       },
-      map: {
+      $map: {
         enumerable: true,
-        get: () => this.services.map
+        get: () => this.$services && this.$services.map
       }
     })
   },
@@ -55,15 +55,17 @@ const methods = {
    * @return {OlStyle|undefined}
    */
   getStyle () {
-    return this.olObject
+    return this.$olObject
   },
   /**
    * @return {Object}
    * @protected
    */
   getServices () {
+    const vm = this
+
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      style: this
+      get style () { return vm.$style }
     })
   },
   /**

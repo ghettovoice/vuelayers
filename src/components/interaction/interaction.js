@@ -34,17 +34,17 @@ const methods = {
    */
   defineAccessors () {
     Object.defineProperties(this, {
-      interaction: {
+      $interaction: {
         enumerable: true,
         get: this.getInteraction
       },
-      map: {
+      $map: {
         enumerable: true,
-        get: () => this.services && this.services.map
+        get: () => this.$services && this.$services.map
       },
-      view: {
+      $view: {
         enumerable: true,
-        get: () => this.services && this.services.view
+        get: () => this.$services && this.$services.view
       }
     })
   },
@@ -52,7 +52,7 @@ const methods = {
    * @return {ol.interaction.Interaction|undefined}
    */
   getInteraction () {
-    return this.olObject
+    return this.$olObject
   },
   /**
    * @returns {Object}
@@ -62,7 +62,7 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get interaction () { return vm.interaction }
+      get interaction () { return vm.$interaction }
     })
   },
   /**
@@ -86,14 +86,14 @@ const methods = {
    */
   refresh () {
     assert.hasInteraction(this)
-    this.interaction.changed()
+    this.$interaction.changed()
   }
 }
 
 const watch = {
   active (value) {
-    if (this.interaction && value !== this.interaction.getActive()) {
-      this.interaction.setActive(value)
+    if (this.$interaction && value !== this.$interaction.getActive()) {
+      this.$interaction.setActive(value)
     }
   }
 }

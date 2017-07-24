@@ -7,7 +7,6 @@
   }
 
   const methods = {
-    // protected & private
     /**
      * @return {ol.layer.Tile}
      * @protected

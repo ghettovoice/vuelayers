@@ -78,7 +78,7 @@ const methods = {
     assert.hasView(this)
 
     return tileGridHelper.createXYZ({
-      extent: extentHelper.fromProjection(this.view.getProjection()),
+      extent: extentHelper.fromProjection(this.$view.getProjection()),
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
       tileSize: this.tileSize
@@ -93,7 +93,7 @@ const methods = {
      * @type {ol.tilegrid.TileGrid}
      * @protected
      */
-    this.tileGrid = this.createTileGrid()
+    this._tileGrid = this.createTileGrid()
 
     return this::source.methods.init()
   },
@@ -102,15 +102,15 @@ const methods = {
    * @protected
    */
   deinit () {
-    this.tileGrid = undefined
+    this._tileGrid = undefined
     this::source.methods.deinit()
   }
 }
 
 const watch = {
   urlTmpl (value) {
-    if (this.source && !this.source.getUrls().includes(value)) {
-      this.source.setUrl(value)
+    if (this.$source && !this.$source.getUrls().includes(value)) {
+      this.$source.setUrl(value)
     }
   }
 }

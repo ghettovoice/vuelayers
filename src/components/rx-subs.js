@@ -18,8 +18,8 @@ export default {
      * @protected
      */
     unsubscribeAll () {
-      this.rxSubs.forEach(x => x.unsubscribe())
-      this.rxSubs = []
+      this._rxSubs.forEach(x => x.unsubscribe())
+      this._rxSubs = []
     },
     /**
      * @param {Observable<T>} observable
@@ -36,7 +36,7 @@ export default {
       }
 
       const subs = observable.subscribe(next, error, complete)
-      this.rxSubs.push(subs)
+      this._rxSubs.push(subs)
 
       return subs
     }
@@ -46,7 +46,7 @@ export default {
      * @type {Subscription[]}
      * @private
      */
-    this.rxSubs = []
+    this._rxSubs = []
   },
   destroyed () {
     this.unsubscribeAll()

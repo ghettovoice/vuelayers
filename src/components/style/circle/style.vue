@@ -20,8 +20,8 @@
       return new Circle({
         radius: this.radius,
         snapToPixel: this.snapToPixel,
-        fill: this.fill,
-        stroke: this.stroke
+        fill: this._fill,
+        stroke: this._stroke
       })
     },
     /**
@@ -29,9 +29,9 @@
      * @return {void}
      */
     setFill (fill) {
-      fill = fill instanceof Vue ? fill.style : fill
-      if (fill !== this.fill) {
-        this.fill = fill
+      fill = fill instanceof Vue ? fill.$style : fill
+      if (fill !== this._fill) {
+        this._fill = fill
         this.requestRefresh()
       }
     },
@@ -40,9 +40,9 @@
      * @return {void}
      */
     setStroke (stroke) {
-      stroke = stroke instanceof Vue ? stroke.style : stroke
-      if (stroke !== this.stroke) {
-        this.stroke = stroke
+      stroke = stroke instanceof Vue ? stroke.$style : stroke
+      if (stroke !== this._stroke) {
+        this._stroke = stroke
         this.requestRefresh()
       }
     }

@@ -7,7 +7,7 @@ import mergeDescriptors from '../utils/multi-merge-descriptors'
 
 export default {
   inject: {
-    services: SERVICES_PROP
+    $services: SERVICES_PROP
   },
   provide () {
     return {
@@ -20,7 +20,7 @@ export default {
      * @protected
      */
     getServices () {
-      return mergeDescriptors({}, this.services || {})
+      return mergeDescriptors({}, this.$services || {})
     }
   }
 }

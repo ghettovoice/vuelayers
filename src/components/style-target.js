@@ -4,7 +4,6 @@
 import Vue from 'vue'
 import { filter, flow, isFunction, map } from 'lodash/fp'
 import { style as styleHelper } from '../ol-ext'
-import { hasMap } from '../utils/assert'
 import { warndbg } from '../utils/debug'
 
 export default {
@@ -13,14 +12,14 @@ export default {
      * @type {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
      * @private
      */
-    this.styles = undefined
+    this._styles = undefined
   },
   methods: {
     /**
      * @return {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
      */
     getStyles () {
-      return this.styles
+      return this._styles
     },
     /**
      * Default style factory
@@ -35,7 +34,7 @@ export default {
      */
     addStyle (style) {
       let currentStyles = this.getStyles()
-      let olStyle = style instanceof Vue ? style.style : style
+      let olStyle = style instanceof Vue ? style.$style : style
 
       if (isFunction(olStyle)) {
         if (currentStyles) {
@@ -51,9 +50,9 @@ export default {
           }
           currentStyles = []
         }
-        style = style instanceof Vue ? style : { style, condition: true }
+        style = style instanceof Vue ? style : { $style: style, condition: true }
         if (!currentStyles.includes(style)) {
-          currentStyles = currentStyles.concat(style)
+          currentStyles.push(style)
         }
       }
 
@@ -64,13 +63,13 @@ export default {
      * @return {void}
      */
     setStyle (styles) {
-      if (styles === this.styles) return
-      this.styles = styles
+      if (styles === this._styles) return
+      this._styles = styles
 
       const styleTarget = this.getStyleTarget()
       if (!styleTarget) return
 
-      if (this.styles === null || this.styles) {
+      if (this._styles === null || this._styles) {
         styleTarget.setStyle(this.createStyleFunc())
       } else {
         styleTarget.setStyle(undefined)
@@ -89,7 +88,7 @@ export default {
         currentStyles = currentStyles.filter(s => {
           return style instanceof Vue
             ? s !== style
-            : s.style !== style
+            : s.$style !== style
         })
         currentStyles.length || (currentStyles = undefined)
       }
@@ -115,18 +114,16 @@ export default {
       const defaultStyles = this.getDefaultStyles(styleHelper)
 
       return function __styleTargetStyleFunc (feature, resolution) {
-        hasMap(vm)
-
         if (!feature.getGeometry()) return
         let styles = vm.getStyles()
         /* eslint-disable brace-style */
         // handle provided styles
         // styles - ol.StyleFunction or vl-style-func
-        if (styles && (isFunction(styles) || isFunction(styles.style))) {
-          let styleFunc = isFunction(styles) ? styles : styles.style
+        if (styles && (isFunction(styles) || isFunction(styles.$style))) {
+          let styleFunc = isFunction(styles) ? styles : styles.$style
           styles = styleFunc(feature, resolution, styleHelper)
         }
-        // styles is array of ol.style.Style or vl-style-box
+        // styles is array of { $style: ol.style.Style, condition: (bool|function():bool) }
         else if (Array.isArray(styles)) {
           styles = flow(
             filter(({ condition }) => {
@@ -137,7 +134,7 @@ export default {
                   condition(feature, resolution)
                 )
             }),
-            map('style')
+            map('$style')
           )(styles)
         }
         /* eslint-enable brace-style */

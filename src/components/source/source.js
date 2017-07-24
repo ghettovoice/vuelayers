@@ -34,17 +34,17 @@ const methods = {
    */
   defineAccessors () {
     Object.defineProperties(this, {
-      source: {
+      $source: {
         enumerable: true,
         get: this.getSource
       },
-      map: {
+      $map: {
         enumerable: true,
-        get: () => this.services && this.services.map
+        get: () => this.$services && this.$services.map
       },
-      view: {
+      $view: {
         enumerable: true,
-        get: () => this.services && this.services.view
+        get: () => this.$services && this.$services.view
       }
     })
   },
@@ -70,14 +70,14 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get source () { return vm.source }
+      get source () { return vm.$source }
     })
   },
   /**
    * @return {ol.source.Source|undefined}
    */
   getSource () {
-    return this.olObject
+    return this.$olObject
   },
   /**
    * @return {void}
@@ -100,13 +100,13 @@ const methods = {
    */
   refresh () {
     assert.hasSource(this)
-    this.source.changed()
+    this.$source.changed()
   }
 }
 
 const watch = {
   attributions (value) {
-    this.source && this.source.setAttributions(value)
+    this.$source && this.$source.setAttributions(value)
   }
 }
 

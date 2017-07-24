@@ -19,9 +19,9 @@ export default {
     setFill (fill) {
       assert.hasStyle(this)
 
-      fill = fill instanceof Vue ? fill.style : fill
-      if (fill !== this.style.getFill()) {
-        this.style.setFill(fill)
+      fill = fill instanceof Vue ? fill.$style : fill
+      if (fill !== this.$style.getFill()) {
+        this.$style.setFill(fill)
         this.requestRefresh()
       }
     },
@@ -33,9 +33,9 @@ export default {
     setStroke (stroke) {
       assert.hasStyle(this)
 
-      stroke = stroke instanceof Vue ? stroke.style : stroke
-      if (stroke !== this.style.getStroke()) {
-        this.style.setStroke(stroke)
+      stroke = stroke instanceof Vue ? stroke.$style : stroke
+      if (stroke !== this.$style.getStroke()) {
+        this.$style.setStroke(stroke)
         this.requestRefresh()
       }
     }

@@ -21,22 +21,22 @@
      * @protected
      */
     mount () {
-      this.$parent.setFill(this)
+      this.$parent && this.$parent.setFill(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent.setFill(undefined)
+      this.$parent && this.$parent.setFill(undefined)
     }
   }
 
   const watch = {
     color (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setColor(value)
+      this.$style.setColor(value)
       this.requestRefresh()
     }
   }

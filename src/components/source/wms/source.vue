@@ -44,7 +44,7 @@
         gutter: this.gutter,
         hidpi: this.hidpi,
         logo: this.logo,
-        tileGrid: this.tileGrid,
+        tileGrid: this._tileGrid,
         projection: this.projection,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         serverType: this.serverType,
@@ -70,10 +70,10 @@
       assert.hasView(this)
       assert.hasSource(this)
 
-      resolution || (resolution = this.view.getResolution())
+      resolution || (resolution = this.$view.getResolution())
       projection || (projection = this.projection)
 
-      return this.source.getFeatureInfoUrl(
+      return this.$source.getFeatureInfoUrl(
         coordinate,
         resolution,
         projection,
@@ -84,16 +84,16 @@
 
   const watch = {
     layers (LAYERS) {
-      this.source && this.source.updateParams({ LAYERS })
+      this.$source && this.$source.updateParams({ LAYERS })
     },
     version (VERSION) {
-      this.source && this.source.updateParams({ VERSION })
+      this.$source && this.$source.updateParams({ VERSION })
     },
     styles (STYLES) {
-      this.source && this.source.updateParams({ STYLES })
+      this.$source && this.$source.updateParams({ STYLES })
     },
     extParams (value) {
-      this.source && this.source.updateParams(cleanExtParams(value))
+      this.$source && this.$source.updateParams(cleanExtParams(value))
     }
   }
 

@@ -80,7 +80,7 @@
   const diffById = differenceWith((a, b) => a.id === b.id)
   const watch = {
     features (value, oldValue) {
-      if (!this.source) return
+      if (!this.$source) return
 
       let forAdd = diffById(value, oldValue)
       let forRemove = diffById(oldValue, value)

@@ -56,9 +56,9 @@
     addLayer (layer) {
       assert.hasMap(this)
 
-      layer = layer instanceof Vue ? layer.layer : layer
-      if (layer && !this.layers.includes(layer)) {
-        this.map.addLayer(layer)
+      layer = layer instanceof Vue ? layer.$layer : layer
+      if (layer && !this.$layers.includes(layer)) {
+        this.$map.addLayer(layer)
       }
     },
     /**
@@ -68,14 +68,14 @@
     removeLayer (layer) {
       assert.hasMap(this)
 
-      layer = layer instanceof Vue ? layer.layer : layer
-      this.map.removeLayer(layer)
+      layer = layer instanceof Vue ? layer.$layer : layer
+      this.$map.removeLayer(layer)
     },
     /**
      * @return {ol.layer.Layer[]}
      */
     getLayers () {
-      return (this.map && this.map.getLayers().getArray()) || []
+      return (this.$map && this.$map.getLayers().getArray()) || []
     },
     /**
      * @param {ol.interaction.Interaction|Vue} interaction
@@ -84,9 +84,9 @@
     addInteraction (interaction) {
       assert.hasMap(this)
 
-      interaction = interaction instanceof Vue ? interaction.interaction : interaction
-      if (interaction && !this.interactions.includes(interaction)) {
-        this.map.addInteraction(interaction)
+      interaction = interaction instanceof Vue ? interaction.$interaction : interaction
+      if (interaction && !this.$interactions.includes(interaction)) {
+        this.$map.addInteraction(interaction)
       }
     },
     /**
@@ -96,14 +96,14 @@
     removeInteraction (interaction) {
       assert.hasMap(this)
 
-      interaction = interaction instanceof Vue ? interaction.interaction : interaction
-      this.map.removeInteraction(interaction)
+      interaction = interaction instanceof Vue ? interaction.$interaction : interaction
+      this.$map.removeInteraction(interaction)
     },
     /**
      * @return {ol.interaction.Interaction[]}
      */
     getInteractions () {
-      return (this.map && this.map.getInteractions().getArray()) || []
+      return (this.$map && this.$map.getInteractions().getArray()) || []
     },
     /**
      * @return {ol.Map}
@@ -133,19 +133,19 @@
      */
     defineAccessors () {
       Object.defineProperties(this, {
-        map: {
+        $map: {
           enumerable: true,
           get: this.getMap
         },
-        view: {
+        $view: {
           enumerable: true,
           get: this.getView
         },
-        layers: {
+        $layers: {
           enumerable: true,
           get: this.getLayers
         },
-        interactions: {
+        $interactions: {
           enumerable: true,
           get: this.getInteractions
         }
@@ -167,7 +167,7 @@
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       assert.hasMap(this)
 
-      return this.map.forEachFeatureAtPixel(pixel, callback, opts)
+      return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
     },
     /**
      * @param {number[]} pixel
@@ -178,7 +178,7 @@
     forEachLayerAtPixel (pixel, callback, layerFilter) {
       assert.hasMap(this)
 
-      return this.map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
+      return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
      * @param {number[]} pixel
@@ -188,13 +188,13 @@
       assert.hasMap(this)
       assert.hasView(this)
 
-      return projHelper.toLonLat(this.map.getCoordinateFromPixel(pixel), this.view.getProjection())
+      return projHelper.toLonLat(this.$map.getCoordinateFromPixel(pixel), this.$view.getProjection())
     },
     /**
      * @return {ol.Map|undefined}
      */
     getMap () {
-      return this.olObject
+      return this.$olObject
     },
     /**
      * @returns {Object}
@@ -204,15 +204,15 @@
       const vm = this
 
       return mergeDescriptors(this::cmp.methods.getServices(), {
-        get map () { return vm.map },
-        get view () { return vm.view }
+        get map () { return vm.$map },
+        get view () { return vm.$view }
       })
     },
     /**
      * @return {ol.View|undefined}
      */
     getView () {
-      return this.map && this.map.getView()
+      return this.$map && this.$map.getView()
     },
     /**
      * @param {ol.View|Vue|undefined} view
@@ -221,9 +221,9 @@
     setView (view) {
       assert.hasMap(this)
 
-      view = view instanceof Vue ? view.view : view
-      if (view !== this.view) {
-        this.map.setView(view)
+      view = view instanceof Vue ? view.$view : view
+      if (view !== this.$view) {
+        this.$map.setView(view)
       }
     },
     /**
@@ -232,7 +232,7 @@
      */
     mount () {
       assert.hasMap(this)
-      this.map.setTarget(this.$refs.map)
+      this.$map.setTarget(this.$refs.map)
       this.subscribeAll()
     },
     /**
@@ -242,7 +242,7 @@
     unmount () {
       assert.hasMap(this)
       this.unsubscribeAll()
-      this.map.setTarget(undefined)
+      this.$map.setTarget(undefined)
     },
     /**
      * Triggers map re-render.
@@ -250,8 +250,8 @@
      */
     refresh () {
       assert.hasMap(this)
-      this.map.updateSize()
-      this.map.render()
+      this.$map.updateSize()
+      this.$map.render()
     },
     /**
      * @return {void}
@@ -281,22 +281,22 @@
     const ft = 100
     // pointer
     const pointerEvents = Observable.merge(
-      Observable.fromOlEvent(this.map, [
+      Observable.fromOlEvent(this.$map, [
         'click',
         'dblclick',
         'singleclick'
       ]),
-      Observable.fromOlEvent(this.map, [
+      Observable.fromOlEvent(this.$map, [
         'pointerdrag',
         'pointermove'
       ]).throttleTime(ft)
         .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
     ).map(evt => ({
       ...evt,
-      coordinate: projHelper.toLonLat(evt.coordinate, this.view.getProjection())
+      coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection())
     }))
     // other
-    const otherEvents = Observable.fromOlEvent(this.map, [
+    const otherEvents = Observable.fromOlEvent(this.$map, [
       'movestart',
       'moveend',
       'postrender',

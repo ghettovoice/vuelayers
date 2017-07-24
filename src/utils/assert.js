@@ -35,7 +35,7 @@ export function instanceOf (value, Ctor) {
  * @throws {AssertionError}
  */
 export function hasMap (vm) {
-  assert(vm.map, 'component has "map" field')
+  assert(vm.$map, 'component has "$map" field')
 }
 
 /**
@@ -44,7 +44,7 @@ export function hasMap (vm) {
  * @throws {AssertionError}
  */
 export function hasView (vm) {
-  assert(vm.view, 'component has "view" field')
+  assert(vm.$view, 'component has "$view" field')
 }
 
 /**
@@ -53,7 +53,7 @@ export function hasView (vm) {
  * @throws {AssertionError}
  */
 export function hasGeolocation (vm) {
-  assert(vm.geolocation, 'component has "geolocation" field')
+  assert(vm.$geolocation, 'component has "$geolocation" field')
 }
 
 /**
@@ -62,7 +62,7 @@ export function hasGeolocation (vm) {
  * @throws {AssertionError}
  */
 export function hasFeature (vm) {
-  assert(vm.feature, 'component has "feature" field')
+  assert(vm.$feature, 'component has "$feature" field')
 }
 
 /**
@@ -71,7 +71,7 @@ export function hasFeature (vm) {
  * @throws {AssertionError}
  */
 export function hasLayer (vm) {
-  assert(vm.layer, 'component has "layer" field')
+  assert(vm.$layer, 'component has "$layer" field')
 }
 
 /**
@@ -80,7 +80,7 @@ export function hasLayer (vm) {
  * @throws {AssertionError}
  */
 export function hasSource (vm) {
-  assert(vm.source, 'component has "source" field')
+  assert(vm.$source, 'component has "$source" field')
 }
 
 /**
@@ -89,7 +89,7 @@ export function hasSource (vm) {
  * @throws {AssertionError}
  */
 export function hasGeometry (vm) {
-  assert(vm.geometry, 'component has "geom" field')
+  assert(vm.$geometry, 'component has "$geometry" field')
 }
 
 /**
@@ -98,7 +98,7 @@ export function hasGeometry (vm) {
  * @throws {AssertionError}
  */
 export function hasInteraction (vm) {
-  assert(vm.interaction, 'component has "interaction" field')
+  assert(vm.$interaction, 'component has "$interaction" field')
 }
 
 /**
@@ -107,5 +107,5 @@ export function hasInteraction (vm) {
  * @throws {AssertionError}
  */
 export function hasStyle (vm) {
-  assert(vm.style, 'component has "style" field')
+  assert(vm.$style, 'component has "$style" field')
 }

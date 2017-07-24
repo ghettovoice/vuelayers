@@ -66,21 +66,21 @@ const methods = {
    */
   defineAccessors () {
     Object.defineProperties(this, {
-      layer: {
+      $layer: {
         enumerable: true,
         get: this.getLayer
       },
-      source: {
+      $source: {
         enumerable: true,
         get: this.getSource
       },
-      map: {
+      $map: {
         enumerable: true,
-        get: () => this.services && this.services.map
+        get: () => this.$services && this.$services.map
       },
-      view: {
+      $view: {
         enumerable: true,
-        get: () => this.services && this.services.view
+        get: () => this.$services && this.$services.view
       }
     })
   },
@@ -91,13 +91,13 @@ const methods = {
   isAtPixel (pixel) {
     assert.hasMap(this)
 
-    return this.map.forEachLayerAtPixel(pixel, l => l === this.layer)
+    return this.$map.forEachLayerAtPixel(pixel, l => l === this.$layer)
   },
   /**
    * @return {ol.layer.Layer|undefined}
    */
   getLayer () {
-    return this.olObject
+    return this.$olObject
   },
   /**
    * @returns {Object}
@@ -107,14 +107,14 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get layer () { return vm.layer }
+      get layer () { return vm.$layer }
     })
   },
   /**
    * @return {ol.source.Source|undefined}
    */
   getSource () {
-    return this.layer && this.layer.getSource()
+    return this.$layer && this.$layer.getSource()
   },
   /**
    * @param {ol.source.Source|Vue|undefined} source
@@ -123,9 +123,9 @@ const methods = {
   setSource (source) {
     assert.hasLayer(this)
 
-    source = source instanceof Vue ? source.source : source
-    if (source !== this.source) {
-      this.layer.setSource(source)
+    source = source instanceof Vue ? source.$source : source
+    if (source !== this.$source) {
+      this.$layer.setSource(source)
     }
   },
   /**
@@ -164,7 +164,7 @@ const methods = {
    */
   refresh () {
     assert.hasLayer(this)
-    this.layer.changed()
+    this.$layer.changed()
   },
   /**
    * @param {ol.Map|Vue|undefined} map
@@ -172,40 +172,40 @@ const methods = {
   setMap (map) {
     assert.hasLayer(this)
 
-    map = map instanceof Vue ? map.map : map
-    this.layer.setMap(map)
+    map = map instanceof Vue ? map.$map : map
+    this.$layer.setMap(map)
   }
 }
 
 const watch = {
   id (value) {
-    if (this.layer && value !== this.layer.get('id')) {
-      this.layer.set('id', value)
+    if (this.$layer && value !== this.$layer.get('id')) {
+      this.$layer.set('id', value)
     }
   },
   maxResolution (value) {
-    if (this.layer && value !== this.layer.getMaxResolution()) {
-      this.layer.setMaxResolution(value)
+    if (this.$layer && value !== this.$layer.getMaxResolution()) {
+      this.$layer.setMaxResolution(value)
     }
   },
   minResolution (value) {
-    if (this.layer && value !== this.layer.getMinResolution()) {
-      this.layer.setMinResolution(value)
+    if (this.$layer && value !== this.$layer.getMinResolution()) {
+      this.$layer.setMinResolution(value)
     }
   },
   opacity (value) {
-    if (this.layer && value !== this.layer.getOpacity()) {
-      this.layer.setOpacity(value)
+    if (this.$layer && value !== this.$layer.getOpacity()) {
+      this.$layer.setOpacity(value)
     }
   },
   visible (value) {
-    if (this.layer && value !== this.layer.getVisible()) {
-      this.layer.setVisible(value)
+    if (this.$layer && value !== this.$layer.getVisible()) {
+      this.$layer.setVisible(value)
     }
   },
   zIndex (value) {
-    if (this.layer && value !== this.layer.getZIndex()) {
-      this.layer.setZIndex(value)
+    if (this.$layer && value !== this.$layer.getZIndex()) {
+      this.$layer.setZIndex(value)
     }
   }
 }

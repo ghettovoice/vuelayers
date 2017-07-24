@@ -51,14 +51,14 @@
      * @protected
      */
     mount () {
-      this.$parent.addStyle(this)
+      this.$parent && this.$parent.addStyle(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent.removeStyle(this)
+      this.$parent && this.$parent.removeStyle(this)
     },
     /**
      * Overrides style-target `setStyle` method
@@ -66,10 +66,10 @@
      * @return {void}
      */
     setStyle (styles) {
-      if (styles !== this.styles) {
+      if (styles !== this._styles) {
         // simply save all inner styles and
         // use them later in style function as fallback
-        this.styles = styles
+        this._styles = styles
         this.requestRefresh()
       }
     },
@@ -78,10 +78,10 @@
      */
     refresh () {
       // recreate style
-      this.unmount()
-      this.deinit()
-      this.init()
-      this.mount()
+      Promise.resolve(this.unmount)
+        .then(this.deinit)
+        .then(this.init)
+        .then(this.mount)
     }
   }
 

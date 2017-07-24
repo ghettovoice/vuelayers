@@ -34,14 +34,14 @@ const methods = {
     assert.hasSource(this)
 
     if (feature instanceof Vue) {
-      feature = feature.feature
+      feature = feature.$feature
     } else if (isPlainObject(feature)) {
-      feature = geoJson.readFeature(feature, this.view.getProjection())
+      feature = geoJson.readFeature(feature, this.$view.getProjection())
     }
     if (feature.getId() == null) {
       feature.setId(uuid())
     }
-    this.source.addFeature(feature)
+    this.$source.addFeature(feature)
   },
   /**
    * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
@@ -58,18 +58,18 @@ const methods = {
     assert.hasSource(this)
 
     if (feature instanceof Vue) {
-      feature = feature.feature
+      feature = feature.$feature
     } else if (isPlainObject(feature)) {
-      feature = this.source.getFeatureById(feature.id)
+      feature = this.$source.getFeatureById(feature.id)
     }
-    this.source.removeFeature(feature)
+    this.$source.removeFeature(feature)
   },
   /**
    * @return {void}
    */
   clear () {
     assert.hasSource(this)
-    this.source.clear()
+    this.$source.clear()
   },
   /**
    * @param {string|number} id
@@ -78,7 +78,7 @@ const methods = {
   getFeatureById (id) {
     assert.hasSource(this)
 
-    return this.source.getFeatureById(id)
+    return this.$source.getFeatureById(id)
   },
   /**
    * @return {void}

@@ -80,7 +80,7 @@
      * @protected
      */
     getStyleTarget () {
-      return this.interaction
+      return this.$interaction
     },
     /**
      * @return {void}
@@ -112,10 +112,10 @@
         throw new Error('Undefined feature id')
       }
       if (feature instanceof Vue) {
-        feature = feature.feature
+        feature = feature.$feature
       }
 
-      const selection = this.interaction.getFeatures()
+      const selection = this.$interaction.getFeatures()
       const selectedIds = selection.getArray().map(f => f.getId())
       if (selectedIds.includes(id)) return
 
@@ -127,7 +127,7 @@
             feature = source.getFeatureById(id)
           }
           return !feature
-        }, this.map.getLayers().getArray())
+        }, this.$map.getLayers().getArray())
       }
 
       feature && selection.push(feature)
@@ -144,10 +144,10 @@
         throw new Error('Undefined feature id')
       }
       if (feature instanceof Vue) {
-        feature = feature.feature
+        feature = feature.$feature
       }
 
-      const selection = this.interaction.getFeatures()
+      const selection = this.$interaction.getFeatures()
       const selectedIds = selection.getArray().map(f => f.getId())
       const idx = selectedIds.findIndex(x => x === id)
 
@@ -161,8 +161,8 @@
      * @protected
      */
     setStyle (styles) {
-      if (styles !== this.styles) {
-        this.styles = styles
+      if (styles !== this._styles) {
+        this._styles = styles
         this.requestRefresh()
       }
     },
@@ -171,7 +171,7 @@
      */
     refresh () {
       assert.hasInteraction(this)
-      this.interaction.getFeatures().changed()
+      this.$interaction.getFeatures().changed()
       this::interaction.methods.refresh()
     },
     /**
@@ -187,16 +187,16 @@
      */
     unselectAll () {
       assert.hasInteraction(this)
-      this.interaction.getFeatures().clear()
+      this.$interaction.getFeatures().clear()
     }
   }
 
   const diffById = differenceWith((a, b) => extractId(a) === extractId(b))
   const watch = {
     features (features) {
-      if (!this.interaction) return
+      if (!this.$interaction) return
 
-      const selected = this.interaction.getFeatures().getArray()
+      const selected = this.$interaction.getFeatures().getArray()
       let forSelect = diffById(features, selected)
       let forUnselect = diffById(selected, features)
 
@@ -229,12 +229,12 @@
     assert.hasInteraction(this)
 
     this.subscribeTo(
-      Observable.fromOlEvent(this.interaction, 'select'),
+      Observable.fromOlEvent(this.$interaction, 'select'),
       ({ selected, deselected, mapBrowserEvent }) => {
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
 
-        this.$emit('update:features', this.interaction.getFeatures().getArray())
+        this.$emit('update:features', this.$interaction.getFeatures().getArray())
       }
     )
   }

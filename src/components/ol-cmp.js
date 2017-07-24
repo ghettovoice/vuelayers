@@ -22,22 +22,21 @@ const methods = {
    * @protected
    */
   async init () {
-    this.olObject = undefined
-    if (this.ident && this.identMap.has(this.ident)) {
-      this.olObject = this.identMap.get(this.ident)
+    if (this.ident && this.$identityMap.has(this.ident)) {
+      this._olObject = this.$identityMap.get(this.ident)
     } else {
       /**
        * @type {*}
        * @protected
        */
-      this.olObject = await Promise.resolve(this.createOlObject())
+      this._olObject = await Promise.resolve(this.createOlObject())
       if (this.ident) {
-        this.identMap.set(this.ident, this.olObject)
+        this.$identityMap.set(this.ident, this._olObject)
       }
     }
-    this.olObject[VM_PROP] || (this.olObject[VM_PROP] = [])
-    if (!this.olObject[VM_PROP].includes(this)) { // for loaded from IdentityMap
-      this.olObject[VM_PROP].push(this)
+    this._olObject[VM_PROP] || (this._olObject[VM_PROP] = [])
+    if (!this._olObject[VM_PROP].includes(this)) { // for loaded from IdentityMap
+      this._olObject[VM_PROP].push(this)
     }
   },
   /**
@@ -54,10 +53,10 @@ const methods = {
    */
   deinit () {
     if (this.ident) {
-      this.identMap.unset(this.ident)
+      this.$identityMap.unset(this.ident)
     }
-    this.olObject[VM_PROP] = this.olObject[VM_PROP].filter(vm => vm !== this)
-    this.olObject = undefined
+    this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
+    this._olObject = undefined
   },
   /**
    * @protected
@@ -111,12 +110,17 @@ export default {
   methods,
   created () {
     this.defineAccessors()
-    const parentReady = Promise.resolve(this.$parent && this.$parent.readyPromise)
+    const parentCreated = Promise.resolve(this.$parent && this.$parent.$createPromise)
+    /**
+     * @type {*}
+     * @private
+     */
+    this._olObject = undefined
     /**
      * @type {Promise<Vue<T>>}
      * @protected
      */
-    this._readyPromise = parentReady.then(this.init)
+    this._createPromise = parentCreated.then(this.init)
       .then(() => {
         logdbg('created', this.$options.name)
         return this
@@ -132,28 +136,32 @@ export default {
       .toPromise()
 
     Object.defineProperties(this, {
-      readyPromise: {
+      $olObject: {
         enumerable: true,
-        get: () => this._readyPromise
+        get: () => this._olObject
       },
-      mountPromise: {
+      $createPromise: {
+        enumerable: true,
+        get: () => this._createPromise
+      },
+      $mountPromise: {
         enumerable: true,
         get: () => this._mountPromise
       }
     })
   },
   mounted () {
-    this.readyPromise.then(this.mount)
+    this.$createPromise.then(this.mount)
       .then(() => {
         this._mounted = true
         logdbg('mounted', this.$options.name)
       })
   },
   destroyed () {
-    this.mountPromise.then(this.unmount)
+    this.$mountPromise.then(this.unmount)
       .then(this.deinit)
       .then(() => {
-        this._readyPromise = this._mountPromise = undefined
+        this._createPromise = this._mountPromise = undefined
         logdbg('destroyed', this.$options.name)
       })
   }

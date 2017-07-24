@@ -36,14 +36,14 @@
      * @protected
      */
     mount () {
-      this.$parent.addStyle(this)
+      this.$parent && this.$parent.addStyle(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent.removeStyle(this)
+      this.$parent && this.$parent.removeStyle(this)
     },
     /**
      * @param {ol.style.Image|Vue|undefined} image
@@ -52,9 +52,9 @@
     setImage (image) {
       assert.hasStyle(this)
 
-      image = image instanceof Vue ? image.style : image
-      if (image !== this.style.getImage()) {
-        this.style.setImage(image)
+      image = image instanceof Vue ? image.$style : image
+      if (image !== this.$style.getImage()) {
+        this.$style.setImage(image)
         this.requestRefresh()
       }
     },
@@ -65,9 +65,9 @@
     setGeometry (geom) {
       assert.hasStyle(this)
 
-      geom = geom instanceof Vue ? geom.geom : geom
-      if (geom !== this.style.getGeometry()) {
-        this.style.setGeometry(geom)
+      geom = geom instanceof Vue ? geom.$geometry : geom
+      if (geom !== this.$style.getGeometry()) {
+        this.$style.setGeometry(geom)
         this.requestRefresh()
       }
     },
@@ -78,9 +78,9 @@
     setText (text) {
       assert.hasStyle(this)
 
-      text = text instanceof Vue ? text.style : text
-      if (text !== this.style.getText()) {
-        this.style.setText(text)
+      text = text instanceof Vue ? text.$style : text
+      if (text !== this.$style.getText()) {
+        this.$style.setText(text)
         this.requestRefresh()
       }
     }
@@ -88,9 +88,9 @@
 
   const watch = {
     zIndex (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setZIndex(value)
+      this.$style.setZIndex(value)
       this.requestRefresh()
     }
   }

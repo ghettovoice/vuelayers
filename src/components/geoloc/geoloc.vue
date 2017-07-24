@@ -22,22 +22,22 @@
 
   const computed = {
     accuracy () {
-      return this.geolocation && this.geolocation.getAccuracy()
+      return this.$geolocation && this.$geolocation.getAccuracy()
     },
     altitude () {
-      return this.geolocation && this.geolocation.getAltitude()
+      return this.$geolocation && this.$geolocation.getAltitude()
     },
     altitudeAccuracy () {
-      return this.geolocation && this.geolocation.getAltitudeAccuracy()
+      return this.$geolocation && this.$geolocation.getAltitudeAccuracy()
     },
     heading () {
-      return this.geolocation && this.geolocation.getHeading()
+      return this.$geolocation && this.$geolocation.getHeading()
     },
     position () {
-      return this.geolocation && this.geolocation.getPosition()
+      return this.$geolocation && this.$geolocation.getPosition()
     },
     speed () {
-      return this.geolocation && this.geolocation.getSpeed()
+      return this.$geolocation && this.$geolocation.getSpeed()
     }
   }
 
@@ -59,7 +59,7 @@
      */
     defineAccessors () {
       Object.defineProperties(this, {
-        geolocation: {
+        $geolocation: {
           enumerable: true,
           get: this.getGeolocation
         }
@@ -69,7 +69,7 @@
      * @returns {ol.Geolocation|undefined}
      */
     getGeolocation () {
-      return this.olObject
+      return this.$olObject
     },
     /**
      * @return {void}
@@ -86,14 +86,14 @@
       assert.hasGeolocation(this)
 
       this.unsubscribeAll()
-      this.geolocation.setTracking(false)
+      this.$geolocation.setTracking(false)
     },
     /**
      * @return {void}
      */
     refresh () {
       assert.hasGeolocation(this)
-      this.geolocation.changed()
+      this.$geolocation.changed()
     },
     /**
      * @return {void}
@@ -109,12 +109,12 @@
      * @param {boolean} value
      */
     tracking (value) {
-      if (this.geolocation && value !== this.geolocation.getTracking()) {
-        this.geolocation.setTracking(value)
+      if (this.$geolocation && value !== this.$geolocation.getTracking()) {
+        this.$geolocation.setTracking(value)
       }
     },
     tracingOptions (value) {
-      this.geolocation && this.geolocation.setTrackingOptions(value)
+      this.$geolocation && this.$geolocation.setTrackingOptions(value)
     }
   }
 
@@ -141,7 +141,7 @@
 
     const ft = 100
     const getObservable = field => {
-      return Observable.fromOlEvent(this.geolocation, `change:${field}`, () => this[field])
+      return Observable.fromOlEvent(this.$geolocation, `change:${field}`, () => this[field])
         .throttleTime(ft)
         .distinctUntilChanged(isEqual)
         .map(value => ({

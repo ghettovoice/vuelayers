@@ -12,7 +12,6 @@
   }
 
   const methods = {
-    // protected & private
     /**
      * @return {ol.layer.Vector}
      * @protected
@@ -36,7 +35,7 @@
      * @protected
      */
     getStyleTarget () {
-      return this.layer
+      return this.$layer
     }
   }
 

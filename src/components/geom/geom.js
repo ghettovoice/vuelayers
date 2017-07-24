@@ -30,7 +30,7 @@ const computed = {
     throw new Error('Not implemented computed property')
   },
   extent () {
-    return this.geometry && this.extentToLonLat(this.geometry.getExtent())
+    return this.$geometry && this.extentToLonLat(this.$geometry.getExtent())
   }
 }
 
@@ -64,21 +64,21 @@ const methods = {
      * @return {number[]}
      * @protected
      */
-    this.toLonLat = coordinates => toLonLat(coordinates, this.view.getProjection())
+    this.toLonLat = coordinates => toLonLat(coordinates, this.$view.getProjection())
     /**
      * @method
      * @param {number[]} coordinates
      * @return {number[]}
      * @protected
      */
-    this.fromLonLat = coordinates => fromLonLat(coordinates, this.view.getProjection())
+    this.fromLonLat = coordinates => fromLonLat(coordinates, this.$view.getProjection())
     /**
      * @method
      * @param {number[]} extent
      * @return {number[]}
      * @protected
      */
-    this.extentToLonLat = extent => projHelper.extentToLonLat(extent, this.view.getProjection())
+    this.extentToLonLat = extent => projHelper.extentToLonLat(extent, this.$view.getProjection())
 
     return this::cmp.methods.init()
   },
@@ -95,17 +95,17 @@ const methods = {
    */
   defineAccessors () {
     Object.defineProperties(this, {
-      geometry: {
+      $geometry: {
         enumerable: true,
         get: this.getGeometry
       },
-      map: {
+      $map: {
         enumerable: true,
-        get: () => this.services && this.services.map
+        get: () => this.$services && this.$services.map
       },
-      view: {
+      $view: {
         enumerable: true,
-        get: () => this.services && this.services.view
+        get: () => this.$services && this.$services.view
       }
     })
   },
@@ -113,14 +113,14 @@ const methods = {
    * @returns {ol.geometry.Geometry|undefined}
    */
   getGeometry () {
-    return this.olObject
+    return this.$olObject
   },
   /**
    * @return {void}
    */
   refresh () {
     assert.hasGeometry(this)
-    this.geometry.changed()
+    this.$geometry.changed()
   },
   /**
    * @return {Object}
@@ -130,7 +130,7 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get geometry () { return vm.geometry }
+      get geometry () { return vm.$geometry }
     })
   },
   /**
@@ -159,18 +159,18 @@ const methods = {
 }
 const watch = {
   coordinates (value) {
-    if (!this.geometry) return
+    if (!this.$geometry) return
 
     let isEq = isEqualGeom({
       coordinates: value,
       extent: extentHelper.boundingExtent(value)
     }, {
-      coordinates: this.toLonLat(this.geometry.getCoordinates()),
+      coordinates: this.toLonLat(this.$geometry.getCoordinates()),
       extent: this.extent
     })
 
     if (!isEq) {
-      this.geometry.setCoordinates(this.fromLonLat(value))
+      this.$geometry.setCoordinates(this.fromLonLat(value))
     }
   }
 }
@@ -196,9 +196,9 @@ function subscribeToGeomChanges () {
   assert.hasGeometry(this)
 
   const ft = 100
-  const events = Observable.fromOlEvent(this.geometry, 'change', () => ({
-    coordinates: this.toLonLat(this.geometry.getCoordinates()),
-    extent: this.extentToLonLat(this.geometry.getExtent())
+  const events = Observable.fromOlEvent(this.$geometry, 'change', () => ({
+    coordinates: this.toLonLat(this.$geometry.getCoordinates()),
+    extent: this.extentToLonLat(this.$geometry.getExtent())
   })).throttleTime(ft)
     .distinctUntilChanged(isEqualGeom)
     .map(({ coordinates }) => ({

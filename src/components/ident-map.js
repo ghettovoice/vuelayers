@@ -17,7 +17,7 @@ function initIdentityMap () {
     Vue[IDENTITY_MAP_PROP] = Vue.prototype[IDENTITY_MAP_PROP] = new IdentityMap()
   }
   Object.defineProperties(this, {
-    identMap: {
+    $identityMap: {
       enumerable: true,
       get: () => this[IDENTITY_MAP_PROP]
     }

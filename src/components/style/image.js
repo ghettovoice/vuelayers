@@ -13,14 +13,14 @@ const methods = {
    * @protected
    */
   mount () {
-    this.$parent.setImage(this)
+    this.$parent && this.$parent.setImage(this)
   },
   /**
    * @return {void}
    * @protected
    */
   unmount () {
-    this.$parent.setImage(undefined)
+    this.$parent && this.$parent.setImage(undefined)
   },
   /**
    * @return {void}

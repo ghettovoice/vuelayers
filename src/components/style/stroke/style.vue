@@ -48,46 +48,46 @@
      * @protected
      */
     mount () {
-      this.$parent.setStroke(this)
+      this.$parent && this.$parent.setStroke(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent.setStroke(undefined)
+      this.$parent && this.$parent.setStroke(undefined)
     }
   }
 
   const watch = {
     color (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setColor(value)
+      this.$style.setColor(value)
       this.requestRefresh()
     },
     lineCap (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setLineCap(value)
+      this.$style.setLineCap(value)
       this.requestRefresh()
     },
     lineDash (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setLineDash(value)
+      this.$style.setLineDash(value)
       this.requestRefresh()
     },
     lineJoin (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setLineJoin(value)
+      this.$style.setLineJoin(value)
       this.requestRefresh()
     },
     width (value) {
-      if (!this.style) return
+      if (!this.$style) return
 
-      this.style.setWidth(value)
+      this.$style.setWidth(value)
       this.requestRefresh()
     }
   }

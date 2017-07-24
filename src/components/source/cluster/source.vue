@@ -31,7 +31,7 @@
        * @type {SourceBuilder}
        * @private
        */
-      this.sourceBuilder = new SourceBuilder()
+      this._sourceBuilder = new SourceBuilder()
         .setAttributions(this.attributions)
         .setDistance(this.distance)
         .setGeometryFunction(function __geomFunc (feature) {
@@ -41,14 +41,14 @@
         .setProjection(this.projection)
         .setWrapX(this.wrapX)
 
-      return this.sourceBuilder.promise()
+      return this._sourceBuilder.promise()
     },
     /**
      * Returns inner wrapped vector source
      * @return {ol.source.Vector|undefined}
      */
     getInnerSource () {
-      return this.sourceBuilder && this.sourceBuilder.getSource()
+      return this._sourceBuilder && this._sourceBuilder.getSource()
     },
     /**
      * Set inner vector source
@@ -56,17 +56,17 @@
      * @return {void}
      */
     setSource (source) {
-      source = source instanceof Vue ? source.source : source
-      if (source !== this.sourceBuilder.getSource()) {
-        this.sourceBuilder.setSource(source)
+      source = source instanceof Vue ? source.$source : source
+      if (source !== this._sourceBuilder.getSource()) {
+        this._sourceBuilder.setSource(source)
       }
     }
   }
 
   const watch = {
     distance (value) {
-      if (this.source && value !== this.source.getDistance()) {
-        this.source.setDistance(value)
+      if (this.$source && value !== this.$source.getDistance()) {
+        this.$source.setDistance(value)
       }
     }
   }

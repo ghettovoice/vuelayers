@@ -58,7 +58,7 @@
         projection: this.projection,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         requestEncoding: this.requestEncoding,
-        tileGrid: this.tileGrid,
+        tileGrid: this._tileGrid,
         tilePixelRatio: this.tilePixelRatio,
         style: this.styleName,
         version: this.version,
@@ -73,9 +73,9 @@
     createTileGrid () {
       assert.hasView(this)
 
-      const extent = extentHelper.fromProjection(this.view.getProjection())
+      const extent = extentHelper.fromProjection(this.$view.getProjection())
       const resolutions = tileGridHelper.resolutionsFromExtent(
-        extents,
+        extent,
         this.maxZoom,
         this.tileSize
       )

@@ -44,23 +44,23 @@
      */
     defineAccessors () {
       Object.defineProperties(this, {
-        feature: {
+        $feature: {
           enumerable: true,
           get: this.getFeature
         },
-        layer: {
+        $layer: {
           enumerable: true,
-          get: () => this.services && this.services.layer
+          get: () => this.$services && this.$services.layer
         },
-        map: {
+        $map: {
           enumerable: true,
-          get: () => this.services && this.services.map
+          get: () => this.$services && this.$services.map
         },
-        view: {
+        $view: {
           enumerable: true,
-          get: () => this.services && this.services.view
+          get: () => this.$services && this.$services.view
         },
-        geometry: {
+        $geometry: {
           enumerable: true,
           get: this.getGeometry
         }
@@ -70,13 +70,13 @@
      * @returns {ol.Feature|undefined}
      */
     getFeature () {
-      return this.olObject
+      return this.$olObject
     },
     /**
      * @return {ol.geom.Geometry|undefined}
      */
     getGeometry () {
-      return this.feature && this.feature.getGeometry()
+      return this.$feature && this.$feature.getGeometry()
     },
     /**
      * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
@@ -87,12 +87,12 @@
       assert.hasFeature(this)
 
       if (geom instanceof Vue) {
-        geom = geom.geom
+        geom = geom.$geometry
       } else if (isPlainObject(geom)) {
-        geom = geoJson.readGeometry(geom, this.view.getProjection())
+        geom = geoJson.readGeometry(geom, this.$view.getProjection())
       }
-      if (geom !== this.geometry) {
-        this.feature.setGeometry(geom)
+      if (geom !== this.$geometry) {
+        this.$feature.setGeometry(geom)
       }
     },
     /**
@@ -103,7 +103,7 @@
       const vm = this
 
       return mergeDescriptors(this::cmp.methods.getServices(), {
-        get feature () { return vm.feature }
+        get feature () { return vm.$feature }
       })
     },
     /**
@@ -111,7 +111,7 @@
      * @protected
      */
     getStyleTarget () {
-      return this.feature
+      return this.$feature
     },
     /**
      * @param {number} pixel
@@ -120,10 +120,10 @@
     isAtPixel (pixel) {
       assert.hasMap(this)
 
-      return this.map.forEachFeatureAtPixel(
+      return this.$map.forEachFeatureAtPixel(
         pixel,
-        f => f === this.feature,
-        { layerFilter: l => l === this.layer }
+        f => f === this.$feature,
+        { layerFilter: l => l === this.$layer }
       )
     },
     /**
@@ -147,7 +147,7 @@
      */
     refresh () {
       assert.hasFeature(this)
-      this.feature.changed()
+      this.$feature.changed()
     }
   }
 
@@ -156,15 +156,15 @@
      * @param {string|number} value
      */
     id (value) {
-      if (this.feature && value !== this.feature.getId()) {
-        this.feature.setId(value)
+      if (this.$feature && value !== this.$feature.getId()) {
+        this.$feature.setId(value)
       }
     },
     /**
      * @param {Object} value
      */
     properties (value) {
-      this.feature && this.feature.setProperties(plainProps(value))
+      this.$feature && this.$feature.setProperties(plainProps(value))
     }
   }
 
