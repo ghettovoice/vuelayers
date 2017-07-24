@@ -15,7 +15,7 @@
      * @returns {ol.geom.LineString}
      * @protected
      */
-    createGeom () {
+    createGeometry () {
       return new LineString(this.fromLonLat(this.coordinates))
     }
   }

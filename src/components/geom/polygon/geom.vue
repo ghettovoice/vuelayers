@@ -15,7 +15,7 @@
      * @returns {ol.geom.Polygon}
      * @protected
      */
-    createGeom () {
+    createGeometry () {
       return new Polygon(this.fromLonLat(this.coordinates))
     }
   }

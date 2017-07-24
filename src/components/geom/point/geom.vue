@@ -21,7 +21,7 @@
      * @return {ol.geom.Point}
      * @protected
      */
-    createGeom () {
+    createGeometry () {
       return new Point(this.fromLonLat(this.coordinates))
     }
   }

@@ -15,7 +15,7 @@
      * @returns {ol.geom.MultiLineString}
      * @protected
      */
-    createGeom () {
+    createGeometry () {
       return new MultiLineString(this.fromLonLat(this.coordinates))
     }
   }

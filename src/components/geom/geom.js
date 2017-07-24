@@ -40,14 +40,14 @@ const methods = {
    * @protected
    */
   createOlObject () {
-    return this.createGeom()
+    return this.createGeometry()
   },
   /**
    * @return {ol.geometry.Geometry|Promise<ol.geometry.Geometry>}
    * @protected
    * @abstract
    */
-  createGeom () {
+  createGeometry () {
     throw new Error('Not implemented method')
   },
   /**
@@ -97,7 +97,7 @@ const methods = {
     Object.defineProperties(this, {
       geometry: {
         enumerable: true,
-        get: this.getGeom
+        get: this.getGeometry
       },
       map: {
         enumerable: true,
@@ -112,14 +112,14 @@ const methods = {
   /**
    * @returns {ol.geometry.Geometry|undefined}
    */
-  getGeom () {
+  getGeometry () {
     return this.olObject
   },
   /**
    * @return {void}
    */
   refresh () {
-    assert.hasGeom(this)
+    assert.hasGeometry(this)
     this.geometry.changed()
   },
   /**
@@ -193,7 +193,7 @@ export default {
  * @private
  */
 function subscribeToGeomChanges () {
-  assert.hasGeom(this)
+  assert.hasGeometry(this)
 
   const ft = 100
   const events = Observable.fromOlEvent(this.geometry, 'change', () => ({

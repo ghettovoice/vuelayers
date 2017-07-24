@@ -52,8 +52,8 @@ export function hasView (vm) {
  * @return {void}
  * @throws {AssertionError}
  */
-export function hasGeoloc (vm) {
-  assert(vm.geoloc, 'component has "geoloc" field')
+export function hasGeolocation (vm) {
+  assert(vm.geolocation, 'component has "geolocation" field')
 }
 
 /**
@@ -88,8 +88,8 @@ export function hasSource (vm) {
  * @return {void}
  * @throws {AssertionError}
  */
-export function hasGeom (vm) {
-  assert(vm.geom, 'component has "geom" field')
+export function hasGeometry (vm) {
+  assert(vm.geometry, 'component has "geom" field')
 }
 
 /**
