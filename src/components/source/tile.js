@@ -3,13 +3,13 @@ import {
   CACHE_SIZE,
   CROSS_ORIGIN,
   EPSG_3857,
+  extent as extentHelper,
   MAX_ZOOM,
   MIN_ZOOM,
   PIXEL_RATIO,
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
-  tileGrid as tileGridHelper,
-  extent as extentHelper
+  tileGrid as tileGridHelper
 } from '../../ol-ext'
 import replaceTokens from '../../utils/replace-tokens'
 import source from './source'
@@ -98,12 +98,27 @@ const methods = {
     return this::source.methods.init()
   },
   /**
-   * @return {void}
+   * @return {void|Promise<void>}
    * @protected
    */
   deinit () {
     this._tileGrid = undefined
-    this::source.methods.deinit()
+
+    return this::source.methods.deinit()
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  mount () {
+    this::source.methods.mount()
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  unmount () {
+    this::source.methods.mount()
   }
 }
 

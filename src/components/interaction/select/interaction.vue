@@ -2,7 +2,6 @@
   import Vue from 'vue'
   import SelectInteraction from 'ol/interaction/select'
   import Feature from 'ol/feature'
-  import Collection from 'ol/collection'
   import {
     mapValues,
     differenceWith,

@@ -9,6 +9,20 @@ const props = {
 
 const methods = {
   /**
+   * @return {Promise}
+   * @protected
+   */
+  init () {
+    return this::style.methods.init()
+  },
+  /**
+   * @return {void|Promise<void>}
+   * @protected
+   */
+  deinit () {
+    return this::style.methods.deinit()
+  },
+  /**
    * @return {void}
    * @protected
    */

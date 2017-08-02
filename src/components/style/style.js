@@ -28,11 +28,11 @@ const methods = {
     return this::cmp.methods.init()
   },
   /**
-   * @return {void}
+   * @return {void|Promise<void>}
    * @protected
    */
   deinit () {
-    this::cmp.methods.deinit()
+    return this::cmp.methods.deinit()
   },
   /**
    * @return {void}

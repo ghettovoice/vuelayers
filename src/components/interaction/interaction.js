@@ -1,6 +1,5 @@
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import * as assert from '../../utils/assert'
 
 const props = {
   active: {
@@ -66,6 +65,20 @@ const methods = {
     })
   },
   /**
+   * @return {Promise} Resolves when initialization completes
+   * @protected
+   */
+  init () {
+    return this::cmp.methods.init()
+  },
+  /**
+   * @return {void|Promise<void>}
+   * @protected
+   */
+  deinit () {
+    return this::cmp.methods.deinit()
+  },
+  /**
    * @return {void}
    * @protected
    */
@@ -85,12 +98,7 @@ const methods = {
    * @return {Promise}
    */
   refresh () {
-    return new Promise(resolve => {
-      assert.hasInteraction(this)
-
-      this.$interaction.once('change', () => resolve())
-      this.$interaction.changed()
-    })
+    return this::cmp.methods.refresh()
   }
 }
 

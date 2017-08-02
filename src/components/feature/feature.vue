@@ -141,17 +141,6 @@
     unmount () {
       this.unsubscribeAll()
       this.$parent && this.$parent.removeFeature(this)
-    },
-    /**
-     * @return {Promise}
-     */
-    refresh () {
-      return new Promise(resolve => {
-        assert.hasFeature(this)
-
-        this.$feature.once('change', () => resolve())
-        this.$feature.changed()
-      })
     }
   }
 

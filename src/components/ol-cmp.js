@@ -3,6 +3,7 @@
  * @module components/cmp
  */
 import debounce from 'debounce-promise'
+import { isFunction } from 'lodash/fp'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/interval'
 import 'rxjs/add/operator/skipWhile'
@@ -48,7 +49,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {void}
+   * @return {void|Promise<void>}
    * @protected
    */
   deinit () {
@@ -72,7 +73,7 @@ const methods = {
     return this::services.methods.getServices()
   },
   /**
-   * @return {void}
+   * @return {void|Promise<void>}
    * @protected
    * @abstract
    */
@@ -80,7 +81,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {void}
+   * @return {void|Promise<void>}
    * @protected
    * @abstract
    */
@@ -173,5 +174,12 @@ export default {
  * @return {Promise<void>}
  */
 function refresh () {
-  return Promise.resolve()
+  return Promise.resolve(resolve => {
+    if (this.$olObject && isFunction(this.$olObject.changed)) {
+      this.$olObject.once('change', () => resolve())
+      this.$olObject.changed()
+    } else {
+      resolve()
+    }
+  })
 }

@@ -83,11 +83,11 @@ const methods = {
     return this::cmp.methods.init()
   },
   /**
-   * @return {void}
+   * @return {void|Promise<void>}
    * @protected
    */
   deinit () {
-    this::cmp.methods.deinit()
+    return this::cmp.methods.deinit()
   },
   /**
    * @return {void}
@@ -119,12 +119,7 @@ const methods = {
    * @return {Promise}
    */
   refresh () {
-    return new Promise(resolve => {
-      assert.hasGeometry(this)
-
-      this.$geometry.once('change', () => resolve())
-      this.$geometry.changed()
-    })
+    return this::cmp.methods.refresh()
   },
   /**
    * @return {Object}

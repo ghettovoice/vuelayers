@@ -81,6 +81,20 @@ const methods = {
     return this.$source.getFeatureById(id)
   },
   /**
+   * @return {Promise}
+   * @protected
+   */
+  init () {
+    return this::source.methods.init()
+  },
+  /**
+   * @return {void|Promise<void>}
+   * @protected
+   */
+  deinit () {
+    return this::source.methods.deinit()
+  },
+  /**
    * @return {void}
    * @protected
    */

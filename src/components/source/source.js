@@ -1,6 +1,5 @@
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import * as assert from '../../utils/assert'
 
 const props = {
   attributions: [String, Array],
@@ -49,18 +48,18 @@ const methods = {
     })
   },
   /**
-   * @return {Promise<Vue<ol.source.Source>>}
+   * @return {Promise}
    * @protected
    */
   init () {
     return this::cmp.methods.init()
   },
   /**
-   * @return {void}
+   * @return {void|Promise<void>}
    * @protected
    */
   deinit () {
-    this::cmp.methods.deinit()
+    return this::cmp.methods.deinit()
   },
   /**
    * @return {Object}
@@ -99,12 +98,7 @@ const methods = {
    * @return {Promise}
    */
   refresh () {
-    return new Promise(resolve => {
-      assert.hasSource(this)
-
-      this.$source.once('change', () => resolve())
-      this.$source.changed()
-    })
+    return this::cmp.methods.refresh()
   }
 }
 

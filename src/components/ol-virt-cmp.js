@@ -16,11 +16,11 @@ export default {
       return this::cmp.methods.init()
     },
     /**
-     * @return {void}
+     * @return {void|Promise<void>}
      * @protected
      */
     deinit () {
-      this::cmp.methods.deinit()
+      return this::cmp.methods.deinit()
     },
     /**
      * @return {*}
@@ -37,6 +37,13 @@ export default {
      */
     getServices () {
       return this::cmp.methods.getServices()
+    },
+    /**
+     * Refresh internal ol objects
+     * @return {Promise}
+     */
+    refresh () {
+      return this::cmp.methods.refresh()
     }
   }
 }

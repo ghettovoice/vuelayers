@@ -158,17 +158,6 @@
       this.$parent && this.$parent.setView(undefined)
     },
     /**
-     * @return {Promise}
-     */
-    refresh () {
-      return new Promise(resolve => {
-        assert.hasView(this)
-
-        this.$view.once('change', () => resolve())
-        this.$view.changed()
-      })
-    },
-    /**
      * @return {void}
      * @protected
      */
