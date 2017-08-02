@@ -89,11 +89,15 @@
       this.$geolocation.setTracking(false)
     },
     /**
-     * @return {void}
+     * @return {Promise}
      */
     refresh () {
-      assert.hasGeolocation(this)
-      this.$geolocation.changed()
+      return new Promise(resolve => {
+        assert.hasGeolocation(this)
+
+        this.$geolocation.once('change', () => resolve())
+        this.$geolocation.changed()
+      })
     },
     /**
      * @return {void}

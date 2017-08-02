@@ -2,7 +2,7 @@
  * Basic ol component mixin
  * @module components/cmp
  */
-import { debounce } from 'lodash/fp'
+import debounce from 'debounce-promise'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/interval'
 import 'rxjs/add/operator/skipWhile'
@@ -29,7 +29,7 @@ const methods = {
        * @type {*}
        * @protected
        */
-      this._olObject = await Promise.resolve(this.createOlObject())
+      this._olObject = await this.createOlObject()
       if (this.ident) {
         this.$identityMap.set(this.ident, this._olObject)
       }
@@ -88,15 +88,17 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @type {function():void}
+   * Debounced refresh
+   * @return {Promise}
    */
-  requestRefresh: debounce(100, function () {
-    this.refresh()
-  }),
+  requestRefresh: debounce(function () {
+    return this.refresh()
+  }, 100),
   /**
-   * @return {void}
+   * Refresh internal ol objects
+   * @return {Promise}
    */
-  refresh () {},
+  refresh: refresh,
   /**
    * @return {void}
    * @protected
@@ -165,4 +167,11 @@ export default {
         logdbg('destroyed', this.$options.name)
       })
   }
+}
+
+/**
+ * @return {Promise<void>}
+ */
+function refresh () {
+  return Promise.resolve()
 }

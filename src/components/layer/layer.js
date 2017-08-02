@@ -29,11 +29,11 @@ const props = {
 
 const methods = {
   /**
-   * @return {ol.layer.Layer|Promise<ol.layer.Layer>}
+   * @return {Promise<ol.layer.Layer>}
    * @protected
    */
-  createOlObject () {
-    let layer = this.createLayer()
+  async createOlObject () {
+    let layer = await this.createLayer()
     layer.set('id', this.id)
 
     return layer
@@ -160,11 +160,15 @@ const methods = {
   },
   /**
    * Updates layer state
-   * @return {void}
+   * @return {Promise}
    */
   refresh () {
-    assert.hasLayer(this)
-    this.$layer.changed()
+    return new Promise(resolve => {
+      assert.hasLayer(this)
+
+      this.$layer.once('change', () => resolve())
+      this.$layer.changed()
+    })
   },
   /**
    * @param {ol.Map|Vue|undefined} map

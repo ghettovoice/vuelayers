@@ -167,12 +167,18 @@
       }
     },
     /**
-     * @return {void}
+     * @return {Promise}
      */
     refresh () {
-      assert.hasInteraction(this)
-      this.$interaction.getFeatures().changed()
-      this::interaction.methods.refresh()
+      return Promise.all([
+        new Promise(resolve => {
+          assert.hasInteraction(this)
+
+          this.$interaction.getFeatures().once('change', () => resolve())
+          this.$interaction.getFeatures().changed()
+        }),
+        this::interaction.methods.refresh()
+      ])
     },
     /**
      * @return {void}

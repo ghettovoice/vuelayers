@@ -69,11 +69,11 @@ const methods = {
     })
   },
   /**
-   * @return {void}
+   * @return {Promise}
    */
   refresh () {
-    this.unmount()
-    this.mount()
+    return Promise.resolve(this.unmount())
+      .then(this.mount)
   }
 }
 

@@ -15,7 +15,7 @@ const methods = {
    * @protected
    */
   async createOlObject () {
-    const interaction = await Promise.resolve(this.createInteraction())
+    const interaction = await this.createInteraction()
     interaction.setActive(this.active)
 
     return interaction
@@ -82,11 +82,15 @@ const methods = {
     this.$parent && this.$parent.removeInteraction(this)
   },
   /**
-   * @return {void}
+   * @return {Promise}
    */
   refresh () {
-    assert.hasInteraction(this)
-    this.$interaction.changed()
+    return new Promise(resolve => {
+      assert.hasInteraction(this)
+
+      this.$interaction.once('change', () => resolve())
+      this.$interaction.changed()
+    })
   }
 }
 

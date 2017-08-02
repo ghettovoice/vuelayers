@@ -116,11 +116,15 @@ const methods = {
     return this.$olObject
   },
   /**
-   * @return {void}
+   * @return {Promise}
    */
   refresh () {
-    assert.hasGeometry(this)
-    this.$geometry.changed()
+    return new Promise(resolve => {
+      assert.hasGeometry(this)
+
+      this.$geometry.once('change', () => resolve())
+      this.$geometry.changed()
+    })
   },
   /**
    * @return {Object}

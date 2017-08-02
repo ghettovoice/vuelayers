@@ -74,11 +74,11 @@
       }
     },
     /**
-     * @return {void}
+     * @return {Promise}
      */
     refresh () {
       // recreate style
-      Promise.resolve(this.unmount)
+      return Promise.resolve(this.unmount())
         .then(this.deinit)
         .then(this.init)
         .then(this.mount)

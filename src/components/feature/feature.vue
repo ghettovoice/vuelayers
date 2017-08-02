@@ -143,11 +143,15 @@
       this.$parent && this.$parent.removeFeature(this)
     },
     /**
-     * @return {void}
+     * @return {Promise}
      */
     refresh () {
-      assert.hasFeature(this)
-      this.$feature.changed()
+      return new Promise(resolve => {
+        assert.hasFeature(this)
+
+        this.$feature.once('change', () => resolve())
+        this.$feature.changed()
+      })
     }
   }
 

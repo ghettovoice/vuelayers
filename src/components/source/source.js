@@ -96,11 +96,15 @@ const methods = {
     this.$parent && this.$parent.setSource(undefined)
   },
   /**
-   * @return {void}
+   * @return {Promise}
    */
   refresh () {
-    assert.hasSource(this)
-    this.$source.changed()
+    return new Promise(resolve => {
+      assert.hasSource(this)
+
+      this.$source.once('change', () => resolve())
+      this.$source.changed()
+    })
   }
 }
 

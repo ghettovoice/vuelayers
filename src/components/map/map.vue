@@ -246,12 +246,16 @@
     },
     /**
      * Triggers map re-render.
-     * @return {void}
+     * @return {Promise}
      */
     refresh () {
-      assert.hasMap(this)
-      this.$map.updateSize()
-      this.$map.render()
+      return new Promise(resolve => {
+        assert.hasMap(this)
+
+        this.$map.once('postrender', () => resolve())
+        this.$map.updateSize()
+        this.$map.render()
+      })
     },
     /**
      * @return {void}
