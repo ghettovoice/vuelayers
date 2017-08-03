@@ -1,27 +1,42 @@
 <script>
   import VectorSource from 'ol/source/vector'
   import loadingstrategy from 'ol/loadingstrategy'
-  import { differenceWith } from 'lodash/fp'
+  import FeatureFormat from 'ol/format/feature'
+  import GeoJSONFormat from 'ol/format/GeoJSON'
+  import { differenceWith, stubArray } from 'lodash/fp'
   import { extent, proj, tileGrid } from '../../../ol-ext'
   import vectSource from '../vect'
 
   // todo add support of format, url and default xhr loader
   const props = {
-    // for big datasets
+    /**
+     * @type {Array<(GeoJSONFeature|Vue|ol.Feature)>} features
+     */
     features: {
       type: Array,
-      default: () => []
+      default: stubArray
     },
     loader: Function,
     /**
      * Loading strategy factory
-     * @type {function(helper: Object): ol.LoadingStrategy}
+     * @type {function(helper: Object): ol.LoadingStrategy} strategyFactory
      */
     strategyFactory: {
       type: Function,
-      default: defaultStrategyFactory
+      default: () => defaultStrategyFactory
+    },
+    /**
+     * @type {function(): ol.format.Feature}
+     */
+    formatFactory: {
+      type: Function,
+      default: () => defaultFormaFactory
+    },
+    url: String,
+    overlaps: {
+      type: Boolean,
+      default: true
     }
-    // format: String
   }
 
   const methods = {
