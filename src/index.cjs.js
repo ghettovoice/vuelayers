@@ -10,12 +10,16 @@
  */
 import install from './install'
 import * as components from './components'
+import * as ol from 'ol-ext'
+import * as rx from 'rx-ext'
 
 const VueLayers = {
   // meta & consts
   VERSION: PKG_VERSION,
   // install
   install,
+  ol,
+  rx,
   ...components
 }
 export default VueLayers

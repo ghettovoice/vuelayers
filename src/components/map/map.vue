@@ -58,7 +58,7 @@
       assert.hasMap(this)
 
       layer = layer instanceof Vue ? layer.$layer : layer
-      if (layer && !this.$layers.includes(layer)) {
+      if (layer && !this.$layers.getArray().includes(layer)) {
         this.$map.addLayer(layer)
       }
     },
@@ -73,10 +73,10 @@
       this.$map.removeLayer(layer)
     },
     /**
-     * @return {ol.layer.Layer[]}
+     * @return {ol.Collection<ol.layer.Layer>}
      */
     getLayers () {
-      return (this.$map && this.$map.getLayers().getArray()) || []
+      return this.$map && this.$map.getLayers()
     },
     /**
      * @param {ol.interaction.Interaction|Vue} interaction
@@ -86,7 +86,7 @@
       assert.hasMap(this)
 
       interaction = interaction instanceof Vue ? interaction.$interaction : interaction
-      if (interaction && !this.$interactions.includes(interaction)) {
+      if (interaction && !this.$interactions.getArray().includes(interaction)) {
         this.$map.addInteraction(interaction)
       }
     },
@@ -101,10 +101,10 @@
       this.$map.removeInteraction(interaction)
     },
     /**
-     * @return {ol.interaction.Interaction[]}
+     * @return {ol.Collection<ol.interaction.Interaction>|undefined}
      */
     getInteractions () {
-      return (this.$map && this.$map.getInteractions().getArray()) || []
+      return this.$map && this.$map.getInteractions()
     },
     /**
      * @param {ol.Overlay|Vue} overlay
@@ -114,7 +114,9 @@
       assert.hasMap(this)
 
       overlay = overlay instanceof Vue ? overlay.$overlay : $overlay
-      this.$map.addOverlay(overlay)
+      if (overlay && !this.$overlays.getArray().includes(overlay)) {
+        this.$map.addOverlay(overlay)
+      }
     },
     /**
      * @param {ol.Overlay|Vue} overlay
@@ -127,10 +129,10 @@
       this.$map.removeOverlay(overlay)
     },
     /**
-     * @return {ol.Overlay[]}
+     * @return {ol.Collection<ol.Overlay>|undefined}
      */
     getOverlays () {
-      return (this.$map && this.$map.getOverlays().getArray()) || []
+      return this.$map && this.$map.getOverlays()
     },
     /**
      * @param {string|number}
@@ -245,7 +247,10 @@
 
       return mergeDescriptors(this::cmp.methods.getServices(), {
         get map () { return vm.$map },
-        get view () { return vm.$view }
+        get view () { return vm.$view },
+        get layers () { return vm.$layers },
+        get interactions () { return vm.$interactions },
+        get overlays () { return vm.$overlays }
       })
     },
     /**

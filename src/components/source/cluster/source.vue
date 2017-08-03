@@ -2,7 +2,7 @@
   import Vue from 'vue'
   import SourceBuilder from './builder'
   import vectSource from '../vect'
-  import { geom as geomHelper } from '../../../ol-ext'
+  import * as olExt from '../../../ol-ext'
 
   // todo make inherit from vector
   const props = {
@@ -11,11 +11,12 @@
       default: 20
     },
     /**
-     * @type {function(feature: ol.Feature): (ol.geom.Point|undefined)}
+     * Geometry function factory
+     * @type {function(olExt: Object): (function(f: ol.Feature): ol.geom.SimpleGeometry|undefined)} geomFuncFactory
      */
-    geomFunc: {
+    geomFuncFactory: {
       type: Function,
-      default: defaultGeomFunc
+      default: () => defaultGeomFuncFactory
     }
   }
 
@@ -25,7 +26,6 @@
      * @protected
      */
     createSource () {
-      const geomFunc = this.geomFunc
       // partial setup of ol.source.Cluster with the help of SourceBuilder class
       /**
        * @type {SourceBuilder}
@@ -34,9 +34,7 @@
       this._sourceBuilder = new SourceBuilder()
         .setAttributions(this.attributions)
         .setDistance(this.distance)
-        .setGeometryFunction(function __geomFunc (feature) {
-          return geomFunc(feature, geomHelper)
-        })
+        .setGeometryFunction(this.geomFuncFactory(olExt))
         .setLogo(this.logo)
         .setProjection(this.projection)
         .setWrapX(this.wrapX)
@@ -80,14 +78,15 @@
   }
 
   /**
-   * @param {ol.Feature} feature
-   * @param {Object} h
-   * @returns {ol.geom.Point|undefined}
+   * @param {Object} olExt
+   * @returns {function(f: ol.Feature): ol.geom.SimpleGeometry|undefined}
    */
-  function defaultGeomFunc (feature, { pointOnSurface }) {
-    let geom = feature.getGeometry()
-    if (!geom) return
+  function defaultGeomFuncFactory (olExt) {
+    return function (feature) {
+      let geometry = feature.getGeometry()
+      if (!geometry) return
 
-    return pointOnSurface(geom)
+      return olExt.geom.pointOnSurface(geometry)
+    }
   }
 </script>

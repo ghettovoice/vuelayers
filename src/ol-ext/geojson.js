@@ -1,7 +1,7 @@
-import GeoJSON from 'ol/format/geojson'
+import { geoJson as geoJsonFactory } from './format'
 import { EPSG_4326, EPSG_3857 } from './consts'
 
-const geoJson = new GeoJSON()
+const geoJson = geoJsonFactory()
 
 /**
  * @param {ol.Feature} feature

@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import uuid from 'uuid/v4'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/observable/merge'
+import 'rxjs/add/operator/do'
+import '../../rx-ext'
 import { isPlainObject } from 'lodash/fp'
 import { EPSG_4326, geoJson } from '../../ol-ext'
 import source from './source'
@@ -38,9 +42,7 @@ const methods = {
     } else if (isPlainObject(feature)) {
       feature = geoJson.readFeature(feature, this.$view.getProjection())
     }
-    if (feature.getId() == null) {
-      feature.setId(uuid())
-    }
+    prepareFeature(feature)
     this.$source.addFeature(feature)
   },
   /**
@@ -72,6 +74,19 @@ const methods = {
     this.$source.clear()
   },
   /**
+   * @return {void}
+   * @private
+   */
+  defineAccessors () {
+    this::source.methods.defineAccessors()
+    Object.defineProperties(this, {
+      $features: {
+        enumerable: true,
+        get: this.getFeatures
+      }
+    })
+  },
+  /**
    * @param {string|number} id
    * @return {ol.Feature|undefined}
    */
@@ -79,6 +94,12 @@ const methods = {
     assert.hasSource(this)
 
     return this.$source.getFeatureById(id)
+  },
+  /**
+   * @return {ol.Collection<ol.Feature>}
+   */
+  getFeatures () {
+    return this.$source && this.$source.getFeaturesCollection()
   },
   /**
    * @return {Promise}
@@ -107,6 +128,13 @@ const methods = {
    */
   unmount () {
     this::source.methods.unmount()
+  },
+  /**
+   * @return {void}
+   * @protected
+   */
+  subscribeAll () {
+    this::subscribeToSourceChanges()
   }
 }
 
@@ -121,5 +149,24 @@ export default {
         class: this.$options.name
       }
     }
+  }
+}
+
+function subscribeToSourceChanges () {
+  assert.hasSource(this)
+
+  const add = Observable.fromOlEvent(this.$source, 'addfeature')
+    .do(evt => {
+      prepareFeature(evt.feature)
+    })
+  const remove = Object.fromOlEvent(this.$source, 'removefeature')
+  const events = Observable.merge(add, remove)
+
+  this.subscribeOn(events, evt => this.$emit(evt.type, evt))
+}
+
+function prepareFeature (feature) {
+  if (feature.getId() == null) {
+    feature.setId(uuid())
   }
 }

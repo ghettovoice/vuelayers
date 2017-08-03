@@ -1,38 +1,42 @@
 <script>
   import VectorSource from 'ol/source/vector'
-  import loadingstrategy from 'ol/loadingstrategy'
   import FeatureFormat from 'ol/format/feature'
   import GeoJSONFormat from 'ol/format/GeoJSON'
-  import { differenceWith, stubArray } from 'lodash/fp'
-  import { extent, proj, tileGrid } from '../../../ol-ext'
+  import { differenceWith, stubArray, isFunction } from 'lodash/fp'
+  import * as olExt from '../../../ol-ext'
   import vectSource from '../vect'
 
-  // todo add support of format, url and default xhr loader
   const props = {
     /**
-     * @type {Array<(GeoJSONFeature|Vue|ol.Feature)>} features
+     * @type {GeoJSONFeature[]} features
      */
     features: {
       type: Array,
       default: stubArray
     },
-    loader: Function,
+    /**
+     * Source loader factory
+     * @type {function(olExt: Object): ol.FeatureLoader|undefined} loaderFactory
+     */
+    loaderFactory: Function,
+    /**
+     * Source format factory
+     * @type {function(olExt: Object): ol.format.Feature} formatFactory
+     */
+    formatFactory: Function,
+    /**
+     * String or url function factory
+     * @type {string|function(olExt: Object): ol.FeatureUrlFunction} url
+     */
+    url: [String, Function],
     /**
      * Loading strategy factory
-     * @type {function(helper: Object): ol.LoadingStrategy} strategyFactory
+     * @type {function(olExt: Object): ol.LoadingStrategy} strategyFactory
      */
     strategyFactory: {
       type: Function,
       default: () => defaultStrategyFactory
     },
-    /**
-     * @type {function(): ol.format.Feature}
-     */
-    formatFactory: {
-      type: Function,
-      default: () => defaultFormaFactory
-    },
-    url: String,
     overlaps: {
       type: Boolean,
       default: true
@@ -48,31 +52,106 @@
       return new VectorSource({
         attributions: this.attributions,
         projection: this.projection,
-        loader: this.sourceLoader(),
+        loader: this.$loader,
         useSpatialIndex: this.useSpatialIndex,
         wrapX: this.wrapX,
         logo: this.logo,
-        strategy: this.strategyFactory({
-          strategy: loadingstrategy,
-          extent,
-          proj,
-          tileGrid
-        })
-        // url: this.url,
+        strategy: this.$strategy,
+        format: this.$format
+        url: this.$url,
+        overlaps: this.overlaps
       })
     },
     /**
-     * @return {function|undefined}
+     * @return {void}
+     * @private
+     */
+    defineAccessors () {
+      this::source.methods.defineAccessors()
+      Object.defineProperties(this, {
+        $strategy: {
+          enumerable: true,
+          get: this.getStrategy
+        },
+        $format: {
+          enumerable: true,
+          get: this.getFormat
+        },
+        $loader: {
+          enumerable: true,
+          get: this.getLoader
+        },
+        $url: {
+          enumerable: true,
+          get: this.getUrl
+        }
+      })
+    },
+    /**
+     * @return {ol.FeatureLoader|undefined}
+     */
+    getLoader () {
+      if (!this._loader && this.loaderFactory) {
+        /**
+         * @type {ol.FeatureLoader|undefined}
+         * @private
+         */
+        this._loader = this.loaderFactory(olExt)
+      }
+
+      return this._loader
+    },
+    /**
+     * @return {ol.LoadingStrategy}
+     */
+    getStrategy () {
+      if (!this._strategy) {
+        /**
+         * @type {ol.LoadingStrategy}
+         * @private
+         */
+        this._strategy = this.strategyFactory(olExt)
+      }
+
+      return this._strategy
+    },
+    /**
+     * @return {ol.format.Feature|undefined}
+     */
+    getFormat () {
+      if (!this._format && this.formatFactory) {
+        /**
+         * @type {ol.format.Feature|undefined}
+         * @private
+         */
+        this._format = this.formatFactory(olExt)
+      }
+
+      return this._format
+    },
+    /**
+     * @return {string|ol.FeatureUrlFunction|undefined}
+     */
+    getUrl () {
+      if (isFunction(this.url) && !this._url) {
+        /**
+         * @type {string|ol.FeatureUrlFunction|undefined}
+         */
+        this._url = this.url(olExt)
+      } else {
+        this._url = this.url
+      }
+
+      return this._url
+    },
+    /**
+     * @return {void|Promise<void>}
      * @protected
      */
-    sourceLoader () {
-      if (!this.loader) return
+    deinit () {
+      this._strategy = this._loader = this._format = undefined
 
-      const loader = this.loader
-      // todo add format property, read loaded features
-      return function __vectorSourceLoader (extent, resolution, projection) {
-        loader(extent, resolution, projection)
-      }
+      return this::source.methods.deinit()
     },
     /**
      * @return {void}
@@ -114,10 +193,10 @@
   }
 
   /**
-   * @param {{strategy: Object, extent: Object, proj: Object, tileGrid: Object}} h Helper
+   * @param {Object} olExt OpenLayers Helper
    * @return {ol.LoadingStrategy}
    */
-  function defaultStrategyFactory ({ strategy }) {
-    return strategy.bbox
+  function defaultStrategyFactory ({ loadStrategy }) {
+    return loadStrategy.bbox
   }
 </script>

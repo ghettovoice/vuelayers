@@ -7,7 +7,9 @@ import * as geoJson from './geojson'
 import * as geom from './geom'
 import * as proj from './proj'
 import * as style from './style'
-import * as tileGrid from './tilegrid'
+import * as tileGrid from './tile-grid'
+import * as loadStrategy from './load-strategy'
+import * as format from './format'
 
 export * from './consts'
 export {
@@ -16,5 +18,7 @@ export {
   geom,
   proj,
   style,
-  tileGrid
+  tileGrid,
+  loadStrategy,
+  format
 }

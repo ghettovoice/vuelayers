@@ -108,6 +108,13 @@ const methods = {
   },
   /**
    * @return {void}
+   * @private
+   */
+  defineAccessors () {
+    this::source.methods.defineAccessors()
+  },
+  /**
+   * @return {void}
    * @protected
    */
   mount () {

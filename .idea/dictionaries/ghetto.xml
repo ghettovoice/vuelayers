@@ -2,6 +2,7 @@
   <dictionary name="ghetto">
     <words>
       <w>accuracygeometry</w>
+      <w>addfeature</w>
       <w>altitudeaccuracy</w>
       <w>apidoc</w>
       <w>apikey</w>
@@ -58,6 +59,7 @@
       <w>prepatch</w>
       <w>proj</w>
       <w>regenerator</w>
+      <w>removefeature</w>
       <w>reproj</w>
       <w>reprojection</w>
       <w>scss</w>
