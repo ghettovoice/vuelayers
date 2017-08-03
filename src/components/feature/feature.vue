@@ -170,7 +170,8 @@
     stubVNode: {
       attrs () {
         return {
-          id: [this.$options.name, this.id].join('-')
+          id: [this.$options.name, this.id].join('-'),
+          class: this.$options.name
         }
       }
     }

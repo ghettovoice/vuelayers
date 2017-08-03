@@ -63,7 +63,7 @@ export default {
     empty: false,
     attrs () {
       return {
-        id: this.$options.name
+        class: this.$options.name
       }
     }
   }

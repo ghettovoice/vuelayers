@@ -48,6 +48,7 @@
     }
   }
 
+  // todo add getLayerById, getInteractionById
   const methods = {
     /**
      * @param {ol.layer.Layer|Vue} layer
@@ -106,6 +107,41 @@
       return (this.$map && this.$map.getInteractions().getArray()) || []
     },
     /**
+     * @param {ol.Overlay|Vue} overlay
+     * @return {void}
+     */
+    addOverlay (overlay) {
+      assert.hasMap(this)
+
+      overlay = overlay instanceof Vue ? overlay.$overlay : $overlay
+      this.$map.addOverlay(overlay)
+    },
+    /**
+     * @param {ol.Overlay|Vue} overlay
+     * @return {void}
+     */
+    removeOverlay (overlay) {
+      assert.hasMap(this)
+
+      overlay = overlay instanceof Vue ? overlay.$overlay : $overlay
+      this.$map.removeOverlay(overlay)
+    },
+    /**
+     * @return {ol.Overlay[]}
+     */
+    getOverlays () {
+      return (this.$map && this.$map.getOverlays().getArray()) || []
+    },
+    /**
+     * @param {string|number}
+     * @return {ol.Overlay|undefined}
+     */
+    getOverlayById (id) {
+      assert.hasMap(this)
+
+      return this.$map.getOverlayById(id)
+    },
+    /**
      * @return {ol.Map}
      * @protected
      */
@@ -148,6 +184,10 @@
         $interactions: {
           enumerable: true,
           get: this.getInteractions
+        },
+        $overlays: {
+          enumerable: true,
+          get: this.getOverlays
         }
       })
     },

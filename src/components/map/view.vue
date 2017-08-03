@@ -168,8 +168,8 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, proj.toLonLat(this.$view.getCenter()))) {
-        this.$view.setCenter(proj.fromLonLat(value, this.projection))
+      if (this.$view && !isEqual(value, proj.toLonLat(this.$view.getCenter(), this.$view.getProjection()))) {
+        this.$view.setCenter(proj.fromLonLat(value, this.$view.getProjection()))
       }
     },
     resolution (value) {

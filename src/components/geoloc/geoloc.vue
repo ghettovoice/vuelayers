@@ -2,11 +2,10 @@
   import Geolocation from 'ol/geolocation'
   import { isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/from'
+  import 'rxjs/add/observable/merge'
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
-  import 'rxjs/add/operator/mergeMap'
   import '../../rx-ext'
   import { EPSG_4326 } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
@@ -134,7 +133,7 @@
 
     const ft = 100
     const getObservable = field => {
-      return Observable.fromOlEvent(this.$geolocation, `change:${field}`, () => this[field])
+      return Observable.fromOlEvent(this.$geolocation, `change:${field}`, () => this.$geolocation.get(field))
         .throttleTime(ft)
         .distinctUntilChanged(isEqual)
         .map(value => ({
@@ -142,14 +141,14 @@
           value
         }))
     }
-    const events = Observable.from([
+    const events = Observable.merge.apply(undefined, [
       'accuracy',
       'altitude',
       'altitudeaccuracy',
       'heading',
       'position',
       'speed'
-    ]).mergeMap(getObservable)
+    ].map(getObservable))
 
     this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
   }
