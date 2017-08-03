@@ -99,12 +99,7 @@ const methods = {
    * Refresh internal ol objects
    * @return {Promise}
    */
-  refresh: refresh,
-  /**
-   * @return {void}
-   * @protected
-   */
-  subscribeAll () {}
+  refresh: refresh
 }
 
 export default {

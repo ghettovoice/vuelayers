@@ -1,10 +1,6 @@
 <script>
   import Geolocation from 'ol/geolocation'
-  import { isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/merge'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
   import '../../rx-ext'
   import { EPSG_4326 } from '../../ol-ext'
@@ -131,24 +127,18 @@
   function subscribeToGeolocation () {
     assert.hasGeolocation(this)
 
-    const ft = 100
-    const getObservable = field => {
-      return Observable.fromOlEvent(this.$geolocation, `change:${field}`, () => this.$geolocation.get(field))
-        .throttleTime(ft)
-        .distinctUntilChanged(isEqual)
-        .map(value => ({
-          name: `update:${field}`,
-          value
-        }))
-    }
-    const events = Observable.merge.apply(undefined, [
+    const events = Observable.fromOlChangeEvent(this.$geolocation, [
       'accuracy',
       'altitude',
       'altitudeaccuracy',
       'heading',
       'position',
       'speed'
-    ].map(getObservable))
+    ], true, 100)
+      .map(({ prop, value }) => ({
+        name: `update:${prop}`,
+        value
+      }))
 
     this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
   }

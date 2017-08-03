@@ -1,8 +1,6 @@
 import { isEqual } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/operator/throttleTime'
-import 'rxjs/add/operator/distinctUntilChanged'
 import 'rxjs/add/operator/map'
 import '../../rx-ext'
 import cmp from '../ol-virt-cmp'
@@ -195,15 +193,13 @@ function subscribeToGeomChanges () {
   assert.hasGeometry(this)
 
   const ft = 100
-  const events = Observable.fromOlEvent(this.$geometry, 'change', () => ({
+  const events = Observable.fromOlChangeEvent(this.$geometry, undefined, isEqualGeom, ft, () => ({
     coordinates: this.toLonLat(this.$geometry.getCoordinates()),
     extent: this.extentToLonLat(this.$geometry.getExtent())
-  })).throttleTime(ft)
-    .distinctUntilChanged(isEqualGeom)
-    .map(({ coordinates }) => ({
-      name: 'update:coordinates',
-      value: coordinates
-    }))
+  })).map(({ value: { coordinates } }) => ({
+    name: 'update:coordinates',
+    value: coordinates
+  }))
 
   this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
 }

@@ -3,8 +3,6 @@
   import { isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
   import '../../rx-ext'
   import Overlay from 'ol/overlay'
@@ -171,28 +169,16 @@
     const ft = 100
     const getPosition = () => projHelper.toLonLat(this.$overlay.getPosition(), this.$view.getProjection())
 
-    const offset = Observable.fromOlEvent(this.$overlay, 'change:offset', () => this.$overlay.getOffset())
-      .throttleTime(ft)
-      .distinctUntilChanged(isEqual)
-      .map(value => ({
-        name: 'update:offset',
-        value
-      }))
-    const position = Observable.fromOlEvent(this.$overlay, 'change:position', getPosition)
-      .throttleTime(ft)
-      .distinctUntilChanged(isEqual)
-      .map(value => ({
-        name: 'update:position',
-        value
-      }))
-    const positioning = Observable.fromOlEvent(this.$overlay, 'change:positioning', () => this.$overlay.getPositioning())
-      .throttleTime(ft)
-      .distinctUntilChanged(isEqual)
-      .map(value => ({
-        name: 'update:positioning',
-        value
-      }))
-    const events = Observable.merge(offset, position, positioning)
+    const events = Observable.merge(
+      Observable.fromOlChangeEvent(this.$overlay, 'position', true, ft, getPosition),
+      Observable.fromOlChangeEvent(this.$overlay, [
+        'offset',
+        'positioning'
+      ], true, ft)
+    ).map(({ prop, value }) => ({
+      name: `update:${prop}`,
+      value
+    }))
 
     this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
   }

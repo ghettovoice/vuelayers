@@ -4,7 +4,6 @@
   import { isEqual, isPlainObject, noop } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
-  import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/debounceTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
@@ -225,35 +224,21 @@
     const getCenter = () => proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
     const getZoom = () => Math.round(this.$view.getZoom())
 
-    const center = Observable.fromOlEvent(this.$view, 'change:center', getCenter)
-      .throttleTime(ft)
+    const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
+    const zoom = resolution.map(() => ({
+      prop: 'zoom',
+      value: getZoom()
+    })).debounceTime(ft * 2)
       .distinctUntilChanged(isEqual)
-      .map(value => ({
-        name: 'update:center',
-        value
-      }))
-    const resolution = Observable.fromOlEvent(this.$view, 'change:resolution', () => this.$view.getResolution())
-      .throttleTime(ft)
-      .distinctUntilChanged(isEqual)
-      .map(value => ({
-        name: 'update:resolution',
-        value
-      }))
-    const zoom = resolution.map(getZoom)
-      .debounceTime(ft * 2)
-      .distinctUntilChanged(isEqual)
-      .map(value => ({
-        name: 'update:zoom',
-        value
-      }))
-    const rotation = Observable.fromOlEvent(this.$view, 'change:rotation', () => this.$view.getRotation())
-      .throttleTime(ft)
-      .distinctUntilChanged(isEqual)
-      .map(value => ({
-        name: 'update:rotation',
-        value
-      }))
-    const events = Observable.merge(center, resolution, zoom, rotation)
+    const events = Observable.merge(
+      Observable.fromOlChangeEvent(this.$view, 'center', true, ft, getCenter),
+      Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
+      resolution,
+      zoom
+    ).map(({ prop, value }) => ({
+      name: `update:${prop}`,
+      value
+    }))
 
     this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
   }
