@@ -5,13 +5,13 @@
 import assert from 'assert'
 import isNumeric from './is-numeric'
 
-const { ok, fail, equal, notEqual } = assert
-export {
+export const {
   ok,
   fail,
   equal,
-  notEqual
-}
+  notEqual,
+  AssertionError
+} = assert
 /**
  * @param {*} value
  * @throws {AssertionError}

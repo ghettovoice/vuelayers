@@ -3,7 +3,7 @@
  */
 import Vue from 'vue'
 import { filter, flow, isFunction, map } from 'lodash/fp'
-import { style as styleHelper } from '../ol-ext'
+import * as olExt from '../ol-ext'
 import { warndbg } from '../utils/debug'
 
 export default {
@@ -23,11 +23,11 @@ export default {
     },
     /**
      * Default style factory
-     * @param {Object} h Style helper
+     * @param {Object} olExt Style helper
      * @return {ol.style.Style[]|ol.StyleFunction|undefined}
      * @protected
      */
-    getDefaultStyles (h) {},
+    getDefaultStyles (olExt) {},
     /**
      * @param {ol.style.Style|ol.StyleFunction|Vue|undefined} style
      * @return {void}
@@ -111,7 +111,7 @@ export default {
      */
     createStyleFunc () {
       const vm = this
-      const defaultStyles = this.getDefaultStyles(styleHelper)
+      const defaultStyles = this.getDefaultStyles(olExt)
 
       return function __styleTargetStyleFunc (feature, resolution) {
         if (!feature.getGeometry()) return
@@ -121,7 +121,7 @@ export default {
         // styles - ol.StyleFunction or vl-style-func
         if (styles && (isFunction(styles) || isFunction(styles.$style))) {
           let styleFunc = isFunction(styles) ? styles : styles.$style
-          styles = styleFunc(feature, resolution, styleHelper)
+          styles = styleFunc(feature, resolution, olExt)
         }
         // styles is array of { $style: ol.style.Style, condition: (bool|function():bool) }
         else if (Array.isArray(styles)) {
@@ -149,7 +149,7 @@ export default {
         styles = defaultStyles
         if (styles) {
           return isFunction(styles)
-            ? styles(feature, resolution, styleHelper)
+            ? styles(feature, resolution, olExt)
             : styles
         }
       }

@@ -5,16 +5,31 @@
    * and style target for inner style containers (vl-style-box) as fallback style.
    */
   import { isFunction, noop } from 'lodash/fp'
-  import { style as styleHelper } from '../../../ol-ext'
+  import * as olExt from '../../../ol-ext'
   import { warndbg } from '../../../utils/debug'
   import style from '../style'
   import styleTarget from '../../style-target'
   import * as assert from '../../../utils/assert'
 
   const props = {
+    /**
+     * @type {function(olExt: Object): ol.StyleFunction}
+     */
     factory: {
       type: Function,
       required: true
+    }
+  }
+
+  const computed = {
+    styleFunc () {
+      let func = this.factory(olExt)
+      if (!isFunction(func)) {
+        warndbg(`Factory returned a value not of Function type, fallback style will be used`)
+        func = noop
+      }
+
+      return func
     }
   }
 
@@ -26,16 +41,12 @@
     createStyle () {
       assert.hasMap(this)
       // user provided style function
-      let providedStyleFunc = this.factory(styleHelper)
-      if (!isFunction(providedStyleFunc)) {
-        warndbg(`Factory returned a value not of Function type, fallback style will be used`)
-        providedStyleFunc = noop
-      }
+      const providedStyleFunc = this.styleFunc
       // fallback style function made from inner style containers
       const fallbackStyleFunc = this.createStyleFunc()
 
-      return function __styleFunc (feature, resolution, helper) {
-        const styles = providedStyleFunc(feature, resolution, helper)
+      return function __styleFunc (feature, resolution, olExt) {
+        const styles = providedStyleFunc(feature, resolution, olExt)
         // not empty or null style
         if (
           styles === null ||
@@ -43,7 +54,7 @@
         ) {
           return styles
         }
-        return fallbackStyleFunc(feature, resolution)
+        return fallbackStyleFunc(feature, resolution, olExt)
       }
     },
     /**
@@ -95,6 +106,7 @@
     name: 'vl-style-func',
     mixins: [style, styleTarget],
     props,
+    computed,
     methods,
     watch,
     stubVNode: {

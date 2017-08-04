@@ -1,4 +1,4 @@
-import { isEqual, isFunction } from 'lodash/fp'
+import { isFunction, isEqual } from 'lodash/fp'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/merge'
 import 'rxjs/add/operator/throttleTime'
@@ -29,7 +29,8 @@ export default function fromOlChangeEvent (target, prop, distinct, throttle, sel
     observable = observable.throttleTime(throttle)
   }
   if (distinct) {
-    observable = observable.distinctUntilChanged(isFunction(distinct) ? distinct : isEqual)
+    isFunction(distinct) || (distinct = isEqual)
+    observable = observable.distinctUntilChanged(distinct)
   }
 
   return observable.map(value => ({ prop, value }))

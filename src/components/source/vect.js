@@ -9,7 +9,6 @@ import { EPSG_4326, geoJson } from '../../ol-ext'
 import source from './source'
 import * as assert from '../../utils/assert'
 
-// todo add support of format, url and default xhr loader
 const props = {
   projection: {
     type: String,
@@ -42,8 +41,7 @@ const methods = {
     } else if (isPlainObject(feature)) {
       feature = geoJson.readFeature(feature, this.$view.getProjection())
     }
-    prepareFeature(feature)
-    this.$source.addFeature(feature)
+    this.$source.addFeature(this.prepareFeature(feature))
   },
   /**
    * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
@@ -97,9 +95,12 @@ const methods = {
   },
   /**
    * @return {ol.Collection<ol.Feature>}
+   * @throws {AssertionError}
    */
   getFeatures () {
-    return this.$source && this.$source.getFeaturesCollection()
+    assert.hasSource(this)
+
+    return this.$source.getFeaturesCollection()
   },
   /**
    * @return {Promise}
@@ -130,6 +131,18 @@ const methods = {
     this::source.methods.unmount()
   },
   /**
+   * @param {ol.Feature} feature
+   * @return {ol.Feature}
+   * @protected
+   */
+  prepareFeature (feature) {
+    if (feature.getId() == null) {
+      feature.setId(uuid())
+    }
+
+    return feature
+  },
+  /**
    * @return {void}
    * @protected
    */
@@ -157,16 +170,10 @@ function subscribeToSourceChanges () {
 
   const add = Observable.fromOlEvent(this.$source, 'addfeature')
     .do(evt => {
-      prepareFeature(evt.feature)
+      this.prepareFeature(evt.feature)
     })
   const remove = Object.fromOlEvent(this.$source, 'removefeature')
   const events = Observable.merge(add, remove)
 
   this.subscribeOn(events, evt => this.$emit(evt.type, evt))
-}
-
-function prepareFeature (feature) {
-  if (feature.getId() == null) {
-    feature.setId(uuid())
-  }
 }

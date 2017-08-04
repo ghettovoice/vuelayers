@@ -4,7 +4,6 @@
   import vectSource from '../vect'
   import * as olExt from '../../../ol-ext'
 
-  // todo make inherit from vector
   const props = {
     distance: {
       type: Number,
@@ -17,6 +16,12 @@
     geomFuncFactory: {
       type: Function,
       default: () => defaultGeomFuncFactory
+    }
+  }
+
+  const computed = {
+    geomFunc () {
+      return this.geomFunc(olExt)
     }
   }
 
@@ -34,7 +39,7 @@
       this._sourceBuilder = new SourceBuilder()
         .setAttributions(this.attributions)
         .setDistance(this.distance)
-        .setGeometryFunction(this.geomFuncFactory(olExt))
+        .setGeometryFunction(this.geomFunc)
         .setLogo(this.logo)
         .setProjection(this.projection)
         .setWrapX(this.wrapX)
@@ -73,6 +78,7 @@
     name: 'vl-source-cluster',
     mixins: [vectSource],
     props,
+    computed,
     methods,
     watch
   }

@@ -74,13 +74,17 @@
     },
     /**
      * @return {ol.geom.Geometry|undefined}
+     * @throws {AssertionError}
      */
     getGeometry () {
-      return this.$feature && this.$feature.getGeometry()
+      assert.hasFeature(this)
+
+      return this.$feature.getGeometry()
     },
     /**
      * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
      * @return {void}
+     * @throws {AssertionError}
      */
     setGeometry (geom) {
       assert.hasView(this)
@@ -107,7 +111,7 @@
       })
     },
     /**
-     * @return {ol.Feature}
+     * @return {ol.Feature|undefined}
      * @protected
      */
     getStyleTarget () {

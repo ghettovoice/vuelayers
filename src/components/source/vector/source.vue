@@ -1,7 +1,5 @@
 <script>
   import VectorSource from 'ol/source/vector'
-  import FeatureFormat from 'ol/format/feature'
-  import GeoJSONFormat from 'ol/format/GeoJSON'
   import { differenceWith, stubArray, isFunction } from 'lodash/fp'
   import * as olExt from '../../../ol-ext'
   import vectSource from '../vect'
@@ -25,8 +23,8 @@
      */
     formatFactory: Function,
     /**
-     * String or url function factory
-     * @type {string|function(olExt: Object): ol.FeatureUrlFunction} url
+     * String or url factory
+     * @type {string|function(olExt: Object): string|ol.FeatureUrlFunction} url
      */
     url: [String, Function],
     /**
@@ -43,6 +41,21 @@
     }
   }
 
+  const computed = {
+    strategy () {
+      return this.strategyFactory(olExt)
+    },
+    loader () {
+      return this.loaderFactory(olExt)
+    },
+    urlFunc () {
+      return isFunction(this.url) ? this.url(olExt) : () => this.url
+    },
+    format () {
+      return this.formatFactory(olExt)
+    }
+  }
+
   const methods = {
     /**
      * @return {ol.source.Vector}
@@ -52,106 +65,15 @@
       return new VectorSource({
         attributions: this.attributions,
         projection: this.projection,
-        loader: this.$loader,
+        loader: this.loader,
         useSpatialIndex: this.useSpatialIndex,
         wrapX: this.wrapX,
         logo: this.logo,
-        strategy: this.$strategy,
-        format: this.$format
-        url: this.$url,
+        strategy: this.strategy,
+        format: this.format,
+        url: this.urlFunc,
         overlaps: this.overlaps
       })
-    },
-    /**
-     * @return {void}
-     * @private
-     */
-    defineAccessors () {
-      this::source.methods.defineAccessors()
-      Object.defineProperties(this, {
-        $strategy: {
-          enumerable: true,
-          get: this.getStrategy
-        },
-        $format: {
-          enumerable: true,
-          get: this.getFormat
-        },
-        $loader: {
-          enumerable: true,
-          get: this.getLoader
-        },
-        $url: {
-          enumerable: true,
-          get: this.getUrl
-        }
-      })
-    },
-    /**
-     * @return {ol.FeatureLoader|undefined}
-     */
-    getLoader () {
-      if (!this._loader && this.loaderFactory) {
-        /**
-         * @type {ol.FeatureLoader|undefined}
-         * @private
-         */
-        this._loader = this.loaderFactory(olExt)
-      }
-
-      return this._loader
-    },
-    /**
-     * @return {ol.LoadingStrategy}
-     */
-    getStrategy () {
-      if (!this._strategy) {
-        /**
-         * @type {ol.LoadingStrategy}
-         * @private
-         */
-        this._strategy = this.strategyFactory(olExt)
-      }
-
-      return this._strategy
-    },
-    /**
-     * @return {ol.format.Feature|undefined}
-     */
-    getFormat () {
-      if (!this._format && this.formatFactory) {
-        /**
-         * @type {ol.format.Feature|undefined}
-         * @private
-         */
-        this._format = this.formatFactory(olExt)
-      }
-
-      return this._format
-    },
-    /**
-     * @return {string|ol.FeatureUrlFunction|undefined}
-     */
-    getUrl () {
-      if (isFunction(this.url) && !this._url) {
-        /**
-         * @type {string|ol.FeatureUrlFunction|undefined}
-         */
-        this._url = this.url(olExt)
-      } else {
-        this._url = this.url
-      }
-
-      return this._url
-    },
-    /**
-     * @return {void|Promise<void>}
-     * @protected
-     */
-    deinit () {
-      this._strategy = this._loader = this._format = undefined
-
-      return this::source.methods.deinit()
     },
     /**
      * @return {void}
@@ -188,6 +110,7 @@
     name: 'vl-source-vector',
     mixins: [vectSource],
     props,
+    computed,
     methods,
     watch
   }

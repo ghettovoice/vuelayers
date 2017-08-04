@@ -50,6 +50,7 @@ const methods = {
   },
   /**
    * @return {Promise}
+   * @throws {AssertionError}
    * @protected
    */
   init () {

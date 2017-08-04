@@ -23,7 +23,7 @@
   const props = {
     filter: {
       type: Function,
-      default: constant(true)
+      default: () => constant(true)
     },
     hitTolerance: {
       type: Number,
@@ -35,9 +35,9 @@
     },
     /**
      * Initial selection
-     * @type {Array<(GeoJSONFeature|Vue|ol.Feature|string|number)>} Array of ids, GeoJSON's objects, vl-feature, ol.Feature
+     * @type {string[]|number[]} Initial selection as Array of ids
      */
-    features: {
+    selected: {
       type: Array,
       default: stubArray
     },
@@ -61,12 +61,25 @@
       })
     },
     /**
-     * @param {Object} h
+     * @return {void}
+     * @protected
+     */
+    defineAccessors () {
+      this::interaction.methods.defineAccessors()
+      Object.defineProperties(this, {
+        $features: {
+          enumerable: true,
+          get: this.getFeatures
+        }
+      })
+    },
+    /**
+     * @param {Object} olExt
      * @return {ol.StyleFunction}
      * @protected
      */
-    getDefaultStyles (h) {
-      const defaultStyles = mapValues(styles => styles.map(h.style), h.defaultEditStyle())
+    getDefaultStyles (olExt) {
+      const defaultStyles = mapValues(styles => styles.map(olExt.style.style), olExt.style.defaultEditStyle())
 
       return function __selectDefaultStyleFunc (feature) {
         if (feature.getGeometry()) {
@@ -75,7 +88,15 @@
       }
     },
     /**
-     * @return {ol.interaction.Interaction}
+     * @return {ol.Collection<ol.Feature>}
+     */
+    getFeatures () {
+      assert.hasInteraction(this)
+
+      return this.$interaction.getFeatures()
+    },
+    /**
+     * @return {ol.interaction.Interaction|undefined}
      * @protected
      */
     getStyleTarget () {
@@ -87,7 +108,7 @@
      */
     mount () {
       this::interaction.methods.mount()
-      this.features.forEach(this.select)
+      this.selected.forEach(this.select)
     },
     /**
      * @return {void}
@@ -114,8 +135,7 @@
         feature = feature.$feature
       }
 
-      const selection = this.$interaction.getFeatures()
-      const selectedIds = selection.getArray().map(f => f.getId())
+      const selectedIds = this.$features.getArray().map(extractId)
       if (selectedIds.includes(id)) return
 
       if (!(feature instanceof Feature)) {
@@ -129,7 +149,7 @@
         }, this.$map.getLayers().getArray())
       }
 
-      feature && selection.push(feature)
+      feature && this.$features.push(feature)
     },
     /**
      * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
@@ -146,12 +166,11 @@
         feature = feature.$feature
       }
 
-      const selection = this.$interaction.getFeatures()
-      const selectedIds = selection.getArray().map(f => f.getId())
+      const selectedIds = this.$features.getArray().map(f => f.getId())
       const idx = selectedIds.findIndex(x => x === id)
 
       if (idx !== -1) {
-        selection.removeAt(idx)
+        this.$features.removeAt(idx)
       }
     },
     /**
@@ -173,8 +192,8 @@
         new Promise(resolve => {
           assert.hasInteraction(this)
 
-          this.$interaction.getFeatures().once('change', () => resolve())
-          this.$interaction.getFeatures().changed()
+          this.$features.once('change', () => resolve())
+          this.$features.changed()
         }),
         this::interaction.methods.refresh()
       ])
@@ -192,18 +211,18 @@
      */
     unselectAll () {
       assert.hasInteraction(this)
-      this.$interaction.getFeatures().clear()
+      this.$features.clear()
     }
   }
 
   const diffById = differenceWith((a, b) => extractId(a) === extractId(b))
   const watch = {
-    features (features) {
+    selected (value) {
       if (!this.$interaction) return
 
-      const selected = this.$interaction.getFeatures().getArray()
-      let forSelect = diffById(features, selected)
-      let forUnselect = diffById(selected, features)
+      const selected = this.$features.getArray()
+      let forSelect = diffById(value, selected)
+      let forUnselect = diffById(selected, value)
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)
@@ -239,7 +258,7 @@
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
 
-        this.$emit('update:features', this.$interaction.getFeatures().getArray())
+        this.$emit('update:selected', this.$features.getArray().map(extractId))
       }
     )
   }

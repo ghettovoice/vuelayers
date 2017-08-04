@@ -74,9 +74,12 @@
     },
     /**
      * @return {ol.Collection<ol.layer.Layer>}
+     * @throws {AssertionError}
      */
     getLayers () {
-      return this.$map && this.$map.getLayers()
+      assert.hasMap(this)
+
+      return this.$map.getLayers()
     },
     /**
      * @param {ol.interaction.Interaction|Vue} interaction
@@ -101,10 +104,13 @@
       this.$map.removeInteraction(interaction)
     },
     /**
-     * @return {ol.Collection<ol.interaction.Interaction>|undefined}
+     * @return {ol.Collection<ol.interaction.Interaction>}
+     * @throws {AssertionError}
      */
     getInteractions () {
-      return this.$map && this.$map.getInteractions()
+      assert.hasMap(this)
+
+      return this.$map.getInteractions()
     },
     /**
      * @param {ol.Overlay|Vue} overlay
@@ -113,7 +119,7 @@
     addOverlay (overlay) {
       assert.hasMap(this)
 
-      overlay = overlay instanceof Vue ? overlay.$overlay : $overlay
+      overlay = overlay instanceof Vue ? overlay.$overlay : overlay
       if (overlay && !this.$overlays.getArray().includes(overlay)) {
         this.$map.addOverlay(overlay)
       }
@@ -125,18 +131,22 @@
     removeOverlay (overlay) {
       assert.hasMap(this)
 
-      overlay = overlay instanceof Vue ? overlay.$overlay : $overlay
+      overlay = overlay instanceof Vue ? overlay.$overlay : overlay
       this.$map.removeOverlay(overlay)
     },
     /**
-     * @return {ol.Collection<ol.Overlay>|undefined}
+     * @return {ol.Collection<ol.Overlay>}
+     * @throws {AssertionError}
      */
     getOverlays () {
-      return this.$map && this.$map.getOverlays()
+      assert.hasMap(this)
+
+      return this.$map.getOverlays()
     },
     /**
-     * @param {string|number}
+     * @param {string|number} id
      * @return {ol.Overlay|undefined}
+     * @throws {AssertionError}
      */
     getOverlayById (id) {
       assert.hasMap(this)
@@ -254,10 +264,13 @@
       })
     },
     /**
-     * @return {ol.View|undefined}
+     * @return {ol.View}
+     * @throws {AssertionError}
      */
     getView () {
-      return this.$map && this.$map.getView()
+      assert.hasMap(this)
+
+      return this.$map.getView()
     },
     /**
      * @param {ol.View|Vue|undefined} view

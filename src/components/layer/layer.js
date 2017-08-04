@@ -112,9 +112,12 @@ const methods = {
   },
   /**
    * @return {ol.source.Source|undefined}
+   * @throws {AssertionError}
    */
   getSource () {
-    return this.$layer && this.$layer.getSource()
+    assert.hasLayer(this)
+
+    return this.$layer.getSource()
   },
   /**
    * @param {ol.source.Source|Vue|undefined} source

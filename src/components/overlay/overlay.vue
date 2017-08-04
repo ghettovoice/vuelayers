@@ -142,6 +142,7 @@
     }
   }
 
+  // todo add scoped slot support?
   export default {
     name: 'vl-overlay',
     mixins: [cmp],
