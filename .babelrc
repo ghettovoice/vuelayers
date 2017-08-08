@@ -4,15 +4,18 @@
     "stage-0"
   ],
   "plugins": [
-    "transform-runtime",
-    "lodash"
+    "transform-runtime"
   ],
   "env": {
     "test": {
       "plugins": ["istanbul"]
     },
-    "cjs": {
+    "production": {
+      "plugins": ["lodash"]
+    },
+    "production-cjs": {
       "plugins": [
+        "lodash",
         ["./modules/babel-plugin-merge-imports", {
           "pkg": "openlayers",
           "pkgVar": "__ol",

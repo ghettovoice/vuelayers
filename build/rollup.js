@@ -107,9 +107,9 @@ function bundle (opts = {}) {
   let bundleName = opts.bundleName
 
   if (['cjs', 'umd'].includes(opts.format)) {
-    process.env.BABEL_ENV = 'cjs'
+    process.env.BABEL_ENV = 'production-cjs'
   } else {
-    delete process.env.BABEL_ENV
+    process.env.BABEL_ENV = 'production'
   }
 
   const plugins = [
@@ -187,23 +187,20 @@ function bundle (opts = {}) {
       external: opts.external,
       plugins
     }))
-    .then(bundler => {
-      const { code, map } = bundler.generate({
-        format: opts.format,
-        banner: config.banner,
-        moduleName: config.fullname,
-        // moduleId: config.name,
-        sourceMap: true,
-        sourceMapFile: dest,
-        globals: opts.globals
-      })
-
-      return Promise.all([
-        utils.writeFile(dest, code),
-        utils.writeFile(dest + '.map', map.toString()),
-        postcssPromise
-      ])
-    })
+    .then(bundler => bundler.generate({
+      format: opts.format,
+      banner: config.banner,
+      moduleName: config.fullname,
+      // moduleId: config.name,
+      sourceMap: true,
+      sourceMapFile: dest,
+      globals: opts.globals
+    }))
+    .then(({ code, map }) => Promise.all([
+      utils.writeFile(dest, code),
+      utils.writeFile(dest + '.map', map.toString()),
+      postcssPromise
+    ]))
     .then(([ jsSrc, jsMap, [ cssSrc, cssMap ] ]) => {
       spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
