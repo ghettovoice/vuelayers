@@ -6,7 +6,7 @@ language: java
 jdk:
   - oraclejdk8
 env:
-  - NODE_VERSION=6 DBUS_SESSION_BUS_ADDRESS=/dev/null
+  - NODE_VERSION=7 DBUS_SESSION_BUS_ADDRESS=/dev/null
 cache:
   directories:
     - node_modules
