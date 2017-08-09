@@ -172,8 +172,8 @@ function subscribeToSourceChanges () {
     .do(evt => {
       this.prepareFeature(evt.feature)
     })
-  const remove = Object.fromOlEvent(this.$source, 'removefeature')
+  const remove = Observable.fromOlEvent(this.$source, 'removefeature')
   const events = Observable.merge(add, remove)
 
-  this.subscribeOn(events, evt => this.$emit(evt.type, evt))
+  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

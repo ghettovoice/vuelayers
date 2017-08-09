@@ -4,6 +4,8 @@
       <vl-map>
         <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
+        <vl-geoloc/>
+
         <vl-interaction-select @select="select" @unselect="unselect" :features.sync="selected"></vl-interaction-select>
 
         <vl-layer-tile id="sputnik">
@@ -60,6 +62,7 @@
 
 <script>
   import { range, random } from 'lodash/fp'
+  import VlGeoloc from '../src/components/geoloc/geoloc.vue'
 
   const methods = {
     select (feature) {
@@ -94,6 +97,7 @@
   }
 
   export default {
+    components: { VlGeoloc },
     name: 'app',
     methods,
     data () {

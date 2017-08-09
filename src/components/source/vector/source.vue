@@ -33,7 +33,7 @@
      */
     strategyFactory: {
       type: Function,
-      default: () => defaultStrategyFactory
+      default: defaultStrategyFactory
     },
     overlaps: {
       type: Boolean,
@@ -43,16 +43,24 @@
 
   const computed = {
     strategy () {
-      return this.strategyFactory(olExt)
+      if (this.strategyFactory) {
+        return this.strategyFactory(olExt)
+      }
     },
     loader () {
-      return this.loaderFactory(olExt)
+      if (this.loaderFactory) {
+        return this.loaderFactory(olExt)
+      }
     },
     urlFunc () {
-      return isFunction(this.url) ? this.url(olExt) : () => this.url
+      if (this.url) {
+        return isFunction(this.url) ? this.url(olExt) : () => this.url
+      }
     },
     format () {
-      return this.formatFactory(olExt)
+      if (this.formatFactory) {
+        return this.formatFactory(olExt)
+      }
     }
   }
 
