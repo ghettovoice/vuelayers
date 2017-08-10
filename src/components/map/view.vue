@@ -54,6 +54,31 @@
     }
   }
 
+  const computed = {
+    currentCenter () {
+      if (this.rev && this.$view) {
+        return proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
+      }
+
+      return []
+    },
+    currentResolution () {
+      if (this.rev && this.$view) {
+        return this.$view.getResolution()
+      }
+    },
+    currentZoom () {
+      if (this.rev && this.$view) {
+        return Math.round(this.$view.getZoom())
+      }
+    },
+    currentRotation () {
+      if (this.rev && this.$view) {
+        return this.$view.getRotation()
+      }
+    }
+  }
+
   const methods = {
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
@@ -167,23 +192,23 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, proj.toLonLat(this.$view.getCenter(), this.$view.getProjection()))) {
+      if (this.$view && !isEqual(value, this.currentCenter)) {
         this.$view.setCenter(proj.fromLonLat(value, this.$view.getProjection()))
       }
     },
     resolution (value) {
-      if (this.$view && value !== this.$view.getResolution()) {
+      if (this.$view && value !== this.currentResolution) {
         this.$view.setResolution(value)
       }
     },
     zoom (value) {
       value = Math.round(value)
-      if (this.$view && value !== Math.round(this.$view.getZoom())) {
+      if (this.$view && value !== this.currentZoom) {
         this.$view.setZoom(value)
       }
     },
     rotation (value) {
-      if (this.$view && value !== this.$view.getRotation()) {
+      if (this.$view && value !== this.currentRotation) {
         this.$view.setRotation(value)
       }
     },
@@ -203,11 +228,17 @@
     name: 'vl-view',
     mixins: [cmp],
     props,
+    computed,
     methods,
     watch,
     stubVNode: {
       empty () {
         return this.$options.name
+      }
+    },
+    data () {
+      return {
+        rev: 1
       }
     }
   }
@@ -221,17 +252,14 @@
     assert.hasView(this)
 
     const ft = 100
-    const getCenter = () => proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
-    const getZoom = () => Math.round(this.$view.getZoom())
-
     const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution.map(() => ({
       prop: 'zoom',
-      value: getZoom()
+      value: this.currentZoom
     })).debounceTime(ft * 2)
       .distinctUntilChanged(isEqual)
     const events = Observable.merge(
-      Observable.fromOlChangeEvent(this.$view, 'center', true, ft, getCenter),
+      Observable.fromOlChangeEvent(this.$view, 'center', true, ft, () => this.currentCenter),
       Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
       zoom
@@ -240,6 +268,9 @@
       value
     }))
 
-    this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
+    this.subscribeTo(events, ({ name, value }) => {
+      ++this.rev
+      this.$emit(name, value)
+    })
   }
 </script>

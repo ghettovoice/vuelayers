@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/merge'
 import 'rxjs/add/operator/do'
 import '../../rx-ext'
+import Collection from 'ol/collection'
 import { isPlainObject } from 'lodash/fp'
 import { EPSG_4326, geoJson } from '../../ol-ext'
 import source from './source'
@@ -34,14 +35,21 @@ const methods = {
    */
   addFeature (feature) {
     assert.hasView(this)
-    assert.hasSource(this)
+    // assert.hasSource(this)
 
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
       feature = geoJson.readFeature(feature, this.$view.getProjection())
     }
-    this.$source.addFeature(this.prepareFeature(feature))
+
+    this.prepareFeature(feature)
+
+    if (!this._featuresCollection.getArray().includes(feature)) {
+      this._featuresCollection.push(feature)
+      this._featuresIndex[feature.getId()] = feature
+      this.$source && this.$source.addFeature(feature)
+    }
   },
   /**
    * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
@@ -60,16 +68,23 @@ const methods = {
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
-      feature = this.$source.getFeatureById(feature.id)
+      feature = this._featuresIndex[feature.id]
     }
-    this.$source.removeFeature(feature)
+
+    if (feature) {
+      this._featuresCollection.remove(feature)
+      delete this._featuresIndex[feature.getId()]
+      this.$source && this.$source.removeFeature(feature)
+    }
   },
   /**
    * @return {void}
    */
   clear () {
     assert.hasSource(this)
-    this.$source.clear()
+    this._featuresCollection.clear()
+    this._featuresIndex = Object.create(null)
+    this.$source && this.$source.clear()
   },
   /**
    * @return {void}
@@ -89,24 +104,31 @@ const methods = {
    * @return {ol.Feature|undefined}
    */
   getFeatureById (id) {
-    assert.hasSource(this)
-
-    return this.$source.getFeatureById(id)
+    return this._featuresIndex[id]
   },
   /**
    * @return {ol.Collection<ol.Feature>}
    * @throws {AssertionError}
    */
   getFeatures () {
-    assert.hasSource(this)
-
-    return this.$source.getFeaturesCollection()
+    return this._featuresCollection
   },
   /**
    * @return {Promise}
    * @protected
    */
   init () {
+    /**
+     * @type {ol.Collection<ol.Feature>}
+     * @private
+     */
+    this._featuresCollection = new Collection()
+    /**
+     * @type {Object<(string|number), ol.Feature>}
+     * @private
+     */
+    this._featuresIndex = Object.create(null)
+
     return this::source.methods.init()
   },
   /**
@@ -169,10 +191,13 @@ function subscribeToSourceChanges () {
   assert.hasSource(this)
 
   const add = Observable.fromOlEvent(this.$source, 'addfeature')
-    .do(evt => {
-      this.prepareFeature(evt.feature)
+    .do(({ feature }) => {
+      this.addFeature(feature)
     })
   const remove = Observable.fromOlEvent(this.$source, 'removefeature')
+    .do(({ feature }) => {
+      this.removeFeature(feature)
+    })
   const events = Observable.merge(add, remove)
 
   this.subscribeTo(events, evt => this.$emit(evt.type, evt))

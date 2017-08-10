@@ -4,13 +4,13 @@
       <vl-map>
         <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
-        <vl-geoloc/>
+        <!--<vl-geoloc/>
 
         <vl-interaction-select @select="select" @unselect="unselect" :features.sync="selected"></vl-interaction-select>
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
-        </vl-layer-tile>
+        </vl-layer-tile>-->
 
         <vl-layer-vector id="points" v-if="pointsLayer">
           <!--<vl-source-cluster>-->
@@ -18,7 +18,7 @@
           <!--</vl-source-cluster>-->
         </vl-layer-vector>
 
-        <vl-layer-tile id="wmts">
+        <!--<vl-layer-tile id="wmts">
           <vl-source-wmts
             url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
             layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
@@ -30,7 +30,7 @@
               <vl-geom-polygon :coordinates.sync="polygonCoords" />
             </vl-feature>
           </vl-source-vector>
-        </vl-layer-vector>
+        </vl-layer-vector>-->
       </vl-map>
     </div>
     <!--<div style="height: 50%">
@@ -73,7 +73,7 @@
     },
     loadData () {
       const points = []
-      range(1, 100).forEach(i => {
+      range(1, 10).forEach(i => {
         points.push({
           type: 'Feature',
           id: i,

@@ -108,7 +108,6 @@ export default {
   methods,
   created () {
     this.defineAccessors()
-    const parentCreated = Promise.resolve(this.$parent && this.$parent.$createPromise)
     /**
      * @type {*}
      * @private
@@ -118,7 +117,7 @@ export default {
      * @type {Promise<Vue<T>>}
      * @protected
      */
-    this._createPromise = parentCreated.then(this.init)
+    this._createPromise = Promise.resolve(this.init())
       .then(() => {
         logdbg('created', this.$options.name)
         return this
