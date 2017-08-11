@@ -35,6 +35,7 @@
        */
       let feature = new Feature(this.properties)
       feature.setId(this.id)
+      feature.setGeometry(this._geometry)
 
       return feature
     },
@@ -74,12 +75,9 @@
     },
     /**
      * @return {ol.geom.Geometry|undefined}
-     * @throws {AssertionError}
      */
     getGeometry () {
-      assert.hasFeature(this)
-
-      return this.$feature.getGeometry()
+      return this._geometry
     },
     /**
      * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
@@ -88,14 +86,20 @@
      */
     setGeometry (geom) {
       assert.hasView(this)
-      assert.hasFeature(this)
 
       if (geom instanceof Vue) {
         geom = geom.$geometry
       } else if (isPlainObject(geom)) {
         geom = geoJson.readGeometry(geom, this.$view.getProjection())
       }
-      if (geom !== this.$geometry) {
+      if (geom !== this._geometry) {
+        /**
+         * @type {ol.geom.Geometry|undefined}
+         * @private
+         */
+        this._geometry = geom
+      }
+      if (this.$feature && geom !== this.$feature.getGeometry()) {
         this.$feature.setGeometry(geom)
       }
     },
