@@ -371,7 +371,7 @@
       otherEvents
     )
 
-    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
+    this.subscribeTo(events, evt => {}/* this.$emit(evt.type, evt) */)
   }
 </script>
 

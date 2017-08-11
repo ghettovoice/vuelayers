@@ -1,6 +1,6 @@
 /**
  * Basic ol component with stub VNode, i.e. virtual component
- * @module components/virt-cmp
+ * @module components/ol-virt-cmp
  */
 import cmp from './ol-cmp'
 import stubVNode from './stub-vnode'

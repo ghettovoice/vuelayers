@@ -84,7 +84,7 @@ const methods = {
    */
   clear () {
     assert.hasSource(this)
-    this._featuresIndex = Object.create(null)
+    this._features = Object.create(null)
     this.$source && this.$source.clear()
   },
   /**
@@ -118,12 +118,6 @@ const methods = {
    * @protected
    */
   init () {
-    /**
-     * @type {Object<string, ol.Feature>}
-     * @private
-     */
-    this._features = Object.create(null)
-
     return this::source.methods.init()
   },
   /**
@@ -179,6 +173,13 @@ export default {
         class: this.$options.name
       }
     }
+  },
+  created () {
+    /**
+     * @type {Object<string, ol.Feature>}
+     * @private
+     */
+    this._features = Object.create(null)
   }
 }
 

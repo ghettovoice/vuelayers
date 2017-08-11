@@ -18,8 +18,14 @@
       default: () => [0, 0],
       validator: value => value.length === 2
     },
-    constrainRotation: Boolean,
-    enableRotation: Boolean,
+    constrainRotation: {
+      type: Boolean,
+      default: true
+    },
+    enableRotation: {
+      type: Boolean,
+      default: true
+    },
     extent: {
       type: Array,
       validator: value => value.length === 4
@@ -259,6 +265,7 @@
     })).debounceTime(ft * 2)
       .distinctUntilChanged(isEqual)
     const events = Observable.merge(
+      // todo разобраться с зацикливанием и дерганием карты
       Observable.fromOlChangeEvent(this.$view, 'center', true, ft, () => this.currentCenter),
       Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,

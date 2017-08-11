@@ -1,6 +1,6 @@
 /**
  * Basic ol component mixin
- * @module components/cmp
+ * @module components/ol-cmp
  */
 import debounce from 'debounce-promise'
 import { isFunction } from 'lodash/fp'
@@ -18,6 +18,11 @@ import { logdbg } from '../utils/debug'
 const props = {}
 
 const methods = {
+  /**
+   * @return {Promise<void>}
+   * @protected
+   */
+  beforeInit () {},
   /**
    * @return {Promise} Resolves when initialization completes
    * @protected
@@ -117,7 +122,8 @@ export default {
      * @type {Promise<Vue<T>>}
      * @protected
      */
-    this._createPromise = Promise.resolve(this.init())
+    this._createPromise = Promise.resolve(this.beforeInit())
+      .then(this.init)
       .then(() => {
         logdbg('created', this.$options.name)
         return this

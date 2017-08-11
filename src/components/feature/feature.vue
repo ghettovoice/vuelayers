@@ -6,6 +6,7 @@
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import plainProps from '../../utils/plain-props'
   import cmp from '../ol-virt-cmp'
+  import useMapCmp from '../ol-use-map-cmp'
   import styleTarget from '../style-target'
   import { geoJson } from '../../ol-ext'
   import * as assert from '../../utils/assert'
@@ -171,7 +172,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [cmp, styleTarget],
+    mixins: [cmp, useMapCmp, styleTarget],
     props,
     methods,
     watch,

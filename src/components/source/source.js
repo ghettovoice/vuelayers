@@ -1,5 +1,6 @@
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
+import useMapCmp from '../ol-use-map-cmp'
 
 const props = {
   attributions: [String, Array],
@@ -109,7 +110,7 @@ const watch = {
 }
 
 export default {
-  mixins: [cmp],
+  mixins: [cmp, useMapCmp],
   props,
   methods,
   watch,
