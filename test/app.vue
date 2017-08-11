@@ -6,16 +6,16 @@
 
         <!--<vl-geoloc/>
 
-        <vl-interaction-select @select="select" @unselect="unselect" :features.sync="selected"></vl-interaction-select>
+        <vl-interaction-select @select="select" @unselect="unselect" :features.sync="selected"></vl-interaction-select>-->
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
-        </vl-layer-tile>-->
+        </vl-layer-tile>
 
         <vl-layer-vector id="points" v-if="pointsLayer">
-          <!--<vl-source-cluster>-->
+          <vl-source-cluster>
             <vl-source-vector :features="points"/>
-          <!--</vl-source-cluster>-->
+          </vl-source-cluster>
         </vl-layer-vector>
 
         <!--<vl-layer-tile id="wmts">
@@ -73,7 +73,7 @@
     },
     loadData () {
       const points = []
-      range(1, 10).forEach(i => {
+      range(1, 100).forEach(i => {
         points.push({
           type: 'Feature',
           id: i,

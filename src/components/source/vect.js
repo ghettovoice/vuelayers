@@ -4,7 +4,6 @@ import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/merge'
 import 'rxjs/add/operator/do'
 import '../../rx-ext'
-import Collection from 'ol/collection'
 import { isPlainObject } from 'lodash/fp'
 import { EPSG_4326, geoJson } from '../../ol-ext'
 import source from './source'
@@ -45,10 +44,11 @@ const methods = {
 
     this.prepareFeature(feature)
 
-    if (!this._featuresCollection.getArray().includes(feature)) {
-      this._featuresCollection.push(feature)
-      this._featuresIndex[feature.getId()] = feature
-      this.$source && this.$source.addFeature(feature)
+    if (!this._features[feature.getId()]) {
+      this._features[feature.getId()] = feature
+    }
+    if (this.$source && !this.$source.getFeatureById(feature.getId())) {
+      this.$source.addFeature(feature)
     }
   },
   /**
@@ -68,13 +68,15 @@ const methods = {
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
-      feature = this._featuresIndex[feature.id]
+      feature = this._features[feature.id]
     }
 
     if (feature) {
-      this._featuresCollection.remove(feature)
-      delete this._featuresIndex[feature.getId()]
-      this.$source && this.$source.removeFeature(feature)
+      delete this._features[feature.getId()]
+
+      if (this.$source && this.$source.getFeatureById(feature.getId())) {
+        this.$source.removeFeature(feature)
+      }
     }
   },
   /**
@@ -82,7 +84,6 @@ const methods = {
    */
   clear () {
     assert.hasSource(this)
-    this._featuresCollection.clear()
     this._featuresIndex = Object.create(null)
     this.$source && this.$source.clear()
   },
@@ -104,14 +105,13 @@ const methods = {
    * @return {ol.Feature|undefined}
    */
   getFeatureById (id) {
-    return this._featuresIndex[id]
+    return this._features[id]
   },
   /**
-   * @return {ol.Collection<ol.Feature>}
-   * @throws {AssertionError}
+   * @return {ol.Feature[]}
    */
   getFeatures () {
-    return this._featuresCollection
+    return Object.values(this._features)
   },
   /**
    * @return {Promise}
@@ -119,15 +119,10 @@ const methods = {
    */
   init () {
     /**
-     * @type {ol.Collection<ol.Feature>}
+     * @type {Object<string, ol.Feature>}
      * @private
      */
-    this._featuresCollection = new Collection()
-    /**
-     * @type {Object<(string|number), ol.Feature>}
-     * @private
-     */
-    this._featuresIndex = Object.create(null)
+    this._features = Object.create(null)
 
     return this::source.methods.init()
   },
