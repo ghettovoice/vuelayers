@@ -1,7 +1,7 @@
 <script>
   import Vue from 'vue'
   import View from 'ol/view'
-  import { isEqual, isPlainObject, noop } from 'lodash/fp'
+  import { isEqual, isPlainObject, noop, upperFirst } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
   import 'rxjs/add/operator/debounceTime'
@@ -63,7 +63,7 @@
   const computed = {
     currentCenter () {
       if (this.rev && this.$view) {
-        return proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
+        return this::getCenter()
       }
 
       return []
@@ -75,7 +75,7 @@
     },
     currentZoom () {
       if (this.rev && this.$view) {
-        return Math.round(this.$view.getZoom())
+        return this::getZoom()
       }
     },
     currentRotation () {
@@ -198,23 +198,23 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, this.currentCenter)) {
+      if (this.$view && !isEqual(value, this::getCenter())) {
         this.$view.setCenter(proj.fromLonLat(value, this.$view.getProjection()))
       }
     },
     resolution (value) {
-      if (this.$view && value !== this.currentResolution) {
+      if (this.$view && value !== this.$view.getResolution()) {
         this.$view.setResolution(value)
       }
     },
     zoom (value) {
       value = Math.round(value)
-      if (this.$view && value !== this.currentZoom) {
+      if (this.$view && value !== this::getZoom()) {
         this.$view.setZoom(value)
       }
     },
     rotation (value) {
-      if (this.$view && value !== this.currentRotation) {
+      if (this.$view && value !== this.$view.getRotation()) {
         this.$view.setRotation(value)
       }
     },
@@ -261,23 +261,37 @@
     const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution.map(() => ({
       prop: 'zoom',
-      value: this.currentZoom
-    })).debounceTime(ft * 2)
+      value: this::getZoom()
+    })).debounceTime(2 * ft)
       .distinctUntilChanged(isEqual)
     const events = Observable.merge(
-      // todo разобраться с зацикливанием и дерганием карты
-      Observable.fromOlChangeEvent(this.$view, 'center', true, ft, () => this.currentCenter),
+      Observable.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
       Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
       zoom
     ).map(({ prop, value }) => ({
       name: `update:${prop}`,
+      prop,
       value
     }))
 
-    this.subscribeTo(events, ({ name, value }) => {
+    this.subscribeTo(events, ({ name, prop, value }) => {
       ++this.rev
+
+      let dataField = 'current' + upperFirst(prop)
+      if (!isEqual(this[dataField], value)) {
+        this[dataField] = value
+      }
+
       this.$emit(name, value)
     })
+  }
+
+  function getZoom () {
+    return Math.round(this.$view.getZoom())
+  }
+
+  function getCenter () {
+    return proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
   }
 </script>
