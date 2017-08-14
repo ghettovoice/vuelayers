@@ -55,10 +55,14 @@
      * @return {void}
      */
     addLayer (layer) {
-      assert.hasMap(this)
-
       layer = layer instanceof Vue ? layer.$layer : layer
-      if (layer && !this.$layers.getArray().includes(layer)) {
+
+      if (!layer) return
+
+      if (!this._layers[layer.get('id')]) {
+        this._layers[layer.get('id')] = layer
+      }
+      if (this.$map && !this.$map.getLayers().getArray().includes(layer)) {
         this.$map.addLayer(layer)
       }
     },
@@ -67,29 +71,35 @@
      * @return {void}
      */
     removeLayer (layer) {
-      assert.hasMap(this)
-
       layer = layer instanceof Vue ? layer.$layer : layer
-      this.$map.removeLayer(layer)
+
+      if (!layer) return
+
+      delete this._layers[layer.get('id')]
+
+      if (this.$map && this.$map.getLayers().getArray().includes(layer)) {
+        this.$map.removeLayer(layer)
+      }
     },
     /**
-     * @return {ol.Collection<ol.layer.Layer>}
-     * @throws {AssertionError}
+     * @return {ol.layer.Layer[]}
      */
     getLayers () {
-      assert.hasMap(this)
-
-      return this.$map.getLayers()
+      return Object.values(this._layers)
     },
     /**
      * @param {ol.interaction.Interaction|Vue} interaction
      * @return {void}
      */
     addInteraction (interaction) {
-      assert.hasMap(this)
-
       interaction = interaction instanceof Vue ? interaction.$interaction : interaction
-      if (interaction && !this.$interactions.getArray().includes(interaction)) {
+
+      if (!interaction) return
+
+      if (!this._interactions[interaction.get('id')]) {
+        this._interactions[interaction.get('id')] = interaction
+      }
+      if (this.$map && !this.$map.getInteractions().getArray().includes(interaction)) {
         this.$map.addInteraction(interaction)
       }
     },
@@ -98,29 +108,35 @@
      * @return {void}
      */
     removeInteraction (interaction) {
-      assert.hasMap(this)
-
       interaction = interaction instanceof Vue ? interaction.$interaction : interaction
-      this.$map.removeInteraction(interaction)
+
+      if (!interaction) return
+
+      delete this._interactions[interaction.get('id')]
+
+      if (this.$map && this.$map.getInteractions().getArray().includes(interaction)) {
+        this.$map.removeInteraction(interaction)
+      }
     },
     /**
-     * @return {ol.Collection<ol.interaction.Interaction>}
-     * @throws {AssertionError}
+     * @return {ol.interaction.Interaction[]}
      */
     getInteractions () {
-      assert.hasMap(this)
-
-      return this.$map.getInteractions()
+      return Object.values(this._interactions)
     },
     /**
      * @param {ol.Overlay|Vue} overlay
      * @return {void}
      */
     addOverlay (overlay) {
-      assert.hasMap(this)
-
       overlay = overlay instanceof Vue ? overlay.$overlay : overlay
-      if (overlay && !this.$overlays.getArray().includes(overlay)) {
+
+      if (!overlay) return
+
+      if (!this._overlays[overlay.getId()]) {
+        this._overlays[overlay.getId()] = overlay
+      }
+      if (this.$map && !this.$map.getOverlays().getArray().includes(overlay)) {
         this.$map.addOverlay(overlay)
       }
     },
@@ -129,43 +145,49 @@
      * @return {void}
      */
     removeOverlay (overlay) {
-      assert.hasMap(this)
-
       overlay = overlay instanceof Vue ? overlay.$overlay : overlay
-      this.$map.removeOverlay(overlay)
+
+      if (!overlay) return
+
+      delete this._overlays[overlay.getId()]
+
+      if (this.$map && this.$map.getOverlays().getArray().includes(overlay)) {
+        this.$map.removeOverlay(overlay)
+      }
     },
     /**
-     * @return {ol.Collection<ol.Overlay>}
-     * @throws {AssertionError}
+     * @return {ol.Overlay[]}
      */
     getOverlays () {
-      assert.hasMap(this)
-
-      return this.$map.getOverlays()
+      return Object.values(this._overlays)
     },
     /**
      * @param {string|number} id
      * @return {ol.Overlay|undefined}
-     * @throws {AssertionError}
      */
     getOverlayById (id) {
-      assert.hasMap(this)
-
-      return this.$map.getOverlayById(id)
+      return this._overlays[id]
+    },
+    /**
+     * @param {string|number} id
+     * @return {ol.layer.Layer|undefined}
+     */
+    getLayerById (id) {
+      return this._layers[id]
+    },
+    /**
+     * @param {string|number} id
+     * @return {ol.interaction.Interaction|undefined}
+     */
+    getInteractionById (id) {
+      return this._interactions[id]
     },
     /**
      * @return {ol.Map}
      * @protected
      */
     createOlObject () {
-      // todo disable all default interaction and controls and use custom if defined, wrap all
-      /**
-       * @type {ol.Map}
-       * @private
-       */
-      return new Map({
-        layers: [],
-        // interactions: [],
+      const map = new Map({
         controls: this.defControls ? olcontrol.defaults() : [],
         loadTilesWhileAnimating: this.loadTilesWhileAnimating,
         loadTilesWhileInteracting: this.loadTilesWhileInteracting,
@@ -174,34 +196,9 @@
         logo: this.logo,
         keyboardEventTarget: this.keyboardEventTarget
       })
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    defineAccessors () {
-      Object.defineProperties(this, {
-        $map: {
-          enumerable: true,
-          get: this.getMap
-        },
-        $view: {
-          enumerable: true,
-          get: this.getView
-        },
-        $layers: {
-          enumerable: true,
-          get: this.getLayers
-        },
-        $interactions: {
-          enumerable: true,
-          get: this.getInteractions
-        },
-        $overlays: {
-          enumerable: true,
-          get: this.getOverlays
-        }
-      })
+      this._view = map.getView()
+
+      return map
     },
     /**
      * Trigger focus on map container.
@@ -257,30 +254,26 @@
 
       return mergeDescriptors(this::cmp.methods.getServices(), {
         get map () { return vm.$map },
-        get view () { return vm.$view },
-        get layers () { return vm.$layers },
-        get interactions () { return vm.$interactions },
-        get overlays () { return vm.$overlays }
+        get view () { return vm.$view }
       })
     },
     /**
      * @return {ol.View}
-     * @throws {AssertionError}
      */
     getView () {
-      assert.hasMap(this)
-
-      return this.$map.getView()
+      return this._view
     },
     /**
      * @param {ol.View|Vue|undefined} view
      * @return {void}
      */
     setView (view) {
-      assert.hasMap(this)
-
       view = view instanceof Vue ? view.$view : view
-      if (view !== this.$view) {
+
+      if (view !== this._view) {
+        this._view = view
+      }
+      if (this.$map && view !== this.$map.getView()) {
         this.$map.setView(view)
       }
     },
@@ -328,7 +321,58 @@
     name: 'vl-map',
     mixins: [cmp],
     props,
-    methods
+    methods,
+    created () {
+      /**
+       * @type {ol.View}
+       * @private
+       */
+      this._view = undefined
+      /**
+       * @type {Object<string, ol.layer.Layer>}
+       * @private
+       */
+      this._layers = Object.create(null)
+      /**
+       * @type {Object<string, ol.interaction.Interaction>}
+       * @private
+       */
+      this._interactions = Object.create(null)
+      /**
+       * @type {Object<string, ol.Overlay>}
+       * @private
+       */
+      this._overlays = Object.create(null)
+
+      Object.defineProperties(this, {
+        $map: {
+          enumerable: true,
+          get: this.getMap
+        },
+        $view: {
+          enumerable: true,
+          get: this.getView
+        },
+        $layers: {
+          enumerable: true,
+          get: this.getLayers
+        },
+        $interactions: {
+          enumerable: true,
+          get: this.getInteractions
+        },
+        $overlays: {
+          enumerable: true,
+          get: this.getOverlays
+        }
+      })
+    },
+    destroyed () {
+      this._view = undefined
+      this._layers = Object.create(null)
+      this._interactions = Object.create(null)
+      this._overlays = Object.create(null)
+    }
   }
 
   /**

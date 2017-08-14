@@ -34,7 +34,6 @@ const methods = {
    */
   addFeature (feature) {
     assert.hasView(this)
-    // assert.hasSource(this)
 
     if (feature instanceof Vue) {
       feature = feature.$feature
@@ -63,42 +62,26 @@ const methods = {
    * @return {void}
    */
   removeFeature (feature) {
-    assert.hasSource(this)
-
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
       feature = this._features[feature.id]
     }
 
-    if (feature) {
-      delete this._features[feature.getId()]
+    if (!feature) return
 
-      if (this.$source && this.$source.getFeatureById(feature.getId())) {
-        this.$source.removeFeature(feature)
-      }
+    delete this._features[feature.getId()]
+
+    if (this.$source && this.$source.getFeatureById(feature.getId())) {
+      this.$source.removeFeature(feature)
     }
   },
   /**
    * @return {void}
    */
   clear () {
-    assert.hasSource(this)
     this._features = Object.create(null)
     this.$source && this.$source.clear()
-  },
-  /**
-   * @return {void}
-   * @private
-   */
-  defineAccessors () {
-    this::source.methods.defineAccessors()
-    Object.defineProperties(this, {
-      $features: {
-        enumerable: true,
-        get: this.getFeatures
-      }
-    })
   },
   /**
    * @param {string|number} id
@@ -179,6 +162,16 @@ export default {
      * @type {Object<string, ol.Feature>}
      * @private
      */
+    this._features = Object.create(null)
+
+    Object.defineProperties(this, {
+      $features: {
+        enumerable: true,
+        get: this.getFeatures
+      }
+    })
+  },
+  destroyed () {
     this._features = Object.create(null)
   }
 }

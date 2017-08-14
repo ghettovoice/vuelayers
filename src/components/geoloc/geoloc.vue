@@ -17,22 +17,34 @@
 
   const computed = {
     accuracy () {
-      return this.$geolocation && this.$geolocation.getAccuracy()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getAccuracy()
+      }
     },
     altitude () {
-      return this.$geolocation && this.$geolocation.getAltitude()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getAltitude()
+      }
     },
     altitudeAccuracy () {
-      return this.$geolocation && this.$geolocation.getAltitudeAccuracy()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getAltitudeAccuracy()
+      }
     },
     heading () {
-      return this.$geolocation && this.$geolocation.getHeading()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getHeading()
+      }
     },
     position () {
-      return this.$geolocation && this.$geolocation.getPosition()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getPosition()
+      }
     },
     speed () {
-      return this.$geolocation && this.$geolocation.getSpeed()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getSpeed()
+      }
     }
   }
 
@@ -46,18 +58,6 @@
         tracking: this.tracking,
         trackingOptions: this.trackingOptions,
         projection: EPSG_4326
-      })
-    },
-    /**
-     * @return {void}
-     * @private
-     */
-    defineAccessors () {
-      Object.defineProperties(this, {
-        $geolocation: {
-          enumerable: true,
-          get: this.getGeolocation
-        }
       })
     },
     /**
@@ -117,6 +117,19 @@
       empty () {
         return this.$options.name
       }
+    },
+    data () {
+      return {
+        rev: 1
+      }
+    },
+    created () {
+      Object.defineProperties(this, {
+        $geolocation: {
+          enumerable: true,
+          get: this.getGeolocation
+        }
+      })
     }
   }
 
@@ -140,6 +153,9 @@
         value
       }))
 
-    this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
+    this.subscribeTo(events, ({ name, value }) => {
+      ++this.rev
+      this.$emit(name, value)
+    })
   }
 </script>

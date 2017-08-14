@@ -29,26 +29,6 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {void}
-   * @private
-   */
-  defineAccessors () {
-    Object.defineProperties(this, {
-      $source: {
-        enumerable: true,
-        get: this.getSource
-      },
-      $map: {
-        enumerable: true,
-        get: () => this.$services && this.$services.map
-      },
-      $view: {
-        enumerable: true,
-        get: () => this.$services && this.$services.view
-      }
-    })
-  },
-  /**
    * @return {Promise}
    * @protected
    */
@@ -118,5 +98,21 @@ export default {
     empty () {
       return this.$options.name
     }
+  },
+  created () {
+    Object.defineProperties(this, {
+      $source: {
+        enumerable: true,
+        get: this.getSource
+      },
+      $map: {
+        enumerable: true,
+        get: () => this.$services && this.$services.map
+      },
+      $view: {
+        enumerable: true,
+        get: () => this.$services && this.$services.view
+      }
+    })
   }
 }

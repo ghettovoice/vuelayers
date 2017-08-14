@@ -65,11 +65,6 @@ const methods = {
     this._olObject = undefined
   },
   /**
-   * @protected
-   * @return {void}
-   */
-  defineAccessors () {},
-  /**
    * Redefine for easy call in child components
    * @returns {Object}
    * @protected
@@ -112,7 +107,6 @@ export default {
   props,
   methods,
   created () {
-    this.defineAccessors()
     /**
      * @type {*}
      * @private
@@ -120,7 +114,7 @@ export default {
     this._olObject = undefined
     /**
      * @type {Promise<Vue<T>>}
-     * @protected
+     * @private
      */
     this._createPromise = Promise.resolve(this.beforeInit())
       .then(this.init)
@@ -130,7 +124,7 @@ export default {
       })
     /**
      * @type {Promise<Vue<T>>}
-     * @protected
+     * @private
      */
     this._mountPromise = Observable.interval(100)
       .skipWhile(() => !this._mounted)

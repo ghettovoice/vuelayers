@@ -1,7 +1,12 @@
+import uuid from 'uuid/v4'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
 
 const props = {
+  id: {
+    type: [String, Number],
+    default: () => uuid()
+  },
   active: {
     type: Boolean,
     default: true
@@ -16,6 +21,7 @@ const methods = {
   async createOlObject () {
     const interaction = await this.createInteraction()
     interaction.setActive(this.active)
+    interaction.set('id', this.id)
 
     return interaction
   },
@@ -26,26 +32,6 @@ const methods = {
    */
   createInteraction () {
     throw new Error('Not implemented method')
-  },
-  /**
-   * @return {void}
-   * @protected
-   */
-  defineAccessors () {
-    Object.defineProperties(this, {
-      $interaction: {
-        enumerable: true,
-        get: this.getInteraction
-      },
-      $map: {
-        enumerable: true,
-        get: () => this.$services && this.$services.map
-      },
-      $view: {
-        enumerable: true,
-        get: () => this.$services && this.$services.view
-      }
-    })
   },
   /**
    * @return {ol.interaction.Interaction|undefined}
@@ -119,5 +105,21 @@ export default {
     empty () {
       return this.$options.name
     }
+  },
+  created () {
+    Object.defineProperties(this, {
+      $interaction: {
+        enumerable: true,
+        get: this.getInteraction
+      },
+      $map: {
+        enumerable: true,
+        get: () => this.$services && this.$services.map
+      },
+      $view: {
+        enumerable: true,
+        get: () => this.$services && this.$services.view
+      }
+    })
   }
 }

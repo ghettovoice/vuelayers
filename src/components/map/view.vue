@@ -1,7 +1,7 @@
 <script>
   import Vue from 'vue'
   import View from 'ol/view'
-  import { isEqual, isPlainObject, noop, upperFirst } from 'lodash/fp'
+  import { isEqual, isPlainObject, noop } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
   import 'rxjs/add/operator/debounceTime'
@@ -126,18 +126,6 @@
       })
     },
     /**
-     * @return {void}
-     * @protected
-     */
-    defineAccessors () {
-      Object.defineProperties(this, {
-        $view: {
-          enumerable: true,
-          get: this.getView
-        }
-      })
-    },
-    /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
      * @param {GeoJSONFeature|ol.Extent|ol.geom.Geometry|Vue} geometryOrExtent
      * @param {olx.view.FitOptions} [options]
@@ -246,6 +234,14 @@
       return {
         rev: 1
       }
+    },
+    created () {
+      Object.defineProperties(this, {
+        $view: {
+          enumerable: true,
+          get: this.getView
+        }
+      })
     }
   }
 
@@ -264,6 +260,7 @@
       value: this::getZoom()
     })).debounceTime(2 * ft)
       .distinctUntilChanged(isEqual)
+
     const events = Observable.merge(
       Observable.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
       Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
@@ -271,18 +268,11 @@
       zoom
     ).map(({ prop, value }) => ({
       name: `update:${prop}`,
-      prop,
       value
     }))
 
-    this.subscribeTo(events, ({ name, prop, value }) => {
+    this.subscribeTo(events, ({ name, value }) => {
       ++this.rev
-
-      let dataField = 'current' + upperFirst(prop)
-      if (!isEqual(this[dataField], value)) {
-        this[dataField] = value
-      }
-
       this.$emit(name, value)
     })
   }

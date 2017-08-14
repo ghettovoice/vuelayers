@@ -2,6 +2,7 @@ import Vue from 'vue'
 import uuid from 'uuid/v4'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
+import useMapCmp from '../ol-use-map-cmp'
 import * as assert from '../../utils/assert'
 
 const props = {
@@ -61,30 +62,6 @@ const methods = {
     return this::cmp.methods.deinit()
   },
   /**
-   * @return {void}
-   * @protected
-   */
-  defineAccessors () {
-    Object.defineProperties(this, {
-      $layer: {
-        enumerable: true,
-        get: this.getLayer
-      },
-      $source: {
-        enumerable: true,
-        get: this.getSource
-      },
-      $map: {
-        enumerable: true,
-        get: () => this.$services && this.$services.map
-      },
-      $view: {
-        enumerable: true,
-        get: () => this.$services && this.$services.view
-      }
-    })
-  },
-  /**
    * @param {number[]} pixel
    * @return {boolean}
    */
@@ -112,22 +89,21 @@ const methods = {
   },
   /**
    * @return {ol.source.Source|undefined}
-   * @throws {AssertionError}
    */
   getSource () {
-    assert.hasLayer(this)
-
-    return this.$layer.getSource()
+    return this._source
   },
   /**
    * @param {ol.source.Source|Vue|undefined} source
    * @return {void}
    */
   setSource (source) {
-    assert.hasLayer(this)
-
     source = source instanceof Vue ? source.$source : source
-    if (source !== this.$source) {
+
+    if (source !== this._source) {
+      this._source = source
+    }
+    if (this.$layer && source !== this.$layer.getSource()) {
       this.$layer.setSource(source)
     }
   },
@@ -213,7 +189,7 @@ const watch = {
 }
 
 export default {
-  mixins: [cmp],
+  mixins: [cmp, useMapCmp],
   props,
   methods,
   watch,
@@ -224,5 +200,34 @@ export default {
         class: this.$options.name
       }
     }
+  },
+  created () {
+    /**
+     * @type {ol.source.Source|undefined}
+     * @private
+     */
+    this._source = undefined
+
+    Object.defineProperties(this, {
+      $layer: {
+        enumerable: true,
+        get: this.getLayer
+      },
+      $source: {
+        enumerable: true,
+        get: this.getSource
+      },
+      $map: {
+        enumerable: true,
+        get: () => this.$services && this.$services.map
+      },
+      $view: {
+        enumerable: true,
+        get: () => this.$services && this.$services.view
+      }
+    })
+  },
+  destroyed () {
+    this._source = undefined
   }
 }

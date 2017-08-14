@@ -41,34 +41,6 @@
       return feature
     },
     /**
-     * @return {void}
-     * @protected
-     */
-    defineAccessors () {
-      Object.defineProperties(this, {
-        $feature: {
-          enumerable: true,
-          get: this.getFeature
-        },
-        $layer: {
-          enumerable: true,
-          get: () => this.$services && this.$services.layer
-        },
-        $map: {
-          enumerable: true,
-          get: () => this.$services && this.$services.map
-        },
-        $view: {
-          enumerable: true,
-          get: () => this.$services && this.$services.view
-        },
-        $geometry: {
-          enumerable: true,
-          get: this.getGeometry
-        }
-      })
-    },
-    /**
      * @returns {ol.Feature|undefined}
      */
     getFeature () {
@@ -94,10 +66,6 @@
         geom = geoJson.readGeometry(geom, this.$view.getProjection())
       }
       if (geom !== this._geometry) {
-        /**
-         * @type {ol.geom.Geometry|undefined}
-         * @private
-         */
         this._geometry = geom
       }
       if (this.$feature && geom !== this.$feature.getGeometry()) {
@@ -183,6 +151,39 @@
           class: this.$options.name
         }
       }
+    },
+    created () {
+      /**
+       * @type {ol.geom.Geometry|undefined}
+       * @private
+       */
+      this._geometry = undefined
+
+      Object.defineProperties(this, {
+        $feature: {
+          enumerable: true,
+          get: this.getFeature
+        },
+        $layer: {
+          enumerable: true,
+          get: () => this.$services && this.$services.layer
+        },
+        $map: {
+          enumerable: true,
+          get: () => this.$services && this.$services.map
+        },
+        $view: {
+          enumerable: true,
+          get: () => this.$services && this.$services.view
+        },
+        $geometry: {
+          enumerable: true,
+          get: this.getGeometry
+        }
+      })
+    },
+    destroyed () {
+      this._geometry = undefined
     }
   }
 </script>

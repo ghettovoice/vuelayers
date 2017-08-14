@@ -20,7 +20,8 @@
         visible: this.visible,
         preload: this.preload,
         extent: this.extent,
-        zIndex: this.zIndex
+        zIndex: this.zIndex,
+        source: this._source
       })
     }
   }
