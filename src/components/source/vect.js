@@ -179,15 +179,26 @@ export default {
 function subscribeToSourceChanges () {
   assert.hasSource(this)
 
-  const add = Observable.fromOlEvent(this.$source, 'addfeature')
-    .do(({ feature }) => {
-      this.addFeature(feature)
-    })
-  const remove = Observable.fromOlEvent(this.$source, 'removefeature')
-    .do(({ feature }) => {
-      this.removeFeature(feature)
-    })
-  const events = Observable.merge(add, remove)
+  let events
+  let eventsIdent = this.getFullIdent('events')
+
+  if (this.$identityMap.has(eventsIdent)) {
+    events = this.$identityMap.get(eventsIdent)
+  } else {
+    const add = Observable.fromOlEvent(this.$source, 'addfeature')
+      .do(({ feature }) => {
+        this.addFeature(feature)
+      })
+    const remove = Observable.fromOlEvent(this.$source, 'removefeature')
+      .do(({ feature }) => {
+        this.removeFeature(feature)
+      })
+    events = Observable.merge(add, remove).share()
+
+    if (eventsIdent) {
+      this.$identityMap.set(eventsIdent, events)
+    }
+  }
 
   this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

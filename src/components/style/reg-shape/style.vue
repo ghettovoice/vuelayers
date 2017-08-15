@@ -51,6 +51,7 @@
      */
     setFill (fill) {
       fill = fill instanceof Vue ? fill.$style : fill
+
       if (fill !== this._fill) {
         this._fill = fill
         this.requestRefresh()
@@ -62,6 +63,7 @@
      */
     setStroke (stroke) {
       stroke = stroke instanceof Vue ? stroke.$style : stroke
+
       if (stroke !== this._stroke) {
         this._stroke = stroke
         this.requestRefresh()

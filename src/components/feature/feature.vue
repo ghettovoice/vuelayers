@@ -58,11 +58,10 @@
      * @throws {AssertionError}
      */
     setGeometry (geom) {
-      assert.hasView(this)
-
       if (geom instanceof Vue) {
         geom = geom.$geometry
       } else if (isPlainObject(geom)) {
+        assert.hasView(this)
         geom = geoJson.readGeometry(geom, this.$view.getProjection())
       }
       if (geom !== this._geometry) {

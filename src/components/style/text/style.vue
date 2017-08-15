@@ -54,7 +54,9 @@
         scale: this.scale,
         text: this.text,
         textAlign: this.textAlign,
-        textBaseline: this.textBaseline
+        textBaseline: this.textBaseline,
+        fill: this._fill,
+        stroke: this._stroke
       })
     },
     /**

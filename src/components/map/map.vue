@@ -16,6 +16,7 @@
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/share'
   import '../../rx-ext'
   import { proj as projHelper } from '../../ol-ext'
   import cmp from '../ol-cmp'
@@ -194,8 +195,10 @@
         pixelRatio: this.pixelRatio,
         renderer: this.renderer,
         logo: this.logo,
-        keyboardEventTarget: this.keyboardEventTarget
+        keyboardEventTarget: this.keyboardEventTarget,
+        view: this._view
       })
+      // ol.Map constructor can create default view if no provided with options
       this._view = map.getView()
 
       return map
@@ -384,38 +387,49 @@
     assert.hasMap(this)
     assert.hasView(this)
 
-    const ft = 100
-    // pointer
-    const pointerEvents = Observable.merge(
-      Observable.fromOlEvent(this.$map, [
-        'click',
-        'dblclick',
-        'singleclick'
-      ]),
-      Observable.fromOlEvent(this.$map, [
-        'pointerdrag',
-        'pointermove'
+    let events
+    let eventsIdent = this.getFullIdent('events')
+
+    if (this.$identityMap.has(eventsIdent)) {
+      events = this.$identityMap.get(eventsIdent)
+    } else {
+      const ft = 100
+      // pointer
+      const pointerEvents = Observable.merge(
+        Observable.fromOlEvent(this.$map, [
+          'click',
+          'dblclick',
+          'singleclick'
+        ]),
+        Observable.fromOlEvent(this.$map, [
+          'pointerdrag',
+          'pointermove'
+        ]).throttleTime(ft)
+          .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
+      ).map(evt => ({
+        ...evt,
+        coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection())
+      }))
+      // other
+      const otherEvents = Observable.fromOlEvent(this.$map, [
+        'movestart',
+        'moveend',
+        'postrender',
+        'precompose',
+        'postcompose'
       ]).throttleTime(ft)
-        .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
-    ).map(evt => ({
-      ...evt,
-      coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection())
-    }))
-    // other
-    const otherEvents = Observable.fromOlEvent(this.$map, [
-      'movestart',
-      'moveend',
-      'postrender',
-      'precompose',
-      'postcompose'
-    ]).throttleTime(ft)
 
-    const events = Observable.merge(
-      pointerEvents,
-      otherEvents
-    )
+      events = Observable.merge(
+        pointerEvents,
+        otherEvents
+      ).share()
 
-    this.subscribeTo(events, evt => {}/* this.$emit(evt.type, evt) */)
+      if (eventsIdent) {
+        this.$identityMap.set(eventsIdent, events)
+      }
+    }
+
+    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
 </script>
 

@@ -2,6 +2,7 @@ import { isEqual } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/share'
 import '../../rx-ext'
 import cmp from '../ol-virt-cmp'
 import useMapCmp from '../ol-use-map-cmp'
@@ -197,14 +198,25 @@ export default {
 function subscribeToGeomChanges () {
   assert.hasGeometry(this)
 
-  const ft = 100
-  const events = Observable.fromOlChangeEvent(this.$geometry, undefined, isEqualGeom, ft, () => ({
-    coordinates: this.toLonLat(this.$geometry.getCoordinates()),
-    extent: this.extentToLonLat(this.$geometry.getExtent())
-  })).map(({ value: { coordinates } }) => ({
-    name: 'update:coordinates',
-    value: coordinates
-  }))
+  let events
+  let eventsIdent = this.getFullIdent('events')
+
+  if (this.$identityMap.has(eventsIdent)) {
+    events = this.$identityMap.get(eventsIdent)
+  } else {
+    const ft = 100
+    events = Observable.fromOlChangeEvent(this.$geometry, undefined, isEqualGeom, ft, () => ({
+      coordinates: this.toLonLat(this.$geometry.getCoordinates()),
+      extent: this.extentToLonLat(this.$geometry.getExtent())
+    })).map(({ value: { coordinates } }) => ({
+      name: 'update:coordinates',
+      value: coordinates
+    })).share()
+
+    if (eventsIdent) {
+      this.$identityMap.set(eventsIdent, events)
+    }
+  }
 
   this.subscribeTo(events, ({ name, value }) => {
     ++this.rev

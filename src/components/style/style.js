@@ -2,6 +2,7 @@
  * Basic style mixin.
  */
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
+import useMapCmp from '../ol-use-map-cmp'
 import cmp from '../ol-virt-cmp'
 
 const methods = {
@@ -35,26 +36,6 @@ const methods = {
     return this::cmp.methods.deinit()
   },
   /**
-   * @return {void}
-   * @protected
-   */
-  defineAccessors () {
-    Object.defineProperties(this, {
-      $style: {
-        enumerable: true,
-        get: this.getStyle
-      },
-      $map: {
-        enumerable: true,
-        get: () => this.$services && this.$services.map
-      },
-      $view: {
-        enumerable: true,
-        get: () => this.$services && this.$services.view
-      }
-    })
-  },
-  /**
    * Inner ol style instance getter
    * @return {OlStyle|undefined}
    */
@@ -82,11 +63,27 @@ const methods = {
 }
 
 export default {
-  mixins: [cmp],
+  mixins: [cmp, useMapCmp],
   methods,
   stubVNode: {
     empty () {
       return this.$options.name
     }
+  },
+  created () {
+    Object.defineProperties(this, {
+      $style: {
+        enumerable: true,
+        get: this.getStyle
+      },
+      $map: {
+        enumerable: true,
+        get: () => this.$services && this.$services.map
+      },
+      $view: {
+        enumerable: true,
+        get: () => this.$services && this.$services.view
+      }
+    })
   }
 }

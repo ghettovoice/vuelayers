@@ -4,9 +4,9 @@
       <vl-map>
         <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
-        <!--<vl-geoloc/>
+        <vl-geoloc/>
 
-        <vl-interaction-select @select="select" @unselect="unselect" :features.sync="selected"></vl-interaction-select>-->
+        <vl-interaction-select @select="select" @unselect="unselect" :selected.sync="selected"/>
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
@@ -18,7 +18,7 @@
           </vl-source-cluster>
         </vl-layer-vector>
 
-        <!--<vl-layer-tile id="wmts">
+        <vl-layer-tile id="wmts">
           <vl-source-wmts
             url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
             layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
@@ -30,39 +30,33 @@
               <vl-geom-polygon :coordinates.sync="polygonCoords" />
             </vl-feature>
           </vl-source-vector>
-        </vl-layer-vector>-->
+
+          <vl-style-box>
+            <vl-style-fill :color="[45, 156, 201, 0.4]"/>
+            <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4" />
+          </vl-style-box>
+        </vl-layer-vector>
       </vl-map>
     </div>
-    <!--<div style="height: 50%">
+    <div style="height: 50%">
       <vl-map>
         <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
         <vl-layer-tile>
-          <vl-source-sputnik/>
+          <vl-source-osm/>
         </vl-layer-tile>
 
         <vl-layer-tile id="wms">
           <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
                          :ext-params="{ TILED: true }" server-type="geoserver"/>
         </vl-layer-tile>
-
-        <vl-layer-vector>
-          &lt;!&ndash;<vl-source-cluster>&ndash;&gt;
-          <vl-source-vector>
-            <vl-feature>
-              <vl-geom-polygon :coordinates.sync="polygonCoords" />
-            </vl-feature>
-          </vl-source-vector>
-          &lt;!&ndash;</vl-source-cluster>&ndash;&gt;
-        </vl-layer-vector>
       </vl-map>
-    </div>-->
+    </div>
   </div>
 </template>
 
 <script>
   import { range, random } from 'lodash/fp'
-  import VlGeoloc from '../src/components/geoloc/geoloc.vue'
 
   const methods = {
     select (feature) {
@@ -97,7 +91,6 @@
   }
 
   export default {
-    components: { VlGeoloc },
     name: 'app',
     methods,
     data () {

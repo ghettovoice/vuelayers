@@ -1,6 +1,7 @@
 import uuid from 'uuid/v4'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
+import useMapCmp from '../ol-use-map-cmp'
 
 const props = {
   id: {
@@ -97,7 +98,7 @@ const watch = {
 }
 
 export default {
-  mixins: [cmp],
+  mixins: [cmp, useMapCmp],
   props,
   methods,
   watch,

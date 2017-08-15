@@ -4,9 +4,11 @@
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
   import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/share'
   import '../../rx-ext'
   import Overlay from 'ol/overlay'
   import cmp from '../ol-virt-cmp'
+  import useMapCmp from '../ol-use-map-cmp'
   import { OVERLAY_POSITIONING, proj as projHelper } from '../../ol-ext'
   import * as assert from '../../utils/assert'
 
@@ -45,6 +47,16 @@
     autoPanAnimation: Object
   }
 
+  const computed = {
+    currentPosition () {
+      if (this.rev && this.$overlay) {
+        return this::getPosition()
+      }
+
+      return []
+    }
+  }
+
   const methods = {
     /**
      * @return {ol.Overlay}
@@ -61,26 +73,6 @@
         autoPan: this.autoPan,
         autoPanMargin: this.autoPanMargin,
         autoPanAnimation: this.autoPanAnimation
-      })
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    defineAccessors () {
-      Object.defineProperties(this, {
-        $overlay: {
-          enumerable: true,
-          get: this.getOverlay
-        },
-        $map: {
-          enumerable: true,
-          get: this.$services && this.$services.map
-        },
-        $view: {
-          enumerable: true,
-          get: this.$services && this.$services.view
-        }
       })
     },
     /**
@@ -145,8 +137,9 @@
   // todo add scoped slot support?
   export default {
     name: 'vl-overlay',
-    mixins: [cmp],
+    mixins: [cmp, useMapCmp],
     props,
+    computed,
     methods,
     watch,
     stubVNode: {
@@ -156,6 +149,27 @@
           class: this.$options.name
         }
       }
+    },
+    data () {
+      return {
+        rev: 1
+      }
+    },
+    created () {
+      Object.defineProperties(this, {
+        $overlay: {
+          enumerable: true,
+          get: this.getOverlay
+        },
+        $map: {
+          enumerable: true,
+          get: this.$services && this.$services.map
+        },
+        $view: {
+          enumerable: true,
+          get: this.$services && this.$services.view
+        }
+      })
     }
   }
 
@@ -167,20 +181,36 @@
     assert.hasOverlay(this)
     assert.hasView(this)
 
-    const ft = 100
-    const getPosition = () => projHelper.toLonLat(this.$overlay.getPosition(), this.$view.getProjection())
+    let events
+    let eventsIdent = this.getFullIdent('events')
 
-    const events = Observable.merge(
-      Observable.fromOlChangeEvent(this.$overlay, 'position', true, ft, getPosition),
-      Observable.fromOlChangeEvent(this.$overlay, [
-        'offset',
-        'positioning'
-      ], true, ft)
-    ).map(({ prop, value }) => ({
-      name: `update:${prop}`,
-      value
-    }))
+    if (this.$identityMap.has(eventsIdent)) {
+      events = this.$identityMap.get(eventsIdent)
+    } else {
+      const ft = 100
+      events = Observable.merge(
+        Observable.fromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
+        Observable.fromOlChangeEvent(this.$overlay, [
+          'offset',
+          'positioning'
+        ], true, ft)
+      ).map(({ prop, value }) => ({
+        name: `update:${prop}`,
+        value
+      })).share()
 
-    this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
+      if (eventsIdent) {
+        this.$identityMap.set(eventsIdent, events)
+      }
+    }
+
+    this.subscribeTo(events, ({ name, value }) => {
+      ++this.rev
+      this.$emit(name, value)
+    })
+  }
+
+  function getPosition () {
+    return projHelper.toLonLat(this.$overlay.getPosition(), this.$view.getProjection())
   }
 </script>
