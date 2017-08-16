@@ -8,7 +8,6 @@
   import Style from 'ol/style/style'
   import style from '../style'
   import withFillStroke from '../with-fill-stroke'
-  import * as assert from '../../../utils/assert'
 
   const props = {
     zIndex: {
@@ -28,7 +27,12 @@
      */
     createStyle () {
       return new Style({
-        zIndex: this.zIndex
+        zIndex: this.zIndex,
+        image: this._image,
+        stroke: this._stroke,
+        fill: this._fill,
+        text: this._text,
+        geometry: this._geometry
       })
     },
     /**
@@ -50,10 +54,12 @@
      * @return {void}
      */
     setImage (image) {
-      assert.hasStyle(this)
-
       image = image instanceof Vue ? image.$style : image
-      if (image !== this.$style.getImage()) {
+
+      if (image !== this._image) {
+        this._image = image
+      }
+      if (this.$style && image !== this.$style.getImage()) {
         this.$style.setImage(image)
         this.requestRefresh()
       }
@@ -63,10 +69,12 @@
      * @return {void}
      */
     setGeometry (geom) {
-      assert.hasStyle(this)
-
       geom = geom instanceof Vue ? geom.$geometry : geom
-      if (geom !== this.$style.getGeometry()) {
+
+      if (geom !== this._geometry) {
+        this._geometry = geom
+      }
+      if (this.$style && geom !== this.$style.getGeometry()) {
         this.$style.setGeometry(geom)
         this.requestRefresh()
       }
@@ -76,10 +84,12 @@
      * @return {void}
      */
     setText (text) {
-      assert.hasStyle(this)
-
       text = text instanceof Vue ? text.$style : text
-      if (text !== this.$style.getText()) {
+
+      if (text !== this._text) {
+        this._text = text
+      }
+      if (this.$style && text !== this.$style.getText()) {
         this.$style.setText(text)
         this.requestRefresh()
       }
@@ -100,6 +110,26 @@
     mixins: [style, withFillStroke],
     props,
     methods,
-    watch
+    watch,
+    created () {
+      /**
+       * @type {ol.style.Image|undefined}
+       * @private
+       */
+      this._image = undefined
+      /**
+       * @type {ol.style.Text|undefined}
+       * @private
+       */
+      this._text = undefined
+      /**
+       * @type {ol.geom.Geometry|undefined}
+       * @private
+       */
+      this._geometry = undefined
+    },
+    destroyed () {
+      this._image = this._text = this._geometry = undefined
+    }
   }
 </script>

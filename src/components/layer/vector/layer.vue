@@ -27,7 +27,8 @@
         extent: this.extent,
         zIndex: this.zIndex,
         updateWhileAnimating: this.updateWhileAnimating,
-        updateWhileInteracting: this.updateWhileInteracting
+        updateWhileInteracting: this.updateWhileInteracting,
+        source: this._source
       })
     },
     /**

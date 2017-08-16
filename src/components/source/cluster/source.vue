@@ -15,13 +15,13 @@
      */
     geomFuncFactory: {
       type: Function,
-      default: () => defaultGeomFuncFactory
+      default: defaultGeomFuncFactory
     }
   }
 
   const computed = {
     geomFunc () {
-      return this.geomFunc(olExt)
+      return this.geomFuncFactory(olExt)
     }
   }
 

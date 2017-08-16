@@ -5,7 +5,6 @@ import 'rxjs/add/operator/first'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/toPromise'
 import Cluster from 'ol/source/cluster'
-import Vector from 'ol/source/vector'
 import * as assert from '../../../utils/assert'
 
 export default class Builder {
@@ -16,11 +15,10 @@ export default class Builder {
     return this.source
   }
   /**
-   * @param {ol.source.Vector} value
+   * @param {ol.source.Vector|undefined} value
    * @returns {Builder}
    */
   setSource (value) {
-    assert.instanceOf(value, Vector)
     this.source = value
     return this
   }

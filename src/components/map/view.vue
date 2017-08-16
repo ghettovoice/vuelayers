@@ -7,6 +7,7 @@
   import 'rxjs/add/operator/debounceTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/share'
   import '../../rx-ext'
   import { MIN_ZOOM, MAX_ZOOM, EPSG_3857, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
@@ -18,8 +19,14 @@
       default: () => [0, 0],
       validator: value => value.length === 2
     },
-    constrainRotation: Boolean,
-    enableRotation: Boolean,
+    constrainRotation: {
+      type: Boolean,
+      default: true
+    },
+    enableRotation: {
+      type: Boolean,
+      default: true
+    },
     extent: {
       type: Array,
       validator: value => value.length === 4
@@ -51,6 +58,31 @@
     zoomFactor: {
       type: Number,
       default: ZOOM_FACTOR
+    }
+  }
+
+  const computed = {
+    currentCenter () {
+      if (this.rev && this.$view) {
+        return this::getCenter()
+      }
+
+      return []
+    },
+    currentResolution () {
+      if (this.rev && this.$view) {
+        return this.$view.getResolution()
+      }
+    },
+    currentZoom () {
+      if (this.rev && this.$view) {
+        return this::getZoom()
+      }
+    },
+    currentRotation () {
+      if (this.rev && this.$view) {
+        return this.$view.getRotation()
+      }
     }
   }
 
@@ -92,18 +124,6 @@
         rotation: this.rotation,
         zoom: this.zoom,
         zoomFactor: this.zoomFactor
-      })
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    defineAccessors () {
-      Object.defineProperties(this, {
-        $view: {
-          enumerable: true,
-          get: this.getView
-        }
       })
     },
     /**
@@ -167,7 +187,7 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, proj.toLonLat(this.$view.getCenter(), this.$view.getProjection()))) {
+      if (this.$view && !isEqual(value, this::getCenter())) {
         this.$view.setCenter(proj.fromLonLat(value, this.$view.getProjection()))
       }
     },
@@ -178,7 +198,7 @@
     },
     zoom (value) {
       value = Math.round(value)
-      if (this.$view && value !== Math.round(this.$view.getZoom())) {
+      if (this.$view && value !== this::getZoom()) {
         this.$view.setZoom(value)
       }
     },
@@ -203,12 +223,26 @@
     name: 'vl-view',
     mixins: [cmp],
     props,
+    computed,
     methods,
     watch,
     stubVNode: {
       empty () {
         return this.$options.name
       }
+    },
+    data () {
+      return {
+        rev: 1
+      }
+    },
+    created () {
+      Object.defineProperties(this, {
+        $view: {
+          enumerable: true,
+          get: this.getView
+        }
+      })
     }
   }
 
@@ -220,26 +254,47 @@
   function subscribeToViewChanges () {
     assert.hasView(this)
 
-    const ft = 100
-    const getCenter = () => proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
-    const getZoom = () => Math.round(this.$view.getZoom())
+    let events
+    let eventsIdent = this.ident ? this.ident + ':events' : undefined
 
-    const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
-    const zoom = resolution.map(() => ({
-      prop: 'zoom',
-      value: getZoom()
-    })).debounceTime(ft * 2)
-      .distinctUntilChanged(isEqual)
-    const events = Observable.merge(
-      Observable.fromOlChangeEvent(this.$view, 'center', true, ft, getCenter),
-      Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
-      resolution,
-      zoom
-    ).map(({ prop, value }) => ({
-      name: `update:${prop}`,
-      value
-    }))
+    if (eventsIdent && this.$identityMap.has(eventsIdent)) {
+      events = this.$identityMap.get(eventsIdent)
+    } else {
+      const ft = 100
+      const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
+        .share()
+      const zoom = resolution.map(() => ({
+        prop: 'zoom',
+        value: this::getZoom()
+      })).debounceTime(2 * ft)
+        .distinctUntilChanged(isEqual)
 
-    this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
+      events = Observable.merge(
+        Observable.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
+        Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
+        resolution,
+        zoom
+      ).map(({ prop, value }) => ({
+        name: `update:${prop}`,
+        value
+      })).share()
+
+      if (eventsIdent) {
+        this.$identityMap.set(eventsIdent, events)
+      }
+    }
+
+    this.subscribeTo(events, ({ name, value }) => {
+      ++this.rev
+      this.$emit(name, value)
+    })
+  }
+
+  function getZoom () {
+    return Math.round(this.$view.getZoom())
+  }
+
+  function getCenter () {
+    return proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
   }
 </script>

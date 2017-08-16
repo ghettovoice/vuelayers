@@ -2,8 +2,10 @@ import { isEqual } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/share'
 import '../../rx-ext'
 import cmp from '../ol-virt-cmp'
+import useMapCmp from '../ol-use-map-cmp'
 import { extent as extentHelper, proj as projHelper } from '../../ol-ext'
 import * as assert from '../../utils/assert'
 
@@ -28,7 +30,9 @@ const computed = {
     throw new Error('Not implemented computed property')
   },
   extent () {
-    return this.$geometry && this.extentToLonLat(this.$geometry.getExtent())
+    if (this.rev && this.$geometry) {
+      return this.extentToLonLat(this.$geometry.getExtent())
+    }
   }
 }
 
@@ -87,26 +91,6 @@ const methods = {
    */
   deinit () {
     return this::cmp.methods.deinit()
-  },
-  /**
-   * @return {void}
-   * @protected
-   */
-  defineAccessors () {
-    Object.defineProperties(this, {
-      $geometry: {
-        enumerable: true,
-        get: this.getGeometry
-      },
-      $map: {
-        enumerable: true,
-        get: () => this.$services && this.$services.map
-      },
-      $view: {
-        enumerable: true,
-        get: () => this.$services && this.$services.view
-      }
-    })
   },
   /**
    * @returns {ol.geometry.Geometry|undefined}
@@ -174,7 +158,7 @@ const watch = {
 }
 
 export default {
-  mixins: [cmp],
+  mixins: [cmp, useMapCmp],
   props,
   computed,
   watch,
@@ -183,6 +167,27 @@ export default {
     empty () {
       return this.$options.name
     }
+  },
+  data () {
+    return {
+      rev: 1
+    }
+  },
+  created () {
+    Object.defineProperties(this, {
+      $geometry: {
+        enumerable: true,
+        get: this.getGeometry
+      },
+      $map: {
+        enumerable: true,
+        get: () => this.$services && this.$services.map
+      },
+      $view: {
+        enumerable: true,
+        get: () => this.$services && this.$services.view
+      }
+    })
   }
 }
 
@@ -193,16 +198,30 @@ export default {
 function subscribeToGeomChanges () {
   assert.hasGeometry(this)
 
-  const ft = 100
-  const events = Observable.fromOlChangeEvent(this.$geometry, undefined, isEqualGeom, ft, () => ({
-    coordinates: this.toLonLat(this.$geometry.getCoordinates()),
-    extent: this.extentToLonLat(this.$geometry.getExtent())
-  })).map(({ value: { coordinates } }) => ({
-    name: 'update:coordinates',
-    value: coordinates
-  }))
+  let events
+  let eventsIdent = this.getFullIdent('events')
 
-  this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
+  if (this.$identityMap.has(eventsIdent)) {
+    events = this.$identityMap.get(eventsIdent)
+  } else {
+    const ft = 100
+    events = Observable.fromOlChangeEvent(this.$geometry, undefined, isEqualGeom, ft, () => ({
+      coordinates: this.toLonLat(this.$geometry.getCoordinates()),
+      extent: this.extentToLonLat(this.$geometry.getExtent())
+    })).map(({ value: { coordinates } }) => ({
+      name: 'update:coordinates',
+      value: coordinates
+    })).share()
+
+    if (eventsIdent) {
+      this.$identityMap.set(eventsIdent, events)
+    }
+  }
+
+  this.subscribeTo(events, ({ name, value }) => {
+    ++this.rev
+    this.$emit(name, value)
+  })
 }
 
 /**

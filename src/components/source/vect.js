@@ -34,14 +34,21 @@ const methods = {
    */
   addFeature (feature) {
     assert.hasView(this)
-    assert.hasSource(this)
 
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
       feature = geoJson.readFeature(feature, this.$view.getProjection())
     }
-    this.$source.addFeature(this.prepareFeature(feature))
+
+    this.prepareFeature(feature)
+
+    if (!this._features[feature.getId()]) {
+      this._features[feature.getId()] = feature
+    }
+    if (this.$source && !this.$source.getFeatureById(feature.getId())) {
+      this.$source.addFeature(feature)
+    }
   },
   /**
    * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
@@ -55,52 +62,39 @@ const methods = {
    * @return {void}
    */
   removeFeature (feature) {
-    assert.hasSource(this)
-
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
-      feature = this.$source.getFeatureById(feature.id)
+      feature = this._features[feature.id]
     }
-    this.$source.removeFeature(feature)
+
+    if (!feature) return
+
+    delete this._features[feature.getId()]
+
+    if (this.$source && this.$source.getFeatureById(feature.getId())) {
+      this.$source.removeFeature(feature)
+    }
   },
   /**
    * @return {void}
    */
   clear () {
-    assert.hasSource(this)
-    this.$source.clear()
-  },
-  /**
-   * @return {void}
-   * @private
-   */
-  defineAccessors () {
-    this::source.methods.defineAccessors()
-    Object.defineProperties(this, {
-      $features: {
-        enumerable: true,
-        get: this.getFeatures
-      }
-    })
+    this._features = Object.create(null)
+    this.$source && this.$source.clear()
   },
   /**
    * @param {string|number} id
    * @return {ol.Feature|undefined}
    */
   getFeatureById (id) {
-    assert.hasSource(this)
-
-    return this.$source.getFeatureById(id)
+    return this._features[id]
   },
   /**
-   * @return {ol.Collection<ol.Feature>}
-   * @throws {AssertionError}
+   * @return {ol.Feature[]}
    */
   getFeatures () {
-    assert.hasSource(this)
-
-    return this.$source.getFeaturesCollection()
+    return Object.values(this._features)
   },
   /**
    * @return {Promise}
@@ -162,18 +156,49 @@ export default {
         class: this.$options.name
       }
     }
+  },
+  created () {
+    /**
+     * @type {Object<string, ol.Feature>}
+     * @private
+     */
+    this._features = Object.create(null)
+
+    Object.defineProperties(this, {
+      $features: {
+        enumerable: true,
+        get: this.getFeatures
+      }
+    })
+  },
+  destroyed () {
+    this._features = Object.create(null)
   }
 }
 
 function subscribeToSourceChanges () {
   assert.hasSource(this)
 
-  const add = Observable.fromOlEvent(this.$source, 'addfeature')
-    .do(evt => {
-      this.prepareFeature(evt.feature)
-    })
-  const remove = Observable.fromOlEvent(this.$source, 'removefeature')
-  const events = Observable.merge(add, remove)
+  let events
+  let eventsIdent = this.getFullIdent('events')
+
+  if (this.$identityMap.has(eventsIdent)) {
+    events = this.$identityMap.get(eventsIdent)
+  } else {
+    const add = Observable.fromOlEvent(this.$source, 'addfeature')
+      .do(({ feature }) => {
+        this.addFeature(feature)
+      })
+    const remove = Observable.fromOlEvent(this.$source, 'removefeature')
+      .do(({ feature }) => {
+        this.removeFeature(feature)
+      })
+    events = Observable.merge(add, remove).share()
+
+    if (eventsIdent) {
+      this.$identityMap.set(eventsIdent, events)
+    }
+  }
 
   this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

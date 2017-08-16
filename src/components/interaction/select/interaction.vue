@@ -14,6 +14,7 @@
     forEach
   } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/operator/share'
   import '../../../rx-ext'
   import interaction from '../interaction'
   import styleTarget from '../../style-target'
@@ -47,6 +48,16 @@
     }
   }
 
+  const computed = {
+    currentSelected () {
+      if (this.rev) {
+        return this.$features.map(extractId)
+      }
+
+      return []
+    }
+  }
+
   const methods = {
     /**
      * @return {ol.interaction.Select}
@@ -58,19 +69,6 @@
         wrapX: this.wrapX,
         filter: this.filter,
         style: this.createStyleFunc()
-      })
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    defineAccessors () {
-      this::interaction.methods.defineAccessors()
-      Object.defineProperties(this, {
-        $features: {
-          enumerable: true,
-          get: this.getFeatures
-        }
       })
     },
     /**
@@ -88,12 +86,10 @@
       }
     },
     /**
-     * @return {ol.Collection<ol.Feature>}
+     * @return {ol.Feature[]}
      */
     getFeatures () {
-      assert.hasInteraction(this)
-
-      return this.$interaction.getFeatures()
+      return (this.$interaction && this.$interaction.getFeatures().getArray()) || []
     },
     /**
      * @return {ol.interaction.Interaction|undefined}
@@ -135,21 +131,23 @@
         feature = feature.$feature
       }
 
-      const selectedIds = this.$features.getArray().map(extractId)
+      const selectedIds = this.$features.map(extractId)
       if (selectedIds.includes(id)) return
 
       if (!(feature instanceof Feature)) {
         feature = undefined
         forEach(layer => {
           const source = layer.getSource()
+
           if (source && isFunction(source.getFeatureById)) {
             feature = source.getFeatureById(id)
           }
+
           return !feature
         }, this.$map.getLayers().getArray())
       }
 
-      feature && this.$features.push(feature)
+      feature && this.$interaction.getFeatures().push(feature)
     },
     /**
      * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
@@ -166,11 +164,11 @@
         feature = feature.$feature
       }
 
-      const selectedIds = this.$features.getArray().map(f => f.getId())
+      const selectedIds = this.$features.map(extractId)
       const idx = selectedIds.findIndex(x => x === id)
 
       if (idx !== -1) {
-        this.$features.removeAt(idx)
+        this.$interaction.getFeatures().removeAt(idx)
       }
     },
     /**
@@ -192,8 +190,9 @@
         new Promise(resolve => {
           assert.hasInteraction(this)
 
-          this.$features.once('change', () => resolve())
-          this.$features.changed()
+          const featuresCollection = this.$interaction.getFeatures()
+          featuresCollection.once('change', () => resolve())
+          featuresCollection.changed()
         }),
         this::interaction.methods.refresh()
       ])
@@ -211,7 +210,8 @@
      */
     unselectAll () {
       assert.hasInteraction(this)
-      this.$features.clear()
+
+      this.$interaction.getFeatures().clear()
     }
   }
 
@@ -220,9 +220,8 @@
     selected (value) {
       if (!this.$interaction) return
 
-      const selected = this.$features.getArray()
-      let forSelect = diffById(value, selected)
-      let forUnselect = diffById(selected, value)
+      let forSelect = diffById(value, this.$features)
+      let forUnselect = diffById(this.$features, value)
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)
@@ -233,6 +232,7 @@
     name: 'vl-interaction-select',
     mixins: [interaction, styleTarget],
     props,
+    computed,
     methods,
     watch,
     stubVNode: {
@@ -242,6 +242,19 @@
           class: this.$options.name
         }
       }
+    },
+    data () {
+      return {
+        rev: 1
+      }
+    },
+    created () {
+      Object.defineProperties(this, {
+        $features: {
+          enumerable: true,
+          get: this.getFeatures
+        }
+      })
     }
   }
 
@@ -252,13 +265,28 @@
   function subscribeToInteractionChanges () {
     assert.hasInteraction(this)
 
+    let events
+    let eventsIdent = this.getFullIdent('events')
+
+    if (this.$identityMap.has(eventsIdent)) {
+      events = this.$identityMap.get(eventsIdent)
+    } else {
+      events = Observable.fromOlEvent(this.$interaction, 'select').share()
+
+      if (eventsIdent) {
+        this.$identityMap.set(eventsIdent, events)
+      }
+    }
+
     this.subscribeTo(
-      Observable.fromOlEvent(this.$interaction, 'select'),
+      events,
       ({ selected, deselected, mapBrowserEvent }) => {
+        ++this.rev
+
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
 
-        this.$emit('update:selected', this.$features.getArray().map(extractId))
+        this.$emit('update:selected', this.$features.map(extractId))
       }
     )
   }

@@ -6,6 +6,7 @@
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import plainProps from '../../utils/plain-props'
   import cmp from '../ol-virt-cmp'
+  import useMapCmp from '../ol-use-map-cmp'
   import styleTarget from '../style-target'
   import { geoJson } from '../../ol-ext'
   import * as assert from '../../utils/assert'
@@ -35,36 +36,9 @@
        */
       let feature = new Feature(this.properties)
       feature.setId(this.id)
+      feature.setGeometry(this._geometry)
 
       return feature
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    defineAccessors () {
-      Object.defineProperties(this, {
-        $feature: {
-          enumerable: true,
-          get: this.getFeature
-        },
-        $layer: {
-          enumerable: true,
-          get: () => this.$services && this.$services.layer
-        },
-        $map: {
-          enumerable: true,
-          get: () => this.$services && this.$services.map
-        },
-        $view: {
-          enumerable: true,
-          get: () => this.$services && this.$services.view
-        },
-        $geometry: {
-          enumerable: true,
-          get: this.getGeometry
-        }
-      })
     },
     /**
      * @returns {ol.Feature|undefined}
@@ -74,12 +48,9 @@
     },
     /**
      * @return {ol.geom.Geometry|undefined}
-     * @throws {AssertionError}
      */
     getGeometry () {
-      assert.hasFeature(this)
-
-      return this.$feature.getGeometry()
+      return this._geometry
     },
     /**
      * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
@@ -87,15 +58,16 @@
      * @throws {AssertionError}
      */
     setGeometry (geom) {
-      assert.hasView(this)
-      assert.hasFeature(this)
-
       if (geom instanceof Vue) {
         geom = geom.$geometry
       } else if (isPlainObject(geom)) {
+        assert.hasView(this)
         geom = geoJson.readGeometry(geom, this.$view.getProjection())
       }
-      if (geom !== this.$geometry) {
+      if (geom !== this._geometry) {
+        this._geometry = geom
+      }
+      if (this.$feature && geom !== this.$feature.getGeometry()) {
         this.$feature.setGeometry(geom)
       }
     },
@@ -167,7 +139,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [cmp, styleTarget],
+    mixins: [cmp, useMapCmp, styleTarget],
     props,
     methods,
     watch,
@@ -178,6 +150,39 @@
           class: this.$options.name
         }
       }
+    },
+    created () {
+      /**
+       * @type {ol.geom.Geometry|undefined}
+       * @private
+       */
+      this._geometry = undefined
+
+      Object.defineProperties(this, {
+        $feature: {
+          enumerable: true,
+          get: this.getFeature
+        },
+        $layer: {
+          enumerable: true,
+          get: () => this.$services && this.$services.layer
+        },
+        $map: {
+          enumerable: true,
+          get: () => this.$services && this.$services.map
+        },
+        $view: {
+          enumerable: true,
+          get: () => this.$services && this.$services.view
+        },
+        $geometry: {
+          enumerable: true,
+          get: this.getGeometry
+        }
+      })
+    },
+    destroyed () {
+      this._geometry = undefined
     }
   }
 </script>

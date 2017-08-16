@@ -1,5 +1,6 @@
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
+import useMapCmp from '../ol-use-map-cmp'
 
 const props = {
   attributions: [String, Array],
@@ -26,26 +27,6 @@ const methods = {
    */
   createSource () {
     throw new Error('Not implemented method')
-  },
-  /**
-   * @return {void}
-   * @private
-   */
-  defineAccessors () {
-    Object.defineProperties(this, {
-      $source: {
-        enumerable: true,
-        get: this.getSource
-      },
-      $map: {
-        enumerable: true,
-        get: () => this.$services && this.$services.map
-      },
-      $view: {
-        enumerable: true,
-        get: () => this.$services && this.$services.view
-      }
-    })
   },
   /**
    * @return {Promise}
@@ -109,7 +90,7 @@ const watch = {
 }
 
 export default {
-  mixins: [cmp],
+  mixins: [cmp, useMapCmp],
   props,
   methods,
   watch,
@@ -117,5 +98,21 @@ export default {
     empty () {
       return this.$options.name
     }
+  },
+  created () {
+    Object.defineProperties(this, {
+      $source: {
+        enumerable: true,
+        get: this.getSource
+      },
+      $map: {
+        enumerable: true,
+        get: () => this.$services && this.$services.map
+      },
+      $view: {
+        enumerable: true,
+        get: () => this.$services && this.$services.view
+      }
+    })
   }
 }

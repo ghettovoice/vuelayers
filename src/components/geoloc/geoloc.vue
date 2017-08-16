@@ -2,6 +2,7 @@
   import Geolocation from 'ol/geolocation'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/share'
   import '../../rx-ext'
   import { EPSG_4326 } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
@@ -17,22 +18,34 @@
 
   const computed = {
     accuracy () {
-      return this.$geolocation && this.$geolocation.getAccuracy()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getAccuracy()
+      }
     },
     altitude () {
-      return this.$geolocation && this.$geolocation.getAltitude()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getAltitude()
+      }
     },
     altitudeAccuracy () {
-      return this.$geolocation && this.$geolocation.getAltitudeAccuracy()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getAltitudeAccuracy()
+      }
     },
     heading () {
-      return this.$geolocation && this.$geolocation.getHeading()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getHeading()
+      }
     },
     position () {
-      return this.$geolocation && this.$geolocation.getPosition()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getPosition()
+      }
     },
     speed () {
-      return this.$geolocation && this.$geolocation.getSpeed()
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getSpeed()
+      }
     }
   }
 
@@ -46,18 +59,6 @@
         tracking: this.tracking,
         trackingOptions: this.trackingOptions,
         projection: EPSG_4326
-      })
-    },
-    /**
-     * @return {void}
-     * @private
-     */
-    defineAccessors () {
-      Object.defineProperties(this, {
-        $geolocation: {
-          enumerable: true,
-          get: this.getGeolocation
-        }
       })
     },
     /**
@@ -117,6 +118,19 @@
       empty () {
         return this.$options.name
       }
+    },
+    data () {
+      return {
+        rev: 1
+      }
+    },
+    created () {
+      Object.defineProperties(this, {
+        $geolocation: {
+          enumerable: true,
+          get: this.getGeolocation
+        }
+      })
     }
   }
 
@@ -127,19 +141,34 @@
   function subscribeToGeolocation () {
     assert.hasGeolocation(this)
 
-    const events = Observable.fromOlChangeEvent(this.$geolocation, [
-      'accuracy',
-      'altitude',
-      'altitudeaccuracy',
-      'heading',
-      'position',
-      'speed'
-    ], true, 100)
-      .map(({ prop, value }) => ({
-        name: `update:${prop}`,
-        value
-      }))
+    let events
+    let eventsIdent = this.getFullIdent('events')
 
-    this.subscribeTo(events, ({ name, value }) => this.$emit(name, value))
+    if (this.$identityMap.has(eventsIdent)) {
+      events = this.$identityMap.get(eventsIdent)
+    } else {
+      const ft = 100
+      events = Observable.fromOlChangeEvent(this.$geolocation, [
+        'accuracy',
+        'altitude',
+        'altitudeaccuracy',
+        'heading',
+        'position',
+        'speed'
+      ], true, ft)
+        .map(({ prop, value }) => ({
+          name: `update:${prop}`,
+          value
+        })).share()
+
+      if (eventsIdent) {
+        this.$identityMap.set(eventsIdent, events)
+      }
+    }
+
+    this.subscribeTo(events, ({ name, value }) => {
+      ++this.rev
+      this.$emit(name, value)
+    })
   }
 </script>

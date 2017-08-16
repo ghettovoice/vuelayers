@@ -7,11 +7,14 @@ import * as olExt from '../ol-ext'
 import { warndbg } from '../utils/debug'
 
 export default {
-  beforeCreate () {
+  created () {
     /**
      * @type {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
      * @private
      */
+    this._styles = undefined
+  },
+  destroyed () {
     this._styles = undefined
   },
   methods: {
