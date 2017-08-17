@@ -16,7 +16,6 @@
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
-  import 'rxjs/add/operator/share'
   import '../../rx-ext'
   import { proj as projHelper } from '../../ol-ext'
   import cmp from '../ol-cmp'
@@ -387,47 +386,36 @@
     assert.hasMap(this)
     assert.hasView(this)
 
-    let events
-    let eventsIdent = this.getFullIdent('events')
-
-    if (this.$identityMap.has(eventsIdent)) {
-      events = this.$identityMap.get(eventsIdent)
-    } else {
-      const ft = 100
-      // pointer
-      const pointerEvents = Observable.merge(
-        Observable.fromOlEvent(this.$map, [
-          'click',
-          'dblclick',
-          'singleclick'
-        ]),
-        Observable.fromOlEvent(this.$map, [
-          'pointerdrag',
-          'pointermove'
-        ]).throttleTime(ft)
-          .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
-      ).map(evt => ({
-        ...evt,
-        coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection())
-      }))
-      // other
-      const otherEvents = Observable.fromOlEvent(this.$map, [
-        'movestart',
-        'moveend',
-        'postrender',
-        'precompose',
-        'postcompose'
+    const ft = 100
+    // pointer
+    const pointerEvents = Observable.merge(
+      Observable.fromOlEvent(this.$map, [
+        'click',
+        'dblclick',
+        'singleclick'
+      ]),
+      Observable.fromOlEvent(this.$map, [
+        'pointerdrag',
+        'pointermove'
       ]).throttleTime(ft)
+        .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
+    ).map(evt => ({
+      ...evt,
+      coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection())
+    }))
+    // other
+    const otherEvents = Observable.fromOlEvent(this.$map, [
+      'movestart',
+      'moveend',
+      'postrender',
+      'precompose',
+      'postcompose'
+    ]).throttleTime(ft)
 
-      events = Observable.merge(
-        pointerEvents,
-        otherEvents
-      ).share()
-
-      if (eventsIdent) {
-        this.$identityMap.set(eventsIdent, events)
-      }
-    }
+    const events = Observable.merge(
+      pointerEvents,
+      otherEvents
+    )
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }

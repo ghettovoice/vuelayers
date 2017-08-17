@@ -13,10 +13,13 @@ export default VueLayers
 export const {
   install,
   mixins,
+  ol,
+  rx,
   // common
   Map,
   Feature,
   Geoloc,
+  Overlay,
   // geoms
   PointGeom,
   LineStringGeom,

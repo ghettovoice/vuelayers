@@ -1,3 +1,4 @@
+import Feature from 'ol/feature'
 import { geoJson as geoJsonFactory } from './format'
 import { EPSG_4326, EPSG_3857 } from './consts'
 
@@ -10,7 +11,19 @@ const geoJson = geoJsonFactory()
  * @return {GeoJSONFeature|Object}
  */
 export function writeFeature (feature, featureProjection = EPSG_3857, dataProjection = EPSG_4326) {
-  return geoJson.writeFeatureObject(feature, { featureProjection, dataProjection })
+  const geoJsonFeature = geoJson.writeFeatureObject(feature, { featureProjection, dataProjection })
+
+  if (geoJsonFeature.properties && geoJsonFeature.properties.features) {
+    geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(f => {
+      if (f instanceof Feature) {
+        return writeFeature(f)
+      }
+
+      return f
+    })
+  }
+
+  return geoJsonFeature
 }
 
 /**
@@ -21,6 +34,7 @@ export function writeFeature (feature, featureProjection = EPSG_3857, dataProjec
  */
 export function readFeature (geoJsonFeature, featureProjection = EPSG_3857, dataProjection = EPSG_4326) {
   dataProjection = readProjection(geoJsonFeature, dataProjection)
+
   return geoJson.readFeature(geoJsonFeature, { featureProjection, dataProjection })
 }
 
@@ -45,6 +59,7 @@ export function writeGeometry (geometry, geometryProjection = EPSG_3857, dataPro
  */
 export function readGeometry (geoJsonGeometry, geometryProjection = EPSG_3857, dataProjection = EPSG_4326) {
   dataProjection = readProjection(geoJsonGeometry, dataProjection)
+
   return geoJson.readGeometry(geoJsonGeometry, {
     featureProjection: geometryProjection,
     dataProjection

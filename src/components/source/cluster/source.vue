@@ -2,7 +2,7 @@
   import Vue from 'vue'
   import SourceBuilder from './builder'
   import vectSource from '../vect'
-  import * as olExt from '../../../ol-ext'
+  import * as vlol from '../../../ol-ext'
 
   const props = {
     distance: {
@@ -11,7 +11,7 @@
     },
     /**
      * Geometry function factory
-     * @type {function(olExt: Object): (function(f: ol.Feature): ol.geom.SimpleGeometry|undefined)} geomFuncFactory
+     * @type {function(vlol: Object): (function(f: ol.Feature): ol.geom.SimpleGeometry|undefined)} geomFuncFactory
      */
     geomFuncFactory: {
       type: Function,
@@ -21,7 +21,7 @@
 
   const computed = {
     geomFunc () {
-      return this.geomFuncFactory(olExt)
+      return this.geomFuncFactory(vlol)
     }
   }
 
@@ -84,15 +84,15 @@
   }
 
   /**
-   * @param {Object} olExt
+   * @param {Object} vlol
    * @returns {function(f: ol.Feature): ol.geom.SimpleGeometry|undefined}
    */
-  function defaultGeomFuncFactory (olExt) {
+  function defaultGeomFuncFactory (vlol) {
     return function (feature) {
       let geometry = feature.getGeometry()
       if (!geometry) return
 
-      return olExt.geom.pointOnSurface(geometry)
+      return vlol.geom.pointOnSurface(geometry)
     }
   }
 </script>

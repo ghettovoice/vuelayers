@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div style="height: 50%">
-      <vl-map>
-        <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
+      <vl-map ref="map">
+        <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
         <vl-geoloc/>
 
@@ -26,14 +26,22 @@
 
         <vl-layer-vector>
           <vl-source-vector>
-            <vl-feature :id="polyId" ref="poly">
-              <vl-geom-polygon :coordinates.sync="polygonCoords" />
+            <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
+              <template scope="feature">
+                <vl-geom-polygon :coordinates.sync="polygonCoords"/>
+                <vl-overlay v-if="selected.includes(feature.id)" :position="pointOnSurface(feature.geometry)">
+                  <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
+                    poly feature {{ polyId }}
+                    qwerty: {{ feature.properties.qwerty }}
+                  </div>
+                </vl-overlay>
+              </template>
             </vl-feature>
           </vl-source-vector>
 
           <vl-style-box>
             <vl-style-fill :color="[45, 156, 201, 0.4]"/>
-            <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4" />
+            <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
           </vl-style-box>
         </vl-layer-vector>
       </vl-map>
@@ -50,6 +58,15 @@
           <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
                          :ext-params="{ TILED: true }" server-type="geoserver"/>
         </vl-layer-tile>
+
+        <vl-overlay v-if="selectedFeatures.length" :position="pointOnSurface(selectedFeatures[0].geometry)">
+          <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
+            Popup cluster feature {{ selectedFeatures[0].id }}<br />
+            <span v-for="feature in selectedFeatures[0].properties.features">
+              feature {{ feature.id }}
+            </span>
+          </div>
+        </vl-overlay>
       </vl-map>
     </div>
   </div>
@@ -57,17 +74,29 @@
 
 <script>
   import { range, random } from 'lodash/fp'
+  import { ol as vlol } from '../src'
+
+  const computed = {
+  }
 
   const methods = {
-    select (feature) {
-      console.log('select', feature)
+    select ({ feature }) {
+      if (feature.get('features') && feature.get('features').length > 1) {
+        this.selected = this.selected.filter(id => id !== feature.getId())
+        this.$refs.view.fit(vlol.geom.collection(feature.get('features').map(f => f.getGeometry())).getExtent(), {
+          duration: 500
+        })
+      } else {
+        this.selectedFeatures.push(vlol.geoJson.writeFeature(feature))
+      }
     },
-    unselect (feature) {
+    unselect ({ feature }) {
       console.log('unselect', feature)
+      this.selectedFeatures = this.selectedFeatures.filter(f => f.id !== feature.getId())
     },
     loadData () {
       const points = []
-      range(1, 100).forEach(i => {
+      range(1, 20).forEach(i => {
         points.push({
           type: 'Feature',
           id: i,
@@ -87,11 +116,16 @@
       this.points = points
 
       return Promise.resolve(this.points)
+    },
+    pointOnSurface (geometry) {
+      console.log(geometry)
+      return vlol.geom.pointOnSurfaceAsCoordinate(geometry)
     }
   }
 
   export default {
     name: 'app',
+    computed,
     methods,
     data () {
       return {
@@ -102,7 +136,8 @@
         pointsLayer: true,
         polyId: '123',
         polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
-        selected: [10, 20, 30]
+        selected: [],
+        selectedFeatures: []
       }
     },
     mounted () {

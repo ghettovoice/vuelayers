@@ -1,7 +1,7 @@
 <script>
   import VectorSource from 'ol/source/vector'
   import { differenceWith, stubArray, isFunction } from 'lodash/fp'
-  import * as olExt from '../../../ol-ext'
+  import * as vlol from '../../../ol-ext'
   import vectSource from '../vect'
 
   const props = {
@@ -14,22 +14,22 @@
     },
     /**
      * Source loader factory
-     * @type {function(olExt: Object): ol.FeatureLoader|undefined} loaderFactory
+     * @type {function(vlol: Object): ol.FeatureLoader|undefined} loaderFactory
      */
     loaderFactory: Function,
     /**
      * Source format factory
-     * @type {function(olExt: Object): ol.format.Feature} formatFactory
+     * @type {function(vlol: Object): ol.format.Feature} formatFactory
      */
     formatFactory: Function,
     /**
      * String or url factory
-     * @type {string|function(olExt: Object): string|ol.FeatureUrlFunction} url
+     * @type {string|function(vlol: Object): string|ol.FeatureUrlFunction} url
      */
     url: [String, Function],
     /**
      * Loading strategy factory
-     * @type {function(olExt: Object): ol.LoadingStrategy} strategyFactory
+     * @type {function(vlol: Object): ol.LoadingStrategy} strategyFactory
      */
     strategyFactory: {
       type: Function,
@@ -44,22 +44,22 @@
   const computed = {
     strategy () {
       if (this.strategyFactory) {
-        return this.strategyFactory(olExt)
+        return this.strategyFactory(vlol)
       }
     },
     loader () {
       if (this.loaderFactory) {
-        return this.loaderFactory(olExt)
+        return this.loaderFactory(vlol)
       }
     },
     urlFunc () {
       if (this.url) {
-        return isFunction(this.url) ? this.url(olExt) : () => this.url
+        return isFunction(this.url) ? this.url(vlol) : () => this.url
       }
     },
     format () {
       if (this.formatFactory) {
-        return this.formatFactory(olExt)
+        return this.formatFactory(vlol)
       }
     }
   }
@@ -124,7 +124,7 @@
   }
 
   /**
-   * @param {Object} olExt OpenLayers Helper
+   * @param {Object} vlol OpenLayers Helper
    * @return {ol.LoadingStrategy}
    */
   function defaultStrategyFactory ({ loadStrategy }) {

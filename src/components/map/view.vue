@@ -7,7 +7,6 @@
   import 'rxjs/add/operator/debounceTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
-  import 'rxjs/add/operator/share'
   import '../../rx-ext'
   import { MIN_ZOOM, MAX_ZOOM, EPSG_3857, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
@@ -67,22 +66,28 @@
         return this::getCenter()
       }
 
-      return []
+      return this.center
     },
     currentResolution () {
       if (this.rev && this.$view) {
         return this.$view.getResolution()
       }
+
+      return this.resolution
     },
     currentZoom () {
       if (this.rev && this.$view) {
         return this::getZoom()
       }
+
+      return this.zoom
     },
     currentRotation () {
       if (this.rev && this.$view) {
         return this.$view.getRotation()
       }
+
+      return this.rotation
     }
   }
 
@@ -254,35 +259,23 @@
   function subscribeToViewChanges () {
     assert.hasView(this)
 
-    let events
-    let eventsIdent = this.ident ? this.ident + ':events' : undefined
+    const ft = 100
+    const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
+    const zoom = resolution.map(() => ({
+      prop: 'zoom',
+      value: this::getZoom()
+    })).debounceTime(2 * ft)
+      .distinctUntilChanged(isEqual)
 
-    if (eventsIdent && this.$identityMap.has(eventsIdent)) {
-      events = this.$identityMap.get(eventsIdent)
-    } else {
-      const ft = 100
-      const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
-        .share()
-      const zoom = resolution.map(() => ({
-        prop: 'zoom',
-        value: this::getZoom()
-      })).debounceTime(2 * ft)
-        .distinctUntilChanged(isEqual)
-
-      events = Observable.merge(
-        Observable.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
-        Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
-        resolution,
-        zoom
-      ).map(({ prop, value }) => ({
-        name: `update:${prop}`,
-        value
-      })).share()
-
-      if (eventsIdent) {
-        this.$identityMap.set(eventsIdent, events)
-      }
-    }
+    const events = Observable.merge(
+      Observable.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
+      Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
+      resolution,
+      zoom
+    ).map(({ prop, value }) => ({
+      name: `update:${prop}`,
+      value
+    }))
 
     this.subscribeTo(events, ({ name, value }) => {
       ++this.rev

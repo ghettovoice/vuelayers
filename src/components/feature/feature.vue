@@ -1,11 +1,19 @@
-<script type="text/babel">
+<template>
+  <i :id="id" :class="[$options.name, id].join('-')" style="display: none !important;">
+    <slot :id="id" :properties="properties" :geometry="geometry"></slot>
+  </i>
+</template>
+
+<script>
   import Vue from 'vue'
   import uuid from 'uuid/v4'
   import Feature from 'ol/feature'
   import { isPlainObject } from 'lodash/fp'
+  import { Observable } from 'rxjs/Observable'
+  import '../../rx-ext'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import plainProps from '../../utils/plain-props'
-  import cmp from '../ol-virt-cmp'
+  import cmp from '../ol-cmp'
   import useMapCmp from '../ol-use-map-cmp'
   import styleTarget from '../style-target'
   import { geoJson } from '../../ol-ext'
@@ -19,6 +27,14 @@
     properties: {
       type: Object,
       default: () => Object.create(null)
+    }
+  }
+
+  const computed = {
+    geometry () {
+      if (this.rev && this.$geometry) {
+        return geoJson.writeGeometry(this.$geometry)
+      }
     }
   }
 
@@ -117,6 +133,13 @@
     unmount () {
       this.unsubscribeAll()
       this.$parent && this.$parent.removeFeature(this)
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToFeatureChanges()
     }
   }
 
@@ -141,6 +164,7 @@
     name: 'vl-feature',
     mixins: [cmp, useMapCmp, styleTarget],
     props,
+    computed,
     methods,
     watch,
     stubVNode: {
@@ -149,6 +173,11 @@
           id: [this.$options.name, this.id].join('-'),
           class: this.$options.name
         }
+      }
+    },
+    data () {
+      return {
+        rev: 1
       }
     },
     created () {
@@ -184,5 +213,20 @@
     destroyed () {
       this._geometry = undefined
     }
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function subscribeToFeatureChanges () {
+    assert.hasFeature(this)
+
+    const ft = 100
+    const events = Observable.fromOlChangeEvent(this.$feature, 'geometry', true, ft)
+
+    this.subscribeTo(events, () => {
+      ++this.rev
+    })
   }
 </script>

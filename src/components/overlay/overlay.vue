@@ -1,13 +1,18 @@
+<template>
+  <div :id="[$options.name, id].join('-')" :class="$options.name">
+    <slot></slot>
+  </div>
+</template>
+
 <script>
   import uuid from 'uuid/v4'
   import { isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
   import 'rxjs/add/operator/map'
-  import 'rxjs/add/operator/share'
   import '../../rx-ext'
   import Overlay from 'ol/overlay'
-  import cmp from '../ol-virt-cmp'
+  import cmp from '../ol-cmp'
   import useMapCmp from '../ol-use-map-cmp'
   import { OVERLAY_POSITIONING, proj as projHelper } from '../../ol-ext'
   import * as assert from '../../utils/assert'
@@ -28,7 +33,7 @@
     },
     positioning: {
       type: String,
-      default: Object.values(OVERLAY_POSITIONING),
+      default: OVERLAY_POSITIONING.TOP_LEFT,
       validator: value => Object.values(OVERLAY_POSITIONING).includes(value)
     },
     stopEvent: Boolean,
@@ -53,7 +58,7 @@
         return this::getPosition()
       }
 
-      return []
+      return this.position
     }
   }
 
@@ -89,7 +94,7 @@
       assert.hasOverlay(this)
 
       this.$overlay.setElement(this.$el)
-      this.$parent && this.$parent.addOverlay(this)
+      this.$map && this.$map.addOverlay(this.$overlay)
       this.subscribeAll()
     },
     /**
@@ -101,7 +106,7 @@
 
       this.unsubscribeAll()
       this.$overlay.setElement(undefined)
-      this.$parent && this.$parent.removeOverlay(this)
+      this.$map && this.$map.removeOverlay(this.$overlay)
     },
     /**
      * @return {void}
@@ -142,14 +147,6 @@
     computed,
     methods,
     watch,
-    stubVNode: {
-      attrs () {
-        return {
-          id: [this.$options.name, this.id].join('-'),
-          class: this.$options.name
-        }
-      }
-    },
     data () {
       return {
         rev: 1
@@ -163,11 +160,11 @@
         },
         $map: {
           enumerable: true,
-          get: this.$services && this.$services.map
+          get: () => this.$services && this.$services.map
         },
         $view: {
           enumerable: true,
-          get: this.$services && this.$services.view
+          get: () => this.$services && this.$services.view
         }
       })
     }
@@ -181,28 +178,17 @@
     assert.hasOverlay(this)
     assert.hasView(this)
 
-    let events
-    let eventsIdent = this.getFullIdent('events')
-
-    if (this.$identityMap.has(eventsIdent)) {
-      events = this.$identityMap.get(eventsIdent)
-    } else {
-      const ft = 100
-      events = Observable.merge(
-        Observable.fromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
-        Observable.fromOlChangeEvent(this.$overlay, [
-          'offset',
-          'positioning'
-        ], true, ft)
-      ).map(({ prop, value }) => ({
-        name: `update:${prop}`,
-        value
-      })).share()
-
-      if (eventsIdent) {
-        this.$identityMap.set(eventsIdent, events)
-      }
-    }
+    const ft = 100
+    const events = Observable.merge(
+      Observable.fromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
+      Observable.fromOlChangeEvent(this.$overlay, [
+        'offset',
+        'positioning'
+      ], true, ft)
+    ).map(({ prop, value }) => ({
+      name: `update:${prop}`,
+      value
+    }))
 
     this.subscribeTo(events, ({ name, value }) => {
       ++this.rev

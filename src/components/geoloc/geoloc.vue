@@ -2,7 +2,6 @@
   import Geolocation from 'ol/geolocation'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/operator/map'
-  import 'rxjs/add/operator/share'
   import '../../rx-ext'
   import { EPSG_4326 } from '../../ol-ext'
   import cmp from '../ol-virt-cmp'
@@ -141,30 +140,19 @@
   function subscribeToGeolocation () {
     assert.hasGeolocation(this)
 
-    let events
-    let eventsIdent = this.getFullIdent('events')
-
-    if (this.$identityMap.has(eventsIdent)) {
-      events = this.$identityMap.get(eventsIdent)
-    } else {
-      const ft = 100
-      events = Observable.fromOlChangeEvent(this.$geolocation, [
-        'accuracy',
-        'altitude',
-        'altitudeaccuracy',
-        'heading',
-        'position',
-        'speed'
-      ], true, ft)
-        .map(({ prop, value }) => ({
-          name: `update:${prop}`,
-          value
-        })).share()
-
-      if (eventsIdent) {
-        this.$identityMap.set(eventsIdent, events)
-      }
-    }
+    const ft = 100
+    const events = Observable.fromOlChangeEvent(this.$geolocation, [
+      'accuracy',
+      'altitude',
+      'altitudeaccuracy',
+      'heading',
+      'position',
+      'speed'
+    ], true, ft)
+      .map(({ prop, value }) => ({
+        name: `update:${prop}`,
+        value
+      }))
 
     this.subscribeTo(events, ({ name, value }) => {
       ++this.rev

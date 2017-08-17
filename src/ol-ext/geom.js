@@ -134,3 +134,14 @@ export function pointOnSurface (geom) {
     return point(pointFeature.geometry.coordinates)
   }
 }
+
+/**
+ * @param {ol.geom.Geometry|GeoJSONGeometry} geom
+ * @return {ol.Coordinate|undefined}
+ */
+export function pointOnSurfaceAsCoordinate (geom) {
+  const point = pointOnSurface(geom)
+  if (point) {
+    return point.getCoordinates()
+  }
+}

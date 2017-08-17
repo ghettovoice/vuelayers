@@ -16,6 +16,7 @@ import withFillStrokeStyle from './style/with-fill-stroke'
 export Map from './map'
 export Feature from './feature'
 export Geoloc from './geoloc'
+export Overlay from './overlay'
 // geoms
 export PointGeom from './geom/point'
 export LineStringGeom from './geom/line-string'

@@ -14,7 +14,6 @@
     forEach
   } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/operator/share'
   import '../../../rx-ext'
   import interaction from '../interaction'
   import styleTarget from '../../style-target'
@@ -24,7 +23,7 @@
   const props = {
     filter: {
       type: Function,
-      default: () => constant(true)
+      default: constant(true)
     },
     hitTolerance: {
       type: Number,
@@ -72,12 +71,12 @@
       })
     },
     /**
-     * @param {Object} olExt
+     * @param {Object} vlol
      * @return {ol.StyleFunction}
      * @protected
      */
-    getDefaultStyles (olExt) {
-      const defaultStyles = mapValues(styles => styles.map(olExt.style.style), olExt.style.defaultEditStyle())
+    getDefaultStyles (vlol) {
+      const defaultStyles = mapValues(styles => styles.map(vlol.style.style), vlol.style.defaultEditStyle())
 
       return function __selectDefaultStyleFunc (feature) {
         if (feature.getGeometry()) {
@@ -265,28 +264,16 @@
   function subscribeToInteractionChanges () {
     assert.hasInteraction(this)
 
-    let events
-    let eventsIdent = this.getFullIdent('events')
-
-    if (this.$identityMap.has(eventsIdent)) {
-      events = this.$identityMap.get(eventsIdent)
-    } else {
-      events = Observable.fromOlEvent(this.$interaction, 'select').share()
-
-      if (eventsIdent) {
-        this.$identityMap.set(eventsIdent, events)
-      }
-    }
+    const events = Observable.fromOlEvent(this.$interaction, 'select')
 
     this.subscribeTo(
       events,
       ({ selected, deselected, mapBrowserEvent }) => {
         ++this.rev
 
+        this.$emit('update:selected', this.$features.map(extractId))
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
-
-        this.$emit('update:selected', this.$features.map(extractId))
       }
     )
   }
