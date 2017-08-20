@@ -10,7 +10,7 @@ import 'rxjs/add/operator/skipWhile'
 import 'rxjs/add/operator/toPromise'
 import { Observable } from 'rxjs/Observable'
 import { VM_PROP } from '../consts'
-import { logdbg } from '../utils/debug'
+// import { logdbg } from '../utils/debug'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
 import services from './services'
@@ -123,10 +123,10 @@ export default {
      */
     this._createPromise = Promise.resolve(this.beforeInit())
       .then(this.init)
-      .then(() => {
-        logdbg('created', this.$options.name)
-        return this
-      })
+      // .then(() => {
+      //   logdbg('created', this.$options.name)
+      //   return this
+      // })
     /**
      * @type {Promise<Vue<T>>}
      * @private
@@ -164,7 +164,7 @@ export default {
       .then(this.deinit)
       .then(() => {
         this._olObject = this._createPromise = this._mountPromise = undefined
-        logdbg('destroyed', this.$options.name)
+        // logdbg('destroyed', this.$options.name)
       })
   }
 }
