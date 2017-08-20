@@ -17,6 +17,7 @@ import services from './services'
 
 const props = {}
 
+const INSTANCE_PROMISE = 'instancePromise'
 const methods = {
   /**
    * @return {Promise<void>}
@@ -30,13 +31,14 @@ const methods = {
   async init () {
     let createPromise
 
-    if (this.ident && this.$identityMap.has(this.ident)) {
-      createPromise = this.$identityMap.get(this.ident)
+    const ident = this.getFullIdent(INSTANCE_PROMISE)
+    if (ident && this.$identityMap.has(ident)) {
+      createPromise = this.$identityMap.get(ident)
     } else {
       createPromise = Promise.resolve(this.createOlObject())
 
-      if (this.ident) {
-        this.$identityMap.set(this.ident, createPromise)
+      if (ident) {
+        this.$identityMap.set(ident, createPromise)
       }
     }
 
@@ -60,8 +62,9 @@ const methods = {
    * @protected
    */
   deinit () {
-    if (this.ident) {
-      this.$identityMap.unset(this.ident)
+    const ident = this.getFullIdent(INSTANCE_PROMISE)
+    if (ident) {
+      this.$identityMap.unset(ident)
     }
     this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
     this._olObject = undefined

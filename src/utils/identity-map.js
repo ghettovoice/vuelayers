@@ -1,26 +1,31 @@
+/**
+ * Simple Identity map with refs count
+ */
 export default class IdentityMap {
   map = Object.create(null)
 
-  set (id, object) {
+  set (id, value) {
+    if (value == null) return
+
     this.map[id] = {
-      object,
-      refs: 0
+      value,
+      refs: 1
     }
   }
 
   get (id) {
-    const rec = this.map[id] || {}
-    if (!rec || !rec.value == null) return
+    let rec = this.map[id]
+    if (!rec || rec.value == null) return
 
     rec.refs++
     this.map[id] = rec
 
-    return rec.object
+    return rec.value
   }
 
   unset (id) {
-    const rec = this.map[id]
-    if (!rec || !rec.value == null) return
+    let rec = this.map[id]
+    if (!rec || rec.value == null) return
 
     rec.refs--
     if (rec.refs === 0) {
@@ -32,5 +37,13 @@ export default class IdentityMap {
 
   has (id) {
     return !!this.map[id]
+  }
+
+  ids () {
+    return Object.keys(this.map)
+  }
+
+  refs (id) {
+    return this.has(id) ? this.map[id].refs : undefined
   }
 }
