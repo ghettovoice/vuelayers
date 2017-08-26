@@ -1,0 +1,18 @@
+#
+# Theme settings
+#
+googleAnalytics: UA-98870917-1
+# Package description
+pkg:
+  name: vuelayers
+  fullname: VueLayers.js
+  version: 0.6.2
+  author:
+    name: Vladimir Vershinin
+    user: ghettovoice
+    homepage:
+      url: https://ghettovoice.github.io
+      name: My Home page
+  license:
+    name: MIT
+    url: https://github.com/ghettovoice/vuelayers/blob/master/LICENSE

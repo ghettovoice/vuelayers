@@ -1,0 +1,54 @@
+<% /* global theme, config, page, date, partial, is_home */ %>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title><%= page.title ? page.title + ' :: ' + config.title : config.title %></title>
+  <meta name="description" content="<%= page.description || config.description %>">
+  <meta name="keywords" content="<%= page.keywords || config.keywords %>">
+  <!--Author-->
+  <% if (config.author){ %>
+  <meta name="author" content="<%= config.author %>">
+  <% } %>
+  <!--Favicon-->
+  <% if (theme.favicon){ %>
+  <link rel="icon" href="<%= theme.favicon %>">
+  <% } %>
+
+  <%- css('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css') %>
+  <%- css('https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css') %>
+  <%- css('scss/main') %>
+
+  <%- partial('partial/ga') %>
+</head>
+<body class="<%= is_home() ? 'is-home' : '' %>">
+  <div id="page-loader">
+    <div class="rotating-loader"></div>
+  </div>
+
+  <header id="header">
+    <%- partial('partial/header') %>
+  </header>
+
+  <aside id="left-sidebar" class="sidebar">
+    <%- partial('partial/left-sidebar') %>
+  </aside>
+
+  <main id="main" class="is-relative">
+    <div class="page">
+      <%- body %>
+    </div>
+  </main>
+
+  <footer id="footer" class="footer">
+    <%- partial('partial/footer') %>
+  </footer>
+
+  <%- js('https://unpkg.com/progressbar.js@latest/dist/progressbar.min.js', { defer: true }) %>
+  <%- js('https://unpkg.com/vue@latest/dist/vue.js', { defer: true }) %>
+  <%- js('https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.js', { defer: true }) %>
+  <%- js('js/main.js', { defer: true }) %>
+</body>
+</html>

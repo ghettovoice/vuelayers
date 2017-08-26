@@ -66,14 +66,6 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
-      },
-      {
-        test: /\.(geo)?json$/,
-        loader: 'json-loader'
-      },
-      {
-        test: /\.html/,
-        loader: 'text-loader'
       }
     ],
     noParse: [ /openlayers/ ]
