@@ -1,4 +1,3 @@
-require('babel-register')
 const config = require('../../build/config')
 
 // http://nightwatchjs.org/guide#settings-file

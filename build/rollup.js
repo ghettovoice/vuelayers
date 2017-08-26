@@ -183,17 +183,17 @@ function bundle (opts = {}) {
 
   return Promise.resolve(utils.ensureDir(path.dirname(dest)))
     .then(() => rollup.rollup({
-      entry: opts.entry,
+      input: opts.entry,
       external: opts.external,
       plugins
     }))
     .then(bundler => bundler.generate({
       format: opts.format,
       banner: config.banner,
-      moduleName: config.fullname,
+      name: config.fullname,
       // moduleId: config.name,
-      sourceMap: true,
-      sourceMapFile: dest,
+      sourcemap: true,
+      sourcemapFile: dest,
       globals: opts.globals
     }))
     .then(({ code, map }) => Promise.all([

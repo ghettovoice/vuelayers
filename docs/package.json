@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "hexo": {
-    "version": "3.3.6"
+    "version": "3.3.8"
   },
   "scripts": {
     "start": "hexo server --debug",
@@ -12,14 +12,14 @@
     "clean": "hexo clean"
   },
   "dependencies": {
-    "bulma": "^0.4.1",
-    "hexo": "^3.3.5",
-    "hexo-all-minifier": "^0.1.1",
-    "hexo-deployer-git": "^0.3.0",
-    "hexo-renderer-ejs": "^0.2.0",
-    "hexo-renderer-marked": "^0.2.10",
-    "hexo-renderer-scss": "^1.0.2",
-    "hexo-server": "^0.2.0",
+    "bulma": "^0.5.1",
+    "hexo": "^3.3.8",
+    "hexo-all-minifier": "^0.2.6",
+    "hexo-deployer-git": "^0.3.1",
+    "hexo-renderer-ejs": "^0.3.1",
+    "hexo-renderer-marked": "^0.3.0",
+    "hexo-renderer-scss": "^1.0.3",
+    "hexo-server": "^0.2.2",
     "lodash": "^4.17.4"
   }
 }

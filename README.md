@@ -75,7 +75,8 @@ new Vue({
 </script>
 <style>
   /* CSS file needs to be imported separately. */
-  @import "~vuelayers/dist/vuelayers.";
+  @import "~ol/ol.css";
+  @import "~vuelayers/dist/vuelayers.es.css";
 </style>
 ```
 
@@ -124,7 +125,7 @@ Example Babel config
 ```json
 {
   "presets": [
-    ["latest", "stage-2"]
+    ["env", "stage-2"]
   ],
   "plugins": [["component", [
     {

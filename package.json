@@ -20,9 +20,10 @@
     "travis": "npm run travis-test && npm run coveralls",
     "travis-test": "npm run unit && npm run e2e -- --env travis",
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls",
-    "demo": "node build/dev-server.js --conf=demo-dev",
-    "demo-build": "rm -rf ./dist-demo && cross-env NODE_ENV=production webpack --config=build/webpack.demo-prod.conf.js",
-    "demo-deploy": "gh-pages -d ./dist-demo"
+    "docs-start": "cd docs && npm start",
+    "docs-build": "cd docs && npm run build",
+    "docs-deploy": "cd docs && npm start",
+    "docs-clean": "cd docs && npm run clean"
   },
   "directories": {
     "lib": "dist",
@@ -78,7 +79,6 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-0": "^6.24.1",
-    "babel-register": "^6.26.0",
     "chai": "^4.1.1",
     "chalk": "^2.1.0",
     "chromedriver": "^2.31.0",
@@ -104,7 +104,7 @@
     "file-loader": "^0.11.2",
     "friendly-errors-webpack-plugin": "^1.6.1",
     "fs-extra": "^4.0.1",
-    "geckodriver": "^1.8.0",
+    "geckodriver": "^1.8.1",
     "gh-pages": "^1.0.0",
     "glob": "^7.1.2",
     "highlight.js": "^9.12.0",
@@ -133,14 +133,14 @@
     "postcss": "^6.0.9",
     "rollup": "^0.48.2",
     "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-commonjs": "^8.1.0",
+    "rollup-plugin-commonjs": "^8.2.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-uglify": "^2.0.1",
     "rollup-plugin-vue": "^2.4.1",
     "rollup-pluginutils": "^2.0.1",
     "sass-loader": "^6.0.6",
-    "selenium-server": "^3.5.0",
+    "selenium-server": "^3.5.2",
     "sinon": "^3.2.1",
     "sinon-chai": "^2.13.0",
     "text-loader": "0.0.1",
@@ -169,6 +169,5 @@
     "README.md",
     "dist",
     "src"
-  ],
-  "false": {}
+  ]
 }
