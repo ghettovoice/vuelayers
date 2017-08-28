@@ -7,6 +7,7 @@
   "main": "dist/vuelayers.cjs.js",
   "module": "dist/vuelayers.es.js",
   "scripts": {
+    "install": "npm run docs-install",
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
     "rollup": "node build/rollup.js",
@@ -20,6 +21,7 @@
     "travis": "npm run travis-test && npm run coveralls",
     "travis-test": "npm run unit && npm run e2e -- --env travis",
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls",
+    "docs-install": "cd docs && npm install",
     "docs-start": "cd docs && npm start",
     "docs-build": "cd docs && npm run build",
     "docs-deploy": "cd docs && npm start",

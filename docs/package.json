@@ -18,7 +18,7 @@
     "hexo-deployer-git": "^0.3.1",
     "hexo-renderer-ejs": "^0.3.1",
     "hexo-renderer-marked": "^0.3.0",
-    "hexo-renderer-scss": "^1.0.3",
+    "hexo-renderer-sass": "^0.3.2",
     "hexo-server": "^0.2.2",
     "lodash": "^4.17.4"
   }
