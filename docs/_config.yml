@@ -4,8 +4,8 @@
 
 # Site
 title: VueLayers.js
-subtitle: Vue.js components for OpenLayers
-description: Vue.js components for OpenLayers
+subtitle: Vue.js components to work with OpenLayers
+description: Vue.js components to work with OpenLayers
 keywords: vuelayers, vuejs, vuejs plugins, vuejs components, openlayers, ol, web maps, vuejs maps
 author: Vladimir Vershinin
 language:
@@ -84,7 +84,7 @@ markdown:
   smartLists: true
   smartypants: true
 
-# SCSS settings
+# SASS settings
 node_sass:
   debug: false
   outputStyle: nested

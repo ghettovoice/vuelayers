@@ -1,0 +1,65 @@
+/*! VueLayers.js site */
+@import "variables"
+// Import Bulma and Buefy styles
+@import "../../../../node_modules/bulma/bulma"
+@import "helpers"
+@import "base"
+@import "loader"
+
+// Page loader
+#page-loader
+  position: absolute
+  left: 0
+  top: 0
+  right: 0
+  bottom: 0
+  background: $white
+  z-index: 99999
+  opacity: 1
+  transition: opacity ease-out 1s
+
+  .rotating-loader
+    position: absolute
+    top: 50%
+    left: 50%
+    margin-top: -40px
+    margin-left: -40px
+
+  &.hidden
+    opacity: 0
+
+// header
+#header
+  width: 100%
+
+// Sidebars
+#left-sidebar
+  // Menu
+  .menu
+    padding: 1rem .75rem
+
+    +desktop()
+      padding: 1.25rem
+
+// Main section
+#main
+  position: relative
+  width: 100%
+
+// Footer
+#footer
+  position: relative
+
+// Home
+.is-home
+  position: relative
+
+  #bg-map
+    height: 200px
+
+  .intro
+    background: rgba(255, 255, 255, .6)
+
+    .buttons
+      .button
+        display: flex

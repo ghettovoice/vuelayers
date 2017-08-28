@@ -1,25 +1,21 @@
 <% /* global config, theme, partial */ %>
-<div id="bg-map" class="map-container" inline>
-  <vl-map :def-controls="false" ref="map">
-    <vl-view :zoom="2"></vl-view>
+<div class="is-home">
+  <div id="bg-map" class="map-container" inline>
+    <%- partial('partial/vl-map') %>
+  </div>
 
-    <vl-layer-tile>
-      <vl-source-sputnik></vl-source-sputnik>
-    </vl-layer-tile>
-  </vl-map>
-</div>
+  <section class="section intro">
+    <h1 class="title has-text-centered"><%= page.title %></h1>
+    <h2 class="subtitle has-text-centered">
+      <a href="https://vuejs.org/" title="Vue.js Home" target="_blank">Vue.js</a> components to work with
+      <a href="https://openlayers.org/" title="OpenLayers Home" target="_blank">OpenLayers</a>
+    </h2>
 
-<section class="section">
-  <h1 class="title has-text-centered"><%= page.title %></h1>
-  <h2 class="subtitle has-text-centered">
-    <a href="https://vuejs.org/" title="Vue.js Home" target="_blank">Vue.js</a> components for
-    <a href="https://openlayers.org/" title="OpenLayers Home" target="_blank">OpenLayers</a>
-  </h2>
+    <div class="content has-text-centered">
+      <pre class="is-medium">npm install <%= theme.pkg.name %></pre>
+    </div>
 
-  <div class="content has-text-centered">
-    <pre class="is-medium">npm install <%= theme.pkg.name %></pre>
-
-    <p>
+    <div class="buttons is-flex-desktop is-flex-justify-center">
       <a class="button is-success is-large"
          href="<%= ghUrl(theme.pkg.author.user, theme.pkg.name, 'download', { tag: 'v' + theme.pkg.version }) %>"
          title="Download latest version">
@@ -35,33 +31,31 @@
           <i class="fa fa-arrow-right"></i>
         </span>
       </a>
-    </p>
-
-    <p>
-      v<%= theme.pkg.version %>
-    </p>
-
+    </div>
     <hr>
-
-    <p>
-      <%- partial('partial/github-button', {
-        type: 'star',
-        user: theme.pkg.author.user,
-        repo: theme.pkg.name,
-        size: 'large',
-        count: true,
-        width: '120px',
-        height: '30px'
-      }) %>
-      <% /* partial('partial/github-button', {
-       type: 'fork',
-       user: theme.pkg.author.user,
-       repo: theme.pkg.name,
-       count: true,
-       size: 'large',
-       width: '120px',
-       height: '30px'
-       }) */ %>
-    </p>
-  </div>
-</section>
+    <div class="links is-flex is-flex-justify-center">
+      <div class="link">
+        <%- partial('partial/github-button', {
+          type: 'star',
+          user: theme.pkg.author.user,
+          repo: theme.pkg.name,
+          size: 'large',
+          count: true,
+          width: '120px',
+          height: '30px'
+        }) %>
+      </div>
+      <div class="link">
+        <%- partial('partial/github-button', {
+          type: 'fork',
+          user: theme.pkg.author.user,
+          repo: theme.pkg.name,
+          count: true,
+          size: 'large',
+          width: '120px',
+          height: '30px'
+        }) %>
+      </div>
+    </div>
+  </section>
+</div>

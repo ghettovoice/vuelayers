@@ -13,11 +13,22 @@
    ------------------------------ */
   function init () {
     // run bg map on home
-    if (document.body.classList.contains('is-home')) {
+    var bgMapElem = document.getElementById('bg-map')
+    if (bgMapElem) {
       Vue.use(VueLayers)
 
       var root = new Vue({
-        el: '#bg-map'
+        el: '#bg-map',
+        data () {
+          return {
+            position: []
+          }
+        },
+        methods: {
+          updateGeoloc (evt) {
+            this.position = evt.position
+          }
+        }
       })
 
       return new Promise(function (resolve) {

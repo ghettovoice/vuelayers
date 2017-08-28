@@ -1,0 +1,23 @@
+<vl-map :def-controls="false" ref="map">
+  <vl-view :zoom="2" :min-zoom="2"></vl-view>
+
+  <vl-geoloc @change="updateGeoloc"></vl-geoloc>
+
+  <vl-layer-tile>
+    <vl-source-sputnik></vl-source-sputnik>
+  </vl-layer-tile>
+
+  <!-- current position overlay -->
+  <vl-layer-vector v-if="position.length" id="geoloc-layer" :z-index="100" :overlay="true">
+    <vl-style-container>
+      <vl-style-icon src="/images/marker.png" :scale="0.3" :anchor="[0.5, 1]"/>
+    </vl-style-container>
+
+    <vl-source-vector>
+      <vl-feature id="geoloc" :z-index="999">
+        <vl-geom-point :coordinates="position"/>
+      </vl-feature>
+    </vl-source-vector>
+  </vl-layer-vector>
+  <!--// current position overlay -->
+</vl-map>

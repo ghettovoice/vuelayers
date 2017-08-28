@@ -23,7 +23,7 @@
 
   <%- partial('partial/ga') %>
 </head>
-<body class="<%= is_home() ? 'is-home' : '' %>">
+<body class="<%= is_home() ? 'is-home-layout' : '' %>">
   <div id="page-loader">
     <div class="rotating-loader"></div>
   </div>
@@ -32,14 +32,8 @@
     <%- partial('partial/header') %>
   </header>
 
-  <aside id="left-sidebar" class="sidebar">
-    <%- partial('partial/left-sidebar') %>
-  </aside>
-
   <main id="main" class="is-relative">
-    <div class="page">
-      <%- body %>
-    </div>
+    <%- body %>
   </main>
 
   <footer id="footer" class="footer">
