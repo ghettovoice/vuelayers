@@ -8,6 +8,7 @@ import { isPlainObject } from 'lodash/fp'
 import { EPSG_4326, geoJson } from '../../ol-ext'
 import source from './source'
 import * as assert from '../../utils/assert'
+import mergeDescriptors from '../../utils/multi-merge-descriptors'
 
 const props = {
   projection: {
@@ -95,6 +96,17 @@ const methods = {
    */
   getFeatures () {
     return Object.values(this._features)
+  },
+  /**
+   * @return {Object}
+   * @protected
+   */
+  getServices () {
+    const vm = this
+
+    return mergeDescriptors(this::source.methods.getServices(), {
+      get featureContainer () { return vm }
+    })
   },
   /**
    * @return {Promise}

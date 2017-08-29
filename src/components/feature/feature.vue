@@ -8,8 +8,10 @@
   import Vue from 'vue'
   import uuid from 'uuid/v4'
   import Feature from 'ol/feature'
-  import { isPlainObject } from 'lodash/fp'
+  import { isPlainObject, isEqual } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/throttleTime'
   import '../../rx-ext'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import plainProps from '../../utils/plain-props'
@@ -188,6 +190,10 @@
       this._geometry = undefined
 
       Object.defineProperties(this, {
+        $featuresContainer: {
+          enumerable: true,
+          get: this.$services && this.$services.featuresContainer
+        },
         $feature: {
           enumerable: true,
           get: this.getFeature
@@ -222,11 +228,17 @@
   function subscribeToFeatureChanges () {
     assert.hasFeature(this)
 
+    const getPropValue = prop => this.$feature.get(prop)
     const ft = 100
-    const events = Observable.fromOlChangeEvent(this.$feature, 'geometry', true, ft)
+    const events = Observable.fromOlEvent(this.$feature, 'change', ({ key }) => ({ prop: key, value: getPropValue(key) }))
+      .throttleTime(ft)
+      .distinctUntilChanged(isEqual)
 
-    this.subscribeTo(events, () => {
+    this.subscribeTo(events, ({ prop, value }) => {
       ++this.rev
+      if (prop !== this.$feature.getGeometryName()) {
+        this.pr
+      }
     })
   }
 </script>
