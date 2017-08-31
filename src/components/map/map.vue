@@ -19,6 +19,9 @@
   import '../../rx-ext'
   import { proj as projHelper } from '../../ol-ext'
   import cmp from '../ol-cmp'
+  import layersContainer from '../layers-container'
+  import interactionsContainer from '../interactions-container'
+  import overlaysContainer from '../overlays-container'
   import * as assert from '../../utils/assert'
 
   const props = {
@@ -48,139 +51,56 @@
     }
   }
 
-  // todo add getLayerById, getInteractionById
   const methods = {
     /**
-     * @param {ol.layer.Layer|Vue} layer
-     * @return {void}
+     * @return {{
+     *    hasLayer: function(ol.Layer),
+     *    addLayer: function(ol.Layer),
+     *    removeLayer: function(ol.Layer)
+     *  }|undefined}
+     *  @protected
      */
-    addLayer (layer) {
-      layer = layer instanceof Vue ? layer.$layer : layer
+    getLayersTarget () {
+      if (!this.$map) return
 
-      if (!layer) return
+      const layers = this.$map.getLayers()
 
-      if (!this._layers[layer.get('id')]) {
-        this._layers[layer.get('id')] = layer
-      }
-      if (this.$map && !this.$map.getLayers().getArray().includes(layer)) {
-        this.$map.addLayer(layer)
-      }
-    },
-    /**
-     * @param {ol.layer.Layer|Vue} layer
-     * @return {void}
-     */
-    removeLayer (layer) {
-      layer = layer instanceof Vue ? layer.$layer : layer
-
-      if (!layer) return
-
-      delete this._layers[layer.get('id')]
-
-      if (this.$map && this.$map.getLayers().getArray().includes(layer)) {
-        this.$map.removeLayer(layer)
+      return {
+        hasLayer (layer) {
+          return layers.getArray().includes(layer)
+        },
+        addLayer (layer) {
+          this.$map.addLayer(layer)
+        },
+        removeLayer (layer) {
+          this.map.removeLayer(layer)
+        }
       }
     },
     /**
-     * @return {ol.layer.Layer[]}
+     * @return {{
+     *     hasInteraction: function(ol.interaction.Interaction): bool,
+     *     addInteraction: function(ol.interaction.Interaction): void,
+     *     removeInteraction: function(ol.interaction.Interaction): void
+     *   }|undefined}
+     * @protected
      */
-    getLayers () {
-      return Object.values(this._layers)
-    },
-    /**
-     * @param {ol.interaction.Interaction|Vue} interaction
-     * @return {void}
-     */
-    addInteraction (interaction) {
-      interaction = interaction instanceof Vue ? interaction.$interaction : interaction
+    getInteractionsTarget () {
+      if (!this.$map) return
 
-      if (!interaction) return
+      const interactions = this.$map.getInteractions()
 
-      if (!this._interactions[interaction.get('id')]) {
-        this._interactions[interaction.get('id')] = interaction
+      return {
+        hasInteraction (interaction) {
+          return interactions.getArray().includes(interaction)
+        },
+        addInteraction (interaction) {
+          this.$map.addInteraction(interaction)
+        },
+        removeInteraction (interaction) {
+          this.$map.removeInteraction(interaction)
+        }
       }
-      if (this.$map && !this.$map.getInteractions().getArray().includes(interaction)) {
-        this.$map.addInteraction(interaction)
-      }
-    },
-    /**
-     * @param {ol.interaction.Interaction|Vue} interaction
-     * @return {void}
-     */
-    removeInteraction (interaction) {
-      interaction = interaction instanceof Vue ? interaction.$interaction : interaction
-
-      if (!interaction) return
-
-      delete this._interactions[interaction.get('id')]
-
-      if (this.$map && this.$map.getInteractions().getArray().includes(interaction)) {
-        this.$map.removeInteraction(interaction)
-      }
-    },
-    /**
-     * @return {ol.interaction.Interaction[]}
-     */
-    getInteractions () {
-      return Object.values(this._interactions)
-    },
-    /**
-     * @param {ol.Overlay|Vue} overlay
-     * @return {void}
-     */
-    addOverlay (overlay) {
-      overlay = overlay instanceof Vue ? overlay.$overlay : overlay
-
-      if (!overlay) return
-
-      if (!this._overlays[overlay.getId()]) {
-        this._overlays[overlay.getId()] = overlay
-      }
-      if (this.$map && !this.$map.getOverlays().getArray().includes(overlay)) {
-        this.$map.addOverlay(overlay)
-      }
-    },
-    /**
-     * @param {ol.Overlay|Vue} overlay
-     * @return {void}
-     */
-    removeOverlay (overlay) {
-      overlay = overlay instanceof Vue ? overlay.$overlay : overlay
-
-      if (!overlay) return
-
-      delete this._overlays[overlay.getId()]
-
-      if (this.$map && this.$map.getOverlays().getArray().includes(overlay)) {
-        this.$map.removeOverlay(overlay)
-      }
-    },
-    /**
-     * @return {ol.Overlay[]}
-     */
-    getOverlays () {
-      return Object.values(this._overlays)
-    },
-    /**
-     * @param {string|number} id
-     * @return {ol.Overlay|undefined}
-     */
-    getOverlayById (id) {
-      return this._overlays[id]
-    },
-    /**
-     * @param {string|number} id
-     * @return {ol.layer.Layer|undefined}
-     */
-    getLayerById (id) {
-      return this._layers[id]
-    },
-    /**
-     * @param {string|number} id
-     * @return {ol.interaction.Interaction|undefined}
-     */
-    getInteractionById (id) {
-      return this._interactions[id]
     },
     /**
      * @return {ol.Map}
@@ -256,7 +176,10 @@
 
       return mergeDescriptors(this::cmp.methods.getServices(), {
         get map () { return vm.$map },
-        get view () { return vm.$view }
+        get view () { return vm.$view },
+        get layersContainer () { return vm },
+        get interactionsContainer () { return vm },
+        get overlaysContainer () { return vm }
       })
     },
     /**
@@ -321,7 +244,7 @@
 
   export default {
     name: 'vl-map',
-    mixins: [cmp],
+    mixins: [cmp, layersContainer, interactionsContainer, overlaysContainer],
     props,
     methods,
     created () {
@@ -330,21 +253,6 @@
        * @private
        */
       this._view = undefined
-      /**
-       * @type {Object<string, ol.layer.Layer>}
-       * @private
-       */
-      this._layers = Object.create(null)
-      /**
-       * @type {Object<string, ol.interaction.Interaction>}
-       * @private
-       */
-      this._interactions = Object.create(null)
-      /**
-       * @type {Object<string, ol.Overlay>}
-       * @private
-       */
-      this._overlays = Object.create(null)
 
       Object.defineProperties(this, {
         $map: {
@@ -354,26 +262,11 @@
         $view: {
           enumerable: true,
           get: this.getView
-        },
-        $layers: {
-          enumerable: true,
-          get: this.getLayers
-        },
-        $interactions: {
-          enumerable: true,
-          get: this.getInteractions
-        },
-        $overlays: {
-          enumerable: true,
-          get: this.getOverlays
         }
       })
     },
     destroyed () {
       this._view = undefined
-      this._layers = Object.create(null)
-      this._interactions = Object.create(null)
-      this._overlays = Object.create(null)
     }
   }
 

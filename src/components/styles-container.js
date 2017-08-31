@@ -1,5 +1,5 @@
 /**
- * @module components/style-target
+ * @module components/styles-container
  */
 import Vue from 'vue'
 import { filter, flow, isFunction, map } from 'lodash/fp'

@@ -13,7 +13,7 @@
   import '../../rx-ext'
   import Overlay from 'ol/overlay'
   import cmp from '../ol-cmp'
-  import useMapCmp from '../ol-use-map-cmp'
+  import useMapCmp from '../use-map-cmp'
   import { OVERLAY_POSITIONING, proj as projHelper } from '../../ol-ext'
   import * as assert from '../../utils/assert'
 

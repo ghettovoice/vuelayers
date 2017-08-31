@@ -5,21 +5,26 @@
 </template>
 
 <script>
-  import Vue from 'vue'
   import uuid from 'uuid/v4'
   import Feature from 'ol/feature'
-  import { isPlainObject, isEqual } from 'lodash/fp'
+  import { isEqual, merge } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/observable/merge'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/mergeAll'
   import '../../rx-ext'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import plainProps from '../../utils/plain-props'
   import cmp from '../ol-cmp'
-  import useMapCmp from '../ol-use-map-cmp'
-  import styleTarget from '../style-target'
+  import useMapCmp from '../use-map-cmp'
+  import styleContainer from '../styles-container'
+  import geometryContainer from '../geometry-container'
   import { geoJson } from '../../ol-ext'
   import * as assert from '../../utils/assert'
+
+  const mergeNArg = merge.convert({ fixed: false })
 
   const props = {
     id: {
@@ -54,7 +59,7 @@
        */
       let feature = new Feature(this.properties)
       feature.setId(this.id)
-      feature.setGeometry(this._geometry)
+      feature.setGeometry(this.$geometry)
 
       return feature
     },
@@ -65,29 +70,14 @@
       return this.$olObject
     },
     /**
-     * @return {ol.geom.Geometry|undefined}
+     * @return {{
+     *     getGeometry: function(): ol.geom.Geometry|undefined,
+     *     setGeometry: function(ol.geom.Geometry|undefined)
+     *   }|ol.Feature|undefined}
+     * @protected
      */
-    getGeometry () {
-      return this._geometry
-    },
-    /**
-     * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
-     * @return {void}
-     * @throws {AssertionError}
-     */
-    setGeometry (geom) {
-      if (geom instanceof Vue) {
-        geom = geom.$geometry
-      } else if (isPlainObject(geom)) {
-        assert.hasView(this)
-        geom = geoJson.readGeometry(geom, this.$view.getProjection())
-      }
-      if (geom !== this._geometry) {
-        this._geometry = geom
-      }
-      if (this.$feature && geom !== this.$feature.getGeometry()) {
-        this.$feature.setGeometry(geom)
-      }
+    getGeometryTarget () {
+      return this.$feature
     },
     /**
      * @return {Object}
@@ -97,7 +87,8 @@
       const vm = this
 
       return mergeDescriptors(this::cmp.methods.getServices(), {
-        get feature () { return vm.$feature }
+        get feature () { return vm.$feature },
+        get geometryContainer () { return vm }
       })
     },
     /**
@@ -125,7 +116,7 @@
      * @protected
      */
     mount () {
-      this.$parent && this.$parent.addFeature(this)
+      this.$featuresContainer && this.$featuresContainer.addFeature(this)
       this.subscribeAll()
     },
     /**
@@ -134,7 +125,7 @@
      */
     unmount () {
       this.unsubscribeAll()
-      this.$parent && this.$parent.removeFeature(this)
+      this.$featuresContainer && this.$featuresContainer.removeFeature(this)
     },
     /**
      * @return {void}
@@ -158,42 +149,34 @@
      * @param {Object} value
      */
     properties (value) {
-      this.$feature && this.$feature.setProperties(plainProps(value))
+      value = plainProps(value)
+      if (this.$feature && !isEqual(value, plainProps(this.$feature.getProperties()))) {
+        this.$feature.setProperties(plainProps(value))
+      }
     }
   }
 
   export default {
     name: 'vl-feature',
-    mixins: [cmp, useMapCmp, styleTarget],
+    mixins: [cmp, useMapCmp, geometryContainer, styleContainer],
     props,
     computed,
     methods,
     watch,
-    stubVNode: {
-      attrs () {
-        return {
-          id: [this.$options.name, this.id].join('-'),
-          class: this.$options.name
-        }
-      }
-    },
     data () {
       return {
         rev: 1
       }
     },
     created () {
-      /**
-       * @type {ol.geom.Geometry|undefined}
-       * @private
-       */
-      this._geometry = undefined
-
       Object.defineProperties(this, {
         $featuresContainer: {
           enumerable: true,
           get: this.$services && this.$services.featuresContainer
         },
+        /**
+         * @type {ol.Feature|undefined}
+         */
         $feature: {
           enumerable: true,
           get: this.getFeature
@@ -209,15 +192,8 @@
         $view: {
           enumerable: true,
           get: () => this.$services && this.$services.view
-        },
-        $geometry: {
-          enumerable: true,
-          get: this.getGeometry
         }
       })
-    },
-    destroyed () {
-      this._geometry = undefined
     }
   }
 
@@ -230,14 +206,38 @@
 
     const getPropValue = prop => this.$feature.get(prop)
     const ft = 100
-    const events = Observable.fromOlEvent(this.$feature, 'change', ({ key }) => ({ prop: key, value: getPropValue(key) }))
+    // all plain properties
+    const propChanges = Observable.fromOlEvent(
+      this.$feature,
+      'propertychange',
+      ({ key }) => ({ prop: key, value: getPropValue(key) })
+    ).throttleTime(ft)
+      .distinctUntilChanged(isEqual)
+    // id, style and other generic changes
+    const changes = Observable.fromOlEvent(
+      this.$feature,
+      'change'
+    ).map(() => Observable.create(obs => {
+      if (this.$feature.getId() !== this.id) {
+        obs.next({ prop: 'id', value: this.$feature.getId() })
+      }
+      // todo style?
+    })).mergeAll()
       .throttleTime(ft)
       .distinctUntilChanged(isEqual)
+    // all changes
+    const allChanges = Observable.merge(
+      propChanges,
+      changes
+    )
 
-    this.subscribeTo(events, ({ prop, value }) => {
+    this.subscribeTo(allChanges, ({ prop, value }) => {
       ++this.rev
-      if (prop !== this.$feature.getGeometryName()) {
-        this.pr
+
+      if (prop === 'id') {
+        this.$emit(`update:${prop}`, value)
+      } else if (prop !== this.$feature.getGeometryName()) {
+        this.$emit('update:properties', mergeNArg({}, this.properties, { prop: value }))
       }
     })
   }

@@ -267,19 +267,16 @@
     })).debounceTime(2 * ft)
       .distinctUntilChanged(isEqual)
 
-    const events = Observable.merge(
+    const changes = Observable.merge(
       Observable.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
       Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
       zoom
-    ).map(({ prop, value }) => ({
-      name: `update:${prop}`,
-      value
-    }))
+    )
 
-    this.subscribeTo(events, ({ name, value }) => {
+    this.subscribeTo(changes, ({ prop, value }) => {
       ++this.rev
-      this.$emit(name, value)
+      this.$emit(`update:${prop}`, value)
     })
   }
 

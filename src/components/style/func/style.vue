@@ -8,7 +8,7 @@
   import * as vlol from '../../../ol-ext'
   import { warndbg } from '../../../utils/debug'
   import style from '../style'
-  import styleTarget from '../../style-target'
+  import styleContainer from '../../styles-container'
   import * as assert from '../../../utils/assert'
 
   const props = {

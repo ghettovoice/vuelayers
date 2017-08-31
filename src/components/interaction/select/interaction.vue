@@ -16,7 +16,7 @@
   import { Observable } from 'rxjs/Observable'
   import '../../../rx-ext'
   import interaction from '../interaction'
-  import styleTarget from '../../style-target'
+  import stylesContainer from '../../styles-container'
   import * as assert from '../../../utils/assert'
 
   // todo add other options, like event modifiers
@@ -48,13 +48,6 @@
   }
 
   const computed = {
-    currentSelected () {
-      if (this.rev) {
-        return this.$features.map(extractId)
-      }
-
-      return []
-    }
   }
 
   const methods = {
@@ -229,7 +222,7 @@
 
   export default {
     name: 'vl-interaction-select',
-    mixins: [interaction, styleTarget],
+    mixins: [interaction, stylesContainer],
     props,
     computed,
     methods,

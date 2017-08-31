@@ -58,6 +58,7 @@
       <w>postcss</w>
       <w>prepatch</w>
       <w>proj</w>
+      <w>propertychange</w>
       <w>regenerator</w>
       <w>removefeature</w>
       <w>reproj</w>

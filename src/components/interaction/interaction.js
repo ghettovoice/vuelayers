@@ -1,7 +1,7 @@
 import uuid from 'uuid/v4'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import useMapCmp from '../ol-use-map-cmp'
+import useMapCmp from '../use-map-cmp'
 
 const props = {
   id: {
@@ -70,7 +70,7 @@ const methods = {
    * @protected
    */
   mount () {
-    this.$parent && this.$parent.addInteraction(this)
+    this.$interactionsContainer && this.$interactionsContainer.addInteraction(this)
     this.subscribeAll()
   },
   /**
@@ -79,7 +79,7 @@ const methods = {
    */
   unmount () {
     this.unsubscribeAll()
-    this.$parent && this.$parent.removeInteraction(this)
+    this.$interactionsContainer && this.$interactionsContainer.removeInteraction(this)
   },
   /**
    * @return {Promise}
@@ -109,6 +109,9 @@ export default {
   },
   created () {
     Object.defineProperties(this, {
+      /**
+       * @type {ol.interaction.Interaction|undefined}
+       */
       $interaction: {
         enumerable: true,
         get: this.getInteraction
@@ -120,6 +123,10 @@ export default {
       $view: {
         enumerable: true,
         get: () => this.$services && this.$services.view
+      },
+      $interactionsContainer: {
+        enumerable: true,
+        get: () => this.$services && this.$services.interactionsContainer
       }
     })
   }

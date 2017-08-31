@@ -2,7 +2,8 @@ import Vue from 'vue'
 import uuid from 'uuid/v4'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import useMapCmp from '../ol-use-map-cmp'
+import useMapCmp from '../use-map-cmp'
+import sourceContainer from '../source-container'
 import * as assert from '../../utils/assert'
 
 const props = {
@@ -84,39 +85,30 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get layer () { return vm.$layer }
+      get layer () { return vm.$layer },
+      get sourceContainer () { return vm }
     })
   },
   /**
-   * @return {ol.source.Source|undefined}
+   * @return {{
+   *     setSource: function(ol.source.Source): void,
+   *     getSource: function(): ol.source.Source
+   *   }|undefined}
+   * @protected
    */
-  getSource () {
-    return this._source
-  },
-  /**
-   * @param {ol.source.Source|Vue|undefined} source
-   * @return {void}
-   */
-  setSource (source) {
-    source = source instanceof Vue ? source.$source : source
-
-    if (source !== this._source) {
-      this._source = source
-    }
-    if (this.$layer && source !== this.$layer.getSource()) {
-      this.$layer.setSource(source)
-    }
+  getSourceTarget () {
+    return this.$layer
   },
   /**
    * @return {void}
    * @protected
    */
   mount () {
-    if (this.$parent) {
+    if (this.$layersContainer) {
       if (this.overlay) {
-        this.setMap(this.$parent)
+        this.setMap(this.$layersContainer)
       } else {
-        this.$parent.addLayer(this)
+        this.$layersContainer.addLayer(this)
       }
     }
 
@@ -129,11 +121,11 @@ const methods = {
   unmount () {
     this.unsubscribeAll()
 
-    if (this.$parent) {
+    if (this.$layersContainer) {
       if (this.overlay) {
         this.setMap(undefined)
       } else {
-        this.$parent.removeLayer(this)
+        this.$layersContainer.removeLayer(this)
       }
     }
   },
@@ -189,7 +181,7 @@ const watch = {
 }
 
 export default {
-  mixins: [cmp, useMapCmp],
+  mixins: [cmp, useMapCmp, sourceContainer],
   props,
   methods,
   watch,
@@ -202,20 +194,13 @@ export default {
     }
   },
   created () {
-    /**
-     * @type {ol.source.Source|undefined}
-     * @private
-     */
-    this._source = undefined
-
     Object.defineProperties(this, {
+      /**
+       * @type {ol.layer.Layer|undefined}
+       */
       $layer: {
         enumerable: true,
         get: this.getLayer
-      },
-      $source: {
-        enumerable: true,
-        get: this.getSource
       },
       $map: {
         enumerable: true,
@@ -224,10 +209,11 @@ export default {
       $view: {
         enumerable: true,
         get: () => this.$services && this.$services.view
+      },
+      $layersContainer: {
+        enumerable: true,
+        get: () => this.$services && this.$services.layersContainer
       }
     })
-  },
-  destroyed () {
-    this._source = undefined
   }
 }

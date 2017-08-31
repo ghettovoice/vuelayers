@@ -1,7 +1,7 @@
 <script>
   import VectorLayer from 'ol/layer/vector'
   import layer from '../layer'
-  import styleTarget from '../../style-target'
+  import styleContainer from '../../styles-container'
 
   const props = {
     updateWhileAnimating: Boolean,
