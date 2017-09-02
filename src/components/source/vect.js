@@ -1,12 +1,10 @@
-import Vue from 'vue'
-import uuid from 'uuid/v4'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/merge'
 import 'rxjs/add/operator/do'
 import '../../rx-ext'
-import { isPlainObject } from 'lodash/fp'
-import { EPSG_4326, geoJson } from '../../ol-ext'
+import { EPSG_4326 } from '../../ol-ext'
 import source from './source'
+import featuresContainer from '../features-container'
 import * as assert from '../../utils/assert'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 
@@ -23,61 +21,6 @@ const props = {
 
 const methods = {
   /**
-   * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
-   * @return {void}
-   */
-  addFeatures (features) {
-    features.forEach(this.addFeature)
-  },
-  /**
-   * @param {ol.Feature|Vue|GeoJSONFeature} feature
-   * @return {void}
-   */
-  addFeature (feature) {
-    assert.hasView(this)
-
-    if (feature instanceof Vue) {
-      feature = feature.$feature
-    } else if (isPlainObject(feature)) {
-      feature = geoJson.readFeature(feature, this.$view.getProjection())
-    }
-
-    this.prepareFeature(feature)
-
-    if (!this._features[feature.getId()]) {
-      this._features[feature.getId()] = feature
-    }
-    if (this.$source && !this.$source.getFeatureById(feature.getId())) {
-      this.$source.addFeature(feature)
-    }
-  },
-  /**
-   * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
-   * @return {void}
-   */
-  removeFeatures (features) {
-    features.forEach(this.removeFeature)
-  },
-  /**
-   * @param {ol.Feature|Vue|GeoJSONFeature} feature
-   * @return {void}
-   */
-  removeFeature (feature) {
-    if (feature instanceof Vue) {
-      feature = feature.$feature
-    } else if (isPlainObject(feature)) {
-      feature = this._features[feature.id]
-    }
-
-    if (!feature) return
-
-    delete this._features[feature.getId()]
-
-    if (this.$source && this.$source.getFeatureById(feature.getId())) {
-      this.$source.removeFeature(feature)
-    }
-  },
-  /**
    * @return {void}
    */
   clear () {
@@ -85,17 +28,29 @@ const methods = {
     this.$source && this.$source.clear()
   },
   /**
-   * @param {string|number} id
-   * @return {ol.Feature|undefined}
+   * @return {{
+   *     addFeature: function(ol.Feature): void,
+   *     removeFeature: function(ol.Feature): void,
+   *     hasFeature: function(ol.Feature): bool
+   *   }|undefined}
+   * @protected
    */
-  getFeatureById (id) {
-    return this._features[id]
-  },
-  /**
-   * @return {ol.Feature[]}
-   */
-  getFeatures () {
-    return Object.values(this._features)
+  getFeaturesTarget () {
+    if (!this.$source) return
+
+    const source = this.$source
+
+    return {
+      hasFeature (feature) {
+        return source.getFeatureById(feature.getId()) != null
+      },
+      addFeature (feature) {
+        source.addFeature(feature)
+      },
+      removeFeature (feature) {
+        source.removeFeature(feature)
+      }
+    }
   },
   /**
    * @return {Object}
@@ -105,7 +60,7 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::source.methods.getServices(), {
-      get featureContainer () { return vm }
+      get featuresContainer () { return vm }
     })
   },
   /**
@@ -137,18 +92,6 @@ const methods = {
     this::source.methods.unmount()
   },
   /**
-   * @param {ol.Feature} feature
-   * @return {ol.Feature}
-   * @protected
-   */
-  prepareFeature (feature) {
-    if (feature.getId() == null) {
-      feature.setId(uuid())
-    }
-
-    return feature
-  },
-  /**
    * @return {void}
    * @protected
    */
@@ -158,7 +101,7 @@ const methods = {
 }
 
 export default {
-  mixins: [source],
+  mixins: [source, featuresContainer],
   props,
   methods,
   stubVNode: {
@@ -168,23 +111,6 @@ export default {
         class: this.$options.name
       }
     }
-  },
-  created () {
-    /**
-     * @type {Object<string, ol.Feature>}
-     * @private
-     */
-    this._features = Object.create(null)
-
-    Object.defineProperties(this, {
-      $features: {
-        enumerable: true,
-        get: this.getFeatures
-      }
-    })
-  },
-  destroyed () {
-    this._features = Object.create(null)
   }
 }
 

@@ -64,7 +64,7 @@ const methods = {
    * @protected
    */
   mount () {
-    this.$parent && this.$parent.setSource(this)
+    this.$sourceContainer && this.$sourceContainer.setSource(this)
     this.subscribeAll()
   },
   /**
@@ -73,7 +73,7 @@ const methods = {
    */
   unmount () {
     this.unsubscribeAll()
-    this.$parent && this.$parent.setSource(undefined)
+    this.$sourceContainer && this.$sourceContainer.setSource(undefined)
   },
   /**
    * @return {Promise}
@@ -112,6 +112,10 @@ export default {
       $view: {
         enumerable: true,
         get: () => this.$services && this.$services.view
+      },
+      $sourceContainer: {
+        enumerable: true,
+        get: () => this.$services && this.$services.sourceContainer
       }
     })
   }

@@ -170,10 +170,6 @@
     },
     created () {
       Object.defineProperties(this, {
-        $featuresContainer: {
-          enumerable: true,
-          get: this.$services && this.$services.featuresContainer
-        },
         /**
          * @type {ol.Feature|undefined}
          */
@@ -192,6 +188,10 @@
         $view: {
           enumerable: true,
           get: () => this.$services && this.$services.view
+        },
+        $featuresContainer: {
+          enumerable: true,
+          get: this.$services && this.$services.featuresContainer
         }
       })
     }

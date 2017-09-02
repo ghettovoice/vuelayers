@@ -1,8 +1,8 @@
 <script>
   import VectorSource from 'ol/source/vector'
   import { differenceWith, stubArray, isFunction } from 'lodash/fp'
-  import * as vlol from '../../../ol-ext'
   import vectSource from '../vect'
+  import { loadStrategy } from '../../../ol-ext'
 
   const props = {
     /**
@@ -14,22 +14,22 @@
     },
     /**
      * Source loader factory
-     * @type {function(vlol: Object): ol.FeatureLoader|undefined} loaderFactory
+     * @type {function(): ol.FeatureLoader|undefined} loaderFactory
      */
     loaderFactory: Function,
     /**
      * Source format factory
-     * @type {function(vlol: Object): ol.format.Feature} formatFactory
+     * @type {function(): ol.format.Feature} formatFactory
      */
     formatFactory: Function,
     /**
      * String or url factory
-     * @type {string|function(vlol: Object): string|ol.FeatureUrlFunction} url
+     * @type {string|function(): string|ol.FeatureUrlFunction} url
      */
     url: [String, Function],
     /**
      * Loading strategy factory
-     * @type {function(vlol: Object): ol.LoadingStrategy} strategyFactory
+     * @type {function(): ol.LoadingStrategy} strategyFactory
      */
     strategyFactory: {
       type: Function,
@@ -44,22 +44,22 @@
   const computed = {
     strategy () {
       if (this.strategyFactory) {
-        return this.strategyFactory(vlol)
+        return this.strategyFactory()
       }
     },
     loader () {
       if (this.loaderFactory) {
-        return this.loaderFactory(vlol)
+        return this.loaderFactory()
       }
     },
     urlFunc () {
       if (this.url) {
-        return isFunction(this.url) ? this.url(vlol) : () => this.url
+        return isFunction(this.url) ? this.url() : () => this.url
       }
     },
     format () {
       if (this.formatFactory) {
-        return this.formatFactory(vlol)
+        return this.formatFactory()
       }
     }
   }
@@ -124,10 +124,9 @@
   }
 
   /**
-   * @param {Object} vlol OpenLayers Helper
    * @return {ol.LoadingStrategy}
    */
-  function defaultStrategyFactory ({ loadStrategy }) {
+  function defaultStrategyFactory () {
     return loadStrategy.bbox
   }
 </script>
