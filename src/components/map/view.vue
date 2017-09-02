@@ -164,7 +164,7 @@
      * @protected
      */
     mount () {
-      this.$parent && this.$parent.setView(this)
+      this.$viewContainer && this.$viewContainer.setView(this)
       this.subscribeAll()
     },
     /**
@@ -173,7 +173,7 @@
      */
     unmount () {
       this.unsubscribeAll()
-      this.$parent && this.$parent.setView(undefined)
+      this.$viewContainer && this.$viewContainer.setView(undefined)
     },
     /**
      * @return {void}
@@ -237,9 +237,16 @@
     },
     created () {
       Object.defineProperties(this, {
+        /**
+         * @type {ol.View|undefined}
+         */
         $view: {
           enumerable: true,
           get: () => this.$olObject
+        },
+        $viewContainer: {
+          enumerable: true,
+          get: () => this.$services && this.$services.viewContainer
         }
       })
     }

@@ -15,6 +15,7 @@
   } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import '../../../rx-ext'
+  import { style as styleHelper } from '../../../ol-ext'
   import interaction from '../interaction'
   import stylesContainer from '../../styles-container'
   import * as assert from '../../../utils/assert'
@@ -65,12 +66,11 @@
       })
     },
     /**
-     * @param {Object} vlol
      * @return {ol.StyleFunction}
      * @protected
      */
-    getDefaultStyles (vlol) {
-      const defaultStyles = mapValues(styles => styles.map(vlol.style.style), vlol.style.defaultEditStyle())
+    getDefaultStyles () {
+      const defaultStyles = mapValues(styles => styles.map(styleHelper.style), styleHelper.defaultEditStyle())
 
       return function __selectDefaultStyleFunc (feature) {
         if (feature.getGeometry()) {

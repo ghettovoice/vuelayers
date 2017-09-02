@@ -3,7 +3,6 @@
  */
 import Vue from 'vue'
 import { filter, flow, isFunction, map } from 'lodash/fp'
-import * as olExt from '../ol-ext'
 import { warndbg } from '../utils/debug'
 
 export default {
@@ -20,11 +19,10 @@ export default {
   methods: {
     /**
      * Default style factory
-     * @param {Object} olExt Style helper
      * @return {ol.style.Style[]|ol.StyleFunction|undefined}
      * @protected
      */
-    getDefaultStyles (olExt) {},
+    getDefaultStyles () {},
     /**
      * @returns {Object}
      * @protected
@@ -125,7 +123,7 @@ export default {
      */
     createStyleFunc () {
       const vm = this
-      const defaultStyles = this.getDefaultStyles(olExt)
+      const defaultStyles = this.getDefaultStyles()
 
       return function __styleTargetStyleFunc (feature, resolution) {
         if (!feature.getGeometry()) return
@@ -135,7 +133,7 @@ export default {
         // styles - ol.StyleFunction or vl-style-func
         if (styles && (isFunction(styles) || isFunction(styles.$style))) {
           let styleFunc = isFunction(styles) ? styles : styles.$style
-          styles = styleFunc(feature, resolution, olExt)
+          styles = styleFunc(feature, resolution)
         }
         // styles is array of { $style: ol.style.Style, condition: (bool|function():bool) }
         else if (Array.isArray(styles)) {
@@ -163,7 +161,7 @@ export default {
         styles = defaultStyles
         if (styles) {
           return isFunction(styles)
-            ? styles(feature, resolution, olExt)
+            ? styles(feature, resolution)
             : styles
         }
       }

@@ -101,12 +101,10 @@ const methods = {
    * @protected
    */
   mount () {
-    if (this.$layersContainer) {
-      if (this.overlay) {
-        this.setMap(this.$layersContainer)
-      } else {
-        this.$layersContainer.addLayer(this)
-      }
+    if (this.overlay && this.$map) {
+      this.setMap(this.$map)
+    } else if (this.$layersContainer) {
+      this.$layersContainer.addLayer(this)
     }
 
     this.subscribeAll()
@@ -118,12 +116,10 @@ const methods = {
   unmount () {
     this.unsubscribeAll()
 
-    if (this.$layersContainer) {
-      if (this.overlay) {
-        this.setMap(undefined)
-      } else {
-        this.$layersContainer.removeLayer(this)
-      }
+    if (this.overlay) {
+      this.setMap(undefined)
+    } else if (this.$layersContainer) {
+      this.$layersContainer.removeLayer(this)
     }
   },
   /**

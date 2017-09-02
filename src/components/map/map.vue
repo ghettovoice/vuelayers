@@ -175,7 +175,8 @@
         this::overlaysContainer.methods.getServices(),
         {
           get map () { return vm.$map },
-          get view () { return vm.$view }
+          get view () { return vm.$view },
+          get viewContainer () { return vm }
         }
       )
     },
@@ -246,6 +247,9 @@
       this._view = undefined
 
       Object.defineProperties(this, {
+        /**
+         * @type {ol.Map|undefined}
+         */
         $map: {
           enumerable: true,
           get: () => this.$olObject

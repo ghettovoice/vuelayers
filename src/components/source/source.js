@@ -95,6 +95,9 @@ export default {
   },
   created () {
     Object.defineProperties(this, {
+      /**
+       * @type {ol.source.Source|undefined}
+       */
       $source: {
         enumerable: true,
         get: () => this.$olObject
