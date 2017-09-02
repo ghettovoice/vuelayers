@@ -36,10 +36,13 @@
       <w>jsnext</w>
       <w>loadingstrategy</w>
       <w>lodash</w>
+      <w>logdbg</w>
       <w>mapbox</w>
       <w>minified</w>
       <w>minifier</w>
       <w>mixins</w>
+      <w>moveend</w>
+      <w>movestart</w>
       <w>multiline</w>
       <w>mutators</w>
       <w>noop</w>
@@ -55,7 +58,10 @@
       <w>pointermove</w>
       <w>positionchange</w>
       <w>positionchanged</w>
+      <w>postcompose</w>
       <w>postcss</w>
+      <w>postrender</w>
+      <w>precompose</w>
       <w>prepatch</w>
       <w>proj</w>
       <w>propertychange</w>
@@ -70,6 +76,7 @@
       <w>sourcemap</w>
       <w>tilegrid</w>
       <w>tmpl</w>
+      <w>topo</w>
       <w>topp</w>
       <w>uglify</w>
       <w>unmount</w>
@@ -87,6 +94,7 @@
       <w>whatwg</w>
       <w>wmts</w>
       <w>yargs</w>
+      <w>zakas</w>
     </words>
   </dictionary>
 </component>
