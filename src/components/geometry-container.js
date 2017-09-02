@@ -21,6 +21,17 @@ const methods = {
     return this._geometry
   },
   /**
+   * @return {Object}
+   * @protected
+   */
+  getServices () {
+    const vm = this
+
+    return {
+      get geometryContainer () { return vm }
+    }
+  },
+  /**
    * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
    * @return {void}
    * @throws {AssertionError}

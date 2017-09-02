@@ -1,8 +1,9 @@
 <script>
-  import Vue from 'vue'
-  import SourceBuilder from './builder'
-  import vectSource from '../vect'
   import { geom as geomHelper } from '../../../ol-ext'
+  import vectSource from '../vect'
+  import sourceContainer from '../../source-container'
+  import SourceBuilder from './builder'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   const props = {
     distance: {
@@ -47,22 +48,26 @@
       return this._sourceBuilder.promise()
     },
     /**
-     * Returns inner wrapped vector source
-     * @return {ol.source.Vector|undefined}
-     */
-    getInnerSource () {
-      return this._sourceBuilder && this._sourceBuilder.getSource()
-    },
-    /**
      * Set inner vector source
      * @param {ol.source.Vector|Vue|undefined} source
      * @return {void}
      */
     setSource (source) {
-      source = source instanceof Vue ? source.$source : source
-      if (source !== this._sourceBuilder.getSource()) {
-        this._sourceBuilder.setSource(source)
+      this::sourceContainer.methods.setSource(source)
+
+      if (this._source !== this._sourceBuilder.getSource()) {
+        this._sourceBuilder.setSource(this._source)
       }
+    },
+    /**
+     * @return {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(
+        this::vectSource.methods.getServices(),
+        this::sourceContainer.methods.getServices()
+      )
     }
   }
 
@@ -76,7 +81,7 @@
 
   export default {
     name: 'vl-source-cluster',
-    mixins: [vectSource],
+    mixins: [vectSource, sourceContainer],
     props,
     computed,
     methods,

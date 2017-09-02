@@ -19,18 +19,29 @@ export default {
   },
   methods: {
     /**
-     * @return {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
-     */
-    getStyles () {
-      return this._styles
-    },
-    /**
      * Default style factory
      * @param {Object} olExt Style helper
      * @return {ol.style.Style[]|ol.StyleFunction|undefined}
      * @protected
      */
     getDefaultStyles (olExt) {},
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return {
+        get stylesContainer () { return vm }
+      }
+    },
+    /**
+     * @return {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
+     */
+    getStyles () {
+      return this._styles
+    },
     /**
      * @param {ol.style.Style|ol.StyleFunction|Vue|undefined} style
      * @return {void}

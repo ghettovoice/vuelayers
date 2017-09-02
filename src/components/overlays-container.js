@@ -58,6 +58,17 @@ const methods = {
    */
   getOverlayById (id) {
     return this._overlays[id]
+  },
+  /**
+   * @returns {Object}
+   * @protected
+   */
+  getServices () {
+    const vm = this
+
+    return {
+      get overlaysContainer () { return vm }
+    }
   }
 }
 

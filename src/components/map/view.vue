@@ -160,12 +160,6 @@
       })
     },
     /**
-     * @return {ol.View|undefined} OpenLayers `ol.View` instance
-     */
-    getView () {
-      return this.$olObject
-    },
-    /**
      * @return {void}
      * @protected
      */
@@ -245,7 +239,7 @@
       Object.defineProperties(this, {
         $view: {
           enumerable: true,
-          get: this.getView
+          get: () => this.$olObject
         }
       })
     }

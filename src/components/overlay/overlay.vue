@@ -80,12 +80,6 @@
       })
     },
     /**
-     * @return {ol.Overlay|undefined}
-     */
-    getOverlay () {
-      return this.$olObject
-    },
-    /**
      * @return {void}
      * @protected
      */
@@ -158,7 +152,7 @@
          */
         $overlay: {
           enumerable: true,
-          get: this.getOverlay
+          get: () => this.$olObject
         },
         $map: {
           enumerable: true,

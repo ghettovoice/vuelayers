@@ -54,12 +54,6 @@ const methods = {
     })
   },
   /**
-   * @return {ol.source.Source|undefined}
-   */
-  getSource () {
-    return this.$olObject
-  },
-  /**
    * @return {void}
    * @protected
    */
@@ -103,7 +97,7 @@ export default {
     Object.defineProperties(this, {
       $source: {
         enumerable: true,
-        get: this.getSource
+        get: () => this.$olObject
       },
       $map: {
         enumerable: true,

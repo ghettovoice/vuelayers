@@ -75,6 +75,12 @@ const methods = {
     }
   },
   /**
+   * @return {void}
+   */
+  clear () {
+    this._features = Object.create(null)
+  },
+  /**
    * @param {string|number} id
    * @return {ol.Feature|undefined}
    */
@@ -86,6 +92,17 @@ const methods = {
    */
   getFeatures () {
     return Object.values(this._features)
+  },
+  /**
+   * @returns {Object}
+   * @protected
+   */
+  getServices () {
+    const vm = this
+
+    return {
+      get featuresContainer () { return vm }
+    }
   },
   /**
    * @param {ol.Feature} feature

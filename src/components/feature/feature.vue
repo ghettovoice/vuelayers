@@ -19,7 +19,7 @@
   import plainProps from '../../utils/plain-props'
   import cmp from '../ol-cmp'
   import useMapCmp from '../use-map-cmp'
-  import styleContainer from '../styles-container'
+  import stylesContainer from '../styles-container'
   import geometryContainer from '../geometry-container'
   import { geoJson } from '../../ol-ext'
   import * as assert from '../../utils/assert'
@@ -64,12 +64,6 @@
       return feature
     },
     /**
-     * @returns {ol.Feature|undefined}
-     */
-    getFeature () {
-      return this.$olObject
-    },
-    /**
      * @return {{
      *     getGeometry: function(): ol.geom.Geometry|undefined,
      *     setGeometry: function(ol.geom.Geometry|undefined)
@@ -86,10 +80,14 @@
     getServices () {
       const vm = this
 
-      return mergeDescriptors(this::cmp.methods.getServices(), {
-        get feature () { return vm.$feature },
-        get geometryContainer () { return vm }
-      })
+      return mergeDescriptors(
+        this::cmp.methods.getServices(),
+        this::geometryContainer.methods.getServices(),
+        this::stylesContainer.methods.getServices(),
+        {
+          get feature () { return vm.$feature }
+        }
+      )
     },
     /**
      * @return {ol.Feature|undefined}
@@ -158,7 +156,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [cmp, useMapCmp, geometryContainer, styleContainer],
+    mixins: [cmp, useMapCmp, geometryContainer, stylesContainer],
     props,
     computed,
     methods,
@@ -175,7 +173,7 @@
          */
         $feature: {
           enumerable: true,
-          get: this.getFeature
+          get: () => this.$olObject
         },
         $layer: {
           enumerable: true,

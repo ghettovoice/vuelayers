@@ -35,12 +35,6 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {ol.interaction.Interaction|undefined}
-   */
-  getInteraction () {
-    return this.$olObject
-  },
-  /**
    * @returns {Object}
    * @protected
    */
@@ -114,7 +108,7 @@ export default {
        */
       $interaction: {
         enumerable: true,
-        get: this.getInteraction
+        get: () => this.$olObject
       },
       $map: {
         enumerable: true,

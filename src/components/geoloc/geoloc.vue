@@ -68,12 +68,6 @@
       })
     },
     /**
-     * @returns {ol.Geolocation|undefined}
-     */
-    getGeolocation () {
-      return this.$olObject
-    },
-    /**
      * @return {void}
      * @private
      */
@@ -137,7 +131,7 @@
          */
         $geolocation: {
           enumerable: true,
-          get: this.getGeolocation
+          get: () => this.$olObject
         }
       })
     }

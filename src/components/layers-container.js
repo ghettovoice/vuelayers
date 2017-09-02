@@ -58,6 +58,17 @@ const methods = {
    */
   getLayerById (id) {
     return this._layers[id]
+  },
+  /**
+   * @returns {Object}
+   * @protected
+   */
+  getServices () {
+    const vm = this
+
+    return {
+      get layersContainer () { return vm }
+    }
   }
 }
 

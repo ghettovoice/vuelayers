@@ -1,10 +1,10 @@
-import Vue from 'vue'
 import uuid from 'uuid/v4'
+import Vue from 'vue'
+import * as assert from '../../utils/assert'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import useMapCmp from '../use-map-cmp'
 import sourceContainer from '../source-container'
-import * as assert from '../../utils/assert'
+import useMapCmp from '../use-map-cmp'
 
 const props = {
   id: {
@@ -72,22 +72,19 @@ const methods = {
     return this.$map.forEachLayerAtPixel(pixel, l => l === this.$layer)
   },
   /**
-   * @return {ol.layer.Layer|undefined}
-   */
-  getLayer () {
-    return this.$olObject
-  },
-  /**
    * @returns {Object}
    * @protected
    */
   getServices () {
     const vm = this
 
-    return mergeDescriptors(this::cmp.methods.getServices(), {
-      get layer () { return vm.$layer },
-      get sourceContainer () { return vm }
-    })
+    return mergeDescriptors(
+      this::cmp.methods.getServices(),
+      this::sourceContainer.methods.getServices(),
+      {
+        get layer () { return vm.$layer }
+      }
+    )
   },
   /**
    * @return {{
@@ -200,7 +197,7 @@ export default {
        */
       $layer: {
         enumerable: true,
-        get: this.getLayer
+        get: () => this.$olObject
       },
       $map: {
         enumerable: true,

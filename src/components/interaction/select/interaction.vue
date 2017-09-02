@@ -18,6 +18,7 @@
   import interaction from '../interaction'
   import stylesContainer from '../../styles-container'
   import * as assert from '../../../utils/assert'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   // todo add other options, like event modifiers
   const props = {
@@ -82,6 +83,16 @@
      */
     getFeatures () {
       return (this.$interaction && this.$interaction.getFeatures().getArray()) || []
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(
+        this::interaction.methods.getServices(),
+        this::stylesContainer.methods.getServices()
+      )
     },
     /**
      * @return {ol.interaction.Interaction|undefined}

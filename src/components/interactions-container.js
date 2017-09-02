@@ -58,6 +58,17 @@ const methods = {
    */
   getInteractionById (id) {
     return this._interactions[id]
+  },
+  /**
+   * @returns {Object}
+   * @protected
+   */
+  getServices () {
+    const vm = this
+
+    return {
+      get interactionsContainer () { return vm }
+    }
   }
 }
 

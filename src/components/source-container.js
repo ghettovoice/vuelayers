@@ -18,6 +18,17 @@ const methods = {
     return this._source
   },
   /**
+   * @returns {Object}
+   * @protected
+   */
+  getServices () {
+    const vm = this
+
+    return {
+      get sourceContainer () { return vm }
+    }
+  },
+  /**
    * @param {ol.source.Source|Vue|undefined} source
    * @return {void}
    */

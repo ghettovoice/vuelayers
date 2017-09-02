@@ -94,12 +94,6 @@ const methods = {
     return this::cmp.methods.deinit()
   },
   /**
-   * @returns {ol.geometry.Geometry|undefined}
-   */
-  getGeometry () {
-    return this.$olObject
-  },
-  /**
    * @return {Promise}
    */
   refresh () {
@@ -181,7 +175,7 @@ export default {
        */
       $geometry: {
         enumerable: true,
-        get: this.getGeometry
+        get: () => this.$olObject
       },
       $map: {
         enumerable: true,

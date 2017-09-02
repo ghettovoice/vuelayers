@@ -24,7 +24,7 @@ const methods = {
    * @return {void}
    */
   clear () {
-    this._features = Object.create(null)
+    this::featuresContainer.methods.clear()
     this.$source && this.$source.clear()
   },
   /**
@@ -57,11 +57,10 @@ const methods = {
    * @protected
    */
   getServices () {
-    const vm = this
-
-    return mergeDescriptors(this::source.methods.getServices(), {
-      get featuresContainer () { return vm }
-    })
+    return mergeDescriptors(
+      this::source.methods.getServices(),
+      this::featuresContainer.methods.getServices()
+    )
   },
   /**
    * @return {Promise}

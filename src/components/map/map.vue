@@ -162,31 +162,22 @@
       return projHelper.toLonLat(this.$map.getCoordinateFromPixel(pixel), this.$view.getProjection())
     },
     /**
-     * @return {ol.Map|undefined}
-     */
-    getMap () {
-      return this.$olObject
-    },
-    /**
      * @returns {Object}
      * @protected
      */
     getServices () {
       const vm = this
 
-      return mergeDescriptors(this::cmp.methods.getServices(), {
-        get map () { return vm.$map },
-        get view () { return vm.$view },
-        get layersContainer () { return vm },
-        get interactionsContainer () { return vm },
-        get overlaysContainer () { return vm }
-      })
-    },
-    /**
-     * @return {ol.View}
-     */
-    getView () {
-      return this._view
+      return mergeDescriptors(
+        this::cmp.methods.getServices(),
+        this::layersContainer.methods.getServices(),
+        this::interactionsContainer.methods.getServices(),
+        this::overlaysContainer.methods.getServices(),
+        {
+          get map () { return vm.$map },
+          get view () { return vm.$view }
+        }
+      )
     },
     /**
      * @param {ol.View|Vue|undefined} view
@@ -257,11 +248,11 @@
       Object.defineProperties(this, {
         $map: {
           enumerable: true,
-          get: this.getMap
+          get: () => this.$olObject
         },
         $view: {
           enumerable: true,
-          get: this.getView
+          get: () => this._view
         }
       })
     },
