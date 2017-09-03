@@ -1,24 +1,18 @@
-/* global Vue, VueLayers, ProgressBar */
+/* global App */
 (function (window, document) {
-  // run page loader
-  var pageLoaderContainer = document.querySelector('#page-loader')
-  var pageLoader
-
-  showLoader()
-    .then(init)
-    .then(hideLoader)
+  new App().run()
 
   /* ----------------------------
    Functions
    ------------------------------ */
   function init () {
-    // run bg map on home
-    var bgMapElem = document.getElementById('bg-map')
-    if (bgMapElem) {
+    // run map on home
+    var mapElem = document.getElementById('home-map')
+    if (mapElem) {
       Vue.use(VueLayers)
 
       var root = new Vue({
-        el: '#bg-map',
+        el: mapElem,
         data () {
           return {
             position: []
@@ -40,24 +34,6 @@
 
     return new Promise(function (resolve) {
       setTimeout(resolve, 10)
-    })
-  }
-
-  function showLoader () {
-    pageLoaderContainer.style.display = 'block'
-    pageLoader = new ProgressBar.Circle(pageLoaderContainer.querySelector('.rotating-loader'), {
-      color: '#8c67ef',
-      trailColor: '#eee',
-      strokeWidth: 10,
-      duration: 2500,
-      easing: 'easeInOut'
-    })
-
-    pageLoader.set(0.2)
-    pageLoaderContainer.classList.remove('hidden')
-
-    return new Promise(function (resolve) {
-      setTimeout(resolve, 1000)
     })
   }
 
