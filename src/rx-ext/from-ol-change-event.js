@@ -22,7 +22,7 @@ export default function fromOlChangeEvent (target, prop, distinct, throttle, sel
   }
 
   selector = selector || ((target, prop) => target.get(prop))
-  let event = `change${prop}`
+  let event = `change:${prop}`
   let observable = fromOlEvent(target, event, () => selector(target, prop))
 
   if (throttle != null) {

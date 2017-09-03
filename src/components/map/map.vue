@@ -9,6 +9,8 @@
   import Vue from 'vue'
   import { isEqual } from 'lodash/fp'
   import Map from 'ol/map'
+  import VectorLayer from 'ol/layer/vector'
+  import VectorSource from 'ol/source/vector'
   import olcontrol from 'ol/control'
   import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import { Observable } from 'rxjs/Observable'
@@ -22,6 +24,7 @@
   import layersContainer from '../layers-container'
   import interactionsContainer from '../interactions-container'
   import overlaysContainer from '../overlays-container'
+  import featuresContainer from '../features-container'
   import * as assert from '../../utils/assert'
 
   const props = {
@@ -53,56 +56,6 @@
 
   const methods = {
     /**
-     * @return {{
-     *    hasLayer: function(ol.Layer),
-     *    addLayer: function(ol.Layer),
-     *    removeLayer: function(ol.Layer)
-     *  }|undefined}
-     *  @protected
-     */
-    getLayersTarget () {
-      if (!this.$map) return
-
-      const layers = this.$map.getLayers()
-
-      return {
-        hasLayer (layer) {
-          return layers.getArray().includes(layer)
-        },
-        addLayer (layer) {
-          this.$map.addLayer(layer)
-        },
-        removeLayer (layer) {
-          this.map.removeLayer(layer)
-        }
-      }
-    },
-    /**
-     * @return {{
-     *     hasInteraction: function(ol.interaction.Interaction): bool,
-     *     addInteraction: function(ol.interaction.Interaction): void,
-     *     removeInteraction: function(ol.interaction.Interaction): void
-     *   }|undefined}
-     * @protected
-     */
-    getInteractionsTarget () {
-      if (!this.$map) return
-
-      const interactions = this.$map.getInteractions()
-
-      return {
-        hasInteraction (interaction) {
-          return interactions.getArray().includes(interaction)
-        },
-        addInteraction (interaction) {
-          this.$map.addInteraction(interaction)
-        },
-        removeInteraction (interaction) {
-          this.$map.removeInteraction(interaction)
-        }
-      }
-    },
-    /**
      * @return {ol.Map}
      * @protected
      */
@@ -119,8 +72,141 @@
       })
       // ol.Map constructor can create default view if no provided with options
       this._view = map.getView()
+      // add default overlay to map
+      this._defaultLayer.setMap(map)
 
       return map
+    },
+    /**
+     * @return {{
+     *    hasLayer: function(ol.Layer),
+     *    addLayer: function(ol.Layer),
+     *    removeLayer: function(ol.Layer)
+     *  }|undefined}
+     *  @protected
+     */
+    getLayersTarget () {
+      if (!this.$map) return
+
+      const map = this.$map
+      const layers = this.$map.getLayers()
+
+      return {
+        hasLayer (layer) {
+          return layers.getArray().includes(layer)
+        },
+        addLayer (layer) {
+          map.addLayer(layer)
+        },
+        removeLayer (layer) {
+          map.removeLayer(layer)
+        }
+      }
+    },
+    /**
+     * @return {{
+     *     hasInteraction: function(ol.interaction.Interaction): bool,
+     *     addInteraction: function(ol.interaction.Interaction): void,
+     *     removeInteraction: function(ol.interaction.Interaction): void
+     *   }|undefined}
+     * @protected
+     */
+    getInteractionsTarget () {
+      if (!this.$map) return
+
+      const map = this.$map
+      const interactions = this.$map.getInteractions()
+
+      return {
+        hasInteraction (interaction) {
+          return interactions.getArray().includes(interaction)
+        },
+        addInteraction (interaction) {
+          map.addInteraction(interaction)
+        },
+        removeInteraction (interaction) {
+          map.removeInteraction(interaction)
+        }
+      }
+    },
+    /**
+     * @return {{
+     *     addFeature: function(ol.Feature): void,
+     *     removeFeature: function(ol.Feature): void,
+     *     hasFeature: function(ol.Feature): bool
+     *   }|undefined}
+     * @protected
+     */
+    getFeaturesTarget () {
+      const source = this._defaultLayer.getSource()
+
+      return {
+        hasFeature (feature) {
+          return source.getFeatureById(feature.getId()) != null
+        },
+        addFeature (feature) {
+          source.addFeature(feature)
+        },
+        removeFeature (feature) {
+          source.removeFeature(feature)
+        }
+      }
+    },
+    /**
+     * @return {{
+     *     hasOverlay: function(ol.Overlay): bool,
+     *     addOverlay: function(ol.Overlay): void,
+     *     removeOverlay: function(ol.Overlay): void
+     *   }|undefined}
+     * @protected
+     */
+    getOverlaysTarget () {
+      if (!this.$map) return
+
+      const map = this.$map
+      const overlays = this.$map.getOverlays()
+
+      return {
+        hasInteraction (interaction) {
+          return overlays.getArray().includes(interaction)
+        },
+        addInteraction (interaction) {
+          map.addOverlay(interaction)
+        },
+        removeInteraction (interaction) {
+          map.removeOverlay(interaction)
+        }
+      }
+    },
+    /**
+     * @param {number[]} pixel
+     * @return {number[]} Coordinates in EPSG:4326
+     */
+    getCoordinateFromPixel (pixel) {
+      assert.hasMap(this)
+      assert.hasView(this)
+
+      return projHelper.toLonLat(this.$map.getCoordinateFromPixel(pixel), this.$view.getProjection())
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(
+        this::cmp.methods.getServices(),
+        this::layersContainer.methods.getServices(),
+        this::interactionsContainer.methods.getServices(),
+        this::overlaysContainer.methods.getServices(),
+        this::featuresContainer.methods.getServices(),
+        {
+          get map () { return vm.$map },
+          get view () { return vm.$view },
+          get viewContainer () { return vm }
+        }
+      )
     },
     /**
      * Trigger focus on map container.
@@ -150,35 +236,6 @@
       assert.hasMap(this)
 
       return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
-    },
-    /**
-     * @param {number[]} pixel
-     * @return {number[]} Coordinates in EPSG:4326
-     */
-    getCoordinateFromPixel (pixel) {
-      assert.hasMap(this)
-      assert.hasView(this)
-
-      return projHelper.toLonLat(this.$map.getCoordinateFromPixel(pixel), this.$view.getProjection())
-    },
-    /**
-     * @returns {Object}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return mergeDescriptors(
-        this::cmp.methods.getServices(),
-        this::layersContainer.methods.getServices(),
-        this::interactionsContainer.methods.getServices(),
-        this::overlaysContainer.methods.getServices(),
-        {
-          get map () { return vm.$map },
-          get view () { return vm.$view },
-          get viewContainer () { return vm }
-        }
-      )
     },
     /**
      * @param {ol.View|Vue|undefined} view
@@ -236,7 +293,7 @@
 
   export default {
     name: 'vl-map',
-    mixins: [cmp, layersContainer, interactionsContainer, overlaysContainer],
+    mixins: [cmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer],
     props,
     methods,
     created () {
@@ -245,6 +302,13 @@
        * @private
        */
       this._view = undefined
+      /**
+       * @type {ol.layer.Vector}
+       * @private
+       */
+      this._defaultLayer = new VectorLayer({
+        source: new VectorSource()
+      })
 
       Object.defineProperties(this, {
         /**

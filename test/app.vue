@@ -4,7 +4,19 @@
       <vl-map ref="map">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
-        <vl-geoloc/>
+        <vl-geoloc>
+          <template scope="ctx">
+            <vl-feature v-if="ctx.position" id="my-geoloc">
+              <vl-geom-point :coordinates="ctx.position" />
+              <vl-style-box>
+                <vl-style-circle :radius="7">
+                  <vl-style-fill color="#abcabc" />
+                  <vl-style-stroke color="#ff22ff" :width="5" />
+                </vl-style-circle>
+              </vl-style-box>
+            </vl-feature>
+          </template>
+        </vl-geoloc>
 
         <vl-interaction-select @select="select" @unselect="unselect" :selected.sync="selected"/>
 
@@ -118,7 +130,6 @@
       return Promise.resolve(this.points)
     },
     pointOnSurface (geometry) {
-      console.log(geometry)
       return vlol.geom.pointOnSurfaceAsCoordinate(geometry)
     }
   }

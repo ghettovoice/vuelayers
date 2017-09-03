@@ -61,34 +61,6 @@
   }
 
   const computed = {
-    currentCenter () {
-      if (this.rev && this.$view) {
-        return this::getCenter()
-      }
-
-      return this.center
-    },
-    currentResolution () {
-      if (this.rev && this.$view) {
-        return this.$view.getResolution()
-      }
-
-      return this.resolution
-    },
-    currentZoom () {
-      if (this.rev && this.$view) {
-        return this::getZoom()
-      }
-
-      return this.zoom
-    },
-    currentRotation () {
-      if (this.rev && this.$view) {
-        return this.$view.getRotation()
-      }
-
-      return this.rotation
-    }
   }
 
   const methods = {

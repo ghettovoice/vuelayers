@@ -52,13 +52,6 @@
   }
 
   const computed = {
-    currentPosition () {
-      if (this.rev && this.$overlay) {
-        return this::getPosition()
-      }
-
-      return this.position
-    }
   }
 
   const methods = {

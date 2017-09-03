@@ -189,7 +189,7 @@
         },
         $featuresContainer: {
           enumerable: true,
-          get: this.$services && this.$services.featuresContainer
+          get: () => this.$services && this.$services.featuresContainer
         }
       })
     }

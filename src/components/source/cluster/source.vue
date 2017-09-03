@@ -48,18 +48,6 @@
       return this._sourceBuilder.promise()
     },
     /**
-     * Set inner vector source
-     * @param {ol.source.Vector|Vue|undefined} source
-     * @return {void}
-     */
-    setSource (source) {
-      this::sourceContainer.methods.setSource(source)
-
-      if (this._source !== this._sourceBuilder.getSource()) {
-        this._sourceBuilder.setSource(this._source)
-      }
-    },
-    /**
      * @return {Object}
      * @protected
      */
@@ -68,6 +56,16 @@
         this::vectSource.methods.getServices(),
         this::sourceContainer.methods.getServices()
       )
+    },
+    /**
+     * @return {{
+     *     setSource: function(ol.source.Source): void,
+     *     getSource: function(): ol.source.Source
+     *   }|undefined}
+     * @protected
+     */
+    getSourceTarget () {
+      return this._sourceBuilder
     }
   }
 

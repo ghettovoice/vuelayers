@@ -37,6 +37,13 @@ const methods = {
     this.$stylesContainer && this.$stylesContainer.setImage(undefined)
   },
   /**
+   * @return {Object}
+   * @protected
+   */
+  getServices () {
+    return this::style.methods.getServices()
+  },
+  /**
    * @return {Promise}
    */
   refresh () {
