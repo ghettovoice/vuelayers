@@ -167,13 +167,13 @@
       const overlays = this.$map.getOverlays()
 
       return {
-        hasInteraction (interaction) {
+        hasOverlay (interaction) {
           return overlays.getArray().includes(interaction)
         },
-        addInteraction (interaction) {
+        addOverlay (interaction) {
           map.addOverlay(interaction)
         },
-        removeInteraction (interaction) {
+        removeOverlay (interaction) {
           map.removeOverlay(interaction)
         }
       }

@@ -2,7 +2,7 @@
   import VectorSource from 'ol/source/vector'
   import { differenceWith, stubArray, isFunction } from 'lodash/fp'
   import vectSource from '../vect'
-  import { loadStrategy } from '../../../ol-ext'
+  import { loadStrategy, format } from '../../../ol-ext'
 
   const props = {
     /**
@@ -21,7 +21,10 @@
      * Source format factory
      * @type {function(): ol.format.Feature} formatFactory
      */
-    formatFactory: Function,
+    formatFactory: {
+      type: Function,
+      default: defaultFormatFactory
+    },
     /**
      * String or url factory
      * @type {string|function(): string|ol.FeatureUrlFunction} url
@@ -128,5 +131,12 @@
    */
   function defaultStrategyFactory () {
     return loadStrategy.bbox
+  }
+
+  /**
+   * @return {ol.format.GeoJSON}
+   */
+  function defaultFormatFactory () {
+    return format.geoJson()
   }
 </script>

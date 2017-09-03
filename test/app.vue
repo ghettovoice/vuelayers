@@ -71,7 +71,12 @@
                          :ext-params="{ TILED: true }" server-type="geoserver"/>
         </vl-layer-tile>
 
-        <vl-overlay v-if="selectedFeatures.length" :position="pointOnSurface(selectedFeatures[0].geometry)">
+        <vl-layer-vector id="countries">
+          <vl-source-vector url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
+        </vl-layer-vector>
+
+        <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
+                    :position="pointOnSurface(selectedFeatures[0].geometry)">
           <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
             Popup cluster feature {{ selectedFeatures[0].id }}<br />
             <span v-for="feature in selectedFeatures[0].properties.features">
@@ -87,6 +92,8 @@
 <script>
   import { range, random } from 'lodash/fp'
   import { ol as vlol } from '../src'
+  import VlLayerVector from '../src/components/layer/vector/layer.vue'
+  import VlSourceVector from '../src/components/source/vector/source.vue'
 
   const computed = {
   }
@@ -103,7 +110,6 @@
       }
     },
     unselect ({ feature }) {
-      console.log('unselect', feature)
       this.selectedFeatures = this.selectedFeatures.filter(f => f.id !== feature.getId())
     },
     loadData () {
@@ -135,6 +141,9 @@
   }
 
   export default {
+    components: {
+      VlSourceVector,
+      VlLayerVector },
     name: 'app',
     computed,
     methods,
