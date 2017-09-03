@@ -84,24 +84,25 @@ markdown:
   smartLists: true
   smartypants: true
 
+webpack_config: themes/vl/webpack.config.js
 # SASS settings
-node_sass:
-  debug: false
-  outputStyle: nested
-  precision: 5
-  sourceComments: false
-
-html_minifier:
-  enable: true
-css_minifier:
-  enable: true
-  exclude:
-    - '*.min.css'
-js_minifier:
-  enable: true
-  mangle: true
-  compress: true
-  output:
-    preamble: "/*! VueLayers.js site */"
-  exclude:
-    - '*.min.js'
+#node_sass:
+#  debug: false
+#  outputStyle: nested
+#  precision: 5
+#  sourceComments: false
+#
+#html_minifier:
+#  enable: true
+#css_minifier:
+#  enable: true
+#  exclude:
+#    - '*.min.css'
+#js_minifier:
+#  enable: true
+#  mangle: true
+#  compress: true
+#  output:
+#    preamble: "/*! VueLayers.js site */"
+#  exclude:
+#    - '*.min.js'

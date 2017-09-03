@@ -9,8 +9,8 @@ const express = require('express')
 const webpack = require('webpack')
 let webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./webpack.prod.conf')
-  : ( argv.conf
-    ? require(`./webpack.${argv.conf}.conf`)
+  : ( argv.name
+    ? require(`./webpack.${argv.name}.dev.conf`)
     : require('./webpack.dev.conf') )
 
 if (typeof webpackConfig === 'function') {

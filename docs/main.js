@@ -2,9 +2,10 @@ import 'babel-polyfill'
 import Vue from 'vue'
 import VueLayers from '../src'
 import App from './app.vue'
+import VueProgress from 'vue-progress'
 
+Vue.use(VueProgress)
 Vue.use(VueLayers)
-console.log(VueLayers)
 
 /* eslint-disable no-new */
 new Vue({

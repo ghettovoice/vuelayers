@@ -7,7 +7,6 @@
   "main": "dist/vuelayers.cjs.js",
   "module": "dist/vuelayers.es.js",
   "scripts": {
-    "install": "npm run docs-install",
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
     "rollup": "node build/rollup.js",
@@ -21,11 +20,9 @@
     "travis": "npm run travis-test && npm run coveralls",
     "travis-test": "npm run unit && npm run e2e -- --env travis",
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls",
-    "docs-install": "cd docs && npm install",
-    "docs-start": "cd docs && npm start",
-    "docs-build": "cd docs && npm run build",
-    "docs-deploy": "cd docs && npm start",
-    "docs-clean": "cd docs && npm run clean"
+    "docs-start": "node build/dev-server.js --name docs",
+    "docs-build": "rm -rf dist-docs && cross-env NODE_ENV=production webpack --config=build/webpack.docs.prod.conf.js --progress",
+    "docs-deploy": "gh-pages -d dist-docs"
   },
   "directories": {
     "lib": "dist",
@@ -81,6 +78,8 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-0": "^6.24.1",
+    "buefy": "^0.5.1",
+    "bulma": "^0.5.1",
     "chai": "^4.1.1",
     "chalk": "^2.1.0",
     "chromedriver": "^2.31.0",
@@ -149,6 +148,7 @@
     "url-loader": "^0.5.9",
     "vue": "^2.4.2",
     "vue-loader": "^13.0.4",
+    "vue-progress": "^0.2.1",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.4.2",
     "webpack": "^3.5.5",
