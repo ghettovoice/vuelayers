@@ -48,14 +48,14 @@
      * @protected
      */
     mount () {
-      this.$parent && this.$parent.setStroke(this)
+      this.$stylesContainer && this.$stylesContainer.setStroke(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent && this.$parent.setStroke(undefined)
+      this.$stylesContainer && this.$stylesContainer.setStroke(undefined)
     }
   }
 

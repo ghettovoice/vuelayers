@@ -1,6 +1,6 @@
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import useMapCmp from '../ol-use-map-cmp'
+import useMapCmp from '../use-map-cmp'
 
 const props = {
   attributions: [String, Array],
@@ -54,17 +54,11 @@ const methods = {
     })
   },
   /**
-   * @return {ol.source.Source|undefined}
-   */
-  getSource () {
-    return this.$olObject
-  },
-  /**
    * @return {void}
    * @protected
    */
   mount () {
-    this.$parent && this.$parent.setSource(this)
+    this.$sourceContainer && this.$sourceContainer.setSource(this)
     this.subscribeAll()
   },
   /**
@@ -73,7 +67,7 @@ const methods = {
    */
   unmount () {
     this.unsubscribeAll()
-    this.$parent && this.$parent.setSource(undefined)
+    this.$sourceContainer && this.$sourceContainer.setSource(undefined)
   },
   /**
    * @return {Promise}
@@ -101,9 +95,12 @@ export default {
   },
   created () {
     Object.defineProperties(this, {
+      /**
+       * @type {ol.source.Source|undefined}
+       */
       $source: {
         enumerable: true,
-        get: this.getSource
+        get: () => this.$olObject
       },
       $map: {
         enumerable: true,
@@ -112,6 +109,10 @@ export default {
       $view: {
         enumerable: true,
         get: () => this.$services && this.$services.view
+      },
+      $sourceContainer: {
+        enumerable: true,
+        get: () => this.$services && this.$services.sourceContainer
       }
     })
   }

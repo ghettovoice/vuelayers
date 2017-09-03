@@ -1,10 +1,16 @@
+<template>
+  <i :class="$options.name" style="display: none !important;">
+    <slot :accuracy="accuracy" :altitude="altitude" :altitude-accuracy="altitudeAccuracy"
+          :heading="heading" :position="position" :speed="speed"></slot>
+  </i>
+</template>
+
 <script>
   import Geolocation from 'ol/geolocation'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/operator/map'
   import '../../rx-ext'
   import { EPSG_4326 } from '../../ol-ext'
-  import cmp from '../ol-virt-cmp'
+  import cmp from '../ol-cmp'
   import * as assert from '../../utils/assert'
 
   const props = {
@@ -13,6 +19,7 @@
       default: true
     },
     trackingOptions: Object
+    // todo add autoCenter, bindToPosition
   }
 
   const computed = {
@@ -59,12 +66,6 @@
         trackingOptions: this.trackingOptions,
         projection: EPSG_4326
       })
-    },
-    /**
-     * @returns {ol.Geolocation|undefined}
-     */
-    getGeolocation () {
-      return this.$olObject
     },
     /**
      * @return {void}
@@ -125,9 +126,12 @@
     },
     created () {
       Object.defineProperties(this, {
+        /**
+         * @type {ol.Geolocation|undefined}
+         */
         $geolocation: {
           enumerable: true,
-          get: this.getGeolocation
+          get: () => this.$olObject
         }
       })
     }
@@ -141,22 +145,23 @@
     assert.hasGeolocation(this)
 
     const ft = 100
-    const events = Observable.fromOlChangeEvent(this.$geolocation, [
-      'accuracy',
-      'altitude',
-      'altitudeaccuracy',
-      'heading',
-      'position',
-      'speed'
-    ], true, ft)
-      .map(({ prop, value }) => ({
-        name: `update:${prop}`,
-        value
-      }))
+    const changes = Observable.fromOlChangeEvent(
+      this.$geolocation,
+      [
+        'accuracy',
+        'altitude',
+        'altitudeaccuracy',
+        'heading',
+        'position',
+        'speed'
+      ],
+      true,
+      ft
+    )
 
-    this.subscribeTo(events, ({ name, value }) => {
+    this.subscribeTo(changes, ({ prop, value }) => {
       ++this.rev
-      this.$emit(name, value)
+      this.$emit(`update:${prop}`, value)
     })
   }
 </script>

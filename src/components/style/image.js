@@ -27,14 +27,21 @@ const methods = {
    * @protected
    */
   mount () {
-    this.$parent && this.$parent.setImage(this)
+    this.$stylesContainer && this.$stylesContainer.setImage(this)
   },
   /**
    * @return {void}
    * @protected
    */
   unmount () {
-    this.$parent && this.$parent.setImage(undefined)
+    this.$stylesContainer && this.$stylesContainer.setImage(undefined)
+  },
+  /**
+   * @return {Object}
+   * @protected
+   */
+  getServices () {
+    return this::style.methods.getServices()
   },
   /**
    * @return {Promise}

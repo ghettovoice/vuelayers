@@ -1,8 +1,9 @@
 <script>
-  import Vue from 'vue'
-  import SourceBuilder from './builder'
+  import { geom as geomHelper } from '../../../ol-ext'
   import vectSource from '../vect'
-  import * as vlol from '../../../ol-ext'
+  import sourceContainer from '../../source-container'
+  import SourceBuilder from './builder'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   const props = {
     distance: {
@@ -11,7 +12,7 @@
     },
     /**
      * Geometry function factory
-     * @type {function(vlol: Object): (function(f: ol.Feature): ol.geom.SimpleGeometry|undefined)} geomFuncFactory
+     * @type {function(): (function(f: ol.Feature): ol.geom.SimpleGeometry|undefined)} geomFuncFactory
      */
     geomFuncFactory: {
       type: Function,
@@ -21,7 +22,7 @@
 
   const computed = {
     geomFunc () {
-      return this.geomFuncFactory(vlol)
+      return this.geomFuncFactory()
     }
   }
 
@@ -47,22 +48,24 @@
       return this._sourceBuilder.promise()
     },
     /**
-     * Returns inner wrapped vector source
-     * @return {ol.source.Vector|undefined}
+     * @return {Object}
+     * @protected
      */
-    getInnerSource () {
-      return this._sourceBuilder && this._sourceBuilder.getSource()
+    getServices () {
+      return mergeDescriptors(
+        this::vectSource.methods.getServices(),
+        this::sourceContainer.methods.getServices()
+      )
     },
     /**
-     * Set inner vector source
-     * @param {ol.source.Vector|Vue|undefined} source
-     * @return {void}
+     * @return {{
+     *     setSource: function(ol.source.Source): void,
+     *     getSource: function(): ol.source.Source
+     *   }|undefined}
+     * @protected
      */
-    setSource (source) {
-      source = source instanceof Vue ? source.$source : source
-      if (source !== this._sourceBuilder.getSource()) {
-        this._sourceBuilder.setSource(source)
-      }
+    getSourceTarget () {
+      return this._sourceBuilder
     }
   }
 
@@ -76,7 +79,7 @@
 
   export default {
     name: 'vl-source-cluster',
-    mixins: [vectSource],
+    mixins: [vectSource, sourceContainer],
     props,
     computed,
     methods,
@@ -84,15 +87,14 @@
   }
 
   /**
-   * @param {Object} vlol
    * @returns {function(f: ol.Feature): ol.geom.SimpleGeometry|undefined}
    */
-  function defaultGeomFuncFactory (vlol) {
+  function defaultGeomFuncFactory () {
     return function (feature) {
       let geometry = feature.getGeometry()
       if (!geometry) return
 
-      return vlol.geom.pointOnSurface(geometry)
+      return geomHelper.pointOnSurface(geometry)
     }
   }
 </script>

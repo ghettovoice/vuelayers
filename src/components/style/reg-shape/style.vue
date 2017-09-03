@@ -3,6 +3,7 @@
   import RegularShape from 'ol/style/regularshape'
   import imageStyle from '../image'
   import withFillStroke from '../with-fill-stroke'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   const props = {
     points: {
@@ -43,6 +44,17 @@
         snapToPixel: this.snapToPixel,
         fill: this._fill,
         stroke: this._stroke
+      })
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(this::imageStyle.methods.getServices(), {
+        get stylesContainer () { return vm }
       })
     },
     /**

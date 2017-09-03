@@ -8,6 +8,7 @@
   import Style from 'ol/style/style'
   import style from '../style'
   import withFillStroke from '../with-fill-stroke'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   const props = {
     zIndex: {
@@ -36,18 +37,29 @@
       })
     },
     /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(this::style.methods.getServices(), {
+        get stylesContainer () { return vm }
+      })
+    },
+    /**
      * @return {void}
      * @protected
      */
     mount () {
-      this.$parent && this.$parent.addStyle(this)
+      this.$stylesContainer && this.$stylesContainer.addStyle(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent && this.$parent.removeStyle(this)
+      this.$stylesContainer && this.$stylesContainer.removeStyle(this)
     },
     /**
      * @param {ol.style.Image|Vue|undefined} image

@@ -3,6 +3,7 @@
   import Circle from 'ol/style/circle'
   import imageStyle from '../image'
   import withFillStroke from '../with-fill-stroke'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   const props = {
     radius: {
@@ -22,6 +23,17 @@
         snapToPixel: this.snapToPixel,
         fill: this._fill,
         stroke: this._stroke
+      })
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(this::imageStyle.methods.getServices(), {
+        get stylesContainer () { return vm }
       })
     },
     /**

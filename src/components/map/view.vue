@@ -61,34 +61,6 @@
   }
 
   const computed = {
-    currentCenter () {
-      if (this.rev && this.$view) {
-        return this::getCenter()
-      }
-
-      return this.center
-    },
-    currentResolution () {
-      if (this.rev && this.$view) {
-        return this.$view.getResolution()
-      }
-
-      return this.resolution
-    },
-    currentZoom () {
-      if (this.rev && this.$view) {
-        return this::getZoom()
-      }
-
-      return this.zoom
-    },
-    currentRotation () {
-      if (this.rev && this.$view) {
-        return this.$view.getRotation()
-      }
-
-      return this.rotation
-    }
   }
 
   const methods = {
@@ -160,17 +132,11 @@
       })
     },
     /**
-     * @return {ol.View|undefined} OpenLayers `ol.View` instance
-     */
-    getView () {
-      return this.$olObject
-    },
-    /**
      * @return {void}
      * @protected
      */
     mount () {
-      this.$parent && this.$parent.setView(this)
+      this.$viewContainer && this.$viewContainer.setView(this)
       this.subscribeAll()
     },
     /**
@@ -179,7 +145,7 @@
      */
     unmount () {
       this.unsubscribeAll()
-      this.$parent && this.$parent.setView(undefined)
+      this.$viewContainer && this.$viewContainer.setView(undefined)
     },
     /**
      * @return {void}
@@ -243,9 +209,16 @@
     },
     created () {
       Object.defineProperties(this, {
+        /**
+         * @type {ol.View|undefined}
+         */
         $view: {
           enumerable: true,
-          get: this.getView
+          get: () => this.$olObject
+        },
+        $viewContainer: {
+          enumerable: true,
+          get: () => this.$services && this.$services.viewContainer
         }
       })
     }
@@ -267,19 +240,16 @@
     })).debounceTime(2 * ft)
       .distinctUntilChanged(isEqual)
 
-    const events = Observable.merge(
+    const changes = Observable.merge(
       Observable.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
       Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
       zoom
-    ).map(({ prop, value }) => ({
-      name: `update:${prop}`,
-      value
-    }))
+    )
 
-    this.subscribeTo(events, ({ name, value }) => {
+    this.subscribeTo(changes, ({ prop, value }) => {
       ++this.rev
-      this.$emit(name, value)
+      this.$emit(`update:${prop}`, value)
     })
   }
 

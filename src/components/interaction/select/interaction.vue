@@ -15,9 +15,11 @@
   } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import '../../../rx-ext'
+  import { style as styleHelper } from '../../../ol-ext'
   import interaction from '../interaction'
-  import styleTarget from '../../style-target'
+  import stylesContainer from '../../styles-container'
   import * as assert from '../../../utils/assert'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   // todo add other options, like event modifiers
   const props = {
@@ -48,13 +50,6 @@
   }
 
   const computed = {
-    currentSelected () {
-      if (this.rev) {
-        return this.$features.map(extractId)
-      }
-
-      return []
-    }
   }
 
   const methods = {
@@ -71,12 +66,11 @@
       })
     },
     /**
-     * @param {Object} vlol
      * @return {ol.StyleFunction}
      * @protected
      */
-    getDefaultStyles (vlol) {
-      const defaultStyles = mapValues(styles => styles.map(vlol.style.style), vlol.style.defaultEditStyle())
+    getDefaultStyles () {
+      const defaultStyles = mapValues(styles => styles.map(styleHelper.style), styleHelper.defaultEditStyle())
 
       return function __selectDefaultStyleFunc (feature) {
         if (feature.getGeometry()) {
@@ -89,6 +83,16 @@
      */
     getFeatures () {
       return (this.$interaction && this.$interaction.getFeatures().getArray()) || []
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(
+        this::interaction.methods.getServices(),
+        this::stylesContainer.methods.getServices()
+      )
     },
     /**
      * @return {ol.interaction.Interaction|undefined}
@@ -229,7 +233,7 @@
 
   export default {
     name: 'vl-interaction-select',
-    mixins: [interaction, styleTarget],
+    mixins: [interaction, stylesContainer],
     props,
     computed,
     methods,

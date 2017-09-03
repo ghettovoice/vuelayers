@@ -21,14 +21,14 @@
      * @protected
      */
     mount () {
-      this.$parent && this.$parent.setFill(this)
+      this.$stylesContainer && this.$stylesContainer.setFill(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent && this.$parent.setFill(undefined)
+      this.$stylesContainer && this.$stylesContainer.setFill(undefined)
     }
   }
 

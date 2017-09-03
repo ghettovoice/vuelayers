@@ -2,6 +2,7 @@
   import Text from 'ol/style/text'
   import style from '../style'
   import withFillStroke from '../with-fill-stroke'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   const props = {
     font: {
@@ -64,14 +65,25 @@
      * @protected
      */
     mount () {
-      this.$parent && this.$parent.setText(this)
+      this.$stylesContainer && this.$stylesContainer.setText(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent && this.$parent.setText(undefined)
+      this.$stylesContainer && this.$stylesContainer.setText(undefined)
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(this::style.methods.getServices(), {
+        get stylesContainer () { return vm }
+      })
     }
   }
 

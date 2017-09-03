@@ -1,9 +1,10 @@
-import Vue from 'vue'
 import uuid from 'uuid/v4'
+import Vue from 'vue'
+import * as assert from '../../utils/assert'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import cmp from '../ol-virt-cmp'
-import useMapCmp from '../ol-use-map-cmp'
-import * as assert from '../../utils/assert'
+import sourceContainer from '../source-container'
+import useMapCmp from '../use-map-cmp'
 
 const props = {
   id: {
@@ -71,53 +72,39 @@ const methods = {
     return this.$map.forEachLayerAtPixel(pixel, l => l === this.$layer)
   },
   /**
-   * @return {ol.layer.Layer|undefined}
-   */
-  getLayer () {
-    return this.$olObject
-  },
-  /**
    * @returns {Object}
    * @protected
    */
   getServices () {
     const vm = this
 
-    return mergeDescriptors(this::cmp.methods.getServices(), {
-      get layer () { return vm.$layer }
-    })
+    return mergeDescriptors(
+      this::cmp.methods.getServices(),
+      this::sourceContainer.methods.getServices(),
+      {
+        get layer () { return vm.$layer }
+      }
+    )
   },
   /**
-   * @return {ol.source.Source|undefined}
+   * @return {{
+   *     setSource: function(ol.source.Source): void,
+   *     getSource: function(): ol.source.Source
+   *   }|undefined}
+   * @protected
    */
-  getSource () {
-    return this._source
-  },
-  /**
-   * @param {ol.source.Source|Vue|undefined} source
-   * @return {void}
-   */
-  setSource (source) {
-    source = source instanceof Vue ? source.$source : source
-
-    if (source !== this._source) {
-      this._source = source
-    }
-    if (this.$layer && source !== this.$layer.getSource()) {
-      this.$layer.setSource(source)
-    }
+  getSourceTarget () {
+    return this.$layer
   },
   /**
    * @return {void}
    * @protected
    */
   mount () {
-    if (this.$parent) {
-      if (this.overlay) {
-        this.setMap(this.$parent)
-      } else {
-        this.$parent.addLayer(this)
-      }
+    if (this.overlay && this.$map) {
+      this.setMap(this.$map)
+    } else if (this.$layersContainer) {
+      this.$layersContainer.addLayer(this)
     }
 
     this.subscribeAll()
@@ -129,12 +116,10 @@ const methods = {
   unmount () {
     this.unsubscribeAll()
 
-    if (this.$parent) {
-      if (this.overlay) {
-        this.setMap(undefined)
-      } else {
-        this.$parent.removeLayer(this)
-      }
+    if (this.overlay) {
+      this.setMap(undefined)
+    } else if (this.$layersContainer) {
+      this.$layersContainer.removeLayer(this)
     }
   },
   /**
@@ -189,7 +174,7 @@ const watch = {
 }
 
 export default {
-  mixins: [cmp, useMapCmp],
+  mixins: [cmp, useMapCmp, sourceContainer],
   props,
   methods,
   watch,
@@ -202,20 +187,13 @@ export default {
     }
   },
   created () {
-    /**
-     * @type {ol.source.Source|undefined}
-     * @private
-     */
-    this._source = undefined
-
     Object.defineProperties(this, {
+      /**
+       * @type {ol.layer.Layer|undefined}
+       */
       $layer: {
         enumerable: true,
-        get: this.getLayer
-      },
-      $source: {
-        enumerable: true,
-        get: this.getSource
+        get: () => this.$olObject
       },
       $map: {
         enumerable: true,
@@ -224,10 +202,11 @@ export default {
       $view: {
         enumerable: true,
         get: () => this.$services && this.$services.view
+      },
+      $layersContainer: {
+        enumerable: true,
+        get: () => this.$services && this.$services.layersContainer
       }
     })
-  },
-  destroyed () {
-    this._source = undefined
   }
 }

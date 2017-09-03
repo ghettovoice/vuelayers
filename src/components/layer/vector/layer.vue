@@ -1,7 +1,8 @@
 <script>
   import VectorLayer from 'ol/layer/vector'
   import layer from '../layer'
-  import styleTarget from '../../style-target'
+  import stylesContainer from '../../styles-container'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   const props = {
     updateWhileAnimating: Boolean,
@@ -32,6 +33,16 @@
       })
     },
     /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(
+        this::layer.methods.getServices(),
+        this::stylesContainer.methods.getServices()
+      )
+    },
+    /**
      * @return {ol.layer.Vector|undefined}
      * @protected
      */
@@ -42,7 +53,7 @@
 
   export default {
     name: 'vl-layer-vector',
-    mixins: [layer, styleTarget],
+    mixins: [layer, stylesContainer],
     props,
     methods
   }

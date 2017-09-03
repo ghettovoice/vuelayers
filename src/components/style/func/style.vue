@@ -8,8 +8,9 @@
   import * as vlol from '../../../ol-ext'
   import { warndbg } from '../../../utils/debug'
   import style from '../style'
-  import styleTarget from '../../style-target'
+  import stylesContainer from '../../styles-container'
   import * as assert from '../../../utils/assert'
+  import mergeDescriptors from '../../../utils/multi-merge-descriptors'
 
   const props = {
     /**
@@ -62,17 +63,28 @@
      * @protected
      */
     mount () {
-      this.$parent && this.$parent.addStyle(this)
+      this.$stylesContainer && this.$stylesContainer.addStyle(this)
     },
     /**
      * @return {void}
      * @protected
      */
     unmount () {
-      this.$parent && this.$parent.removeStyle(this)
+      this.$stylesContainer && this.$stylesContainer.removeStyle(this)
     },
     /**
-     * Overrides style-target `setStyle` method
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(this::style.methods.getServices(), {
+        get stylesContainer () { return vm }
+      })
+    },
+    /**
+     * Overrides stylesContainer `setStyle` method
      * @param {Array<{ style: ol.style.Style, condition: (function|boolean|undefined) }>|ol.StyleFunction|Vue|undefined} styles
      * @return {void}
      */
@@ -104,7 +116,7 @@
 
   export default {
     name: 'vl-style-func',
-    mixins: [style, styleTarget],
+    mixins: [style, stylesContainer],
     props,
     computed,
     methods,

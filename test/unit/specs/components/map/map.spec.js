@@ -22,7 +22,7 @@ describe('vl-map', () => {
 
         vm.$destroy()
         Vue.nextTick(done)
-      })
+      }).catch(done)
     })
   })
 
@@ -38,7 +38,7 @@ describe('vl-map', () => {
 
         vm.$destroy()
         Vue.nextTick(done)
-      })
+      }).catch(done)
     })
 
     it('should render correct contents', done => {
@@ -50,7 +50,7 @@ describe('vl-map', () => {
 
         vm.$destroy()
         Vue.nextTick(done)
-      })
+      }).catch(done)
     })
   })
 
@@ -67,7 +67,7 @@ describe('vl-map', () => {
 
         vm.$destroy()
         Vue.nextTick(done)
-      })
+      }).catch(done)
     })
   })
 
@@ -77,12 +77,11 @@ describe('vl-map', () => {
 
       vm.$createPromise.then(() => {
         expect(vm.$view).to.be.instanceof(olView)
-        expect(vm.getView()).to.instanceof(olView)
-        expect(vm.$view).to.equal(vm.getView())
+        expect(vm.$view).to.equal(vm.$map.getView())
 
         vm.$destroy()
         Vue.nextTick(done)
-      })
+      }).catch(done)
     })
   })
 })

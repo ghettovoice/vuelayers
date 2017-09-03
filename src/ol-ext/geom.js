@@ -11,7 +11,7 @@ import MultiLineString from 'ol/geom/multilinestring'
 import MultiPolygon from 'ol/geom/multipolygon'
 import GeometryCollection from 'ol/geom/geometrycollection'
 import turfPointOnSurface from '@turf/point-on-surface'
-import { GEOMETRY_TYPE } from './consts'
+import { GEOMETRY_TYPE, WGS84_SPHERE } from './consts'
 
 /**
  * @param {number|number[]} lonOrCoordinates
@@ -72,6 +72,15 @@ export function multiPolygon (polygons) {
  */
 export function collection (geoms) {
   return new GeometryCollection(geoms)
+}
+
+/**
+ * @param {ol.Coordinate|number[]} center
+ * @param {number} radius
+ * @return {ol.geom.Polygon}
+ */
+export function circularPolygon (center, radius) {
+  return Polygon.circular(WGS84_SPHERE, center, radius)
 }
 
 /**

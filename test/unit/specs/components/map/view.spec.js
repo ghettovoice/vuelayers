@@ -21,7 +21,7 @@ describe('view component', () => {
 
         vm.$destroy()
         Vue.nextTick(done)
-      })
+      }).catch(done)
     })
   })
 
@@ -35,7 +35,7 @@ describe('view component', () => {
       vm.$mountPromise.then(() => {
         vm.$destroy()
         Vue.nextTick(done)
-      })
+      }).catch(done)
     })
   })
 })

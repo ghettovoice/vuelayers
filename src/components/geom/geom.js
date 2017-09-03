@@ -2,9 +2,11 @@ import { isEqual } from 'lodash/fp'
 import mergeDescriptors from '../../utils/multi-merge-descriptors'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/throttleTime'
+import 'rxjs/add/operator/distinctUntilChanged'
 import '../../rx-ext'
 import cmp from '../ol-virt-cmp'
-import useMapCmp from '../ol-use-map-cmp'
+import useMapCmp from '../use-map-cmp'
 import { extent as extentHelper, proj as projHelper } from '../../ol-ext'
 import * as assert from '../../utils/assert'
 
@@ -92,12 +94,6 @@ const methods = {
     return this::cmp.methods.deinit()
   },
   /**
-   * @returns {ol.geometry.Geometry|undefined}
-   */
-  getGeometry () {
-    return this.$olObject
-  },
-  /**
    * @return {Promise}
    */
   refresh () {
@@ -119,7 +115,7 @@ const methods = {
    * @protected
    */
   mount () {
-    this.$parent && this.$parent.setGeometry(this)
+    this.$geometryContainer && this.$geometryContainer.setGeometry(this)
     this.subscribeAll()
   },
   /**
@@ -128,7 +124,7 @@ const methods = {
    */
   unmount () {
     this.unsubscribeAll()
-    this.$parent && this.$parent.setGeometry(undefined)
+    this.$geometryContainer && this.$geometryContainer.setGeometry(undefined)
   },
   /**
    * @return {void}
@@ -174,9 +170,12 @@ export default {
   },
   created () {
     Object.defineProperties(this, {
+      /**
+       * @type {ol.geom.Geometry|undefined}
+       */
       $geometry: {
         enumerable: true,
-        get: this.getGeometry
+        get: () => this.$olObject
       },
       $map: {
         enumerable: true,
@@ -185,6 +184,10 @@ export default {
       $view: {
         enumerable: true,
         get: () => this.$services && this.$services.view
+      },
+      $geometryContainer: {
+        enumerable: true,
+        get: () => this.$services && this.$services.geometryContainer
       }
     })
   }
@@ -198,17 +201,23 @@ function subscribeToGeomChanges () {
   assert.hasGeometry(this)
 
   const ft = 100
-  const events = Observable.fromOlChangeEvent(this.$geometry, undefined, isEqualGeom, ft, () => ({
-    coordinates: this.toLonLat(this.$geometry.getCoordinates()),
-    extent: this.extentToLonLat(this.$geometry.getExtent())
-  })).map(({ value: { coordinates } }) => ({
-    name: 'update:coordinates',
-    value: coordinates
-  }))
+  const changes = Observable.fromOlEvent(
+    this.$geometry,
+    'change',
+    () => ({
+      coordinates: this.toLonLat(this.$geometry.getCoordinates()),
+      extent: this.extentToLonLat(this.$geometry.getExtent())
+    })
+  ).throttleTime(ft)
+    .distinctUntilChanged(isEqualGeom)
+    .map(({ value: { coordinates } }) => ({
+      prop: 'coordinates',
+      value: coordinates
+    }))
 
-  this.subscribeTo(events, ({ name, value }) => {
+  this.subscribeTo(changes, ({ prop, value }) => {
     ++this.rev
-    this.$emit(name, value)
+    this.$emit(`update:${prop}`, value)
   })
 }
 
