@@ -17,6 +17,10 @@ const webpackConfig = merge(baseWebpackConfig, {
         loader: 'vue-loader',
         options: utils.vueLoaderConfig()
       },
+      {
+        test: /\.md$/,
+        loader: 'vue-markdown-loader'
+      },
       ...utils.styleLoaders({
         sourceMap: true
       })

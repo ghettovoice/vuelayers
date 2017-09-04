@@ -45,7 +45,6 @@
   @import ~bulma/bulma
   @import sass/helpers
   @import sass/base
-  @import sass/loader
 
   // Page loader
   #page-loader
