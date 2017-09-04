@@ -141,5 +141,6 @@ $RECYCLE.BIN/
 ### App
 .DS_Store
 test/e2e/reports
+test/unit/coverage
 dist
-dist-demo
+dist-docs

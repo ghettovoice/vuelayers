@@ -1,4 +1,4 @@
-// This is webpack config for hot mode
+// This is webpack config for docs hot mode
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
