@@ -2,7 +2,7 @@
 @import "~bulma/sass/utilities/_all";
 
 // Set your colors
-$primary: "#8c67ef";
+$primary: #02AAD2;
 $primary-invert: findColorInvert($primary);
 
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
@@ -22,5 +22,12 @@ $link: $primary;
 $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
-// Nav
-$nav-item-primary-color: $primary;
+// Menu
+$menu-item-color: $text;
+$menu-item-radius: $radius-small;
+$menu-item-hover-color: $text-strong;
+$menu-item-hover-background-color: $background;
+$menu-item-active-color: $link-invert;
+$menu-item-active-background-color: $link;
+$menu-list-border-left: 1px solid $border;
+$menu-label-color: $text-light;

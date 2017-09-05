@@ -20,6 +20,9 @@ const webpackConfig = merge(baseWebpackConfig, {
       {
         test: /\.md$/,
         loader: 'vue-markdown-loader',
+        options: {
+          preprocess: (md, src) => `<div class="content">${src}</div>`,
+        },
       },
       ...utils.styleLoaders({
         sourceMap: true,

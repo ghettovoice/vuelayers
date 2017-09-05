@@ -16,7 +16,6 @@ const webpackConfig = merge(baseWebpackConfig, {
     path: utils.resolve('dist-docs'),
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js'),
-    publicPath: '',
   },
   module: {
     rules: [
@@ -28,6 +27,9 @@ const webpackConfig = merge(baseWebpackConfig, {
       {
         test: /\.md$/,
         loader: 'vue-markdown-loader',
+        options: {
+          preprocess: (md, src) => `<div class="content">${src}</div>`,
+        },
       },
       ...utils.styleLoaders({
         sourceMap: true,

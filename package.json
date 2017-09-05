@@ -4,6 +4,7 @@
   "version": "0.6.2",
   "description": "Vue components to work with OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
+  "authorName": "Vladimir Vershinin",
   "main": "dist/vuelayers.cjs.js",
   "module": "dist/vuelayers.es.js",
   "scripts": {
@@ -12,7 +13,8 @@
     "rollup": "node build/rollup.js",
     "umd": "webpack --config=build/webpack.umd.conf.js --progress",
     "umd-min": "cross-env NODE_ENV=production webpack --config=build/webpack.umd.conf.js --progress",
-    "build": "rm -rf dist && npm run lint && npm run rollup",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && npm run lint && npm run rollup",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
@@ -22,7 +24,8 @@
     "travis-test": "npm run unit && npm run e2e -- --env travis",
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls",
     "docs-start": "node build/dev-server.js --name docs",
-    "docs-build": "rm -rf dist-docs && cross-env NODE_ENV=production webpack --config=build/webpack.docs.prod.conf.js --progress",
+    "docs-clean": "rm -rf dist-docs",
+    "docs-build": "npm run docs-clean && cross-env NODE_ENV=production BASE_URL=/vuelayers/ webpack --config=build/webpack.docs.prod.conf.js --progress",
     "docs-deploy": "gh-pages -d dist-docs"
   },
   "directories": {
@@ -133,7 +136,6 @@
     "ora": "^1.3.0",
     "phantomjs-prebuilt": "^2.1.15",
     "postcss": "^6.0.9",
-    "progressbar.js": "^1.0.1",
     "rollup": "^0.48.2",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-commonjs": "^8.2.0",

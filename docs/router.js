@@ -1,18 +1,15 @@
+/* global BASE_URL */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import routes, { flatRoutes } from './routes'
 
 Vue.use(VueRouter)
 
-const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: resolve => require(['./pages/index.md'], resolve),
-  },
-]
-
 const router = new VueRouter({
-  routes,
+  mode: 'history',
+  base: BASE_URL,
+  linkExactActiveClass: 'router-link-exact-active is-active',
+  routes: flatRoutes(routes),
 })
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || document.title
