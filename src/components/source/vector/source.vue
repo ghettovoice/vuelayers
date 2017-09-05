@@ -10,7 +10,7 @@
      */
     features: {
       type: Array,
-      default: stubArray
+      default: stubArray,
     },
     /**
      * Source loader factory
@@ -23,7 +23,7 @@
      */
     formatFactory: {
       type: Function,
-      default: defaultFormatFactory
+      default: defaultFormatFactory,
     },
     /**
      * String or url factory
@@ -36,12 +36,12 @@
      */
     strategyFactory: {
       type: Function,
-      default: defaultStrategyFactory
+      default: defaultStrategyFactory,
     },
     overlaps: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   }
 
   const computed = {
@@ -64,7 +64,7 @@
       if (this.formatFactory) {
         return this.formatFactory()
       }
-    }
+    },
   }
 
   const methods = {
@@ -83,7 +83,7 @@
         strategy: this.strategy,
         format: this.format,
         url: this.urlFunc,
-        overlaps: this.overlaps
+        overlaps: this.overlaps,
       })
     },
     /**
@@ -101,7 +101,7 @@
     unmount () {
       this.clear()
       this::vectSource.methods.unmount()
-    }
+    },
   }
 
   const diffById = differenceWith((a, b) => a.id === b.id)
@@ -114,7 +114,7 @@
 
       this.addFeatures(forAdd)
       this.removeFeatures(forRemove)
-    }
+    },
   }
 
   export default {
@@ -123,7 +123,7 @@
     props,
     computed,
     methods,
-    watch
+    watch,
   }
 
   /**

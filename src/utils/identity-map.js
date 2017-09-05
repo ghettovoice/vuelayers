@@ -9,7 +9,7 @@ export default class IdentityMap {
 
     this.map[id] = {
       value,
-      refs: 1
+      refs: 1,
     }
   }
 

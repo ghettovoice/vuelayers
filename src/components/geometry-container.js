@@ -28,7 +28,7 @@ const methods = {
     const vm = this
 
     return {
-      get geometryContainer () { return vm }
+      get geometryContainer () { return vm },
     }
   },
   /**
@@ -51,7 +51,7 @@ const methods = {
     if (geomTarget && geom !== geomTarget.getGeometry()) {
       geomTarget.setGeometry(geom)
     }
-  }
+  },
 }
 
 export default {
@@ -66,11 +66,11 @@ export default {
     Object.defineProperties(this, {
       $geometry: {
         enumerable: true,
-        get: this.getGeometry
-      }
+        get: this.getGeometry,
+      },
     })
   },
   destroyed () {
     this._geometry = undefined
-  }
+  },
 }

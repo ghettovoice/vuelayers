@@ -16,48 +16,48 @@
     center: {
       type: Array,
       default: () => [0, 0],
-      validator: value => value.length === 2
+      validator: value => value.length === 2,
     },
     constrainRotation: {
       type: Boolean,
-      default: true
+      default: true,
     },
     enableRotation: {
       type: Boolean,
-      default: true
+      default: true,
     },
     extent: {
       type: Array,
-      validator: value => value.length === 4
+      validator: value => value.length === 4,
     },
     maxResolution: Number,
     minResolution: Number,
     maxZoom: {
       type: Number,
-      default: MAX_ZOOM
+      default: MAX_ZOOM,
     },
     minZoom: {
       type: Number,
-      default: MIN_ZOOM
+      default: MIN_ZOOM,
     },
     projection: {
       type: String,
-      default: EPSG_3857
+      default: EPSG_3857,
     },
     resolution: Number,
     resolutions: Array,
     rotation: {
       type: Number,
-      default: 0
+      default: 0,
     },
     zoom: {
       type: Number,
-      default: MIN_ZOOM
+      default: MIN_ZOOM,
     },
     zoomFactor: {
       type: Number,
-      default: ZOOM_FACTOR
-    }
+      default: ZOOM_FACTOR,
+    },
   }
 
   const computed = {
@@ -100,7 +100,7 @@
         resolutions: this.resolutions,
         rotation: this.rotation,
         zoom: this.zoom,
-        zoomFactor: this.zoomFactor
+        zoomFactor: this.zoomFactor,
       })
     },
     /**
@@ -127,7 +127,7 @@
           callback: complete => {
             cb(complete)
             resolve(complete)
-          }
+          },
         })
       })
     },
@@ -153,7 +153,7 @@
      */
     subscribeAll () {
       this::subscribeToViewChanges()
-    }
+    },
   }
 
   const watch = {
@@ -187,7 +187,7 @@
       if (this.$view && value !== this.$view.getMaxZoom()) {
         this.$view.setMaxZoom(value)
       }
-    }
+    },
   }
 
   export default {
@@ -200,11 +200,11 @@
     stubVNode: {
       empty () {
         return this.$options.name
-      }
+      },
     },
     data () {
       return {
-        rev: 1
+        rev: 1,
       }
     },
     created () {
@@ -214,14 +214,14 @@
          */
         $view: {
           enumerable: true,
-          get: () => this.$olObject
+          get: () => this.$olObject,
         },
         $viewContainer: {
           enumerable: true,
-          get: () => this.$services && this.$services.viewContainer
-        }
+          get: () => this.$services && this.$services.viewContainer,
+        },
       })
-    }
+    },
   }
 
   /**
@@ -236,7 +236,7 @@
     const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution.map(() => ({
       prop: 'zoom',
-      value: this::getZoom()
+      value: this::getZoom(),
     })).debounceTime(2 * ft)
       .distinctUntilChanged(isEqual)
 

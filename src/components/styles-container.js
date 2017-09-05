@@ -31,7 +31,7 @@ export default {
       const vm = this
 
       return {
-        get stylesContainer () { return vm }
+        get stylesContainer () { return vm },
       }
     },
     /**
@@ -165,6 +165,6 @@ export default {
             : styles
         }
       }
-    }
-  }
+    },
+  },
 }

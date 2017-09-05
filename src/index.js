@@ -49,5 +49,5 @@ export const {
   StrokeStyle,
   StyleBox,
   StyleContainer,
-  StyleFunc
+  StyleFunc,
 } = VueLayers

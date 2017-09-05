@@ -25,7 +25,7 @@
         tileGrid: this._tileGrid,
         tilePixelRatio: this.tilePixelRatio,
         tileUrlFunction: this.createTileUrlFunction(),
-        wrapX: this.wrapX
+        wrapX: this.wrapX,
       })
     },
     /**
@@ -40,14 +40,14 @@
         this._tileGrid,
         extentHelper.fromProjection(this.$view.getProjection())
       )
-    }
+    },
   }
 
   // watch only url changes, other settings (like tileGrid) can't be changed at runtime
   const watch = {
     urlTmpl () {
       this.$source && this.$source.setTileUrlFunction(this.createTileUrlFunction())
-    }
+    },
   }
 
   export default {
@@ -55,6 +55,6 @@
     mixins: [tileSource],
     props,
     methods,
-    watch
+    watch,
   }
 </script>

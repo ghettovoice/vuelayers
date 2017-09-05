@@ -39,7 +39,7 @@ export default {
       this._rxSubs.push(subs)
 
       return subs
-    }
+    },
   },
   beforeCreate () {
     /**
@@ -50,5 +50,5 @@ export default {
   },
   destroyed () {
     this.unsubscribeAll()
-  }
+  },
 }

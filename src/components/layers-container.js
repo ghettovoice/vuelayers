@@ -67,9 +67,9 @@ const methods = {
     const vm = this
 
     return {
-      get layersContainer () { return vm }
+      get layersContainer () { return vm },
     }
-  }
+  },
 }
 
 export default {
@@ -83,5 +83,5 @@ export default {
   },
   destroyed () {
     this._layers = Object.create(null)
-  }
+  },
 }

@@ -8,12 +8,12 @@
     coordinates: {
       type: Array,
       required: true,
-      validator: value => value.length === 2
-    }
+      validator: value => value.length === 2,
+    },
   }
 
   const computed = {
-    type: constant(GEOMETRY_TYPE.POINT)
+    type: constant(GEOMETRY_TYPE.POINT),
   }
 
   const methods = {
@@ -23,7 +23,7 @@
      */
     createGeometry () {
       return new Point(this.fromLonLat(this.coordinates))
-    }
+    },
   }
 
   export default {
@@ -31,6 +31,6 @@
     mixins: [geom],
     props,
     computed,
-    methods
+    methods,
   }
 </script>

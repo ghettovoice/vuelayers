@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-    <progress-bar type="circle" ref="line" :options="options" />
-
     <header id="header" class="header">
     </header>
 
@@ -14,35 +12,19 @@
 </template>
 
 <script>
-  function loopAnimate (target) {
-    target.animate(1.0, () => {
-      setTimeout(target.animate(0, () => {
-        setTimeout(loopAnimate(target), 10)
-      }), 10)
-    })
-  }
-
   export default {
-    data () {
-      return {
-        options: {
-          color: '#007AFF',
-          strokeWidth: 0.5,
-          duration: 1200
-        }
-      }
-    },
-    mounted: function () {
-      loopAnimate(this.$refs.line)
-    }
+    name: 'app',
   }
 </script>
 
 <style lang="sass">
   /*! VueLayers.js site */
+  // import theme variables
   @import sass/variables
   // Import Bulma and Buefy styles
-  @import ~bulma/bulma
+  @import ~bulma
+  @import ~buefy/src/scss/buefy
+  // import other
   @import sass/helpers
   @import sass/base
 

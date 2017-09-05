@@ -67,9 +67,9 @@ const methods = {
     const vm = this
 
     return {
-      get overlaysContainer () { return vm }
+      get overlaysContainer () { return vm },
     }
-  }
+  },
 }
 
 export default {
@@ -83,5 +83,5 @@ export default {
   },
   destroyed () {
     this._overlays = Object.create(null)
-  }
+  },
 }

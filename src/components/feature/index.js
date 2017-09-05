@@ -7,5 +7,5 @@ export default {
   Feature,
   install (Vue) {
     Vue.component(Feature.name, Feature)
-  }
+  },
 }

@@ -32,7 +32,7 @@ const methods = {
       this.$style.setStroke(stroke)
       this.requestRefresh()
     }
-  }
+  },
 }
 
 export default {
@@ -41,9 +41,9 @@ export default {
     empty: false,
     attrs () {
       return {
-        class: this.$options.name
+        class: this.$options.name,
       }
-    }
+    },
   },
   created () {
     /**
@@ -59,5 +59,5 @@ export default {
   },
   destroyed () {
     this._fill = this._stroke = undefined
-  }
+  },
 }

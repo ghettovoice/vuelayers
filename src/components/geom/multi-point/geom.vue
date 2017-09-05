@@ -7,7 +7,7 @@
   const props = {}
 
   const computed = {
-    type: constant(GEOMETRY_TYPE.MULTI_POINT)
+    type: constant(GEOMETRY_TYPE.MULTI_POINT),
   }
 
   const methods = {
@@ -17,7 +17,7 @@
      */
     createGeometry () {
       return new MultiPoint(this.fromLonLat(this.coordinates))
-    }
+    },
   }
 
   export default {
@@ -25,6 +25,6 @@
     mixins: [geom],
     props,
     computed,
-    methods
+    methods,
   }
 </script>

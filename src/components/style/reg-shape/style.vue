@@ -8,23 +8,23 @@
   const props = {
     points: {
       type: Number,
-      required: true
+      required: true,
     },
     radius: Number,
     radius1: Number,
     radius2: Number,
     angle: {
       type: Number,
-      default: 0
+      default: 0,
     },
     rotation: {
       type: Number,
-      default: 0
+      default: 0,
     },
     rotateWithView: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   }
 
   const methods = {
@@ -43,7 +43,7 @@
         rotateWithView: this.rotateWithView,
         snapToPixel: this.snapToPixel,
         fill: this._fill,
-        stroke: this._stroke
+        stroke: this._stroke,
       })
     },
     /**
@@ -54,7 +54,7 @@
       const vm = this
 
       return mergeDescriptors(this::imageStyle.methods.getServices(), {
-        get stylesContainer () { return vm }
+        get stylesContainer () { return vm },
       })
     },
     /**
@@ -80,13 +80,13 @@
         this._stroke = stroke
         this.requestRefresh()
       }
-    }
+    },
   }
 
   export default {
     name: 'vl-style-reg-shape',
     mixins: [imageStyle, withFillStroke],
     props,
-    methods
+    methods,
   }
 </script>

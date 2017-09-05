@@ -29,12 +29,12 @@
   const props = {
     id: {
       type: [String, Number],
-      default: () => uuid()
+      default: () => uuid(),
     },
     properties: {
       type: Object,
-      default: () => Object.create(null)
-    }
+      default: () => Object.create(null),
+    },
   }
 
   const computed = {
@@ -42,7 +42,7 @@
       if (this.rev && this.$geometry) {
         return geoJson.writeGeometry(this.$geometry)
       }
-    }
+    },
   }
 
   const methods = {
@@ -85,7 +85,7 @@
         this::geometryContainer.methods.getServices(),
         this::stylesContainer.methods.getServices(),
         {
-          get feature () { return vm.$feature }
+          get feature () { return vm.$feature },
         }
       )
     },
@@ -131,7 +131,7 @@
      */
     subscribeAll () {
       this::subscribeToFeatureChanges()
-    }
+    },
   }
 
   const watch = {
@@ -151,7 +151,7 @@
       if (this.$feature && !isEqual(value, plainProps(this.$feature.getProperties()))) {
         this.$feature.setProperties(plainProps(value))
       }
-    }
+    },
   }
 
   export default {
@@ -163,7 +163,7 @@
     watch,
     data () {
       return {
-        rev: 1
+        rev: 1,
       }
     },
     created () {
@@ -173,26 +173,26 @@
          */
         $feature: {
           enumerable: true,
-          get: () => this.$olObject
+          get: () => this.$olObject,
         },
         $layer: {
           enumerable: true,
-          get: () => this.$services && this.$services.layer
+          get: () => this.$services && this.$services.layer,
         },
         $map: {
           enumerable: true,
-          get: () => this.$services && this.$services.map
+          get: () => this.$services && this.$services.map,
         },
         $view: {
           enumerable: true,
-          get: () => this.$services && this.$services.view
+          get: () => this.$services && this.$services.view,
         },
         $featuresContainer: {
           enumerable: true,
-          get: () => this.$services && this.$services.featuresContainer
-        }
+          get: () => this.$services && this.$services.featuresContainer,
+        },
       })
-    }
+    },
   }
 
   /**

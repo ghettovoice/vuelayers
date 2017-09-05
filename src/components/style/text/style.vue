@@ -7,37 +7,37 @@
   const props = {
     font: {
       type: String,
-      default: '10px sans-serif' // css font format https://developer.mozilla.org/en-US/docs/Web/CSS/font?v=control
+      default: '10px sans-serif', // css font format https://developer.mozilla.org/en-US/docs/Web/CSS/font?v=control
     },
     offsetX: {
       type: Number,
-      default: 0
+      default: 0,
     },
     offsetY: {
       type: Number,
-      default: 0
+      default: 0,
     },
     rotateWithView: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rotation: {
       type: Number,
-      default: 0
+      default: 0,
     },
     scale: {
       type: Number,
-      default: 1
+      default: 1,
     },
     text: String,
     textAlign: {
       type: String,
-      default: 'start' // left, right, center, end, start
+      default: 'start', // left, right, center, end, start
     },
     textBaseline: {
       type: String,
-      default: 'alphabetic' // bottom, top, middle, alphabetic, hanging, ideographic
-    }
+      default: 'alphabetic', // bottom, top, middle, alphabetic, hanging, ideographic
+    },
   }
 
   const methods = {
@@ -57,7 +57,7 @@
         textAlign: this.textAlign,
         textBaseline: this.textBaseline,
         fill: this._fill,
-        stroke: this._stroke
+        stroke: this._stroke,
       })
     },
     /**
@@ -82,9 +82,9 @@
       const vm = this
 
       return mergeDescriptors(this::style.methods.getServices(), {
-        get stylesContainer () { return vm }
+        get stylesContainer () { return vm },
       })
-    }
+    },
   }
 
   const watch = {
@@ -135,7 +135,7 @@
 
       this.$style.setTextBaseline(value)
       this.requestRefresh()
-    }
+    },
   }
 
   export default {
@@ -148,9 +148,9 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name
+          class: this.$options.name,
         }
-      }
-    }
+      },
+    },
   }
 </script>

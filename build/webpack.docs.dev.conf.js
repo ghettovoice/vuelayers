@@ -15,20 +15,20 @@ const webpackConfig = merge(baseWebpackConfig, {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: utils.vueLoaderConfig()
+        options: utils.vueLoaderConfig(),
       },
       {
         test: /\.md$/,
-        loader: 'vue-markdown-loader'
+        loader: 'vue-markdown-loader',
       },
       ...utils.styleLoaders({
-        sourceMap: true
-      })
-    ]
+        sourceMap: true,
+      }),
+    ],
   },
   plugins: [
     new webpack.DefinePlugin(Object.assign(config.replaces, {
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     })),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
@@ -37,17 +37,17 @@ const webpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'docs/index.html',
-      inject: true
+      inject: true,
     }),
-    new FriendlyErrorsPlugin()
-  ]
+    new FriendlyErrorsPlugin(),
+  ],
 })
 
 webpackConfig.entry = {
   app: [
     './build/dev-client',
-    utils.resolve('docs/main.js')
-  ]
+    utils.resolve('docs/main.js'),
+  ],
 }
 
 module.exports = webpackConfig

@@ -16,42 +16,42 @@ const webpackConfig = merge(baseWebpackConfig, {
     path: utils.resolve('dist-docs'),
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js'),
-    publicPath: ''
+    publicPath: '',
   },
   module: {
     rules: [
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: utils.vueLoaderConfig(true)
+        options: utils.vueLoaderConfig(true),
       },
       {
         test: /\.md$/,
-        loader: 'vue-markdown-loader'
+        loader: 'vue-markdown-loader',
       },
       ...utils.styleLoaders({
         sourceMap: true,
-        extract: isProduction
-      })
-    ]
+        extract: isProduction,
+      }),
+    ],
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin(Object.assign(config.replaces, {
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     })),
-    ...( isProduction ? [
+    ...(isProduction ? [
       new webpack.optimize.UglifyJsPlugin({
         mangle: true,
         sourceMap: true,
         compress: {
-          warnings: false
-        }
-      })
-    ] : [] ),
+          warnings: false,
+        },
+      }),
+    ] : []),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: utils.assetsPath('css/[name].[contenthash].css')
+      filename: utils.assetsPath('css/[name].[contenthash].css'),
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
@@ -66,12 +66,12 @@ const webpackConfig = merge(baseWebpackConfig, {
       minify: {
         removeComments: true,
         collapseWhitespace: true,
-        removeAttributeQuotes: true
+        removeAttributeQuotes: true,
         // more options:
         // https://github.com/kangax/html-minifier#options-quick-reference
       },
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-      chunksSortMode: 'dependency'
+      chunksSortMode: 'dependency',
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
@@ -83,27 +83,27 @@ const webpackConfig = merge(baseWebpackConfig, {
           /\.js$/.test(module.resource) &&
           module.resource.indexOf(utils.resolve('node_modules')) === 0
         )
-      }
+      },
     }),
     // extract webpack runtime and module manifest to its own file in order to
     // prevent vendor hash from being updated whenever app bundle is updated
     new webpack.optimize.CommonsChunkPlugin({
       name: 'manifest',
-      chunks: ['vendor']
+      chunks: ['vendor'],
     }),
     // copy custom static assets
     new CopyWebpackPlugin([
       {
         from: utils.resolve('docs/static'),
         to: config.assetsSubDir,
-        ignore: ['.*']
-      }
-    ])
-  ]
+        ignore: ['.*'],
+      },
+    ]),
+  ],
 })
 
 webpackConfig.entry = {
-  app: utils.resolve('docs/main.js')
+  app: utils.resolve('docs/main.js'),
 }
 
 module.exports = (env = {}) => {

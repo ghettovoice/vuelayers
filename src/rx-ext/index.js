@@ -11,5 +11,5 @@ Observable.fromOlChangeEvent = fromOlChangeEvent
 
 export {
   fromOlEvent,
-  fromOlChangeEvent
+  fromOlChangeEvent,
 }

@@ -11,7 +11,7 @@ export const {
   transformExtent,
   getPointResolution,
   get,
-  equivalent
+  equivalent,
 } = olproj
 
 /**
@@ -123,28 +123,28 @@ export function multiPolygonFromLonLat (coordinates, projection = EPSG_3857) {
 export const transforms = {
   [ GEOMETRY_TYPE.POINT ]: {
     toLonLat: pointToLonLat,
-    fromLonLat: pointFromLonLat
+    fromLonLat: pointFromLonLat,
   },
   [ GEOMETRY_TYPE.LINE_STRING ]: {
     toLonLat: lineToLonLat,
-    fromLonLat: lineFromLonLat
+    fromLonLat: lineFromLonLat,
   },
   [ GEOMETRY_TYPE.POLYGON ]: {
     toLonLat: polygonToLonLat,
-    fromLonLat: polygonFromLonLat
+    fromLonLat: polygonFromLonLat,
   },
   [ GEOMETRY_TYPE.MULTI_POINT ]: {
     toLonLat: multiPointToLonLat,
-    fromLonLat: multiPointFromLonLat
+    fromLonLat: multiPointFromLonLat,
   },
   [ GEOMETRY_TYPE.MULTI_LINE_STRING ]: {
     toLonLat: multiLineToLonLat,
-    fromLonLat: multiLineFromLonLat
+    fromLonLat: multiLineFromLonLat,
   },
   [ GEOMETRY_TYPE.MULTI_POLYGON ]: {
     toLonLat: multiPolygonToLonLat,
-    fromLonLat: multiPolygonFromLonLat
-  }
+    fromLonLat: multiPolygonFromLonLat,
+  },
 }
 
 /**

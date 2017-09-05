@@ -61,12 +61,12 @@ describe('RxJS extensions', () => {
       const observable = Observable.fromOlEvent(olMock, [
         'click',
         {
-          event: 'move'
+          event: 'move',
         },
         {
           event: 'dblclick',
-          selector
-        }
+          selector,
+        },
       ])
 
       expect(observable).to.be.instanceof(Observable)

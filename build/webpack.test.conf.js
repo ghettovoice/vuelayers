@@ -12,17 +12,17 @@ const webpackConfig = merge(baseWebpackConfig, {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: utils.vueLoaderConfig()
+        options: utils.vueLoaderConfig(),
       },
-      ...utils.styleLoaders()
-    ]
+      ...utils.styleLoaders(),
+    ],
   },
   devtool: '#inline-source-map',
   plugins: [
     new webpack.DefinePlugin(Object.assign(config.replaces, {
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
-    }))
-  ]
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+    })),
+  ],
 })
 
 // no need for app entry during tests

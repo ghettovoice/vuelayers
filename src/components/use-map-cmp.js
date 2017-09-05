@@ -21,6 +21,6 @@ export default {
         .first()
         .map(() => this)
         .toPromise()
-    }
-  }
+    },
+  },
 }

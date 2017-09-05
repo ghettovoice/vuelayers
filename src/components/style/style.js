@@ -43,7 +43,7 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get style () { return vm.$style }
+      get style () { return vm.$style },
     })
   },
   /**
@@ -52,7 +52,7 @@ const methods = {
   refresh () {
     return Promise.resolve(this.unmount())
       .then(this.mount)
-  }
+  },
 }
 
 export default {
@@ -61,26 +61,26 @@ export default {
   stubVNode: {
     empty () {
       return this.$options.name
-    }
+    },
   },
   created () {
     Object.defineProperties(this, {
       $style: {
         enumerable: true,
-        get: () => this.$olObject
+        get: () => this.$olObject,
       },
       $map: {
         enumerable: true,
-        get: () => this.$services && this.$services.map
+        get: () => this.$services && this.$services.map,
       },
       $view: {
         enumerable: true,
-        get: () => this.$services && this.$services.view
+        get: () => this.$services && this.$services.view,
       },
       $stylesContainer: {
         enumerable: true,
-        get: () => this.$services && this.$services.stylesContainer
-      }
+        get: () => this.$services && this.$services.stylesContainer,
+      },
     })
-  }
+  },
 }

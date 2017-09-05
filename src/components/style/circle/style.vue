@@ -8,8 +8,8 @@
   const props = {
     radius: {
       type: Number,
-      default: 5
-    }
+      default: 5,
+    },
   }
 
   const methods = {
@@ -22,7 +22,7 @@
         radius: this.radius,
         snapToPixel: this.snapToPixel,
         fill: this._fill,
-        stroke: this._stroke
+        stroke: this._stroke,
       })
     },
     /**
@@ -33,7 +33,7 @@
       const vm = this
 
       return mergeDescriptors(this::imageStyle.methods.getServices(), {
-        get stylesContainer () { return vm }
+        get stylesContainer () { return vm },
       })
     },
     /**
@@ -59,13 +59,13 @@
         this._stroke = stroke
         this.requestRefresh()
       }
-    }
+    },
   }
 
   const watch = {
     radius () {
       this.requestRefresh()
-    }
+    },
   }
 
   export default {
@@ -73,6 +73,6 @@
     mixins: [imageStyle, withFillStroke],
     props,
     methods,
-    watch
+    watch,
   }
 </script>

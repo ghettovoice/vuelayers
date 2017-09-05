@@ -13,12 +13,12 @@
   const props = {
     zIndex: {
       type: Number,
-      default: 0
+      default: 0,
     },
     condition: {
       type: [Function, Boolean],
-      default: true
-    }
+      default: true,
+    },
   }
 
   const methods = {
@@ -33,7 +33,7 @@
         stroke: this._stroke,
         fill: this._fill,
         text: this._text,
-        geometry: this._geometry
+        geometry: this._geometry,
       })
     },
     /**
@@ -44,7 +44,7 @@
       const vm = this
 
       return mergeDescriptors(this::style.methods.getServices(), {
-        get stylesContainer () { return vm }
+        get stylesContainer () { return vm },
       })
     },
     /**
@@ -105,7 +105,7 @@
         this.$style.setText(text)
         this.requestRefresh()
       }
-    }
+    },
   }
 
   const watch = {
@@ -114,7 +114,7 @@
 
       this.$style.setZIndex(value)
       this.requestRefresh()
-    }
+    },
   }
 
   export default {
@@ -142,6 +142,6 @@
     },
     destroyed () {
       this._image = this._text = this._geometry = undefined
-    }
+    },
   }
 </script>

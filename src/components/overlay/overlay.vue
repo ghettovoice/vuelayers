@@ -19,36 +19,36 @@
   const props = {
     id: {
       type: [String, Number],
-      default: () => uuid()
+      default: () => uuid(),
     },
     offset: {
       type: Array,
       default: () => [0, 0],
-      validator: value => value.length === 2
+      validator: value => value.length === 2,
     },
     position: {
       type: Array,
-      validator: value => value.length === 2
+      validator: value => value.length === 2,
     },
     positioning: {
       type: String,
       default: OVERLAY_POSITIONING.TOP_LEFT,
-      validator: value => Object.values(OVERLAY_POSITIONING).includes(value)
+      validator: value => Object.values(OVERLAY_POSITIONING).includes(value),
     },
     stopEvent: Boolean,
     insertFirst: {
       type: Boolean,
-      default: true
+      default: true,
     },
     autoPan: {
       type: Boolean,
-      default: true
+      default: true,
     },
     autoPanMargin: {
       type: Number,
-      default: 20
+      default: 20,
     },
-    autoPanAnimation: Object
+    autoPanAnimation: Object,
   }
 
   const computed = {
@@ -69,7 +69,7 @@
         insertFirst: this.insertFirst,
         autoPan: this.autoPan,
         autoPanMargin: this.autoPanMargin,
-        autoPanAnimation: this.autoPanAnimation
+        autoPanAnimation: this.autoPanAnimation,
       })
     },
     /**
@@ -100,7 +100,7 @@
      */
     subscribeAll () {
       this::subscribeToOverlayChanges()
-    }
+    },
   }
 
   const watch = {
@@ -122,7 +122,7 @@
       if (this.$overlay && value !== this.$overlay.getPositioning()) {
         this.$overlay.setPositioning(value)
       }
-    }
+    },
   }
 
   // todo add scoped slot support?
@@ -135,7 +135,7 @@
     watch,
     data () {
       return {
-        rev: 1
+        rev: 1,
       }
     },
     created () {
@@ -145,22 +145,22 @@
          */
         $overlay: {
           enumerable: true,
-          get: () => this.$olObject
+          get: () => this.$olObject,
         },
         $map: {
           enumerable: true,
-          get: () => this.$services && this.$services.map
+          get: () => this.$services && this.$services.map,
         },
         $view: {
           enumerable: true,
-          get: () => this.$services && this.$services.view
+          get: () => this.$services && this.$services.view,
         },
         $overlaysContainer: {
           enumerable: true,
-          get: () => this.$services && this.$services.overlaysContainer
-        }
+          get: () => this.$services && this.$services.overlaysContainer,
+        },
       })
-    }
+    },
   }
 
   /**
@@ -176,7 +176,7 @@
       Observable.fromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
       Observable.fromOlChangeEvent(this.$overlay, [
         'offset',
-        'positioning'
+        'positioning',
       ], true, ft)
     )
 

@@ -1,14 +1,16 @@
 import 'babel-polyfill'
 import Vue from 'vue'
+import Buefy from 'buefy'
 import VueLayers from '../src'
 import App from './app.vue'
-import VueProgress from 'vue-progress'
+import router from './router'
 
-Vue.use(VueProgress)
+Vue.use(Buefy)
 Vue.use(VueLayers)
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  render: h => h(App)
+  router,
+  render: h => h(App),
 })

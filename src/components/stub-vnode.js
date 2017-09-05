@@ -35,12 +35,12 @@ export default {
     let data = {
       attrs,
       style: {
-        display: 'none !important'
-      }
+        display: 'none !important',
+      },
     }
 
     return h(options.tag || 'i', data, children)
-  }
+  },
 }
 
 function extractChildren (slots, slotNames = []) {

@@ -11,14 +11,14 @@
     hidpi: Boolean,
     layers: {
       type: String,
-      required: true
+      required: true,
     },
     serverType: String,
     styles: String, // WMS Request styles
     version: {
       type: String,
-      default: WMS_VERSION
-    }
+      default: WMS_VERSION,
+    },
   }
 
   const upperCase = x => x.toUpperCase()
@@ -38,7 +38,7 @@
           ...cleanExtParams(this.extParams),
           LAYERS: this.layers,
           STYLES: this.styles,
-          VERSION: this.version
+          VERSION: this.version,
         },
         crossOrigin: this.crossOrigin,
         gutter: this.gutter,
@@ -49,7 +49,7 @@
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         serverType: this.serverType,
         wrapX: this.wrapX,
-        url: this.urlTmpl
+        url: this.urlTmpl,
       })
     },
     /**
@@ -79,7 +79,7 @@
         projection,
         cleanExtParams(params)
       )
-    }
+    },
   }
 
   const watch = {
@@ -94,7 +94,7 @@
     },
     extParams (value) {
       this.$source && this.$source.updateParams(cleanExtParams(value))
-    }
+    },
   }
 
   export default {
@@ -102,6 +102,6 @@
     mixins: [tileSource],
     props,
     methods,
-    watch
+    watch,
   }
 </script>

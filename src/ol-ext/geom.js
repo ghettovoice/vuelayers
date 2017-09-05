@@ -93,7 +93,7 @@ export function isMulti (geom) {
     GEOMETRY_TYPE.MULTI_POINT,
     GEOMETRY_TYPE.MULTI_LINE_STRING,
     GEOMETRY_TYPE.MULTI_POLYGON,
-    GEOMETRY_TYPE.GEOMETRY_COLLECTION
+    GEOMETRY_TYPE.GEOMETRY_COLLECTION,
   ]
 
   return multiTypes.includes(geom.type || geom.getType())
@@ -136,7 +136,7 @@ export function pointOnSurface (geom) {
   const singleGeom = reduceToSingle(geom)
   const pointFeature = turfPointOnSurface({
     type: singleGeom.type || singleGeom.getType(),
-    coordinates: singleGeom.coordinates || singleGeom.getCoordinates()
+    coordinates: singleGeom.coordinates || singleGeom.getCoordinates(),
   })
 
   if (pointFeature) {

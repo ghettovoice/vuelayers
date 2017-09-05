@@ -8,16 +8,16 @@
   const props = {
     attributions: {
       type: String,
-      default: OSMSource.ATTRIBUTION.getHTML()
+      default: OSMSource.ATTRIBUTION.getHTML(),
     },
     maxZoom: {
       type: Number,
-      default: OSM_MAX_ZOOM
+      default: OSM_MAX_ZOOM,
     },
     url: {
       type: String,
-      default: OSM_URL_TEMPLATE
-    }
+      default: OSM_URL_TEMPLATE,
+    },
   }
 
   const methods = {
@@ -31,15 +31,15 @@
         cacheSize: this.cacheSize,
         opaque: this.opaque,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
-        wrapX: this.wrapX
+        wrapX: this.wrapX,
       })
-    }
+    },
   }
 
   export default {
     name: 'vl-source-osm',
     mixins: [xyzSource],
     props,
-    methods
+    methods,
   }
 </script>

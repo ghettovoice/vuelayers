@@ -8,8 +8,8 @@ const props = {
   projection: String,
   wrapX: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 }
 
 const methods = {
@@ -50,7 +50,7 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get source () { return vm.$source }
+      get source () { return vm.$source },
     })
   },
   /**
@@ -74,13 +74,13 @@ const methods = {
    */
   refresh () {
     return this::cmp.methods.refresh()
-  }
+  },
 }
 
 const watch = {
   attributions (value) {
     this.$source && this.$source.setAttributions(value)
-  }
+  },
 }
 
 export default {
@@ -91,7 +91,7 @@ export default {
   stubVNode: {
     empty () {
       return this.$options.name
-    }
+    },
   },
   created () {
     Object.defineProperties(this, {
@@ -100,20 +100,20 @@ export default {
        */
       $source: {
         enumerable: true,
-        get: () => this.$olObject
+        get: () => this.$olObject,
       },
       $map: {
         enumerable: true,
-        get: () => this.$services && this.$services.map
+        get: () => this.$services && this.$services.map,
       },
       $view: {
         enumerable: true,
-        get: () => this.$services && this.$services.view
+        get: () => this.$services && this.$services.view,
       },
       $sourceContainer: {
         enumerable: true,
-        get: () => this.$services && this.$services.sourceContainer
-      }
+        get: () => this.$services && this.$services.sourceContainer,
+      },
     })
-  }
+  },
 }

@@ -16,9 +16,9 @@
   const props = {
     tracking: {
       type: Boolean,
-      default: true
+      default: true,
     },
-    trackingOptions: Object
+    trackingOptions: Object,
     // todo add autoCenter, bindToPosition
   }
 
@@ -52,7 +52,7 @@
       if (this.rev && this.$geolocation) {
         return this.$geolocation.getSpeed()
       }
-    }
+    },
   }
 
   const methods = {
@@ -64,7 +64,7 @@
       return new Geolocation({
         tracking: this.tracking,
         trackingOptions: this.trackingOptions,
-        projection: EPSG_4326
+        projection: EPSG_4326,
       })
     },
     /**
@@ -90,7 +90,7 @@
      */
     subscribeAll () {
       this::subscribeToGeolocation()
-    }
+    },
   }
 
   const watch = {
@@ -104,7 +104,7 @@
     },
     tracingOptions (value) {
       this.$geolocation && this.$geolocation.setTrackingOptions(value)
-    }
+    },
   }
 
   export default {
@@ -117,11 +117,11 @@
     stubVNode: {
       empty () {
         return this.$options.name
-      }
+      },
     },
     data () {
       return {
-        rev: 1
+        rev: 1,
       }
     },
     created () {
@@ -131,10 +131,10 @@
          */
         $geolocation: {
           enumerable: true,
-          get: () => this.$olObject
-        }
+          get: () => this.$olObject,
+        },
       })
-    }
+    },
   }
 
   /**
@@ -153,7 +153,7 @@
         'altitudeaccuracy',
         'heading',
         'position',
-        'speed'
+        'speed',
       ],
       true,
       ft

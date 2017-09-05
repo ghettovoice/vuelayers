@@ -7,6 +7,7 @@
       <w>apidoc</w>
       <w>apikey</w>
       <w>attrs</w>
+      <w>buefy</w>
       <w>bundler</w>
       <w>bundlers</w>
       <w>chunkhash</w>
@@ -90,6 +91,7 @@
       <w>virt</w>
       <w>vlol</w>
       <w>vnode</w>
+      <w>vuejs</w>
       <w>vuelayers</w>
       <w>warndbg</w>
       <w>whatwg</w>

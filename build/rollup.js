@@ -21,7 +21,7 @@ const config = require('./config')
 
 const bundles = argv.bundles
   ? argv.bundles.split(',').map(s => s.trim())
-  : [ 'es', 'umd', 'umd-min', 'cjs', 'comp' ]
+  : ['es', 'umd', 'umd-min', 'cjs', 'comp']
 
 Promise.resolve(utils.ensureDir(config.outDir))
   // ES6
@@ -29,14 +29,14 @@ Promise.resolve(utils.ensureDir(config.outDir))
     format: 'es',
     bundleName: config.name + '.es',
     entry: config.entry,
-    external: nodeExternal()
+    external: nodeExternal(),
   }))
   // CommonJS
   .then(() => bundles.includes('cjs') && bundle({
     format: 'cjs',
     bundleName: config.name + '.cjs',
     entry: config.cjsEntry,
-    external: nodeExternal()
+    external: nodeExternal(),
   }))
   // UMD
   .then(() => bundles.includes('umd') && bundle({
@@ -44,11 +44,11 @@ Promise.resolve(utils.ensureDir(config.outDir))
     bundleName: config.name + '.umd',
     entry: config.cjsEntry,
     env: 'development',
-    external: [ 'vue', 'openlayers', 'ol' ],
+    external: ['vue', 'openlayers', 'ol'],
     globals: {
       vue: 'Vue',
-      openlayers: 'ol'
-    }
+      openlayers: 'ol',
+    },
   }))
   // UMD minified
   .then(() => bundles.includes('umd-min') && bundle({
@@ -56,45 +56,45 @@ Promise.resolve(utils.ensureDir(config.outDir))
     bundleName: config.name + '.umd.min',
     entry: config.cjsEntry,
     env: 'production',
-    external: [ 'vue', 'openlayers', 'ol' ],
+    external: ['vue', 'openlayers', 'ol'],
     globals: {
       vue: 'Vue',
-      openlayers: 'ol'
-    }
+      openlayers: 'ol',
+    },
   }))
   // Separate CommonJS modules
   .then(() => {
     return bundles.includes('comp') && bundle({
-        format: 'cjs',
-        bundleName: 'modules/index',
-        styleName: 'modules/style',
-        entry: config.cjsEntry,
-        external: nodeExternal()
-      }).then(() => Promise.all([
-          getUtils(),
-          getCommons(),
-          getComponents()
-        ]))
-        .then(result => {
-          let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
-          let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
+      format: 'cjs',
+      bundleName: 'modules/index',
+      styleName: 'modules/style',
+      entry: config.cjsEntry,
+      external: nodeExternal(),
+    }).then(() => Promise.all([
+      getUtils(),
+      getCommons(),
+      getComponents(),
+    ]))
+      .then(result => {
+        let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
+        let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
 
-          return Promise.all(bundles.map(opts => bundle({
-            format: 'cjs',
-            entry: opts.entry,
-            bundleName: opts.bundleName,
-            styleName: opts.styleName,
-            external: nodeExternal(),
-            modules: true,
-            bundlesMap
-          })))
-        })
+        return Promise.all(bundles.map(opts => bundle({
+          format: 'cjs',
+          entry: opts.entry,
+          bundleName: opts.bundleName,
+          styleName: opts.styleName,
+          external: nodeExternal(),
+          modules: true,
+          bundlesMap,
+        })))
+      })
   })
   // All done
   .then(() => {
     notifier.notify({
       title: config.fullname,
-      message: 'Excellent, all bundles are ready!'
+      message: 'Excellent, all bundles are ready!',
     })
   })
   .catch(err => {
@@ -113,9 +113,9 @@ function bundle (opts = {}) {
   }
 
   const plugins = [
-    ...(opts.modules ? [ externalize(opts.bundlesMap) ] : []),
+    ...(opts.modules ? [externalize(opts.bundlesMap)] : []),
     replace(Object.assign(replaces(opts), {
-      sourceMap: true
+      sourceMap: true,
     })),
     vue({
       compileTemplate: true,
@@ -127,32 +127,32 @@ function bundle (opts = {}) {
         sourceMapEmbed: true,
         includePaths: [
           utils.resolve('src'),
-          utils.resolve('node_modules')
-        ]
+          utils.resolve('node_modules'),
+        ],
       },
       // todo process each style with postcss, then concatenate sources and source maps
       css: style => {
         postcssPromise = opts.styleName !== false
           ? postcssProcess(opts.styleName || bundleName, style)
           : Promise.resolve([])
-      }
+      },
     }),
     babel({
       runtimeHelpers: true,
       sourceMap: true,
       include: [
         'src/**/*',
-        'node_modules/ol-tilecache/**/*'
-      ]
+        'node_modules/ol-tilecache/**/*',
+      ],
     }),
     nodeResolve({
       main: true,
       module: true,
       jsnext: true,
       browser: true,
-      preferBuiltins: false
+      preferBuiltins: false,
     }),
-    cjs()
+    cjs(),
   ]
 
   if (opts.env === 'production' && opts.format === 'umd') {
@@ -161,19 +161,19 @@ function bundle (opts = {}) {
         mangle: true,
         sourceMap: true,
         compress: {
-          warnings: false
+          warnings: false,
         },
         output: {
           comments: (node, comment) => {
             let text = comment.value
             let type = comment.type
-            if (type === "comment2") {
+            if (type === 'comment2') {
               // multiline comment
               return /@preserve|@license|@cc_on/i.test(text)
             }
-          }
-        }
-      })
+          },
+        },
+      }),
     )
   }
 
@@ -185,7 +185,7 @@ function bundle (opts = {}) {
     .then(() => rollup.rollup({
       input: opts.entry,
       external: opts.external,
-      plugins
+      plugins,
     }))
     .then(bundler => bundler.generate({
       format: opts.format,
@@ -194,14 +194,14 @@ function bundle (opts = {}) {
       // moduleId: config.name,
       sourcemap: true,
       sourcemapFile: dest,
-      globals: opts.globals
+      globals: opts.globals,
     }))
     .then(({ code, map }) => Promise.all([
       utils.writeFile(dest, code),
       utils.writeFile(dest + '.map', map.toString()),
-      postcssPromise
+      postcssPromise,
     ]))
-    .then(([ jsSrc, jsMap, [ cssSrc, cssMap ] ]) => {
+    .then(([jsSrc, jsMap, [cssSrc, cssMap]]) => {
       spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
       console.log(jsSrc.path + ' ' + chalk.gray(jsSrc.size))
@@ -228,7 +228,7 @@ function postcssProcess (bundleName, style) {
 }
 
 function nodeExternal () {
-  const deps = [ config.name ].concat(Object.keys(dependencies))
+  const deps = [config.name].concat(Object.keys(dependencies))
     .concat(Object.keys(peerDependencies))
     .concat(Object.keys(devDependencies))
 
@@ -237,11 +237,11 @@ function nodeExternal () {
 
 function replaces (opts = {}) {
   const obj = Object.assign({}, config.replaces, {
-    '~': ''
+    '~': '',
   })
 
   if (opts.env) {
-    obj[ 'process.env.NODE_ENV' ] = opts.env
+    obj['process.env.NODE_ENV'] = opts.env
   }
 
   if (opts.format === 'cjs') {
@@ -278,7 +278,7 @@ function getComponents () {
           [
             'style/box/index',
             'style/container/index',
-            'style/func/index'
+            'style/func/index',
           ].includes(relPath) === false
         ) {
           pathParts.reverse()
@@ -293,7 +293,7 @@ function getComponents () {
             bundleName: path.join('modules', pathParts.join('-'), 'index'),
             styleName: path.join('modules', pathParts.join('-'), 'style'),
             src: path.join('components', relPath).replace('/index', ''),
-            dest: path.join('modules', pathParts.join('-'))
+            dest: path.join('modules', pathParts.join('-')),
           })
         }
 
@@ -303,7 +303,7 @@ function getComponents () {
           bundleName: path.join('modules', 'mixins', pathParts.join('-')),
           styleName: false,
           src: path.join('components', relPath),
-          dest: path.join('modules', 'mixins', pathParts.join('-'))
+          dest: path.join('modules', 'mixins', pathParts.join('-')),
         })
       }, []))
     })
@@ -311,25 +311,27 @@ function getComponents () {
 }
 
 function getCommons () {
-  return Promise.resolve([ {
-    entry: utils.resolve('src/ol-ext/index.js'),
-    bundleName: 'modules/ol-ext',
-    styleName: false,
-    src: 'ol-ext',
-    dest: 'modules/ol-ext'
-  }, {
-    entry: utils.resolve('src/rx-ext/index.js'),
-    bundleName: 'modules/rx-ext',
-    styleName: false,
-    src: 'rx-ext',
-    dest: 'modules/rx-ext'
-  }, {
-    entry: utils.resolve('src/consts.js'),
-    bundleName: 'modules/consts',
-    styleName: false,
-    src: 'consts',
-    dest: 'modules/consts'
-  } ])
+  return Promise.resolve([
+    {
+      entry: utils.resolve('src/ol-ext/index.js'),
+      bundleName: 'modules/ol-ext',
+      styleName: false,
+      src: 'ol-ext',
+      dest: 'modules/ol-ext',
+    }, {
+      entry: utils.resolve('src/rx-ext/index.js'),
+      bundleName: 'modules/rx-ext',
+      styleName: false,
+      src: 'rx-ext',
+      dest: 'modules/rx-ext',
+    }, {
+      entry: utils.resolve('src/consts.js'),
+      bundleName: 'modules/consts',
+      styleName: false,
+      src: 'consts',
+      dest: 'modules/consts',
+    },
+  ])
 }
 
 function getUtils () {
@@ -347,7 +349,7 @@ function getUtils () {
           bundleName,
           styleName: false,
           src: file.replace('.js', '').replace(utils.resolve('src') + '/', ''),
-          dest: bundleName
+          dest: bundleName,
         }
       }))
     })
@@ -366,10 +368,10 @@ function externalize (modulesMap) {
       const ms = new MagicString(code)
       let match, start, end, hasReplacements
 
-      while (match = regex.exec(code)) {
+      while ((match = regex.exec(code)) != null) {
         // start, end without quotes
         start = match.index + 1
-        end = start + match[ 0 ].length - 2
+        end = start + match[0].length - 2
 
         let extModulePath = path.resolve(path.dirname(id), match[0].slice(1, -1))
         let extModuleRelPath = extModulePath.replace(utils.resolve('src') + '/', '')
@@ -385,8 +387,8 @@ function externalize (modulesMap) {
 
       return {
         code: ms.toString(),
-        map: ms.generateMap({ hires: true })
+        map: ms.generateMap({ hires: true }),
       }
-    }
+    },
   }
 }

@@ -20,7 +20,7 @@ const VueLayers = {
   install,
   ol,
   rx,
-  ...components
+  ...components,
 }
 export default VueLayers
 // auto install for Browser env

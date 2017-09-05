@@ -7,7 +7,7 @@ import { EXTENT_CORNER, MAX_ZOOM, TILE_SIZE } from './consts'
 const { createXYZ } = oltilegrid
 
 export {
-  createXYZ
+  createXYZ,
 }
 
 /**
@@ -54,7 +54,7 @@ export function createForExtent (extent, maxZoom = MAX_ZOOM, tileSize = TILE_SIZ
     extent,
     origin: extentHelper.getCorner(extent, corner),
     resolutions,
-    tileSize
+    tileSize,
   })
 }
 

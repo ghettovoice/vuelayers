@@ -3,8 +3,8 @@ import style from './style'
 const props = {
   snapToPixel: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 }
 
 const methods = {
@@ -52,13 +52,13 @@ const methods = {
       .then(this.deinit)
       .then(this.init)
       .then(this.mount)
-  }
+  },
 }
 
 const watch = {
   snapToPixel () {
     this.requestRefresh()
-  }
+  },
 }
 
 export default {
@@ -70,8 +70,8 @@ export default {
     empty: false,
     attrs () {
       return {
-        class: this.$options.name
+        class: this.$options.name,
       }
-    }
-  }
+    },
+  },
 }

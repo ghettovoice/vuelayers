@@ -11,12 +11,12 @@ describe('plainProps', () => {
       str: 'qwe',
       arr: [ 1, 2, 3 ],
       func () {},
-      inst: new Ctor()
+      inst: new Ctor(),
     }
     const expected = {
       num: 123,
       str: 'qwe',
-      arr: [ 1, 2, 3 ]
+      arr: [ 1, 2, 3 ],
     }
 
     expect(plainProps(obj)).to.be.deep.equal(expected)

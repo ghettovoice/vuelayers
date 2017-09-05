@@ -4,5 +4,5 @@ export default {
   Style,
   install (Vue) {
     Vue.component(Style.name, Style)
-  }
+  },
 }

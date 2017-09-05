@@ -26,8 +26,8 @@ export function defaultStyle () {
       fillColor: [255, 255, 255, 0.4],
       strokeColor: '#3399CC',
       strokeWidth: 1.25,
-      imageRadius: 5
-    }
+      imageRadius: 5,
+    },
   ]
 }
 
@@ -44,19 +44,19 @@ export function defaultEditStyle () {
   styles[GEOMETRY_TYPE.LINE_STRING] = [
     {
       strokeColor: white,
-      strokeWidth: width + 2
+      strokeWidth: width + 2,
     }, {
       strokeColor: blue,
-      strokeWidth: width
-    }
+      strokeWidth: width,
+    },
   ]
   styles[GEOMETRY_TYPE.MULTI_LINE_STRING] =
     styles[GEOMETRY_TYPE.LINE_STRING]
 
   styles[GEOMETRY_TYPE.POLYGON] = [
     {
-      fillColor: [255, 255, 255, 0.5]
-    }
+      fillColor: [255, 255, 255, 0.5],
+    },
   ].concat(styles[GEOMETRY_TYPE.LINE_STRING])
   styles[GEOMETRY_TYPE.MULTI_POLYGON] =
     styles[GEOMETRY_TYPE.POLYGON]
@@ -72,8 +72,8 @@ export function defaultEditStyle () {
       fillColor: blue,
       strokeColor: white,
       strokeWidth: width / 2,
-      zIndex: Infinity
-    }
+      zIndex: Infinity,
+    },
   ]
   styles[GEOMETRY_TYPE.MULTI_POINT] =
     styles[GEOMETRY_TYPE.POINT]
@@ -108,7 +108,7 @@ export function style (vlStyle) {
     stroke: stroke(vlStyle),
     image: image(vlStyle),
     geometry: geom(vlStyle),
-    zIndex: vlStyle.zIndex
+    zIndex: vlStyle.zIndex,
   }
 
   if (!isEmpty(olStyle)) {
@@ -254,7 +254,7 @@ export function image (vlStyle) {
       img: vlStyle.image,
       imgSize: vlStyle.imageImgSize,
       src: vlStyle.imageSrc,
-      crossOrigin: 'anonymous'
+      crossOrigin: 'anonymous',
     }
   } else if (vlStyle.imagePoints != null) {
     // regular shape construction
@@ -267,7 +267,7 @@ export function image (vlStyle) {
       radius1: vlStyle.imageRadius1,
       radius2: vlStyle.imageRadius2,
       angle: vlStyle.imageAngle,
-      rotation: vlStyle.imageRotation
+      rotation: vlStyle.imageRotation,
     }
   } else {
     // circle construction
@@ -275,7 +275,7 @@ export function image (vlStyle) {
     // create Circle options
     imageStyle = {
       ...vlStyle,
-      radius: vlStyle.imageRadius
+      radius: vlStyle.imageRadius,
     }
   }
 
@@ -283,7 +283,7 @@ export function image (vlStyle) {
     ...imageStyle,
     fill: fill(vlStyle, 'image') || fill(vlStyle),
     stroke: stroke(vlStyle, 'image') || stroke(vlStyle),
-    snapToPixel: true
+    snapToPixel: true,
   }
 
   if (!isEmpty(imageStyle)) {
@@ -301,7 +301,7 @@ export function text (vlStyle) {
   if (vlStyle.text instanceof Text) return vlStyle.text
 
   const textStyle = {
-    text: vlStyle.text
+    text: vlStyle.text,
   }
 
   let fontSize = vlStyle.textFontSize ? vlStyle.textFontSize + 'px' : undefined
@@ -313,7 +313,7 @@ export function text (vlStyle) {
     {
       font,
       fill: fill(vlStyle, 'text') || fill(vlStyle),
-      stroke: stroke(vlStyle, 'text') || stroke(vlStyle)
+      stroke: stroke(vlStyle, 'text') || stroke(vlStyle),
     }
   )
 

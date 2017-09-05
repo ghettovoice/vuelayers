@@ -103,7 +103,7 @@
       if (feature.get('features') && feature.get('features').length > 1) {
         this.selected = this.selected.filter(id => id !== feature.getId())
         this.$refs.view.fit(vlol.geom.collection(feature.get('features').map(f => f.getGeometry())).getExtent(), {
-          duration: 500
+          duration: 500,
         })
       } else {
         this.selectedFeatures.push(vlol.geoJson.writeFeature(feature))
@@ -119,15 +119,15 @@
           type: 'Feature',
           id: i,
           properties: {
-            id: i
+            id: i,
           },
           geometry: {
             type: 'Point',
             coordinates: [
               random(-179, 179),
-              random(-89, 89)
-            ]
-          }
+              random(-89, 89),
+            ],
+          },
         })
       })
 
@@ -137,7 +137,7 @@
     },
     pointOnSurface (geometry) {
       return vlol.geom.pointOnSurfaceAsCoordinate(geometry)
-    }
+    },
   }
 
   export default {
@@ -157,12 +157,12 @@
         polyId: '123',
         polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
         selected: [],
-        selectedFeatures: []
+        selectedFeatures: [],
       }
     },
     mounted () {
       this.loadData()
-    }
+    },
   }
 </script>
 
