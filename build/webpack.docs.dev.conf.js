@@ -21,7 +21,11 @@ const webpackConfig = merge(baseWebpackConfig, {
         test: /\.md$/,
         loader: 'vue-markdown-loader',
         options: {
-          preprocess: (md, src) => `<div class="content">${src}</div>`,
+          preprocess: (md, src) => {
+            src = Object.keys(config.replaces).reduce((out, token) => out.replace(token, config.replaces[token]), src)
+
+            return `<div class="content">\n\n${src}\n\n</div>`
+          },
         },
       },
       ...utils.styleLoaders({
@@ -30,9 +34,6 @@ const webpackConfig = merge(baseWebpackConfig, {
     ],
   },
   plugins: [
-    new webpack.DefinePlugin(Object.assign(config.replaces, {
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
-    })),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),

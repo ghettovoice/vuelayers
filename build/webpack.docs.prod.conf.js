@@ -28,7 +28,11 @@ const webpackConfig = merge(baseWebpackConfig, {
         test: /\.md$/,
         loader: 'vue-markdown-loader',
         options: {
-          preprocess: (md, src) => `<div class="content">${src}</div>`,
+          preprocess: (md, src) => {
+            src = Object.keys(config.replaces).reduce((out, token) => out.replace(token, config.replaces[token]), src)
+
+            return `<div class="content">\n\n${src}\n\n</div>`
+          },
         },
       },
       ...utils.styleLoaders({
@@ -38,10 +42,6 @@ const webpackConfig = merge(baseWebpackConfig, {
     ],
   },
   plugins: [
-    // http://vuejs.github.io/vue-loader/en/workflow/production.html
-    new webpack.DefinePlugin(Object.assign(config.replaces, {
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
-    })),
     ...(isProduction ? [
       new webpack.optimize.UglifyJsPlugin({
         mangle: true,

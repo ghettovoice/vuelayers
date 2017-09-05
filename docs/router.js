@@ -1,18 +1,17 @@
-/* global BASE_URL */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import routes, { flatRoutes } from './routes'
+import routes from './routes'
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
   mode: 'history',
-  base: BASE_URL,
+  base: 'C_BASE_URL',
   linkExactActiveClass: 'router-link-exact-active is-active',
-  routes: flatRoutes(routes),
+  routes: routes,
 })
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || document.title
+  document.title = [to.meta.title || document.title, 'C_PKG_FULLNAME.js Docs'].join(' :: ')
 
   const metaKeywords = document.head.querySelector('meta[name="keywords"]')
   metaKeywords.setAttribute('content', to.meta.keywords || metaKeywords.getAttribute('content'))

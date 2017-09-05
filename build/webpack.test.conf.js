@@ -19,9 +19,6 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   devtool: '#inline-source-map',
   plugins: [
-    new webpack.DefinePlugin(Object.assign(config.replaces, {
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
-    })),
   ],
 })
 

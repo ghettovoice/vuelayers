@@ -1,5 +1,5 @@
 <template>
-  <div class="menu-group">
+  <div class="menu-list-container">
     <p v-if="label" class="menu-label">
       {{ label }}
     </p>
@@ -20,5 +20,8 @@
   }
 </script>
 
-<style>
+<style lang="sass">
+  .menu-list-container .menu-label
+    margin-top: 1em
+    margin-bottom: 1em
 </style>

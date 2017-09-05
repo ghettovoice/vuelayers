@@ -1,37 +1,40 @@
-@import "variables"
+@import variables
 
 html, body
-  height   : 100%
-  overflow : auto
+  height: 100%
+  width: 100%
 
 pre
   font-size: .8rem
 
   &.is-medium
-    font-size : 1rem
+    font-size: 1rem
 
   &.is-large
-    font-size : 1.2rem
+    font-size: 1.2rem
 
 .nav-right
   +desktop()
     .nav-item:last-child
-      padding-right : 0
+      padding-right: 0
 
 // helpers
 .is-wh-100
-  width  : 100%
-  height : 100%
+  width: 100%
+  height: 100%
 
 .is-flex-column
-  display   : flex
-  flex-flow : column nowrap
+  display: flex
+  flex-flow: column nowrap
 
 .is-flex-grow
-  flex-grow : 1
+  flex-grow: 1
 
 .is-flex-justify-center
   justify-content: center
 
 .is-relative
-  position : relative
+  position: relative
+
+.is-fullheight
+  min-height: 100vh

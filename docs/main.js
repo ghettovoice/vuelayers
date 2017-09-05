@@ -5,7 +5,9 @@ import VueLayers from '../src'
 import App from './app.vue'
 import router from './router'
 
-Vue.use(Buefy)
+Vue.use(Buefy, {
+  defaultIconPack: 'fa',
+})
 Vue.use(VueLayers)
 
 /* eslint-disable no-new */

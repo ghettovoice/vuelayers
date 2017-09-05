@@ -1,5 +1,6 @@
 const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
+const StringReplacePlugin = require('string-replace-webpack-plugin')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -27,6 +28,25 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        enforce: 'pre',
+        test: /\.(js|vue|md)$/,
+        include: [
+          utils.resolve('src'),
+          utils.resolve('docs'),
+          utils.resolve('test'),
+        ],
+        use: [
+          {
+            loader: StringReplacePlugin.replace({
+              replacements: Object.keys(config.replaces).map(token => ({
+                pattern: new RegExp(token, 'g'),
+                replacement: match => config.replaces[match],
+              })),
+            }),
+          },
+        ],
+      },
       {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
@@ -70,6 +90,11 @@ module.exports = {
     noParse: [/openlayers/],
   },
   plugins: [
+    new StringReplacePlugin(),
+    // http://vuejs.github.io/vue-loader/en/workflow/production.html
+    new webpack.DefinePlugin(Object.assign(config.replaces, {
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+    })),
     new webpack.BannerPlugin({
       banner: config.banner,
       raw: true,
