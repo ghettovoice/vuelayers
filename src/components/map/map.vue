@@ -259,6 +259,7 @@
       assert.hasMap(this)
       this.$map.setTarget(this.$refs.map)
       this.subscribeAll()
+      this.updateSize()
     },
     /**
      * @return {void}
@@ -278,7 +279,7 @@
         assert.hasMap(this)
 
         this.$map.once('postrender', () => resolve())
-        this.$map.updateSize()
+        this.updateSize()
         this.$map.render()
       })
     },
@@ -288,6 +289,12 @@
      */
     subscribeAll () {
       this::subscribeToMapEvents()
+    },
+    /**
+     * @return {void}
+     */
+    updateSize () {
+      this.$map.updateSize()
     },
   }
 

@@ -1,29 +1,29 @@
 <template>
   <main id="app">
-    <div class="columns">
-      <vl-sidebar id="left-sidebar" size="is-one-quarter" class="column is-hidden-mobile">
-        <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs">C_PKG_FULLNAME@C_PKG_VERSION</router-link>
+    <div class="columns is-gapless">
+      <div class="column is-one-third-tablet is-one-quarter-desktop is-hidden-mobile">
+        <vl-sidebar>
+          <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs">C_PKG_FULLNAME@C_PKG_VERSION</router-link>
 
-        <a slot="links" href="C_PKG_REPOSITORY" title="View on GitHub" target="_blank">
-          <b-icon icon="github" size="is-medium"></b-icon>
-        </a>
+          <a slot="links" href="C_PKG_REPOSITORY" title="View on GitHub" target="_blank">
+            <b-icon icon="github" size="is-medium"></b-icon>
+          </a>
 
-        <vl-menu>
-          <vl-menu-list v-for="group in menu" :key="group.title" :label="group.title">
-            <vl-menu-item v-for="item in group.items" :key="item.url">
-              <router-link :to="item.url" :title="item.title">
-                {{ item.title }}
-              </router-link>
-            </vl-menu-item>
-          </vl-menu-list>
-        </vl-menu>
-      </vl-sidebar>
+          <vl-menu>
+            <vl-menu-list v-for="group in menu" :key="group.title" :label="group.title">
+              <vl-menu-item v-for="item in group.items" :key="item.url">
+                <router-link :to="item.url" :title="item.title">
+                  {{ item.title }}
+                </router-link>
+              </vl-menu-item>
+            </vl-menu-list>
+          </vl-menu>
+        </vl-sidebar>
+      </div>
 
-      <section id="page" class="page column">
-        <div class="section">
-          <router-view/>
-        </div>
-      </section>
+      <div class="column">
+        <router-view/>
+      </div>
     </div>
 
 
@@ -35,7 +35,7 @@
       </div>
 
       <div slot="right">
-        <a href="C_PKG_REPOSITORY" target="_blank" title="View on GitHub" class="button">
+        <a href="C_PKG_REPOSITORY" target="_blank" title="View on GitHub" class="button is-outlined is-info">
           <b-icon icon="github"></b-icon>
           <span>GitHub</span>
         </a>

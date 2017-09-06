@@ -31,6 +31,7 @@
       <w>eslint</w>
       <w>fullheight</w>
       <w>fullwidth</w>
+      <w>gapless</w>
       <w>geoloc</w>
       <w>geolocation</w>
       <w>geolocchanged</w>
@@ -44,6 +45,7 @@
       <w>lodash</w>
       <w>logdbg</w>
       <w>mapbox</w>
+      <w>marginless</w>
       <w>minified</w>
       <w>minifier</w>
       <w>mixins</w>

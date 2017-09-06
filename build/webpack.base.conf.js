@@ -17,9 +17,10 @@ module.exports = {
     publicPath: config.publicPath,
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.vue', '.json', '.md'],
     modules: [
       utils.resolve('src'),
+      utils.resolve('docs'),
       utils.resolve('node_modules'),
     ],
     alias: {
@@ -29,23 +30,17 @@ module.exports = {
   module: {
     rules: [
       {
-        enforce: 'pre',
         test: /\.(js|vue|md)$/,
+        loader: utils.stringReplaceLoader(), //require.resolve('./loaders/string-replace-loader'),
+        enforce: 'pre',
         include: [
           utils.resolve('src'),
           utils.resolve('docs'),
           utils.resolve('test'),
         ],
-        use: [
-          {
-            loader: StringReplacePlugin.replace({
-              replacements: Object.keys(config.replaces).map(token => ({
-                pattern: new RegExp(token, 'g'),
-                replacement: match => config.replaces[match],
-              })),
-            }),
-          },
-        ],
+        // options: {
+        //   replaces: config.replaces,
+        // },
       },
       {
         test: /\.(js|vue)$/,
@@ -97,7 +92,7 @@ module.exports = {
   plugins: [
     new StringReplacePlugin(),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
-    new webpack.DefinePlugin(Object.assign(config.replaces, {
+    new webpack.DefinePlugin(Object.assign({}, config.replaces, {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     })),
     new webpack.BannerPlugin({

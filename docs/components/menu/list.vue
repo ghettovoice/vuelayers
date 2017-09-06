@@ -21,7 +21,8 @@
 </script>
 
 <style lang="sass">
-  .menu-list-container .menu-label
-    margin-top: 1em
-    margin-bottom: 1em
+  .menu-list-container
+    .menu-label
+      margin-top: 1em
+      margin-bottom: 1em
 </style>

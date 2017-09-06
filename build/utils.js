@@ -1,6 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const StringReplacePlugin = require('string-replace-webpack-plugin')
 const config = require('./config')
 
 function resolve (relPath) {
@@ -83,10 +84,17 @@ function postcssPlugins () {
 
 function vueLoaderConfig (extract) {
   return {
-    loaders: cssLoaders({
-      sourceMap: true,
-      extract,
-    }),
+    preLoaders: {
+      html: stringReplaceLoader(),
+      // js: compileVarsReplaceLoader(),
+      // html: require.resolve('./loaders/string-replace') + '?' + JSON.stringify({ replaces: config.replaces }),
+    },
+    loaders: {
+      ...cssLoaders({
+        sourceMap: true,
+        extract,
+      }),
+    },
     postcss: postcssPlugins(),
   }
 }
@@ -120,16 +128,21 @@ function getSize (data) {
 
 function vueMarkdownLoaderConfig () {
   return {
-    preprocess: (md, src) => {
-      src = Object.keys(config.replaces).reduce((out, token) => out.replace(token, config.replaces[token]), src)
-
-      return `<div class="content">\n\n${src}\n\n</div>`
-    },
+    preprocess: (md, src) => `<div class="content">\n\n${src}\n\n</div>`,
     use: [
       require('markdown-it-checkbox'),
       require('markdown-it-decorate'),
     ],
   }
+}
+
+function stringReplaceLoader () {
+  return StringReplacePlugin.replace({
+    replacements: Object.keys(config.replaces).map(token => ({
+      pattern: new RegExp(token, 'g'),
+      replacement: match => config.replaces[match],
+    })),
+  })
 }
 
 module.exports = {
@@ -143,4 +156,5 @@ module.exports = {
   ensureDir,
   getSize,
   vueMarkdownLoaderConfig,
+  stringReplaceLoader,
 }

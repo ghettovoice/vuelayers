@@ -1,5 +1,5 @@
 <template>
-  <aside class="sidebar" :class="[size]">
+  <aside class="sidebar">
     <div class="logo" v-if="$slots.logo && $slots.logo.length">
       <slot name="logo"></slot>
     </div>
@@ -14,7 +14,6 @@
 
 <script>
   const props = {
-    size: String,
   }
 
   export default {
@@ -27,8 +26,9 @@
   @import ../sass/variables
 
   .sidebar
+    padding: 0 1rem
     > *
-      padding: .25em .75em
+      margin: .5rem 0
 
   .logo
     text-align: center

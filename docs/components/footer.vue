@@ -27,5 +27,7 @@
   }
 </script>
 
-<style>
+<style lang="sass">
+  .footer
+    padding-bottom: 3rem
 </style>

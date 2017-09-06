@@ -125,6 +125,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.4",
+    "loader-utils": "^1.1.0",
     "magic-string": "^0.22.4",
     "markdown-it": "^8.4.0",
     "markdown-it-checkbox": "^1.1.0",
