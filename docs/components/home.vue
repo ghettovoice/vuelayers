@@ -1,10 +1,10 @@
 <template>
   <div class="home">
     <section class="map">
-      <vl-map :def-controls="false" ref="map">
-        <vl-view :zoom="3" :min-zoom="2"/>
+      <vl-map ref="map" :def-controls="false" :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
+        <vl-view ref="view" :zoom="3" :min-zoom="2"/>
 
-        <vl-geoloc>
+        <vl-geoloc @update:position="onUpdatePosition">
           <template scope="ctx">
             <vl-feature v-if="ctx.position" id="position-feature">
               <vl-geom-point :coordinates="ctx.position"/>
@@ -34,7 +34,7 @@
             <span>Download</span>
           </a>
 
-          <router-link to="/usage" class="button is-primary is-large" title="Usage guide">
+          <router-link to="/install" class="button is-primary is-large" title="Install & Usage">
             <span>Get started</span>
             <b-icon icon="arrow-right"></b-icon>
           </router-link>
@@ -56,8 +56,19 @@
 </template>
 
 <script>
+  import { ol as vlol } from 'vuelayers'
   import VlHomePage from '../md/partial/home.md'
   import VlGithubBtn from './github-button.vue'
+
+  const methods = {
+    onUpdatePosition (coordinate) {
+      this.$refs.view.animate({
+        center: vlol.proj.fromLonLat(coordinate),
+        zoom: 12,
+        duration: 1000,
+      })
+    },
+  }
 
   export default {
     name: 'vl-home',
@@ -65,6 +76,7 @@
       VlHomePage,
       VlGithubBtn,
     },
+    methods,
   }
 </script>
 

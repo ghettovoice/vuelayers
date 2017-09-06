@@ -22,6 +22,10 @@
       </div>
 
       <div class="column">
+        <vl-navbar>
+          <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs">C_PKG_FULLNAME@C_PKG_VERSION</router-link>
+        </vl-navbar>
+
         <router-view/>
       </div>
     </div>
@@ -46,6 +50,7 @@
 
 <script>
   import { Menu as VlMenu, List as VlMenuList, Item as VlMenuItem } from './components/menu'
+  import VlNavbar from './components/navbar.vue'
   import VlSidebar from './components/sidebar.vue'
   import VlFooter from './components/footer.vue'
 
@@ -79,6 +84,7 @@
       VlMenu,
       VlMenuList,
       VlMenuItem,
+      VlNavbar,
       VlSidebar,
       VlFooter,
     },

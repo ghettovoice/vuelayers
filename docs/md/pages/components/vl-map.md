@@ -1,1 +1,7 @@
-**vl-map** description
+# vl-map <!-- {.title} -->
+
+## Map component <!-- {.subtitle} -->
+
+---
+
+... 
