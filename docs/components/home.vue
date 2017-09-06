@@ -56,7 +56,7 @@
 </template>
 
 <script>
-  import VlHomePage from '../pages/index.md'
+  import VlHomePage from '../md/partial/home.md'
   import VlGithubBtn from './github-button.vue'
 
   export default {

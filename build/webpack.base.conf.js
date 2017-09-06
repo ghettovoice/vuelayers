@@ -31,16 +31,13 @@ module.exports = {
     rules: [
       {
         test: /\.(js|vue|md)$/,
-        loader: utils.stringReplaceLoader(), //require.resolve('./loaders/string-replace-loader'),
+        loader: utils.compileVarsReplaceLoader(),
         enforce: 'pre',
         include: [
           utils.resolve('src'),
           utils.resolve('docs'),
           utils.resolve('test'),
         ],
-        // options: {
-        //   replaces: config.replaces,
-        // },
       },
       {
         test: /\.(js|vue)$/,

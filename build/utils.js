@@ -84,11 +84,6 @@ function postcssPlugins () {
 
 function vueLoaderConfig (extract) {
   return {
-    preLoaders: {
-      html: stringReplaceLoader(),
-      // js: compileVarsReplaceLoader(),
-      // html: require.resolve('./loaders/string-replace') + '?' + JSON.stringify({ replaces: config.replaces }),
-    },
     loaders: {
       ...cssLoaders({
         sourceMap: true,
@@ -128,7 +123,17 @@ function getSize (data) {
 
 function vueMarkdownLoaderConfig () {
   return {
-    preprocess: (md, src) => `<div class="content">\n\n${src}\n\n</div>`,
+    preprocess: function (md, src) {
+      const { pattern, replacement } = compileVarsReplacement()
+      src = src.replace(pattern, replacement)
+      src = `<div class="content">\n\n${src}\n\n</div>`
+
+      if (/docs\/md\/pages/.test(this.resourcePath)) {
+        src = `<div class="section">\n${src}\n</div>`
+      }
+
+      return src
+    },
     use: [
       require('markdown-it-checkbox'),
       require('markdown-it-decorate'),
@@ -136,12 +141,16 @@ function vueMarkdownLoaderConfig () {
   }
 }
 
-function stringReplaceLoader () {
+function compileVarsReplacement () {
+  return {
+    pattern: new RegExp(Object.keys(config.replaces).join('|'), 'g'),
+    replacement: match => config.replaces[match],
+  }
+}
+
+function compileVarsReplaceLoader () {
   return StringReplacePlugin.replace({
-    replacements: Object.keys(config.replaces).map(token => ({
-      pattern: new RegExp(token, 'g'),
-      replacement: match => config.replaces[match],
-    })),
+    replacements: [compileVarsReplacement()],
   })
 }
 
@@ -156,5 +165,6 @@ module.exports = {
   ensureDir,
   getSize,
   vueMarkdownLoaderConfig,
-  stringReplaceLoader,
+  compileVarsReplacement,
+  compileVarsReplaceLoader,
 }
