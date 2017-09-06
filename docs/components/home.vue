@@ -2,18 +2,18 @@
   <div class="home">
     <section class="map">
       <vl-map :def-controls="false" ref="map">
-        <vl-view :zoom="2" :min-zoom="2"/>
+        <vl-view :zoom="3" :min-zoom="2"/>
 
-        <!--<vl-geoloc>
+        <vl-geoloc>
           <template scope="ctx">
             <vl-feature v-if="ctx.position" id="position-feature">
               <vl-geom-point :coordinates="ctx.position"/>
               <vl-style-box>
-                <vl-style-icon src="../static/marker.png" :scale="0.3" :anchor="[0.5, 1]"/>
+                <vl-style-icon src="../static/marker.png" :scale="0.4" :anchor="[0.5, 1]"/>
               </vl-style-box>
             </vl-feature>
           </template>
-        </vl-geoloc>-->
+        </vl-geoloc>
 
         <vl-layer-tile>
           <vl-source-sputnik/>
@@ -73,7 +73,7 @@
 
   .home
     .map
-      height: 30vh
+      height: 40vh
 
     .buttons
       margin: .5rem 0

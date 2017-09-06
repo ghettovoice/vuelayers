@@ -210,7 +210,7 @@ function subscribeToGeomChanges () {
     })
   ).throttleTime(ft)
     .distinctUntilChanged(isEqualGeom)
-    .map(({ value: { coordinates } }) => ({
+    .map(({ coordinates }) => ({
       prop: 'coordinates',
       value: coordinates,
     }))
