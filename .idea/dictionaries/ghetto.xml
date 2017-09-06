@@ -30,10 +30,12 @@
       <w>errordbg</w>
       <w>eslint</w>
       <w>fullheight</w>
+      <w>fullwidth</w>
       <w>geoloc</w>
       <w>geolocation</w>
       <w>geolocchanged</w>
       <w>geoserver</w>
+      <w>ghettovoice</w>
       <w>hashmap</w>
       <w>hidpi</w>
       <w>ident</w>

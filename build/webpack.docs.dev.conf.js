@@ -4,7 +4,6 @@ const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const utils = require('./utils')
-const config = require('./config')
 const baseWebpackConfig = require('./webpack.base.conf')
 
 const webpackConfig = merge(baseWebpackConfig, {
@@ -16,17 +15,6 @@ const webpackConfig = merge(baseWebpackConfig, {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: utils.vueLoaderConfig(),
-      },
-      {
-        test: /\.md$/,
-        loader: 'vue-markdown-loader',
-        options: {
-          preprocess: (md, src) => {
-            src = Object.keys(config.replaces).reduce((out, token) => out.replace(token, config.replaces[token]), src)
-
-            return `<div class="content">\n\n${src}\n\n</div>`
-          },
-        },
       },
       ...utils.styleLoaders({
         sourceMap: true,

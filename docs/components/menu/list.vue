@@ -15,7 +15,7 @@
   }
 
   export default {
-    name: 'list',
+    name: 'vl-list',
     props,
   }
 </script>

@@ -1,26 +1,23 @@
 <template>
   <main id="app">
     <div class="columns">
-      <aside id="left-sidebar" class="sidebar column is-one-quarter is-fullheight is-hidden-mobile">
-        <div class="logo is-size-4-desktop">
-          <router-link to="/" title="C_PKG_FULLNAME.js Docs">C_PKG_FULLNAME@C_PKG_VERSION</router-link>
-        </div>
-        <div class="links">
-          <a href="C_PKG_HOMEPAGE" title="View on GitHub" target="_blank">
-            <b-icon icon="github" size="is-medium"></b-icon>
-          </a>
-        </div>
+      <vl-sidebar id="left-sidebar" size="is-one-quarter" class="column is-hidden-mobile">
+        <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs">C_PKG_FULLNAME@C_PKG_VERSION</router-link>
 
-        <v-menu>
-          <v-menu-list v-for="group in menu" :key="group.title" :label="group.title">
-            <v-menu-item v-for="item in group.items" :key="item.url">
+        <a slot="links" href="C_PKG_REPOSITORY" title="View on GitHub" target="_blank">
+          <b-icon icon="github" size="is-medium"></b-icon>
+        </a>
+
+        <vl-menu>
+          <vl-menu-list v-for="group in menu" :key="group.title" :label="group.title">
+            <vl-menu-item v-for="item in group.items" :key="item.url">
               <router-link :to="item.url" :title="item.title">
                 {{ item.title }}
               </router-link>
-            </v-menu-item>
-          </v-menu-list>
-        </v-menu>
-      </aside>
+            </vl-menu-item>
+          </vl-menu-list>
+        </vl-menu>
+      </vl-sidebar>
 
       <section id="page" class="page column">
         <div class="section">
@@ -29,13 +26,28 @@
       </section>
     </div>
 
-    <footer id="footer" class="footer">
-    </footer>
+
+    <vl-footer id="footer" right-mods="has-text-centered has-text-right-tablet">
+      <div slot="left">
+        Licensed under <a href="C_PKG_LICENSE_URL" target="_blank" title="View license text">C_PKG_LICENSE_NAME</a>
+        <br>
+        &copy; 2016-{{ new Date().getFullYear() }} <a href="C_PKG_AUTHOR_HOMEPAGE" title="C_PKG_AUTHOR_NAME Homepage" target="_blank">C_PKG_AUTHOR_NAME</a>
+      </div>
+
+      <div slot="right">
+        <a href="C_PKG_REPOSITORY" target="_blank" title="View on GitHub" class="button">
+          <b-icon icon="github"></b-icon>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </vl-footer>
   </main>
 </template>
 
 <script>
-  import { Menu as VMenu, List as VMenuList, Item as VMenuItem } from './components/menu'
+  import { Menu as VlMenu, List as VlMenuList, Item as VlMenuItem } from './components/menu'
+  import VlSidebar from './components/sidebar.vue'
+  import VlFooter from './components/footer.vue'
 
   const computed = {
     menu () {
@@ -64,9 +76,11 @@
   export default {
     name: 'app',
     components: {
-      VMenu,
-      VMenuList,
-      VMenuItem,
+      VlMenu,
+      VlMenuList,
+      VlMenuItem,
+      VlSidebar,
+      VlFooter,
     },
     computed,
   }
@@ -82,22 +96,4 @@
   @import ~buefy/src/scss/buefy
   // import other
   @import sass/base
-
-  // left sidebar
-  #left-sidebar
-    > *
-      padding: .25em .75em
-    /*.menu-label
-      padding: 0 0.75em*/
-
-  .logo
-    text-align: center
-    font-size: 1.2em
-
-  .links
-    text-align: center
-    a
-      color: $text-light
-      &:hover
-        color: $text
 </style>

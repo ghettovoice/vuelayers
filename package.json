@@ -4,7 +4,6 @@
   "version": "0.6.2",
   "description": "Vue components to work with OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
-  "authorName": "Vladimir Vershinin",
   "main": "dist/vuelayers.cjs.js",
   "module": "dist/vuelayers.es.js",
   "scripts": {
@@ -53,7 +52,7 @@
   "bugs": {
     "url": "https://github.com/ghettovoice/vuelayers/issues"
   },
-  "homepage": "https://github.com/ghettovoice/vuelayers",
+  "homepage": "https://ghettovoice.github.io/vuelayers",
   "dependencies": {
     "@turf/point-on-surface": "^4.6.1",
     "assert": "^1.4.1",
@@ -127,6 +126,9 @@
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.4",
     "magic-string": "^0.22.4",
+    "markdown-it": "^8.4.0",
+    "markdown-it-checkbox": "^1.1.0",
+    "markdown-it-decorate": "^1.2.2",
     "mocha": "^3.5.0",
     "nightwatch": "^0.9.16",
     "node-notifier": "^5.1.2",

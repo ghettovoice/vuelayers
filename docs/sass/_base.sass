@@ -4,20 +4,6 @@ html, body
   height: 100%
   width: 100%
 
-pre
-  font-size: .8rem
-
-  &.is-medium
-    font-size: 1rem
-
-  &.is-large
-    font-size: 1.2rem
-
-.nav-right
-  +desktop()
-    .nav-item:last-child
-      padding-right: 0
-
 // helpers
 .is-wh-100
   width: 100%
@@ -38,3 +24,7 @@ pre
 
 .is-fullheight
   min-height: 100vh
+
+.content
+  pre > code
+    padding: 0

@@ -24,17 +24,6 @@ const webpackConfig = merge(baseWebpackConfig, {
         loader: 'vue-loader',
         options: utils.vueLoaderConfig(true),
       },
-      {
-        test: /\.md$/,
-        loader: 'vue-markdown-loader',
-        options: {
-          preprocess: (md, src) => {
-            src = Object.keys(config.replaces).reduce((out, token) => out.replace(token, config.replaces[token]), src)
-
-            return `<div class="content">\n\n${src}\n\n</div>`
-          },
-        },
-      },
       ...utils.styleLoaders({
         sourceMap: true,
         extract: isProduction,

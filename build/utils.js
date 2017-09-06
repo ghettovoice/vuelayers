@@ -118,6 +118,20 @@ function getSize (data) {
   return (data.length / 1024).toFixed(2) + 'kb'
 }
 
+function vueMarkdownLoaderConfig () {
+  return {
+    preprocess: (md, src) => {
+      src = Object.keys(config.replaces).reduce((out, token) => out.replace(token, config.replaces[token]), src)
+
+      return `<div class="content">\n\n${src}\n\n</div>`
+    },
+    use: [
+      require('markdown-it-checkbox'),
+      require('markdown-it-decorate'),
+    ],
+  }
+}
+
 module.exports = {
   resolve,
   assetsPath,
@@ -128,4 +142,5 @@ module.exports = {
   writeFile,
   ensureDir,
   getSize,
+  vueMarkdownLoaderConfig,
 }
