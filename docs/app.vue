@@ -9,7 +9,7 @@
           </router-link>
 
           <a slot="links" href="C_PKG_REPOSITORY" title="View on GitHub" target="_blank">
-            <b-icon icon="github" size="is-medium"></b-icon>
+            <b-icon icon="github" size="is-medium"/>
           </a>
 
           <vl-menu>
@@ -26,13 +26,13 @@
 
       <div class="column">
         <vl-navbar>
-          <vl-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo" :router="true">
+          <vl-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo has-text-left" :router="true">
             C_PKG_FULLNAME.js<br/>
             <small>vC_PKG_VERSION</small>
           </vl-navbar-item>
           <vl-navbar-item slot="brand" link="C_PKG_REPOSITORY" title="View on GitHub" target="_blank"
                           class="is-hidden-desktop">
-            <b-icon icon="github" size="is-medium"></b-icon>
+            <b-icon icon="github" size="is-medium" />
           </vl-navbar-item>
 
           <vl-navbar-dropdown-item slot="left" v-for="group in mobileMenu" :key="group.title" :hover="true"
@@ -62,7 +62,7 @@
 
       <div slot="right">
         <a href="C_PKG_REPOSITORY" target="_blank" title="View on GitHub" class="button is-outlined is-info">
-          <b-icon icon="github"></b-icon>
+          <b-icon icon="github"/>
           <span>GitHub</span>
         </a>
       </div>
