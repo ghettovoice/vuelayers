@@ -26,6 +26,7 @@
       <w>devtool</w>
       <w>dirname</w>
       <w>doesn</w>
+      <w>dropdown</w>
       <w>epsg</w>
       <w>errordbg</w>
       <w>eslint</w>
@@ -39,6 +40,7 @@
       <w>ghettovoice</w>
       <w>hashmap</w>
       <w>hidpi</w>
+      <w>hoverable</w>
       <w>ident</w>
       <w>jsnext</w>
       <w>loadingstrategy</w>
@@ -53,6 +55,7 @@
       <w>movestart</w>
       <w>multiline</w>
       <w>mutators</w>
+      <w>navbar</w>
       <w>noop</w>
       <w>olcontrol</w>
       <w>olextent</w>

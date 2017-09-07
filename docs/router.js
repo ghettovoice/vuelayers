@@ -7,7 +7,6 @@ Vue.use(VueRouter)
 const router = new VueRouter({
   mode: 'history',
   base: 'C_BASE_URL',
-  linkExactActiveClass: 'router-link-exact-active is-active',
   routes: routes,
 })
 router.beforeEach((to, from, next) => {

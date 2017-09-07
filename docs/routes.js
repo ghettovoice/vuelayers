@@ -3,7 +3,7 @@ export default [
     path: '/',
     meta: {
       title: 'Home',
-      group: 'General',
+      desktopMenuGroup: 'General',
     },
     component: () => import('./components/home.vue'),
   },
@@ -11,7 +11,7 @@ export default [
     path: '/demo',
     meta: {
       title: 'Demo',
-      group: 'General',
+      desktopMenuGroup: 'General',
     },
     component: () => import('./md/pages/demo.md'),
   },
@@ -19,6 +19,8 @@ export default [
     path: '/components',
     meta: {
       title: 'Components',
+      mobileMenuGroup: 'Components',
+      mobileMenuIndex: true,
     },
     component: () => import('./md/pages/components/index.md'),
   },
@@ -26,7 +28,7 @@ export default [
     path: '/components/vl-map',
     meta: {
       title: 'vl-map',
-      group: 'Components',
+      mobileMenuGroup: 'Components',
     },
     component: () => import('./md/pages/components/vl-map.md'),
   },
@@ -34,7 +36,7 @@ export default [
     path: '/components/vl-view',
     meta: {
       title: 'vl-view',
-      group: 'Components',
+      mobileMenuGroup: 'Components',
     },
     component: () => import('./md/pages/components/vl-view.md'),
   },

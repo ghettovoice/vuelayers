@@ -3,16 +3,19 @@
     <div class="columns is-gapless">
       <div class="column is-one-third-tablet is-one-quarter-desktop is-hidden-mobile">
         <vl-sidebar>
-          <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs">C_PKG_FULLNAME@C_PKG_VERSION</router-link>
+          <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs" exact-active-class="is-active">
+            C_PKG_FULLNAME.js<br/>
+            <small>vC_PKG_VERSION</small>
+          </router-link>
 
           <a slot="links" href="C_PKG_REPOSITORY" title="View on GitHub" target="_blank">
             <b-icon icon="github" size="is-medium"></b-icon>
           </a>
 
           <vl-menu>
-            <vl-menu-list v-for="group in menu" :key="group.title" :label="group.title">
+            <vl-menu-list v-for="group in desktopMenu" :key="group.title" :label="group.title">
               <vl-menu-item v-for="item in group.items" :key="item.url">
-                <router-link :to="item.url" :title="item.title">
+                <router-link :to="item.url" :title="item.title" exact-active-class="is-active">
                   {{ item.title }}
                 </router-link>
               </vl-menu-item>
@@ -23,10 +26,29 @@
 
       <div class="column">
         <vl-navbar>
-          <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs">C_PKG_FULLNAME@C_PKG_VERSION</router-link>
+          <vl-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo" :router="true">
+            C_PKG_FULLNAME.js<br/>
+            <small>vC_PKG_VERSION</small>
+          </vl-navbar-item>
+          <vl-navbar-item slot="brand" link="C_PKG_REPOSITORY" title="View on GitHub" target="_blank"
+                          class="is-hidden-desktop">
+            <b-icon icon="github" size="is-medium"></b-icon>
+          </vl-navbar-item>
+
+          <vl-navbar-dropdown-item slot="left" v-for="group in mobileMenu" :key="group.title" :hover="true"
+                                   :link="group.url" :router="true" :title="group.title">
+            <span>{{ group.title }}</span>
+
+            <vl-navbar-item slot="dropdown" v-for="item in group.items" :key="item.url" :router="true" :link="item.url"
+                            :title="item.title">
+              {{ item.title }}
+            </vl-navbar-item>
+          </vl-navbar-dropdown-item>
         </vl-navbar>
 
-        <router-view/>
+        <div class="page">
+          <router-view/>
+        </div>
       </div>
     </div>
 
@@ -50,18 +72,22 @@
 
 <script>
   import { Menu as VlMenu, List as VlMenuList, Item as VlMenuItem } from './components/menu'
-  import VlNavbar from './components/navbar.vue'
+  import {
+    Navbar as VlNavbar,
+    NavbarItem as VlNavbarItem,
+    NavbarDropdownItem as VlNavbarDropdownItem,
+  } from './components/navbar'
   import VlSidebar from './components/sidebar.vue'
   import VlFooter from './components/footer.vue'
 
   const computed = {
-    menu () {
+    desktopMenu () {
       return this.$router.options.routes.reduce((all, route) => {
-        if (route.meta && route.meta.group) {
-          let group = all.find(g => g.title === route.meta.group)
+        if (route.meta && route.meta.desktopMenuGroup) {
+          let group = all.find(g => g.title === route.meta.desktopMenuGroup)
           if (!group) {
             group = {
-              title: route.meta.group,
+              title: route.meta.desktopMenuGroup,
               items: [],
             }
             all.push(group)
@@ -76,6 +102,38 @@
         return all
       }, [])
     },
+    mobileMenu () {
+      const waitingItems = {}
+
+      return this.$router.options.routes.reduce((all, route) => {
+        if (route.meta && route.meta.mobileMenuGroup) {
+          let group
+          if (route.meta.mobileMenuIndex) {
+            all.push({
+              title: route.meta.mobileMenuGroup,
+              url: route.path,
+              items: (waitingItems[route.meta.mobileMenuGroup] || []),
+            })
+            delete waitingItems[route.meta.mobileMenuGroup]
+          } else {
+            group = all.find(x => x.title === route.meta.mobileMenuGroup)
+            if (group) {
+              group.items.push({
+                title: route.meta.title,
+                url: route.path,
+              })
+            } else {
+              waitingItems[route.meta.mobileMenuGroup] = (waitingItems[route.meta.mobileMenuGroup] || []).push({
+                title: route.meta.title,
+                url: route.path,
+              })
+            }
+          }
+        }
+
+        return all
+      }, [])
+    },
   }
 
   export default {
@@ -85,6 +143,8 @@
       VlMenuList,
       VlMenuItem,
       VlNavbar,
+      VlNavbarItem,
+      VlNavbarDropdownItem,
       VlSidebar,
       VlFooter,
     },
