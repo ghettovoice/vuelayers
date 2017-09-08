@@ -382,7 +382,7 @@
 
 <style lang="sass">
   @import ../../styles/mixins
-  @import ol/ol
+  @import ~ol/ol
 
   .vl-map, .vl-map .map
     +vl-wh(100%, 100%)
