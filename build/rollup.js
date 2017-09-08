@@ -138,7 +138,7 @@ function bundle (opts = {}) {
         ],
       },
       css: (_, styles) => {
-        if (opts.styleName === false) return []
+        if (opts.styleName === false) return
 
         postcssPromise = Promise.all(styles.map(postcssProcess))
           .then(results => {
@@ -218,14 +218,16 @@ function bundle (opts = {}) {
       utils.writeFile(dest + '.map', map.toString()),
       postcssPromise,
     ]))
-    .then(([jsSrc, jsMap, [cssSrc, cssMap]]) => {
+    .then(([jsSrc, jsMap, css]) => {
       spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
       console.log(jsSrc.path + ' ' + chalk.gray(jsSrc.size))
       console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
 
-      cssSrc && console.log(cssSrc.path + ' ' + chalk.gray(cssSrc.size))
-      cssMap && console.log(cssMap.path + ' ' + chalk.gray(cssMap.size))
+      if (css) {
+        css[0] && console.log(css[0].path + ' ' + chalk.gray(css[0].size))
+        css[1] && console.log(css[1].path + ' ' + chalk.gray(css[1].size))
+      }
     })
     .catch(err => {
       spinner.fail(chalk.red(`${bundleName} bundle is failed to create`))

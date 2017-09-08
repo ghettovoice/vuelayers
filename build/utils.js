@@ -84,12 +84,13 @@ function postcssPlugins () {
 
 function vueLoaderConfig (extract) {
   return {
-    loaders: {
-      ...cssLoaders({
+    loaders: Object.assign(
+      {},
+      cssLoaders({
         sourceMap: true,
         extract,
-      }),
-    },
+      })
+    ),
     postcss: postcssPlugins(),
   }
 }
