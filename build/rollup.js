@@ -14,6 +14,7 @@ const uglify = require('rollup-plugin-uglify')
 const createFilter = require('rollup-pluginutils').createFilter
 const MagicString = require('magic-string')
 const notifier = require('node-notifier')
+const Concat = require('concat-with-sourcemaps')
 const argv = require('yargs').argv
 const { dependencies, peerDependencies, devDependencies } = require('../package.json')
 const utils = require('./utils')
@@ -28,6 +29,7 @@ Promise.resolve(utils.ensureDir(config.outDir))
   .then(() => bundles.includes('es') && bundle({
     format: 'es',
     bundleName: config.name + '.es',
+    styleName: config.name,
     entry: config.entry,
     external: nodeExternal(),
   }))
@@ -35,6 +37,7 @@ Promise.resolve(utils.ensureDir(config.outDir))
   .then(() => bundles.includes('cjs') && bundle({
     format: 'cjs',
     bundleName: config.name + '.cjs',
+    styleName: config.name,
     entry: config.cjsEntry,
     external: nodeExternal(),
   }))
@@ -42,6 +45,7 @@ Promise.resolve(utils.ensureDir(config.outDir))
   .then(() => bundles.includes('umd') && bundle({
     format: 'umd',
     bundleName: config.name + '.umd',
+    styleName: config.name,
     entry: config.cjsEntry,
     env: 'development',
     external: ['vue', 'openlayers', 'ol'],
@@ -54,6 +58,7 @@ Promise.resolve(utils.ensureDir(config.outDir))
   .then(() => bundles.includes('umd-min') && bundle({
     format: 'umd',
     bundleName: config.name + '.umd.min',
+    styleName: config.name,
     entry: config.cjsEntry,
     env: 'production',
     external: ['vue', 'openlayers', 'ol'],
@@ -123,18 +128,30 @@ function bundle (opts = {}) {
       sourceMap: true,
       scss: {
         outputStyle: 'compressed',
-        sourceMap: true,
-        sourceMapEmbed: true,
+        sourceMap: opts.styleName
+          ? path.join(config.outDir, opts.styleName + '.css')
+          : false,
+        sourceMapContents: true,
         includePaths: [
           utils.resolve('src'),
           utils.resolve('node_modules'),
         ],
       },
-      // todo process each style with postcss, then concatenate sources and source maps
-      css: style => {
-        postcssPromise = opts.styleName !== false
-          ? postcssProcess(opts.styleName || bundleName, style)
-          : Promise.resolve([])
+      css: (_, styles) => {
+        if (opts.styleName === false) return []
+
+        postcssPromise = Promise.all(styles.map(postcssProcess))
+          .then(results => {
+            const dest = path.join(config.outDir, opts.styleName + '.css')
+            const concat = new Concat(true, opts.styleName + '.css', '\n')
+            concat.add(null, config.banner)
+            results.forEach(({ css, map, style }) => concat.add(path.relative(config.outDir, style.id), css, map))
+
+            return Promise.all([
+              utils.writeFile(dest, concat.content),
+              utils.writeFile(dest + '.map', concat.sourceMap),
+            ])
+          })
       },
     }),
     babel({
@@ -216,15 +233,21 @@ function bundle (opts = {}) {
     })
 }
 
-function postcssProcess (bundleName, style) {
-  const dest = path.join(config.outDir, `${bundleName}.css`)
-
+function postcssProcess (style) {
   return postcss(utils.postcssPlugins())
-    .process(style ? config.banner + style : '')
-    .then(({ css, map }) => Promise.all([
-      utils.writeFile(dest, css),
-      // utils.writeFile(dest + '.map', map.toString()),
-    ]))
+    .process(style.$compiled.code, {
+      from: path.relative(config.outDir, style.id),
+      to: path.relative(config.outDir, style.id),
+      map: {
+        inline: false,
+        prev: style.$compiled.map,
+      },
+    })
+    .then(result => ({
+      css: result.css,
+      map: result.map.toJSON(),
+      style,
+    }))
 }
 
 function nodeExternal () {
