@@ -122,14 +122,7 @@
 </script>
 
 <style lang="sass">
-  /*! VueLayers.js site */
-  @import ~highlight.js/styles/github-gist.css
-  // import theme variables
-  @import sass/variables
-  // Import Bulma and Buefy styles
-  @import ~bulma
-  @import ~buefy/src/scss/buefy
-  // import other
+  // import base
   @import sass/base
 
   .navbar

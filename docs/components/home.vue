@@ -23,7 +23,7 @@
 
     <section class="hero">
       <div class="hero-body">
-        <vld-home-page/>
+        <vld-home-content/>
 
         <section class="buttons">
           <a class="button is-success is-large"
@@ -57,26 +57,34 @@
 
 <script>
   import { ol as vlol } from 'vuelayers'
-  import VldHomePage from '../md/partial/home.md'
+  import VldHomeContent from '../md/partial/home.md'
   import VldGithubBtn from './github-button.vue'
 
   const methods = {
     onUpdatePosition (coordinate) {
-      this.$refs.view.animate({
-        center: vlol.proj.fromLonLat(coordinate),
-        zoom: 12,
-        duration: 1000,
-      })
+      if (!this.zoomedToPosition) {
+        this.zoomedToPosition = true
+        this.$refs.view.animate({
+          center: vlol.proj.fromLonLat(coordinate, this.$refs.view.projection),
+          zoom: 12,
+          duration: 1000,
+        })
+      }
     },
   }
 
   export default {
     name: 'vld-home',
     components: {
-      VldHomePage,
+      VldHomeContent,
       VldGithubBtn,
     },
     methods,
+    data () {
+      return {
+        zoomedToPosition: false,
+      }
+    },
   }
 </script>
 

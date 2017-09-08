@@ -11,7 +11,7 @@ export default [
     meta: {
       title: 'Demo',
     },
-    component: () => import('./md/pages/demo.md'),
+    component: () => import('./components/demo.vue'),
   },
   {
     path: '/components',

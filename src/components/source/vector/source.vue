@@ -45,26 +45,6 @@
   }
 
   const computed = {
-    strategy () {
-      if (this.strategyFactory) {
-        return this.strategyFactory()
-      }
-    },
-    loader () {
-      if (this.loaderFactory) {
-        return this.loaderFactory()
-      }
-    },
-    urlFunc () {
-      if (this.url) {
-        return isFunction(this.url) ? this.url() : () => this.url
-      }
-    },
-    format () {
-      if (this.formatFactory) {
-        return this.formatFactory()
-      }
-    },
   }
 
   const methods = {
@@ -124,13 +104,49 @@
     computed,
     methods,
     watch,
+    created () {
+      Object.defineProperties(this, {
+        strategy: {
+          enumerable: true,
+          get () {
+            if (this.strategyFactory) {
+              return this.strategyFactory()
+            }
+          },
+        },
+        loader: {
+          enumerable: true,
+          get () {
+            if (this.loaderFactory) {
+              return this.loaderFactory()
+            }
+          },
+        },
+        urlFunc: {
+          enumerable: true,
+          get () {
+            if (this.url) {
+              return isFunction(this.url) ? this.url() : () => this.url
+            }
+          },
+        },
+        format: {
+          enumerable: true,
+          get () {
+            if (this.formatFactory) {
+              return this.formatFactory()
+            }
+          },
+        },
+      })
+    },
   }
 
   /**
    * @return {ol.LoadingStrategy}
    */
   function defaultStrategyFactory () {
-    return loadStrategy.bbox
+    return loadStrategy.all
   }
 
   /**

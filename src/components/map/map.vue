@@ -380,10 +380,10 @@
   }
 </script>
 
-<style lang="scss">
-  @import "../../styles/mixins";
+<style lang="sass">
+  @import ../../styles/mixins
+  @import ~ol/ol.css
 
-  .vl-map, .vl-map .map {
-    @include vl-wh(100%, 100%);
-  }
+  .vl-map, .vl-map .map
+    +vl-wh(100%, 100%)
 </style>
