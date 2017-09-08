@@ -2,7 +2,7 @@
   <main id="app">
     <div class="columns is-gapless">
       <div class="column is-4-tablet is-3-desktop is-2-widescreen is-hidden-mobile">
-        <vl-sidebar>
+        <vld-sidebar>
           <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs" exact-active-class="is-active">
             <div class="name">C_PKG_FULLNAME.js</div>
             <b-tag type="is-info">vC_PKG_VERSION</b-tag>
@@ -12,52 +12,52 @@
             <b-icon icon="github" size="is-medium"/>
           </a>
 
-          <vl-menu>
-            <vl-menu-list label="General">
-              <vl-menu-item v-for="item in generalMenuItems" :key="item.link">
+          <vld-menu>
+            <vld-menu-list label="General">
+              <vld-menu-item v-for="item in generalMenuItems" :key="item.link">
                 <router-link :to="item.link" :title="item.title" exact-active-class="is-active">
                   {{ item.title }}
                 </router-link>
-              </vl-menu-item>
-            </vl-menu-list>
+              </vld-menu-item>
+            </vld-menu-list>
 
-            <vl-menu-list v-for="item in groupedMenuItems" :key="item.title" :label="item.title">
-              <vl-menu-item v-for="subitem in item.items" :key="subitem.link">
+            <vld-menu-list v-for="item in groupedMenuItems" :key="item.title" :label="item.title">
+              <vld-menu-item v-for="subitem in item.items" :key="subitem.link">
                 <router-link :to="subitem.link" :title="subitem.title" exact-active-class="is-active">
                   {{ subitem.title }}
                 </router-link>
-              </vl-menu-item>
-            </vl-menu-list>
-          </vl-menu>
-        </vl-sidebar>
+              </vld-menu-item>
+            </vld-menu-list>
+          </vld-menu>
+        </vld-sidebar>
       </div>
 
       <div class="column">
-        <vl-navbar class="is-hidden-tablet">
-          <vl-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo has-text-left"
+        <vld-navbar class="is-hidden-tablet">
+          <vld-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo has-text-left"
                           :router="true">
             <div class="name">C_PKG_FULLNAME.js</div>
             <b-tag type="is-info">vC_PKG_VERSION</b-tag>
-          </vl-navbar-item>
-          <vl-navbar-item slot="brand" link="C_PKG_REPOSITORY" title="View on GitHub" target="_blank"
+          </vld-navbar-item>
+          <vld-navbar-item slot="brand" link="C_PKG_REPOSITORY" title="View on GitHub" target="_blank"
                           class="is-hidden-desktop">
             <b-icon icon="github" size="is-medium" />
-          </vl-navbar-item>
+          </vld-navbar-item>
 
-          <vl-navbar-item slot="start" v-for="item in generalMenuItems" :key="item.link" :router="true"
+          <vld-navbar-item slot="start" v-for="item in generalMenuItems" :key="item.link" :router="true"
                           :link="item.link" :title="item.title">
             {{ item.title }}
-          </vl-navbar-item>
-          <vl-navbar-dropdown-item slot="start" v-for="item in groupedMenuItems" :key="item.link" :hover="true"
+          </vld-navbar-item>
+          <vld-navbar-dropdown-item slot="start" v-for="item in groupedMenuItems" :key="item.link" :hover="true"
                                    :link="item.link" :router="true" :title="item.title">
             <span>{{ item.title }}</span>
 
-            <vl-navbar-item slot="dropdown" v-for="subitem in item.items" :key="subitem.link" :router="true"
+            <vld-navbar-item slot="dropdown" v-for="subitem in item.items" :key="subitem.link" :router="true"
                             :link="subitem.link" :title="subitem.title">
               {{ subitem.title }}
-            </vl-navbar-item>
-          </vl-navbar-dropdown-item>
-        </vl-navbar>
+            </vld-navbar-item>
+          </vld-navbar-dropdown-item>
+        </vld-navbar>
 
         <div class="page">
           <router-view/>
@@ -66,7 +66,7 @@
     </div>
 
 
-    <vl-footer id="footer" right-mods="has-text-centered has-text-right-tablet">
+    <vld-footer id="footer" right-mods="has-text-centered has-text-right-tablet">
       <div slot="left">
         Licensed under <a href="C_PKG_LICENSE_URL" target="_blank" title="View license text">C_PKG_LICENSE_NAME</a>
         <br>
@@ -79,21 +79,21 @@
           <span>GitHub</span>
         </a>
       </div>
-    </vl-footer>
+    </vld-footer>
   </main>
 </template>
 
 <script>
   import { constant } from 'lodash/fp'
   import menu from './menu'
-  import { Menu as VlMenu, List as VlMenuList, Item as VlMenuItem } from './components/menu'
+  import { Menu as VldMenu, List as VldMenuList, Item as VldMenuItem } from './components/menu'
   import {
-    Navbar as VlNavbar,
-    NavbarItem as VlNavbarItem,
-    NavbarDropdownItem as VlNavbarDropdownItem,
+    Navbar as VldNavbar,
+    NavbarItem as VldNavbarItem,
+    NavbarDropdownItem as VldNavbarDropdownItem,
   } from './components/navbar'
-  import VlSidebar from './components/sidebar.vue'
-  import VlFooter from './components/footer.vue'
+  import VldSidebar from './components/sidebar.vue'
+  import VldFooter from './components/footer.vue'
 
   const computed = {
     menu: constant(menu),
@@ -108,14 +108,14 @@
   export default {
     name: 'app',
     components: {
-      VlMenu,
-      VlMenuList,
-      VlMenuItem,
-      VlNavbar,
-      VlNavbarItem,
-      VlNavbarDropdownItem,
-      VlSidebar,
-      VlFooter,
+      VldMenu,
+      VldMenuList,
+      VldMenuItem,
+      VldNavbar,
+      VldNavbarItem,
+      VldNavbarDropdownItem,
+      VldSidebar,
+      VldFooter,
     },
     computed,
   }

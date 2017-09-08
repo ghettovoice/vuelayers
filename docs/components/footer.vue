@@ -22,7 +22,7 @@
   }
 
   export default {
-    name: 'vl-footer',
+    name: 'vld-footer',
     props,
   }
 </script>

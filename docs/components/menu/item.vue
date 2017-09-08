@@ -15,7 +15,7 @@
   }
 
   export default {
-    name: 'vl-menu-item',
+    name: 'vld-menu-item',
     props,
     methods,
   }

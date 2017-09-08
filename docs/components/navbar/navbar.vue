@@ -33,7 +33,7 @@
   }
 
   export default {
-    name: 'vl-navbar',
+    name: 'vld-navbar',
     props,
     methods,
   }

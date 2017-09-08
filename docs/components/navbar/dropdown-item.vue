@@ -35,7 +35,7 @@
   }
 
   export default {
-    name: 'vl-navbar-dropdown-item',
+    name: 'vld-navbar-dropdown-item',
     extends: Item,
     props,
     computed,

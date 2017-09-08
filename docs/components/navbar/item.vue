@@ -52,7 +52,7 @@
   }
 
   export default {
-    name: 'vl-navbar-item',
+    name: 'vld-navbar-item',
     props,
     computed,
     methods,

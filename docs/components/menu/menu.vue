@@ -9,7 +9,7 @@
   }
 
   export default {
-    name: 'vl-menu',
+    name: 'vld-menu',
     props,
   }
 </script>

@@ -17,7 +17,7 @@
   }
 
   export default {
-    name: 'vl-sidebar',
+    name: 'vld-sidebar',
     props,
   }
 </script>

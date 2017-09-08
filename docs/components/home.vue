@@ -23,7 +23,7 @@
 
     <section class="hero">
       <div class="hero-body">
-        <vl-home-page/>
+        <vld-home-page/>
 
         <section class="buttons">
           <a class="button is-success is-large"
@@ -43,10 +43,10 @@
         <hr/>
 
         <section class="github-buttons is-flex is-flex-justify-center">
-          <vl-github-btn user="C_PKG_AUTHOR_USER" repo="C_PKG_NAME" type="star" :count="true"
+          <vld-github-btn user="C_PKG_AUTHOR_USER" repo="C_PKG_NAME" type="star" :count="true"
                          size="large" width="120px"
                          height="30px"/>
-          <vl-github-btn user="C_PKG_AUTHOR_USER" repo="C_PKG_NAME" type="fork" :count="true"
+          <vld-github-btn user="C_PKG_AUTHOR_USER" repo="C_PKG_NAME" type="fork" :count="true"
                          size="large" width="120px"
                          height="30px"/>
         </section>
@@ -57,8 +57,8 @@
 
 <script>
   import { ol as vlol } from 'vuelayers'
-  import VlHomePage from '../md/partial/home.md'
-  import VlGithubBtn from './github-button.vue'
+  import VldHomePage from '../md/partial/home.md'
+  import VldGithubBtn from './github-button.vue'
 
   const methods = {
     onUpdatePosition (coordinate) {
@@ -71,10 +71,10 @@
   }
 
   export default {
-    name: 'vl-home',
+    name: 'vld-home',
     components: {
-      VlHomePage,
-      VlGithubBtn,
+      VldHomePage,
+      VldGithubBtn,
     },
     methods,
   }
