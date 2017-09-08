@@ -7,5 +7,5 @@ export default {
   Overlay,
   install (Vue) {
     Vue.component(Overlay.name, Overlay)
-  }
+  },
 }

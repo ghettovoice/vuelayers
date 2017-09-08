@@ -7,6 +7,8 @@
       <w>apidoc</w>
       <w>apikey</w>
       <w>attrs</w>
+      <w>buefy</w>
+      <w>bulma</w>
       <w>bundler</w>
       <w>bundlers</w>
       <w>chunkhash</w>
@@ -21,23 +23,31 @@
       <w>denit</w>
       <w>deps</w>
       <w>dest</w>
+      <w>devtool</w>
       <w>dirname</w>
       <w>doesn</w>
+      <w>dropdown</w>
       <w>epsg</w>
       <w>errordbg</w>
       <w>eslint</w>
+      <w>fullheight</w>
+      <w>fullwidth</w>
+      <w>gapless</w>
       <w>geoloc</w>
       <w>geolocation</w>
       <w>geolocchanged</w>
       <w>geoserver</w>
+      <w>ghettovoice</w>
       <w>hashmap</w>
       <w>hidpi</w>
+      <w>hoverable</w>
       <w>ident</w>
       <w>jsnext</w>
       <w>loadingstrategy</w>
       <w>lodash</w>
       <w>logdbg</w>
       <w>mapbox</w>
+      <w>marginless</w>
       <w>minified</w>
       <w>minifier</w>
       <w>mixins</w>
@@ -45,6 +55,7 @@
       <w>movestart</w>
       <w>multiline</w>
       <w>mutators</w>
+      <w>navbar</w>
       <w>noop</w>
       <w>olcontrol</w>
       <w>olextent</w>
@@ -89,6 +100,7 @@
       <w>virt</w>
       <w>vlol</w>
       <w>vnode</w>
+      <w>vuejs</w>
       <w>vuelayers</w>
       <w>warndbg</w>
       <w>whatwg</w>

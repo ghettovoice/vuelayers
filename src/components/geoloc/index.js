@@ -7,5 +7,5 @@ export default {
   Geoloc,
   install (Vue) {
     Vue.component(Geoloc.name, Geoloc)
-  }
+  },
 }

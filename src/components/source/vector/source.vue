@@ -10,7 +10,7 @@
      */
     features: {
       type: Array,
-      default: stubArray
+      default: stubArray,
     },
     /**
      * Source loader factory
@@ -23,7 +23,7 @@
      */
     formatFactory: {
       type: Function,
-      default: defaultFormatFactory
+      default: defaultFormatFactory,
     },
     /**
      * String or url factory
@@ -36,35 +36,15 @@
      */
     strategyFactory: {
       type: Function,
-      default: defaultStrategyFactory
+      default: defaultStrategyFactory,
     },
     overlaps: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   }
 
   const computed = {
-    strategy () {
-      if (this.strategyFactory) {
-        return this.strategyFactory()
-      }
-    },
-    loader () {
-      if (this.loaderFactory) {
-        return this.loaderFactory()
-      }
-    },
-    urlFunc () {
-      if (this.url) {
-        return isFunction(this.url) ? this.url() : () => this.url
-      }
-    },
-    format () {
-      if (this.formatFactory) {
-        return this.formatFactory()
-      }
-    }
   }
 
   const methods = {
@@ -83,7 +63,7 @@
         strategy: this.strategy,
         format: this.format,
         url: this.urlFunc,
-        overlaps: this.overlaps
+        overlaps: this.overlaps,
       })
     },
     /**
@@ -101,7 +81,7 @@
     unmount () {
       this.clear()
       this::vectSource.methods.unmount()
-    }
+    },
   }
 
   const diffById = differenceWith((a, b) => a.id === b.id)
@@ -114,7 +94,7 @@
 
       this.addFeatures(forAdd)
       this.removeFeatures(forRemove)
-    }
+    },
   }
 
   export default {
@@ -123,14 +103,50 @@
     props,
     computed,
     methods,
-    watch
+    watch,
+    created () {
+      Object.defineProperties(this, {
+        strategy: {
+          enumerable: true,
+          get () {
+            if (this.strategyFactory) {
+              return this.strategyFactory()
+            }
+          },
+        },
+        loader: {
+          enumerable: true,
+          get () {
+            if (this.loaderFactory) {
+              return this.loaderFactory()
+            }
+          },
+        },
+        urlFunc: {
+          enumerable: true,
+          get () {
+            if (this.url) {
+              return isFunction(this.url) ? this.url() : () => this.url
+            }
+          },
+        },
+        format: {
+          enumerable: true,
+          get () {
+            if (this.formatFactory) {
+              return this.formatFactory()
+            }
+          },
+        },
+      })
+    },
   }
 
   /**
    * @return {ol.LoadingStrategy}
    */
   function defaultStrategyFactory () {
-    return loadStrategy.bbox
+    return loadStrategy.all
   }
 
   /**

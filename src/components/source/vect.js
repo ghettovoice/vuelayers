@@ -11,12 +11,12 @@ import mergeDescriptors from '../../utils/multi-merge-descriptors'
 const props = {
   projection: {
     type: String,
-    default: EPSG_4326
+    default: EPSG_4326,
   },
   useSpatialIndex: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 }
 
 const methods = {
@@ -49,7 +49,7 @@ const methods = {
       },
       removeFeature (feature) {
         source.removeFeature(feature)
-      }
+      },
     }
   },
   /**
@@ -96,7 +96,7 @@ const methods = {
    */
   subscribeAll () {
     this::subscribeToSourceChanges()
-  }
+  },
 }
 
 export default {
@@ -107,10 +107,10 @@ export default {
     empty: false,
     attrs () {
       return {
-        class: this.$options.name
+        class: this.$options.name,
       }
-    }
-  }
+    },
+  },
 }
 
 function subscribeToSourceChanges () {

@@ -104,7 +104,7 @@ const methods = {
    * Refresh internal ol objects
    * @return {Promise}
    */
-  refresh: refresh
+  refresh: refresh,
 }
 
 export default {
@@ -140,16 +140,16 @@ export default {
     Object.defineProperties(this, {
       $olObject: {
         enumerable: true,
-        get: () => this._olObject
+        get: () => this._olObject,
       },
       $createPromise: {
         enumerable: true,
-        get: () => this._createPromise
+        get: () => this._createPromise,
       },
       $mountPromise: {
         enumerable: true,
-        get: () => this._mountPromise
-      }
+        get: () => this._mountPromise,
+      },
     })
   },
   mounted () {
@@ -166,7 +166,7 @@ export default {
         this._olObject = this._createPromise = this._mountPromise = undefined
         // logdbg('destroyed', this.$options.name)
       })
-  }
+  },
 }
 
 /**

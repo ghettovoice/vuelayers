@@ -6,25 +6,25 @@
     color: [Array, String],
     lineCap: {
       type: String,
-      default: 'round' // round, butt, square
+      default: 'round', // round, butt, square
     },
     lineJoin: {
       type: String,
-      default: 'round' // round, bevel, miter
+      default: 'round', // round, bevel, miter
     },
     lineDash: Array,
     lineDashOffset: {
       type: Number,
-      default: 0
+      default: 0,
     },
     miterLimit: {
       type: Number,
-      default: 10
+      default: 10,
     },
     width: {
       type: Number,
-      default: 1.25
-    }
+      default: 1.25,
+    },
   }
 
   const methods = {
@@ -40,7 +40,7 @@
         lineDash: this.lineDash,
         lineDashOffset: this.lineDashOffset,
         miterLimit: this.miterLimit,
-        width: this.width
+        width: this.width,
       })
     },
     /**
@@ -56,7 +56,7 @@
      */
     unmount () {
       this.$stylesContainer && this.$stylesContainer.setStroke(undefined)
-    }
+    },
   }
 
   const watch = {
@@ -89,7 +89,7 @@
 
       this.$style.setWidth(value)
       this.requestRefresh()
-    }
+    },
   }
 
   export default {
@@ -97,6 +97,6 @@
     mixins: [style],
     props,
     watch,
-    methods
+    methods,
   }
 </script>

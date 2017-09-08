@@ -1,6 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const StringReplacePlugin = require('string-replace-webpack-plugin')
 const config = require('./config')
 
 function resolve (relPath) {
@@ -19,19 +20,19 @@ function cssLoaders (options) {
   const cssLoader = {
     loader: 'css-loader',
     options: {
-      sourceMap: options.sourceMap
-    }
+      sourceMap: options.sourceMap,
+    },
   }
 
   // generate loader string to be used with extract text plugin
   function generateLoaders (loader, loaderOptions) {
-    const loaders = [ cssLoader ]
+    const loaders = [cssLoader]
     if (loader) {
       loaders.push({
         loader: loader + '-loader',
         options: Object.assign({}, loaderOptions, {
-          sourceMap: options.sourceMap
-        })
+          sourceMap: options.sourceMap,
+        }),
       })
     }
 
@@ -40,10 +41,10 @@ function cssLoaders (options) {
     if (options.extract) {
       return ExtractTextPlugin.extract({
         use: loaders,
-        fallback: 'vue-style-loader'
+        fallback: 'vue-style-loader',
       })
     } else {
-      return [ 'vue-style-loader' ].concat(loaders)
+      return ['vue-style-loader'].concat(loaders)
     }
   }
 
@@ -55,7 +56,7 @@ function cssLoaders (options) {
     sass: generateLoaders('sass', { indentedSyntax: true }),
     scss: generateLoaders('sass'),
     stylus: generateLoaders('stylus'),
-    styl: generateLoaders('stylus')
+    styl: generateLoaders('stylus'),
   }
 }
 
@@ -64,10 +65,10 @@ function styleLoaders (options) {
   const output = []
   const loaders = cssLoaders(options)
   for (let extension in loaders) {
-    const loader = loaders[ extension ]
+    const loader = loaders[extension]
     output.push({
       test: new RegExp('\\.' + extension + '$'),
-      use: loader
+      use: loader,
     })
   }
   return output
@@ -76,18 +77,20 @@ function styleLoaders (options) {
 function postcssPlugins () {
   return [
     require('autoprefixer')({
-      browsers: [ 'last 5 versions' ]
-    })
+      browsers: ['last 5 versions'],
+    }),
   ]
 }
 
 function vueLoaderConfig (extract) {
   return {
-    loaders: cssLoaders({
-      sourceMap: true,
-      extract
-    }),
-    postcss: postcssPlugins()
+    loaders: {
+      ...cssLoaders({
+        sourceMap: true,
+        extract,
+      }),
+    },
+    postcss: postcssPlugins(),
   }
 }
 
@@ -98,7 +101,7 @@ function writeFile (dest, data) {
 
       resolve({
         path: dest,
-        size: getSize(data)
+        size: getSize(data),
       })
     })
   })
@@ -118,6 +121,39 @@ function getSize (data) {
   return (data.length / 1024).toFixed(2) + 'kb'
 }
 
+function vueMarkdownLoaderConfig () {
+  return {
+    preprocess: function (md, src) {
+      const { pattern, replacement } = compileVarsReplacement()
+      src = src.replace(pattern, replacement)
+      src = `<div class="content">\n\n${src}\n\n</div>`
+
+      if (/docs\/md\/pages/.test(this.resourcePath)) {
+        src = `<div class="section">\n${src}\n</div>`
+      }
+
+      return src
+    },
+    use: [
+      require('markdown-it-checkbox'),
+      require('markdown-it-decorate'),
+    ],
+  }
+}
+
+function compileVarsReplacement () {
+  return {
+    pattern: new RegExp(Object.keys(config.replaces).join('|'), 'g'),
+    replacement: match => config.replaces[match],
+  }
+}
+
+function compileVarsReplaceLoader () {
+  return StringReplacePlugin.replace({
+    replacements: [compileVarsReplacement()],
+  })
+}
+
 module.exports = {
   resolve,
   assetsPath,
@@ -127,5 +163,8 @@ module.exports = {
   postcssPlugins,
   writeFile,
   ensureDir,
-  getSize
+  getSize,
+  vueMarkdownLoaderConfig,
+  compileVarsReplacement,
+  compileVarsReplaceLoader,
 }

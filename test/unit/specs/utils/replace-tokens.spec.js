@@ -8,7 +8,7 @@ describe('replaceTokens', () => {
     const replacement = {
       format: 'png',
       apiKey: 'my-super-secret-key',
-      mapId: 'shik-map'
+      mapId: 'shik-map',
     }
     const expected = `http://localhost/tiles/{z}/{x}/{y}.${replacement.format}?apiKey=${replacement.apiKey}&mapId=${replacement.mapId}`
 

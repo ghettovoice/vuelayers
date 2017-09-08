@@ -9,24 +9,24 @@ import useMapCmp from '../use-map-cmp'
 const props = {
   id: {
     type: [String, Number],
-    default: () => uuid()
+    default: () => uuid(),
   },
   extent: {
     type: Array,
-    validator: value => value.length === 4
+    validator: value => value.length === 4,
   },
   minResolution: Number,
   maxResolution: Number,
   opacity: {
     type: Number,
-    default: 1
+    default: 1,
   },
   overlay: Boolean,
   visible: {
     type: Boolean,
-    default: true
+    default: true,
   },
-  zIndex: Number
+  zIndex: Number,
 }
 
 const methods = {
@@ -82,7 +82,7 @@ const methods = {
       this::cmp.methods.getServices(),
       this::sourceContainer.methods.getServices(),
       {
-        get layer () { return vm.$layer }
+        get layer () { return vm.$layer },
       }
     )
   },
@@ -137,7 +137,7 @@ const methods = {
 
     map = map instanceof Vue ? map.$map : map
     this.$layer.setMap(map)
-  }
+  },
 }
 
 const watch = {
@@ -170,7 +170,7 @@ const watch = {
     if (this.$layer && value !== this.$layer.getZIndex()) {
       this.$layer.setZIndex(value)
     }
-  }
+  },
 }
 
 export default {
@@ -182,9 +182,9 @@ export default {
     attrs () {
       return {
         id: [this.$options.name, this.id].join('-'),
-        class: this.$options.name
+        class: this.$options.name,
       }
-    }
+    },
   },
   created () {
     Object.defineProperties(this, {
@@ -193,20 +193,20 @@ export default {
        */
       $layer: {
         enumerable: true,
-        get: () => this.$olObject
+        get: () => this.$olObject,
       },
       $map: {
         enumerable: true,
-        get: () => this.$services && this.$services.map
+        get: () => this.$services && this.$services.map,
       },
       $view: {
         enumerable: true,
-        get: () => this.$services && this.$services.view
+        get: () => this.$services && this.$services.view,
       },
       $layersContainer: {
         enumerable: true,
-        get: () => this.$services && this.$services.layersContainer
-      }
+        get: () => this.$services && this.$services.layersContainer,
+      },
     })
-  }
+  },
 }

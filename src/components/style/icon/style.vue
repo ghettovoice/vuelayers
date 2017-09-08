@@ -5,59 +5,59 @@
   const props = {
     src: {
       type: String,
-      required: true
+      required: true,
     },
     size: {
       type: Array,
-      validator: value => value.length === 2
+      validator: value => value.length === 2,
     },
     anchor: {
       type: Array,
       default: () => [0.5, 0.5],
-      validator: value => value.length === 2
+      validator: value => value.length === 2,
     },
     anchorOrigin: {
       type: String,
-      default: 'top-left' // bottom-left, bottom-right, top-left or top-right
+      default: 'top-left', // bottom-left, bottom-right, top-left or top-right
     },
     anchorXUnits: {
       type: String,
-      default: 'fraction' // pixels, fraction
+      default: 'fraction', // pixels, fraction
     },
     anchorYUnits: {
       type: String,
-      default: 'fraction' // pixels, fraction
+      default: 'fraction', // pixels, fraction
     },
     color: [Array, String],
     crossOrigin: {
       type: String,
-      default: 'anonymous'
+      default: 'anonymous',
     },
     offset: {
       type: Array,
       default: () => [0, 0],
-      validator: value => value.length === 2
+      validator: value => value.length === 2,
     },
     offsetOrigin: {
       type: String,
-      default: 'top-left' // bottom-left, bottom-right, top-left or top-right
+      default: 'top-left', // bottom-left, bottom-right, top-left or top-right
     },
     opacity: {
       type: Number,
-      default: 1
+      default: 1,
     },
     scale: {
       type: Number,
-      default: 1
+      default: 1,
     },
     rotateWithView: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rotation: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   }
 
   const methods = {
@@ -81,9 +81,9 @@
         rotateWithView: this.rotateWithView,
         rotation: this.rotation,
         size: this.size,
-        src: this.src
+        src: this.src,
       })
-    }
+    },
   }
   // todo other watchers
   const watch = {
@@ -98,7 +98,7 @@
     },
     scale () {
       this.requestRefresh()
-    }
+    },
   }
 
   export default {
@@ -106,6 +106,6 @@
     mixins: [imageStyle],
     props,
     methods,
-    watch
+    watch,
   }
 </script>

@@ -25,7 +25,7 @@ const methods = {
     const vm = this
 
     return {
-      get sourceContainer () { return vm }
+      get sourceContainer () { return vm },
     }
   },
   /**
@@ -43,7 +43,7 @@ const methods = {
     if (sourceTarget && source !== sourceTarget.getSource()) {
       sourceTarget.setSource(source)
     }
-  }
+  },
 }
 
 export default {
@@ -57,5 +57,5 @@ export default {
   },
   destroyed () {
     this._source = undefined
-  }
+  },
 }

@@ -52,14 +52,14 @@ export const GEOMETRY_TYPE = {
   MULTI_LINE_STRING: 'MultiLineString',
   MULTI_POLYGON: 'MultiPolygon',
   GEOMETRY_COLLECTION: 'GeometryCollection',
-  CIRCLE: 'Circle'
+  CIRCLE: 'Circle',
 }
 
 export const EXTENT_CORNER = {
   BOTTOM_LEFT: 'bottom-left',
   BOTTOM_RIGHT: 'bottom-right',
   TOP_LEFT: 'top-left',
-  TOP_RIGHT: 'top-right'
+  TOP_RIGHT: 'top-right',
 }
 
 export const PROJ_UNIT = {
@@ -68,7 +68,7 @@ export const PROJ_UNIT = {
   METERS: 'm',
   PIXELS: 'pixels',
   TILE_PIXELS: 'tile-pixels',
-  USFEET: 'us-ft'
+  USFEET: 'us-ft',
 }
 
 export const OVERLAY_POSITIONING = {
@@ -80,7 +80,7 @@ export const OVERLAY_POSITIONING = {
   CENTER_RIGHT: 'center-right',
   TOP_LEFT: 'top-left',
   TOP_CENTER: 'top-center',
-  TOP_RIGHT: 'top-right'
+  TOP_RIGHT: 'top-right',
 }
 
 /**

@@ -7,5 +7,5 @@ export default {
   Geom,
   install (Vue) {
     Vue.component(Geom.name, Geom)
-  }
+  },
 }

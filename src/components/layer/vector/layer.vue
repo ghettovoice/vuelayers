@@ -6,7 +6,7 @@
 
   const props = {
     updateWhileAnimating: Boolean,
-    updateWhileInteracting: Boolean
+    updateWhileInteracting: Boolean,
     // todo implement options
     // renderOrder: Function,
     // renderBuffer: Number
@@ -29,7 +29,7 @@
         zIndex: this.zIndex,
         updateWhileAnimating: this.updateWhileAnimating,
         updateWhileInteracting: this.updateWhileInteracting,
-        source: this._source
+        source: this._source,
       })
     },
     /**
@@ -48,13 +48,13 @@
      */
     getStyleTarget () {
       return this.$layer
-    }
+    },
   }
 
   export default {
     name: 'vl-layer-vector',
     mixins: [layer, stylesContainer],
     props,
-    methods
+    methods,
   }
 </script>

@@ -67,9 +67,9 @@ const methods = {
     const vm = this
 
     return {
-      get interactionsContainer () { return vm }
+      get interactionsContainer () { return vm },
     }
-  }
+  },
 }
 
 export default {
@@ -83,5 +83,5 @@ export default {
   },
   destroyed () {
     this._interactions = Object.create(null)
-  }
+  },
 }

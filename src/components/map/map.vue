@@ -30,28 +30,28 @@
   const props = {
     defControls: {
       type: Boolean,
-      default: true
+      default: true,
     },
     keyboardEventTarget: [String, Element],
     loadTilesWhileAnimating: {
       type: Boolean,
-      default: false
+      default: false,
     },
     loadTilesWhileInteracting: {
       type: Boolean,
-      default: false
+      default: false,
     },
     logo: [String, Object],
     moveTolerance: Number,
     pixelRatio: {
       type: Number,
-      default: 1
+      default: 1,
     },
     renderer: [String, Array],
     tabIndex: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   }
 
   const methods = {
@@ -68,7 +68,7 @@
         renderer: this.renderer,
         logo: this.logo,
         keyboardEventTarget: this.keyboardEventTarget,
-        view: this._view
+        view: this._view,
       })
       // ol.Map constructor can create default view if no provided with options
       this._view = map.getView()
@@ -100,7 +100,7 @@
         },
         removeLayer (layer) {
           map.removeLayer(layer)
-        }
+        },
       }
     },
     /**
@@ -126,7 +126,7 @@
         },
         removeInteraction (interaction) {
           map.removeInteraction(interaction)
-        }
+        },
       }
     },
     /**
@@ -149,7 +149,7 @@
         },
         removeFeature (feature) {
           source.removeFeature(feature)
-        }
+        },
       }
     },
     /**
@@ -175,7 +175,7 @@
         },
         removeOverlay (interaction) {
           map.removeOverlay(interaction)
-        }
+        },
       }
     },
     /**
@@ -204,7 +204,7 @@
         {
           get map () { return vm.$map },
           get view () { return vm.$view },
-          get viewContainer () { return vm }
+          get viewContainer () { return vm },
         }
       )
     },
@@ -259,6 +259,7 @@
       assert.hasMap(this)
       this.$map.setTarget(this.$refs.map)
       this.subscribeAll()
+      this.updateSize()
     },
     /**
      * @return {void}
@@ -278,7 +279,7 @@
         assert.hasMap(this)
 
         this.$map.once('postrender', () => resolve())
-        this.$map.updateSize()
+        this.updateSize()
         this.$map.render()
       })
     },
@@ -288,7 +289,13 @@
      */
     subscribeAll () {
       this::subscribeToMapEvents()
-    }
+    },
+    /**
+     * @return {void}
+     */
+    updateSize () {
+      this.$map.updateSize()
+    },
   }
 
   export default {
@@ -307,7 +314,7 @@
        * @private
        */
       this._defaultLayer = new VectorLayer({
-        source: new VectorSource()
+        source: new VectorSource(),
       })
 
       Object.defineProperties(this, {
@@ -316,17 +323,17 @@
          */
         $map: {
           enumerable: true,
-          get: () => this.$olObject
+          get: () => this.$olObject,
         },
         $view: {
           enumerable: true,
-          get: () => this._view
-        }
+          get: () => this._view,
+        },
       })
     },
     destroyed () {
       this._view = undefined
-    }
+    },
   }
 
   /**
@@ -344,16 +351,16 @@
       Observable.fromOlEvent(this.$map, [
         'click',
         'dblclick',
-        'singleclick'
+        'singleclick',
       ]),
       Observable.fromOlEvent(this.$map, [
         'pointerdrag',
-        'pointermove'
+        'pointermove',
       ]).throttleTime(ft)
         .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
     ).map(evt => ({
       ...evt,
-      coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection())
+      coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection()),
     }))
     // other
     const otherEvents = Observable.fromOlEvent(this.$map, [
@@ -361,7 +368,7 @@
       'moveend',
       'postrender',
       'precompose',
-      'postcompose'
+      'postcompose',
     ]).throttleTime(ft)
 
     const events = Observable.merge(
@@ -373,10 +380,10 @@
   }
 </script>
 
-<style lang="scss">
-  @import "../../styles/mixins";
+<style lang="sass">
+  @import ../../styles/mixins
+  @import ol/ol
 
-  .vl-map, .vl-map .map {
-    @include vl-wh(100%, 100%);
-  }
+  .vl-map, .vl-map .map
+    +vl-wh(100%, 100%)
 </style>

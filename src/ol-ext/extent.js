@@ -11,7 +11,7 @@ export const {
   boundingExtent,
   buffer,
   equals,
-  extend
+  extend,
 } = olextent
 
 /**

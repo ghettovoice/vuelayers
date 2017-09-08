@@ -100,7 +100,7 @@ export default class Builder {
       logo: this.logo,
       projection: this.projection,
       source: this.source,
-      wrapX: this.wrapX
+      wrapX: this.wrapX,
     })
     source.setProperties(this.values)
 

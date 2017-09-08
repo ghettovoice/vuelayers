@@ -11,7 +11,7 @@
     isFunction,
     constant,
     stubArray,
-    forEach
+    forEach,
   } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import '../../../rx-ext'
@@ -25,15 +25,15 @@
   const props = {
     filter: {
       type: Function,
-      default: constant(true)
+      default: constant(true),
     },
     hitTolerance: {
       type: Number,
-      default: 0
+      default: 0,
     },
     multi: {
       type: Boolean,
-      default: false
+      default: false,
     },
     /**
      * Initial selection
@@ -41,12 +41,12 @@
      */
     selected: {
       type: Array,
-      default: stubArray
+      default: stubArray,
     },
     wrapX: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   }
 
   const computed = {
@@ -62,7 +62,7 @@
         multi: this.multi,
         wrapX: this.wrapX,
         filter: this.filter,
-        style: this.createStyleFunc()
+        style: this.createStyleFunc(),
       })
     },
     /**
@@ -197,7 +197,7 @@
           featuresCollection.once('change', () => resolve())
           featuresCollection.changed()
         }),
-        this::interaction.methods.refresh()
+        this::interaction.methods.refresh(),
       ])
     },
     /**
@@ -215,7 +215,7 @@
       assert.hasInteraction(this)
 
       this.$interaction.getFeatures().clear()
-    }
+    },
   }
 
   const diffById = differenceWith((a, b) => extractId(a) === extractId(b))
@@ -228,7 +228,7 @@
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)
-    }
+    },
   }
 
   export default {
@@ -242,23 +242,23 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name
+          class: this.$options.name,
         }
-      }
+      },
     },
     data () {
       return {
-        rev: 1
+        rev: 1,
       }
     },
     created () {
       Object.defineProperties(this, {
         $features: {
           enumerable: true,
-          get: this.getFeatures
-        }
+          get: this.getFeatures,
+        },
       })
-    }
+    },
   }
 
   /**

@@ -9,7 +9,7 @@ import {
   PIXEL_RATIO,
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
-  tileGrid as tileGridHelper
+  tileGrid as tileGridHelper,
 } from '../../ol-ext'
 import replaceTokens from '../../utils/replace-tokens'
 import source from './source'
@@ -18,42 +18,42 @@ import * as assert from '../../utils/assert'
 const props = {
   cacheSize: {
     type: Number,
-    default: CACHE_SIZE
+    default: CACHE_SIZE,
   },
   crossOrigin: {
     type: String,
-    default: CROSS_ORIGIN
+    default: CROSS_ORIGIN,
   },
   maxZoom: {
     type: Number,
-    default: MAX_ZOOM
+    default: MAX_ZOOM,
   },
   minZoom: {
     type: Number,
-    default: MIN_ZOOM
+    default: MIN_ZOOM,
   },
   opaque: Boolean,
   projection: {
     type: String,
-    default: EPSG_3857
+    default: EPSG_3857,
   },
   reprojectionErrorThreshold: {
     type: Number,
-    default: REPROJ_ERR_THRESHOLD
+    default: REPROJ_ERR_THRESHOLD,
   },
   tilePixelRatio: {
     type: Number,
-    default: PIXEL_RATIO
+    default: PIXEL_RATIO,
   },
   tileSize: {
     type: Array,
     default: () => [TILE_SIZE, TILE_SIZE],
-    validator: value => value.length === 2
+    validator: value => value.length === 2,
   },
   url: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 }
 
 const computed = {
@@ -66,7 +66,7 @@ const computed = {
   /**
    * @type {string[]}
    */
-  urlTokens () { return [] }
+  urlTokens () { return [] },
 }
 
 const methods = {
@@ -81,7 +81,7 @@ const methods = {
       extent: extentHelper.fromProjection(this.$view.getProjection()),
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
-      tileSize: this.tileSize
+      tileSize: this.tileSize,
     })
   },
   /**
@@ -119,7 +119,7 @@ const methods = {
    */
   unmount () {
     this::source.methods.mount()
-  }
+  },
 }
 
 const watch = {
@@ -127,7 +127,7 @@ const watch = {
     if (this.$source && !this.$source.getUrls().includes(value)) {
       this.$source.setUrl(value)
     }
-  }
+  },
 }
 
 export default {
@@ -135,5 +135,5 @@ export default {
   props,
   computed,
   methods,
-  watch
+  watch,
 }

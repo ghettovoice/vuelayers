@@ -24,12 +24,12 @@ npm install -S vue vuelayers
 
 #### UMD
 
-- Full debug version: `dist/vuelayers.umd.js` and `dist/vuelayers.umd.css`
-- Full production version: `dist/vuelayers.umd.min.js` and `dist/vuelayers.umd.min.css`
+- Full debug version: `dist/vuelayers.umd.js` and `dist/vuelayers.css`
+- Full production version: `dist/vuelayers.umd.min.js` and `dist/vuelayers.css`
 
 #### CommonJS
 
-- Full version: `dist/vuelayers.cjs.js` and `dist/vuelayers.cjs.css`
+- Full version: `dist/vuelayers.cjs.js` and `dist/vuelayers.css`
 
 #### CommonJS separate components (for plugins like `babel-plugin-component`)
 
@@ -38,7 +38,7 @@ npm install -S vue vuelayers
 
 #### ES6 module
 
-- Full version: `dist/vuelayers.es.js` and `dist/vuelayers.es.css`
+- Full version: `dist/vuelayers.es.js` and `dist/vuelayers.css`
 
 ## Usage 
 
@@ -75,31 +75,30 @@ new Vue({
 </script>
 <style>
   /* CSS file needs to be imported separately. */
-  @import "~ol/ol.css";
-  @import "~vuelayers/dist/vuelayers.es.css";
+  @import "~vuelayers/dist/vuelayers.css";
 </style>
 ```
 
 **Note about usage of different builds**
 
-* For browser is available pre-build UMD version by simply including `dist/vuelayers.umd.min.js` and `vuelayers.umd.min.css` files 
+* For browser is available pre-build UMD version by simply including `dist/vuelayers.umd.min.js` and `vuelayers.css` files 
   on the page after VueJS.  
   Or use from CDN like [unpkg.org](https://unpkg.com).
     
   * [https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.js](https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.js)
-  * [https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css](https://unpkg.com/vuelayers@latest/dist/vuelayers.umd.min.css)
+  * [https://unpkg.com/vuelayers@latest/dist/vuelayers.css](https://unpkg.com/vuelayers@latest/dist/vuelayers.css)
   
 * For NodeJS is available CommonJS version (it is included by default) from `dist/vuelayers.cjs.js` and
-  appropriate stylesheet `dist/vuelayers.cjs.css`.  
+  appropriate stylesheet `dist/vuelayers.css`.  
   See below for example of incremental loading of what you need with tools like `babel-plugin-component`.
   
 * For bundlers like Webpack 2 and Rollup is available ES6 module version from `dist/vuelayers.es.js` and 
-  appropriate stylesheet `dist/vuelayers.es.css`.
+  appropriate stylesheet `dist/vuelayers.css`.
 
 ### Incremental import  
 
 With Webpack 2 or Rollup may be used without additional configuration, simply import what you need.
-Stylesheet should be imported manually (`dist/vuelayers.es.css`).
+Stylesheet should be imported manually (`dist/vuelayers.css`).
 
 ```js
 import Vue from 'vue'

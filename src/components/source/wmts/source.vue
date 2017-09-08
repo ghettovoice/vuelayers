@@ -7,7 +7,7 @@
     WMTS_REQUEST_ENCODING,
     WMTS_FORMAT,
     tileGrid as tileGridHelper,
-    extent as extentHelper
+    extent as extentHelper,
   } from '../../../ol-ext'
   import tileSource from '../tile'
   import * as assert from '../../../utils/assert'
@@ -16,28 +16,28 @@
     dimensions: Object,
     format: {
       type: String,
-      default: WMTS_FORMAT
+      default: WMTS_FORMAT,
     },
     layerName: {
       type: String,
-      required: true
+      required: true,
     },
     matrixSet: {
       type: String,
-      required: true
+      required: true,
     },
     requestEncoding: {
       type: String,
-      default: WMTS_REQUEST_ENCODING
+      default: WMTS_REQUEST_ENCODING,
     },
     styleName: {
       type: String,
-      required: true
+      required: true,
     },
     version: {
       type: String,
-      default: WMTS_VERSION
-    }
+      default: WMTS_VERSION,
+    },
   }
 
   const methods = {
@@ -63,7 +63,7 @@
         style: this.styleName,
         version: this.version,
         url: this.urlTmpl,
-        wrapX: this.wrapX
+        wrapX: this.wrapX,
       })
     },
     /**
@@ -85,15 +85,15 @@
         resolutions,
         tileSize: this.tileSize,
         minZoom: this.minZoom,
-        matrixIds: range(this.minZoom, resolutions.length)
+        matrixIds: range(this.minZoom, resolutions.length),
       })
-    }
+    },
   }
 
   export default {
     name: 'vl-source-wmts',
     mixins: [tileSource],
     props,
-    methods
+    methods,
   }
 </script>

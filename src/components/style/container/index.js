@@ -15,12 +15,12 @@ const Style = {
   beforeCreate () {
     warndbg('vl-style-container was renamed to vl-style-box. ' +
       'Name "vl-style-container" now is deprecated and will be removed in the next release.')
-  }
+  },
 }
 
 export default {
   Style,
   install (Vue) {
     Vue.component(Style.name, Style)
-  }
+  },
 }

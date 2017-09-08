@@ -3,12 +3,12 @@ module.exports = {
   root: true,
   parser: 'babel-eslint',
   parserOptions: {
-    sourceType: 'module'
+    sourceType: 'module',
   },
   env: {
     browser: true,
     es6: true,
-    node: true
+    node: true,
   },
   // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
   extends: 'standard',
@@ -16,7 +16,7 @@ module.exports = {
   plugins: [
     'import',
     'html',
-    'lodash-fp'
+    'lodash-fp',
   ],
   // add your custom rules here
   'rules': {
@@ -25,6 +25,7 @@ module.exports = {
     // allow async-await
     'generator-star-spacing': 0,
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
-  }
+    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+    'comma-dangle': ['error', 'always-multiline'],
+  },
 }

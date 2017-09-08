@@ -10,7 +10,7 @@ export const {
   fail,
   equal,
   notEqual,
-  AssertionError
+  AssertionError,
 } = assert
 /**
  * @param {*} value

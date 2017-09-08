@@ -63,5 +63,5 @@ export const mixins = {
   tileSource,
   style,
   imageStyle,
-  withFillStrokeStyle
+  withFillStrokeStyle,
 }

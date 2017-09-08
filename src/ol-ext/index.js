@@ -20,5 +20,5 @@ export {
   style,
   tileGrid,
   loadStrategy,
-  format
+  format,
 }

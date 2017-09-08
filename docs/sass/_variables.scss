@@ -1,0 +1,12 @@
+// Import Bulma's core
+@import "~bulma/sass/utilities/_all";
+
+// Menu
+$menu-item-color: $text;
+$menu-item-radius: $radius-small;
+$menu-item-hover-color: $text-strong;
+$menu-item-hover-background-color: $background;
+$menu-item-active-color: $link-invert;
+$menu-item-active-background-color: $link;
+$menu-list-border-left: 1px solid $border;
+$menu-label-color: $text-light;

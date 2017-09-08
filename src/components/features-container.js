@@ -101,7 +101,7 @@ const methods = {
     const vm = this
 
     return {
-      get featuresContainer () { return vm }
+      get featuresContainer () { return vm },
     }
   },
   /**
@@ -115,7 +115,7 @@ const methods = {
     }
 
     return feature
-  }
+  },
 }
 
 export default {
@@ -129,5 +129,5 @@ export default {
   },
   destroyed () {
     this._features = Object.create(null)
-  }
+  },
 }

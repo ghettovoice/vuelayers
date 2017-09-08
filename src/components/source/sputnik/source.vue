@@ -13,15 +13,15 @@
   const props = {
     url: {
       type: String,
-      default: SPUTNIK_URL_TEMPLATE
+      default: SPUTNIK_URL_TEMPLATE,
     },
     apiKey: {
-      type: String
+      type: String,
     },
     attributions: {
       type: String,
-      default: SPUTNIK_ATTRIBUTIONS
-    }
+      default: SPUTNIK_ATTRIBUTIONS,
+    },
   }
 
   const computed = {
@@ -30,13 +30,13 @@
      */
     urlTokens () {
       return ['apiKey']
-    }
+    },
   }
 
   export default {
     name: 'vl-source-sputnik',
     mixins: [xyzSource],
     props,
-    computed
+    computed,
   }
 </script>

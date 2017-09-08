@@ -18,8 +18,8 @@
      */
     factory: {
       type: Function,
-      required: true
-    }
+      required: true,
+    },
   }
 
   const computed = {
@@ -31,7 +31,7 @@
       }
 
       return func
-    }
+    },
   }
 
   const methods = {
@@ -80,7 +80,7 @@
       const vm = this
 
       return mergeDescriptors(this::style.methods.getServices(), {
-        get stylesContainer () { return vm }
+        get stylesContainer () { return vm },
       })
     },
     /**
@@ -105,13 +105,13 @@
         .then(this.deinit)
         .then(this.init)
         .then(this.mount)
-    }
+    },
   }
 
   const watch = {
     factory () {
       this.requestRefresh()
-    }
+    },
   }
 
   export default {
@@ -125,9 +125,9 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name
+          class: this.$options.name,
         }
-      }
-    }
+      },
+    },
   }
 </script>

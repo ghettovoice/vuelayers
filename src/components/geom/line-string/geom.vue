@@ -7,7 +7,7 @@
   const props = {}
 
   const computed = {
-    type: constant(GEOMETRY_TYPE.LINE_STRING)
+    type: constant(GEOMETRY_TYPE.LINE_STRING),
   }
 
   const methods = {
@@ -17,7 +17,7 @@
      */
     createGeometry () {
       return new LineString(this.fromLonLat(this.coordinates))
-    }
+    },
   }
 
   export default {
@@ -25,6 +25,6 @@
     mixins: [geom],
     props,
     computed,
-    methods
+    methods,
   }
 </script>

@@ -9,28 +9,28 @@
   const props = {
     accessToken: {
       type: String,
-      required: true
+      required: true,
     },
     attributions: {
       type: String,
-      default: MAPBOX_ATTRIBUTIONS
+      default: MAPBOX_ATTRIBUTIONS,
     },
     mapId: {
       type: String,
-      required: true
+      required: true,
     },
     projection: {
       type: String,
-      default: EPSG_3857
+      default: EPSG_3857,
     },
     tileFormat: {
       type: String,
-      default: TILE_FORMAT
+      default: TILE_FORMAT,
     },
     url: {
       type: String,
-      default: MAPBOX_URL_TEMPLATE
-    }
+      default: MAPBOX_URL_TEMPLATE,
+    },
   }
 
   const computed = {
@@ -45,14 +45,14 @@
      */
     urlTokens () {
       return ['mapId', 'accessToken', 'tileNameSuffix', 'tileFormat']
-    }
+    },
   }
 
   export default {
     name: 'vl-source-mapbox',
     mixins: [xyzSource],
     props,
-    computed
+    computed,
   }
 
   /**

@@ -11,5 +11,5 @@ export default {
   install (Vue) {
     Vue.component(Map.name, Map)
     Vue.component(View.name, View)
-  }
+  },
 }

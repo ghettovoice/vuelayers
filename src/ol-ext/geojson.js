@@ -47,7 +47,7 @@ export function readFeature (geoJsonFeature, featureProjection = EPSG_3857, data
 export function writeGeometry (geometry, geometryProjection = EPSG_3857, dataProjection = EPSG_4326) {
   return geoJson.writeGeometryObject(geometry, {
     featureProjection: geometryProjection,
-    dataProjection
+    dataProjection,
   })
 }
 
@@ -62,7 +62,7 @@ export function readGeometry (geoJsonGeometry, geometryProjection = EPSG_3857, d
 
   return geoJson.readGeometry(geoJsonGeometry, {
     featureProjection: geometryProjection,
-    dataProjection
+    dataProjection,
   })
 }
 

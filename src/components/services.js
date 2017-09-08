@@ -7,11 +7,11 @@ import mergeDescriptors from '../utils/multi-merge-descriptors'
 
 export default {
   inject: {
-    $services: SERVICES_PROP
+    $services: SERVICES_PROP,
   },
   provide () {
     return {
-      [SERVICES_PROP]: this.getServices()
+      [SERVICES_PROP]: this.getServices(),
     }
   },
   methods: {
@@ -21,7 +21,7 @@ export default {
      */
     getServices () {
       return mergeDescriptors({}, this.$services || {})
-    }
+    },
   },
   beforeCreate () {
     // bloody patch to suppress Vue warning about not provided
@@ -42,5 +42,5 @@ export default {
 
       this._provided[SERVICES_PROP] = undefined
     }
-  }
+  },
 }

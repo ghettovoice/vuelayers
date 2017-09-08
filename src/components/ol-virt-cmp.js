@@ -44,6 +44,6 @@ export default {
      */
     refresh () {
       return this::cmp.methods.refresh()
-    }
-  }
+    },
+  },
 }

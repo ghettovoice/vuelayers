@@ -17,8 +17,8 @@ const props = {
   coordinates: {
     type: Array,
     required: true,
-    validator: val => val.length
-  }
+    validator: val => val.length,
+  },
 }
 
 const computed = {
@@ -34,7 +34,7 @@ const computed = {
     if (this.rev && this.$geometry) {
       return this.extentToLonLat(this.$geometry.getExtent())
     }
-  }
+  },
 }
 
 const methods = {
@@ -107,7 +107,7 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get geometry () { return vm.$geometry }
+      get geometry () { return vm.$geometry },
     })
   },
   /**
@@ -132,7 +132,7 @@ const methods = {
    */
   subscribeAll () {
     this::subscribeToGeomChanges()
-  }
+  },
 }
 const watch = {
   coordinates (value) {
@@ -140,16 +140,16 @@ const watch = {
 
     let isEq = isEqualGeom({
       coordinates: value,
-      extent: extentHelper.boundingExtent(value)
+      extent: extentHelper.boundingExtent(value),
     }, {
       coordinates: this.toLonLat(this.$geometry.getCoordinates()),
-      extent: this.extent
+      extent: this.extent,
     })
 
     if (!isEq) {
       this.$geometry.setCoordinates(this.fromLonLat(value))
     }
-  }
+  },
 }
 
 export default {
@@ -161,11 +161,11 @@ export default {
   stubVNode: {
     empty () {
       return this.$options.name
-    }
+    },
   },
   data () {
     return {
-      rev: 1
+      rev: 1,
     }
   },
   created () {
@@ -175,22 +175,22 @@ export default {
        */
       $geometry: {
         enumerable: true,
-        get: () => this.$olObject
+        get: () => this.$olObject,
       },
       $map: {
         enumerable: true,
-        get: () => this.$services && this.$services.map
+        get: () => this.$services && this.$services.map,
       },
       $view: {
         enumerable: true,
-        get: () => this.$services && this.$services.view
+        get: () => this.$services && this.$services.view,
       },
       $geometryContainer: {
         enumerable: true,
-        get: () => this.$services && this.$services.geometryContainer
-      }
+        get: () => this.$services && this.$services.geometryContainer,
+      },
     })
-  }
+  },
 }
 
 /**
@@ -206,13 +206,13 @@ function subscribeToGeomChanges () {
     'change',
     () => ({
       coordinates: this.toLonLat(this.$geometry.getCoordinates()),
-      extent: this.extentToLonLat(this.$geometry.getExtent())
+      extent: this.extentToLonLat(this.$geometry.getExtent()),
     })
   ).throttleTime(ft)
     .distinctUntilChanged(isEqualGeom)
-    .map(({ value: { coordinates } }) => ({
+    .map(({ coordinates }) => ({
       prop: 'coordinates',
-      value: coordinates
+      value: coordinates,
     }))
 
   this.subscribeTo(changes, ({ prop, value }) => {

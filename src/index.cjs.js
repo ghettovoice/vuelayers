@@ -1,4 +1,3 @@
-/* global PKG_VERSION */
 /**
  * VueLayers
  * Vue components to work with OpenLayers.
@@ -15,12 +14,12 @@ import * as rx from './rx-ext'
 
 const VueLayers = {
   // meta & consts
-  VERSION: PKG_VERSION,
+  VERSION: 'C_PKG_VERSION',
   // install
   install,
   ol,
   rx,
-  ...components
+  ...components,
 }
 export default VueLayers
 // auto install for Browser env

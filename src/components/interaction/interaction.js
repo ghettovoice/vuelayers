@@ -6,12 +6,12 @@ import useMapCmp from '../use-map-cmp'
 const props = {
   id: {
     type: [String, Number],
-    default: () => uuid()
+    default: () => uuid(),
   },
   active: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 }
 
 const methods = {
@@ -42,7 +42,7 @@ const methods = {
     const vm = this
 
     return mergeDescriptors(this::cmp.methods.getServices(), {
-      get interaction () { return vm.$interaction }
+      get interaction () { return vm.$interaction },
     })
   },
   /**
@@ -80,7 +80,7 @@ const methods = {
    */
   refresh () {
     return this::cmp.methods.refresh()
-  }
+  },
 }
 
 const watch = {
@@ -88,7 +88,7 @@ const watch = {
     if (this.$interaction && value !== this.$interaction.getActive()) {
       this.$interaction.setActive(value)
     }
-  }
+  },
 }
 
 export default {
@@ -99,7 +99,7 @@ export default {
   stubVNode: {
     empty () {
       return this.$options.name
-    }
+    },
   },
   created () {
     Object.defineProperties(this, {
@@ -108,20 +108,20 @@ export default {
        */
       $interaction: {
         enumerable: true,
-        get: () => this.$olObject
+        get: () => this.$olObject,
       },
       $map: {
         enumerable: true,
-        get: () => this.$services && this.$services.map
+        get: () => this.$services && this.$services.map,
       },
       $view: {
         enumerable: true,
-        get: () => this.$services && this.$services.view
+        get: () => this.$services && this.$services.view,
       },
       $interactionsContainer: {
         enumerable: true,
-        get: () => this.$services && this.$services.interactionsContainer
-      }
+        get: () => this.$services && this.$services.interactionsContainer,
+      },
     })
-  }
+  },
 }

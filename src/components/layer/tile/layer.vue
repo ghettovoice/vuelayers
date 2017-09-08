@@ -3,7 +3,7 @@
   import layer from '../layer'
 
   const props = {
-    preload: Number
+    preload: Number,
   }
 
   const methods = {
@@ -21,15 +21,15 @@
         preload: this.preload,
         extent: this.extent,
         zIndex: this.zIndex,
-        source: this._source
+        source: this._source,
       })
-    }
+    },
   }
 
   export default {
     name: 'vl-layer-tile',
     mixins: [layer],
     props,
-    methods
+    methods,
   }
 </script>

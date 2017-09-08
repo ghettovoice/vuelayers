@@ -6,18 +6,18 @@ import IdentityMap from '../utils/identity-map'
 export default {
   props: {
     // unique key for saving to identity map
-    ident: [String, Number]
+    ident: [String, Number],
   },
   methods: {
     getFullIdent (...parts) {
       if (!this.ident) return
 
       return [this.$options.name, this.ident, ...parts].filter(identity).join(':')
-    }
+    },
   },
   created () {
     this::initIdentityMap()
-  }
+  },
 }
 
 function initIdentityMap () {
@@ -27,7 +27,7 @@ function initIdentityMap () {
   Object.defineProperties(this, {
     $identityMap: {
       enumerable: true,
-      get: () => this[IDENTITY_MAP_PROP]
-    }
+      get: () => this[IDENTITY_MAP_PROP],
+    },
   })
 }

@@ -8,7 +8,7 @@
   const props = {
     distance: {
       type: Number,
-      default: 20
+      default: 20,
     },
     /**
      * Geometry function factory
@@ -16,14 +16,14 @@
      */
     geomFuncFactory: {
       type: Function,
-      default: defaultGeomFuncFactory
-    }
+      default: defaultGeomFuncFactory,
+    },
   }
 
   const computed = {
     geomFunc () {
       return this.geomFuncFactory()
-    }
+    },
   }
 
   const methods = {
@@ -66,7 +66,7 @@
      */
     getSourceTarget () {
       return this._sourceBuilder
-    }
+    },
   }
 
   const watch = {
@@ -74,7 +74,7 @@
       if (this.$source && value !== this.$source.getDistance()) {
         this.$source.setDistance(value)
       }
-    }
+    },
   }
 
   export default {
@@ -83,7 +83,7 @@
     props,
     computed,
     methods,
-    watch
+    watch,
   }
 
   /**

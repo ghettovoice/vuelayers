@@ -3,7 +3,7 @@
   import style from '../style'
 
   const props = {
-    color: [String, Array]
+    color: [String, Array],
   }
 
   const methods = {
@@ -13,7 +13,7 @@
      */
     createStyle () {
       return new Fill({
-        color: this.color
+        color: this.color,
       })
     },
     /**
@@ -29,7 +29,7 @@
      */
     unmount () {
       this.$stylesContainer && this.$stylesContainer.setFill(undefined)
-    }
+    },
   }
 
   const watch = {
@@ -38,7 +38,7 @@
 
       this.$style.setColor(value)
       this.requestRefresh()
-    }
+    },
   }
 
   export default {
@@ -46,6 +46,6 @@
     mixins: [style],
     props,
     methods,
-    watch
+    watch,
   }
 </script>
