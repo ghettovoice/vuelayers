@@ -1,6 +1,9 @@
+### Demo app source code
+
+```html
 <template>
-  <div class="demo">
-    <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
+  <div class="demo-app">
+    <vl-map ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
       <!-- map view aka ol.View -->
       <vl-view ref="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
@@ -26,8 +29,9 @@
         <!-- vl-source-* -->
         <component :is="layer.source.cmp" v-bind="layer.source">
           <!-- add static features to vl-source-vector if provided -->
-          <vl-feature v-if="source.features && source.features.length" :id="feature.id"
-                      :properties="feature.properties">
+          <vl-feature v-if="layer.source.staticFeatures && layer.source.staticFeatures.length"
+                      v-for="feature in layer.source.staticFeatures" :key="feature.id"
+                      :id="feature.id" :properties="feature.properties">
             <component :is="geometryTypeToCmpName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
           </vl-feature>
         </component>
@@ -38,23 +42,18 @@
           <!-- if vl-style-box used, create vl-style-circle, vl-style-icon, vl-style-fill, vl-style-stroke & etc -->
           <component v-if="style.styles" v-for="(style, cmp) in style.styles" :key="cmp" :is="cmp" v-bind="style">
             <!-- vl-style-fill, vl-style-stroke if provided -->
-            <vl-style-fill v-if="style.fill" v-bind="style.fill" />
-            <vl-style-fill v-if="style.stroke" v-bind="style.stroke" />
+            <vl-style-fill v-if="style.fill" v-bind="style.fill"/>
+            <vl-style-fill v-if="style.stroke" v-bind="style.stroke"/>
           </component>
         </component>
       </component>
     </vl-map>
-
-    <vld-demo-content/>
   </div>
 </template>
 
 <script>
   import { kebabCase } from 'lodash/fp'
   import { ol as vlol } from 'vuelayers'
-  import VldDemoContent from '../md/partial/demo.md'
-  import VlFeature from '../../src/components/feature/feature.vue'
-  import VlStyleFill from '../../src/components/style/fill/style.vue'
 
   const methods = {
     geometryTypeToCmpName (type) {
@@ -107,17 +106,12 @@
   }
 
   export default {
-    name: 'vld-demo',
-    components: {
-      VlStyleFill,
-      VlFeature,
-      VldDemoContent,
-    },
+    name: 'vld-demo-app',
     methods,
     data () {
       return {
         center: [0, 0],
-        zoom: 2,
+        zoom: 1,
         rotation: 0,
         layers: [
           {
@@ -126,7 +120,7 @@
             visible: true,
             source: {
               cmp: 'vl-source-vector',
-              url: 'C_BASE_URL/static/pacman.geojson',
+              url: '../static/pacman.geojson',
             },
             style: [
               {
@@ -143,3 +137,4 @@
 
 <style>
 </style>
+```

@@ -129,7 +129,7 @@ function vueMarkdownLoaderConfig () {
       src = src.replace(pattern, replacement)
       src = `<div class="content">\n\n${src}\n\n</div>`
 
-      if (/docs\/md\/pages/.test(this.resourcePath)) {
+      if (/docs\/pages\/.*\.md$/.test(this.resourcePath)) {
         src = `<div class="section">\n${src}\n</div>`
       }
 

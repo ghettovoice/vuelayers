@@ -32,7 +32,7 @@
   }
 
   export default {
-    name: 'vld-github-button',
+    name: 'vld-github-btn',
     props,
     computed,
   }

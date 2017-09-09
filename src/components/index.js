@@ -1,14 +1,23 @@
 import identMap from './ident-map'
 import olCmp from './ol-cmp'
 import olVirtCmp from './ol-virt-cmp'
+import useMapCmp from './use-map-cmp'
 import rxSubs from './rx-subs'
 import services from './services'
 import stubVNode from './stub-vnode'
-import styleTarget from './styles-container'
+import stylesContainers from './styles-container'
+import featuresContainers from './features-container'
+import geometryContainers from './geometry-container'
+import interactionsContainers from './interactions-container'
+import layersContainers from './layers-container'
+import overlaysContainers from './overlays-container'
+import sourceContainers from './source-container'
+import geom from './geom/geom'
 import interaction from './interaction/interaction'
 import layer from './layer/layer'
 import source from './source/source'
 import tileSource from './source/tile'
+import vectSource from './source/vect'
 import style from './style/style'
 import imageStyle from './style/image'
 import withFillStrokeStyle from './style/with-fill-stroke'
@@ -53,14 +62,23 @@ export const mixins = {
   identMap,
   olCmp,
   olVirtCmp,
+  useMapCmp,
   rxSubs,
   services,
   stubVNode,
-  styleTarget,
+  stylesContainers,
+  featuresContainers,
+  geometryContainers,
+  interactionsContainers,
+  layersContainers,
+  overlaysContainers,
+  sourceContainers,
+  geom,
   interaction,
   layer,
   source,
   tileSource,
+  vectSource,
   style,
   imageStyle,
   withFillStrokeStyle,

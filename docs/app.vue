@@ -1,7 +1,7 @@
 <template>
   <main id="app">
-    <div class="columns is-gapless">
-      <div class="column is-4-tablet is-3-desktop is-2-widescreen is-hidden-mobile">
+    <div class="columns is-gapless layout">
+      <div class="column left is-4-tablet is-3-desktop is-2-widescreen is-hidden-mobile is-fullheight">
         <vld-sidebar>
           <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs" exact-active-class="is-active">
             <div class="name">C_PKG_FULLNAME.js</div>
@@ -32,7 +32,7 @@
         </vld-sidebar>
       </div>
 
-      <div class="column">
+      <div class="column center is-8-tablet is-9-desktop is-10-widescreen">
         <vld-navbar class="is-hidden-tablet">
           <vld-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo has-text-left"
                           :router="true">
@@ -62,38 +62,29 @@
         <div class="page">
           <router-view/>
         </div>
+
+        <vld-footer id="footer" right-mods="has-text-centered has-text-right-tablet">
+          <div slot="left">
+            Licensed under <a href="C_PKG_LICENSE_URL" target="_blank" title="View license text">C_PKG_LICENSE_NAME</a>
+            <br>
+            &copy; 2016-{{ new Date().getFullYear() }} <a href="C_PKG_AUTHOR_HOMEPAGE" title="C_PKG_AUTHOR_NAME Homepage" target="_blank">C_PKG_AUTHOR_NAME</a>
+          </div>
+
+          <div slot="right">
+            <a href="C_PKG_REPOSITORY" target="_blank" title="View on GitHub" class="button is-outlined is-info">
+              <b-icon icon="github"/>
+              <span>GitHub</span>
+            </a>
+          </div>
+        </vld-footer>
       </div>
     </div>
-
-
-    <vld-footer id="footer" right-mods="has-text-centered has-text-right-tablet">
-      <div slot="left">
-        Licensed under <a href="C_PKG_LICENSE_URL" target="_blank" title="View license text">C_PKG_LICENSE_NAME</a>
-        <br>
-        &copy; 2016-{{ new Date().getFullYear() }} <a href="C_PKG_AUTHOR_HOMEPAGE" title="C_PKG_AUTHOR_NAME Homepage" target="_blank">C_PKG_AUTHOR_NAME</a>
-      </div>
-
-      <div slot="right">
-        <a href="C_PKG_REPOSITORY" target="_blank" title="View on GitHub" class="button is-outlined is-info">
-          <b-icon icon="github"/>
-          <span>GitHub</span>
-        </a>
-      </div>
-    </vld-footer>
   </main>
 </template>
 
 <script>
   import { constant } from 'lodash/fp'
   import menu from './menu'
-  import { Menu as VldMenu, List as VldMenuList, Item as VldMenuItem } from './components/menu'
-  import {
-    Navbar as VldNavbar,
-    NavbarItem as VldNavbarItem,
-    NavbarDropdownItem as VldNavbarDropdownItem,
-  } from './components/navbar'
-  import VldSidebar from './components/sidebar.vue'
-  import VldFooter from './components/footer.vue'
 
   const computed = {
     menu: constant(menu),
@@ -107,16 +98,6 @@
 
   export default {
     name: 'app',
-    components: {
-      VldMenu,
-      VldMenuList,
-      VldMenuItem,
-      VldNavbar,
-      VldNavbarItem,
-      VldNavbarDropdownItem,
-      VldSidebar,
-      VldFooter,
-    },
     computed,
   }
 </script>
@@ -124,6 +105,25 @@
 <style lang="sass">
   // import base
   @import sass/base
+
+  .layout
+    margin-bottom: 0 !important
+    .left
+      background: $dark
+      a
+        &:hover
+          color: $primary-invert
+      .menu-list
+        a
+          color: $primary
+          &:hover
+            background: lighten($dark, 10%)
+            color: $primary-invert
+          &.is-active
+            color: $primary-invert
+            background: $primary
+    .page
+      min-height: calc(100% - 168px)
 
   .navbar
     position: absolute

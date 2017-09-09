@@ -15,7 +15,7 @@
   }
 
   export default {
-    name: 'vld-list',
+    name: 'vld-menu-list',
     props,
   }
 </script>

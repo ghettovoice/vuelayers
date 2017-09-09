@@ -21,44 +21,43 @@
       </vl-map>
     </section>
 
-    <section class="hero">
-      <div class="hero-body">
-        <vld-home-content/>
-
-        <section class="buttons">
-          <a class="button is-success is-large"
-             href="C_PKG_REPOSITORY/archive/C_PKG_VERSION.zip"
-             title="Download latest version"
-             target="_blank">
-            <b-icon icon="download"></b-icon>
-            <span>Download</span>
-          </a>
-
-          <router-link to="/install" class="button is-primary is-large" title="Install & Usage">
-            <span>Get started</span>
-            <b-icon icon="arrow-right"></b-icon>
-          </router-link>
-        </section>
-
-        <hr/>
-
-        <section class="github-buttons is-flex is-flex-justify-center">
-          <vld-github-btn user="C_PKG_AUTHOR_USER" repo="C_PKG_NAME" type="star" :count="true"
-                         size="large" width="120px"
-                         height="30px"/>
-          <vld-github-btn user="C_PKG_AUTHOR_USER" repo="C_PKG_NAME" type="fork" :count="true"
-                         size="large" width="120px"
-                         height="30px"/>
-        </section>
+    <vld-hero>
+      <div class="has-text-centered">
+        <vld-home-intro/>
       </div>
-    </section>
+
+      <section class="buttons">
+        <a class="button is-success is-large"
+           href="C_PKG_REPOSITORY/archive/C_PKG_VERSION.zip"
+           title="Download latest version"
+           target="_blank">
+          <b-icon icon="download"></b-icon>
+          <span>Download</span>
+        </a>
+
+        <router-link to="/install" class="button is-primary is-large" title="Install & Usage">
+          <span>Get started</span>
+          <b-icon icon="arrow-right"></b-icon>
+        </router-link>
+      </section>
+
+      <hr/>
+
+      <section class="github-buttons is-flex is-flex-justify-center">
+        <vld-github-btn user="C_PKG_AUTHOR_USER" repo="C_PKG_NAME" type="star" :count="true"
+                       size="large" width="120px"
+                       height="30px"/>
+        <vld-github-btn user="C_PKG_AUTHOR_USER" repo="C_PKG_NAME" type="fork" :count="true"
+                       size="large" width="120px"
+                       height="30px"/>
+      </section>
+    </vld-hero>
   </div>
 </template>
 
 <script>
   import { ol as vlol } from 'vuelayers'
-  import VldHomeContent from '../md/partial/home.md'
-  import VldGithubBtn from './github-button.vue'
+  import VldHomeIntro from '../partial/home-intro.md'
 
   const methods = {
     onUpdatePosition (coordinate) {
@@ -74,10 +73,9 @@
   }
 
   export default {
-    name: 'vld-home',
+    name: 'vld-home-page',
     components: {
-      VldHomeContent,
-      VldGithubBtn,
+      VldHomeIntro,
     },
     methods,
     data () {
@@ -89,7 +87,7 @@
 </script>
 
 <style lang="sass">
-  @import ../sass/variables
+  @import "../sass/variables"
 
   .home
     .map

@@ -46,3 +46,34 @@ html *
     font-weight: 400
     font-size: 1.25rem
     line-height: 1.25
+
+.buttons
+  margin: .5rem 0
+  .button
+    margin: .25rem 0
+    display: flex
+    &:first-child
+      margin-top: 0
+    &:last-child
+      margin-bottom: 0
+  +tablet()
+    display: flex
+    justify-content: center
+    .button
+      margin: 0 .25rem
+      &:first-child
+        margin-left: 0
+      &:last-child
+        margin-right: 0
+
+.github-buttons
+  margin: .5rem 0
+  display: flex
+  justify-content: center
+  .github-button
+    margin: 0 .25em
+    display: flex
+    &:first-child
+      margin-left: 0
+    &:last-child
+      margin-right: 0
