@@ -28,8 +28,9 @@
   import * as assert from '../../utils/assert'
 
   const props = {
-    defControls: {
-      type: Boolean,
+    // todo remove when vl-control-* components will be ready
+    controls: {
+      type: [Object, Boolean],
       default: true,
     },
     keyboardEventTarget: [String, Element],
@@ -61,7 +62,7 @@
      */
     createOlObject () {
       const map = new Map({
-        controls: this.defControls ? olcontrol.defaults() : [],
+        controls: [],
         loadTilesWhileAnimating: this.loadTilesWhileAnimating,
         loadTilesWhileInteracting: this.loadTilesWhileInteracting,
         pixelRatio: this.pixelRatio,
@@ -74,6 +75,11 @@
       this._view = map.getView()
       // add default overlay to map
       this._defaultLayer.setMap(map)
+
+      if (this.controls) {
+        let opts = typeof this.controls === 'object' ? this.controls : undefined
+        map.getControls().extend(olcontrol.defaults(opts).getArray())
+      }
 
       return map
     },

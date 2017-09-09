@@ -1,10 +1,10 @@
 /*! VueLayers.js docs site */
 @import variables
-@import ~highlight.js/styles/github-gist.css
+@import ~highlight.js/styles/github-gist
 // Import Bulma and Buefy styles
 @import ~bulma
 @import ~buefy/src/scss/buefy
-@import ~vuelayers/dist/vuelayers.css
+@import ~vuelayers/dist/vuelayers
 
 html, body
   height: 100%
@@ -34,6 +34,9 @@ html *
 
 .is-fullheight
   min-height: 100vh
+
+pre, pre.hljs
+  background: darken($light, 2%)
 
 .content
   pre > code

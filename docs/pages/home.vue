@@ -22,9 +22,7 @@
     </section>
 
     <vld-hero>
-      <div class="has-text-centered">
-        <vld-home-intro/>
-      </div>
+      <vld-home-intro class="intro"/>
 
       <section class="buttons">
         <a class="button is-success is-large"
@@ -92,6 +90,12 @@
   .home
     .map
       height: 40vh
+
+    .intro
+      text-align: center
+      margin: 0 auto
+      +desktop()
+        width: 50%
 
     .buttons
       margin: .5rem 0

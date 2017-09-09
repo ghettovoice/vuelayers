@@ -2,7 +2,7 @@
   <div class="demo">
     <vld-hero :bold="true" color="is-primary">
       <h1 class="title">C_PKG_FULLNAME demo app</h1>
-      <h2 class="subtitle">An example app based on C_PKG_FULLNAME.js</h2>
+      <h2 class="subtitle">An example app with C_PKG_FULLNAME.js</h2>
     </vld-hero>
 
     <vld-demo-app />

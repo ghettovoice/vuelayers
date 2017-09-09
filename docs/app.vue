@@ -1,9 +1,9 @@
 <template>
   <main id="app">
-    <div class="columns is-gapless layout">
+    <div class="columns layout">
       <div class="column left is-4-tablet is-3-desktop is-2-widescreen is-hidden-mobile is-fullheight">
         <vld-sidebar>
-          <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Docs" exact-active-class="is-active">
+          <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Home" exact-active-class="is-active">
             <div class="name">C_PKG_FULLNAME.js</div>
             <b-tag type="is-info">vC_PKG_VERSION</b-tag>
           </router-link>
@@ -32,7 +32,7 @@
         </vld-sidebar>
       </div>
 
-      <div class="column center is-8-tablet is-9-desktop is-10-widescreen">
+      <div class="column center is-8-tablet is-9-desktop is-10-widescreen is-offset-4-tablet is-offset-3-desktop is-offset-2-widescreen">
         <vld-navbar class="is-hidden-tablet">
           <vld-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo has-text-left"
                           :router="true">
@@ -107,9 +107,12 @@
   @import sass/base
 
   .layout
-    margin-bottom: 0 !important
+    margin: 0
+    position: relative
     .left
-      background: $dark
+      background: $dark url(static/sidebar-bg.png) repeat
+      padding: 0
+      position: fixed
       a
         &:hover
           color: $primary-invert
@@ -122,17 +125,21 @@
           &.is-active
             color: $primary-invert
             background: $primary
+    .center
+      padding: 50px 0 0
+      +tablet()
+        padding-top: 0
     .page
-      min-height: calc(100% - 168px)
+      min-height: calc(100vh - 168px)
 
-  .navbar
-    position: absolute
-    top: 0
-    left: 0
-    right: 0
-    z-index: 10
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4)
-    .logo
-      .name
-        margin-right: .25em
+    .navbar
+      position: fixed
+      top: 0
+      left: 0
+      right: 0
+      z-index: 10
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4)
+      .logo
+        .name
+          margin-right: .25em
 </style>

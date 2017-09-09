@@ -1,5 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
+const hljs = require('highlight.js')
+const { escape } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
 const config = require('./config')
@@ -124,6 +126,18 @@ function getSize (data) {
 
 function vueMarkdownLoaderConfig () {
   return {
+    langPrefix: '',
+    highlight: (str, lang) => {
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          return '<pre class="hljs"><code class="' + lang + '">' +
+            hljs.highlight(lang, str, true).value +
+            '</code></pre>'
+        } catch (__) {}
+      }
+
+      return '<pre class="hljs"><code class="' + lang + '">' + escape(str) + '</code></pre>'
+    },
     preprocess: function (md, src) {
       const { pattern, replacement } = compileVarsReplacement()
       src = src.replace(pattern, replacement)
