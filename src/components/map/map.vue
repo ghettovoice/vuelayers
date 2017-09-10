@@ -282,10 +282,18 @@
      */
     refresh () {
       return new Promise(resolve => {
+        this.updateSize()
+        resolve()
+      })
+    },
+    /**
+     * @return {Promise}
+     */
+    render () {
+      return new Promise(resolve => {
         assert.hasMap(this)
 
         this.$map.once('postrender', () => resolve())
-        this.updateSize()
         this.$map.render()
       })
     },
@@ -300,6 +308,7 @@
      * @return {void}
      */
     updateSize () {
+      assert.hasMap(this)
       this.$map.updateSize()
     },
   }
@@ -375,7 +384,7 @@
       'postrender',
       'precompose',
       'postcompose',
-    ]).throttleTime(ft)
+    ])
 
     const events = Observable.merge(
       pointerEvents,

@@ -35,11 +35,11 @@
         </template>
       </vl-geoloc>
 
-      <!-- simple marker -->
-      <vl-feature id="marker">
+      <!-- overlay marker with animation -->
+      <vl-feature id="marker" ref="marker" :properties="{ start: Date.now(), duration: 2500 }">
         <vl-geom-point :coordinates="[0, 0]"/>
         <vl-style-box>
-          <vl-style-icon src="../static/flag.png" :scale="0.5" :anchor="[0.1, 0.95]"/>
+          <vl-style-icon src="../static/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"/>
         </vl-style-box>
       </vl-feature>
 
@@ -120,7 +120,6 @@
   import easing from 'ol/easing'
   import { ol as vlol } from 'vuelayers'
   import pacmanFeaturesCollection from '../static/pacman.geojson'
-  import BSwitch from '../../node_modules/buefy/src/components/switch/Switch.vue'
 
   const methods = {
     geometryTypeToCmpName (type) {
@@ -174,30 +173,35 @@
       this.devicePosition = coordinate
     },
     onMapPostCompose ({ vectorContext, frameState }) {
-      const features = this.$refs.map.getLayerById('pacman')
-        .getSource()
-        .getFeatures()
-        .filter(f => f.getGeometry().getType() === 'Point')
-      console.log(features)
-      features.forEach(feature => {
-        const flashGeom = feature.getGeometry().clone()
-        const elapsed = frameState.time - feature.get('start')
-        const elapsedRatio = elapsed / 2000
-        const radius = easing.easeOut(elapsedRatio) * 35 + 5
-        const opacity = easing.easeOut(1 - elapsedRatio)
-        const fillOpacity = easing.easeOut(0.5 - elapsedRatio)
+      if (!this.$refs.marker || !this.$refs.marker.$feature) return
 
-        vectorContext.setStyle(vlol.style.style({
-          imageRadius: radius,
-          fillColor: [119, 170, 203, fillOpacity],
-          strokeColor: [119, 170, 203, opacity],
-          strokeWidth: 2 + opacity,
-        }))
-        vectorContext.drawGeometry(flashGeom)
-        vectorContext.drawGeometry(feature.getGeometry())
-      })
+      const feature = this.$refs.marker.$feature
+      if (!feature.getGeometry() || !feature.getStyle()) return
 
-      this.$refs.map.$map.render()
+      const flashGeom = feature.getGeometry().clone()
+      const duration = feature.get('duration')
+      const elapsed = frameState.time - feature.get('start')
+      const elapsedRatio = elapsed / duration
+      const radius = easing.easeOut(elapsedRatio) * 35 + 5
+      const opacity = easing.easeOut(1 - elapsedRatio)
+      const fillOpacity = easing.easeOut(0.5 - elapsedRatio)
+
+      vectorContext.setStyle(vlol.style.style({
+        imageRadius: radius,
+        fillColor: [119, 170, 203, fillOpacity],
+        strokeColor: [119, 170, 203, opacity],
+        strokeWidth: 2 + opacity,
+      }))
+
+      vectorContext.drawGeometry(flashGeom)
+      vectorContext.setStyle(feature.getStyle()(feature)[0])
+      vectorContext.drawGeometry(feature.getGeometry())
+
+      if (elapsed > duration) {
+        feature.set('start', Date.now())
+      }
+
+      this.$refs.map.render()
     },
     // map panel
     mapPanelTabClasses (tab) {
@@ -214,7 +218,6 @@
   }
 
   export default {
-    components: { BSwitch },
     name: 'vld-demo-app',
     methods,
     data () {
