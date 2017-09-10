@@ -93,7 +93,7 @@
         // simply save all inner styles and
         // use them later in style function as fallback
         this._styles = styles
-        this.requestRefresh()
+        this.refresh()
       }
     },
     /**
@@ -110,7 +110,7 @@
 
   const watch = {
     factory () {
-      this.requestRefresh()
+      this.refresh()
     },
   }
 

@@ -48,16 +48,14 @@ const methods = {
    */
   refresh () {
     // recreate style
-    return Promise.resolve(this.unmount())
-      .then(this.deinit)
-      .then(this.init)
+    return Promise.resolve(this.init())
       .then(this.mount)
   },
 }
 
 const watch = {
   snapToPixel () {
-    this.requestRefresh()
+    this.refresh()
   },
 }
 

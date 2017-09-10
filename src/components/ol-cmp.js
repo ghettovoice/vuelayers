@@ -2,7 +2,6 @@
  * Basic ol component mixin
  * @module components/ol-cmp
  */
-import debounce from 'debounce-promise'
 import { isFunction } from 'lodash/fp'
 import 'rxjs/add/observable/interval'
 import 'rxjs/add/operator/first'
@@ -66,8 +65,10 @@ const methods = {
     if (ident) {
       this.$identityMap.unset(ident)
     }
-    this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
-    this._olObject = undefined
+    if (this._olObject) {
+      this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
+      this._olObject = undefined
+    }
   },
   /**
    * Redefine for easy call in child components
@@ -93,13 +94,6 @@ const methods = {
   unmount () {
     throw new Error('Not implemented method')
   },
-  /**
-   * Debounced refresh
-   * @return {Promise}
-   */
-  requestRefresh: debounce(function () {
-    return this.refresh()
-  }, 100),
   /**
    * Refresh internal ol objects
    * @return {Promise}

@@ -14,7 +14,7 @@ const methods = {
     }
     if (this.$style && fill !== this.$style.getFill()) {
       this.$style.setFill(fill)
-      this.requestRefresh()
+      this.refresh()
     }
   },
   /**
@@ -30,7 +30,7 @@ const methods = {
     }
     if (this.$style && stroke !== this.$style.getStroke()) {
       this.$style.setStroke(stroke)
-      this.requestRefresh()
+      this.refresh()
     }
   },
 }

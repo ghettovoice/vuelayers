@@ -66,7 +66,7 @@
 
       if (fill !== this._fill) {
         this._fill = fill
-        this.requestRefresh()
+        this.refresh()
       }
     },
     /**
@@ -78,7 +78,7 @@
 
       if (stroke !== this._stroke) {
         this._stroke = stroke
-        this.requestRefresh()
+        this.refresh()
       }
     },
   }

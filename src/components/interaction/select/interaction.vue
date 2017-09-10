@@ -182,7 +182,7 @@
     setStyle (styles) {
       if (styles !== this._styles) {
         this._styles = styles
-        this.requestRefresh()
+        this.refresh()
       }
     },
     /**

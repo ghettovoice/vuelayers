@@ -92,49 +92,49 @@
       if (!this.$style) return
 
       this.$style.setFont(value)
-      this.requestRefresh()
+      this.refresh()
     },
     offsetX (value) {
       if (!this.$style) return
 
       this.$style.setOffsetX(value)
-      this.requestRefresh()
+      this.refresh()
     },
     offsetY (value) {
       if (!this.$style) return
 
       this.$style.setOffsetY(value)
-      this.requestRefresh()
+      this.refresh()
     },
     rotation (value) {
       if (!this.$style) return
 
       this.$style.setRotation(value)
-      this.requestRefresh()
+      this.refresh()
     },
     scale (value) {
       if (!this.$style) return
 
       this.$style.setScale(value)
-      this.requestRefresh()
+      this.refresh()
     },
     text (value) {
       if (!this.$style) return
 
       this.$style.setText(value)
-      this.requestRefresh()
+      this.refresh()
     },
     textAlign (value) {
       if (!this.$style) return
 
       this.$style.setTextAlign(value)
-      this.requestRefresh()
+      this.refresh()
     },
     textBaseline (value) {
       if (!this.$style) return
 
       this.$style.setTextBaseline(value)
-      this.requestRefresh()
+      this.refresh()
     },
   }
 

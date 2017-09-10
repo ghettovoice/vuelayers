@@ -37,7 +37,7 @@
       if (!this.$style) return
 
       this.$style.setColor(value)
-      this.requestRefresh()
+      this.refresh()
     },
   }
 

@@ -64,31 +64,31 @@
       if (!this.$style) return
 
       this.$style.setColor(value)
-      this.requestRefresh()
+      this.refresh()
     },
     lineCap (value) {
       if (!this.$style) return
 
       this.$style.setLineCap(value)
-      this.requestRefresh()
+      this.refresh()
     },
     lineDash (value) {
       if (!this.$style) return
 
       this.$style.setLineDash(value)
-      this.requestRefresh()
+      this.refresh()
     },
     lineJoin (value) {
       if (!this.$style) return
 
       this.$style.setLineJoin(value)
-      this.requestRefresh()
+      this.refresh()
     },
     width (value) {
       if (!this.$style) return
 
       this.$style.setWidth(value)
-      this.requestRefresh()
+      this.refresh()
     },
   }
 

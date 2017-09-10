@@ -1,21 +1,29 @@
 <template>
   <div class="demo-app">
-    <vl-map ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
+    <vl-map class="map" ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true"
+            @postcompose="onMapPostCompose">
       <!-- map view aka ol.View -->
       <vl-view ref="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
       <!-- interactions -->
-      <vl-interaction-select :selected.sync="selected" :filter="selectFilter">
+      <vl-interaction-select :selected.sync="selected">
         <vl-style-box>
           <vl-style-stroke color="#423e9e" :width="7"/>
           <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+          <vl-style-circle :radius="5">
+            <vl-style-stroke color="#423e9e" :width="7"/>
+            <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+          </vl-style-circle>
         </vl-style-box>
-        <vl-style-box>
+        <vl-style-box :z-index="1">
           <vl-style-stroke color="#d43f45" :width="2"/>
+          <vl-style-circle :radius="5">
+            <vl-style-stroke color="#d43f45" :width="2"/>
+          </vl-style-circle>
         </vl-style-box>
       </vl-interaction-select>
 
-      <!-- ol.Geolocation -->
+      <!-- Geolocation -->
       <vl-geoloc @update:position="onUpdatePosition">
         <template scope="ctx">
           <vl-feature v-if="ctx.position" id="position-feature">
@@ -26,6 +34,14 @@
           </vl-feature>
         </template>
       </vl-geoloc>
+
+      <!-- simple marker -->
+      <vl-feature id="marker">
+        <vl-geom-point :coordinates="[0, 0]"/>
+        <vl-style-box>
+          <vl-style-icon src="../static/flag.png" :scale="0.5" :anchor="[0.1, 0.95]"/>
+        </vl-style-box>
+      </vl-feature>
 
       <!-- base layer -->
       <vl-layer-tile id="sputnik">
@@ -56,13 +72,55 @@
         </component>
       </component>
     </vl-map>
+
+    <!-- map panel, controls -->
+    <div class="map-panel box">
+      <b-panel :has-custom-template="true">
+        <strong slot="header">Map panel</strong>
+        <p class="panel-tabs">
+          <a @click="onMapPanelTabClick('state')" :class="mapPanelTabClasses('state')">State</a>
+          <a @click="onMapPanelTabClick('layers')" :class="mapPanelTabClasses('layers')">Layers</a>
+        </p>
+
+        <div class="panel-block" v-if="mapPanel.tab === 'state'">
+          <table class="table is-fullwidth">
+            <tr>
+              <th>Map center</th>
+              <td>{{ center }}</td>
+            </tr>
+            <tr>
+              <th>Map zoom</th>
+              <td>{{ zoom }}</td>
+            </tr>
+            <tr>
+              <th>Map rotation</th>
+              <td>{{ rotation }}</td>
+            </tr>
+            <tr>
+              <th>Device position</th>
+              <td>{{ devicePosition }}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="panel-block" v-for="layer in layers" :key="layer.id" @click="onMapPanelLayerClick"
+             :class="{ 'is-active': layer.visible }"
+             v-if="mapPanel.tab === 'layers'">
+          <b-switch v-model="layer.visible">
+            {{ layer.title }}
+          </b-switch>
+        </div>
+      </b-panel>
+    </div>
   </div>
 </template>
 
 <script>
   import { kebabCase } from 'lodash/fp'
+  import easing from 'ol/easing'
   import { ol as vlol } from 'vuelayers'
   import pacmanFeaturesCollection from '../static/pacman.geojson'
+  import BSwitch from '../../node_modules/buefy/src/components/switch/Switch.vue'
 
   const methods = {
     geometryTypeToCmpName (type) {
@@ -110,14 +168,53 @@
       }
     },
     selectFilter (feature) {
-      return [ 'position-feature' ].indexOf(feature.getId()) === -1
+      return ['position-feature'].indexOf(feature.getId()) === -1
     },
     onUpdatePosition (coordinate) {
-      console.log('current position', coordinate)
+      this.devicePosition = coordinate
+    },
+    onMapPostCompose ({ vectorContext, frameState }) {
+      const features = this.$refs.map.getLayerById('pacman')
+        .getSource()
+        .getFeatures()
+        .filter(f => f.getGeometry().getType() === 'Point')
+      console.log(features)
+      features.forEach(feature => {
+        const flashGeom = feature.getGeometry().clone()
+        const elapsed = frameState.time - feature.get('start')
+        const elapsedRatio = elapsed / 2000
+        const radius = easing.easeOut(elapsedRatio) * 35 + 5
+        const opacity = easing.easeOut(1 - elapsedRatio)
+        const fillOpacity = easing.easeOut(0.5 - elapsedRatio)
+
+        vectorContext.setStyle(vlol.style.style({
+          imageRadius: radius,
+          fillColor: [119, 170, 203, fillOpacity],
+          strokeColor: [119, 170, 203, opacity],
+          strokeWidth: 2 + opacity,
+        }))
+        vectorContext.drawGeometry(flashGeom)
+        vectorContext.drawGeometry(feature.getGeometry())
+      })
+
+      this.$refs.map.$map.render()
+    },
+    // map panel
+    mapPanelTabClasses (tab) {
+      return {
+        'is-active': this.mapPanel.tab === tab,
+      }
+    },
+    onMapPanelLayerClick (layer) {
+      layer.visible = !layer.visible
+    },
+    onMapPanelTabClick (tab) {
+      this.mapPanel.tab = tab
     },
   }
 
   export default {
+    components: { BSwitch },
     name: 'vld-demo-app',
     methods,
     data () {
@@ -126,12 +223,16 @@
         zoom: 1,
         rotation: 0,
         selected: [],
+        devicePosition: [],
+        mapPanel: {
+          tab: 'state',
+        },
         layers: [
           {
             id: 'pacman',
             title: 'Pacman',
             cmp: 'vl-layer-vector',
-            visible: true,
+            visible: false,
             source: {
               cmp: 'vl-source-vector',
               staticFeatures: pacmanFeaturesCollection.features,
@@ -147,7 +248,7 @@
             id: 'countries',
             title: 'Countries',
             cmp: 'vl-layer-vector',
-            visible: true,
+            visible: false,
             source: {
               cmp: 'vl-source-vector',
               url: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
@@ -184,7 +285,7 @@
             id: 'wmts',
             title: 'WMTS',
             cmp: 'vl-layer-tile',
-            visible: true,
+            visible: false,
             source: {
               cmp: 'vl-source-wmts',
               url: 'https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/',
@@ -200,5 +301,19 @@
   }
 </script>
 
-<style>
+<style lang="sass">
+  @import ../sass/variables
+
+  .demo-app
+    position: relative
+    .map
+      height: 500px
+    .map-panel
+      padding: 0
+      +widescreen()
+        position: absolute
+        top: 0
+        right: 0
+        max-height: 500px
+        width: 20em
 </style>

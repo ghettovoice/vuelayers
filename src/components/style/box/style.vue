@@ -73,7 +73,7 @@
       }
       if (this.$style && image !== this.$style.getImage()) {
         this.$style.setImage(image)
-        this.requestRefresh()
+        this.refresh()
       }
     },
     /**
@@ -88,7 +88,7 @@
       }
       if (this.$style && geom !== this.$style.getGeometry()) {
         this.$style.setGeometry(geom)
-        this.requestRefresh()
+        this.refresh()
       }
     },
     /**
@@ -103,7 +103,7 @@
       }
       if (this.$style && text !== this.$style.getText()) {
         this.$style.setText(text)
-        this.requestRefresh()
+        this.refresh()
       }
     },
   }
@@ -113,7 +113,7 @@
       if (!this.$style) return
 
       this.$style.setZIndex(value)
-      this.requestRefresh()
+      this.refresh()
     },
   }
 

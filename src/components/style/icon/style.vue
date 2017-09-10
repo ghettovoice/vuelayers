@@ -88,16 +88,16 @@
   // todo other watchers
   const watch = {
     src () {
-      this.requestRefresh()
+      this.refresh()
     },
     size () {
-      this.requestRefresh()
+      this.refresh()
     },
     anchor () {
-      this.requestRefresh()
+      this.refresh()
     },
     scale () {
-      this.requestRefresh()
+      this.refresh()
     },
   }
 
