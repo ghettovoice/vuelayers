@@ -95,7 +95,7 @@
       text-align: center
       margin: 0 auto
       +desktop()
-        width: 50%
+        max-width: 30em
 
     .buttons
       margin: .5rem 0

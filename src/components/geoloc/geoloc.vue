@@ -11,6 +11,7 @@
   import '../../rx-ext'
   import { EPSG_4326 } from '../../ol-ext'
   import cmp from '../ol-cmp'
+  import useMapCmp from '../use-map-cmp'
   import * as assert from '../../utils/assert'
 
   const props = {
@@ -109,7 +110,7 @@
 
   export default {
     name: 'vl-geoloc',
-    mixins: [cmp],
+    mixins: [cmp, useMapCmp],
     props,
     computed,
     methods,
@@ -132,6 +133,10 @@
         $geolocation: {
           enumerable: true,
           get: () => this.$olObject,
+        },
+        $map: {
+          enumerable: true,
+          get: () => this.$services && this.$services.map,
         },
       })
     },

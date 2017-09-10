@@ -191,11 +191,13 @@
     refresh () {
       return Promise.all([
         new Promise(resolve => {
-          assert.hasInteraction(this)
-
-          const featuresCollection = this.$interaction.getFeatures()
-          featuresCollection.once('change', () => resolve())
-          featuresCollection.changed()
+          if (this.$interaction) {
+            const featuresCollection = this.$interaction.getFeatures()
+            featuresCollection.once('change', () => resolve())
+            featuresCollection.changed()
+          } else {
+            resolve()
+          }
         }),
         this::interaction.methods.refresh(),
       ])
