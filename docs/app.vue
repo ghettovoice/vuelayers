@@ -110,21 +110,22 @@
     margin: 0
     position: relative
     .left
-      background: $dark url(static/sidebar-bg.png) repeat
+      background: $sidebar-background
       padding: 0
       position: fixed
       a
+        color: $sidebar-link-color
         &:hover
-          color: $primary-invert
+          color: $sidebar-link-hover-color
       .menu-list
         a
-          color: $primary
+          color: $sidebar-link-color
           &:hover
-            background: lighten($dark, 10%)
-            color: $primary-invert
+            background: $sidebar-link-hover-background
+            color: $sidebar-link-hover-color
           &.is-active
-            color: $primary-invert
-            background: $primary
+            color: $sidebar-link-active-color
+            background: $sidebar-link-active-background
     .center
       padding: 50px 0 0
       +tablet()
@@ -138,7 +139,7 @@
       left: 0
       right: 0
       z-index: 10
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4)
+      box-shadow: 0 0 1em rgba(0, 0, 0, 0.4)
       .logo
         .name
           margin-right: .25em

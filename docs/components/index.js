@@ -5,6 +5,7 @@ import Footer from './footer.vue'
 import GithubButton from './github-button.vue'
 import Hero from './hero.vue'
 import Sidebar from './sidebar.vue'
+import Card from './card.vue'
 
 export default {
   install (Vue) {
@@ -15,5 +16,6 @@ export default {
     Vue.component(GithubButton.name, GithubButton)
     Vue.component(Hero.name, Hero)
     Vue.component(Sidebar.name, Sidebar)
+    Vue.component(Card.name, Card)
   },
 }

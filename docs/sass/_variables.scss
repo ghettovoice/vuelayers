@@ -1,6 +1,18 @@
 // Import Bulma's core
 @import "~bulma/sass/utilities/_all";
 
+$code-background: darken($light, 2%);
+
+// sidebar
+$sidebar-background: $dark url(static/sidebar-bg.png) repeat;
+$sidebar-link-color: $primary;
+$sidebar-link-hover-color: $primary-invert;
+$sidebar-link-active-color: $primary-invert;
+$sidebar-link-background: none;
+$sidebar-link-hover-background: lighten($dark, 10%);
+$sidebar-link-active-background: $primary;
+
+
 // Menu
 $menu-item-color: $text;
 $menu-item-radius: $radius-small;

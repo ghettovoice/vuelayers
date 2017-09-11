@@ -6,7 +6,7 @@
       <vl-view ref="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
       <!-- interactions -->
-      <vl-interaction-select :selected.sync="selected">
+      <vl-interaction-select :selected.sync="selectedFeatures">
         <vl-style-box>
           <vl-style-stroke color="#423e9e" :width="7"/>
           <vl-style-fill :color="[254, 178, 76, 0.7]"/>
@@ -71,6 +71,28 @@
           </component>
         </component>
       </component>
+
+      <!-- selected feature popup -->
+      <vl-overlay v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id"
+                  :position="pointOnSurface(feature.geometry)">
+        <template scope="ctx">
+          <vld-card>
+            <p slot="header" class="card-header-title">
+              Feature #{{ feature.id }}
+            </p>
+            <a slot="header" class="card-header-icon" title="Close">
+              <b-icon icon="close" />
+            </a>
+
+            <div class="content">
+              <p>This overlay popup content for Feature with <strong>{{ feature.id }}</strong></p>
+              <p>
+                Popup context: {{ JSON.stringify(ctx) }}
+              </p>
+            </div>
+          </vld-card>
+        </template>
+      </vl-overlay>
     </vl-map>
 
     <!-- map panel, controls -->
@@ -100,6 +122,10 @@
               <th>Device position</th>
               <td>{{ devicePosition }}</td>
             </tr>
+            <tr>
+              <th>Selected features</th>
+              <td>{{ selectedFeatures.map(f => f.id) }}</td>
+            </tr>
           </table>
         </div>
 
@@ -117,11 +143,12 @@
 
 <script>
   import { kebabCase } from 'lodash/fp'
-  import easing from 'ol/easing'
   import { ol as vlol } from 'vuelayers'
   import pacmanFeaturesCollection from '../static/pacman.geojson'
+  import VldCard from './card.vue'
 
   const methods = {
+    pointOnSurface: vlol.geom.pointOnSurfaceAsCoordinate,
     geometryTypeToCmpName (type) {
       return 'vl-geom-' + kebabCase(type)
     },
@@ -182,9 +209,9 @@
       const duration = feature.get('duration')
       const elapsed = frameState.time - feature.get('start')
       const elapsedRatio = elapsed / duration
-      const radius = easing.easeOut(elapsedRatio) * 35 + 5
-      const opacity = easing.easeOut(1 - elapsedRatio)
-      const fillOpacity = easing.easeOut(0.5 - elapsedRatio)
+      const radius = vlol.easing.easeOut(elapsedRatio) * 35 + 5
+      const opacity = vlol.easing.easeOut(1 - elapsedRatio)
+      const fillOpacity = vlol.easing.easeOut(0.5 - elapsedRatio)
 
       vectorContext.setStyle(vlol.style.style({
         imageRadius: radius,
@@ -218,6 +245,7 @@
   }
 
   export default {
+    components: { VldCard },
     name: 'vld-demo-app',
     methods,
     data () {
@@ -225,7 +253,7 @@
         center: [0, 0],
         zoom: 1,
         rotation: 0,
-        selected: [],
+        selectedFeatures: [],
         devicePosition: [],
         mapPanel: {
           tab: 'state',

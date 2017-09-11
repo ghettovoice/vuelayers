@@ -10,6 +10,7 @@ import * as style from './style'
 import * as tileGrid from './tile-grid'
 import * as loadStrategy from './load-strategy'
 import * as format from './format'
+import easing from 'ol/easing'
 
 export * from './consts'
 export {
@@ -21,4 +22,5 @@ export {
   tileGrid,
   loadStrategy,
   format,
+  easing,
 }

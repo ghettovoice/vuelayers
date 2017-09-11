@@ -15,7 +15,7 @@
   } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import '../../../rx-ext'
-  import { style as styleHelper } from '../../../ol-ext'
+  import { style as styleHelper, geoJson } from '../../../ol-ext'
   import interaction from '../interaction'
   import stylesContainer from '../../styles-container'
   import * as assert from '../../../utils/assert'
@@ -37,7 +37,7 @@
     },
     /**
      * Initial selection
-     * @type {string[]|number[]} Initial selection as Array of ids
+     * @type {string[]|number[]|GeoJSONFeature[]} Initial selection as Array of ids or Array of GeoJSON features
      */
     selected: {
       type: Array,
@@ -277,7 +277,7 @@
       ({ selected, deselected, mapBrowserEvent }) => {
         ++this.rev
 
-        this.$emit('update:selected', this.$features.map(extractId))
+        this.$emit('update:selected', this.$features.map(geoJson.writeFeature))
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
       }

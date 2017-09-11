@@ -36,11 +36,15 @@ html *
   min-height: 100vh
 
 pre, pre.hljs
-  background: darken($light, 2%)
+  background: $code-background
 
 .content
-  pre > code
-    padding: 0
+  pre
+    background: $code-background
+    &.hljs
+      background: $code-background
+    > code
+      padding: 0
   .title
     font-size: 2rem
     font-weight: 600
