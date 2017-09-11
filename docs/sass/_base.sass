@@ -4,7 +4,7 @@
 // Import Bulma and Buefy styles
 @import ~bulma
 @import ~buefy/src/scss/buefy
-//@import ~vuelayers/dist/vuelayers
+@import ~vuelayers/dist/vuelayers
 
 html, body
   height: 100%
@@ -84,3 +84,10 @@ pre, pre.hljs
       margin-left: 0
     &:last-child
       margin-right: 0
+
+// transitions
+.fade-enter-active, .fade-leave-active
+  transition: opacity .5s
+
+.fade-enter, .fade-leave-to
+  opacity: 0

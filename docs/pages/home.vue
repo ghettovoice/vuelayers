@@ -9,7 +9,7 @@
             <vl-feature v-if="ctx.position" id="position-feature">
               <vl-geom-point :coordinates="ctx.position"/>
               <vl-style-box>
-                <vl-style-icon src="../static/marker.png" :scale="0.4" :anchor="[0.5, 1]"/>
+                <vl-style-icon src="../static/img/marker.png" :scale="0.4" :anchor="[0.5, 1]"/>
               </vl-style-box>
             </vl-feature>
           </template>

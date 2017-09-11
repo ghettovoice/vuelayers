@@ -1,13 +1,16 @@
 // This the Webpack config for docs production build
-const utils = require('./utils')
+const fs = require('fs-extra')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const config = require('./config')
+const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
+const PreloadWebpackPlugin = require('preload-webpack-plugin')
 const baseWebpackConfig = require('./webpack.base.conf')
+const utils = require('./utils')
+const config = require('./config')
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -52,7 +55,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: utils.resolve('dist-docs/index.html'),
-      template: 'docs/index.html',
+      template: 'docs/index.ejs',
       inject: true,
       minify: {
         removeComments: true,
@@ -63,6 +66,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       },
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency',
+      serviceWorker: `<script>${fs.readFileSync(utils.resolve('build/service-worker-registration.js'), 'utf-8')}</script>`,
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
@@ -90,6 +94,16 @@ const webpackConfig = merge(baseWebpackConfig, {
         ignore: ['.*'],
       },
     ]),
+    new PreloadWebpackPlugin({
+      rel: 'prefetch',
+    }),
+    new SWPrecacheWebpackPlugin({
+      cacheId: `${config.name}-docs-app`,
+      filename: 'service-worker.js',
+      minify: true,
+      navigateFallback: config.publicPath,
+      staticFileGlobsIgnorePatterns: [/dist-docs\/.*\.html/],
+    }),
   ],
 })
 

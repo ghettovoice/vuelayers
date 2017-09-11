@@ -1,25 +1,40 @@
 <template>
   <div class="demo">
-    <vld-hero :bold="true" color="is-primary">
-      <h1 class="title">C_PKG_FULLNAME demo app</h1>
-      <h2 class="subtitle">An example app with C_PKG_FULLNAME.js</h2>
+    <vld-hero :bold="bold" :color="color">
+      <h1 class="title">{{ title }}</h1>
+      <h2 class="subtitle">{{ subtitle }}</h2>
     </vld-hero>
 
     <vld-demo-app />
 
     <section class="section">
-      <vld-demo-app-sources />
+      <p class="subtitle">Demo app source code</p>
+      <b-tabs>
+        <b-tab-item label="JS">
+          <vld-js-src />
+        </b-tab-item>
+        <b-tab-item label="HTML">
+          <vld-html-src />
+        </b-tab-item>
+      </b-tabs>
     </section>
   </div>
 </template>
 
 <script>
-  import VldDemoAppSources from '../partial/demo-app-sources.md'
+  import page from './page'
+  import VldJsSrc from '../partial/demo/js-src.md'
+  import VldHtmlSrc from '../partial/demo/html-src.md'
+
+  const props = {}
 
   export default {
     name: 'vld-demo-page',
+    mixins: [page],
     components: {
-      VldDemoAppSources,
+      VldJsSrc,
+      VldHtmlSrc,
     },
+    props,
   }
 </script>

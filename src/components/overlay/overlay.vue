@@ -1,5 +1,5 @@
 <template>
-  <div :id="[$options.name, id].join('-')" :class="$options.name">
+  <div :id="[$options.name, id].join('-')" :class="$options.name" style="visibility: hidden">
     <slot :id="id" :position="position"></slot>
   </div>
 </template>
@@ -35,11 +35,11 @@
       default: OVERLAY_POSITIONING.TOP_LEFT,
       validator: value => Object.values(OVERLAY_POSITIONING).includes(value),
     },
-    stopEvent: Boolean,
-    insertFirst: {
+    stopEvent: {
       type: Boolean,
       default: true,
     },
+    insertFirst: Boolean,
     autoPan: Boolean,
     autoPanMargin: {
       type: Number,
@@ -76,9 +76,13 @@
     mount () {
       assert.hasOverlay(this)
 
+      this.$overlay.once('change:element', () => {
+        this.$el.style.visibility = 'visible'
+      })
       this.$overlay.setElement(this.$el)
       this.$overlaysContainer && this.$overlaysContainer.addOverlay(this.$overlay)
       this.subscribeAll()
+      this.refresh()
     },
     /**
      * @return {void}
@@ -97,6 +101,19 @@
      */
     subscribeAll () {
       this::subscribeToOverlayChanges()
+    },
+    /**
+     * Refresh internal ol objects
+     * @return {Promise}
+     */
+    refresh () {
+      return Promise.all([
+        cmp.methods.refresh(),
+        new Promise(resolve => {
+          this.$overlay.once('change:position', () => resolve())
+          this.$overlay.setPosition(this.$overlay.getPosition().slice())
+        }),
+      ])
     },
   }
 
@@ -187,10 +204,3 @@
     return projHelper.toLonLat(this.$overlay.getPosition(), this.$view.getProjection())
   }
 </script>
-
-<style lang="sass">
-  @import ../../styles/all
-
-  .vl-overlay
-    +vl-hidden()
-</style>

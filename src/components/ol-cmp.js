@@ -167,7 +167,7 @@ export default {
  * @return {Promise<void>}
  */
 function refresh () {
-  return Promise.resolve(resolve => {
+  return new Promise(resolve => {
     if (this.$olObject && isFunction(this.$olObject.changed)) {
       this.$olObject.once('change', () => resolve())
       this.$olObject.changed()

@@ -25,10 +25,16 @@ function cssLoaders (options) {
       sourceMap: options.sourceMap,
     },
   }
+  const resolveUrlLoader = {
+    loader: 'resolve-url-loader',
+    options: {
+      sourceMap: options.sourceMap,
+    },
+  }
 
   // generate loader string to be used with extract text plugin
   function generateLoaders (loader, loaderOptions) {
-    const loaders = [cssLoader]
+    const loaders = [cssLoader, resolveUrlLoader]
     if (loader) {
       loaders.push({
         loader: loader + '-loader',
@@ -128,6 +134,7 @@ function vueMarkdownLoaderConfig () {
   return {
     langPrefix: '',
     preventExtract: true,
+    wrapper: 'div',
     highlight: (str, lang) => {
       if (lang && hljs.getLanguage(lang)) {
         try {
@@ -141,18 +148,13 @@ function vueMarkdownLoaderConfig () {
     },
     preprocess: function (md, src) {
       const { pattern, replacement } = compileVarsReplacement()
-      src = src.replace(pattern, replacement)
-      src = `<div class="content">\n\n${src}\n\n</div>`
 
-      if (/docs\/pages\/.*\.md$/.test(this.resourcePath)) {
-        src = `<div class="section">\n${src}\n</div>`
-      }
-
-      return src
+      return src.replace(pattern, replacement)
     },
     use: [
       require('markdown-it-checkbox'),
       require('markdown-it-decorate'),
+      [require('markdown-it-container'), 'content'],
     ],
   }
 }

@@ -9,8 +9,8 @@ $sidebar-link-color: $primary;
 $sidebar-link-hover-color: $primary-invert;
 $sidebar-link-active-color: $primary-invert;
 $sidebar-link-background: none;
-$sidebar-link-hover-background: lighten($dark, 10%);
-$sidebar-link-active-background: $primary;
+$sidebar-link-hover-background: transparentize(lighten($dark, 10%), 0.5);
+$sidebar-link-active-background: transparentize($primary, 0.5);
 
 
 // Menu

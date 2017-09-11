@@ -1,8 +1,8 @@
-import Page from './pages/page.vue'
-
-const routerViewProxy = contentCmp => ({
-  render (h) {
-    return h(Page, {}, [contentCmp])
+const routerViewProxy = (PageCmp, ContentCmp) => ({
+  name: 'vld-router-view-proxy',
+  functional: true,
+  render (h, { props }) {
+    return h(PageCmp, { props }, [h(ContentCmp, { props })])
   },
 })
 
@@ -19,6 +19,11 @@ export default [
     meta: {
       title: 'Demo',
     },
+    props: {
+      title: 'C_PKG_FULLNAME demo app',
+      subtitle: 'An example app with C_PKG_FULLNAME.js',
+      color: 'is-primary',
+    },
     component: () => import('./pages/demo.vue'),
   },
   {
@@ -26,7 +31,15 @@ export default [
     meta: {
       title: 'Components',
     },
-    component: () => import('./pages/components/index.md'),
+    props: {
+      title: 'Components index',
+      subtitle: 'Learn how to build app with C_PKG_FULLNAME.js',
+      color: 'is-info',
+    },
+    component: () => Promise.all([
+      import('./pages/common.vue'),
+      import('./pages/components/index.md'),
+    ]).then(([PageCmp, ContentCmp]) => routerViewProxy(PageCmp.default, ContentCmp.default)),
   },
   {
     path: '/components/vl-map',

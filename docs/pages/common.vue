@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="common">
     <vld-hero :bold="bold" :color="color">
       <h1 class="title">{{ title }}</h1>
       <h2 class="subtitle" v-if="subtitle">{{ subtitle }}</h2>
@@ -12,18 +12,16 @@
 </template>
 
 <script>
+  import page from './page'
+
   const props = {
-    title: {
-      type: String,
-      required: true,
-    },
-    subtitle: String,
-    color: String,
-    bold: Boolean,
   }
 
   export default {
-    name: 'vld-page',
+    name: 'vld-common-page',
+    mixins: [page],
     props,
   }
 </script>
+
+<style></style>

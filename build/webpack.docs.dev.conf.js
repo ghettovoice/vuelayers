@@ -3,8 +3,9 @@ const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
-const utils = require('./utils')
+const PreloadWebpackPlugin = require('preload-webpack-plugin')
 const baseWebpackConfig = require('./webpack.base.conf')
+const utils = require('./utils')
 
 const webpackConfig = merge(baseWebpackConfig, {
   // cheap-module-eval-source-map is faster for development
@@ -28,10 +29,14 @@ const webpackConfig = merge(baseWebpackConfig, {
     // https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: 'docs/index.html',
+      template: 'docs/index.ejs',
       inject: true,
+      serviceWorker: '',
     }),
     new FriendlyErrorsPlugin(),
+    new PreloadWebpackPlugin({
+      rel: 'prefetch',
+    }),
   ],
 })
 
