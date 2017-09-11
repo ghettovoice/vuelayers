@@ -1,3 +1,11 @@
+import Page from './pages/page.vue'
+
+const routerViewProxy = contentCmp => ({
+  render (h) {
+    return h(Page, {}, [contentCmp])
+  },
+})
+
 export default [
   {
     path: '/',

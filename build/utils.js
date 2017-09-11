@@ -127,6 +127,7 @@ function getSize (data) {
 function vueMarkdownLoaderConfig () {
   return {
     langPrefix: '',
+    preventExtract: true,
     highlight: (str, lang) => {
       if (lang && hljs.getLanguage(lang)) {
         try {

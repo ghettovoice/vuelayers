@@ -2,6 +2,4 @@
 
 ## Map component <!-- {.subtitle} -->
 
----
-
 ... 

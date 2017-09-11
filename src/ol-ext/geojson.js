@@ -2,7 +2,10 @@ import Feature from 'ol/feature'
 import { geoJson as geoJsonFactory } from './format'
 import { EPSG_4326, EPSG_3857 } from './consts'
 
-const geoJson = geoJsonFactory()
+const geoJson = geoJsonFactory({
+  defaultDataProjection: EPSG_4326,
+  featureProjection: EPSG_3857,
+})
 
 /**
  * @param {ol.Feature} feature
@@ -16,7 +19,7 @@ export function writeFeature (feature, featureProjection = EPSG_3857, dataProjec
   if (geoJsonFeature.properties && geoJsonFeature.properties.features) {
     geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(f => {
       if (f instanceof Feature) {
-        return writeFeature(f)
+        return writeFeature(f, featureProjection, dataProjection)
       }
 
       return f

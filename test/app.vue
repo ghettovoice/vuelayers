@@ -136,7 +136,7 @@
       return Promise.resolve(this.points)
     },
     pointOnSurface (geometry) {
-      return vlol.geom.pointOnSurfaceAsCoordinate(geometry)
+      return vlol.geom.pointOnSurface(geometry)
     },
   }
 

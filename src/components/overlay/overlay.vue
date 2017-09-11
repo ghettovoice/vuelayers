@@ -40,10 +40,7 @@
       type: Boolean,
       default: true,
     },
-    autoPan: {
-      type: Boolean,
-      default: true,
-    },
+    autoPan: Boolean,
     autoPanMargin: {
       type: Number,
       default: 20,
@@ -190,3 +187,10 @@
     return projHelper.toLonLat(this.$overlay.getPosition(), this.$view.getProjection())
   }
 </script>
+
+<style lang="sass">
+  @import ../../styles/all
+
+  .vl-overlay
+    +vl-hidden()
+</style>

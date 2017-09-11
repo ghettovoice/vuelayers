@@ -1,5 +1,5 @@
 <template>
-  <i :class="$options.name" style="display: none !important;">
+  <i class="vl-hidden" :class="[$options.name]">
     <slot :accuracy="accuracy" :altitude="altitude" :altitude-accuracy="altitudeAccuracy"
           :heading="heading" :position="position" :speed="speed"></slot>
   </i>

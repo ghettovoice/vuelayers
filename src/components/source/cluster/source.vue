@@ -91,10 +91,13 @@
    */
   function defaultGeomFuncFactory () {
     return function (feature) {
-      let geometry = feature.getGeometry()
+      const geometry = feature.getGeometry()
       if (!geometry) return
 
-      return geomHelper.pointOnSurface(geometry)
+      let coordinate = geomHelper.pointOnSurface(geometry)
+      if (coordinate) {
+        return geomHelper.point(coordinate)
+      }
     }
   }
 </script>

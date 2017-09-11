@@ -277,7 +277,7 @@
       ({ selected, deselected, mapBrowserEvent }) => {
         ++this.rev
 
-        this.$emit('update:selected', this.$features.map(geoJson.writeFeature))
+        this.$emit('update:selected', this.$features.map(f => geoJson.writeFeature(f)))
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
       }

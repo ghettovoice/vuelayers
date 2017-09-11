@@ -1,5 +1,5 @@
 <template>
-  <i :id="id" :class="[$options.name, id].join('-')" style="display: none !important;">
+  <i :id="[this.$options.name, this.id].join('-')" :class="[$options.name]">
     <slot :id="id" :properties="properties" :geometry="geometry"></slot>
   </i>
 </template>
@@ -240,3 +240,10 @@
     })
   }
 </script>
+
+<style lang="sass">
+  @import ../../styles/all
+
+  .vl-feature
+    +vl-hidden()
+</style>

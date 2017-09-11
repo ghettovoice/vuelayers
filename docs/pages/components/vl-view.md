@@ -2,6 +2,4 @@
 
 ## Map view component <!-- {.subtitle} -->
 
----
-
 ...

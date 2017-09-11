@@ -1,16 +1,16 @@
+import turfPointOnSurface from '@turf/point-on-surface'
+import GeometryCollection from 'ol/geom/geometrycollection'
+import LineString from 'ol/geom/linestring'
+import MultiLineString from 'ol/geom/multilinestring'
+import MultiPoint from 'ol/geom/multipoint'
+import MultiPolygon from 'ol/geom/multipolygon'
 /**
  * @param {number|number[]} lonOrCoordinates
  * @param {number} [lat]
  * @returns {ol.geom.Point}
  */
 import Point from 'ol/geom/point'
-import LineString from 'ol/geom/linestring'
 import Polygon from 'ol/geom/polygon'
-import MultiPoint from 'ol/geom/multipoint'
-import MultiLineString from 'ol/geom/multilinestring'
-import MultiPolygon from 'ol/geom/multipolygon'
-import GeometryCollection from 'ol/geom/geometrycollection'
-import turfPointOnSurface from '@turf/point-on-surface'
 import { GEOMETRY_TYPE, WGS84_SPHERE } from './consts'
 
 /**
@@ -104,53 +104,29 @@ export function isMulti (geom) {
  * @return {ol.geom.SimpleGeometry|GeoJSONGeometry}
  * @throws {Error}
  */
-export function reduceToSingle (geom) {
-  if (!isMulti(geom)) return geom
+export function toSimpleGeom (geom) {
+  const type = geom.type || geom.getType()
+  const complexTypes = [
+    GEOMETRY_TYPE.GEOMETRY_COLLECTION,
+  ]
 
-  let type = geom.type || geom.getType()
+  if (!complexTypes.includes(type)) return geom
 
-  if (type === GEOMETRY_TYPE.GEOMETRY_COLLECTION) {
-    let geometries = geom.geometries || geom.getGeometries()
-    return reduceToSingle(geometries[0])
-  }
-
-  if (geom.coordinates) {
-    return geom.coordinates[0]
-  }
-
-  switch (type) {
-    case GEOMETRY_TYPE.MULTI_POINT:
-      return geom.getPoint(0)
-    case GEOMETRY_TYPE.MULTI_LINE_STRING:
-      return geom.getLineString(0)
-    case GEOMETRY_TYPE.MULTI_POLYGON:
-      return geom.getPolygon(0)
-  }
-}
-
-/**
- * @param {ol.geom.Geometry|GeoJSONGeometry} geom
- * @return {ol.geom.Point|undefined}
- */
-export function pointOnSurface (geom) {
-  const singleGeom = reduceToSingle(geom)
-  const pointFeature = turfPointOnSurface({
-    type: singleGeom.type || singleGeom.getType(),
-    coordinates: singleGeom.coordinates || singleGeom.getCoordinates(),
-  })
-
-  if (pointFeature) {
-    return point(pointFeature.geometry.coordinates)
-  }
+  return (geom.geometries || geom.getGeometries())[0]
 }
 
 /**
  * @param {ol.geom.Geometry|GeoJSONGeometry} geom
  * @return {ol.Coordinate|undefined}
  */
-export function pointOnSurfaceAsCoordinate (geom) {
-  const point = pointOnSurface(geom)
-  if (point) {
-    return point.getCoordinates()
+export function pointOnSurface (geom) {
+  const simpleGeom = toSimpleGeom(geom)
+  const pointFeature = turfPointOnSurface({
+    type: simpleGeom.type || simpleGeom.getType(),
+    coordinates: simpleGeom.coordinates || simpleGeom.getCoordinates(),
+  })
+
+  if (pointFeature && pointFeature.geometry) {
+    return pointFeature.geometry.coordinates
   }
 }

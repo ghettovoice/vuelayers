@@ -1,6 +1,5 @@
 <template>
-  <div class="vl-map">
-    <div class="map" :tabindex="tabIndex" ref="map"></div>
+  <div :class="[$options.name]">
     <slot></slot>
   </div>
 </template>
@@ -219,7 +218,7 @@
      * @return {void}
      */
     focus () {
-      this.$refs.map.focus()
+      this.$el.focus()
     },
     /**
      * @param {number[]} pixel
@@ -263,7 +262,7 @@
      */
     mount () {
       assert.hasMap(this)
-      this.$map.setTarget(this.$refs.map)
+      this.$map.setTarget(this.$el)
       this.subscribeAll()
       this.updateSize()
     },
@@ -396,9 +395,8 @@
 </script>
 
 <style lang="sass">
-  @import ../../styles/mixins
-  @import ~ol/ol
+  @import ../../styles/all
 
-  .vl-map, .vl-map .map
+  .vl-map
     +vl-wh(100%, 100%)
 </style>

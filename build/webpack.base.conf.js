@@ -24,7 +24,7 @@ module.exports = {
       utils.resolve('node_modules'),
     ],
     alias: {
-      [ config.name ]: utils.resolve(''),
+      [ config.name ]: utils.resolve('src'),
     },
   },
   module: {

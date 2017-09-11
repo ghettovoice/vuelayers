@@ -1,7 +1,7 @@
 <template>
   <div class="demo-app">
     <vl-map class="map" ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true"
-            @postcompose="onMapPostCompose">
+            @click="clickCoordinate = $event.coordinate" @postcompose="onMapPostCompose">
       <!-- map view aka ol.View -->
       <vl-view ref="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
@@ -37,7 +37,7 @@
 
       <!-- overlay marker with animation -->
       <vl-feature id="marker" ref="marker" :properties="{ start: Date.now(), duration: 2500 }">
-        <vl-geom-point :coordinates="[0, 0]"/>
+        <vl-geom-point :coordinates="[-10, -10]"/>
         <vl-style-box>
           <vl-style-icon src="../static/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"/>
         </vl-style-box>
@@ -73,19 +73,21 @@
       </component>
 
       <!-- selected feature popup -->
-      <vl-overlay v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id"
-                  :position="pointOnSurface(feature.geometry)">
+      <vl-overlay v-if="clickCoordinate" v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id"
+                  :position="clickCoordinate" :auto-pan="true">
         <template scope="ctx">
-          <vld-card>
+          <vld-card class="feature-card">
             <p slot="header" class="card-header-title">
-              Feature #{{ feature.id }}
+              Feature ID {{ feature.id }}
             </p>
             <a slot="header" class="card-header-icon" title="Close">
               <b-icon icon="close" />
             </a>
 
             <div class="content">
-              <p>This overlay popup content for Feature with <strong>{{ feature.id }}</strong></p>
+              <p>
+                Overlay popup content for Feature with ID <strong>{{ feature.id }}</strong>
+              </p>
               <p>
                 Popup context: {{ JSON.stringify(ctx) }}
               </p>
@@ -119,8 +121,8 @@
               <td>{{ rotation }}</td>
             </tr>
             <tr>
-              <th>Device position</th>
-              <td>{{ devicePosition }}</td>
+              <th>Device coordinate</th>
+              <td>{{ deviceCoordinate }}</td>
             </tr>
             <tr>
               <th>Selected features</th>
@@ -148,7 +150,7 @@
   import VldCard from './card.vue'
 
   const methods = {
-    pointOnSurface: vlol.geom.pointOnSurfaceAsCoordinate,
+    pointOnSurface: vlol.geom.pointOnSurface,
     geometryTypeToCmpName (type) {
       return 'vl-geom-' + kebabCase(type)
     },
@@ -197,7 +199,7 @@
       return ['position-feature'].indexOf(feature.getId()) === -1
     },
     onUpdatePosition (coordinate) {
-      this.devicePosition = coordinate
+      this.deviceCoordinate = coordinate
     },
     onMapPostCompose ({ vectorContext, frameState }) {
       if (!this.$refs.marker || !this.$refs.marker.$feature) return
@@ -253,8 +255,9 @@
         center: [0, 0],
         zoom: 1,
         rotation: 0,
+        clickCoordinate: [],
         selectedFeatures: [],
-        devicePosition: [],
+        deviceCoordinate: [],
         mapPanel: {
           tab: 'state',
         },
@@ -347,4 +350,27 @@
         right: 0
         max-height: 500px
         width: 20em
+    .feature-card
+      position: absolute
+      left: -50px
+      bottom: 12px
+      max-width: 30em
+      &:after, &:before
+        top: 100%
+        border: solid transparent
+        content: ' '
+        height: 0
+        width: 0
+        position: absolute
+        pointer-events: none
+      &:after
+        border-top-color: white
+        border-width: 10px
+        left: 48px
+        margin-left: -10px
+      &:before
+        border-top-color: #cccccc
+        border-width: 11px
+        left: 48px
+        margin-left: -11px
 </style>
