@@ -1,5 +1,5 @@
 ::: content
 
-...
+Coming soon
 
 ::: content

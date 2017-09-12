@@ -22,7 +22,7 @@
     </section>
 
     <vld-hero>
-      <vld-home-intro class="intro"/>
+      <vld-home-content class="intro"/>
 
       <section class="buttons">
         <a class="button is-success is-large"
@@ -33,7 +33,7 @@
           <span>Download</span>
         </a>
 
-        <router-link to="/install" class="button is-primary is-large" title="Install & Usage">
+        <router-link to="/start" class="button is-primary is-large" title="Install & Usage">
           <span>Get started</span>
           <b-icon icon="arrow-right"></b-icon>
         </router-link>
@@ -55,7 +55,7 @@
 
 <script>
   import { ol as vlol } from 'vuelayers'
-  import VldHomeIntro from '../md/home-intro.md'
+  import VldHomeContent from '../md/home.md'
 
   const methods = {
     onUpdatePosition (coordinate) {
@@ -73,7 +73,7 @@
   export default {
     name: 'vld-home-page',
     components: {
-      VldHomeIntro,
+      VldHomeContent,
     },
     methods,
     data () {

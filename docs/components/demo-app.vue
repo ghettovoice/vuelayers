@@ -1,5 +1,6 @@
 <template>
   <div class="demo-app">
+    <!-- app map -->
     <vl-map class="map" ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true"
             @click="clickCoordinate = $event.coordinate" @postcompose="onMapPostCompose">
       <!-- map view aka ol.View -->
@@ -22,8 +23,9 @@
           </vl-style-circle>
         </vl-style-box>
       </vl-interaction-select>
+      <!--// interactions -->
 
-      <!-- Geolocation -->
+      <!-- geolocation -->
       <vl-geoloc @update:position="onUpdatePosition">
         <template scope="geoloc">
           <vl-feature v-if="geoloc.position" id="position-feature">
@@ -34,6 +36,7 @@
           </vl-feature>
         </template>
       </vl-geoloc>
+      <!--// geolocation -->
 
       <!-- overlay marker with animation -->
       <vl-feature id="marker" ref="marker" :properties="{ start: Date.now(), duration: 2500 }">
@@ -42,7 +45,7 @@
           <vl-style-box>
             <vl-style-icon src="../static/img/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"/>
           </vl-style-box>
-
+          <!-- overlay binded to feature -->
           <vl-overlay v-if="feature.geometry" :position="pointOnSurface(feature.geometry)" :offset="[10, 10]">
             <p class="is-light box content">
               Always opened overlay for Feature ID <strong>{{ feature.id }}</strong>
@@ -50,15 +53,16 @@
           </vl-overlay>
         </template>
       </vl-feature>
+      <!--// overlay marker -->
 
       <!-- base layer -->
       <vl-layer-tile id="sputnik">
         <vl-source-sputnik/>
       </vl-layer-tile>
 
-      <!-- other layers -->
+      <!-- other layers from config -->
       <component v-for="layer in layers" :is="layer.cmp" :key="layer.id" v-bind="layer">
-        <!-- vl-source-* -->
+        <!-- add vl-source-* -->
         <component :is="layer.source.cmp" v-bind="layer.source">
           <!-- add static features to vl-source-vector if provided -->
           <vl-feature v-if="layer.source.staticFeatures && layer.source.staticFeatures.length"
@@ -66,19 +70,32 @@
                       :id="feature.id" :properties="feature.properties">
             <component :is="geometryTypeToCmpName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
           </vl-feature>
+
+          <!-- add inner source if provided (like vl-source-vector inside vl-source-cluster) -->
+          <component v-if="layer.source.source" :is="layer.source.source.cmp" v-bind="layer.source.source">
+            <!-- add static features to vl-source-vector if provided -->
+            <vl-feature v-if="layer.source.source.staticFeatures && layer.source.source.staticFeatures.length"
+                        v-for="feature in layer.source.source.staticFeatures" :key="feature.id"
+                        :id="feature.id" :properties="feature.properties">
+              <component :is="geometryTypeToCmpName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
+            </vl-feature>
+          </component>
         </component>
+        <!--// vl-source-* -->
 
         <!-- add style components if provided -->
         <!-- create vl-style-box or vl-style-func -->
         <component v-if="layer.style" v-for="(style, i) in layer.style" :key="i" :is="style.cmp" v-bind="style">
-          <!-- if vl-style-box used, create vl-style-circle, vl-style-icon, vl-style-fill, vl-style-stroke & etc -->
+          <!-- create inner style components: vl-style-circle, vl-style-icon, vl-style-fill, vl-style-stroke & etc -->
           <component v-if="style.styles" v-for="(st, cmp) in style.styles" :key="cmp" :is="cmp" v-bind="st">
             <!-- vl-style-fill, vl-style-stroke if provided -->
             <vl-style-fill v-if="st.fill" v-bind="st.fill"/>
             <vl-style-fill v-if="st.stroke" v-bind="st.stroke"/>
           </component>
         </component>
+        <!--// style -->
       </component>
+      <!--// other layers -->
 
       <!-- selected feature popup -->
       <vl-overlay class="feature-popup" v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id"
@@ -107,7 +124,9 @@
           </vld-card>
         </template>
       </vl-overlay>
+      <!--// selected popup -->
     </vl-map>
+    <!--// app map -->
 
     <!-- map panel, controls -->
     <div class="map-panel">
@@ -152,14 +171,14 @@
         </div>
       </b-panel>
     </div>
+    <!--// map panel, controls -->
   </div>
 </template>
 
 <script>
-  import { kebabCase } from 'lodash/fp'
+  import { kebabCase, range, random } from 'lodash/fp'
   import { ol as vlol } from 'vuelayers'
   import pacmanFeaturesCollection from '../static/sample-data/pacman.geojson'
-  import VldCard from './card.vue'
 
   const methods = {
     pointOnSurface: vlol.geom.pointOnSurface,
@@ -167,7 +186,6 @@
       return 'vl-geom-' + kebabCase(type)
     },
     pacmanStyleFunc () {
-      // first argument is an style helper. See https://github.com/ghettovoice/vuelayers/blob/master/src/ol-ext/style.js
       const pacman = [
         vlol.style.style({
           strokeColor: '#de9147',
@@ -205,6 +223,26 @@
           case 'pacman-eye':
             return eye
         }
+      }
+    },
+    clusterStyleFunc () {
+      const cache = {}
+
+      return function __clusterStyleFunc (feature) {
+        const size = feature.get('features').length
+        let style = cache[size]
+
+        if (!style) {
+          style = vlol.style.style({
+            imageRadius: 10,
+            strokeColor: '#fff',
+            fillColor: '#3399cc',
+            text: size.toString(),
+            textFillColor: '#fff',
+          })
+          cache[size] = style
+        }
+        return [style]
       }
     },
     selectFilter (feature) {
@@ -259,7 +297,6 @@
   }
 
   export default {
-    components: { VldCard },
     name: 'vld-demo-app',
     methods,
     data () {
@@ -340,6 +377,37 @@
               format: 'image/png',
               styleName: 'default',
             },
+          },
+          {
+            id: 'cluster',
+            title: 'Cluster',
+            cmp: 'vl-layer-vector',
+            visible: false,
+            source: {
+              cmp: 'vl-source-cluster',
+              distance: 40,
+              source: {
+                cmp: 'vl-source-vector',
+                features: range(0, 20000).map(i => {
+                  let coordinate = [random(-50, 50), random(-50, 50)]
+
+                  return {
+                    type: 'Feature',
+                    id: 'random-' + i,
+                    geometry: {
+                      type: 'Point',
+                      coordinates: coordinate,
+                    },
+                  }
+                }),
+              },
+            },
+            style: [
+              {
+                cmp: 'vl-style-func',
+                factory: this.clusterStyleFunc,
+              },
+            ],
           },
         ],
       }

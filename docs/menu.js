@@ -4,8 +4,12 @@ export default [
     title: 'Home',
   },
   {
+    link: '/start',
+    title: 'Quick Start',
+  },
+  {
     link: '/demo',
-    title: 'Demo',
+    title: 'Live Demo',
   },
   {
     link: '/components',

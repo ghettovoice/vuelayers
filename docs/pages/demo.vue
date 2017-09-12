@@ -8,23 +8,14 @@
     <vld-demo-app />
 
     <section class="section">
-      <p class="subtitle">Demo app source code</p>
-      <b-tabs>
-        <b-tab-item label="JS">
-          <vld-js-src />
-        </b-tab-item>
-        <b-tab-item label="HTML">
-          <vld-html-src />
-        </b-tab-item>
-      </b-tabs>
+      <vld-demo-content/>
     </section>
   </div>
 </template>
 
 <script>
   import page from './page'
-  import VldJsSrc from '../md/demo/js-src.md'
-  import VldHtmlSrc from '../md/demo/html-src.md'
+  import VldDemoContent from '../md/demo.md'
 
   const props = {}
 
@@ -32,8 +23,7 @@
     name: 'vld-demo-page',
     mixins: [page],
     components: {
-      VldJsSrc,
-      VldHtmlSrc,
+      VldDemoContent,
     },
     props,
   }

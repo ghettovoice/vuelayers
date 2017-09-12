@@ -12,31 +12,35 @@ export default [
     component: () => import('./pages/home.vue'),
   },
   {
+    path: '/start',
+    meta: {
+      title: 'Quick Start',
+    },
+    props: {
+      title: 'Quick Start',
+      subtitle: 'Installation and usage guide',
+      color: 'is-primary',
+    },
+    component: () => Promise.all([
+      import('./pages/common.vue'),
+      import('./md/components/start.md'),
+    ]).then(routerViewProxyFromArray),
+  },
+  {
     path: '/demo',
     meta: {
-      title: 'Demo',
+      title: 'Live Demo',
     },
     props: {
       title: 'C_PKG_FULLNAME demo app',
-      subtitle: 'An example app with C_PKG_FULLNAME.js',
-      color: 'is-primary',
+      subtitle: 'An example app built with C_PKG_FULLNAME.js',
+      color: 'is-info',
     },
     component: () => import('./pages/demo.vue'),
   },
   {
     path: '/components',
-    meta: {
-      title: 'Components',
-    },
-    props: {
-      title: 'Components index',
-      subtitle: 'Learn how to build app with C_PKG_FULLNAME.js',
-      color: 'is-light',
-    },
-    component: () => Promise.all([
-      import('./pages/common.vue'),
-      import('./md/components/index.md'),
-    ]).then(routerViewProxyFromArray),
+    redirect: '/components/vl-map',
   },
   {
     path: '/components/vl-map',
@@ -76,7 +80,7 @@ export default [
     props: {
       title: '4040 Not Found',
       subtitle: 'There is nothing to do here',
-      color: 'is-info',
+      color: 'is-warning',
     },
     component: () => Promise.all([
       import('./pages/common.vue'),
