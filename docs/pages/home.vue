@@ -25,15 +25,7 @@
       <vld-home-content class="intro"/>
 
       <section class="buttons">
-        <a class="button is-success is-large"
-           href="C_PKG_REPOSITORY/archive/C_PKG_VERSION.zip"
-           title="Download latest version"
-           target="_blank">
-          <b-icon icon="download"></b-icon>
-          <span>Download</span>
-        </a>
-
-        <router-link to="/start" class="button is-primary is-large" title="Install & Usage">
+        <router-link to="/start" class="button is-success is-large" title="Quick Start Guide">
           <span>Get started</span>
           <b-icon icon="arrow-right"></b-icon>
         </router-link>

@@ -2,4 +2,4 @@
 
 Coming soon
 
-::: content
+:::

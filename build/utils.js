@@ -154,6 +154,7 @@ function vueMarkdownLoaderConfig () {
     use: [
       require('markdown-it-checkbox'),
       require('markdown-it-decorate'),
+      require('markdown-it-link-target'),
       [require('markdown-it-container'), 'content'],
     ],
   }

@@ -8,14 +8,27 @@
     <vld-demo-app />
 
     <section class="section">
-      <vld-demo-content/>
+      <h3 class="title">Source code</h3>
+      <b-tabs>
+        <b-tab-item label="JS">
+          <vld-demo-script/>
+        </b-tab-item>
+        <b-tab-item label="HTML">
+          <vld-demo-template/>
+        </b-tab-item>
+        <b-tab-item label="SASS">
+          <vld-demo-style/>
+        </b-tab-item>
+      </b-tabs>
     </section>
   </div>
 </template>
 
 <script>
   import page from './page'
-  import VldDemoContent from '../md/demo.md'
+  import VldDemoScript from '../md/demo/script.md'
+  import VldDemoTemplate from '../md/demo/template.md'
+  import VldDemoStyle from '../md/demo/style.md'
 
   const props = {}
 
@@ -23,7 +36,9 @@
     name: 'vld-demo-page',
     mixins: [page],
     components: {
-      VldDemoContent,
+      VldDemoScript,
+      VldDemoTemplate,
+      VldDemoStyle,
     },
     props,
   }

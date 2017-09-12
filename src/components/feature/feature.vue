@@ -39,8 +39,8 @@
 
   const computed = {
     geometry () {
-      if (this.rev && this.$geometry) {
-        return geoJson.writeGeometry(this.$geometry)
+      if (this.rev && this.$geometry && this.$view) {
+        return geoJson.writeGeometry(this.$geometry, this.$view.getProjection())
       }
     },
   }

@@ -23,7 +23,7 @@ export default [
     },
     component: () => Promise.all([
       import('./pages/common.vue'),
-      import('./md/components/start.md'),
+      import('./md/start.md'),
     ]).then(routerViewProxyFromArray),
   },
   {
@@ -34,7 +34,7 @@ export default [
     props: {
       title: 'C_PKG_FULLNAME demo app',
       subtitle: 'An example app built with C_PKG_FULLNAME.js',
-      color: 'is-info',
+      color: 'is-primary',
     },
     component: () => import('./pages/demo.vue'),
   },
@@ -50,7 +50,7 @@ export default [
     props: {
       title: 'vl-map',
       subtitle: 'Map component',
-      color: 'is-light',
+      color: 'is-info',
     },
     component: () => Promise.all([
       import('./pages/common.vue'),
@@ -65,7 +65,7 @@ export default [
     props: {
       title: 'vl-view',
       subtitle: 'Map view component',
-      color: 'is-light',
+      color: 'is-info',
     },
     component: () => Promise.all([
       import('./pages/common.vue'),
@@ -78,7 +78,7 @@ export default [
       title: '404 Not Found',
     },
     props: {
-      title: '4040 Not Found',
+      title: '404 Not Found',
       subtitle: 'There is nothing to do here',
       color: 'is-warning',
     },

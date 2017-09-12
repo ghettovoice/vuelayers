@@ -61,7 +61,7 @@
       </vl-layer-tile>
 
       <!-- other layers from config -->
-      <component v-for="layer in layers" :is="layer.cmp" :key="layer.id" v-bind="layer">
+      <component v-for="layer in layers" :is="layer.cmp" v-if="layer.visible" :key="layer.id" v-bind="layer">
         <!-- add vl-source-* -->
         <component :is="layer.source.cmp" v-bind="layer.source">
           <!-- add static features to vl-source-vector if provided -->
@@ -99,7 +99,7 @@
 
       <!-- selected feature popup -->
       <vl-overlay class="feature-popup" v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id"
-                  :position="pointOnSurface(feature.geometry)" :auto-pan="true" :stop-event="false">
+                  :position="pointOnSurface(feature.geometry)" :auto-pan="true">
         <template scope="popup">
           <vld-card>
             <p slot="header" class="card-header-title">
@@ -459,6 +459,9 @@
         border-width: 11px
         left: 48px
         margin-left: -11px
+      .card-content
+        max-height: 20em
+        overflow: auto
       .content
         word-break: break-all
 </style>
