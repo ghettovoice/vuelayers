@@ -25,9 +25,9 @@
 
       <!-- Geolocation -->
       <vl-geoloc @update:position="onUpdatePosition">
-        <template scope="ctx">
-          <vl-feature v-if="ctx.position" id="position-feature">
-            <vl-geom-point :coordinates="ctx.position"/>
+        <template scope="geoloc">
+          <vl-feature v-if="geoloc.position" id="position-feature">
+            <vl-geom-point :coordinates="geoloc.position"/>
             <vl-style-box>
               <vl-style-icon src="../static/img/marker.png" :scale="0.4" :anchor="[0.5, 1]"/>
             </vl-style-box>
@@ -37,10 +37,18 @@
 
       <!-- overlay marker with animation -->
       <vl-feature id="marker" ref="marker" :properties="{ start: Date.now(), duration: 2500 }">
-        <vl-geom-point :coordinates="[-10, -10]"/>
-        <vl-style-box>
-          <vl-style-icon src="../static/img/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"/>
-        </vl-style-box>
+        <template scope="feature">
+          <vl-geom-point :coordinates="[-10, -10]"/>
+          <vl-style-box>
+            <vl-style-icon src="../static/img/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"/>
+          </vl-style-box>
+
+          <vl-overlay v-if="feature.geometry" :position="pointOnSurface(feature.geometry)" :offset="[10, 10]">
+            <p class="is-light box content">
+              Always opened overlay for Feature ID <strong>{{ feature.id }}</strong>
+            </p>
+          </vl-overlay>
+        </template>
       </vl-feature>
 
       <!-- base layer -->
@@ -74,8 +82,8 @@
 
       <!-- selected feature popup -->
       <vl-overlay class="feature-popup" v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id"
-                  :position="pointOnSurface(feature.geometry)" :auto-pan="true">
-        <template scope="ctx">
+                  :position="pointOnSurface(feature.geometry)" :auto-pan="true" :stop-event="false">
+        <template scope="popup">
           <vld-card>
             <p slot="header" class="card-header-title">
               Feature ID {{ feature.id }}
@@ -90,7 +98,10 @@
                 Overlay popup content for Feature with ID <strong>{{ feature.id }}</strong>
               </p>
               <p>
-                Popup context: {{ JSON.stringify(ctx) }}
+                Popup: {{ JSON.stringify(popup) }}
+              </p>
+              <p>
+                Feature: {{ JSON.stringify({ id: feature.id, properties: feature.properties }) }}
               </p>
             </div>
           </vld-card>
@@ -337,7 +348,7 @@
 </script>
 
 <style lang="sass">
-  @import ../sass/variables
+  @import ../styles/variables
 
   .demo-app
     position: relative

@@ -395,7 +395,7 @@
 </script>
 
 <style lang="sass">
-  @import ../../styles/all
+  @import ../../styles/utils
 
   .vl-map
     +vl-wh(100%, 100%)

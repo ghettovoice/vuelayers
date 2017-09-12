@@ -8,7 +8,7 @@
             <b-tag type="is-info">vC_PKG_VERSION</b-tag>
           </router-link>
 
-          <a slot="links" href="C_PKG_REPOSITORY" title="View on GitHub" target="_blank">
+          <a slot="links" href="C_PKG_REPOSITORY" title="View on GitHub" target="_blank" class="icon">
             <b-icon icon="github" size="is-medium"/>
           </a>
 
@@ -104,7 +104,7 @@
 
 <style lang="sass">
   // import base
-  @import sass/base
+  @import styles/base
 
   .layout
     margin: 0
@@ -117,15 +117,19 @@
         color: $sidebar-link-color
         &:hover
           color: $sidebar-link-hover-color
+      .icon
+        color: $sidebar-icon-color
+        &:hover
+          color: $sidebar-icon-hover-color
       .menu-list
         a
-          color: $sidebar-link-color
+          color: $sidebar-menu-link-color
           &:hover
-            background: $sidebar-link-hover-background
-            color: $sidebar-link-hover-color
+            background: $sidebar-menu-link-hover-background
+            color: $sidebar-menu-link-hover-color
           &.is-active
-            color: $sidebar-link-active-color
-            background: $sidebar-link-active-background
+            color: $sidebar-menu-link-active-color
+            background: $sidebar-menu-link-active-background
     .center
       padding: 50px 0 0
       +tablet()

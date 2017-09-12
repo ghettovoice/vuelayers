@@ -23,8 +23,8 @@
 
 <script>
   import page from './page'
-  import VldJsSrc from '../partial/demo/js-src.md'
-  import VldHtmlSrc from '../partial/demo/html-src.md'
+  import VldJsSrc from '../md/demo/js-src.md'
+  import VldHtmlSrc from '../md/demo/html-src.md'
 
   const props = {}
 

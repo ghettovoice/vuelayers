@@ -22,7 +22,7 @@
 </script>
 
 <style lang="sass">
-  @import ../../sass/variables
+  @import ../../styles/variables
 
   .menu-list
     span

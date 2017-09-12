@@ -1,3 +1,5 @@
+::: content
+
 ```js
 import { kebabCase } from 'lodash/fp'
 import { ol as vlol } from 'vuelayers'
@@ -81,3 +83,5 @@ export default {
   },
 }
 ```
+
+::: content

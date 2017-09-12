@@ -242,7 +242,7 @@
 </script>
 
 <style lang="sass">
-  @import ../../styles/all
+  @import ../../styles/utils
 
   .vl-feature
     +vl-hidden()

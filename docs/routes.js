@@ -1,10 +1,7 @@
-const routerViewProxy = (PageCmp, ContentCmp) => ({
-  name: 'vld-router-view-proxy',
-  functional: true,
-  render (h, { props }) {
-    return h(PageCmp, { props }, [h(ContentCmp, { props })])
-  },
-})
+import { spread } from 'lodash/fp'
+import { routerViewProxy } from './utils'
+
+const routerViewProxyFromArray = spread(({ default: PageCmp }, { default: ContentCmp }) => routerViewProxy(PageCmp, ContentCmp))
 
 export default [
   {
@@ -34,32 +31,56 @@ export default [
     props: {
       title: 'Components index',
       subtitle: 'Learn how to build app with C_PKG_FULLNAME.js',
-      color: 'is-info',
+      color: 'is-light',
     },
     component: () => Promise.all([
       import('./pages/common.vue'),
-      import('./pages/components/index.md'),
-    ]).then(([PageCmp, ContentCmp]) => routerViewProxy(PageCmp.default, ContentCmp.default)),
+      import('./md/components/index.md'),
+    ]).then(routerViewProxyFromArray),
   },
   {
     path: '/components/vl-map',
     meta: {
       title: 'vl-map',
     },
-    component: () => import('./pages/components/vl-map.md'),
+    props: {
+      title: 'vl-map',
+      subtitle: 'Map component',
+      color: 'is-light',
+    },
+    component: () => Promise.all([
+      import('./pages/common.vue'),
+      import('./md/components/vl-map.md'),
+    ]).then(routerViewProxyFromArray),
   },
   {
     path: '/components/vl-view',
     meta: {
       title: 'vl-view',
     },
-    component: () => import('./pages/components/vl-view.md'),
+    props: {
+      title: 'vl-view',
+      subtitle: 'Map view component',
+      color: 'is-light',
+    },
+    component: () => Promise.all([
+      import('./pages/common.vue'),
+      import('./md/components/vl-view.md'),
+    ]).then(routerViewProxyFromArray),
   },
   {
     path: '*',
     meta: {
       title: '404 Not Found',
     },
-    component: () => import('./pages/404.md'),
+    props: {
+      title: '4040 Not Found',
+      subtitle: 'There is nothing to do here',
+      color: 'is-info',
+    },
+    component: () => Promise.all([
+      import('./pages/common.vue'),
+      import('./md/404.md'),
+    ]).then(routerViewProxyFromArray),
   },
 ]

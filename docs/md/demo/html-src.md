@@ -1,3 +1,5 @@
+::: content
+
 ```html
 <div class="demo-app">
   <vl-map ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
@@ -47,3 +49,5 @@
   </vl-map>
 </div>
 ```
+
+::: content

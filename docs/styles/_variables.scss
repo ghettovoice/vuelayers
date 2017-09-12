@@ -4,13 +4,17 @@
 $code-background: darken($light, 2%);
 
 // sidebar
-$sidebar-background: $dark url(static/sidebar-bg.png) repeat;
+$sidebar-background: $dark url(../static/img/sidebar-bg.png) repeat;
 $sidebar-link-color: $primary;
 $sidebar-link-hover-color: $primary-invert;
-$sidebar-link-active-color: $primary-invert;
-$sidebar-link-background: none;
-$sidebar-link-hover-background: transparentize(lighten($dark, 10%), 0.5);
-$sidebar-link-active-background: transparentize($primary, 0.5);
+$sidebar-icon-color: $grey-light;
+$sidebar-icon-hover-color: $light;
+$sidebar-menu-link-color: $primary;
+$sidebar-menu-link-hover-color: $primary-invert;
+$sidebar-menu-link-active-color: $primary-invert;
+$sidebar-menu-link-background: none;
+$sidebar-menu-link-hover-background: transparentize(lighten($dark, 10%), 0.7);
+$sidebar-menu-link-active-background: transparentize($primary, 0.7);
 
 
 // Menu

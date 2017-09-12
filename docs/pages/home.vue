@@ -55,7 +55,7 @@
 
 <script>
   import { ol as vlol } from 'vuelayers'
-  import VldHomeIntro from '../partial/home-intro.md'
+  import VldHomeIntro from '../md/home-intro.md'
 
   const methods = {
     onUpdatePosition (coordinate) {
@@ -85,7 +85,7 @@
 </script>
 
 <style lang="sass">
-  @import "../sass/variables"
+  @import ../styles/variables
 
   .home
     .map
