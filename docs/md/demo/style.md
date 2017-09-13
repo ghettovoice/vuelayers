@@ -1,12 +1,19 @@
 ::: content
 
 ```stylus
-@import ../styles/variables
-// Import Bulma and Buefy styles for UI
+@import variables
+@import ~highlight.js/styles/github-gist
+// import OpenLayers and C_PKG_FULLNAME styles
+@import ~ol/ol
+@import ~C_PKG_NAME/dist/C_PKG_NAME
+// Import Bulma and Buefy styles
 @import ~bulma
 @import ~buefy/src/scss/buefy
-// Import C_PKG_FULLNAME styles
-@import ~C_PKG_NAME/dist/C_PKG_NAME
+
+html, body
+  height: 100%
+  width: 100%
+  box-sizing: border-box
 
 .demo-app
   position: relative

@@ -4,11 +4,6 @@ import LineString from 'ol/geom/linestring'
 import MultiLineString from 'ol/geom/multilinestring'
 import MultiPoint from 'ol/geom/multipoint'
 import MultiPolygon from 'ol/geom/multipolygon'
-/**
- * @param {number|number[]} lonOrCoordinates
- * @param {number} [lat]
- * @returns {ol.geom.Point}
- */
 import Point from 'ol/geom/point'
 import Polygon from 'ol/geom/polygon'
 import { GEOMETRY_TYPE, WGS84_SPHERE } from './consts'

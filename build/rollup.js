@@ -261,9 +261,7 @@ function nodeExternal () {
 }
 
 function replaces (opts = {}) {
-  const obj = Object.assign({}, config.replaces, {
-    '~': '',
-  })
+  const obj = Object.assign({}, config.replaces)
 
   if (opts.env) {
     obj['process.env.NODE_ENV'] = opts.env
