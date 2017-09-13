@@ -4,7 +4,7 @@
 
 ## Requirements
 
-- ![Vue.js](https://vuejs.org/ "Vue.js Homepage") version **2.3+**.
+- [Vue.js](https://vuejs.org/ "Vue.js Homepage")<!-- {target="_blank"} --> version **2.3+**.
 
 :::
 
@@ -26,12 +26,12 @@ npm install --save vue C_PKG_NAME
 
 Include C_PKG_FULLNAME files from **unpkg.com**  
 
-- JavaScript ![https://unpkg.com/C_PKG_NAME](https://unpkg.com/C_PKG_NAME)
-- CSS ![https://unpkg.com/C_PKG_NAME/dist/C_PKG_NAME.css](https://unpkg.com/C_PKG_NAME/dist/C_PKG_NAME.css)
+- JavaScript https://unpkg.com/C_PKG_NAME<!-- {a:target="_blank"} -->
+- CSS https://unpkg.com/C_PKG_NAME/dist/C_PKG_NAME.css<!-- {a:target="_blank"} -->
 
 ## Available builds
 
-All builds are stored at the ![`dist` directory of the NPM package](https://unpkg.com/C_PKG_NAME/dist/)
+All builds are stored at the [`dist` directory of the NPM package](https://unpkg.com/C_PKG_NAME/dist/)<!-- {a:target="_blank"} -->
 
 | Type                          | JS                                      | CSS                |
 |-------------------------------|-----------------------------------------|--------------------|

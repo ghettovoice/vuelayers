@@ -44,6 +44,7 @@
       <w>hoverable</w>
       <w>ident</w>
       <w>jsnext</w>
+      <w>linkify</w>
       <w>loadingstrategy</w>
       <w>lodash</w>
       <w>logdbg</w>

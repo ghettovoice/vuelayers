@@ -7,8 +7,8 @@
     "stage-0"
   ],
   "plugins": [
-    "transform-runtime",
     "lodash",
+    "transform-runtime"
   ],
   "env": {
     "test": {
