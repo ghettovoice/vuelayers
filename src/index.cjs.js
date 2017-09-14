@@ -7,19 +7,17 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
-import install from './install'
+
 import * as components from './components'
-import * as ol from './ol-ext'
-import * as rx from './rx-ext'
-import './styles/main.sass'
+import * as core from './core'
+import install from './install'
 
 const VueLayers = {
   // meta & consts
   VERSION: 'C_PKG_VERSION',
   // install
   install,
-  ol,
-  rx,
+  ...core,
   ...components,
 }
 export default VueLayers

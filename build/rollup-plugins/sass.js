@@ -96,7 +96,7 @@ module.exports = function sass (options) {
           sourcesRelativeTo: id,
         })),
         dest,
-        options.banner,
+        options.banner
       )
 
       return Promise.all([

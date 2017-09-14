@@ -113,8 +113,8 @@ Promise.resolve(fs.ensureDir(config.outDir))
             bundlesMap,
             banner: config.banner,
             varName: config.fullname,
-          })),
-        ),
+          }))
+        )
       )
     })
   })
@@ -220,7 +220,7 @@ function bundle (opts = {}) {
             }
           },
         },
-      }),
+      })
     )
   }
 
@@ -254,7 +254,7 @@ function bundle (opts = {}) {
           sourcesRelativeTo: id,
         })),
         destCss,
-        opts.banner,
+        opts.banner
       )
 
       return utils.postcssProcess({
