@@ -13,7 +13,6 @@ const uglify = require('rollup-plugin-uglify')
 const externalize = require('./rollup-plugins/externalize')
 const sass = require('./rollup-plugins/sass')
 const notifier = require('node-notifier')
-const Concat = require('concat-with-sourcemaps')
 const argv = require('yargs').argv
 const { dependencies, peerDependencies, devDependencies } = require('../package.json')
 const utils = require('./utils')
@@ -26,22 +25,29 @@ const bundles = argv.bundles
 Promise.resolve(fs.ensureDir(config.outDir))
   // ES6
   .then(() => bundles.includes('es') && bundle({
+    outDir: config.outDir,
     format: 'es',
     bundleName: config.name + '.es',
     styleName: config.name,
     entry: config.entry,
     external: nodeExternal(),
+    banner: config.banner,
+    varName: config.fullname,
   }))
   // CommonJS
   .then(() => bundles.includes('cjs') && bundle({
+    outDir: config.outDir,
     format: 'cjs',
     bundleName: config.name + '.cjs',
     styleName: config.name,
     entry: config.cjsEntry,
     external: nodeExternal(),
+    banner: config.banner,
+    varName: config.fullname,
   }))
   // UMD
   .then(() => bundles.includes('umd') && bundle({
+    outDir: config.outDir,
     format: 'umd',
     bundleName: config.name + '.umd',
     styleName: config.name,
@@ -52,9 +58,12 @@ Promise.resolve(fs.ensureDir(config.outDir))
       vue: 'Vue',
       openlayers: 'ol',
     },
+    banner: config.banner,
+    varName: config.fullname,
   }))
   // UMD minified
   .then(() => bundles.includes('umd-min') && bundle({
+    outDir: config.outDir,
     format: 'umd',
     bundleName: config.name + '.umd.min',
     styleName: config.name,
@@ -65,6 +74,8 @@ Promise.resolve(fs.ensureDir(config.outDir))
       vue: 'Vue',
       openlayers: 'ol',
     },
+    banner: config.banner,
+    varName: config.fullname,
   }))
   // Separate CommonJS modules
   .then(() => {
@@ -79,6 +90,7 @@ Promise.resolve(fs.ensureDir(config.outDir))
       return Promise.all(
         [
           bundle({
+            outDir: config.outDir,
             format: 'cjs',
             bundleName: 'modules/index',
             styleName: 'modules/style',
@@ -86,9 +98,12 @@ Promise.resolve(fs.ensureDir(config.outDir))
             external: nodeExternal(),
             modules: true,
             bundlesMap,
+            banner: config.banner,
+            varName: config.fullname,
           }),
         ].concat(
           bundles.map(opts => bundle({
+            outDir: config.outDir,
             format: 'cjs',
             entry: opts.entry,
             bundleName: opts.bundleName,
@@ -96,6 +111,8 @@ Promise.resolve(fs.ensureDir(config.outDir))
             external: nodeExternal(),
             modules: true,
             bundlesMap,
+            banner: config.banner,
+            varName: config.fullname,
           })),
         ),
       )
@@ -116,7 +133,11 @@ Promise.resolve(fs.ensureDir(config.outDir))
 // helpers
 function bundle (opts = {}) {
   let bundleName = opts.bundleName
-  // todo собирать все готовые css файлы и мерджить в конце или в кучу
+  let cssBundleName = opts.styleName === true
+    ? bundleName
+    : (typeof opts.styleName === 'string'
+      ? opts.styleName
+      : undefined)
   let vueStylesPromise = Promise.resolve()
   let sassStylesPromise = Promise.resolve()
 
@@ -149,31 +170,18 @@ function bundle (opts = {}) {
         ],
       },
       css: (_, styles) => {
-        if (opts.styleName === false) return
-
-        vueStylesPromise = Promise.all(
-          styles.map(({ id, $compiled: { code, map } }) => utils.postcssProcess({ id, code, map })),
-        ).then(results => {
-          const dest = path.join(opts.outDir, opts.styleName + '.css')
-          const concat = new Concat(true, opts.styleName + '.css', '\n')
-          concat.add(null, opts.banner)
-          results.forEach(({ css, map, style }) => concat.add(path.relative(opts.outDir, style.id), css, map))
-
-          return Promise.all([
-            utils.writeFile(dest, concat.content),
-            utils.writeFile(dest + '.map', concat.sourceMap),
-          ])
-        })
+        vueStylesPromise = Promise.all(styles.map(({ id, $compiled: { code, map } }) => ({ id, code, map })))
       },
     }),
     sass({
-      output: path.join(opts.outDir, opts.styleName + '.css'),
       banner: opts.banner,
-      postProcess: utils.postcssProcess,
       sass: {
         includePaths: [
           utils.resolve('node_modules'),
         ],
+      },
+      output: styles => {
+        sassStylesPromise = Promise.all(styles)
       },
     }),
     babel({
@@ -217,6 +225,7 @@ function bundle (opts = {}) {
   }
 
   const dest = path.join(opts.outDir, `${bundleName}.js`)
+  let destCss = cssBundleName ? path.join(opts.outDir, cssBundleName + '.css') : undefined
   const spinner = ora(chalk.bold.blue(`cook ${bundleName} bundle...`)).start()
 
   return rollup.rollup({
@@ -226,24 +235,49 @@ function bundle (opts = {}) {
   }).then(bundler => bundler.generate({
     format: opts.format,
     banner: opts.banner,
-    name: opts.name,
+    name: opts.varName,
     // moduleId: config.name,
     sourcemap: true,
     sourcemapFile: dest,
     globals: opts.globals,
-  })).then(({ code, map }) => Promise.all([
-    utils.writeFile(dest, code),
-    utils.writeFile(dest + '.map', map.toString()),
-  ])).then(([jsSrc, jsMap, css]) => {
+  })).then(js => {
+    if (!destCss) return { js, css: undefined }
+    // concat all extracted styles from Vue and Sass files
+    return Promise.all([
+      sassStylesPromise,
+      vueStylesPromise,
+    ]).then(([sassStyles, vueStyles]) => {
+      const { code, map } = utils.concatFiles(
+        (sassStyles || []).concat(vueStyles).map(({ id, code, map }) => ({
+          code,
+          map,
+          sourcesRelativeTo: id,
+        })),
+        destCss,
+        opts.banner,
+      )
+
+      return utils.postcssProcess({
+        id: destCss,
+        code,
+        map,
+      })
+    }).then(css => ({ js, css }))
+  }).then(({ js, css }) => Promise.all([
+    utils.writeFile(dest, js.code),
+    utils.writeFile(dest + '.map', js.map),
+    ...(css ? [
+      utils.writeFile(destCss, css.code),
+      utils.writeFile(destCss + '.map', css.map),
+    ] : []),
+  ])).then(([jsSrc, jsMap, cssSrc, cssMap]) => {
     spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
     console.log(jsSrc.path, chalk.gray(jsSrc.size))
     console.log(jsMap.path, chalk.gray(jsMap.size))
 
-    if (css) {
-      css[0] && console.log(css[0].path, chalk.gray(css[0].size))
-      css[1] && console.log(css[1].path, chalk.gray(css[1].size))
-    }
+    cssSrc && console.log(cssSrc.path, chalk.gray(cssSrc.size))
+    cssMap && console.log(cssMap.path, chalk.gray(cssMap.size))
   }).catch(err => {
     spinner.fail(chalk.red(`${bundleName} bundle is failed to create`))
     throw err

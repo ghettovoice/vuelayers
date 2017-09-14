@@ -1,6 +1,5 @@
 const path = require('path')
 const chalk = require('chalk')
-const concat = require('source-map-concat')
 const pluginUtils = require('rollup-pluginutils')
 const utils = require('../utils')
 
@@ -90,31 +89,19 @@ module.exports = function sass (options) {
 
       if (!dest) return
 
-      const concatenated = concat(
-        styles.map(({ id, code, map }) => {
-          return {
-            code,
-            map,
-            sourcesRelativeTo: id,
-          }
-        }),
-        {
-          delimiter: '\n',
-          mapPath: dest + '.map',
-        },
+      const res = utils.concatFiles(
+        styles.map(({ id, code, map }) => ({
+          code,
+          map,
+          sourcesRelativeTo: id,
+        })),
+        dest,
+        options.banner,
       )
-
-      if (options.banner) {
-        concatenated.prepend(options.banner + '\n')
-      }
-
-      const res = concatenated.toStringWithSourceMap({
-        file: path.basename(dest),
-      })
 
       return Promise.all([
         utils.writeFile(dest, res.code),
-        utils.writeFile(dest + '.map', res.map.toString()),
+        utils.writeFile(dest + '.map', res.map),
       ]).then(([css, map]) => {
         console.log(css.path, chalk.gray(css.size))
         console.log(map.path, chalk.gray(map.size))

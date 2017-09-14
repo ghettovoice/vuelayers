@@ -4,6 +4,7 @@ const hljs = require('highlight.js')
 const { escape } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
+const concat = require('source-map-concat')
 const postcss = require('postcss')
 const config = require('./config')
 
@@ -193,6 +194,27 @@ function compileVarsReplaceLoader () {
   })
 }
 
+function concatFiles (files, dest, banner) {
+  const concatenated = concat(files, {
+    delimiter: '\n',
+    mapPath: dest + '.map',
+  })
+
+  if (banner) {
+    concatenated.prepend(banner + '\n')
+  }
+
+  const { code, map } = concatenated.toStringWithSourceMap({
+    file: path.basename(dest),
+  })
+
+  return {
+    id: dest,
+    code: code,
+    map: map.toString(),
+  }
+}
+
 module.exports = {
   resolve,
   assetsPath,
@@ -206,4 +228,5 @@ module.exports = {
   vueMarkdownLoaderConfig,
   compileVarsReplacement,
   compileVarsReplaceLoader,
+  concatFiles,
 }
