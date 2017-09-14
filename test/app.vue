@@ -91,9 +91,9 @@
 
 <script>
   import { range, random } from 'lodash/fp'
-  import { ol as vlol } from '../src'
-  import VlLayerVector from '../src/components/layer/vector/layer.vue'
-  import VlSourceVector from '../src/components/source/vector/source.vue'
+  import { core } from '../src'
+
+  const { ol: vlol } = core
 
   const computed = {
   }
@@ -136,9 +136,6 @@
   }
 
   export default {
-    components: {
-      VlSourceVector,
-      VlLayerVector },
     name: 'app',
     computed,
     methods,

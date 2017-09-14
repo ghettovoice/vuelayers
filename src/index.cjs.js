@@ -17,7 +17,7 @@ const VueLayers = {
   VERSION: 'C_PKG_VERSION',
   // install
   install,
-  ...core,
+  core,
   ...components,
 }
 export default VueLayers

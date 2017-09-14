@@ -11,20 +11,16 @@
   import VectorLayer from 'ol/layer/vector'
   import VectorSource from 'ol/source/vector'
   import olcontrol from 'ol/control'
-  import mergeDescriptors from '../../utils/multi-merge-descriptors'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
-  import '../../rx-ext'
-  import { proj as projHelper } from '../../ol-ext'
-  import cmp from '../ol-cmp'
-  import layersContainer from '../layers-container'
-  import interactionsContainer from '../interactions-container'
-  import overlaysContainer from '../overlays-container'
-  import featuresContainer from '../features-container'
-  import * as assert from '../../utils/assert'
+  import { ol as vlol, rx as vlrx, mixins, utils } from '../../core'
+
+  const { proj: projHelper } = vlol
+  const { mergeDescriptors, assert } = utils
+  const { olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer } = mixins
 
   const props = {
     // todo remove when vl-control-* components will be ready
@@ -201,7 +197,7 @@
       const vm = this
 
       return mergeDescriptors(
-        this::cmp.methods.getServices(),
+        this::olCmp.methods.getServices(),
         this::layersContainer.methods.getServices(),
         this::interactionsContainer.methods.getServices(),
         this::overlaysContainer.methods.getServices(),
@@ -314,7 +310,7 @@
 
   export default {
     name: 'vl-map',
-    mixins: [cmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer],
+    mixins: [olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer],
     props,
     methods,
     created () {
@@ -362,12 +358,12 @@
     const ft = 100
     // pointer
     const pointerEvents = Observable.merge(
-      Observable.fromOlEvent(this.$map, [
+      vlrx.fromOlEvent(this.$map, [
         'click',
         'dblclick',
         'singleclick',
       ]),
-      Observable.fromOlEvent(this.$map, [
+      vlrx.fromOlEvent(this.$map, [
         'pointerdrag',
         'pointermove',
       ]).throttleTime(ft)
@@ -377,7 +373,7 @@
       coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection()),
     }))
     // other
-    const otherEvents = Observable.fromOlEvent(this.$map, [
+    const otherEvents = vlrx.fromOlEvent(this.$map, [
       'movestart',
       'moveend',
       'postrender',

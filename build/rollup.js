@@ -20,104 +20,152 @@ const config = require('./config')
 
 const bundles = argv.bundles
   ? argv.bundles.split(',').map(s => s.trim())
-  : ['es', 'umd', 'umd-min', 'cjs', 'comp']
+  : ['es', 'umd', 'umd-min', 'cjs']
 
-Promise.resolve(fs.ensureDir(config.outDir))
-  // ES6
-  .then(() => bundles.includes('es') && bundle({
+const modules = [
+  // lib core
+  {
+    entry: 'core',
+    bundleName: 'core/index',
+    styleName: 'core/style',
+  },
+  // components
+  {
+    entry: 'components/feature/index',
+    bundleName: 'feature/index',
+    styleName: 'feature/style',
+  },
+  {
+    entry: 'components/map/index',
+    bundleName: 'map/index',
+    styleName: 'map/style',
+  },
+].map(m => Object.assign(m, {
+  entryPath: path.join(utils.resolve('src'), m.entry) + '.js',
+}))
+const modulesForExternalize = modules.map(({ entry, bundleName }) => ({
+  src: entry.replace(/\/index$/, ''),
+  dest: path.join('es', bundleName.replace(/\/index$/, '')),
+}))
+
+Promise.resolve()
+  // ES index
+  .then(() => cookBundle({
     outDir: config.outDir,
     format: 'es',
-    bundleName: config.name + '.es',
-    styleName: config.name,
+    bundleName: 'es/index',
+    styleName: 'es/style',
     entry: config.entry,
-    external: nodeExternal(),
+    external: externals(),
     banner: config.banner,
-    varName: config.fullname,
+    modules: modulesForExternalize,
   }))
-  // CommonJS
-  .then(() => bundles.includes('cjs') && bundle({
+  .then(() => Promise.all(modules.map(m => cookBundle({
     outDir: config.outDir,
-    format: 'cjs',
-    bundleName: config.name + '.cjs',
-    styleName: config.name,
-    entry: config.cjsEntry,
-    external: nodeExternal(),
+    format: 'es',
+    bundleName: path.join('es', m.bundleName),
+    styleName: m.styleName ? path.join('es', m.styleName) : false,
+    entry: m.entryPath,
+    external: externals(),
     banner: config.banner,
-    varName: config.fullname,
-  }))
-  // UMD
-  .then(() => bundles.includes('umd') && bundle({
-    outDir: config.outDir,
-    format: 'umd',
-    bundleName: config.name + '.umd',
-    styleName: config.name,
-    entry: config.cjsEntry,
-    env: 'development',
-    external: ['vue', 'openlayers', 'ol'],
-    globals: {
-      vue: 'Vue',
-      openlayers: 'ol',
-    },
-    banner: config.banner,
-    varName: config.fullname,
-  }))
-  // UMD minified
-  .then(() => bundles.includes('umd-min') && bundle({
-    outDir: config.outDir,
-    format: 'umd',
-    bundleName: config.name + '.umd.min',
-    styleName: config.name,
-    entry: config.cjsEntry,
-    env: 'production',
-    external: ['vue', 'openlayers', 'ol'],
-    globals: {
-      vue: 'Vue',
-      openlayers: 'ol',
-    },
-    banner: config.banner,
-    varName: config.fullname,
-  }))
-  // Separate CommonJS modules
-  .then(() => {
-    return bundles.includes('comp') && Promise.all([
-      getUtils(),
-      getCommons(),
-      getComponents(),
-    ]).then(result => {
-      let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
-      let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
+    modules: modulesForExternalize,
+  }))))
 
-      return Promise.all(
-        [
-          bundle({
-            outDir: config.outDir,
-            format: 'cjs',
-            bundleName: 'modules/index',
-            styleName: 'modules/style',
-            entry: config.cjsEntry,
-            external: nodeExternal(),
-            modules: true,
-            bundlesMap,
-            banner: config.banner,
-            varName: config.fullname,
-          }),
-        ].concat(
-          bundles.map(opts => bundle({
-            outDir: config.outDir,
-            format: 'cjs',
-            entry: opts.entry,
-            bundleName: opts.bundleName,
-            styleName: opts.styleName,
-            external: nodeExternal(),
-            modules: true,
-            bundlesMap,
-            banner: config.banner,
-            varName: config.fullname,
-          }))
-        )
-      )
-    })
-  })
+  // ES6
+  // .then(() => bundles.includes('es') && bundle({
+  //   outDir: config.outDir,
+  //   format: 'es',
+  //   bundleName: config.name + '.es',
+  //   styleName: config.name,
+  //   entry: config.entry,
+  //   external: nodeExternal(),
+  //   banner: config.banner,
+  //   varName: config.fullname,
+  // }))
+  // // CommonJS
+  // .then(() => bundles.includes('cjs') && bundle({
+  //   outDir: config.outDir,
+  //   format: 'cjs',
+  //   bundleName: config.name + '.cjs',
+  //   styleName: config.name,
+  //   entry: config.cjsEntry,
+  //   external: nodeExternal(),
+  //   banner: config.banner,
+  //   varName: config.fullname,
+  // }))
+  // // UMD
+  // .then(() => bundles.includes('umd') && bundle({
+  //   outDir: config.outDir,
+  //   format: 'umd',
+  //   bundleName: config.name + '.umd',
+  //   styleName: config.name,
+  //   entry: config.cjsEntry,
+  //   env: 'development',
+  //   external: ['vue', 'openlayers', 'ol'],
+  //   globals: {
+  //     vue: 'Vue',
+  //     openlayers: 'ol',
+  //   },
+  //   banner: config.banner,
+  //   varName: config.fullname,
+  // }))
+  // // UMD minified
+  // .then(() => bundles.includes('umd-min') && bundle({
+  //   outDir: config.outDir,
+  //   format: 'umd',
+  //   bundleName: config.name + '.umd.min',
+  //   styleName: config.name,
+  //   entry: config.cjsEntry,
+  //   env: 'production',
+  //   external: ['vue', 'openlayers', 'ol'],
+  //   globals: {
+  //     vue: 'Vue',
+  //     openlayers: 'ol',
+  //   },
+  //   banner: config.banner,
+  //   varName: config.fullname,
+  // }))
+  // // Separate CommonJS modules
+  // .then(() => {
+  //   return bundles.includes('comp') && Promise.all([
+  //     getUtils(),
+  //     getCommons(),
+  //     getComponents(),
+  //   ]).then(result => {
+  //     let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
+  //     let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
+  //
+  //     return Promise.all(
+  //       [
+  //         bundle({
+  //           outDir: config.outDir,
+  //           format: 'cjs',
+  //           bundleName: 'modules/index',
+  //           styleName: 'modules/style',
+  //           entry: config.cjsEntry,
+  //           external: nodeExternal(),
+  //           modules: true,
+  //           bundlesMap,
+  //           banner: config.banner,
+  //           varName: config.fullname,
+  //         }),
+  //       ].concat(
+  //         bundles.map(opts => bundle({
+  //           outDir: config.outDir,
+  //           format: 'cjs',
+  //           entry: opts.entry,
+  //           bundleName: opts.bundleName,
+  //           styleName: opts.styleName,
+  //           external: nodeExternal(),
+  //           modules: true,
+  //           bundlesMap,
+  //           banner: config.banner,
+  //           varName: config.fullname,
+  //         }))
+  //       )
+  //     )
+  //   })
+  // })
   // All done
   .then(() => {
     notifier.notify({
@@ -131,7 +179,7 @@ Promise.resolve(fs.ensureDir(config.outDir))
   })
 
 // helpers
-function bundle (opts = {}) {
+function cookBundle (opts = {}) {
   let bundleName = opts.bundleName
   let cssBundleName = opts.styleName === true
     ? bundleName
@@ -151,8 +199,8 @@ function bundle (opts = {}) {
     ...(opts.modules ? [
       externalize({
         root: utils.resolve('src'),
-        newRoot: 'vuelayers/dist',
-        map: opts.bundlesMap,
+        newRoot: path.relative(path.dirname(utils.resolve('')), opts.outDir),
+        map: opts.modules,
       }),
     ] : []),
     replace({
@@ -284,7 +332,7 @@ function bundle (opts = {}) {
   })
 }
 
-function nodeExternal () {
+function externals () {
   const deps = [config.name].concat(Object.keys(dependencies))
     .concat(Object.keys(peerDependencies))
     .concat(Object.keys(devDependencies))

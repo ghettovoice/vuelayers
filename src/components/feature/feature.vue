@@ -14,15 +14,11 @@
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/map'
   import 'rxjs/add/operator/mergeAll'
-  import '../../rx-ext'
-  import mergeDescriptors from '../../utils/multi-merge-descriptors'
-  import plainProps from '../../utils/plain-props'
-  import cmp from '../ol-cmp'
-  import useMapCmp from '../use-map-cmp'
-  import stylesContainer from '../styles-container'
-  import geometryContainer from '../geometry-container'
-  import { geoJson } from '../../ol-ext'
-  import * as assert from '../../utils/assert'
+  import { ol as vlol, rx as vlrx, utils, mixins } from '../../core'
+
+  const { geoJson } = vlol
+  const { mergeDescriptors, plainProps, assert } = utils
+  const { olCmp, useMapCmp, stylesContainer, geometryContainer } = mixins
 
   const mergeNArg = merge.convert({ fixed: false })
 
@@ -81,7 +77,7 @@
       const vm = this
 
       return mergeDescriptors(
-        this::cmp.methods.getServices(),
+        this::olCmp.methods.getServices(),
         this::geometryContainer.methods.getServices(),
         this::stylesContainer.methods.getServices(),
         {
@@ -156,7 +152,7 @@
 
   export default {
     name: 'vl-feature',
-    mixins: [cmp, useMapCmp, geometryContainer, stylesContainer],
+    mixins: [olCmp, useMapCmp, geometryContainer, stylesContainer],
     props,
     computed,
     methods,
@@ -205,14 +201,14 @@
     const getPropValue = prop => this.$feature.get(prop)
     const ft = 100
     // all plain properties
-    const propChanges = Observable.fromOlEvent(
+    const propChanges = vlrx.fromOlEvent(
       this.$feature,
       'propertychange',
       ({ key }) => ({ prop: key, value: getPropValue(key) })
     ).throttleTime(ft)
       .distinctUntilChanged(isEqual)
     // id, style and other generic changes
-    const changes = Observable.fromOlEvent(
+    const changes = vlrx.fromOlEvent(
       this.$feature,
       'change'
     ).map(() => Observable.create(obs => {

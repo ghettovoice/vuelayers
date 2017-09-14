@@ -9,7 +9,7 @@ module.exports = function externalize (options) {
     newRoot: process.cwd(),
     include: 'src/**',
     exclude: 'node_modules/**',
-    regExp: /'(\.{1,2}\/)+([^.'\n]+)'/g,
+    regExp: /'(?:\.{1,2}\/)+([^.'\n]+)'/g,
     map: {},
   }, options)
 

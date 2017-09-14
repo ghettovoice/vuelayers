@@ -7,10 +7,11 @@
   import 'rxjs/add/operator/debounceTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
-  import '../../rx-ext'
-  import { MIN_ZOOM, MAX_ZOOM, EPSG_3857, ZOOM_FACTOR, proj, geoJson } from '../../ol-ext'
-  import cmp from '../ol-virt-cmp'
-  import * as assert from '../../utils/assert'
+  import { ol as vlol, rx as vlrx, mixins, utils } from '../../core'
+
+  const { MIN_ZOOM, MAX_ZOOM, EPSG_3857, ZOOM_FACTOR, proj, geoJson } = vlol
+  const { olVirtCmp } = mixins
+  const { assert } = utils
 
   const props = {
     center: {
@@ -192,7 +193,7 @@
 
   export default {
     name: 'vl-view',
-    mixins: [cmp],
+    mixins: [olVirtCmp],
     props,
     computed,
     methods,
@@ -233,7 +234,7 @@
     assert.hasView(this)
 
     const ft = 100
-    const resolution = Observable.fromOlChangeEvent(this.$view, 'resolution', true, ft)
+    const resolution = vlrx.fromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution.map(() => ({
       prop: 'zoom',
       value: this::getZoom(),
@@ -241,8 +242,8 @@
       .distinctUntilChanged(isEqual)
 
     const changes = Observable.merge(
-      Observable.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
-      Observable.fromOlChangeEvent(this.$view, 'rotation', true, ft),
+      vlrx.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
+      vlrx.fromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
       zoom
     )

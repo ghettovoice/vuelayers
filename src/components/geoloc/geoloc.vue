@@ -7,12 +7,11 @@
 
 <script>
   import Geolocation from 'ol/geolocation'
-  import { Observable } from 'rxjs/Observable'
-  import '../../rx-ext'
-  import { EPSG_4326 } from '../../ol-ext'
-  import cmp from '../ol-cmp'
-  import useMapCmp from '../use-map-cmp'
-  import * as assert from '../../utils/assert'
+  import { ol as vlol, rx as vlrx, mixins, utils } from '../../core'
+
+  const { EPSG_4326 } = vlol
+  const { olCmp, useMapCmp } = mixins
+  const { assert } = utils
 
   const props = {
     tracking: {
@@ -110,7 +109,7 @@
 
   export default {
     name: 'vl-geoloc',
-    mixins: [cmp, useMapCmp],
+    mixins: [olCmp, useMapCmp],
     props,
     computed,
     methods,
@@ -150,7 +149,7 @@
     assert.hasGeolocation(this)
 
     const ft = 100
-    const changes = Observable.fromOlChangeEvent(
+    const changes = vlrx.fromOlChangeEvent(
       this.$geolocation,
       [
         'accuracy',

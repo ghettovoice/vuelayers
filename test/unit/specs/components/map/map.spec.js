@@ -2,7 +2,7 @@
 import olMap from 'ol/map'
 import olView from 'ol/view'
 import Vue from 'vue'
-import { VM_PROP } from '../../../../../src/consts'
+import { VM_PROP } from '../../../../../src/core/consts'
 import Map from '../../../../../src/components/map'
 
 describe('vl-map', () => {

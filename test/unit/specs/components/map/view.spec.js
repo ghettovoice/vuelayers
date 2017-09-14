@@ -2,7 +2,7 @@
 import olView from 'ol/view'
 import Vue from 'vue'
 import Map from '../../../../../src/components/map'
-import { VM_PROP } from '../../../../../src/consts'
+import { VM_PROP } from '../../../../../src/core/consts'
 
 describe('view component', () => {
   const Ctor = Vue.extend(Map.View)

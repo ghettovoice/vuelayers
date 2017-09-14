@@ -7,14 +7,14 @@
 <script>
   import uuid from 'uuid/v4'
   import { isEqual } from 'lodash/fp'
+  import Overlay from 'ol/overlay'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
-  import '../../rx-ext'
-  import Overlay from 'ol/overlay'
-  import cmp from '../ol-cmp'
-  import useMapCmp from '../use-map-cmp'
-  import { OVERLAY_POSITIONING, proj as projHelper } from '../../ol-ext'
-  import * as assert from '../../utils/assert'
+  import { ol as vlol, rx as vlrx, mixins, utils } from '../../core'
+
+  const { OVERLAY_POSITIONING, proj: projHelper } = vlol
+  const { olCmp, useMapCmp } = mixins
+  const { assert } = utils
 
   const props = {
     id: {
@@ -108,7 +108,7 @@
      */
     refresh () {
       return Promise.all([
-        cmp.methods.refresh(),
+        olCmp.methods.refresh(),
         new Promise(resolve => {
           this.$overlay.once('change:position', () => resolve())
           this.$overlay.setPosition(this.$overlay.getPosition().slice())
@@ -142,7 +142,7 @@
   // todo add scoped slot support?
   export default {
     name: 'vl-overlay',
-    mixins: [cmp, useMapCmp],
+    mixins: [olCmp, useMapCmp],
     props,
     computed,
     methods,
@@ -187,8 +187,8 @@
 
     const ft = 100
     const changes = Observable.merge(
-      Observable.fromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
-      Observable.fromOlChangeEvent(this.$overlay, [
+      vlrx.fromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
+      vlrx.fromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
       ], true, ft)
