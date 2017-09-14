@@ -2,7 +2,7 @@
 
 ```js
 import { kebabCase, range, random } from 'lodash/fp'
-import { ol as vlol } from 'C_PKG_NAME'
+import { ol as vlol } from 'vuelayers'
 import pacmanFeaturesCollection from '../static/sample-data/pacman.geojson'
 
 const methods = {

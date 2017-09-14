@@ -61,8 +61,19 @@ function cssLoaders (options) {
     css: generateLoaders(),
     postcss: generateLoaders(),
     less: generateLoaders('less'),
-    sass: generateLoaders('sass', { indentedSyntax: true }),
-    scss: generateLoaders('sass'),
+    sass: generateLoaders('sass', {
+      includePaths: [
+        resolve(''),
+        resolve('node_modules'),
+      ],
+      indentedSyntax: true,
+    }),
+    scss: generateLoaders('sass', {
+      includePaths: [
+        resolve(''),
+        resolve('node_modules'),
+      ],
+    }),
     stylus: generateLoaders('stylus'),
     styl: generateLoaders('stylus'),
   }
@@ -126,8 +137,12 @@ function ensureDir (dir) {
   })
 }
 
-function getSize (data) {
-  return (data.length / 1024).toFixed(2) + 'kb'
+function getSize (bytes) {
+  return bytes < 10000
+    ? bytes.toFixed(0) + ' B'
+    : bytes < 1024000
+      ? (bytes / 1024).toPrecision(3) + ' kB'
+      : (bytes / 1024 / 1024).toPrecision(4) + ' MB'
 }
 
 function vueMarkdownLoaderConfig () {

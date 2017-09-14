@@ -1,12 +1,10 @@
 /*! VueLayers.js docs site */
 @import variables
-@import ~highlight.js/styles/github-gist
-// import OpenLayers and VueLayers styles
-@import ~ol/ol
+@import ~highlight.js/styles/atom-one-light
+// import VueLayers styles
 @import ~vuelayers/dist/vuelayers
-// Import Bulma and Buefy styles
-@import ~bulma
-@import ~buefy/src/scss/buefy
+// Import Buefy styles
+@import ~buefy/src/scss/buefy-build
 
 html, body
   height: 100%
@@ -55,6 +53,13 @@ pre, pre.hljs
     font-weight: 400
     font-size: 1.25rem
     line-height: 1.25
+  .tabs
+    ul
+      list-style: none
+      margin-left: 0
+      margin-top: 0
+    li + li
+      margin-top: 0
 
 .buttons
   margin: .5rem 0

@@ -18,7 +18,7 @@
           </template>
         </vl-geoloc>
 
-        <vl-interaction-select @select="select" @unselect="unselect" :selected.sync="selected"/>
+        <vl-interaction-select @select="select" :features.sync="selectedFeatures"/>
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
@@ -101,16 +101,11 @@
   const methods = {
     select ({ feature }) {
       if (feature.get('features') && feature.get('features').length > 1) {
-        this.selected = this.selected.filter(id => id !== feature.getId())
+        this.selectedFeatures = this.selectedFeatures.filter(id => id !== feature.getId())
         this.$refs.view.fit(vlol.geom.collection(feature.get('features').map(f => f.getGeometry())).getExtent(), {
           duration: 500,
         })
-      } else {
-        this.selectedFeatures.push(vlol.geoJson.writeFeature(feature))
       }
-    },
-    unselect ({ feature }) {
-      this.selectedFeatures = this.selectedFeatures.filter(f => f.id !== feature.getId())
     },
     loadData () {
       const points = []

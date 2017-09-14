@@ -20,6 +20,8 @@ const { dependencies, peerDependencies, devDependencies } = require('../package.
 const utils = require('./utils')
 const config = require('./config')
 
+// todo make time for refactoring of this shit
+
 const bundles = argv.bundles
   ? argv.bundles.split(',').map(s => s.trim())
   : ['es', 'umd', 'umd-min', 'cjs', 'comp']
@@ -69,31 +71,38 @@ Promise.resolve(utils.ensureDir(config.outDir))
   }))
   // Separate CommonJS modules
   .then(() => {
-    return bundles.includes('comp') && bundle({
-      format: 'cjs',
-      bundleName: 'modules/index',
-      styleName: 'modules/style',
-      entry: config.cjsEntry,
-      external: nodeExternal(),
-    }).then(() => Promise.all([
+    return bundles.includes('comp') && Promise.all([
       getUtils(),
       getCommons(),
       getComponents(),
-    ]))
-      .then(result => {
-        let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
-        let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
+    ]).then(result => {
+      let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
+      let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
 
-        return Promise.all(bundles.map(opts => bundle({
-          format: 'cjs',
-          entry: opts.entry,
-          bundleName: opts.bundleName,
-          styleName: opts.styleName,
-          external: nodeExternal(),
-          modules: true,
-          bundlesMap,
-        })))
-      })
+      return Promise.all(
+        [
+          bundle({
+            format: 'cjs',
+            bundleName: 'modules/index',
+            styleName: 'modules/style',
+            entry: config.cjsEntry,
+            external: nodeExternal(),
+            modules: true,
+            bundlesMap,
+          }),
+        ].concat(
+          bundles.map(opts => bundle({
+            format: 'cjs',
+            entry: opts.entry,
+            bundleName: opts.bundleName,
+            styleName: opts.styleName,
+            external: nodeExternal(),
+            modules: true,
+            bundlesMap,
+          })),
+        ),
+      )
+    })
   })
   // All done
   .then(() => {
@@ -119,40 +128,53 @@ function bundle (opts = {}) {
 
   const plugins = [
     ...(opts.modules ? [externalize(opts.bundlesMap)] : []),
-    replace(Object.assign(replaces(opts), {
+    replace({
       sourceMap: true,
-    })),
+      values: replaces(opts),
+    }),
     vue({
       compileTemplate: true,
       htmlMinifier: { collapseBooleanAttributes: false },
       sourceMap: true,
       scss: {
-        outputStyle: 'compressed',
         sourceMap: opts.styleName
           ? path.join(config.outDir, opts.styleName + '.css')
           : false,
         sourceMapContents: true,
         includePaths: [
-          utils.resolve('src'),
+          utils.resolve(''),
           utils.resolve('node_modules'),
         ],
       },
       css: (_, styles) => {
         if (opts.styleName === false) return
 
-        postcssPromise = Promise.all(styles.map(postcssProcess))
-          .then(results => {
-            const dest = path.join(config.outDir, opts.styleName + '.css')
-            const concat = new Concat(true, opts.styleName + '.css', '\n')
-            concat.add(null, config.banner)
-            results.forEach(({ css, map, style }) => concat.add(path.relative(config.outDir, style.id), css, map))
-
-            return Promise.all([
-              utils.writeFile(dest, concat.content),
-              utils.writeFile(dest + '.map', concat.sourceMap),
-            ])
+        postcssPromise = Promise.all(
+          styles.map(({ id, $compiled: { code: css, map } }) => postcssProcess({ id, css, map }))
+        ).then(results => {
+          const dest = path.join(config.outDir, opts.styleName + '.css')
+          const concat = new Concat(true, opts.styleName + '.css', '\n')
+          concat.add(null, config.banner)
+          results.forEach(({ css, map, style }) => {
+            console.log(path.relative(config.outDir, style.id), map)
+            concat.add(path.relative(config.outDir, style.id), css, map)
           })
+
+          return Promise.all([
+            utils.writeFile(dest, concat.content),
+            utils.writeFile(dest + '.map', concat.sourceMap),
+          ])
+        })
       },
+    }),
+    sass({
+      output: path.join(config.outDir, opts.styleName + '.css'),
+      includePaths: [
+        utils.resolve(''),
+        utils.resolve('node_modules'),
+      ],
+      banner: config.banner,
+      processor: postcssProcess,
     }),
     babel({
       runtimeHelpers: true,
@@ -221,12 +243,12 @@ function bundle (opts = {}) {
     .then(([jsSrc, jsMap, css]) => {
       spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
-      console.log(jsSrc.path + ' ' + chalk.gray(jsSrc.size))
-      console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
+      console.log(jsSrc.path, chalk.gray(jsSrc.size))
+      console.log(jsMap.path, chalk.gray(jsMap.size))
 
       if (css) {
-        css[0] && console.log(css[0].path + ' ' + chalk.gray(css[0].size))
-        css[1] && console.log(css[1].path + ' ' + chalk.gray(css[1].size))
+        css[0] && console.log(css[0].path, chalk.gray(css[0].size))
+        css[1] && console.log(css[1].path, chalk.gray(css[1].size))
       }
     })
     .catch(err => {
@@ -237,17 +259,18 @@ function bundle (opts = {}) {
 
 function postcssProcess (style) {
   return postcss(utils.postcssPlugins())
-    .process(style.$compiled.code, {
+    .process(style.css, {
       from: path.relative(config.outDir, style.id),
       to: path.relative(config.outDir, style.id),
       map: {
         inline: false,
-        prev: style.$compiled.map,
+        prev: style.map,
       },
     })
     .then(result => ({
       css: result.css,
       map: result.map.toJSON(),
+      id: style.id,
       style,
     }))
 }
@@ -261,7 +284,10 @@ function nodeExternal () {
 }
 
 function replaces (opts = {}) {
-  const obj = Object.assign({}, config.replaces)
+  const obj = Object.assign({}, config.replaces, {
+    '@import ~': '@import ',
+    '@import "~': '@import "',
+  })
 
   if (opts.env) {
     obj['process.env.NODE_ENV'] = opts.env
@@ -270,8 +296,6 @@ function replaces (opts = {}) {
   if (opts.format === 'cjs') {
     obj['lodash-es'] = 'lodash'
   }
-
-  Object.assign(obj, opts.customReplaces)
 
   return obj
 }
@@ -412,6 +436,119 @@ function externalize (modulesMap) {
         code: ms.toString(),
         map: ms.generateMap({ hires: true }),
       }
+    },
+  }
+}
+
+// originally taken from https://github.com/differui/rollup-plugin-sass/blob/master/src/index.js
+function sass (options) {
+  const filter = createFilter(options.include || [
+    '**/*.css',
+    '**/*.sass',
+    '**/*.scss',
+  ], options.exclude)
+  const styles = []
+  const styleMaps = {}
+  let dest = ''
+  if (typeof options.output === 'string') {
+    dest = options.output
+  }
+
+  options.output = options.output || false
+  options.insert = options.insert || false
+  options.processor = options.processor || null
+  options.options = Object.assign({}, options, options.options)
+  options.banner = options.banner || ''
+
+  return {
+    name: 'sass',
+
+    options (opts) {
+      dest = dest || opts.dest || opts.entry
+      if (dest && (dest.endsWith('.js') || dest.endsWith('.ts'))) {
+        dest = dest.slice(0, -3)
+        dest = `${dest}.css`
+      }
+    },
+
+    transform (code, id) {
+      if (!filter(id)) {
+        return null
+      }
+
+      const paths = [path.dirname(id), process.cwd()]
+      const sassConfig = Object.assign({
+        file: id,
+        outFile: id,
+        sourceMap: true,
+        data: code,
+        indentedSyntax: path.extname(id) === '.sass',
+        omitSourceMapUrl: true,
+        sourceMapContents: true,
+      }, options.options)
+
+      sassConfig.includePaths = sassConfig.includePaths
+        ? sassConfig.includePaths.concat(paths)
+        : paths
+
+      try {
+        let { css, map } = require('node-sass').renderSync(sassConfig)
+        css = css.toString()
+        map = map.toString()
+
+        if (!css.trim()) return
+
+        return Promise.resolve({ id, css, map })
+          .then(style => {
+            // if (typeof options.processor === 'function') {
+            //   return options.processor(style)
+            // }
+
+            return style
+          })
+          .then(({ id, css, map }) => {
+            if (styleMaps[id]) {
+              styleMaps[id].css = css
+              styleMaps[id].map = map
+            } else {
+              styles.push(styleMaps[id] = { id, css, map })
+            }
+
+            return { id, css, map }
+          })
+      } catch (error) {
+        throw error
+      }
+    },
+
+    ongenerate () {
+      if (!styles.length || options.output === false) {
+        return
+      }
+
+      if (typeof options.output === 'function') {
+        return options.output(styles)
+      }
+
+      if (!dest) return
+
+      const concat = new Concat(true, path.basename(dest), '\n')
+      concat.add(null, options.banner)
+      styles.forEach(({ css, map, id }) => {
+        console.log(path.relative(path.dirname(dest), id), map)
+        concat.add(path.relative(path.dirname(dest), id), css, map)
+      })
+
+      return utils.ensureDir(path.dirname(dest))
+        .then(() => Promise.all([
+          utils.writeFile(dest, concat.content),
+          utils.writeFile(dest + '.map', concat.sourceMap),
+        ]))
+        .then(res => {
+          console.log(res[0].path, chalk.gray(res[0].size))
+          console.log(res[1].path, chalk.gray(res[1].size))
+          return res
+        })
     },
   }
 }

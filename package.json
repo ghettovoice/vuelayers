@@ -6,7 +6,7 @@
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "dist/vuelayers.cjs.js",
   "module": "dist/vuelayers.es.js",
-  "browser": "dist/vuelayers.umd.min.js",
+  "browser": "dist/vuelayers.umd.js",
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
@@ -23,7 +23,7 @@
     "travis": "npm run travis-test && npm run coveralls",
     "travis-test": "npm run unit && npm run e2e -- --env travis",
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls",
-    "docs-start": "node build/dev-server.js --name docs",
+    "docs-start": "cross-env PORT=8082 node build/dev-server.js --name docs",
     "docs-clean": "rm -rf dist-docs",
     "docs-build": "npm run docs-clean && cross-env NODE_ENV=production BASE_URL=/vuelayers/ webpack --config=build/webpack.docs.prod.conf.js --progress",
     "docs-deploy": "gh-pages -d dist-docs"
