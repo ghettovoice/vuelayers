@@ -7,12 +7,15 @@
  * @license MIT
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
+
 import VueLayers from './index.cjs'
 
 export default VueLayers
 export const {
   install,
+  consts,
   mixins,
+  utils,
   ol,
   rx,
   // common

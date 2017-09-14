@@ -4,17 +4,15 @@ const chalk = require('chalk')
 const ora = require('ora')
 const glob = require('glob')
 const rollup = require('rollup')
-const postcss = require('postcss')
 const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
 const uglify = require('rollup-plugin-uglify')
-const createFilter = require('rollup-pluginutils').createFilter
-const MagicString = require('magic-string')
+const externalize = require('./rollup-plugins/externalize')
+const sass = require('./rollup-plugins/sass')
 const notifier = require('node-notifier')
-const Concat = require('concat-with-sourcemaps')
 const argv = require('yargs').argv
 const { dependencies, peerDependencies, devDependencies } = require('../package.json')
 const utils = require('./utils')
@@ -24,25 +22,32 @@ const bundles = argv.bundles
   ? argv.bundles.split(',').map(s => s.trim())
   : ['es', 'umd', 'umd-min', 'cjs', 'comp']
 
-Promise.resolve(utils.ensureDir(config.outDir))
+Promise.resolve(fs.ensureDir(config.outDir))
   // ES6
   .then(() => bundles.includes('es') && bundle({
+    outDir: config.outDir,
     format: 'es',
     bundleName: config.name + '.es',
     styleName: config.name,
     entry: config.entry,
     external: nodeExternal(),
+    banner: config.banner,
+    varName: config.fullname,
   }))
   // CommonJS
   .then(() => bundles.includes('cjs') && bundle({
+    outDir: config.outDir,
     format: 'cjs',
     bundleName: config.name + '.cjs',
     styleName: config.name,
     entry: config.cjsEntry,
     external: nodeExternal(),
+    banner: config.banner,
+    varName: config.fullname,
   }))
   // UMD
   .then(() => bundles.includes('umd') && bundle({
+    outDir: config.outDir,
     format: 'umd',
     bundleName: config.name + '.umd',
     styleName: config.name,
@@ -53,9 +58,12 @@ Promise.resolve(utils.ensureDir(config.outDir))
       vue: 'Vue',
       openlayers: 'ol',
     },
+    banner: config.banner,
+    varName: config.fullname,
   }))
   // UMD minified
   .then(() => bundles.includes('umd-min') && bundle({
+    outDir: config.outDir,
     format: 'umd',
     bundleName: config.name + '.umd.min',
     styleName: config.name,
@@ -66,34 +74,49 @@ Promise.resolve(utils.ensureDir(config.outDir))
       vue: 'Vue',
       openlayers: 'ol',
     },
+    banner: config.banner,
+    varName: config.fullname,
   }))
   // Separate CommonJS modules
   .then(() => {
-    return bundles.includes('comp') && bundle({
-      format: 'cjs',
-      bundleName: 'modules/index',
-      styleName: 'modules/style',
-      entry: config.cjsEntry,
-      external: nodeExternal(),
-    }).then(() => Promise.all([
+    return bundles.includes('comp') && Promise.all([
       getUtils(),
       getCommons(),
       getComponents(),
-    ]))
-      .then(result => {
-        let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
-        let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
+    ]).then(result => {
+      let bundles = result.reduce((all, bundles) => all.concat(bundles), [])
+      let bundlesMap = bundles.map(({ src, dest }) => ({ src, dest }))
 
-        return Promise.all(bundles.map(opts => bundle({
-          format: 'cjs',
-          entry: opts.entry,
-          bundleName: opts.bundleName,
-          styleName: opts.styleName,
-          external: nodeExternal(),
-          modules: true,
-          bundlesMap,
-        })))
-      })
+      return Promise.all(
+        [
+          bundle({
+            outDir: config.outDir,
+            format: 'cjs',
+            bundleName: 'modules/index',
+            styleName: 'modules/style',
+            entry: config.cjsEntry,
+            external: nodeExternal(),
+            modules: true,
+            bundlesMap,
+            banner: config.banner,
+            varName: config.fullname,
+          }),
+        ].concat(
+          bundles.map(opts => bundle({
+            outDir: config.outDir,
+            format: 'cjs',
+            entry: opts.entry,
+            bundleName: opts.bundleName,
+            styleName: opts.styleName,
+            external: nodeExternal(),
+            modules: true,
+            bundlesMap,
+            banner: config.banner,
+            varName: config.fullname,
+          }))
+        )
+      )
+    })
   })
   // All done
   .then(() => {
@@ -110,6 +133,13 @@ Promise.resolve(utils.ensureDir(config.outDir))
 // helpers
 function bundle (opts = {}) {
   let bundleName = opts.bundleName
+  let cssBundleName = opts.styleName === true
+    ? bundleName
+    : (typeof opts.styleName === 'string'
+      ? opts.styleName
+      : undefined)
+  let vueStylesPromise = Promise.resolve()
+  let sassStylesPromise = Promise.resolve()
 
   if (['cjs', 'umd'].includes(opts.format)) {
     process.env.BABEL_ENV = 'production-cjs'
@@ -118,40 +148,40 @@ function bundle (opts = {}) {
   }
 
   const plugins = [
-    ...(opts.modules ? [externalize(opts.bundlesMap)] : []),
-    replace(Object.assign(replaces(opts), {
+    ...(opts.modules ? [
+      externalize({
+        root: utils.resolve('src'),
+        newRoot: 'vuelayers/dist',
+        map: opts.bundlesMap,
+      }),
+    ] : []),
+    replace({
       sourceMap: true,
-    })),
+      values: replaces(opts),
+    }),
     vue({
       compileTemplate: true,
       htmlMinifier: { collapseBooleanAttributes: false },
       sourceMap: true,
       scss: {
-        outputStyle: 'compressed',
-        sourceMap: opts.styleName
-          ? path.join(config.outDir, opts.styleName + '.css')
-          : false,
         sourceMapContents: true,
         includePaths: [
-          utils.resolve('src'),
           utils.resolve('node_modules'),
         ],
       },
       css: (_, styles) => {
-        if (opts.styleName === false) return
-
-        postcssPromise = Promise.all(styles.map(postcssProcess))
-          .then(results => {
-            const dest = path.join(config.outDir, opts.styleName + '.css')
-            const concat = new Concat(true, opts.styleName + '.css', '\n')
-            concat.add(null, config.banner)
-            results.forEach(({ css, map, style }) => concat.add(path.relative(config.outDir, style.id), css, map))
-
-            return Promise.all([
-              utils.writeFile(dest, concat.content),
-              utils.writeFile(dest + '.map', concat.sourceMap),
-            ])
-          })
+        vueStylesPromise = Promise.all(styles.map(({ id, $compiled: { code, map } }) => ({ id, code, map })))
+      },
+    }),
+    sass({
+      banner: opts.banner,
+      sass: {
+        includePaths: [
+          utils.resolve('node_modules'),
+        ],
+      },
+      output: styles => {
+        sassStylesPromise = Promise.all(styles)
       },
     }),
     babel({
@@ -190,66 +220,68 @@ function bundle (opts = {}) {
             }
           },
         },
-      }),
+      })
     )
   }
 
-  const dest = path.join(config.outDir, `${bundleName}.js`)
+  const dest = path.join(opts.outDir, `${bundleName}.js`)
+  let destCss = cssBundleName ? path.join(opts.outDir, cssBundleName + '.css') : undefined
   const spinner = ora(chalk.bold.blue(`cook ${bundleName} bundle...`)).start()
-  let postcssPromise
 
-  return Promise.resolve(utils.ensureDir(path.dirname(dest)))
-    .then(() => rollup.rollup({
-      input: opts.entry,
-      external: opts.external,
-      plugins,
-    }))
-    .then(bundler => bundler.generate({
-      format: opts.format,
-      banner: config.banner,
-      name: config.fullname,
-      // moduleId: config.name,
-      sourcemap: true,
-      sourcemapFile: dest,
-      globals: opts.globals,
-    }))
-    .then(({ code, map }) => Promise.all([
-      utils.writeFile(dest, code),
-      utils.writeFile(dest + '.map', map.toString()),
-      postcssPromise,
-    ]))
-    .then(([jsSrc, jsMap, css]) => {
-      spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
+  return rollup.rollup({
+    input: opts.entry,
+    external: opts.external,
+    plugins,
+  }).then(bundler => bundler.generate({
+    format: opts.format,
+    banner: opts.banner,
+    name: opts.varName,
+    // moduleId: config.name,
+    sourcemap: true,
+    sourcemapFile: dest,
+    globals: opts.globals,
+  })).then(js => {
+    if (!destCss) return { js, css: undefined }
+    // concat all extracted styles from Vue and Sass files
+    return Promise.all([
+      sassStylesPromise,
+      vueStylesPromise,
+    ]).then(([sassStyles, vueStyles]) => {
+      const { code, map } = utils.concatFiles(
+        (sassStyles || []).concat(vueStyles).map(({ id, code, map }) => ({
+          code,
+          map,
+          sourcesRelativeTo: id,
+        })),
+        destCss,
+        opts.banner
+      )
 
-      console.log(jsSrc.path + ' ' + chalk.gray(jsSrc.size))
-      console.log(jsMap.path + ' ' + chalk.gray(jsMap.size))
+      return utils.postcssProcess({
+        id: destCss,
+        code,
+        map,
+      })
+    }).then(css => ({ js, css }))
+  }).then(({ js, css }) => Promise.all([
+    utils.writeFile(dest, js.code),
+    utils.writeFile(dest + '.map', js.map),
+    ...(css ? [
+      utils.writeFile(destCss, css.code),
+      utils.writeFile(destCss + '.map', css.map),
+    ] : []),
+  ])).then(([jsSrc, jsMap, cssSrc, cssMap]) => {
+    spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
-      if (css) {
-        css[0] && console.log(css[0].path + ' ' + chalk.gray(css[0].size))
-        css[1] && console.log(css[1].path + ' ' + chalk.gray(css[1].size))
-      }
-    })
-    .catch(err => {
-      spinner.fail(chalk.red(`${bundleName} bundle is failed to create`))
-      throw err
-    })
-}
+    console.log(jsSrc.path, chalk.gray(jsSrc.size))
+    console.log(jsMap.path, chalk.gray(jsMap.size))
 
-function postcssProcess (style) {
-  return postcss(utils.postcssPlugins())
-    .process(style.$compiled.code, {
-      from: path.relative(config.outDir, style.id),
-      to: path.relative(config.outDir, style.id),
-      map: {
-        inline: false,
-        prev: style.$compiled.map,
-      },
-    })
-    .then(result => ({
-      css: result.css,
-      map: result.map.toJSON(),
-      style,
-    }))
+    cssSrc && console.log(cssSrc.path, chalk.gray(cssSrc.size))
+    cssMap && console.log(cssMap.path, chalk.gray(cssMap.size))
+  }).catch(err => {
+    spinner.fail(chalk.red(`${bundleName} bundle is failed to create`))
+    throw err
+  })
 }
 
 function nodeExternal () {
@@ -261,7 +293,10 @@ function nodeExternal () {
 }
 
 function replaces (opts = {}) {
-  const obj = Object.assign({}, config.replaces)
+  const obj = Object.assign({}, config.replaces, {
+    '@import ~': '@import ',
+    '@import "~': '@import "',
+  })
 
   if (opts.env) {
     obj['process.env.NODE_ENV'] = opts.env
@@ -270,8 +305,6 @@ function replaces (opts = {}) {
   if (opts.format === 'cjs') {
     obj['lodash-es'] = 'lodash'
   }
-
-  Object.assign(obj, opts.customReplaces)
 
   return obj
 }
@@ -377,41 +410,4 @@ function getUtils () {
       }))
     })
   })
-}
-
-function externalize (modulesMap) {
-  const filter = createFilter('src/**', 'node_modules/**')
-  const regex = /'(\.{1,2}\/)+([^.'\n]+)'/g
-
-  return {
-    name: 'externalize',
-    transform (code, id) {
-      if (!filter(id)) return null
-
-      const ms = new MagicString(code)
-      let match, start, end, hasReplacements
-
-      while ((match = regex.exec(code)) != null) {
-        // start, end without quotes
-        start = match.index + 1
-        end = start + match[0].length - 2
-
-        let extModulePath = path.resolve(path.dirname(id), match[0].slice(1, -1))
-        let extModuleRelPath = extModulePath.replace(utils.resolve('src') + '/', '')
-        let extModuleMap = modulesMap.find(({ src }) => src === extModuleRelPath)
-
-        if (extModuleMap) {
-          ms.overwrite(start, end, path.join('vuelayers/dist', extModuleMap.dest))
-          hasReplacements = true
-        }
-      }
-
-      if (!hasReplacements) return null
-
-      return {
-        code: ms.toString(),
-        map: ms.generateMap({ hires: true }),
-      }
-    },
-  }
 }

@@ -103,8 +103,8 @@
 </script>
 
 <style lang="sass">
-  // import base
-  @import styles/base
+  // import all styles
+  @import ./styles/main
 
   .layout
     margin: 0

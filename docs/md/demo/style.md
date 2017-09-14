@@ -3,16 +3,17 @@
 ```stylus
 @import variables
 @import ~highlight.js/styles/github-gist
-// import OpenLayers and C_PKG_FULLNAME styles
-@import ~ol/ol
-@import ~C_PKG_NAME/dist/C_PKG_NAME
-// Import Bulma and Buefy styles
-@import ~bulma
-@import ~buefy/src/scss/buefy
+// import VueLayers styles
+@import ~vuelayers/dist/vuelayers
+// Import Buefy styles
+@import ~buefy/src/scss/buefy-build
 
 html, body
   height: 100%
   width: 100%
+  box-sizing: border-box
+
+html *
   box-sizing: border-box
 
 .demo-app

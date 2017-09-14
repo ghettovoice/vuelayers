@@ -25,6 +25,10 @@
       <vld-home-content class="intro"/>
 
       <section class="buttons">
+        <router-link to="/demo" class="button is-primary is-large" title="View Live Demo">
+          <b-icon icon="gear"></b-icon>
+          <span>Live Demo</span>
+        </router-link>
         <router-link to="/start" class="button is-success is-large" title="Quick Start Guide">
           <span>Get started</span>
           <b-icon icon="arrow-right"></b-icon>

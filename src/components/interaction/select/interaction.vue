@@ -1,3 +1,9 @@
+<template>
+  <i :class="[$options.name]" style="display: none !important;">
+    <slot :features="features"></slot>
+  </i>
+</template>
+
 <script>
   import Vue from 'vue'
   import SelectInteraction from 'ol/interaction/select'
@@ -39,7 +45,7 @@
      * Initial selection
      * @type {string[]|number[]|GeoJSONFeature[]} Initial selection as Array of ids or Array of GeoJSON features
      */
-    selected: {
+    features: {
       type: Array,
       default: stubArray,
     },
@@ -107,7 +113,7 @@
      */
     mount () {
       this::interaction.methods.mount()
-      this.selected.forEach(this.select)
+      this.features.forEach(this.select)
     },
     /**
      * @return {void}
@@ -222,7 +228,7 @@
 
   const diffById = differenceWith((a, b) => extractId(a) === extractId(b))
   const watch = {
-    selected (value) {
+    features (value) {
       if (!this.$interaction) return
 
       let forSelect = diffById(value, this.$features)
@@ -277,7 +283,7 @@
       ({ selected, deselected, mapBrowserEvent }) => {
         ++this.rev
 
-        this.$emit('update:selected', this.$features.map(f => geoJson.writeFeature(f)))
+        this.$emit('update:features', this.$features.map(f => geoJson.writeFeature(f)))
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
       }

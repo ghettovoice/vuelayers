@@ -7,21 +7,54 @@
       <vl-view ref="view" :center="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
       <!-- interactions -->
-      <vl-interaction-select :selected.sync="selectedFeatures">
-        <vl-style-box>
-          <vl-style-stroke color="#423e9e" :width="7"/>
-          <vl-style-fill :color="[254, 178, 76, 0.7]"/>
-          <vl-style-circle :radius="5">
+      <vl-interaction-select :features.sync="selectedFeatures">
+        <template scope="select">
+          <!-- select styles -->
+          <vl-style-box>
             <vl-style-stroke color="#423e9e" :width="7"/>
             <vl-style-fill :color="[254, 178, 76, 0.7]"/>
-          </vl-style-circle>
-        </vl-style-box>
-        <vl-style-box :z-index="1">
-          <vl-style-stroke color="#d43f45" :width="2"/>
-          <vl-style-circle :radius="5">
+            <vl-style-circle :radius="5">
+              <vl-style-stroke color="#423e9e" :width="7"/>
+              <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+            </vl-style-circle>
+          </vl-style-box>
+          <vl-style-box :z-index="1">
             <vl-style-stroke color="#d43f45" :width="2"/>
-          </vl-style-circle>
-        </vl-style-box>
+            <vl-style-circle :radius="5">
+              <vl-style-stroke color="#d43f45" :width="2"/>
+            </vl-style-circle>
+          </vl-style-box>
+          <!--// select styles -->
+
+          <!-- selected feature popup -->
+          <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
+                      :position="pointOnSurface(feature.geometry)" :auto-pan="true">
+            <template scope="popup">
+              <vld-card>
+                <p slot="header" class="card-header-title">
+                  Feature ID {{ feature.id }}
+                </p>
+                <a slot="header" class="card-header-icon" title="Close"
+                   @click="selectedFeatures = selectedFeatures.filter(f => f.id !== feature.id)">
+                  <b-icon icon="close"/>
+                </a>
+
+                <div class="content">
+                  <p>
+                    Overlay popup content for Feature with ID <strong>{{ feature.id }}</strong>
+                  </p>
+                  <p>
+                    Popup: {{ JSON.stringify(popup) }}
+                  </p>
+                  <p>
+                    Feature: {{ JSON.stringify({ id: feature.id, properties: feature.properties }) }}
+                  </p>
+                </div>
+              </vld-card>
+            </template>
+          </vl-overlay>
+          <!--// selected popup -->
+        </template>
       </vl-interaction-select>
       <!--// interactions -->
 
@@ -96,35 +129,6 @@
         <!--// style -->
       </component>
       <!--// other layers -->
-
-      <!-- selected feature popup -->
-      <vl-overlay class="feature-popup" v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id"
-                  :position="pointOnSurface(feature.geometry)" :auto-pan="true">
-        <template scope="popup">
-          <vld-card>
-            <p slot="header" class="card-header-title">
-              Feature ID {{ feature.id }}
-            </p>
-            <a slot="header" class="card-header-icon" title="Close"
-               @click="selectedFeatures = selectedFeatures.filter(f => f.id !== feature.id)">
-              <b-icon icon="close"/>
-            </a>
-
-            <div class="content">
-              <p>
-                Overlay popup content for Feature with ID <strong>{{ feature.id }}</strong>
-              </p>
-              <p>
-                Popup: {{ JSON.stringify(popup) }}
-              </p>
-              <p>
-                Feature: {{ JSON.stringify({ id: feature.id, properties: feature.properties }) }}
-              </p>
-            </div>
-          </vld-card>
-        </template>
-      </vl-overlay>
-      <!--// selected popup -->
     </vl-map>
     <!--// app map -->
 

@@ -102,10 +102,9 @@ Stylesheet should be imported manually (`dist/vuelayers.css`).
 
 ```js
 import Vue from 'vue'
-import { Map, View, TileLayer, OsmSource } from 'vuelayers'
+import { Map, TileLayer, OsmSource } from 'vuelayers'
 
 Vue.use(Map)
-Vue.use(View)
 Vue.use(TileLayer)
 Vue.use(OsmSource)
 

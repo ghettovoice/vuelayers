@@ -4,6 +4,8 @@ const hljs = require('highlight.js')
 const { escape } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
+const concat = require('source-map-concat')
+const postcss = require('postcss')
 const config = require('./config')
 
 function resolve (relPath) {
@@ -61,8 +63,19 @@ function cssLoaders (options) {
     css: generateLoaders(),
     postcss: generateLoaders(),
     less: generateLoaders('less'),
-    sass: generateLoaders('sass', { indentedSyntax: true }),
-    scss: generateLoaders('sass'),
+    sass: generateLoaders('sass', {
+      includePaths: [
+        resolve(''),
+        resolve('node_modules'),
+      ],
+      indentedSyntax: true,
+    }),
+    scss: generateLoaders('sass', {
+      includePaths: [
+        resolve(''),
+        resolve('node_modules'),
+      ],
+    }),
     stylus: generateLoaders('stylus'),
     styl: generateLoaders('stylus'),
   }
@@ -90,6 +103,23 @@ function postcssPlugins () {
   ]
 }
 
+function postcssProcess ({ id, code, map }) {
+  return postcss(postcssPlugins())
+    .process(code, {
+      from: id,
+      to: id,
+      map: {
+        inline: false,
+        prev: map,
+      },
+    })
+    .then(({ css, map }) => ({
+      id,
+      code: css,
+      map: map.toString(),
+    }))
+}
+
 function vueLoaderConfig (extract) {
   return {
     loaders: Object.assign(
@@ -104,30 +134,21 @@ function vueLoaderConfig (extract) {
 }
 
 function writeFile (dest, data) {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(dest, data, function (err) {
-      if (err) return reject(err)
-
-      resolve({
-        path: dest,
-        size: getSize(data),
-      })
-    })
-  })
-}
-
-function ensureDir (dir) {
-  return new Promise((resolve, reject) => {
-    fs.ensureDir(dir, err => {
-      if (err) return reject(err)
-
-      resolve()
-    })
-  })
+  return fs.outputFile(dest, data)
+    .then(() => ({
+      path: dest,
+      size: getSize(data),
+    }))
 }
 
 function getSize (data) {
-  return (data.length / 1024).toFixed(2) + 'kb'
+  const bytes = data.length || 0
+
+  return bytes < 10000
+    ? bytes.toFixed(0) + ' B'
+    : bytes < 1024000
+      ? (bytes / 1024).toPrecision(3) + ' kB'
+      : (bytes / 1024 / 1024).toPrecision(4) + ' MB'
 }
 
 function vueMarkdownLoaderConfig () {
@@ -173,6 +194,27 @@ function compileVarsReplaceLoader () {
   })
 }
 
+function concatFiles (files, dest, banner) {
+  const concatenated = concat(files, {
+    delimiter: '\n',
+    mapPath: dest + '.map',
+  })
+
+  if (banner) {
+    concatenated.prepend(banner + '\n')
+  }
+
+  const { code, map } = concatenated.toStringWithSourceMap({
+    file: path.basename(dest),
+  })
+
+  return {
+    id: dest,
+    code: code,
+    map: map.toString(),
+  }
+}
+
 module.exports = {
   resolve,
   assetsPath,
@@ -180,10 +222,11 @@ module.exports = {
   styleLoaders,
   vueLoaderConfig,
   postcssPlugins,
+  postcssProcess,
   writeFile,
-  ensureDir,
   getSize,
   vueMarkdownLoaderConfig,
   compileVarsReplacement,
   compileVarsReplaceLoader,
+  concatFiles,
 }
