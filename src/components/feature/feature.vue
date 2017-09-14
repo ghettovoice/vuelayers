@@ -1,5 +1,5 @@
 <template>
-  <i :id="[this.$options.name, this.id].join('-')" :class="[$options.name]" style="display: none !important;">
+  <i :id="[$options.name, id].join('-')" :class="[$options.name]" style="display: none !important;">
     <slot :id="id" :properties="properties" :geometry="geometry"></slot>
   </i>
 </template>

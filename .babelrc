@@ -7,7 +7,6 @@
     "stage-0"
   ],
   "plugins": [
-    "lodash",
     "transform-runtime"
   ],
   "env": {
@@ -15,10 +14,11 @@
       "plugins": ["istanbul"]
     },
     "production": {
-      "plugins": []
+      "plugins": ["lodash"]
     },
     "production-cjs": {
       "plugins": [
+        "lodash",
         ["./modules/babel-plugin-merge-imports", {
           "pkg": "openlayers",
           "pkgVar": "__ol",
