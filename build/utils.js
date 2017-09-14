@@ -4,6 +4,7 @@ const hljs = require('highlight.js')
 const { escape } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
+const postcss = require('postcss')
 const config = require('./config')
 
 function resolve (relPath) {
@@ -101,6 +102,23 @@ function postcssPlugins () {
   ]
 }
 
+function postcssProcess ({ id, code, map }) {
+  return postcss(postcssPlugins())
+    .process(code, {
+      from: id,
+      to: id,
+      map: {
+        inline: false,
+        prev: map,
+      },
+    })
+    .then(({ css, map }) => ({
+      id,
+      code: css,
+      map: map.toString(),
+    }))
+}
+
 function vueLoaderConfig (extract) {
   return {
     loaders: Object.assign(
@@ -115,29 +133,16 @@ function vueLoaderConfig (extract) {
 }
 
 function writeFile (dest, data) {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(dest, data, function (err) {
-      if (err) return reject(err)
-
-      resolve({
-        path: dest,
-        size: getSize(data),
-      })
-    })
-  })
+  return fs.outputFile(dest, data)
+    .then(() => ({
+      path: dest,
+      size: getSize(data),
+    }))
 }
 
-function ensureDir (dir) {
-  return new Promise((resolve, reject) => {
-    fs.ensureDir(dir, err => {
-      if (err) return reject(err)
+function getSize (data) {
+  const bytes = data.length || 0
 
-      resolve()
-    })
-  })
-}
-
-function getSize (bytes) {
   return bytes < 10000
     ? bytes.toFixed(0) + ' B'
     : bytes < 1024000
@@ -195,8 +200,8 @@ module.exports = {
   styleLoaders,
   vueLoaderConfig,
   postcssPlugins,
+  postcssProcess,
   writeFile,
-  ensureDir,
   getSize,
   vueMarkdownLoaderConfig,
   compileVarsReplacement,

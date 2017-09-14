@@ -4,15 +4,14 @@ const chalk = require('chalk')
 const ora = require('ora')
 const glob = require('glob')
 const rollup = require('rollup')
-const postcss = require('postcss')
 const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
 const uglify = require('rollup-plugin-uglify')
-const createFilter = require('rollup-pluginutils').createFilter
-const MagicString = require('magic-string')
+const externalize = require('./rollup-plugins/externalize')
+const sass = require('./rollup-plugins/sass')
 const notifier = require('node-notifier')
 const Concat = require('concat-with-sourcemaps')
 const argv = require('yargs').argv
@@ -20,13 +19,11 @@ const { dependencies, peerDependencies, devDependencies } = require('../package.
 const utils = require('./utils')
 const config = require('./config')
 
-// todo make time for refactoring of this shit
-
 const bundles = argv.bundles
   ? argv.bundles.split(',').map(s => s.trim())
   : ['es', 'umd', 'umd-min', 'cjs', 'comp']
 
-Promise.resolve(utils.ensureDir(config.outDir))
+Promise.resolve(fs.ensureDir(config.outDir))
   // ES6
   .then(() => bundles.includes('es') && bundle({
     format: 'es',
@@ -119,6 +116,9 @@ Promise.resolve(utils.ensureDir(config.outDir))
 // helpers
 function bundle (opts = {}) {
   let bundleName = opts.bundleName
+  // todo собирать все готовые css файлы и мерджить в конце или в кучу
+  let vueStylesPromise = Promise.resolve()
+  let sassStylesPromise = Promise.resolve()
 
   if (['cjs', 'umd'].includes(opts.format)) {
     process.env.BABEL_ENV = 'production-cjs'
@@ -127,7 +127,13 @@ function bundle (opts = {}) {
   }
 
   const plugins = [
-    ...(opts.modules ? [externalize(opts.bundlesMap)] : []),
+    ...(opts.modules ? [
+      externalize({
+        root: utils.resolve('src'),
+        newRoot: 'vuelayers/dist',
+        map: opts.bundlesMap,
+      }),
+    ] : []),
     replace({
       sourceMap: true,
       values: replaces(opts),
@@ -137,28 +143,21 @@ function bundle (opts = {}) {
       htmlMinifier: { collapseBooleanAttributes: false },
       sourceMap: true,
       scss: {
-        sourceMap: opts.styleName
-          ? path.join(config.outDir, opts.styleName + '.css')
-          : false,
         sourceMapContents: true,
         includePaths: [
-          utils.resolve(''),
           utils.resolve('node_modules'),
         ],
       },
       css: (_, styles) => {
         if (opts.styleName === false) return
 
-        postcssPromise = Promise.all(
-          styles.map(({ id, $compiled: { code: css, map } }) => postcssProcess({ id, css, map }))
+        vueStylesPromise = Promise.all(
+          styles.map(({ id, $compiled: { code, map } }) => utils.postcssProcess({ id, code, map })),
         ).then(results => {
-          const dest = path.join(config.outDir, opts.styleName + '.css')
+          const dest = path.join(opts.outDir, opts.styleName + '.css')
           const concat = new Concat(true, opts.styleName + '.css', '\n')
-          concat.add(null, config.banner)
-          results.forEach(({ css, map, style }) => {
-            console.log(path.relative(config.outDir, style.id), map)
-            concat.add(path.relative(config.outDir, style.id), css, map)
-          })
+          concat.add(null, opts.banner)
+          results.forEach(({ css, map, style }) => concat.add(path.relative(opts.outDir, style.id), css, map))
 
           return Promise.all([
             utils.writeFile(dest, concat.content),
@@ -168,13 +167,14 @@ function bundle (opts = {}) {
       },
     }),
     sass({
-      output: path.join(config.outDir, opts.styleName + '.css'),
-      includePaths: [
-        utils.resolve(''),
-        utils.resolve('node_modules'),
-      ],
-      banner: config.banner,
-      processor: postcssProcess,
+      output: path.join(opts.outDir, opts.styleName + '.css'),
+      banner: opts.banner,
+      postProcess: utils.postcssProcess,
+      sass: {
+        includePaths: [
+          utils.resolve('node_modules'),
+        ],
+      },
     }),
     babel({
       runtimeHelpers: true,
@@ -216,63 +216,38 @@ function bundle (opts = {}) {
     )
   }
 
-  const dest = path.join(config.outDir, `${bundleName}.js`)
+  const dest = path.join(opts.outDir, `${bundleName}.js`)
   const spinner = ora(chalk.bold.blue(`cook ${bundleName} bundle...`)).start()
-  let postcssPromise
 
-  return Promise.resolve(utils.ensureDir(path.dirname(dest)))
-    .then(() => rollup.rollup({
-      input: opts.entry,
-      external: opts.external,
-      plugins,
-    }))
-    .then(bundler => bundler.generate({
-      format: opts.format,
-      banner: config.banner,
-      name: config.fullname,
-      // moduleId: config.name,
-      sourcemap: true,
-      sourcemapFile: dest,
-      globals: opts.globals,
-    }))
-    .then(({ code, map }) => Promise.all([
-      utils.writeFile(dest, code),
-      utils.writeFile(dest + '.map', map.toString()),
-      postcssPromise,
-    ]))
-    .then(([jsSrc, jsMap, css]) => {
-      spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
+  return rollup.rollup({
+    input: opts.entry,
+    external: opts.external,
+    plugins,
+  }).then(bundler => bundler.generate({
+    format: opts.format,
+    banner: opts.banner,
+    name: opts.name,
+    // moduleId: config.name,
+    sourcemap: true,
+    sourcemapFile: dest,
+    globals: opts.globals,
+  })).then(({ code, map }) => Promise.all([
+    utils.writeFile(dest, code),
+    utils.writeFile(dest + '.map', map.toString()),
+  ])).then(([jsSrc, jsMap, css]) => {
+    spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
-      console.log(jsSrc.path, chalk.gray(jsSrc.size))
-      console.log(jsMap.path, chalk.gray(jsMap.size))
+    console.log(jsSrc.path, chalk.gray(jsSrc.size))
+    console.log(jsMap.path, chalk.gray(jsMap.size))
 
-      if (css) {
-        css[0] && console.log(css[0].path, chalk.gray(css[0].size))
-        css[1] && console.log(css[1].path, chalk.gray(css[1].size))
-      }
-    })
-    .catch(err => {
-      spinner.fail(chalk.red(`${bundleName} bundle is failed to create`))
-      throw err
-    })
-}
-
-function postcssProcess (style) {
-  return postcss(utils.postcssPlugins())
-    .process(style.css, {
-      from: path.relative(config.outDir, style.id),
-      to: path.relative(config.outDir, style.id),
-      map: {
-        inline: false,
-        prev: style.map,
-      },
-    })
-    .then(result => ({
-      css: result.css,
-      map: result.map.toJSON(),
-      id: style.id,
-      style,
-    }))
+    if (css) {
+      css[0] && console.log(css[0].path, chalk.gray(css[0].size))
+      css[1] && console.log(css[1].path, chalk.gray(css[1].size))
+    }
+  }).catch(err => {
+    spinner.fail(chalk.red(`${bundleName} bundle is failed to create`))
+    throw err
+  })
 }
 
 function nodeExternal () {
@@ -401,154 +376,4 @@ function getUtils () {
       }))
     })
   })
-}
-
-function externalize (modulesMap) {
-  const filter = createFilter('src/**', 'node_modules/**')
-  const regex = /'(\.{1,2}\/)+([^.'\n]+)'/g
-
-  return {
-    name: 'externalize',
-    transform (code, id) {
-      if (!filter(id)) return null
-
-      const ms = new MagicString(code)
-      let match, start, end, hasReplacements
-
-      while ((match = regex.exec(code)) != null) {
-        // start, end without quotes
-        start = match.index + 1
-        end = start + match[0].length - 2
-
-        let extModulePath = path.resolve(path.dirname(id), match[0].slice(1, -1))
-        let extModuleRelPath = extModulePath.replace(utils.resolve('src') + '/', '')
-        let extModuleMap = modulesMap.find(({ src }) => src === extModuleRelPath)
-
-        if (extModuleMap) {
-          ms.overwrite(start, end, path.join('vuelayers/dist', extModuleMap.dest))
-          hasReplacements = true
-        }
-      }
-
-      if (!hasReplacements) return null
-
-      return {
-        code: ms.toString(),
-        map: ms.generateMap({ hires: true }),
-      }
-    },
-  }
-}
-
-// originally taken from https://github.com/differui/rollup-plugin-sass/blob/master/src/index.js
-function sass (options) {
-  const filter = createFilter(options.include || [
-    '**/*.css',
-    '**/*.sass',
-    '**/*.scss',
-  ], options.exclude)
-  const styles = []
-  const styleMaps = {}
-  let dest = ''
-  if (typeof options.output === 'string') {
-    dest = options.output
-  }
-
-  options.output = options.output || false
-  options.insert = options.insert || false
-  options.processor = options.processor || null
-  options.options = Object.assign({}, options, options.options)
-  options.banner = options.banner || ''
-
-  return {
-    name: 'sass',
-
-    options (opts) {
-      dest = dest || opts.dest || opts.entry
-      if (dest && (dest.endsWith('.js') || dest.endsWith('.ts'))) {
-        dest = dest.slice(0, -3)
-        dest = `${dest}.css`
-      }
-    },
-
-    transform (code, id) {
-      if (!filter(id)) {
-        return null
-      }
-
-      const paths = [path.dirname(id), process.cwd()]
-      const sassConfig = Object.assign({
-        file: id,
-        outFile: id,
-        sourceMap: true,
-        data: code,
-        indentedSyntax: path.extname(id) === '.sass',
-        omitSourceMapUrl: true,
-        sourceMapContents: true,
-      }, options.options)
-
-      sassConfig.includePaths = sassConfig.includePaths
-        ? sassConfig.includePaths.concat(paths)
-        : paths
-
-      try {
-        let { css, map } = require('node-sass').renderSync(sassConfig)
-        css = css.toString()
-        map = map.toString()
-
-        if (!css.trim()) return
-
-        return Promise.resolve({ id, css, map })
-          .then(style => {
-            // if (typeof options.processor === 'function') {
-            //   return options.processor(style)
-            // }
-
-            return style
-          })
-          .then(({ id, css, map }) => {
-            if (styleMaps[id]) {
-              styleMaps[id].css = css
-              styleMaps[id].map = map
-            } else {
-              styles.push(styleMaps[id] = { id, css, map })
-            }
-
-            return { id, css, map }
-          })
-      } catch (error) {
-        throw error
-      }
-    },
-
-    ongenerate () {
-      if (!styles.length || options.output === false) {
-        return
-      }
-
-      if (typeof options.output === 'function') {
-        return options.output(styles)
-      }
-
-      if (!dest) return
-
-      const concat = new Concat(true, path.basename(dest), '\n')
-      concat.add(null, options.banner)
-      styles.forEach(({ css, map, id }) => {
-        console.log(path.relative(path.dirname(dest), id), map)
-        concat.add(path.relative(path.dirname(dest), id), css, map)
-      })
-
-      return utils.ensureDir(path.dirname(dest))
-        .then(() => Promise.all([
-          utils.writeFile(dest, concat.content),
-          utils.writeFile(dest + '.map', concat.sourceMap),
-        ]))
-        .then(res => {
-          console.log(res[0].path, chalk.gray(res[0].size))
-          console.log(res[1].path, chalk.gray(res[1].size))
-          return res
-        })
-    },
-  }
 }
