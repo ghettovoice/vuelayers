@@ -2,8 +2,8 @@
 import olMap from 'ol/map'
 import olView from 'ol/view'
 import Vue from 'vue'
-import { VM_PROP } from '../../../../../src/core/consts'
 import Map from '../../../../../src/components/map'
+import { VM_PROP } from '../../../../../src/core/consts'
 
 describe('vl-map', () => {
   const Ctor = Vue.extend(Map.Map)
@@ -34,7 +34,7 @@ describe('vl-map', () => {
       expect(vm.$mountPromise.then).to.be.a('function')
 
       vm.$mountPromise.then(() => {
-        expect(vm.$map.getTargetElement()).to.be.equal(vm.$refs.map)
+        expect(vm.$map.getTargetElement()).to.be.equal(vm.$el)
 
         vm.$destroy()
         Vue.nextTick(done)
@@ -63,9 +63,10 @@ describe('vl-map', () => {
 
       vm.$mountPromise.then(() => {
         vm.focus()
-        expect(vm.$refs.map).to.be.equal(document.activeElement)
+        expect(vm.$el).to.be.equal(document.activeElement)
 
         vm.$destroy()
+        div.remove()
         Vue.nextTick(done)
       }).catch(done)
     })

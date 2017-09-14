@@ -1,5 +1,5 @@
 <template>
-  <div :class="[$options.name]">
+  <div :class="[$options.name]" :tabindex="tabIndex">
     <slot></slot>
   </div>
 </template>

@@ -47,7 +47,7 @@ const modulesForExternalize = modules.map(({ entry, bundleName }) => ({
   src: entry.replace(/\/index$/, ''),
   dest: path.join('es', bundleName.replace(/\/index$/, '')),
 }))
-
+// todo build ES, CJS, UMD core & split components bundles
 Promise.resolve()
   // ES index
   .then(() => cookBundle({
