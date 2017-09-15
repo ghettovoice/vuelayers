@@ -1,4 +1,4 @@
-import * as components from './components'
+import * as components from './cmps'
 
 export default function install (Vue) {
   if (install.installed) return

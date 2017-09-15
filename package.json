@@ -6,6 +6,7 @@
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "dist/vuelayers.cjs.js",
   "module": "dist/vuelayers.es.js",
+  "browser": "dist/vuelayers.umd.min.js",
   "unpkg": "dist/vuelayers.umd.js",
   "scripts": {
     "dev": "node build/dev-server.js",

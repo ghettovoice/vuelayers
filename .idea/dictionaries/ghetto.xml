@@ -43,6 +43,7 @@
       <w>hljs</w>
       <w>hoverable</w>
       <w>ident</w>
+      <w>importee</w>
       <w>jsnext</w>
       <w>linkify</w>
       <w>loadingstrategy</w>

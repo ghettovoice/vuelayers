@@ -8,7 +8,7 @@
  * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
  */
 
-import * as components from './components'
+import * as components from './cmps'
 import * as core from './core'
 import install from './install'
 

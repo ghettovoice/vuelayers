@@ -12,16 +12,16 @@ const sass = require('./rollup-plugins/sass')
 const externalize = require('./rollup-plugins/externalize')
 const notifier = require('node-notifier')
 const argv = require('yargs').argv
-const { escapeRegExp } = require('lodash/fp')
+const { escapeRegExp, camelCase } = require('lodash/fp')
 const { dependencies, peerDependencies, devDependencies } = require('../package.json')
 const utils = require('./utils')
 const config = require('./config')
 
 const bundles = argv.bundles
   ? argv.bundles.split(',').map(s => s.trim())
-  : ['es', 'umd', 'umd-min', 'cjs']
+  : ['es', 'cjs', 'umd', 'umd.min']
 
-Promise.all(bundles.map(format => makeBundles(format)))
+bundles.reduce((prev, format) => prev.then(() => makeBundles(format)), Promise.resolve())
 
   // ES6
   // .then(() => bundles.includes('es') && bundle({
@@ -134,6 +134,7 @@ Promise.all(bundles.map(format => makeBundles(format)))
 function getAllModules (bundleNameSuffix = '', styleNameSuffix = '') {
   const common = [
     {
+      core: true,
       entry: utils.resolve('src/core/index.js'),
       bundleName: 'core/index' + bundleNameSuffix,
       styleName: 'core/style' + styleNameSuffix,
@@ -161,30 +162,55 @@ function getComponents (bundleNameSuffix = '', styleNameSuffix = '') {
     }))
 }
 
-function makeBundles (format) {
-  const mainEntry = format === 'es' ? config.entry : config.cjsEntry
+function makeBundles (format, env = 'development') {
+  let externals, globals, min
+  [format, min] = format.split('.')
+  let mainEntry = format === 'es' ? config.entry : config.cjsEntry
+  if (format === 'umd') {
+    externals = ['vue', 'openlayers', 'ol']
+    globals = {
+      vue: 'Vue',
+      openlayers: 'ol',
+    }
+  } else {
+    externals = getExternals()
+  }
 
   return getAllModules('.' + format)
-    .then(modules => Promise.all([
-      makeBundle({
+    .then(modules => {
+      return makeBundle({
         outDir: config.outDir,
         entry: mainEntry,
         format,
-        bundleName: 'index.' + format,
-        styleName: 'style',
-        external: externals(),
+        env,
+        bundleName: ['index', format, min].filter(x => x).join('.'),
+        styleName: ['style', min].filter(x => x).join('.'),
+        externals,
+        globals,
         banner: config.banner,
-      }),
-      // ...(modules.map(({ entry, bundleName, styleName }) => makeBundle({
-      //   outDir: config.outDir,
-      //   entry,
-      //   format,
-      //   bundleName,
-      //   styleName,
-      //   external: externals(modules.filter(m => m.entry !== entry)),
-      //   banner: config.banner,
-      // }))),
-    ]))
+        modules: format === 'umd' ? undefined : modules,
+        varName: config.fullname,
+        min: !!min,
+      }).then(() => modules)
+    })
+    .then(modules => {
+      return modules.reduce((prev, { entry, bundleName, styleName }) => {
+        return prev.then(() => makeBundle({
+          outDir: config.outDir,
+          entry,
+          format,
+          env,
+          bundleName: [bundleName, min].filter(x => x).join('.'),
+          styleName: [styleName, min].filter(x => x).join('.'),
+          externals,
+          globals,
+          banner: config.banner,
+          modules: format === 'umd' ? modules.filter(m => m.core) : modules,
+          varName: [config.fullname, camelCase(path.dirname(bundleName))].join('.'),
+          min: !!min,
+        }))
+      }, Promise.resolve())
+    })
 }
 
 function makeBundle (opts = {}) {
@@ -203,8 +229,19 @@ function makeBundle (opts = {}) {
     process.env.BABEL_ENV = 'production'
   }
 
+  const srcDir = utils.resolve('src')
+
   const plugins = [
-    externalize(),
+    ...(opts.modules && opts.modules.length ? [
+      externalize({
+        root: srcDir,
+        newRoot: path.relative(path.dirname(utils.resolve('')), opts.outDir),
+        map: opts.modules.map(({ entry, bundleName }) => ({
+          from: path.relative(srcDir, path.dirname(entry)),
+          to: path.dirname(bundleName),
+        })),
+      }),
+    ] : []),
     replace({
       sourceMap: true,
       values: replaces(opts),
@@ -252,7 +289,7 @@ function makeBundle (opts = {}) {
     cjs(),
   ]
 
-  if (opts.env === 'production' && opts.format === 'umd') {
+  if (opts.min) {
     plugins.push(
       uglify({
         mangle: true,
@@ -270,17 +307,17 @@ function makeBundle (opts = {}) {
             }
           },
         },
-      })
+      }),
     )
   }
 
   const dest = path.join(opts.outDir, `${bundleName}.js`)
   let destCss = cssBundleName ? path.join(opts.outDir, cssBundleName + '.css') : undefined
-  const spinner = ora(chalk.bold.blue(`cook ${bundleName} bundle...`)).start()
+  const spinner = ora(chalk.bold.blue(`making ${bundleName} bundle...`)).start()
 
   return rollup.rollup({
     input: opts.entry,
-    external: opts.external,
+    external: opts.externals,
     plugins,
   }).then(bundler => bundler.generate({
     format: opts.format,
@@ -304,9 +341,9 @@ function makeBundle (opts = {}) {
           sourcesRelativeTo: id,
         })),
         destCss,
-        opts.banner
+        opts.banner,
       )
-
+      // todo add css minification if opts.min = true
       return utils.postcssProcess({
         id: destCss,
         code,
@@ -316,10 +353,18 @@ function makeBundle (opts = {}) {
   }).then(({ js, css }) => Promise.all([
     utils.writeFile(dest, js.code),
     utils.writeFile(dest + '.map', js.map),
-    ...(css ? [
-      utils.writeFile(destCss, css.code),
-      utils.writeFile(destCss + '.map', css.map),
-    ] : []),
+    // todo write package.json, move config to options
+    utils.writeFile(path.join(path.dirname(dest), 'package.json'), JSON.stringify({
+      name: [config.name, path.basename(path.dirname(dest))].join('-'),
+      author: config.author,
+      version: config.version,
+      main: 'index.cjs.js',
+      module: 'index.es.js',
+      browser: 'index.umd.min.js',
+      unpkg: 'index.umd.js',
+    }, null, 2)),
+    css && utils.writeFile(destCss, css.code),
+    css && utils.writeFile(destCss + '.map', css.map),
   ])).then(([jsSrc, jsMap, cssSrc, cssMap]) => {
     spinner.succeed(chalk.green(`${bundleName} bundle is ready`))
 
@@ -334,16 +379,33 @@ function makeBundle (opts = {}) {
   })
 }
 
-function externals () {
-  const deps = [].concat(
-    config.name,
+function getExternals () {
+  const nodeModules = [config.name].concat(
     Object.keys(dependencies),
     Object.keys(peerDependencies),
     Object.keys(devDependencies),
-  ).map(dep => escapeRegExp(dep) + '.*')
-  const regExp = new RegExp(`^(${deps.join('|')})$`, 'i')
+  ).map(escapeRegExp)
+  const regex = new RegExp(`^(${nodeModules.join('|')}.*$)`)
 
-  return moduleId => regExp.test(moduleId)
+  // modules = modules.reduce((all, { entry }) => {
+  //   const moduleDir = path.dirname(entry)
+  //   const moduleParentDir = path.dirname(moduleDir)
+  //   const moduleName = path.basename(moduleDir)
+  //
+  //   all.push(entry, moduleDir)
+  //
+  //   let dir
+  //   if (/\/components\//.test(moduleDir)) {
+  //     dir = moduleDir.replace('components/', '')
+  //   } else {
+  //     dir = path.join(moduleParentDir, 'components', moduleName)
+  //   }
+  //   all.push(dir, dir + '/index.js')
+  //
+  //   return all
+  // }, [])
+
+  return moduleId => regex.test(moduleId)
 }
 
 function replaces (opts = {}) {
@@ -353,7 +415,7 @@ function replaces (opts = {}) {
   })
 
   if (opts.env) {
-    obj['process.env.NODE_ENV'] = opts.env
+    obj['process.env.NODE_ENV'] = `'${opts.env}'`
   }
 
   if (opts.format === 'cjs') {
