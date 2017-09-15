@@ -2,7 +2,7 @@
   /**
    * Layer source to work with Sputnik.ru tile server.
    */
-  import xyzSource from '../xyz-source/source.vue'
+  import XyzSource from '../xyz-source'
 
   const SPUTNIK_URL_TEMPLATE = 'http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png?apikey={apikey}'
   const SPUTNIK_ATTRIBUTIONS = '<a href="http://maps.sputnik.ru/">Спутник</a> ' +
@@ -35,7 +35,7 @@
 
   export default {
     name: 'vl-source-sputnik',
-    extends: xyzSource,
+    extends: XyzSource.Source,
     props,
     computed,
   }

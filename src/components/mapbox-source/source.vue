@@ -1,6 +1,6 @@
 <script>
   import { ol as vlol, utils } from '../../core'
-  import xyzSource from '../xyz-source/source.vue'
+  import XyzSource from '../xyz-source'
 
   const { TILE_FORMAT, EPSG_3857 } = vlol
   const { coalesce } = utils
@@ -52,7 +52,7 @@
 
   export default {
     name: 'vl-source-mapbox',
-    extends: xyzSource,
+    extends: XyzSource.Source,
     props,
     computed,
   }

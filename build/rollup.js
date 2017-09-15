@@ -1,8 +1,6 @@
 const path = require('path')
-const fs = require('fs-extra')
 const chalk = require('chalk')
 const ora = require('ora')
-const glob = require('glob')
 const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
@@ -10,10 +8,11 @@ const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
 const uglify = require('rollup-plugin-uglify')
-const externalize = require('./rollup-plugins/externalize')
 const sass = require('./rollup-plugins/sass')
+const externalize = require('./rollup-plugins/externalize')
 const notifier = require('node-notifier')
 const argv = require('yargs').argv
+const { escapeRegExp } = require('lodash/fp')
 const { dependencies, peerDependencies, devDependencies } = require('../package.json')
 const utils = require('./utils')
 const config = require('./config')
@@ -22,54 +21,7 @@ const bundles = argv.bundles
   ? argv.bundles.split(',').map(s => s.trim())
   : ['es', 'umd', 'umd-min', 'cjs']
 
-const modules = [
-  // lib core
-  {
-    entry: 'core',
-    bundleName: 'core/index',
-    styleName: 'core/style',
-  },
-  // components
-  {
-    entry: 'components/feature/index',
-    bundleName: 'feature/index',
-    styleName: 'feature/style',
-  },
-  {
-    entry: 'components/map/index',
-    bundleName: 'map/index',
-    styleName: 'map/style',
-  },
-].map(m => Object.assign(m, {
-  entryPath: path.join(utils.resolve('src'), m.entry) + '.js',
-}))
-const modulesForExternalize = modules.map(({ entry, bundleName }) => ({
-  src: entry.replace(/\/index$/, ''),
-  dest: path.join('es', bundleName.replace(/\/index$/, '')),
-}))
-// todo build ES, CJS, UMD core & split components bundles
-Promise.resolve()
-  // ES index
-  .then(() => cookBundle({
-    outDir: config.outDir,
-    format: 'es',
-    bundleName: 'es/index',
-    styleName: 'es/style',
-    entry: config.entry,
-    external: externals(),
-    banner: config.banner,
-    modules: modulesForExternalize,
-  }))
-  .then(() => Promise.all(modules.map(m => cookBundle({
-    outDir: config.outDir,
-    format: 'es',
-    bundleName: path.join('es', m.bundleName),
-    styleName: m.styleName ? path.join('es', m.styleName) : false,
-    entry: m.entryPath,
-    external: externals(),
-    banner: config.banner,
-    modules: modulesForExternalize,
-  }))))
+Promise.all(bundles.map(format => makeBundles(format)))
 
   // ES6
   // .then(() => bundles.includes('es') && bundle({
@@ -179,7 +131,63 @@ Promise.resolve()
   })
 
 // helpers
-function cookBundle (opts = {}) {
+function getAllModules (bundleNameSuffix = '', styleNameSuffix = '') {
+  const common = [
+    {
+      entry: utils.resolve('src/core/index.js'),
+      bundleName: 'core/index' + bundleNameSuffix,
+      styleName: 'core/style' + styleNameSuffix,
+    },
+  ]
+
+  return Promise.all([
+    getComponents(bundleNameSuffix, styleNameSuffix),
+  ]).then(([components]) => {
+    return common.concat(components)
+  })
+}
+
+function getComponents (bundleNameSuffix = '', styleNameSuffix = '') {
+  const root = utils.resolve('src/components')
+
+  return utils.readDir(root)
+    .then(files => files.filter(({ stat }) => stat.isDirectory()))
+    .then(dirs => dirs.map(dir => {
+      return {
+        entry: path.join(dir.path, 'index.js'),
+        bundleName: path.relative(root, path.join(dir.path, 'index')) + bundleNameSuffix,
+        styleName: path.relative(root, path.join(dir.path, 'style')) + styleNameSuffix,
+      }
+    }))
+}
+
+function makeBundles (format) {
+  const mainEntry = format === 'es' ? config.entry : config.cjsEntry
+
+  return getAllModules('.' + format)
+    .then(modules => Promise.all([
+      makeBundle({
+        outDir: config.outDir,
+        entry: mainEntry,
+        format,
+        bundleName: 'index.' + format,
+        styleName: 'style',
+        external: externals(),
+        banner: config.banner,
+      }),
+      // ...(modules.map(({ entry, bundleName, styleName }) => makeBundle({
+      //   outDir: config.outDir,
+      //   entry,
+      //   format,
+      //   bundleName,
+      //   styleName,
+      //   external: externals(modules.filter(m => m.entry !== entry)),
+      //   banner: config.banner,
+      // }))),
+    ]))
+}
+
+function makeBundle (opts = {}) {
   let bundleName = opts.bundleName
   let cssBundleName = opts.styleName === true
     ? bundleName
@@ -196,13 +204,7 @@ function cookBundle (opts = {}) {
   }
 
   const plugins = [
-    ...(opts.modules ? [
-      externalize({
-        root: utils.resolve('src'),
-        newRoot: path.relative(path.dirname(utils.resolve('')), opts.outDir),
-        map: opts.modules,
-      }),
-    ] : []),
+    externalize(),
     replace({
       sourceMap: true,
       values: replaces(opts),
@@ -333,11 +335,15 @@ function cookBundle (opts = {}) {
 }
 
 function externals () {
-  const deps = [config.name].concat(Object.keys(dependencies))
-    .concat(Object.keys(peerDependencies))
-    .concat(Object.keys(devDependencies))
+  const deps = [].concat(
+    config.name,
+    Object.keys(dependencies),
+    Object.keys(peerDependencies),
+    Object.keys(devDependencies),
+  ).map(dep => escapeRegExp(dep) + '.*')
+  const regExp = new RegExp(`^(${deps.join('|')})$`, 'i')
 
-  return moduleId => deps.some(dep => new RegExp(`^${dep}.*$`, 'i').test(moduleId))
+  return moduleId => regExp.test(moduleId)
 }
 
 function replaces (opts = {}) {
@@ -355,107 +361,4 @@ function replaces (opts = {}) {
   }
 
   return obj
-}
-
-function getComponents () {
-  const root = utils.resolve('src/components')
-
-  return new Promise((resolve, reject) => {
-    glob(root + '/**/*.js', (err, files) => {
-      if (err) return reject(err)
-
-      resolve(files.reduce((files, file) => {
-        // skip main index and internal files
-        let mainIndexRegex = /components\/index\.js$/
-        let pkgIndex = path.join(path.dirname(file), 'index.js')
-        let isInPkg = file !== pkgIndex && !mainIndexRegex.test(pkgIndex) && fs.existsSync(pkgIndex)
-        if (mainIndexRegex.test(file) || isInPkg) {
-          return files
-        }
-
-        let relPath = file.replace('.js', '').replace(root + '/', '')
-        let pathParts = relPath.split('/')
-        pathParts = pathParts.filter((x, i) => pathParts.indexOf(x) === i)
-
-        // reverse all except some exclusions
-        if (
-          [
-            'style/box/index',
-            'style/container/index',
-            'style/func/index',
-          ].includes(relPath) === false
-        ) {
-          pathParts.reverse()
-        }
-
-        // component package
-        if (/index$/.test(relPath)) {
-          pathParts = pathParts.filter(x => x !== 'index')
-
-          return files.concat({
-            entry: file,
-            bundleName: path.join('modules', pathParts.join('-'), 'index'),
-            styleName: path.join('modules', pathParts.join('-'), 'style'),
-            src: path.join('components', relPath).replace('/index', ''),
-            dest: path.join('modules', pathParts.join('-')),
-          })
-        }
-
-        // base mixins and helpers
-        return files.concat({
-          entry: file,
-          bundleName: path.join('modules', 'mixins', pathParts.join('-')),
-          styleName: false,
-          src: path.join('components', relPath),
-          dest: path.join('modules', 'mixins', pathParts.join('-')),
-        })
-      }, []))
-    })
-  })
-}
-
-function getCommons () {
-  return Promise.resolve([
-    {
-      entry: utils.resolve('src/ol-ext/index.js'),
-      bundleName: 'modules/ol-ext',
-      styleName: false,
-      src: 'ol-ext',
-      dest: 'modules/ol-ext',
-    }, {
-      entry: utils.resolve('src/rx-ext/index.js'),
-      bundleName: 'modules/rx-ext',
-      styleName: false,
-      src: 'rx-ext',
-      dest: 'modules/rx-ext',
-    }, {
-      entry: utils.resolve('src/consts.js'),
-      bundleName: 'modules/consts',
-      styleName: false,
-      src: 'consts',
-      dest: 'modules/consts',
-    },
-  ])
-}
-
-function getUtils () {
-  const root = utils.resolve('src/utils')
-
-  return new Promise((resolve, reject) => {
-    glob(root + '/**/*.js', (err, files) => {
-      if (err) return reject(err)
-
-      resolve(files.map(file => {
-        let bundleName = path.join('modules/utils', path.basename(file, '.js'))
-
-        return {
-          entry: file,
-          bundleName,
-          styleName: false,
-          src: file.replace('.js', '').replace(utils.resolve('src') + '/', ''),
-          dest: bundleName,
-        }
-      }))
-    })
-  })
 }

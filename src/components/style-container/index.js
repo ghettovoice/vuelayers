@@ -2,7 +2,7 @@
  * @module components/style/container
  * @deprecated
  */
-import StyleBox from '../style-box/style.vue'
+import StyleBox from '../style-box'
 import { utils } from '../../core'
 
 const { debug } = utils
@@ -12,7 +12,7 @@ const { debug } = utils
  */
 const Style = {
   name: 'vl-style-container',
-  extends: StyleBox,
+  extends: StyleBox.Style,
   beforeCreate () {
     debug.warndbg('vl-style-container was renamed to vl-style-box. ' +
       'Name "vl-style-container" now is deprecated and will be removed in the next release.')

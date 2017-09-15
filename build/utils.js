@@ -141,6 +141,21 @@ function writeFile (dest, data) {
     }))
 }
 
+function readDir (dir) {
+  return fs.readdir(dir)
+    .then(files => {
+      return Promise.all(files.map(file => {
+        const filePath = path.join(dir, file)
+
+        return fs.stat(filePath)
+          .then(stat => ({
+            path: filePath,
+            stat,
+          }))
+      }))
+    })
+}
+
 function getSize (data) {
   const bytes = data.length || 0
 
@@ -224,6 +239,7 @@ module.exports = {
   postcssPlugins,
   postcssProcess,
   writeFile,
+  readDir,
   getSize,
   vueMarkdownLoaderConfig,
   compileVarsReplacement,

@@ -9,7 +9,7 @@ module.exports = function externalize (options) {
     newRoot: process.cwd(),
     include: 'src/**',
     exclude: 'node_modules/**',
-    regExp: /'(?:\.{1,2}\/)+([^.'\n]+)'/g,
+    regExp: /import .* from '((?:\.{1,2}\/)+.+)'/,
     map: {},
   }, options)
 
@@ -25,19 +25,23 @@ module.exports = function externalize (options) {
       let match, start, end, hasReplacements
 
       while ((match = regExp.exec(code)) != null) {
-        // start, end without quotes
-        start = match.index + 1
-        end = start + match[0].length - 2
-
-        let extModulePath = path.resolve(path.dirname(id), match[0].slice(1, -1))
-        let extModuleRelPath = path.relative(options.root, extModulePath)
-        let extModuleMap = options.map.find(({ src }) => src === extModuleRelPath)
-
-        if (extModuleMap) {
-          ms.overwrite(start, end, path.join(options.newRoot, extModuleMap.dest))
-          hasReplacements = true
-        }
+        const depPath = path.resolve(path.dirname(id), match[1])
+        console.log(match[1], depPath)
       }
+      // while ((match = regExp.exec(code)) != null) {
+      //   start, end without quotes
+      // start = match.index + 1
+      // end = start + match[0].length - 2
+      //
+      // let extModulePath = path.resolve(path.dirname(id), match[0].slice(1, -1))
+      // let extModuleRelPath = path.relative(options.root, extModulePath)
+      // let extModuleMap = options.map.find(({ src }) => src === extModuleRelPath)
+      //
+      // if (extModuleMap) {
+      //   ms.overwrite(start, end, path.join(options.newRoot, extModuleMap.dest))
+      //   hasReplacements = true
+      // }
+      // }
 
       if (!hasReplacements) return
 
