@@ -1,6 +1,6 @@
 <script>
   import OSMSource from 'ol/source/osm'
-  import xyzSource from '../xyz-source/source.vue'
+  import XyzSource from '../xyz-source'
 
   const OSM_URL_TEMPLATE = 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   const OSM_MAX_ZOOM = 19
@@ -38,7 +38,7 @@
 
   export default {
     name: 'vl-source-osm',
-    extends: xyzSource,
+    extends: XyzSource.Source,
     props,
     methods,
   }

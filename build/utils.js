@@ -95,22 +95,28 @@ function styleLoaders (options) {
   return output
 }
 
-function postcssPlugins () {
-  return [
+function postcssPlugins (opts = {}) {
+  const plugins = [
     require('autoprefixer')({
       browsers: ['last 5 versions'],
     }),
   ]
+  if (opts.min) {
+    plugins.push(require('postcss-clean')())
+  }
+
+  return plugins
 }
 
-function postcssProcess ({ id, code, map }) {
-  return postcss(postcssPlugins())
+function postcssProcess ({ id, code, map, min }) {
+  return postcss(postcssPlugins({ min }))
     .process(code, {
       from: id,
       to: id,
       map: {
         inline: false,
         prev: map,
+        annotation: true,
       },
     })
     .then(({ css, map }) => ({
@@ -139,6 +145,21 @@ function writeFile (dest, data) {
       path: dest,
       size: getSize(data),
     }))
+}
+
+function readDir (dir) {
+  return fs.readdir(dir)
+    .then(files => {
+      return Promise.all(files.map(file => {
+        const filePath = path.join(dir, file)
+
+        return fs.stat(filePath)
+          .then(stat => ({
+            path: filePath,
+            stat,
+          }))
+      }))
+    })
 }
 
 function getSize (data) {
@@ -224,6 +245,7 @@ module.exports = {
   postcssPlugins,
   postcssProcess,
   writeFile,
+  readDir,
   getSize,
   vueMarkdownLoaderConfig,
   compileVarsReplacement,
