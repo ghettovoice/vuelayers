@@ -93,8 +93,6 @@
   import { range, random } from 'lodash/fp'
   import { core } from '../src'
 
-  const { ol: vlol } = core
-
   const computed = {
   }
 
@@ -102,7 +100,7 @@
     select ({ feature }) {
       if (feature.get('features') && feature.get('features').length > 1) {
         this.selectedFeatures = this.selectedFeatures.filter(id => id !== feature.getId())
-        this.$refs.view.fit(vlol.geom.collection(feature.get('features').map(f => f.getGeometry())).getExtent(), {
+        this.$refs.view.fit(core.geomHelper.collection(feature.get('features').map(f => f.getGeometry())).getExtent(), {
           duration: 500,
         })
       }
@@ -131,7 +129,7 @@
       return Promise.resolve(this.points)
     },
     pointOnSurface (geometry) {
-      return vlol.geom.pointOnSurface(geometry)
+      return core.geomHelper.pointOnSurface(geometry)
     },
   }
 

@@ -181,38 +181,39 @@
 
 <script>
   import { kebabCase, range, random } from 'lodash/fp'
-  import { ol as vlol } from 'vuelayers'
+  // import C_PKG_FULLNAME core helpers
+  import { core as vlCore } from 'vuelayers'
   import pacmanFeaturesCollection from '../static/sample-data/pacman.geojson'
 
   const methods = {
-    pointOnSurface: vlol.geom.pointOnSurface,
+    pointOnSurface: vlCore.geomHelper.pointOnSurface,
     geometryTypeToCmpName (type) {
       return 'vl-geom-' + kebabCase(type)
     },
     pacmanStyleFunc () {
       const pacman = [
-        vlol.style.style({
+        vlCore.styleHelper.style({
           strokeColor: '#de9147',
           strokeWidth: 3,
           fillColor: [222, 189, 36, 0.8],
         }),
       ]
       const path = [
-        vlol.style.style({
+        vlCore.styleHelper.style({
           strokeColor: 'blue',
           strokeWidth: 1,
         }),
-        vlol.style.style({
+        vlCore.styleHelper.style({
           imageRadius: 5,
           imageFillColor: 'orange',
           geom (feature) {
             // geometry is an LineString, convert it to MultiPoint to style vertex
-            return vlol.geom.multiPoint(feature.getGeometry().getCoordinates())
+            return vlCore.geomHelper.multiPoint(feature.getGeometry().getCoordinates())
           },
         }),
       ]
       const eye = [
-        vlol.style.style({
+        vlCore.styleHelper.style({
           imageRadius: 6,
           imageFillColor: '#444444',
         }),
@@ -237,7 +238,7 @@
         let style = cache[size]
 
         if (!style) {
-          style = vlol.style.style({
+          style = vlCore.styleHelper.style({
             imageRadius: 10,
             strokeColor: '#fff',
             fillColor: '#3399cc',
@@ -265,11 +266,11 @@
       const duration = feature.get('duration')
       const elapsed = frameState.time - feature.get('start')
       const elapsedRatio = elapsed / duration
-      const radius = vlol.easing.easeOut(elapsedRatio) * 35 + 5
-      const opacity = vlol.easing.easeOut(1 - elapsedRatio)
-      const fillOpacity = vlol.easing.easeOut(0.5 - elapsedRatio)
+      const radius = vlCore.easingHelper.easeOut(elapsedRatio) * 35 + 5
+      const opacity = vlCore.easingHelper.easeOut(1 - elapsedRatio)
+      const fillOpacity = vlCore.easingHelper.easeOut(0.5 - elapsedRatio)
 
-      vectorContext.setStyle(vlol.style.style({
+      vectorContext.setStyle(vlCore.styleHelper.style({
         imageRadius: radius,
         fillColor: [119, 170, 203, fillOpacity],
         strokeColor: [119, 170, 203, opacity],

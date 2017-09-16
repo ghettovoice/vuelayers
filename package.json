@@ -6,7 +6,7 @@
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
-  "browser": "lib/index.umd.min.js",
+  "browser": "lib/index.umd.js",
   "unpkg": "lib/index.umd.js",
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -57,7 +57,6 @@
   "homepage": "https://ghettovoice.github.io/vuelayers",
   "dependencies": {
     "@turf/point-on-surface": "^4.6.1",
-    "assert": "^1.4.1",
     "babel-runtime": "^6.26.0",
     "debounce-promise": "^3.0.1",
     "lodash": "^4.17.4",

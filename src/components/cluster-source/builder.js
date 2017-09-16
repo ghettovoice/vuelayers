@@ -5,9 +5,7 @@ import 'rxjs/add/operator/first'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/toPromise'
 import Cluster from 'ol/source/cluster'
-import { utils } from '../../core'
-
-const { assert } = utils
+import { assert } from '../../core'
 
 export default class Builder {
   /**

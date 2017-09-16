@@ -2,16 +2,30 @@
  * Assertion helpers
  * @module utils/assert
  */
-import assert from 'assert'
 import isNumeric from './is-numeric'
 
-export const {
-  ok,
-  fail,
-  equal,
-  notEqual,
-  AssertionError,
-} = assert
+export class AssertionError extends Error {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, this.constructor)
+    } else {
+      this.stack = (new Error(message)).stack
+    }
+  }
+}
+
+export function assert (value, message) {
+  if (!value) {
+    throw new AssertionError(message || `Assertion failed`)
+  }
+}
+
+export function ok (value, message) {
+  assert(ok, message)
+}
+
 /**
  * @param {*} value
  * @throws {AssertionError}

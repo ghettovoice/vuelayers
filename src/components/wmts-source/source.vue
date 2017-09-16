@@ -2,17 +2,15 @@
   import WMTSSource from 'ol/source/wmts'
   import WMTSTileGrid from 'ol/tilegrid/wmts'
   import { range } from 'lodash/fp'
-  import { ol as vlol, mixins, utils } from '../../core'
-
-  const {
+  import {
     WMTS_VERSION,
     WMTS_REQUEST_ENCODING,
     WMTS_FORMAT,
-    tileGrid: tileGridHelper,
-    extent: extentHelper,
-  } = vlol
-  const { assert } = utils
-  const { tileSource } = mixins
+    tileGridHelper,
+    extentHelper,
+    assert,
+    tileSource,
+  } from '../../core'
 
   const props = {
     dimensions: Object,

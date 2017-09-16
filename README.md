@@ -1,6 +1,6 @@
 # VueLayers
 
-> Vue components to work with [OpenLayers](https://openlayers.org)
+> Vue 2.0 components to work with [OpenLayers](https://openlayers.org)
 
 [![Build Status](https://travis-ci.org/ghettovoice/vuelayers.svg?branch=master)](https://travis-ci.org/ghettovoice/vuelayers)
 [![Coverage Status](https://coveralls.io/repos/github/ghettovoice/vuelayers/badge.svg?branch=master)](https://coveralls.io/github/ghettovoice/vuelayers?branch=master)
@@ -17,6 +17,11 @@
 - [Install & Quick Start Guide](https://ghettovoice.github.io/vuelayers/start)
 - [Live Demo](https://ghettovoice.github.io/vuelayers/demo)
 
+## Requirements
+
+- [Vue](https://vuejs.org/) version **^2.3**.
+- [OpenLayers](https://openlayers.org/) version **^3.14**.
+
 ## Install
 
 ```bash
@@ -25,6 +30,8 @@ npm install -S vue vuelayers
 ```
 
 ## Build Setup
+
+**NOTE**: Node **v6+** is required.
 
 ``` bash
 git clone https://github.com/ghettovoice/vuelayers.git

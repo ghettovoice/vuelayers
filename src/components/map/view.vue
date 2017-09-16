@@ -7,11 +7,17 @@
   import 'rxjs/add/operator/debounceTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
-  import { ol as vlol, rx as vlrx, mixins, utils } from '../../core'
-
-  const { MIN_ZOOM, MAX_ZOOM, EPSG_3857, ZOOM_FACTOR, proj, geoJson } = vlol
-  const { olVirtCmp } = mixins
-  const { assert } = utils
+  import {
+    MIN_ZOOM,
+    MAX_ZOOM,
+    EPSG_3857,
+    ZOOM_FACTOR,
+    projHelper,
+    geoJsonHelper,
+    observableFromOlChangeEvent,
+    olVirtCmp,
+    assert,
+  } from '../../core'
 
   const props = {
     center: {
@@ -88,7 +94,7 @@
      */
     createOlObject () {
       return new View({
-        center: proj.fromLonLat(this.center, this.projection),
+        center: projHelper.fromLonLat(this.center, this.projection),
         constrainRotation: this.constrainRotation,
         enableRotation: this.enableRotation,
         extent: this.extent,
@@ -115,7 +121,7 @@
 
       // transform to GeoJSON, vl-feature to ol.Feature
       if (isPlainObject(geometryOrExtent)) {
-        geometryOrExtent = geoJson.readGeometry(geometryOrExtent, this.$view.getProjection())
+        geometryOrExtent = geoJsonHelper.readGeometry(geometryOrExtent, this.$view.getProjection())
       } else if (geometryOrExtent instanceof Vue) {
         geometryOrExtent = geometryOrExtent.$geometry
       }
@@ -160,7 +166,7 @@
   const watch = {
     center (value) {
       if (this.$view && !isEqual(value, this::getCenter())) {
-        this.$view.setCenter(proj.fromLonLat(value, this.$view.getProjection()))
+        this.$view.setCenter(projHelper.fromLonLat(value, this.$view.getProjection()))
       }
     },
     resolution (value) {
@@ -234,7 +240,7 @@
     assert.hasView(this)
 
     const ft = 100
-    const resolution = vlrx.fromOlChangeEvent(this.$view, 'resolution', true, ft)
+    const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution.map(() => ({
       prop: 'zoom',
       value: this::getZoom(),
@@ -242,8 +248,8 @@
       .distinctUntilChanged(isEqual)
 
     const changes = Observable.merge(
-      vlrx.fromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
-      vlrx.fromOlChangeEvent(this.$view, 'rotation', true, ft),
+      observableFromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
+      observableFromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
       zoom
     )
@@ -259,6 +265,6 @@
   }
 
   function getCenter () {
-    return proj.toLonLat(this.$view.getCenter(), this.$view.getProjection())
+    return projHelper.toLonLat(this.$view.getCenter(), this.$view.getProjection())
   }
 </script>

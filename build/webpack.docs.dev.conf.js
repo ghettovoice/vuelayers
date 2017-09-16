@@ -15,6 +15,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     alias: {
       openlayers: 'openlayers/dist/ol-debug.js',
     },
+    mainFields: ['module', 'main'],
   },
   module: {
     rules: [

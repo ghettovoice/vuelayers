@@ -1,11 +1,7 @@
 <script>
   import TileWMSSource from 'ol/source/tilewms'
   import { omit } from 'lodash/fp'
-  import { ol as vlol, mixins, utils } from '../../core'
-
-  const { WMS_VERSION } = vlol
-  const { tileSource } = mixins
-  const { assert } = utils
+  import { WMS_VERSION, tileSource, assert } from '../../core'
 
   const props = {
     extParams: Object, // Additional WMS Request params

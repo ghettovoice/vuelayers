@@ -1,9 +1,6 @@
 <script>
   import VectorLayer from 'ol/layer/vector'
-  import { mixins, utils } from '../../core'
-
-  const { mergeDescriptors } = utils
-  const { layer, stylesContainer } = mixins
+  import { mergeDescriptors, layer, stylesContainer } from '../../core'
 
   const props = {
     updateWhileAnimating: Boolean,

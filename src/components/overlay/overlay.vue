@@ -10,11 +10,14 @@
   import Overlay from 'ol/overlay'
   import { Observable } from 'rxjs/Observable'
   import 'rxjs/add/observable/merge'
-  import { ol as vlol, rx as vlrx, mixins, utils } from '../../core'
-
-  const { OVERLAY_POSITIONING, proj: projHelper } = vlol
-  const { olCmp, useMapCmp } = mixins
-  const { assert } = utils
+  import {
+    OVERLAY_POSITIONING,
+    projHelper,
+    olCmp,
+    useMapCmp,
+    assert,
+    observableFromOlChangeEvent,
+  } from '../../core'
 
   const props = {
     id: {
@@ -187,8 +190,8 @@
 
     const ft = 100
     const changes = Observable.merge(
-      vlrx.fromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
-      vlrx.fromOlChangeEvent(this.$overlay, [
+      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
+      observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
       ], true, ft)

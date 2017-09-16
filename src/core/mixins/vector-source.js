@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/merge'
 import 'rxjs/add/operator/do'
-import * as vlrx from '../rx-ext'
-import { EPSG_4326 } from '../ol-ext'
+import observableFromOlEvent from '../rx-ext/from-ol-event'
+import { EPSG_4326 } from '../ol-ext/consts'
 import source from './source'
 import featuresContainer from '../mixins/features-container'
 import * as assert from '../utils/assert'
@@ -116,11 +116,11 @@ export default {
 function subscribeToSourceChanges () {
   assert.hasSource(this)
 
-  const add = vlrx.fromOlEvent(this.$source, 'addfeature')
+  const add = observableFromOlEvent(this.$source, 'addfeature')
     .do(({ feature }) => {
       this.addFeature(feature)
     })
-  const remove = vlrx.fromOlEvent(this.$source, 'removefeature')
+  const remove = observableFromOlEvent(this.$source, 'removefeature')
     .do(({ feature }) => {
       this.removeFeature(feature)
     })

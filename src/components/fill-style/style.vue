@@ -1,8 +1,6 @@
 <script>
   import Fill from 'ol/style/fill'
-  import { mixins } from '../../core'
-
-  const { style } = mixins
+  import { style } from '../../core'
 
   const props = {
     color: [String, Array],

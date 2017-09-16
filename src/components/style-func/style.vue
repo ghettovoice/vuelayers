@@ -5,14 +5,11 @@
    * and style target for inner style containers (vl-style-box) as fallback style.
    */
   import { isFunction, noop } from 'lodash/fp'
-  import { ol as vlol, mixins, utils } from '../../core'
-
-  const { debug, assert, mergeDescriptors } = utils
-  const { style, stylesContainer } = mixins
+  import { debug, assert, mergeDescriptors, style, stylesContainer } from '../../core'
 
   const props = {
     /**
-     * @type {function(vlol: Object): ol.StyleFunction}
+     * @type {function(): ol.StyleFunction}
      */
     factory: {
       type: Function,
@@ -22,7 +19,7 @@
 
   const computed = {
     styleFunc () {
-      let func = this.factory(vlol)
+      let func = this.factory()
       if (!isFunction(func)) {
         debug.warndbg(`Factory returned a value not of Function type, fallback style will be used`)
         func = noop
@@ -44,8 +41,8 @@
       // fallback style function made from inner style containers
       const fallbackStyleFunc = this.createStyleFunc()
 
-      return function __styleFunc (feature, resolution, vlol) {
-        const styles = providedStyleFunc(feature, resolution, vlol)
+      return function __styleFunc (feature, resolution) {
+        const styles = providedStyleFunc(feature, resolution)
         // not empty or null style
         if (
           styles === null ||
@@ -53,7 +50,7 @@
         ) {
           return styles
         }
-        return fallbackStyleFunc(feature, resolution, vlol)
+        return fallbackStyleFunc(feature, resolution)
       }
     },
     /**

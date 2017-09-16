@@ -3,14 +3,14 @@ import {
   CACHE_SIZE,
   CROSS_ORIGIN,
   EPSG_3857,
-  extent as extentHelper,
   MAX_ZOOM,
   MIN_ZOOM,
   PIXEL_RATIO,
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
-  tileGrid as tileGridHelper,
-} from '../ol-ext'
+} from '../ol-ext/consts'
+import * as extentHelper from '../ol-ext/extent'
+import * as tileGridHelper from '../ol-ext/tile-grid'
 import replaceTokens from '../utils/replace-tokens'
 import source from './source'
 import * as assert from '../utils/assert'

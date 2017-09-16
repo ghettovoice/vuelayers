@@ -1,8 +1,6 @@
 <script>
   import Icon from 'ol/style/icon'
-  import { mixins } from '../../core'
-
-  const { imageStyle } = mixins
+  import { imageStyle } from '../../core'
 
   const props = {
     src: {

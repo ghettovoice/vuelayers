@@ -16,11 +16,17 @@
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
-  import { ol as vlol, rx as vlrx, mixins, utils } from '../../core'
-
-  const { proj: projHelper } = vlol
-  const { mergeDescriptors, assert } = utils
-  const { olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer } = mixins
+  import {
+    projHelper,
+    observableFromOlEvent,
+    mergeDescriptors,
+    assert,
+    olCmp,
+    layersContainer,
+    interactionsContainer,
+    overlaysContainer,
+    featuresContainer,
+  } from '../../core'
 
   const props = {
     // todo remove when vl-control-* components will be ready
@@ -358,12 +364,12 @@
     const ft = 100
     // pointer
     const pointerEvents = Observable.merge(
-      vlrx.fromOlEvent(this.$map, [
+      observableFromOlEvent(this.$map, [
         'click',
         'dblclick',
         'singleclick',
       ]),
-      vlrx.fromOlEvent(this.$map, [
+      observableFromOlEvent(this.$map, [
         'pointerdrag',
         'pointermove',
       ]).throttleTime(ft)
@@ -373,7 +379,7 @@
       coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection()),
     }))
     // other
-    const otherEvents = vlrx.fromOlEvent(this.$map, [
+    const otherEvents = observableFromOlEvent(this.$map, [
       'movestart',
       'moveend',
       'postrender',
@@ -389,10 +395,3 @@
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
 </script>
-
-<style lang="sass">
-  @import ../../styles/utils
-
-  .vl-map
-    +vl-wh(100%, 100%)
-</style>

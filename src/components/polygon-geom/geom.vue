@@ -1,10 +1,7 @@
 <script>
   import { constant } from 'lodash/fp'
   import Polygon from 'ol/geom/polygon'
-  import { ol as vlol, mixins } from '../../core'
-
-  const { GEOMETRY_TYPE } = vlol
-  const { geometry } = mixins
+  import { GEOMETRY_TYPE, geometry } from '../../core'
 
   const props = {}
 

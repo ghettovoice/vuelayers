@@ -1,9 +1,5 @@
 <script>
-  import { ol as vlol, utils } from '../../core'
-  import XyzSource from '../xyz-source'
-
-  const { TILE_FORMAT, EPSG_3857 } = vlol
-  const { coalesce } = utils
+  import { TILE_FORMAT, EPSG_3857, coalesce, xyzSource } from '../../core'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
@@ -52,7 +48,7 @@
 
   export default {
     name: 'vl-source-mapbox',
-    extends: XyzSource.Source,
+    mixins: [xyzSource],
     props,
     computed,
   }

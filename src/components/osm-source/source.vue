@@ -1,6 +1,6 @@
 <script>
   import OSMSource from 'ol/source/osm'
-  import XyzSource from '../xyz-source'
+  import { xyzSource } from '../../core'
 
   const OSM_URL_TEMPLATE = 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   const OSM_MAX_ZOOM = 19
@@ -38,7 +38,7 @@
 
   export default {
     name: 'vl-source-osm',
-    extends: XyzSource.Source,
+    mixins: [xyzSource],
     props,
     methods,
   }

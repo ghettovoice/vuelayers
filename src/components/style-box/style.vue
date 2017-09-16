@@ -6,10 +6,7 @@
    */
   import Vue from 'vue'
   import Style from 'ol/style/style'
-  import { mixins, utils } from '../../core'
-
-  const { style, withFillStrokeStyle } = mixins
-  const { mergeDescriptors } = utils
+  import { style, withFillStrokeStyle, mergeDescriptors } from '../../core'
 
   const props = {
     zIndex: {

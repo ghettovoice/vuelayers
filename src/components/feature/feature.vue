@@ -14,11 +14,17 @@
   import 'rxjs/add/operator/throttleTime'
   import 'rxjs/add/operator/map'
   import 'rxjs/add/operator/mergeAll'
-  import { ol as vlol, rx as vlrx, utils, mixins } from '../../core'
-
-  const { geoJson } = vlol
-  const { mergeDescriptors, plainProps, assert } = utils
-  const { olCmp, useMapCmp, stylesContainer, geometryContainer } = mixins
+  import {
+    geoJsonHelper,
+    mergeDescriptors,
+    plainProps,
+    assert,
+    olCmp,
+    useMapCmp,
+    stylesContainer,
+    geometryContainer,
+    observableFromOlEvent,
+  } from '../../core'
 
   const mergeNArg = merge.convert({ fixed: false })
 
@@ -36,7 +42,7 @@
   const computed = {
     geometry () {
       if (this.rev && this.$geometry && this.$view) {
-        return geoJson.writeGeometry(this.$geometry, this.$view.getProjection())
+        return geoJsonHelper.writeGeometry(this.$geometry, this.$view.getProjection())
       }
     },
   }
@@ -201,14 +207,14 @@
     const getPropValue = prop => this.$feature.get(prop)
     const ft = 100
     // all plain properties
-    const propChanges = vlrx.fromOlEvent(
+    const propChanges = observableFromOlEvent(
       this.$feature,
       'propertychange',
       ({ key }) => ({ prop: key, value: getPropValue(key) })
     ).throttleTime(ft)
       .distinctUntilChanged(isEqual)
     // id, style and other generic changes
-    const changes = vlrx.fromOlEvent(
+    const changes = observableFromOlEvent(
       this.$feature,
       'change'
     ).map(() => Observable.create(obs => {

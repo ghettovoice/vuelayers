@@ -1,8 +1,6 @@
 <script>
   import Stroke from 'ol/style/stroke'
-  import { mixins } from '../../core'
-
-  const { style } = mixins
+  import { style } from '../../core'
 
   const props = {
     color: [Array, String],

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import uuid from 'uuid/v4'
 import { isPlainObject } from 'lodash/fp'
 import * as assert from '../utils/assert'
-import { geoJson } from '../ol-ext/index'
+import * as geoJson from '../ol-ext/geojson'
 
 const methods = {
   /**

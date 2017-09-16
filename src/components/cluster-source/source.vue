@@ -1,10 +1,6 @@
 <script>
-  import { ol as vlol, mixins, utils } from '../../core'
+  import { geomHelper, vectorSource, sourceContainer, mergeDescriptors } from '../../core'
   import SourceBuilder from './builder'
-
-  const { geom: geomHelper } = vlol
-  const { vectorSource, sourceContainer } = mixins
-  const { mergeDescriptors } = utils
 
   const props = {
     distance: {

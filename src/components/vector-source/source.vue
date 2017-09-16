@@ -1,10 +1,7 @@
 <script>
   import VectorSource from 'ol/source/vector'
   import { differenceWith, stubArray, isFunction } from 'lodash/fp'
-  import { ol as vlol, mixins } from '../../core'
-
-  const { loadStrategy, format } = vlol
-  const { vectorSource } = mixins
+  import { loadStrategyHelper, formatHelper, vectorSource } from '../../core'
 
   const props = {
     /**
@@ -148,13 +145,13 @@
    * @return {ol.LoadingStrategy}
    */
   function defaultStrategyFactory () {
-    return loadStrategy.all
+    return loadStrategyHelper.all
   }
 
   /**
    * @return {ol.format.GeoJSON}
    */
   function defaultFormatFactory () {
-    return format.geoJson()
+    return formatHelper.geoJson()
   }
 </script>

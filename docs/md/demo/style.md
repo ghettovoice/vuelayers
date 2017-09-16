@@ -4,7 +4,7 @@
 @import variables
 @import ~highlight.js/styles/github-gist
 // import VueLayers styles
-@import ~vuelayers/dist/vuelayers
+@import ~vuelayers/lib/style
 // Import Buefy styles
 @import ~buefy/src/scss/buefy-build
 

@@ -50,7 +50,7 @@
 </template>
 
 <script>
-  import { ol as vlol } from 'vuelayers'
+  import { core as vlCore } from 'vuelayers'
   import VldHomeContent from '../md/home.md'
 
   const methods = {
@@ -58,7 +58,7 @@
       if (!this.zoomedToPosition) {
         this.zoomedToPosition = true
         this.$refs.view.animate({
-          center: vlol.proj.fromLonLat(coordinate, this.$refs.view.projection),
+          center: vlCore.projHelper.fromLonLat(coordinate, this.$refs.view.projection),
           zoom: 12,
           duration: 1000,
         })

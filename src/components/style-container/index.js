@@ -3,9 +3,8 @@
  * @deprecated
  */
 import StyleBox from '../style-box'
-import { utils } from '../../core'
+import { debug } from '../../core'
 
-const { debug } = utils
 /**
  * @deprecated
  * @todo remove in the next release

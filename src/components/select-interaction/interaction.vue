@@ -19,11 +19,7 @@
     stubArray,
     forEach,
   } from 'lodash/fp'
-  import { ol as vlol, rx as vlrx, mixins, utils } from '../../core'
-
-  const { style: styleHelper, geoJson } = vlol
-  const { interaction, stylesContainer } = mixins
-  const { assert, mergeDescriptors } = utils
+  import { styleHelper, geoJsonHelper, interaction, stylesContainer, assert, mergeDescriptors, observableFromOlEvent } from '../../core'
 
   // todo add other options, like event modifiers
   const props = {
@@ -274,14 +270,14 @@
   function subscribeToInteractionChanges () {
     assert.hasInteraction(this)
 
-    const events = vlrx.fromOlEvent(this.$interaction, 'select')
+    const events = observableFromOlEvent(this.$interaction, 'select')
 
     this.subscribeTo(
       events,
       ({ selected, deselected, mapBrowserEvent }) => {
         ++this.rev
 
-        this.$emit('update:features', this.$features.map(f => geoJson.writeFeature(f, this.$view.getProjection())))
+        this.$emit('update:features', this.$features.map(f => geoJsonHelper.writeFeature(f, this.$view.getProjection())))
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
       }

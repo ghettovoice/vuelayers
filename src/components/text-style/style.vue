@@ -1,9 +1,6 @@
 <script>
   import Text from 'ol/style/text'
-  import { mixins, utils } from '../../core'
-
-  const { mergeDescriptors } = utils
-  const { style, withFillStrokeStyle } = mixins
+  import { mergeDescriptors, style, withFillStrokeStyle } from '../../core'
 
   const props = {
     font: {

@@ -23,8 +23,3 @@ const VueLayers = {
   ...components,
 }
 export default VueLayers
-// auto install for Browser env
-/* istanbul ignore if */
-if (typeof window !== 'undefined' && window.Vue) {
-  window.Vue.use(VueLayers)
-}

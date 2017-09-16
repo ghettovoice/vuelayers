@@ -2,75 +2,52 @@
  * VueLayers Core
  * @module core
  */
+export * from './consts'
+export * from './ol-ext/consts'
+// rx helpers
+export observableFromOlEvent from './rx-ext/from-ol-event'
+export observableFromOlChangeEvent from './rx-ext/from-ol-change-event'
+// ol helpers
+export * as extentHelper from './ol-ext/extent'
+export * as geoJsonHelper from './ol-ext/geojson'
+export * as geomHelper from './ol-ext/geom'
+export * as projHelper from './ol-ext/proj'
+export * as styleHelper from './ol-ext/style'
+export * as tileGridHelper from './ol-ext/tile-grid'
+export * as loadStrategyHelper from './ol-ext/load-strategy'
+export * as formatHelper from './ol-ext/format'
+export easingHelper from 'ol/easing'
 // mixins
-import featuresContainer from './mixins/features-container'
-import geometry from './mixins/geometry'
-import geometryContainer from './mixins/geometry-container'
-import identMap from './mixins/ident-map'
-import imageStyle from './mixins/image-style'
-import interaction from './mixins/interaction'
-import interactionsContainer from './mixins/interactions-container'
-import layer from './mixins/layer'
-import layersContainer from './mixins/layers-container'
-import olCmp from './mixins/ol-cmp'
-import olVirtCmp from './mixins/ol-virt-cmp'
-import overlaysContainer from './mixins/overlays-container'
-import rxSubs from './mixins/rx-subs'
-import services from './mixins/services'
-import source from './mixins/source'
-import sourceContainer from './mixins/source-container'
-import stubVNode from './mixins/stub-vnode'
-import style from './mixins/style'
-import stylesContainer from './mixins/styles-container'
-import tileSource from './mixins/tile-source'
-import useMapCmp from './mixins/use-map-cmp'
-import vectorSource from './mixins/vector-source'
-import withFillStrokeStyle from './mixins/with-fill-stroke-style'
+export featuresContainer from './mixins/features-container'
+export geometry from './mixins/geometry'
+export geometryContainer from './mixins/geometry-container'
+export identMap from './mixins/ident-map'
+export imageStyle from './mixins/image-style'
+export interaction from './mixins/interaction'
+export interactionsContainer from './mixins/interactions-container'
+export layer from './mixins/layer'
+export layersContainer from './mixins/layers-container'
+export olCmp from './mixins/ol-cmp'
+export olVirtCmp from './mixins/ol-virt-cmp'
+export overlaysContainer from './mixins/overlays-container'
+export rxSubs from './mixins/rx-subs'
+export services from './mixins/services'
+export source from './mixins/source'
+export sourceContainer from './mixins/source-container'
+export stubVNode from './mixins/stub-vnode'
+export style from './mixins/style'
+export stylesContainer from './mixins/styles-container'
+export tileSource from './mixins/tile-source'
+export useMapCmp from './mixins/use-map-cmp'
+export vectorSource from './mixins/vector-source'
+export withFillStrokeStyle from './mixins/with-fill-stroke-style'
+export xyzSource from './mixins/xyz-source'
 // utils
-import * as assert from './utils/assert'
-import coalesce from './utils/coalesce'
-import * as debug from './utils/debug'
-import IdentityMap from './utils/identity-map'
-import isNumeric from './utils/is-numeric'
-import mergeDescriptors from './utils/multi-merge-descriptors'
-import plainProps from './utils/plain-props'
-import replaceTokens from './utils/replace-tokens'
-
-export * as ol from './ol-ext'
-export * as rx from './rx-ext'
-export * as consts from './consts'
-export const mixins = {
-  featuresContainer,
-  geometry,
-  geometryContainer,
-  identMap,
-  imageStyle,
-  interaction,
-  interactionsContainer,
-  layer,
-  layersContainer,
-  olCmp,
-  olVirtCmp,
-  overlaysContainer,
-  rxSubs,
-  services,
-  source,
-  sourceContainer,
-  stubVNode,
-  style,
-  stylesContainer,
-  tileSource,
-  useMapCmp,
-  vectorSource,
-  withFillStrokeStyle,
-}
-export const utils = {
-  assert,
-  coalesce,
-  debug,
-  IdentityMap,
-  isNumeric,
-  mergeDescriptors,
-  plainProps,
-  replaceTokens,
-}
+export * as assert from './utils/assert'
+export coalesce from './utils/coalesce'
+export * as debug from './utils/debug'
+export IdentityMap from './utils/identity-map'
+export isNumeric from './utils/is-numeric'
+export mergeDescriptors from './utils/multi-merge-descriptors'
+export plainProps from './utils/plain-props'
+export replaceTokens from './utils/replace-tokens'

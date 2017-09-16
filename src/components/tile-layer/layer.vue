@@ -1,8 +1,6 @@
 <script>
   import TileLayer from 'ol/layer/tile'
-  import { mixins } from '../../core'
-
-  const { layer } = mixins
+  import { layer } from '../../core'
 
   const props = {
     preload: Number,

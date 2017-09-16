@@ -1,12 +1,13 @@
 import { isEqual } from 'lodash/fp'
 import mergeDescriptors from '../utils/multi-merge-descriptors'
-import * as vlrx from '../rx-ext'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/throttleTime'
 import 'rxjs/add/operator/distinctUntilChanged'
+import observableFromOlEvent from '../rx-ext/from-ol-event'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
-import { extent as extentHelper, proj as projHelper } from '../ol-ext'
+import * as extentHelper from '../ol-ext/extent'
+import * as projHelper from '../ol-ext/proj'
 import * as assert from '../utils/assert'
 
 const props = {
@@ -200,7 +201,7 @@ function subscribeToGeomChanges () {
   assert.hasGeometry(this)
 
   const ft = 100
-  const changes = vlrx.fromOlEvent(
+  const changes = observableFromOlEvent(
     this.$geometry,
     'change',
     () => ({

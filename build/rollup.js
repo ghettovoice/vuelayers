@@ -110,7 +110,7 @@ function makeBundles (format, env = 'development') {
         format,
         env,
         bundleName: ['index', format === 'cjs' ? '' : format, min].filter(x => x).join('.'),
-        styleName: ['style', format === 'umd' ? format : '', min].filter(x => x).join('.'),
+        styleName: ['style', min].filter(x => x).join('.'),
         replaces: replaces({
           paths: format !== 'umd',
           env,
@@ -133,7 +133,7 @@ function makeBundles (format, env = 'development') {
           format,
           env,
           bundleName: [bundleName, min].filter(x => x).join('.'),
-          styleName: [styleName, min].filter(x => x).join('.'),
+          // styleName: [styleName, min].filter(x => x).join('.'),
           replaces: replaces({
             paths: true,
             env,
@@ -205,9 +205,10 @@ function makeBundle (opts = {}) {
           utils.resolve('node_modules'),
         ],
       },
-      css: (_, styles) => {
-        vueStylesPromise = Promise.all(styles.map(({ id, $compiled: { code, map } }) => ({ id, code, map })))
-      },
+      css: false,
+      // css: (_, styles) => {
+      //   vueStylesPromise = Promise.all(styles.map(({ id, $compiled: { code, map } }) => ({ id, code, map })))
+      // },
     }),
     sass({
       banner: opts.banner,
@@ -236,7 +237,6 @@ function makeBundle (opts = {}) {
       module: true,
       jsnext: true,
       browser: true,
-      preferBuiltins: false,
     }),
     cjs(),
   ]
@@ -291,7 +291,7 @@ function makeBundle (opts = {}) {
       sassStylesPromise,
       vueStylesPromise,
     ]).then(([sassStyles, vueStyles]) => {
-      const files = (sassStyles || []).concat(vueStyles)
+      const files = (sassStyles || []).concat(vueStyles || [])
         .reduce((all, { id, code, map }) => {
           if (code) {
             all.push({
