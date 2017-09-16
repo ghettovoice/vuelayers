@@ -95,22 +95,28 @@ function styleLoaders (options) {
   return output
 }
 
-function postcssPlugins () {
-  return [
+function postcssPlugins (opts = {}) {
+  const plugins = [
     require('autoprefixer')({
       browsers: ['last 5 versions'],
     }),
   ]
+  if (opts.min) {
+    plugins.push(require('postcss-clean')())
+  }
+
+  return plugins
 }
 
-function postcssProcess ({ id, code, map }) {
-  return postcss(postcssPlugins())
+function postcssProcess ({ id, code, map, min }) {
+  return postcss(postcssPlugins({ min }))
     .process(code, {
       from: id,
       to: id,
       map: {
         inline: false,
         prev: map,
+        annotation: true,
       },
     })
     .then(({ css, map }) => ({

@@ -2,8 +2,6 @@
  * VueLayers Core
  * @module core
  */
-// import lib style
-import '../styles/main.sass'
 // mixins
 import featuresContainer from './mixins/features-container'
 import geometry from './mixins/geometry'

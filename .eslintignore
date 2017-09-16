@@ -1,5 +1,6 @@
 modules/*
 dist/*
+lib/*
 dist-docs/*
 test/e2e/reports/*
 test/unit/coverage/*
