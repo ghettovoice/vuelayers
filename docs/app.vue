@@ -4,7 +4,10 @@
       <div class="column left is-4-tablet is-3-desktop is-2-widescreen is-hidden-mobile is-fullheight">
         <vld-sidebar>
           <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Home" exact-active-class="is-active">
-            <div class="name"><img src="./static/img/logo-white.svg" /></div>
+            <div class="name">
+              <b-icon icon="map-o" />
+              <span>C_PKG_FULLNAME</span>
+            </div>
             <b-tag type="is-info">vC_PKG_VERSION</b-tag>
           </router-link>
 
@@ -36,7 +39,10 @@
         <vld-navbar class="is-hidden-tablet">
           <vld-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo has-text-left"
                           :router="true">
-            <div class="name"><img src="./static/img/logo-purple.svg" /></div>
+            <div class="name">
+              <b-icon icon="map-o" />
+              <span>C_PKG_FULLNAME</span>
+            </div>
             <b-tag type="is-info">vC_PKG_VERSION</b-tag>
           </vld-navbar-item>
           <vld-navbar-item slot="brand" link="C_PKG_REPOSITORY" title="View on GitHub" target="_blank"
@@ -113,14 +119,18 @@
       background: $sidebar-background
       padding: 0
       position: fixed
-      a
-        color: $sidebar-link-color
-        &:hover
-          color: $sidebar-link-hover-color
       .icon
         color: $sidebar-icon-color
         &:hover
           color: $sidebar-icon-hover-color
+      .logo
+        color: $white
+        a, .icon
+          color: $white
+          &:hover, &:hover .icon
+            color: $primary
+        .name
+          font-size: 1.5em
       .menu-list
         a
           color: $sidebar-menu-link-color
@@ -147,6 +157,5 @@
       .logo
         .name
           margin-right: .5em
-          img
-            vertical-align: bottom
+          vertical-align: middle
 </style>
