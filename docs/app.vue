@@ -4,7 +4,7 @@
       <div class="column left is-4-tablet is-3-desktop is-2-widescreen is-hidden-mobile is-fullheight">
         <vld-sidebar>
           <router-link slot="logo" to="/" title="C_PKG_FULLNAME.js Home" exact-active-class="is-active">
-            <div class="name">C_PKG_FULLNAME.js</div>
+            <div class="name"><img src="./static/img/logo-white.svg" /></div>
             <b-tag type="is-info">vC_PKG_VERSION</b-tag>
           </router-link>
 
@@ -36,7 +36,7 @@
         <vld-navbar class="is-hidden-tablet">
           <vld-navbar-item slot="brand" link="/" title="C_PKG_FULLNAME.js Docs" class="logo has-text-left"
                           :router="true">
-            <div class="name">C_PKG_FULLNAME.js</div>
+            <div class="name"><img src="./static/img/logo-purple.svg" /></div>
             <b-tag type="is-info">vC_PKG_VERSION</b-tag>
           </vld-navbar-item>
           <vld-navbar-item slot="brand" link="C_PKG_REPOSITORY" title="View on GitHub" target="_blank"
@@ -146,5 +146,7 @@
       box-shadow: 0 0 1em rgba(0, 0, 0, 0.4)
       .logo
         .name
-          margin-right: .25em
+          margin-right: .5em
+          img
+            vertical-align: bottom
 </style>
