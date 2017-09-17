@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import OlObject from 'ol/object'
 import { identity } from 'lodash/fp'
 import { Observable } from 'rxjs/Observable'
-import * as vlrx from '../../../../src/core/rx-ext'
+import { observableFromOlEvent } from '../../../../src/core'
 
 describe('RxJS extensions', () => {
   describe('fromOlEvent', () => {
@@ -18,13 +18,13 @@ describe('RxJS extensions', () => {
     })
 
     it('should return observable', () => {
-      const observable = vlrx.fromOlEvent(olMock, 'click')
+      const observable = observableFromOlEvent(olMock, 'click')
 
       expect(observable).to.be.instanceof(Observable)
     })
 
     it('should subscribe/unsubscribe to event', () => {
-      vlrx.fromOlEvent(olMock, 'click')
+      observableFromOlEvent(olMock, 'click')
         .subscribe()
         .unsubscribe()
 
@@ -34,7 +34,7 @@ describe('RxJS extensions', () => {
 
     it('should map value through provided selector', done => {
       const selector = sinon.spy(evt => evt.type)
-      const subs = vlrx.fromOlEvent(olMock, 'click', selector)
+      const subs = observableFromOlEvent(olMock, 'click', selector)
         .subscribe(
           type => {
             expect(type).to.be.equal('click')
@@ -58,7 +58,7 @@ describe('RxJS extensions', () => {
 
     it('should subscribe to multiple events', done => {
       const selector = sinon.spy(identity)
-      const observable = vlrx.fromOlEvent(olMock, [
+      const observable = observableFromOlEvent(olMock, [
         'click',
         {
           event: 'move',
