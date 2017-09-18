@@ -5,7 +5,11 @@ import IdentityMap from '../utils/identity-map'
 
 export default {
   props: {
-    // unique key for saving to identity map
+    /**
+     * Unique key for saving to identity map
+     * @type {string|number}
+     * @experimental
+     */
     ident: [String, Number],
   },
   methods: {

@@ -1,5 +1,3 @@
-::: content
-
 ```html
 <div class="demo-app">
   <!-- app map -->
@@ -180,5 +178,3 @@
   <!--// map panel, controls -->
 </div>
 ```
-
-:::

@@ -1,5 +1,3 @@
-::: content
-
 ```stylus
 @import variables
 @import ~highlight.js/styles/github-gist
@@ -63,5 +61,3 @@ html *
     .content
       word-break: break-all
 ```
-
-:::

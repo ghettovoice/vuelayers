@@ -191,8 +191,10 @@ function vueMarkdownLoaderConfig () {
     },
     preprocess: function (md, src) {
       const { pattern, replacement } = compileVarsReplacement()
+      src = src.replace(pattern, replacement)
+      src = `<div class="content">\n\n${src}\n\n</div>`
 
-      return src.replace(pattern, replacement)
+      return src
     },
     use: [
       require('markdown-it-checkbox'),

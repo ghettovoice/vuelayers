@@ -1,5 +1,3 @@
-::: content
-
 ```js
 import { kebabCase, range, random } from 'lodash/fp'
 // import C_PKG_FULLNAME core helpers
@@ -240,5 +238,3 @@ export default {
   },
 }
 ```
-
-:::

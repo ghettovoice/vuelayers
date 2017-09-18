@@ -39,37 +39,22 @@ export default [
     component: () => import('./pages/demo.vue'),
   },
   {
-    path: '/components',
-    redirect: '/components/vl-map',
+    path: '/packages',
+    redirect: '/packages/map',
   },
   {
-    path: '/components/vl-map',
+    path: '/packages/map',
     meta: {
-      title: 'vl-map',
+      title: 'Map',
     },
     props: {
-      title: 'vl-map',
-      subtitle: 'Map component',
+      title: 'Map',
+      subtitle: 'The Core component of C_PKG_FULLNAME',
       color: 'is-info',
     },
     component: () => Promise.all([
       import('./pages/common.vue'),
-      import('./md/components/vl-map.md'),
-    ]).then(routerViewProxyFromArray),
-  },
-  {
-    path: '/components/vl-view',
-    meta: {
-      title: 'vl-view',
-    },
-    props: {
-      title: 'vl-view',
-      subtitle: 'Map view component',
-      color: 'is-info',
-    },
-    component: () => Promise.all([
-      import('./pages/common.vue'),
-      import('./md/components/vl-view.md'),
+      import('./md/packages/map.md'),
     ]).then(routerViewProxyFromArray),
   },
   {

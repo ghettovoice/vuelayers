@@ -1,5 +1,3 @@
-::: content
-
 <b-message type="is-warning">
 
 ## Requirements
@@ -155,5 +153,3 @@ Example `.babelrc` config:
   ]
 }
 ```
-
-:::
