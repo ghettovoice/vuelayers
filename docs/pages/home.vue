@@ -22,7 +22,19 @@
     </section>
 
     <vld-hero>
-      <vld-home-content class="intro"/>
+      <div class="intro content">
+        <h1 class="title">
+          C_PKG_FULLNAME.js
+        </h1>
+        <p class="subtitle">
+          <a href="https://vuejs.org/" title="Vue Homepage" target="_blank">Vue 2.0</a> components to work with
+          <a href="https://openlayers.org/" title="OpenLayers Homepage" target="_blank">OpenLayers]</a>
+        </p>
+
+        <vld-code lang="bash">
+          npm install --save C_PKG_NAME
+        </vld-code>
+      </div>
 
       <section class="buttons">
         <router-link to="/demo" class="button is-primary is-large" title="View Live Demo">
@@ -51,7 +63,6 @@
 
 <script>
   import { core as vlCore } from 'vuelayers'
-  import VldHomeContent from '../md/home.md'
 
   const methods = {
     onUpdatePosition (coordinate) {
@@ -68,9 +79,6 @@
 
   export default {
     name: 'vld-home-page',
-    components: {
-      VldHomeContent,
-    },
     methods,
     data () {
       return {

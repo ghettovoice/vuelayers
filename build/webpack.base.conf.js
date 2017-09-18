@@ -87,13 +87,18 @@ module.exports = {
         },
       },
       {
-        test: /\.md$/,
-        loader: 'vue-markdown-loader',
-        options: utils.vueMarkdownLoaderConfig(),
-      },
-      {
         test: /\.(json|geojson)$/,
         loader: 'json-loader',
+      },
+      {
+        test: /\.md$/,
+        use: [
+          'html-loader',
+          {
+            loader: 'markdown-loader',
+            options: utils.markdownLoaderConfig(),
+          }
+        ],
       },
     ],
     noParse: [/openlayers/],

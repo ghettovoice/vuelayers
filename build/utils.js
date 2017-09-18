@@ -1,7 +1,5 @@
 const fs = require('fs-extra')
 const path = require('path')
-const hljs = require('highlight.js')
-const { escape } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
 const concat = require('source-map-concat')
@@ -139,6 +137,16 @@ function vueLoaderConfig (extract) {
   }
 }
 
+function markdownLoaderConfig () {
+  const hljs = require('highlight.js')
+  const renderer = new (require('marked')).Renderer()
+  renderer.code = (code, lang) => `<pre><code class="hljs ${lang}">${hljs.highlightAuto(code).value}</code></pre>`
+
+  return {
+    renderer,
+  }
+}
+
 function writeFile (dest, data) {
   return fs.outputFile(dest, data)
     .then(() => ({
@@ -170,38 +178,6 @@ function getSize (data) {
     : bytes < 1024000
       ? (bytes / 1024).toPrecision(3) + ' kB'
       : (bytes / 1024 / 1024).toPrecision(4) + ' MB'
-}
-
-function vueMarkdownLoaderConfig () {
-  return {
-    langPrefix: '',
-    preventExtract: true,
-    wrapper: 'div',
-    linkify: true,
-    highlight: (str, lang) => {
-      if (lang && hljs.getLanguage(lang)) {
-        try {
-          return '<pre class="hljs"><code class="' + lang + '">' +
-            hljs.highlight(lang, str, true).value +
-            '</code></pre>'
-        } catch (__) {}
-      }
-
-      return '<pre class="hljs"><code class="' + lang + '">' + escape(str) + '</code></pre>'
-    },
-    preprocess: function (md, src) {
-      const { pattern, replacement } = compileVarsReplacement()
-      src = src.replace(pattern, replacement)
-      src = `<div class="content">\n\n${src}\n\n</div>`
-
-      return src
-    },
-    use: [
-      require('markdown-it-checkbox'),
-      require('markdown-it-decorate'),
-      [require('markdown-it-container'), 'content'],
-    ],
-  }
 }
 
 function compileVarsReplacement () {
@@ -244,12 +220,12 @@ module.exports = {
   cssLoaders,
   styleLoaders,
   vueLoaderConfig,
+  markdownLoaderConfig,
   postcssPlugins,
   postcssProcess,
   writeFile,
   readDir,
   getSize,
-  vueMarkdownLoaderConfig,
   compileVarsReplacement,
   compileVarsReplaceLoader,
   concatFiles,

@@ -1,45 +1,54 @@
-<template>
-  <div class="demo">
-    <vld-hero :bold="bold" :color="color">
-      <h1 class="title">{{ title }}</h1>
-      <h2 class="subtitle">{{ subtitle }}</h2>
-    </vld-hero>
+<template lang="pug">
+  div.demo
+    vld-hero(:bold='bold', :color='color')
+      h1.title {{ title }}
+      h2.subtitle {{ subtitle }}
 
-    <vld-demo-app />
+    vld-demo-app/
 
-    <section class="section">
-      <h3 class="title">Source code</h3>
-      <b-tabs>
-        <b-tab-item label="JS">
-          <vld-demo-script/>
-        </b-tab-item>
-        <b-tab-item label="HTML">
-          <vld-demo-template/>
-        </b-tab-item>
-        <b-tab-item label="SASS">
-          <vld-demo-style/>
-        </b-tab-item>
-      </b-tabs>
-    </section>
-  </div>
+    section.section.content
+      h3.title Source code
+      b-tabs
+        b-tab-item(label='JS')
+          vld-code(lang="js") {{ script }}
+        b-tab-item(label='HTML')
+          vld-code(lang="html") {{ template }}
+        b-tab-item(label='SASS')
+          vld-code(lang="styl") {{ style }}
 </template>
 
 <script>
   import page from './page'
-  import VldDemoScript from '../md/demo/script.md'
-  import VldDemoTemplate from '../md/demo/template.md'
-  import VldDemoStyle from '../md/demo/style.md'
+  // eslint-disable-next-line import/no-webpack-loader-syntax
+  import demoSrc from '!raw-loader!../components/demo-app.vue'
 
   const props = {}
+  const computed = {
+    script () {
+      let match = demoSrc.match(/<script[^>]*>([\s\S]*)<\/script>/)
+      console.log(match)
+      if (match && match[1]) {
+        return match[1]
+      }
+    },
+    template () {
+      let match = demoSrc.match(/<template[^>]*>([\s\S]*)<\/template>/)
+      if (match && match[1]) {
+        return match[1]
+      }
+    },
+    style () {
+      let match = demoSrc.match(/<style[^>]*>([\s\S]*)<\/style>/)
+      if (match && match[1]) {
+        return match[1]
+      }
+    },
+  }
 
   export default {
     name: 'vld-demo-page',
     mixins: [page],
-    components: {
-      VldDemoScript,
-      VldDemoTemplate,
-      VldDemoStyle,
-    },
     props,
+    computed,
   }
 </script>

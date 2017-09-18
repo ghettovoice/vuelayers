@@ -3,6 +3,7 @@
 
 $light-blue: #03a9f4;
 $indigo: #536dfe;
+$grey-very-lighter: lighten($grey-lighter, 8);
 
 // Set your colors
 $primary: $light-blue;
@@ -21,7 +22,9 @@ $colors: (
   "danger": ($danger, $danger-invert),
 );
 
-$code-background: darken($light, 2%);
+$pre-background: $grey-very-lighter;
+$code-background: $grey-very-lighter;
+$code-padding: 0.25em 0.5em 0.25em;
 
 // Links
 $link: $primary;
