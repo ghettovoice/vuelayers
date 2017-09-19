@@ -26,14 +26,13 @@
     > *
       margin: .5rem 0
 
-  .logo
-    text-align: center
-    font-size: 1.2em
+    .logo
+      text-align: center
 
-  .links
-    text-align: center
-    a
-      color: $text-light
-      &:hover
-        color: $text
+    .links
+      text-align: center
+      a
+        color: $text-light
+        &:hover
+          color: $text
 </style>

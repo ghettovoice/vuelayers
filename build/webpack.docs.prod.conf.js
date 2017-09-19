@@ -8,7 +8,6 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 const PreloadWebpackPlugin = require('preload-webpack-plugin')
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const baseWebpackConfig = require('./webpack.base.conf')
 const utils = require('./utils')
 const config = require('./config')
@@ -107,23 +106,6 @@ const webpackConfig = merge(baseWebpackConfig, {
       minify: true,
       navigateFallback: config.publicPath,
       staticFileGlobsIgnorePatterns: [/dist-docs\/.*\.html/],
-    }),
-    new FaviconsWebpackPlugin({
-      logo: utils.resolve('docs/static/img/logo-blue.svg'),
-      prefix: utils.assetsPath('img'),
-      title: config.fullname,
-      icons: {
-        android: true,
-        appleIcon: true,
-        appleStartup: true,
-        coast: false,
-        favicons: true,
-        firefox: true,
-        opengraph: false,
-        twitter: false,
-        yandex: false,
-        windows: false,
-      },
     }),
   ],
 })

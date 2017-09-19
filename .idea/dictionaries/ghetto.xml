@@ -55,7 +55,6 @@
       <w>minified</w>
       <w>minifier</w>
       <w>mixins</w>
-      <w>modsys</w>
       <w>moveend</w>
       <w>movestart</w>
       <w>multiline</w>
@@ -68,7 +67,6 @@
       <w>olsize</w>
       <w>oltilegrid</w>
       <w>ongenerate</w>
-      <w>opengraph</w>
       <w>openstreetmap</w>
       <w>outro</w>
       <w>overriden</w>
@@ -93,7 +91,6 @@
       <w>singleclick</w>
       <w>sinon</w>
       <w>sourcemap</w>
-      <w>subitem</w>
       <w>tilegrid</w>
       <w>tmpl</w>
       <w>topo</w>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     preserveAspectRatio="xMidYMid meet" viewBox="0 0 280.2 288" width="280.2" height="288">
+  <defs>
+    <path d="M270.36 277.94L270.36 9.98L10.74 9.98L10.74 277.94L270.36 277.94Z" id="d1Vrb6ucz9"></path>
+    <path d="M221.4 31.27L33.9 256.27L33.9 31.27" id="a4UvVcJzUX"></path>
+    <clipPath id="clipf30DZBFUvL">
+      <use xlink:href="#a4UvVcJzUX" opacity="1"></use>
+    </clipPath>
+    <path d="M249.09 256.27L61.59 256.27L249.09 31.27" id="cCW4MbDcy"></path>
+    <clipPath id="clipb1ME39PNAH">
+      <use xlink:href="#cCW4MbDcy" opacity="1"></use>
+    </clipPath>
+    <path d="M182.62 31.27L63.66 173.89L63.66 31.27" id="c5w4UYVQlq"></path>
+    <clipPath id="clipb1vvDLUCJg">
+      <use xlink:href="#c5w4UYVQlq" opacity="1"></use>
+    </clipPath>
+    <path d="M249.09 226.32L125.57 226.32L249.09 78.06" id="e6NHwkjPBf"></path>
+    <clipPath id="clipaeXTFVPAs">
+      <use xlink:href="#e6NHwkjPBf" opacity="1"></use>
+    </clipPath>
+    <path d="M249.09 206.31L168.23 206.31L249.09 109.29" id="b71zeAgIhq"></path>
+    <clipPath id="clipa17lCkN4jy">
+      <use xlink:href="#b71zeAgIhq" opacity="1"></use>
+    </clipPath>
+    <path d="M156.61 31.27L83.64 118.71L83.64 31.27" id="b49cU4xoc5"></path>
+    <clipPath id="clipgpZoDMtP3">
+      <use xlink:href="#b49cU4xoc5" opacity="1"></use>
+    </clipPath>
+  </defs>
+  <g>
+    <g>
+      <g>
+        <use xlink:href="#d1Vrb6ucz9" opacity="1" fill="#000000" fill-opacity="0"></use>
+        <g>
+          <use xlink:href="#d1Vrb6ucz9" opacity="1" fill-opacity="0" stroke="#42a5f5" stroke-width="20"
+               stroke-opacity="1"></use>
+        </g>
+      </g>
+      <g>
+        <use xlink:href="#a4UvVcJzUX" opacity="1" fill="#000000" fill-opacity="0"></use>
+        <g clip-path="url(#clipf30DZBFUvL)">
+          <use xlink:href="#a4UvVcJzUX" opacity="1" fill-opacity="0" stroke="#1976D2" stroke-width="60"
+               stroke-opacity="1"></use>
+        </g>
+      </g>
+      <g>
+        <use xlink:href="#cCW4MbDcy" opacity="1" fill="#000000" fill-opacity="0"></use>
+        <g clip-path="url(#clipb1ME39PNAH)">
+          <use xlink:href="#cCW4MbDcy" opacity="1" fill-opacity="0" stroke="#1976D2" stroke-width="60"
+               stroke-opacity="1"></use>
+        </g>
+      </g>
+      <g>
+        <use xlink:href="#c5w4UYVQlq" opacity="1" fill="#000000" fill-opacity="0"></use>
+        <g clip-path="url(#clipb1vvDLUCJg)">
+          <use xlink:href="#c5w4UYVQlq" opacity="1" fill-opacity="0" stroke="#2196f3" stroke-width="40"
+               stroke-opacity="1"></use>
+        </g>
+      </g>
+      <g>
+        <use xlink:href="#e6NHwkjPBf" opacity="1" fill="#000000" fill-opacity="0"></use>
+        <g clip-path="url(#clipaeXTFVPAs)">
+          <use xlink:href="#e6NHwkjPBf" opacity="1" fill-opacity="0" stroke="#2196f3" stroke-width="40"
+               stroke-opacity="1"></use>
+        </g>
+      </g>
+      <g>
+        <g clip-path="url(#clipa17lCkN4jy)">
+          <use xlink:href="#b71zeAgIhq" opacity="1" fill-opacity="0" stroke="#64b5f6" stroke-width="20"
+               stroke-opacity="1"></use>
+        </g>
+      </g>
+      <g>
+        <g clip-path="url(#clipgpZoDMtP3)">
+          <use xlink:href="#b49cU4xoc5" opacity="1" fill-opacity="0" stroke="#64b5f6" stroke-width="20"
+               stroke-opacity="1"></use>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
