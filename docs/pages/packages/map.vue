@@ -17,33 +17,11 @@
       h3 vl-map
       b-tabs
         b-tab-item(label="Properties")
-          -
-            var rows = [
-              [
-                'controls',
-                '#[code Object | Boolean]',
-                'Optional',
-                'Options to configure **default controls** of the map. #[code false] value disables all controls.' +
-                '#[code Object] value simply passed to #[code ol.control.defaults()] #[a(href="https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults", target="_blank") Read more].' +
-                'Default: #[code true].'
-              ],
-            ]
-          table
-            tr
-              th Name
-              th Type
-              th Argument
-              th Description
-            tr
-              td controls
-              td #[code Object | Boolean]
-              td Optional
-              td.
-                Options to configure **default controls** of the map. #[code false] value disables all controls.
-                #[code Object] value simply passed to #[code ol.control.defaults()] #[a(href="https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults", target="_blank") Read more].
-                Default: #[code true].
+          | TODO: describe props
         b-tab-item(label="Events")
+          | TODO: describe events
         b-tab-item(label="Methods")
+          | TODO: describe events
 </template>
 
 <script>

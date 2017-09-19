@@ -51,38 +51,17 @@
         Each directory includes a set of index files: #[code lib/**/index.js], #[code lib/**/index.es.js],
         #[code lib/**/index.umd.js] and #[code lib/**/index.umd.min.js]. All stylesheets are compiled to files:
         #[code lib/style.css] and #[code lib/style.min.css].
-      -
-        var rows = [
-          [
-            'ES modules',
-            'Webpack 2, Rollup',
-            '#[code lib/index.es.js], #[code lib/**/index.es.js]',
-            '#[code lib/style.css]'
-          ],
-          [
-            'CommonJS',
-            'Webpack 1, NodeJS',
-            '#[code lib/index.js], #[code lib/**/index.js]',
-            '#[code lib/style.css]'
-          ],
-          [
-            'UMD',
-            'Browser, AMD',
-            '#[code lib/index.umd.js], #[code lib/**/index.umd.js],#[br]' +
-            '#[code lib/index.umd.min.js], #[code lib/**/index.umd.min.js]',
-            '#[code lib/style.css]'
-          ],
-        ]
       table
         tr
           th Module system
           th Environments
           th JS
           th CSS
-        each row in rows
-          tr
-            each cell in row
-              td!= render('| ' + cell)
+        tr(v-for="row in builds")
+          td {{ row.sys }}
+          td {{ row.env.join(', ') }}
+          td(v-html="row.js.map(f => `<code>${f}</code>`).join('<br />')")
+          td(v-html="row.css.map(f => `<code>${f}</code>`).join('<br />')")
 
       h3 Usage
       h4 NPM / Webpack / Rollup
@@ -163,10 +142,35 @@
 
   const props = {
   }
+  const computed = {
+    builds () {
+      return [
+        {
+          sys: 'ES modules',
+          env: ['Webpack 2', 'Rollup'],
+          js: ['lib/index.es.js', 'lib/**/index.es.js'],
+          css: ['lib/style.css'],
+        },
+        {
+          sys: 'CommonJS',
+          env: ['Webpack 1', 'NodeJS'],
+          js: ['lib/index.js', 'lib/**/index.js'],
+          css: ['lib/style.css'],
+        },
+        {
+          sys: 'UMD',
+          env: ['Browser', 'AMD'],
+          js: ['lib/index.umd[.min].js', 'lib/**/index.umd[.min].js'],
+          css: ['lib/style.css'],
+        },
+      ]
+    },
+  }
 
   export default {
     name: 'vld-start-page',
     mixins: [page],
     props,
+    computed,
   }
 </script>
