@@ -5,12 +5,10 @@ import routes from './routes'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-  mode: 'history',
   base: 'C_BASE_URL',
   routes: routes,
   scrollBehavior: (to, from, saved) => {
     if (saved) return saved
-    else if (to.hash) return { selector: to.hash }
     else return { x: 0, y: 0 }
   },
 })

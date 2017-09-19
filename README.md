@@ -1,12 +1,12 @@
 <p align="center">
   <a href="https://ghettovoice.github.io/vuelayers" target="_blank" title="VueLayers Homepage">
-    <img width="100" src="https://ghettovoice.github.io/vuelayers/assets/img/logo.svg">
+    <img width="100" src="https://ghettovoice.github.io/vuelayers/static/img/logo.svg">
   </a>
 </p>
 
 # VueLayers
 
-> Vue 2.0 components to work with [OpenLayers](https://openlayers.org)
+> [Vue 2.0](https://vuejs.org/) components to work with [OpenLayers](https://openlayers.org)
 
 [![Build Status](https://travis-ci.org/ghettovoice/vuelayers.svg?branch=master)](https://travis-ci.org/ghettovoice/vuelayers)
 [![Coverage Status](https://coveralls.io/repos/github/ghettovoice/vuelayers/badge.svg?branch=master)](https://coveralls.io/github/ghettovoice/vuelayers?branch=master)
@@ -19,9 +19,9 @@
 
 ## Links
 
-- [Documentation](https://ghettovoice.github.io/vuelayers)
-- [Install & Quick Start Guide](https://ghettovoice.github.io/vuelayers/start)
-- [Live Demo](https://ghettovoice.github.io/vuelayers/demo)
+- [Documentation](https://ghettovoice.github.io/vuelayers/)
+- [Install & Quick Start Guide](https://ghettovoice.github.io/vuelayers/#/start)
+- [Live Demo](https://ghettovoice.github.io/vuelayers/#/demo)
 
 ## Requirements
 
