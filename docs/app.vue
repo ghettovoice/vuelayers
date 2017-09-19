@@ -58,7 +58,8 @@
             ) {{ subitem.title }}
 
         div.page
-          router-view/
+          transition(name="fade-delayed" appear)
+            router-view/
 
         vld-footer#footer(right-mods="has-text-centered has-text-right-tablet")
           div(slot="left").

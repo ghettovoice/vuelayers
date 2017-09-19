@@ -7,7 +7,7 @@
     vld-demo-app/
 
     section.section.content
-      h3.title Demo sources
+      h3 Demo sources
       b main.js
       b-tabs
         b-tab-item(label='JS')
