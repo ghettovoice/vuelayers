@@ -30,6 +30,7 @@
       <w>epsg</w>
       <w>errordbg</w>
       <w>eslint</w>
+      <w>favicons</w>
       <w>fullheight</w>
       <w>fullwidth</w>
       <w>gapless</w>
@@ -67,6 +68,7 @@
       <w>olsize</w>
       <w>oltilegrid</w>
       <w>ongenerate</w>
+      <w>opengraph</w>
       <w>openstreetmap</w>
       <w>outro</w>
       <w>overriden</w>
