@@ -6,7 +6,6 @@
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
-  "browser": "lib/index.umd.js",
   "unpkg": "lib/index.umd.js",
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -27,7 +26,7 @@
     "docs-start": "cross-env PORT=8082 node build/dev-server.js --name docs",
     "docs-clean": "rm -rf dist-docs",
     "docs-build": "npm run docs-clean && cross-env NODE_ENV=production BASE_URL=/vuelayers/ webpack --config=build/webpack.docs.prod.conf.js --progress",
-    "docs-deploy": "gh-pages -d dist-docs"
+    "docs-deploy": "gh-pages -d dist-docs -m 'update doc site'"
   },
   "directories": {
     "lib": "lib",

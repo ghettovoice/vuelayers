@@ -1,5 +1,6 @@
 const fs = require('fs-extra')
 const path = require('path')
+const { trimEnd } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
 const concat = require('source-map-concat')
@@ -137,6 +138,11 @@ function vueLoaderConfig (extract) {
     template: {
       render: require('pug').render,
     },
+    transformToRequire: {
+      img: 'src',
+      image: 'xlink:href',
+      'vl-style-icon': 'src',
+    },
   }
 }
 
@@ -218,6 +224,13 @@ function concatFiles (files, dest, banner) {
   }
 }
 
+function getServiceWorkerSrc () {
+  let source = fs.readFileSync(resolve('build/service-worker-registration.js'), 'utf-8')
+  source = source.replace('__SCRIPT_URL__', `${trimEnd(config.publicPath, '/')}/${trimEnd(config.assetsSubDir, '/')}/js/service-worker.js`)
+
+  return source
+}
+
 module.exports = {
   resolve,
   assetsPath,
@@ -233,4 +246,5 @@ module.exports = {
   compileVarsReplacement,
   compileVarsReplaceLoader,
   concatFiles,
+  getServiceWorkerSrc,
 }

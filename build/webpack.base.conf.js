@@ -111,7 +111,7 @@ module.exports = {
     }),
     new FaviconsWebpackPlugin({
       logo: utils.resolve('docs/static/img/logo.svg'),
-      prefix: utils.assetsPath('img'),
+      prefix: utils.assetsPath('img/'),
       title: config.fullname,
       icons: {
         android: true,

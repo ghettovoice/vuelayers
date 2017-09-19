@@ -1,5 +1,4 @@
 // This the Webpack config for docs production build
-const fs = require('fs-extra')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -69,7 +68,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       },
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency',
-      serviceWorker: `<script>${fs.readFileSync(utils.resolve('build/service-worker-registration.js'), 'utf-8')}</script>`,
+      serviceWorker: `<script>${utils.getServiceWorkerSrc()}</script>`,
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
@@ -102,10 +101,10 @@ const webpackConfig = merge(baseWebpackConfig, {
     }),
     new SWPrecacheWebpackPlugin({
       cacheId: `${config.name}-docs-app`,
-      filename: 'service-worker.js',
+      filename: utils.assetsPath('js/service-worker.js'),
       minify: true,
       navigateFallback: config.publicPath,
-      staticFileGlobsIgnorePatterns: [/dist-docs\/.*\.html/],
+      staticFileGlobsIgnorePatterns: [/dist-docs\/.*\.html/, /img\/\.cache$/],
     }),
   ],
 })
