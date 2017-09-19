@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div :class="[$options.name]">
     <section class="map">
       <vl-map ref="map" :def-controls="false" :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
         <vl-view ref="view" :zoom="3" :min-zoom="2"/>
@@ -91,7 +91,7 @@
 <style lang="sass">
   @import ../styles/variables
 
-  .home
+  .vld-home-page
     .map
       height: 40vh
 

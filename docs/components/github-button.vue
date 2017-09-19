@@ -1,5 +1,5 @@
-<template>
-  <iframe class="github-button" :src="src" frameborder="0" scrolling="0"></iframe>
+<template lang="pug">
+  iframe.github-button(:class="[$options.name]", :src="src", frameborder="0", scrolling="0")
 </template>
 
 <script>
@@ -37,6 +37,3 @@
     computed,
   }
 </script>
-
-<style>
-</style>

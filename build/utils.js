@@ -134,6 +134,9 @@ function vueLoaderConfig (extract) {
       })
     ),
     postcss: postcssPlugins(),
+    template: {
+      render: require('pug').render,
+    },
   }
 }
 
@@ -141,6 +144,7 @@ function markdownLoaderConfig () {
   const hljs = require('highlight.js')
   const renderer = new (require('marked')).Renderer()
   renderer.code = (code, lang) => `<pre><code class="hljs ${lang}">${hljs.highlightAuto(code).value}</code></pre>`
+  renderer.html = html => `<div class="content">${html}</div>`
 
   return {
     renderer,

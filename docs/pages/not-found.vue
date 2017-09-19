@@ -1,11 +1,11 @@
 <template lang="pug">
-  div.not-found
+  div(:class="[$options.name]")
     vld-hero(:bold="bold", :color="color")
       h1.title {{ title }}
       h2.subtitle {{ subtitle }}
 
     section.section.content
-      p Go to <router-link to="/" title="C_PKG_FULLNAME Homepage">Home</router-link>
+      p Go to #[router-link(to="/", title="C_PKG_FULLNAME Homepage") Home]
 </template>
 
 <script>
@@ -20,6 +20,3 @@
     props,
   }
 </script>
-
-<style>
-</style>

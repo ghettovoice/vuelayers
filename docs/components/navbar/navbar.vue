@@ -1,23 +1,17 @@
-<template>
-  <nav class="navbar" :class="{ 'is-transparent': transparent }">
-    <div class="navbar-brand">
-      <slot name="brand"></slot>
+<template lang="pug">
+  nav.navbar(:class="{ 'is-transparent': transparent, [$options.name]: true }")
+    div.navbar-brand
+      slot(name="brand")
 
-      <div class="navbar-burger" ref="menuBtn" @click="onMenuClick">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div>
-    <div class="navbar-menu" ref="menu">
-      <div class="navbar-start">
-        <slot name="start"></slot>
-      </div>
-      <div class="navbar-end">
-        <slot name="end"></slot>
-      </div>
-    </div>
-  </nav>
+      div.navbar-burger(ref="menuBtn", @click="onMenuClick")
+        span/
+        span/
+        span/
+    div.navbar-menu(ref="menu")
+      div.navbar-start
+        slot(name="start")
+      div.navbar-end
+        slot(name="end")
 </template>
 
 <script>
@@ -38,6 +32,3 @@
     methods,
   }
 </script>
-
-<style lang="sass">
-</style>

@@ -1,13 +1,10 @@
-<template>
-  <div class="navbar-item has-dropdown" :class="classes" >
-    <component :is="tag" v-bind="props" class="navbar-link" @click="onClick">
-      <slot></slot>
-    </component>
+<template lang="pug">
+  div.navbar-item.has-dropdown(:class="classes")
+    component.navbar-link(:is="tag", v-bind="props", @click="onClick")
+      slot
 
-    <div class="navbar-dropdown" :class="dropdownClasses">
-      <slot name="dropdown"></slot>
-    </div>
-  </div>
+    div.navbar-dropdown(:class="dropdownClasses")
+      slot(name="dropdown")
 </template>
 
 <script>
@@ -22,6 +19,7 @@
   const computed = {
     classes () {
       return {
+        [this.$options.name]: true,
         ...this::Item.computed.classes(),
         'is-hoverable': this.hover,
       }
@@ -41,6 +39,3 @@
     computed,
   }
 </script>
-
-<style>
-</style>

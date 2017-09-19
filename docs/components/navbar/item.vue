@@ -1,7 +1,6 @@
-<template>
-  <component :is="tag" v-bind="props" class="navbar-item" :class="classes" @click="onClick">
-    <slot></slot>
-  </component>
+<template lang="pug">
+  component.navbar-item(:is="tag", v-bind="props", :class="classes", @click="onClick")
+    slot
 </template>
 
 <script>
@@ -21,6 +20,7 @@
     },
     classes () {
       return {
+        [this.$options.name]: true,
         'is-active': this.active,
       }
     },
@@ -58,6 +58,3 @@
     methods,
   }
 </script>
-
-<style>
-</style>

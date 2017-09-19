@@ -1,17 +1,12 @@
-<template>
-  <footer class="footer">
-    <div class="columns">
-      <div class="column" :class="leftMods">
-        <slot name="left"></slot>
-      </div>
-      <div class="column" :class="rightMods">
-        <slot name="right"></slot>
-      </div>
-    </div>
-    <div class="main" :class="mainMods">
-      <slot></slot>
-    </div>
-  </footer>
+<template lang="pug">
+  footer.footer(:class="[$options.name]")
+    div.columns
+      div.column(:class="leftMods")
+        slot(name="left")
+      div.column(:class="rightMods")
+        slot(name="right")
+    div.main(:class="mainMods")
+      slot
 </template>
 
 <script>
@@ -28,6 +23,6 @@
 </script>
 
 <style lang="sass">
-  .footer
+  .vld-footer
     padding-bottom: 3rem
 </style>

@@ -1,9 +1,7 @@
-<template>
-  <section class="hero" :class="[color, bold ? 'is-bold' : '', size]">
-    <div class="hero-body">
-      <slot></slot>
-    </div>
-  </section>
+<template lang="pug">
+  section.hero(:class="[$options.name, color, bold ? 'is-bold' : '', size]")
+    div.hero-body
+      slot
 </template>
 
 <script>
@@ -18,6 +16,3 @@
     props,
   }
 </script>
-
-<style>
-</style>

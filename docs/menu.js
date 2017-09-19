@@ -12,16 +12,12 @@ export default [
     title: 'Live Demo',
   },
   {
-    link: '/components',
-    title: 'Components',
+    link: '/packages',
+    title: 'Packages',
     items: [
       {
-        link: '/components/vl-map',
-        title: 'vl-map',
-      },
-      {
-        link: '/components/vl-view',
-        title: 'vl-view',
+        link: '/packages/map',
+        title: 'Map',
       },
     ],
   },

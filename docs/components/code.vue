@@ -1,5 +1,5 @@
 <template lang="pug">
-  pre
+  pre(:class="[$options.name]")
     code(:class='[lang]', ref='code')
       slot
 </template>

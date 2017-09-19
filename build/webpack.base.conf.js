@@ -90,16 +90,6 @@ module.exports = {
         test: /\.(json|geojson)$/,
         loader: 'json-loader',
       },
-      {
-        test: /\.md$/,
-        use: [
-          'html-loader',
-          {
-            loader: 'markdown-loader',
-            options: utils.markdownLoaderConfig(),
-          }
-        ],
-      },
     ],
     noParse: [/openlayers/],
   },

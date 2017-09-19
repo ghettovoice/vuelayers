@@ -1,5 +1,5 @@
 <template>
-  <div class="demo-app">
+  <div :class="[$options.name]">
     <!-- app map -->
     <vl-map class="map" ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true"
             @click="clickCoordinate = $event.coordinate" @postcompose="onMapPostCompose">
@@ -423,7 +423,7 @@
 <style lang="sass">
   @import ../styles/variables
 
-  .demo-app
+  .vld-demo-app
     position: relative
     .map
       height: 500px

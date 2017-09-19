@@ -1,12 +1,8 @@
-<template>
-  <div class="menu-list-container">
-    <p v-if="label" class="menu-label">
-      {{ label }}
-    </p>
-    <ul class="menu-list">
-      <slot></slot>
-    </ul>
-  </div>
+<template lang="pug">
+  div(:class="$options.name")
+    p.menu-label(v-if="label") {{ label }}
+    ul.menu-list
+      slot
 </template>
 
 <script>
@@ -21,7 +17,7 @@
 </script>
 
 <style lang="sass">
-  .menu-list-container
+  .vld-menu-list
     .menu-label
       margin-top: 1em
       margin-bottom: 1em

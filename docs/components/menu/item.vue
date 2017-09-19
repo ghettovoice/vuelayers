@@ -1,7 +1,6 @@
-<template>
-  <li>
-    <slot @click="onClick"></slot>
-  </li>
+<template lang="pug">
+  li(:class="$options.name")
+    slot(@click="onClick")
 </template>
 
 <script>
@@ -24,7 +23,7 @@
 <style lang="sass">
   @import ../../styles/variables
 
-  .menu-list
+  .vld-menu-item
     span
       border-radius: $menu-item-radius
       color: $menu-item-color

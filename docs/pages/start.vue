@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.start
+  div(:class="[$options.name]")
     vld-hero(:bold="bold", :color="color")
       h1.title {{ title }}
       h2.subtitle {{ subtitle }}
@@ -51,29 +51,38 @@
         Each directory includes a set of index files: #[code lib/**/index.js], #[code lib/**/index.es.js],
         #[code lib/**/index.umd.js] and #[code lib/**/index.umd.min.js]. All stylesheets are compiled to files:
         #[code lib/style.css] and #[code lib/style.min.css].
+      -
+        var rows = [
+          [
+            'ES modules',
+            'Webpack 2, Rollup',
+            '#[code lib/index.es.js], #[code lib/**/index.es.js]',
+            '#[code lib/style.css]'
+          ],
+          [
+            'CommonJS',
+            'Webpack 1, NodeJS',
+            '#[code lib/index.js], #[code lib/**/index.js]',
+            '#[code lib/style.css]'
+          ],
+          [
+            'UMD',
+            'Browser, AMD',
+            '#[code lib/index.umd.js], #[code lib/**/index.umd.js],#[br]' +
+            '#[code lib/index.umd.min.js], #[code lib/**/index.umd.min.js]',
+            '#[code lib/style.css]'
+          ],
+        ]
       table
         tr
           th Module system
           th Environments
           th JS
           th CSS
-        tr
-          td ES modules
-          td Webpack 2, Rollup
-          td #[code lib/index.es.js], #[code lib/**/index.es.js]
-          td #[code lib/style.css]
-        tr
-          td CommonJS
-          td Webpack 1, NodeJS
-          td #[code lib/index.js], #[code lib/**/index.js]
-          td #[code lib/style.css]
-        tr
-          td UMD
-          td Browser, RequireJS
-          td.
-            #[code lib/index.umd.js], #[code lib/**/index.umd.js],#[br]
-            #[code lib/index.umd.min.js], #[code lib/**/index.umd.min.js]
-          td #[code lib/style.css]
+        each row in rows
+          tr
+            each cell in row
+              td!= render('| ' + cell)
 
       h3 Usage
       h4 NPM / Webpack / Rollup
@@ -90,7 +99,20 @@
         // ...
 
       h4 Browser
-      p(v-html="browserUsageExample")/
+      vld-code(lang="html").
+        &lt;!-- include Vue and OpenLayers --&gt;
+        &lt;script src="https://unpkg.com/vue"&gt;&lt;/script&gt;
+        &lt;script src="https://unpkg.com/openlayers"&gt;&lt;/script&gt;
+        &lt;!-- include standalone C_PKG_FULLNAME files --&gt;
+        &lt;link rel="stylesheet" href="https://unpkg.com/C_PKG_NAME/lib/style.css"&gt;
+        &lt;script src="https://unpkg.com/C_PKG_NAME"&gt;&lt;/script&gt;
+
+        &lt;script&gt;
+          // C_PKG_FULLNAME exports itself to the global variable: window.C_PKG_FULLNAME
+          Vue.use(C_PKG_FULLNAME)
+          // now you are ready to go further
+          // ...
+        &lt;/script&gt;
 
       h4 Individual components
       p.
@@ -122,7 +144,7 @@
       p.
         With tools like #[a(href="https://github.com/ant-design/babel-plugin-import", target="_blank") babel-plugin-import] or
         #[a(href="https://github.com/QingWei-Li/babel-plugin-component", target="_blank") babel-plugin-component] you can
-        setup #[a auto import] of JS files. Example #[code .babelrc] config:
+        setup #[b auto import] of JS files. Example #[code .babelrc] config:
       vld-code(lang="json").
         {
           "presets": [
@@ -137,26 +159,14 @@
 </template>
 
 <script>
-  import { constant } from 'lodash/fp'
-  import page from '../page'
-  import browserUsage from './browser-usage.md'
+  import page from './page'
 
   const props = {
-  }
-
-  const computed = {
-    browserUsageExample: constant(browserUsage),
   }
 
   export default {
     name: 'vld-start-page',
     mixins: [page],
     props,
-    computed,
-    mounted () {
-      console.log(this.browserUsageExample)
-    },
   }
 </script>
-
-<style></style>

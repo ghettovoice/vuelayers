@@ -1,7 +1,6 @@
-<template>
-  <nav class="menu">
-    <slot></slot>
-  </nav>
+<template lang="pug">
+  nav.menu
+    slot
 </template>
 
 <script>
@@ -13,6 +12,3 @@
     props,
   }
 </script>
-
-<style lang="sass">
-</style>

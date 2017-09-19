@@ -1,15 +1,11 @@
-<template>
-  <aside class="sidebar">
-    <div class="logo" v-if="$slots.logo && $slots.logo.length">
-      <slot name="logo"></slot>
-    </div>
-    <div class="links" v-if="$slots.links && $slots.links.length">
-      <slot name="links"></slot>
-    </div>
-    <div class="main">
-      <slot></slot>
-    </div>
-  </aside>
+<template lang="pug">
+  aside.sidebar(:class="[$options.name]")
+    div.logo(v-if="$slots.logo && $slots.logo.length")
+      slot(name="logo")
+    div.links(v-if="$slots.links && $slots.links.length")
+      slot(name="links")
+    div.main
+      slot
 </template>
 
 <script>
@@ -25,7 +21,7 @@
 <style lang="sass">
   @import ../styles/variables
 
-  .sidebar
+  .vld-sidebar
     padding: 0 1rem
     > *
       margin: .5rem 0

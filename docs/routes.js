@@ -16,7 +16,7 @@ export default [
       subtitle: 'Installation and usage guide',
       color: 'is-primary',
     },
-    component: () => import('./pages/start/page.vue'),
+    component: () => import('./pages/start.vue'),
   },
   {
     path: '/demo',
@@ -30,25 +30,22 @@ export default [
     },
     component: () => import('./pages/demo.vue'),
   },
-  // {
-  //   path: '/packages',
-  //   redirect: '/packages/map',
-  // },
-  // {
-  //   path: '/packages/map',
-  //   meta: {
-  //     title: 'Map',
-  //   },
-  //   props: {
-  //     title: 'Map',
-  //     subtitle: 'The Core component of C_PKG_FULLNAME',
-  //     color: 'is-info',
-  //   },
-  //   component: () => Promise.all([
-  //     import('./pages/common.vue'),
-  //     import('./md/packages/map.md'),
-  //   ]).then(routerViewProxyFromArray),
-  // },
+  {
+    path: '/packages',
+    redirect: '/packages/map',
+  },
+  {
+    path: '/packages/map',
+    meta: {
+      title: 'Map',
+    },
+    props: {
+      title: 'Map',
+      subtitle: 'The Core component of C_PKG_FULLNAME',
+      color: 'is-info',
+    },
+    component: () => import('./pages/packages/map.vue'),
+  },
   {
     path: '*',
     meta: {
