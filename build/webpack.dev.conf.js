@@ -4,7 +4,6 @@ const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const utils = require('./utils')
-const config = require('./config')
 const baseWebpackConfig = require('./webpack.base.conf')
 
 const webpackConfig = merge(baseWebpackConfig, {
@@ -15,17 +14,14 @@ const webpackConfig = merge(baseWebpackConfig, {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: utils.vueLoaderConfig()
+        options: utils.vueLoaderConfig(),
       },
       ...utils.styleLoaders({
-        sourceMap: true
-      })
-    ]
+        sourceMap: true,
+      }),
+    ],
   },
   plugins: [
-    new webpack.DefinePlugin(Object.assign(config.replaces, {
-      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`
-    })),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
@@ -33,17 +29,17 @@ const webpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'test/index.html',
-      inject: true
+      inject: true,
     }),
-    new FriendlyErrorsPlugin()
-  ]
+    new FriendlyErrorsPlugin(),
+  ],
 })
 
 webpackConfig.entry = {
   app: [
     './build/dev-client',
-    utils.resolve('test/main.js')
-  ]
+    utils.resolve('test/main.js'),
+  ],
 }
 
 module.exports = webpackConfig

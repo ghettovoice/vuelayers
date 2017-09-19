@@ -1,6 +1,7 @@
-const path = require('path')
 const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
+const StringReplacePlugin = require('string-replace-webpack-plugin')
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -8,38 +9,49 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
   entry: {
-    [ config.name ]: config.entry
+    [ config.name ]: config.entry,
   },
   devtool: '#source-map',
   output: {
     path: config.outDir,
     filename: isProduction ? '[name].min.js' : '[name].js',
-    publicPath: config.publicPath
+    publicPath: config.publicPath,
   },
   resolve: {
-    extensions: [ '.js', '.vue', '.json' ],
+    extensions: ['.js', '.vue', '.json', '.md'],
     modules: [
       utils.resolve('src'),
-      utils.resolve('node_modules')
+      utils.resolve('docs'),
+      utils.resolve('node_modules'),
     ],
     alias: {
-      [ config.name ]: utils.resolve('')
-    }
+      [ config.name ]: utils.resolve(''),
+    },
   },
   module: {
     rules: [
       {
-        test: /\.(js|vue)$/,
-        loader: 'eslint-loader',
-        enforce: "pre",
+        test: /\.(js|vue|md)$/,
+        loader: utils.compileVarsReplaceLoader(),
+        enforce: 'pre',
         include: [
           utils.resolve('src'),
           utils.resolve('docs'),
-          utils.resolve('test')
+          utils.resolve('test'),
+        ],
+      },
+      {
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [
+          utils.resolve('src'),
+          utils.resolve('docs'),
+          utils.resolve('test'),
         ],
         options: {
-          formatter: require('eslint-friendly-formatter')
-        }
+          formatter: require('eslint-friendly-formatter'),
+        },
       },
       {
         test: /\.js$/,
@@ -48,45 +60,71 @@ module.exports = {
           utils.resolve('src'),
           utils.resolve('docs'),
           utils.resolve('test'),
-          utils.resolve('node_modules/ol-tilecache')
-        ]
+          utils.resolve('node_modules/ol-tilecache'),
+        ],
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         query: {
           limit: 10000,
-          name: utils.assetsPath('img/[name].[hash:7].[ext]')
-        }
+          name: utils.assetsPath('img/[name].[hash:7].[ext]'),
+        },
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: utils.assetsPath('media/[name].[hash:7].[ext]'),
+        },
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
         query: {
           limit: 10000,
-          name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
-        }
+          name: utils.assetsPath('fonts/[name].[hash:7].[ext]'),
+        },
       },
       {
-        test: /\.(geo)?json$/,
-        loader: 'json-loader'
+        test: /\.(json|geojson)$/,
+        loader: 'json-loader',
       },
-      {
-        test: /\.html/,
-        loader: 'text-loader'
-      }
     ],
-    noParse: [ /openlayers/ ]
+    noParse: [/openlayers/],
   },
   plugins: [
+    new StringReplacePlugin(),
+    // http://vuejs.github.io/vue-loader/en/workflow/production.html
+    new webpack.DefinePlugin(Object.assign({}, config.replaces, {
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+    })),
     new webpack.BannerPlugin({
       banner: config.banner,
       raw: true,
-      entryOnly: true
+      entryOnly: true,
     }),
     new WebpackNotifierPlugin({
       title: config.fullname,
-      alwaysNotify: true
-    })
-  ]
+      alwaysNotify: true,
+    }),
+    new FaviconsWebpackPlugin({
+      logo: utils.resolve('docs/static/img/logo.svg'),
+      prefix: utils.assetsPath('img/'),
+      title: config.fullname,
+      icons: {
+        android: true,
+        appleIcon: true,
+        appleStartup: true,
+        coast: false,
+        favicons: true,
+        firefox: true,
+        opengraph: false,
+        twitter: false,
+        yandex: false,
+        windows: false,
+      },
+    }),
+  ],
 }

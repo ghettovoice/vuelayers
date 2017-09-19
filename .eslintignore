@@ -1,3 +1,7 @@
-build/*.js
+modules/*
 dist/*
-dist-demo/*
+lib/*
+dist-docs/*
+test/e2e/reports/*
+test/unit/coverage/*
+demo/*

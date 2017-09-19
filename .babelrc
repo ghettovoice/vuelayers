@@ -1,23 +1,29 @@
 {
   "presets": [
-    [ "env", { "modules": false } ],
+    ["env", {
+      "modules": false,
+      "useBuiltIns": true
+    }],
     "stage-0"
   ],
   "plugins": [
-    "transform-runtime",
-    "lodash"
+    "transform-runtime"
   ],
   "env": {
     "test": {
-      "plugins": [ "istanbul" ]
+      "plugins": ["istanbul"]
     },
-    "cjs": {
+    "production": {
+      "plugins": ["lodash"]
+    },
+    "production-cjs": {
       "plugins": [
-        [ "./modules/babel-plugin-merge-imports", {
+        "lodash",
+        ["./modules/babel-plugin-merge-imports", {
           "pkg": "openlayers",
           "pkgVar": "__ol",
           "regex": "^ol(?:\/(.*))?$"
-        } ]
+        }]
       ]
     }
   }

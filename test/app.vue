@@ -1,118 +1,136 @@
 <template>
   <div id="app">
-    <vl-map>
-      <vl-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
+    <div style="height: 50%">
+      <vl-map ref="map">
+        <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
-      <!-- interactions -->
-      <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect">
-        <vl-style-container>
-          <vl-style-stroke color="#f03b20" :width="3"/>
-          <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+        <vl-geoloc>
+          <template scope="ctx">
+            <vl-feature v-if="ctx.position" id="my-geoloc">
+              <vl-geom-point :coordinates="ctx.position" />
+              <vl-style-box>
+                <vl-style-circle :radius="7">
+                  <vl-style-fill color="#abcabc" />
+                  <vl-style-stroke color="#ff22ff" :width="5" />
+                </vl-style-circle>
+              </vl-style-box>
+            </vl-feature>
+          </template>
+        </vl-geoloc>
 
-          <vl-style-circle>
-            <vl-style-stroke color="#f03b20" :width="3"/>
-            <vl-style-fill :color="[254, 178, 76, 0.7]"/>
-          </vl-style-circle>
-        </vl-style-container>
-      </vl-interaction-select>
-      <!--// interactions -->
+        <vl-interaction-select @select="select" :features.sync="selectedFeatures"/>
 
-      <vl-layer-tile>
-        <vl-source-sputnik/>
-      </vl-layer-tile>
-      <!--// base layers -->
+        <vl-layer-tile id="sputnik">
+          <vl-source-sputnik/>
+        </vl-layer-tile>
 
-      <vl-layer-vector id="points" v-if="pointsLayer">
-        <!-- layer level style -->
-        <vl-style-container>
-          <vl-style-stroke color="#8856a7" :width="2"/>
-          <vl-style-fill :color="[158, 188, 218, 0.5]"/>
+        <vl-layer-vector id="points" v-if="pointsLayer">
+          <vl-source-cluster>
+            <vl-source-vector :features="points"/>
+          </vl-source-cluster>
+        </vl-layer-vector>
 
-          <vl-style-circle>
-            <vl-style-stroke color="#8856a7" :width="2"/>
-            <vl-style-fill :color="[158, 188, 218, 0.5]"/>
-          </vl-style-circle>
-        </vl-style-container>
-        <!--// layer level style -->
+        <vl-layer-tile id="wmts">
+          <vl-source-wmts
+            url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
+            layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
+        </vl-layer-tile>
 
-        <vl-source-vector :features="points" />
-      </vl-layer-vector>
+        <vl-layer-vector>
+          <vl-source-vector>
+            <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
+              <template scope="feature">
+                <vl-geom-polygon :coordinates.sync="polygonCoords"/>
+                <vl-overlay v-if="selected.includes(feature.id)" :position="pointOnSurface(feature.geometry)">
+                  <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
+                    poly feature {{ polyId }}
+                    qwerty: {{ feature.properties.qwerty }}
+                  </div>
+                </vl-overlay>
+              </template>
+            </vl-feature>
+          </vl-source-vector>
 
-      <!-- Tile WMS -->
-      <vl-layer-tile id="wms">
-        <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
-                       :ext-params="{ TILED: true }" server-type="geoserver" />
-      </vl-layer-tile>
-      <!--// Tile WMS -->
+          <vl-style-box>
+            <vl-style-fill :color="[45, 156, 201, 0.4]"/>
+            <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
+          </vl-style-box>
+        </vl-layer-vector>
+      </vl-map>
+    </div>
+    <div style="height: 50%">
+      <vl-map>
+        <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
-      <!-- WMTS -->
-      <vl-layer-tile id="wmts">
-        <vl-source-wmts
-          url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
-          layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
-      </vl-layer-tile>
-      <!--// WMTS -->
-    </vl-map>
+        <vl-layer-tile>
+          <vl-source-osm/>
+        </vl-layer-tile>
 
-    <div class="controls">
-      <button @click="pointsLayer = !pointsLayer">Toggle</button>
-      <button @click="points = points.slice(1)">Remove</button>
+        <vl-layer-tile id="wms">
+          <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
+                         :ext-params="{ TILED: true }" server-type="geoserver"/>
+        </vl-layer-tile>
+
+        <vl-layer-vector id="countries">
+          <vl-source-vector url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
+        </vl-layer-vector>
+
+        <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
+                    :position="pointOnSurface(selectedFeatures[0].geometry)">
+          <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
+            Popup cluster feature {{ selectedFeatures[0].id }}<br />
+            <span v-for="feature in selectedFeatures[0].properties.features">
+              feature {{ feature.id }}
+            </span>
+          </div>
+        </vl-overlay>
+      </vl-map>
     </div>
   </div>
 </template>
 
 <script>
-  import { kebabCase, range, random } from 'lodash/fp'
+  import { range, random } from 'lodash/fp'
+  import { core } from '../src'
 
   const computed = {
-    selectedIds () {
-      return this.selected.map(feature => feature.id)
-    }
   }
 
   const methods = {
-    geometryTypeToCompName (type) {
-      return 'vl-geom-' + kebabCase(type)
-    },
-    updateMapView ({ center, zoom, rotation }) {
-      this.center = center
-      this.zoom = zoom
-      this.rotation = rotation
-    },
-    select (feature) {
-      const i = this.selectedIds.indexOf(feature.id)
-      if (i === -1) {
-        this.selected.push(feature)
-      }
-    },
-    unselect ({ id }) {
-      const i = this.selectedIds.indexOf(id)
-      if (i !== -1) {
-        this.selected.splice(i, 1)
+    select ({ feature }) {
+      if (feature.get('features') && feature.get('features').length > 1) {
+        this.selectedFeatures = this.selectedFeatures.filter(id => id !== feature.getId())
+        this.$refs.view.fit(core.geomHelper.collection(feature.get('features').map(f => f.getGeometry())).getExtent(), {
+          duration: 500,
+        })
       }
     },
     loadData () {
       const points = []
-      range(1, 100).forEach(i => {
+      range(1, 20).forEach(i => {
         points.push({
+          type: 'Feature',
           id: i,
           properties: {
-            id: i
+            id: i,
           },
           geometry: {
             type: 'Point',
             coordinates: [
               random(-179, 179),
-              random(-89, 89)
-            ]
-          }
+              random(-89, 89),
+            ],
+          },
         })
       })
 
       this.points = points
 
       return Promise.resolve(this.points)
-    }
+    },
+    pointOnSurface (geometry) {
+      return core.geomHelper.pointOnSurface(geometry)
+    },
   }
 
   export default {
@@ -124,19 +142,23 @@
         zoom: 2,
         center: [ 0, 0 ],
         rotation: 0,
-        selected: [],
         points: [],
-        pointsLayer: true
+        pointsLayer: true,
+        polyId: '123',
+        polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
+        selected: [],
+        selectedFeatures: [],
       }
     },
-    created () {
+    mounted () {
       this.loadData()
-        .catch(::console.error)
-    }
+    },
   }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+  @import "~ol/ol.css";
+
   html, body, #app {
     width       : 100%;
     height      : 100%;

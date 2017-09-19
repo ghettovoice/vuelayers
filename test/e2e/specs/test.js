@@ -13,5 +13,5 @@ module.exports = {
       .waitForElementVisible('#app', 5000)
       .assert.elementPresent('.vl-map .ol-viewport canvas')
       .end()
-  }
+  },
 }

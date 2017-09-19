@@ -1,0 +1,56 @@
+// Import Bulma's core
+@import "~bulma/sass/utilities/_all";
+
+$light-blue: #03a9f4;
+$indigo: #536dfe;
+$grey-very-lighter: lighten($grey-lighter, 8);
+
+// Set your colors
+$primary: $light-blue;
+$info: $indigo;
+
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: (
+  "white": ($white, $black),
+  "black": ($black, $white),
+  "light": ($light, $light-invert),
+  "dark": ($dark, $dark-invert),
+  "primary": ($primary, $primary-invert),
+  "info": ($info, $info-invert),
+  "success": ($success, $success-invert),
+  "warning": ($warning, $warning-invert),
+  "danger": ($danger, $danger-invert),
+);
+
+$pre-background: $grey-very-lighter;
+$code-background: $grey-very-lighter;
+$code-padding: 0.25em 0.5em 0.25em;
+
+// Links
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+
+// sidebar
+$sidebar-background: $dark url(../static/img/sidebar-bg.png) repeat;
+$sidebar-link-color: $primary;
+$sidebar-link-hover-color: $primary-invert;
+$sidebar-icon-color: $grey-light;
+$sidebar-icon-hover-color: $light;
+$sidebar-menu-link-color: $primary;
+$sidebar-menu-link-hover-color: $primary-invert;
+$sidebar-menu-link-active-color: $primary-invert;
+$sidebar-menu-link-background: none;
+$sidebar-menu-link-hover-background: transparentize(lighten($dark, 10%), 0.7);
+$sidebar-menu-link-active-background: transparentize($primary, 0.7);
+
+
+// Menu
+$menu-item-color: $text;
+$menu-item-radius: $radius-small;
+$menu-item-hover-color: $text-strong;
+$menu-item-hover-background-color: $background;
+$menu-item-active-color: $link-invert;
+$menu-item-active-background-color: $link;
+$menu-list-border-left: 1px solid $border;
+$menu-label-color: $text-light;

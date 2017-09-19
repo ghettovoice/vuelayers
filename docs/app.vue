@@ -1,399 +1,184 @@
-<template>
-  <div id="app">
-    <vl-map>
-      <vl-view :center="center" :zoom="zoom" :rotation="rotation" @change="updateMapView"/>
-      <vl-geoloc @change="updateGeoloc"/>
+<template lang="pug">
+  main#app(:class="[$options.name]")
+    div.columns.layout
+      div.column.left.is-4-tablet.is-3-desktop.is-hidden-mobile.is-fullheight
+        vld-sidebar
+          router-link.name(slot="logo", to="/", title="C_PKG_FULLNAME.js Home", exact-active-class="is-active")
+            div
+              img(src="./static/img/logo.svg" alt="C_PKG_FULLNAME Logo")
+            div
+              span C_PKG_FULLNAME.js
+          a(
+            slot="logo"
+            href="C_PKG_REPOSITORY/releases/tag/vC_PKG_VERSION"
+            target="_blank"
+            title="Download latest version of C_PKG_FULLNAME"
+          )
+            b-tag(type="is-info") vC_PKG_VERSION
 
-      <!-- interactions -->
-      <vl-interaction-select ref="select" :selected="selected" @select="select" @unselect="unselect"
-                             :filter="selectFilter">
-        <vl-style-func :factory="selectStyleFunc">
-          <!-- fallback style -->
-          <vl-style-container>
-            <vl-style-stroke color="#f03b20" :width="3"/>
-            <vl-style-fill :color="[254, 178, 76, 0.7]"/>
-          </vl-style-container>
-          <!--// fallback style -->
-        </vl-style-func>
-      </vl-interaction-select>
-      <!--// interactions -->
+          a.icon(slot="links", href="C_PKG_REPOSITORY", title="View on GitHub", target="_blank")
+            b-icon(icon="github", size="is-medium")/
 
-      <!-- base layers -->
-      <vl-layer-tile id="osm" :visible="layers.osm">
-        <vl-source-osm/>
-      </vl-layer-tile>
-      <!--// base layers -->
+          vld-menu
+            vld-menu-list(label="General")
+              vld-menu-item(v-for="item in generalMenuItems", :key="item.link")
+                router-link(:to="item.link", :title="item.title" exact-active-class="is-active") {{ item.title }}
 
-      <!-- Tile WMS -->
-      <vl-layer-tile id="wms" :visible="layers.wms">
-        <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
-                       :ext-params="{ TILED: true }" server-type="geoserver" />
-      </vl-layer-tile>
-      <!--// Tile WMS -->
+            vld-menu-list(v-for="item in groupedMenuItems", :key="item.title", :label="item.title")
+              vld-menu-item(v-for="subitem in item.items", :key="subitem.link")
+                router-link(:to="subitem.link", :title="subitem.title" exact-active-class="is-active") {{ subitem.title }}
 
-      <!-- WMTS -->
-      <vl-layer-tile id="wmts" :visible="layers.wmts">
-        <vl-source-wmts
-          url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
-          layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
-      </vl-layer-tile>
-      <!--// WMTS -->
+      div.center.column.is-8-tablet.is-9-desktop.is-offset-4-tablet.is-offset-3-desktop
+        vld-navbar.is-hidden-tablet
+          vld-navbar-item.logo.has-text-left(slot="brand" link="/" title="C_PKG_FULLNAME.js Docs", :router="true")
+            div
+              img(src="./static/img/logo.svg" alt="C_PKG_FULLNAME Logo")
+            div
+              span C_PKG_FULLNAME.js
+          vld-navbar-item(
+            slot="brand"
+            link="C_PKG_REPOSITORY/releases/tag/vC_PKG_VERSION"
+            title="Download latest version of C_PKG_FULLNAME"
+            target="_blank"
+          )
+            b-tag(type="is-info") vC_PKG_VERSION
+          vld-navbar-item.is-hidden-desktop(slot="brand" link="C_PKG_REPOSITORY" title="View on GitHub" target="_blank")
+            b-icon(icon="github" size="is-medium")/
 
-      <!-- countries vector -->
-      <vl-layer-vector id="countries" v-if="countries.length" :visible="layers.countries">
-        <!-- layer level style defined as style function for complex styling  -->
-        <vl-style-func :factory="countriesStyleFunc">
-          <!-- fallback styles -->
-          <vl-style-container>
-            <vl-style-stroke color="#8856a7" :width="2"/>
-            <vl-style-fill :color="[158, 188, 218, 0.5]"/>
-          </vl-style-container>
-          <!--// fallback styles -->
-        </vl-style-func>
-        <!--// layer level style -->
+          vld-navbar-item(
+            slot="start"
+            v-for="item in generalMenuItems"
+            ':key'="item.link"
+            ':router'="true"
+            ':link'="item.link"
+            ':title'="item.title"
+          ) {{ item.title }}
+          vld-navbar-dropdown-item(
+            slot="start"
+            v-for="item in groupedMenuItems"
+            ':key'="item.link"
+            ':hover'="true"
+            ':link'="item.link"
+            ':router'="true"
+            ':title'="item.title"
+          )
+            span {{ item.title }}
 
-        <!-- pass features as array for the huge or server loading datasets -->
-        <vl-source-vector :features="countries"/>
-      </vl-layer-vector>
-      <!--// countries vector -->
+            vld-navbar-item(
+              slot="dropdown"
+              v-for="subitem in item.items"
+              ':key'="subitem.link"
+              ':router'="true"
+              ':link'="subitem.link"
+              ':title'="subitem.title"
+            ) {{ subitem.title }}
 
-      <!-- pacman, use vl-style-func for advanced styling -->
-      <vl-layer-vector id="pacman" v-if="pacman.length" :visible="layers.pacman">
-        <vl-style-func :factory="pacmanStyleFunc"/>
+        div.page
+          transition(name="fade-delayed" appear)
+            router-view/
 
-        <vl-source-vector>
-          <vl-feature v-for="feature in pacman" :key="feature.id" :id="feature.id" :data="feature.properties">
-            <component :is="geometryTypeToCompName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
-          </vl-feature>
-        </vl-source-vector>
-      </vl-layer-vector>
-      <!--// pacman -->
+        vld-footer#footer(right-mods="has-text-centered has-text-right-tablet")
+          div(slot="left").
+            Licensed under #[a(href="C_PKG_LICENSE_URL" target="_blank" title="View license text") C_PKG_LICENSE_NAME]
+            #[br]
+            &copy; {{ new Date().getFullYear() }} #[a(href="C_PKG_AUTHOR_HOMEPAGE" title="C_PKG_AUTHOR_NAME Homepage" target="_blank") C_PKG_AUTHOR_NAME]
 
-      <!-- current position overlay -->
-      <vl-layer-vector v-if="position.length" id="position-layer" :z-index="100" :overlay="true">
-        <vl-style-container>
-          <vl-style-icon src="static/img/marker.png" :scale="0.3" :anchor="[0.5, 1]"/>
-        </vl-style-container>
-
-        <vl-source-vector>
-          <vl-feature id="my-position" :z-index="999">
-            <vl-geom-point :coordinates="position"/>
-          </vl-feature>
-        </vl-source-vector>
-      </vl-layer-vector>
-      <!--// current position overlay -->
-    </vl-map>
-
-    <div class="controls">
-      <button v-for="layer in [ 'osm', 'countries', 'pacman', 'wms', 'wmts' ]" :key="layer"
-              @click="toggleLayer(layer)">
-        Toggle layer {{ layer }}
-      </button>
-
-      <button @click="showSourceCode">Show usage info / example source code</button>
-
-      <hr />
-      Center: {{ center.map(x => parseFloat(x.toPrecision(6))) }} Zoom: {{ zoom }} Rotation {{ rotation }}<br />
-      My position: {{ position.map(x => parseFloat(x.toPrecision(6))) }}<br />
-      Current selection: {{ selectedIds }}
-    </div>
-
-    <transition name="slide">
-      <div id="source-code" ref="sourceCode" v-if="sourceCode">
-        <div class="controls">
-          <button @click="sourceCode = false">Close</button>
-        </div>
-
-        <div id="install" v-html="installHTML"></div>
-
-        <div id="src" v-html="demoSrcHTML"></div>
-
-        <div class="controls">
-          <button @click="sourceCode = false">Close</button>
-        </div>
-      </div>
-    </transition>
-  </div>
+          div(slot="right")
+            a.button.is-outlined.is-info(href="C_PKG_REPOSITORY" target="_blank" title="View on GitHub")
+              b-icon(icon="github")/
+              span GitHub
 </template>
 
 <script>
-  import 'whatwg-fetch'
-  import { kebabCase, forEach, get, set } from 'lodash/fp'
-  import highlight from 'highlight.js'
-  import highlightSCSS from 'highlight.js/lib/languages/scss'
-  import highlightXML from 'highlight.js/lib/languages/xml'
-  import highlightJavascript from 'highlight.js/lib/languages/javascript'
-  import highlightBash from 'highlight.js/lib/languages/bash'
-  import highlightJson from 'highlight.js/lib/languages/json'
-
-  highlight.registerLanguage('scss', highlightSCSS)
-  highlight.registerLanguage('xml', highlightXML)
-  highlight.registerLanguage('javascript', highlightJavascript)
-  highlight.registerLanguage('json', highlightJson)
-  highlight.registerLanguage('bash', highlightBash)
+  import { constant } from 'lodash/fp'
+  import menu from './menu'
 
   const computed = {
-    selectedIds () {
-      return this.selected.map(({ id }) => id)
+    menu: constant(menu),
+    generalMenuItems () {
+      return menu.filter(item => !item.items || !item.items.length)
     },
-    installHTML () {
-      return require('./install.html')
+    groupedMenuItems () {
+      return menu.filter(item => item.items && item.items.length)
     },
-    demoSrcHTML () {
-      return require('./demo-src.html')
-    }
-  }
-
-  const methods = {
-    geometryTypeToCompName (type) {
-      return 'vl-geom-' + kebabCase(type)
-    },
-    updateMapView ({ center, zoom, rotation }) {
-      this.center = center
-      this.zoom = zoom
-      this.rotation = rotation
-    },
-    updateGeoloc ({ position }) {
-      this.position = position
-    },
-    select (plainFeature) {
-      const i = this.selectedIds.indexOf(plainFeature.id)
-      if (i === -1) {
-        this.selected.push(plainFeature)
-      }
-    },
-    unselect ({ id }) {
-      const i = this.selectedIds.indexOf(id)
-      if (i !== -1) {
-        this.selected.splice(i, 1)
-      }
-    },
-    async loadData () {
-      const res = await fetch('https://openlayers.org/en/latest/examples/data/geojson/countries.geojson')
-      const geomCollection = await res.json()
-      this.countries = geomCollection.features.map((feature, i) => {
-        feature.properties = {
-          ...feature.properties,
-          color: i % 2 === 0 ? [ 49, 163, 84, 0.35 ] : [ 166, 100, 255, 0.35 ],
-          selectColor: (i + 1) % 2 !== 0 ? [ 221, 28, 119, 0.5 ] : undefined
-        }
-
-        return feature
-      })
-
-      return this.countries
-    },
-    selectStyleFunc (s) {
-      // first argument is an style helper. See https://github.com/ghettovoice/vuelayers/blob/master/src/ol-ext/style.js
-      const styleName = 'select'
-      const styleByFeature = {}
-      const stroke = s.stroke({
-        strokeColor: '#8856a7',
-        strokeWidth: 4
-      })
-
-      return function __selectStyleFunc ({ id, properties }) {
-        if (properties.selectColor) {
-          let styles = get([ id, styleName ], styleByFeature)
-          if (!styles) {
-            styles = [
-              s.style({
-                stroke,
-                fillColor: properties.selectColor
-              })
-            ]
-
-            set([ id, styleName ], styles, styleByFeature)
-          }
-
-          return styles
-        }
-      }
-    },
-    countriesStyleFunc (s) {
-      // first argument is an style helper. See https://github.com/ghettovoice/vuelayers/blob/master/src/ol-ext/style.js
-      const stroke = s.stroke({
-        strokeColor: '#8856a7',
-        strokeWidth: 1
-      })
-      const styleName = 'default'
-      const styleByFeature = {}
-
-      return function __countriesStyleFunc ({ id, properties }) {
-        let styles = get([ id, styleName ], styleByFeature)
-        if (!styles) {
-          styles = [
-            s.style({
-              stroke,
-              fillColor: properties.color
-            })
-          ]
-
-          set([ id, styleName ], styles, styleByFeature)
-        }
-
-        return styles
-      }
-    },
-    pacmanStyleFunc (s) {
-      // first argument is an style helper. See https://github.com/ghettovoice/vuelayers/blob/master/src/ol-ext/style.js
-      const pacman = [
-        s.style({
-          strokeColor: '#DE9147',
-          strokeWidth: 3,
-          fillColor: [ 222, 189, 36, 0.8 ]
-        })
-      ]
-      const path = [
-        s.style({
-          strokeColor: 'blue',
-          strokeWidth: 1
-        }),
-        s.style({
-          imageRadius: 5,
-          imageFillColor: 'orange',
-          geom ({ geometry }) {
-            // geometry is an LineString, convert it to MultiPoint to style vertex
-            // use turf.js for complex work with geometries
-            return {
-              ...geometry,
-              type: 'MultiPoint'
-            }
-          }
-        })
-      ]
-      const eye = [
-        s.style({
-          imageRadius: 6,
-          imageFillColor: '#444444'
-        })
-      ]
-
-      return function __pacmanStyleFunc (feature) {
-        switch (feature.id) {
-          case 'pacman':
-            return pacman
-          case 'pacman-path':
-            return path
-          case 'pacman-eye':
-            return eye
-        }
-      }
-    },
-    toggleLayer (layer) {
-      this.layers[ layer ] = !this.layers[ layer ]
-    },
-    selectFilter (feature, layer) {
-      return layer && layer.id && [ 'position-layer', 'pacman' ].indexOf(layer.id) === -1
-    },
-    showSourceCode () {
-      this.sourceCode = true
-    }
-  }
-
-  const watch = {
-    sourceCode (value) {
-      if (value) {
-        this.$nextTick(() => {
-          forEach(::highlight.highlightBlock, this.$refs.sourceCode.querySelectorAll('pre > code'))
-        })
-      }
-    },
-    'layers.ani' (value) {
-      if (value) {
-        this.startAnimation()
-      } else {
-        this.stopAnimation()
-      }
-    }
   }
 
   export default {
-    name: 'app',
+    name: 'vld-app',
     computed,
-    watch,
-    methods,
-    data () {
-      return {
-        zoom: 2,
-        center: [ 0, 0 ],
-        rotation: 0,
-        selected: [],
-        countries: [],
-        pacman: require('./static/pacman.geojson').features,
-        position: [],
-        layers: {
-          osm: true,
-          countries: true,
-          pacman: false,
-          wms: false,
-          wmts: false
-        },
-        sourceCode: false
-      }
-    },
-    created () {
-      this.loadData()
-        .catch(::console.error)
-    }
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
-  @import "~highlight.js/styles/androidstudio.css";
+<style lang="sass">
+  // import all styles
+  @import ./styles/main
 
-  html, body, #app {
-    width       : 100%;
-    height      : 100%;
-    margin      : 0;
-    box-sizing  : border-box;
-    font-family : Helvetica, Arial, sans-serif;
-    overflow    : hidden;
+  .vld-app
+    .layout
+      margin: 0
+      position: relative
+      > .left
+        background: $sidebar-background
+        padding: 0
+        position: fixed
+        .icon
+          color: $sidebar-icon-color
+          &:hover
+            color: $sidebar-icon-hover-color
+        .logo
+          color: $white
+          a, .icon
+            color: $white
+            &:hover, &:hover .icon
+              color: $primary
+          .name
+            font-size: 1.8em
+            display: flex
+            justify-content: center
+            div
+              &:first-child
+                max-width: 40px
+                margin-right: .3em
+                flex: 0 0 auto
+            img
+              vertical-align: text-bottom
+        .menu-list
+          a
+            color: $sidebar-menu-link-color
+            &:hover
+              background: $sidebar-menu-link-hover-background
+              color: $sidebar-menu-link-hover-color
+            &.is-active
+              color: $sidebar-menu-link-active-color
+              background: $sidebar-menu-link-active-background
+      > .center
+        padding: 50px 0 0
+        +tablet()
+          padding-top: 0
+      +widescreen()
+        > .left
+          width: 20%
+        > .center
+          width: 80%
+          margin-left: 20%
 
-    * {
-      box-sizing : border-box;
-    }
-  }
+      .page
+        min-height: calc(100vh - 168px)
 
-  .controls {
-    position   : absolute;
-    bottom     : 10px;
-    left       : 50%;
-    transform  : translateX(-50%);
-    width      : 70vw;
-    background : rgba(255, 255, 255, 0.7);
-    box-shadow : 0 0 20px rgba(2, 2, 2, 0.1);
-    padding    : 5px;
-    text-align : center;
-
-    > button {
-      margin         : 5px;
-      padding        : 5px 10px;
-      text-transform : uppercase;
-    }
-  }
-
-  #source-code {
-    overflow   : auto;
-    position   : absolute;
-    top        : 0;
-    left       : 0;
-    width      : 100%;
-    height     : 100%;
-    padding    : 20px;
-    background : #ffffff;
-
-    .controls {
-      position   : relative;
-      box-shadow : none;
-    }
-  }
-
-  .slide-enter, .slide-leave-to {
-    transform : translateY(100%);
-  }
-
-  .slide-enter-active, .slide-leave-active {
-    transition : all .3s ease-out;
-  }
+      .navbar
+        position: fixed
+        top: 0
+        left: 0
+        right: 0
+        z-index: 10
+        box-shadow: 0 0 1em rgba(0, 0, 0, 0.4)
+        .logo
+          font-size: 1.5em
+          display: flex
+          div
+            &:first-child
+              max-width: 50px
+              margin-right: .25em
+            img
+              vertical-align: text-bottom
 </style>

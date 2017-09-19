@@ -1,149 +1,243 @@
-<script type="text/babel">
-  /**
-   * Wrapper around ol.Feature.
-   */
-  import uuid from 'uuid/v4'
-  import Observable from '../../rx-ext'
-  import rxSubs from '../../mixins/rx-subs'
-  import stubVNode from '../../mixins/stub-vnode'
-  import plainProps from '../../utils/plain-props'
-  import styleTarget from '../style-target'
-  import { consts, coordinateHelper, geoJson } from '../../ol-ext'
+<template>
+  <i :id="[$options.name, id].join('-')" :class="[$options.name]" style="display: none !important;">
+    <slot :id="id" :properties="properties" :geometry="geometry"></slot>
+  </i>
+</template>
 
-  const { LAYER_PROP } = consts
-  const { toLonLat } = coordinateHelper
+<script>
+  import uuid from 'uuid/v4'
+  import Feature from 'ol/feature'
+  import { isEqual, merge } from 'lodash/fp'
+  import { Observable } from 'rxjs/Observable'
+  import 'rxjs/add/observable/merge'
+  import 'rxjs/add/operator/distinctUntilChanged'
+  import 'rxjs/add/operator/throttleTime'
+  import 'rxjs/add/operator/map'
+  import 'rxjs/add/operator/mergeAll'
+  import {
+    geoJsonHelper,
+    mergeDescriptors,
+    plainProps,
+    assert,
+    olCmp,
+    useMapCmp,
+    stylesContainer,
+    geometryContainer,
+    observableFromOlEvent,
+  } from '../../core'
+
+  const mergeNArg = merge.convert({ fixed: false })
 
   const props = {
     id: {
-      type: [ String, Number ],
-      default: () => uuid()
+      type: [String, Number],
+      default: () => uuid(),
     },
     properties: {
       type: Object,
-      default: () => Object.create(null)
-    }
+      default: () => Object.create(null),
+    },
+  }
+
+  const computed = {
+    geometry () {
+      if (this.rev && this.$geometry && this.$view) {
+        return geoJsonHelper.writeGeometry(this.$geometry, this.$view.getProjection())
+      }
+    },
   }
 
   const methods = {
-    refresh () {
-      this.feature.changed()
-    },
-    styleTarget () {
-      return this.feature
-    },
-    mountFeature () {
-      if (!this.source) {
-        throw new Error("Invalid usage of feature component, should have source component among it's ancestors")
-      }
+    /**
+     * Create feature without inner style applying, feature level style
+     * will be applied in the layer level style function.
+     * @return {ol.Feature}
+     * @protected
+     */
+    createOlObject () {
+      /**
+       * @type {ol.Feature}
+       * @private
+       */
+      let feature = new Feature(this.properties)
+      feature.setId(this.id)
+      feature.setGeometry(this.$geometry)
 
-      this.source.addFeature(this.feature)
-      this.feature.set(LAYER_PROP, this.layer.get('id'))
-      this.subscribeAll()
+      return feature
     },
-    unmountFeature () {
-      this.unsubscribeAll()
-      if (this.source && this.source.getFeatureById(this.id)) {
-        this.source.removeFeature(this.feature)
-        this.feature.unset(LAYER_PROP)
-      }
+    /**
+     * @return {{
+     *     getGeometry: function(): ol.geom.Geometry|undefined,
+     *     setGeometry: function(ol.geom.Geometry|undefined)
+     *   }|ol.Feature|undefined}
+     * @protected
+     */
+    getGeometryTarget () {
+      return this.$feature
     },
-    subscribeAll () {
-      this::subscribeToMapEvents()
-    },
-    isAtPixel (pixel) {
-      return this.map.forEachFeatureAtPixel(
-        pixel,
-        feature => feature === this.feature,
+    /**
+     * @return {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(
+        this::olCmp.methods.getServices(),
+        this::geometryContainer.methods.getServices(),
+        this::stylesContainer.methods.getServices(),
         {
-          layerFilter: layer => layer === this.layer
+          get feature () { return vm.$feature },
         }
       )
-    }
+    },
+    /**
+     * @return {ol.Feature|undefined}
+     * @protected
+     */
+    getStyleTarget () {
+      return this.$feature
+    },
+    /**
+     * @param {number} pixel
+     * @return {boolean}
+     */
+    isAtPixel (pixel) {
+      assert.hasMap(this)
+
+      return this.$map.forEachFeatureAtPixel(
+        pixel,
+        f => f === this.$feature,
+        { layerFilter: l => l === this.$layer }
+      )
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      this.$featuresContainer && this.$featuresContainer.addFeature(this)
+      this.subscribeAll()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      this.unsubscribeAll()
+      this.$featuresContainer && this.$featuresContainer.removeFeature(this)
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToFeatureChanges()
+    },
   }
 
   const watch = {
+    /**
+     * @param {string|number} value
+     */
     id (value) {
-      this.feature.setId(value)
+      if (this.$feature && value !== this.$feature.getId()) {
+        this.$feature.setId(value)
+      }
     },
+    /**
+     * @param {Object} value
+     */
     properties (value) {
-      this.feature.setProperties(plainProps(value))
-    }
+      value = plainProps(value)
+      if (this.$feature && !isEqual(value, plainProps(this.$feature.getProperties()))) {
+        this.$feature.setProperties(plainProps(value))
+      }
+    },
   }
-
-  const { provide: styleTargetProvide } = styleTarget
 
   export default {
     name: 'vl-feature',
-    mixins: [ rxSubs, stubVNode, styleTarget ],
-    inject: [ 'map', 'view', 'layer', 'source' ],
+    mixins: [olCmp, useMapCmp, geometryContainer, stylesContainer],
     props,
+    computed,
     methods,
     watch,
-    stubVNode: {
-      attrs () {
-        return {
-          id: [ this.$options.name, this.id ].join('-')
-        }
+    data () {
+      return {
+        rev: 1,
       }
     },
-    provide () {
-      return Object.assign(
-        Object.defineProperties(Object.create(null), {
-          feature: {
-            enumerable: true,
-            get: () => this.feature
-          }
-        }),
-        this::styleTargetProvide()
-      )
-    },
     created () {
-      this::createFeature()
-    },
-    mounted () {
-      this.$nextTick(this.mountFeature)
-    },
-    destroyed () {
-      this.$nextTick(() => {
-        this.unmountFeature()
-        this.feature = undefined
+      Object.defineProperties(this, {
+        /**
+         * @type {ol.Feature|undefined}
+         */
+        $feature: {
+          enumerable: true,
+          get: () => this.$olObject,
+        },
+        $layer: {
+          enumerable: true,
+          get: () => this.$services && this.$services.layer,
+        },
+        $map: {
+          enumerable: true,
+          get: () => this.$services && this.$services.map,
+        },
+        $view: {
+          enumerable: true,
+          get: () => this.$services && this.$services.view,
+        },
+        $featuresContainer: {
+          enumerable: true,
+          get: () => this.$services && this.$services.featuresContainer,
+        },
       })
-    }
+    },
   }
 
   /**
-   * Create feature without inner style applying, feature level style
-   * will be applied in the layer level style function.
-   *
-   * @return {ol.Feature}
+   * @return {void}
+   * @private
    */
-  function createFeature () {
-    /**
-     * @type {ol.Feature}
-     * @protected
-     */
-    this.feature = geoJson.readFeature({
-      id: this.id,
-      properties: this.properties
-    }, this.view.getProjection())
-    this.feature.set('vm', this)
+  function subscribeToFeatureChanges () {
+    assert.hasFeature(this)
 
-    return this.feature
-  }
+    const getPropValue = prop => this.$feature.get(prop)
+    const ft = 100
+    // all plain properties
+    const propChanges = observableFromOlEvent(
+      this.$feature,
+      'propertychange',
+      ({ key }) => ({ prop: key, value: getPropValue(key) })
+    ).throttleTime(ft)
+      .distinctUntilChanged(isEqual)
+    // id, style and other generic changes
+    const changes = observableFromOlEvent(
+      this.$feature,
+      'change'
+    ).map(() => Observable.create(obs => {
+      if (this.$feature.getId() !== this.id) {
+        obs.next({ prop: 'id', value: this.$feature.getId() })
+      }
+      // todo style?
+    })).mergeAll()
+      .throttleTime(ft)
+      .distinctUntilChanged(isEqual)
+    // all changes
+    const allChanges = Observable.merge(
+      propChanges,
+      changes
+    )
 
-  function subscribeToMapEvents () {
-    const pointerEvents = Observable.fromOlEvent(
-      this.map,
-      [ 'click', 'dblclick', 'singleclick' ],
-      ({ type, pixel, coordinate }) => ({ type, pixel, coordinate })
-    ).map(evt => ({
-      ...evt,
-      coordinate: toLonLat(evt.coordinate, this.view.getProjection())
-    }))
+    this.subscribeTo(allChanges, ({ prop, value }) => {
+      ++this.rev
 
-    this.subscribeTo(pointerEvents, evt => {
-      if (this.isAtPixel(evt.pixel)) {
-        this.$emit(evt.type, evt)
+      if (prop === 'id') {
+        this.$emit(`update:${prop}`, value)
+      } else if (prop !== this.$feature.getGeometryName()) {
+        this.$emit('update:properties', mergeNArg({}, this.properties, { prop: value }))
       }
     })
   }
