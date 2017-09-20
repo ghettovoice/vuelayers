@@ -3,11 +3,11 @@
     div.navbar-brand
       slot(name="brand")
 
-      div.navbar-burger(ref="menuBtn", @click="onMenuClick")
+      div.navbar-burger(ref="menuBtn" '@click'="onNavBurgerClick" ':class'="{'is-active': isMenuActive}")
         span/
         span/
         span/
-    div.navbar-menu(ref="menu")
+    div.navbar-menu(ref="menu" ':class'="{'is-active': isMenuActive}")
       div.navbar-start
         slot(name="start")
       div.navbar-end
@@ -17,12 +17,21 @@
 <script>
   const props = {
     transparent: Boolean,
+    menuActive: Boolean,
   }
 
   const methods = {
-    onMenuClick () {
-      this.$refs.menuBtn.classList.toggle('is-active')
-      this.$refs.menu.classList.toggle('is-active')
+    onNavBurgerClick () {
+      this.isMenuActive = !this.isMenuActive
+      this.$emit('update:menuActive', this.isMenuActive)
+    },
+  }
+
+  const watch = {
+    menuActive (value) {
+      if (value !== this.isMenuActive) {
+        this.isMenuActive = value
+      }
     },
   }
 
@@ -30,5 +39,11 @@
     name: 'vld-navbar',
     props,
     methods,
+    watch,
+    data () {
+      return {
+        isMenuActive: this.menuActive,
+      }
+    },
   }
 </script>

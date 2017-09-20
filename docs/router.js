@@ -1,3 +1,4 @@
+/* global ga */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './routes'
@@ -22,6 +23,15 @@ router.beforeEach((to, from, next) => {
   metaDescription.setAttribute('content', to.meta.description || metaDescription.getAttribute('content'))
 
   next()
+})
+router.afterEach((to, from) => {
+  if (window.ga != null) {
+    ga('set', {
+      page: to.path,
+      title: to.meta.title,
+    })
+    ga('send', 'pageview')
+  }
 })
 
 export default router
