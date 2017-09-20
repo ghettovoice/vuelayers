@@ -6,6 +6,7 @@ const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const PreloadWebpackPlugin = require('preload-webpack-plugin')
 const baseWebpackConfig = require('./webpack.base.conf')
 const utils = require('./utils')
+const config = require('./config')
 
 const webpackConfig = merge(baseWebpackConfig, {
   // cheap-module-eval-source-map is faster for development
@@ -39,6 +40,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       template: 'docs/index.ejs',
       inject: true,
       serviceWorker: '',
+      gaUID: config.replaces.C_GOOGLE_UID,
     }),
     new FriendlyErrorsPlugin(),
     new PreloadWebpackPlugin({

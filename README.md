@@ -1,10 +1,9 @@
 <p align="center">
   <a href="https://ghettovoice.github.io/vuelayers" target="_blank" title="VueLayers Homepage">
-    <img width="100" src="https://ghettovoice.github.io/vuelayers/static/img/logo.svg">
+    <img width="100" src="https://ghettovoice.github.io/vuelayers/static/img/logo.svg"><br />
+    <h1>VueLayers.js</h1>
   </a>
 </p>
-
-# VueLayers
 
 > [Vue 2.0](https://vuejs.org/) components to work with [OpenLayers](https://openlayers.org)
 

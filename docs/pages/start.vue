@@ -51,7 +51,7 @@
         Each directory includes a set of index files: #[code lib/**/index.js], #[code lib/**/index.es.js],
         #[code lib/**/index.umd.js] and #[code lib/**/index.umd.min.js]. All stylesheets are compiled to files:
         #[code lib/style.css] and #[code lib/style.min.css].
-      table
+      table.is-hidden-touch
         tr
           th Module system
           th Environments
@@ -62,6 +62,12 @@
           td {{ row.env.join(', ') }}
           td(v-html="row.js.map(f => `<code>${f}</code>`).join('<br />')")
           td(v-html="row.css.map(f => `<code>${f}</code>`).join('<br />')")
+      ul.is-hidden-desktop
+        li(v-for="row in builds").
+           #[b Module system]: {{ row.sys }}#[br]
+           #[b Environments]: {{ row.env.join(', ') }}#[br]
+           #[b JS]: #[span(v-html="row.js.map(f => `<code>${f}</code>`).join(', ')")]#[br]
+           #[b CSS]: #[span(v-html="row.css.map(f => `<code>${f}</code>`).join(', ')")]#[br]
 
       h3 Usage
       h4 NPM / Webpack / Rollup

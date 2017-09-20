@@ -29,7 +29,7 @@
                 router-link(:to="subitem.link", :title="subitem.title" exact-active-class="is-active") {{ subitem.title }}
 
       div.center.column.is-8-tablet.is-9-desktop.is-offset-4-tablet.is-offset-3-desktop
-        vld-navbar.is-hidden-tablet
+        vld-navbar.is-hidden-tablet(':menu-active.sync'="navbarMenuActive")
           vld-navbar-item.logo.has-text-left(slot="brand" link="/" title="C_PKG_FULLNAME.js Docs", :router="true")
             div
               img(src="./static/img/logo.svg" alt="C_PKG_FULLNAME Logo")
@@ -103,9 +103,21 @@
     },
   }
 
+  const watch = {
+    $route () {
+      this.navbarMenuActive = false
+    },
+  }
+
   export default {
     name: 'vld-app',
     computed,
+    watch,
+    data () {
+      return {
+        navbarMenuActive: false,
+      }
+    },
   }
 </script>
 
@@ -173,12 +185,16 @@
         z-index: 10
         box-shadow: 0 0 1em rgba(0, 0, 0, 0.4)
         .logo
-          font-size: 1.5em
+          font-size: 1.1em
           display: flex
           div
             &:first-child
-              max-width: 50px
+              max-width: 25px
               margin-right: .25em
             img
               vertical-align: text-bottom
+        +tablet()
+          font-size: 1.5em
+          div:first-child
+            max-width: 50px
 </style>

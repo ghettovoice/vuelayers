@@ -69,6 +69,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency',
       serviceWorker: `<script>${utils.getServiceWorkerSrc()}</script>`,
+      gaUID: config.replaces.C_GOOGLE_UID,
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
