@@ -19,9 +19,9 @@
         h1.title.
           #[img(src="../static/img/logo.svg" width="100" alt="C_PKG_FULLNAME Logo")]
           #[br]
-          C_PKG_FULLNAME.js
+          C_PKG_FULLNAME
         p.subtitle.
-          #[a(href="https://vuejs.org/" title="Vue Homepage" target="_blank") Vue 2.0] components to work with
+          #[a(href="https://vuejs.org/" title="Vue Homepage" target="_blank") Vue 2] components to work with
           #[a(href="https://openlayers.org/" title="OpenLayers Homepage" target="_blank") OpenLayers]
 
         vld-code(lang="bash").

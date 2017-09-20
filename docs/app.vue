@@ -3,11 +3,11 @@
     div.columns.layout
       div.column.left.is-4-tablet.is-3-desktop.is-hidden-mobile.is-fullheight
         vld-sidebar
-          router-link.name(slot="logo", to="/", title="C_PKG_FULLNAME.js Home", exact-active-class="is-active")
+          router-link.name(slot="logo", to="/", title="C_PKG_FULLNAME Homepage", exact-active-class="is-active")
             div
               img(src="./static/img/logo.svg" alt="C_PKG_FULLNAME Logo")
             div
-              span C_PKG_FULLNAME.js
+              span C_PKG_FULLNAME
           a(
             slot="logo"
             href="C_PKG_REPOSITORY/releases/tag/vC_PKG_VERSION"
@@ -30,11 +30,11 @@
 
       div.center.column.is-8-tablet.is-9-desktop.is-offset-4-tablet.is-offset-3-desktop
         vld-navbar.is-hidden-tablet(':menu-active.sync'="navbarMenuActive")
-          vld-navbar-item.logo.has-text-left(slot="brand" link="/" title="C_PKG_FULLNAME.js Docs", :router="true")
+          vld-navbar-item.logo.has-text-left(slot="brand" link="/" title="C_PKG_FULLNAME Homepage", :router="true")
             div
               img(src="./static/img/logo.svg" alt="C_PKG_FULLNAME Logo")
             div
-              span C_PKG_FULLNAME.js
+              span C_PKG_FULLNAME
           vld-navbar-item(
             slot="brand"
             link="C_PKG_REPOSITORY/releases/tag/vC_PKG_VERSION"
@@ -78,10 +78,17 @@
             router-view/
 
         vld-footer#footer(right-mods="has-text-centered has-text-right-tablet")
-          div(slot="left").
-            Licensed under #[a(href="C_PKG_LICENSE_URL" target="_blank" title="View license text") C_PKG_LICENSE_NAME]
-            #[br]
-            &copy; {{ new Date().getFullYear() }} #[a(href="C_PKG_AUTHOR_HOMEPAGE" title="C_PKG_AUTHOR_NAME Homepage" target="_blank") C_PKG_AUTHOR_NAME]
+          div.content(slot="left")
+            p
+              small.
+                #[router-link(to="/" title="C_PKG_FULLNAME Homepage") C_PKG_FULLNAME] is licensed under
+                #[a(href="C_PKG_LICENSE_URL" target="_blank" title="View license text") C_PKG_LICENSE_NAME]
+                #[br]
+                &copy; {{ new Date().getFullYear() }} #[a(href="C_PKG_AUTHOR_HOMEPAGE" title="C_PKG_AUTHOR_NAME Homepage" target="_blank") C_PKG_AUTHOR_NAME]
+            p
+              small.
+                The site is based on #[a(href="http://bulma.io/" title="Bulma Homepage" target="_blank") Bulma]
+                and #[a(href="https://buefy.github.io/" title="Buefy Homepage" target="_blank") Buefy]
 
           div(slot="right")
             a.button.is-outlined.is-info(href="C_PKG_REPOSITORY" target="_blank" title="View on GitHub")
@@ -144,12 +151,12 @@
             &:hover, &:hover .icon
               color: $primary
           .name
-            font-size: 1.8em
+            font-size: 2.1em
             display: flex
             justify-content: center
             div
               &:first-child
-                max-width: 40px
+                max-width: 30px
                 margin-right: .3em
                 flex: 0 0 auto
             img
@@ -185,16 +192,12 @@
         z-index: 10
         box-shadow: 0 0 1em rgba(0, 0, 0, 0.4)
         .logo
-          font-size: 1.1em
+          font-size: 1.4em
           display: flex
           div
             &:first-child
-              max-width: 25px
+              max-width: 22px
               margin-right: .25em
             img
               vertical-align: text-bottom
-        +tablet()
-          font-size: 1.5em
-          div:first-child
-            max-width: 50px
 </style>

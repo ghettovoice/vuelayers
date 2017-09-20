@@ -33,11 +33,11 @@ $link-focus-border: $primary;
 
 // sidebar
 $sidebar-background: $dark url(../static/img/sidebar-bg.png) repeat;
-$sidebar-link-color: $primary;
+$sidebar-link-color: lighten($primary, 20%);
 $sidebar-link-hover-color: $primary-invert;
 $sidebar-icon-color: $grey-light;
 $sidebar-icon-hover-color: $light;
-$sidebar-menu-link-color: $primary;
+$sidebar-menu-link-color: lighten($primary, 20%);
 $sidebar-menu-link-hover-color: $primary-invert;
 $sidebar-menu-link-active-color: $primary-invert;
 $sidebar-menu-link-background: none;
