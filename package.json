@@ -2,7 +2,7 @@
   "name": "vuelayers",
   "fullname": "VueLayers",
   "version": "0.7.0",
-  "description": "Vue 2.0 components to work with OpenLayers",
+  "description": "Vue 2 components to work with OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
@@ -25,8 +25,8 @@
     "coveralls": "cat test/unit/coverage/lcov.info | coveralls",
     "docs-start": "cross-env PORT=8082 node build/dev-server.js --name docs",
     "docs-clean": "rm -rf dist-docs",
-    "docs-build": "npm run docs-clean && cross-env NODE_ENV=production BASE_URL=/vuelayers/ webpack --config=build/webpack.docs.prod.conf.js --progress",
-    "docs-deploy": "gh-pages -d dist-docs -m 'update doc site'"
+    "docs-build": "npm run docs-clean && cross-env NODE_ENV=production webpack --config=build/webpack.docs.prod.conf.js --progress",
+    "docs-deploy": "gh-pages -d dist-docs -m 'update doc site' -r git@github.com:VueLayers/vuelayers.github.io.git -b master"
   },
   "directories": {
     "lib": "lib",
@@ -53,7 +53,7 @@
   "bugs": {
     "url": "https://github.com/ghettovoice/vuelayers/issues"
   },
-  "homepage": "https://ghettovoice.github.io/vuelayers",
+  "homepage": "https://github.com/ghettovoice/vuelayers",
   "dependencies": {
     "@turf/point-on-surface": "^4.6.1",
     "babel-runtime": "^6.26.0",
