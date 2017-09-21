@@ -1,0 +1,7 @@
+{
+  "plugins": ["node_modules/jsdoc-vue"],
+  "source": {
+    "include": ["./src"],
+    "includePattern": "\\.(vue|js)$"
+  }
+}
