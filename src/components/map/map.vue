@@ -5,6 +5,9 @@
 </template>
 
 <script>
+  /**
+   * @module map/Map
+   */
   import Vue from 'vue'
   import { isEqual } from 'lodash/fp'
   import Map from 'ol/map'
@@ -28,8 +31,13 @@
     featuresContainer,
   } from '../../core'
 
-  const props = {
-    // todo remove when vl-control-* components will be ready
+  const props = /** @lends module:map/Map.prototype */{
+    /**
+     * Options for default map controls.
+     * @type {(Object|boolean)}
+     * @vueProp
+     * @todo remove when vl-control-* components will be ready
+     */
     controls: {
       type: [Object, Boolean],
       default: true,
@@ -56,10 +64,11 @@
     },
   }
 
-  const methods = {
+  const methods = /** @lends module:map/Map.prototype */{
     /**
      * @return {ol.Map}
      * @protected
+     * @vueMethod
      */
     createOlObject () {
       const map = new Map({
@@ -224,7 +233,7 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function(feature: ol.Feature, layer: (ol.layer.Layer|undefined))} callback
+     * @param {module:map/Map~featureCallback} callback
      * @param {Object} [opts]
      * @return {T|undefined}
      */
@@ -235,8 +244,8 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function(layer: ol.layer.Layer, rgba: (number[]|undefined))} callback
-     * @param {function(layer: ol.layer.Layer)} [layerFilter]
+     * @param {module:map/Map~layerCallback} callback
+     * @param {module:map/Map~layerFilter} [layerFilter]
      * @return {T|undefined}
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
@@ -314,14 +323,21 @@
     },
   }
 
+  /**
+   * Map component
+   * @vueCmp Map [vl-map]
+   */
   export default {
     name: 'vl-map',
     mixins: [olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer],
     props,
     methods,
+    /**
+     * @this module:map/Map.prototype
+     */
     created () {
       /**
-       * @type {ol.View}
+       * @type {ol.View|undefined}
        * @private
        */
       this._view = undefined
@@ -335,18 +351,26 @@
 
       Object.defineProperties(this, {
         /**
+         * OpenLayers map instance.
          * @type {ol.Map|undefined}
          */
         $map: {
           enumerable: true,
           get: () => this.$olObject,
         },
+        /**
+         * OpenLayers view instance.
+         * @type {ol.View|undefined}
+         */
         $view: {
           enumerable: true,
           get: () => this._view,
         },
       })
     },
+    /**
+     * @this module:map/Map.prototype
+     */
     destroyed () {
       this._view = undefined
     },
@@ -355,6 +379,7 @@
   /**
    * Subscribe to OL map events.
    * @return {void}
+   * @this module:map/Map.prototype
    * @private
    */
   function subscribeToMapEvents () {
@@ -394,4 +419,22 @@
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
+
+  /**
+   * @callback module:map/Map~featureCallback
+   * @param {ol.Feature} feature
+   * @param {?ol.layer.Layer} layer
+   * @return {*}
+   */
+  /**
+   * @callback module:map/Map~layerCallback
+   * @param {ol.layer.Layer} layer
+   * @param {?(number[]|Uint8Array)} rgba
+   * @return {*}
+   */
+  /**
+   * @callback module:map/Map~layerFilter
+   * @param {ol.layer.Layer} layer
+   * @return {boolean}
+   */
 </script>

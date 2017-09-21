@@ -1,7 +1,11 @@
 {
-  "plugins": ["node_modules/jsdoc-vue"],
+  "plugins": [
+    "plugins/markdown",
+    "plugins/underscore",
+    "build/jsdoc-plugins/vue"
+  ],
   "source": {
-    "include": ["./src"],
+    "include": ["./src/components/map"],
     "includePattern": "\\.(vue|js)$"
   }
 }
