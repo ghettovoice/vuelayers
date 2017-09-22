@@ -31,11 +31,10 @@
     featuresContainer,
   } from '../../core'
 
-  const props = /** @lends module:map/Map.prototype */{
+  const props = {
     /**
      * Options for default map controls.
      * @type {(Object|boolean)}
-     * @vueProp
      * @todo remove when vl-control-* components will be ready
      */
     controls: {
@@ -68,7 +67,6 @@
     /**
      * @return {ol.Map}
      * @protected
-     * @vueMethod
      */
     createOlObject () {
       const map = new Map({
@@ -233,7 +231,7 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {module:map/Map~featureCallback} callback
+     * @param {function((ol.Feature|ol.render.Feature), ?ol.layer.Layer): *} callback
      * @param {Object} [opts]
      * @return {T|undefined}
      */
@@ -244,8 +242,8 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {module:map/Map~layerCallback} callback
-     * @param {module:map/Map~layerFilter} [layerFilter]
+     * @param {function(ol.layer.Layer, ?(number[]|Uint8Array)): *} callback
+     * @param {function(ol.layer.Layer): boolean} [layerFilter]
      * @return {T|undefined}
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
@@ -325,7 +323,7 @@
 
   /**
    * Map component
-   * @vueCmp Map [vl-map]
+   * @vueCmp
    */
   export default {
     name: 'vl-map',
@@ -419,22 +417,4 @@
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
-
-  /**
-   * @callback module:map/Map~featureCallback
-   * @param {ol.Feature} feature
-   * @param {?ol.layer.Layer} layer
-   * @return {*}
-   */
-  /**
-   * @callback module:map/Map~layerCallback
-   * @param {ol.layer.Layer} layer
-   * @param {?(number[]|Uint8Array)} rgba
-   * @return {*}
-   */
-  /**
-   * @callback module:map/Map~layerFilter
-   * @param {ol.layer.Layer} layer
-   * @return {boolean}
-   */
 </script>
