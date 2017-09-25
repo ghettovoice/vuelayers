@@ -7,18 +7,17 @@ import View from './view.vue'
 
 export default {
   /**
-   * @memberOf module:map
+   * Map component `vl-map`.
    */
   Map,
   /**
-   * @memberOf module:map
+   * Map view component `vl-view`.
    */
   View,
   /**
-   * Installs Map and View components.
+   * Registers Map and View components with default names.
    * @param {Vue} Vue
    * @return {void}
-   * @memberOf module:map
    */
   install (Vue) {
     Vue.component(Map.name, Map)

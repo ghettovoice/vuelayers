@@ -1,13 +1,6 @@
 /**
- * VueLayers
- * Vue components to work with OpenLayers.
- *
- * @module vuelayers
- * @author Vladimir Vershinin <ghettovoice@gmail.com>
- * @license MIT
- * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
+ * Entry file for non-ES environments.
  */
-
 import * as components from './cmps'
 import * as core from './core'
 import install from './install'

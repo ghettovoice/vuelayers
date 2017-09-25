@@ -20,6 +20,7 @@
   import 'rxjs/add/operator/distinctUntilChanged'
   import 'rxjs/add/operator/map'
   import {
+    RENDERER_TYPE,
     projHelper,
     observableFromOlEvent,
     mergeDescriptors,
@@ -31,39 +32,94 @@
     featuresContainer,
   } from '../../core'
 
+  /**
+   * @vueProps
+   */
   const props = {
     /**
-     * Options for default map controls.
-     * @type {(Object|boolean)}
+     * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
+     * value is used to configure controls. See {@link https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults}.
+     * @type {Object|boolean}
      * @todo remove when vl-control-* components will be ready
      */
     controls: {
       type: [Object, Boolean],
       default: true,
     },
-    keyboardEventTarget: [String, Element],
+    /**
+     * The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard
+     * interactions will always trigger. If this option is not specified, the element the library listens to keyboard
+     * events on is the map target (i.e. the user-provided div for the map). If this is not `document` the target element
+     * needs to be focused for key events to be emitted, requiring that the target element has a `tabindex` attribute.
+     * @type {string|Element|Document}
+     * @default undefined
+     */
+    keyboardEventTarget: [String, Element, Document],
+    /**
+     * When set to `true`, tiles will be loaded during animations.
+     * @type {boolean}
+     */
     loadTilesWhileAnimating: {
       type: Boolean,
       default: false,
     },
+    /**
+     * When set to `true`, tiles will be loaded while interacting with the map.
+     * @type {boolean}
+     */
     loadTilesWhileInteracting: {
       type: Boolean,
       default: false,
     },
-    logo: [String, Object],
-    moveTolerance: Number,
+    /**
+     * The map logo. If a **string** is provided, it will be set as the image source of the logo. If an **object** is provided,
+     * the `src` property should be the **URL** for an image and the `href` property should be a **URL** for creating a link.
+     * If an **element** is provided, the **element** will be used. To disable the map logo, set the option to `false`.
+     * By default, the **OpenLayers** logo is shown.
+     * @type {boolean|string|Object|Element}
+     */
+    logo: [String, Object, Element, Boolean],
+    /**
+     * The minimum distance in pixels the cursor must move to be detected as a map move event instead of a click.
+     * Increasing this value can make it easier to click on the map.
+     * @type {Number}
+     */
+    moveTolerance: {
+      type: Number,
+      default: 1,
+    },
+    /**
+     * The ratio between physical pixels and device-independent pixels (dips) on the device.
+     * @type {number}
+     */
     pixelRatio: {
       type: Number,
       default: 1,
     },
-    renderer: [String, Array],
+    /**
+     * Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,
+     * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,
+     * but **WebGL** can only render **Point** geometries.
+     * @type {string|string[]}
+     */
+    renderer: {
+      type: [String, Array],
+      default: () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL],
+    },
+    /**
+     * Map container element `tabindex` attribute value.
+     * @type {number}
+     */
     tabIndex: {
       type: Number,
       default: 0,
     },
   }
 
-  const methods = /** @lends module:map/Map.prototype */{
+  /**
+   * @vueMethods
+   */
+  const methods = {
     /**
      * @return {ol.Map}
      * @protected
@@ -322,8 +378,8 @@
   }
 
   /**
-   * Map component
-   * @vueCmp
+   * Map component `vl-map`.
+   * @vueProto
    */
   export default {
     name: 'vl-map',
@@ -347,7 +403,7 @@
         source: new VectorSource(),
       })
 
-      Object.defineProperties(this, {
+      Object.defineProperties(this, /** @lends module:map/Map.prototype */{
         /**
          * OpenLayers map instance.
          * @type {ol.Map|undefined}

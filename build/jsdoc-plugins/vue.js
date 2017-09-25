@@ -1,5 +1,6 @@
 const generate = require('astring').generate
 const compiler = require('vue-template-compiler')
+const catharsis = require('catharsis')
 
 exports.handlers = {
   beforeParse (evt) {
@@ -9,18 +10,24 @@ exports.handlers = {
     }
   },
   newDoclet (evt) {
-    if (/^\s*\*\s@vueMethod\s?.*$/im.test(evt.doclet.comment)) {
-      // if (evt.doclet.name === 'forEachFeatureAtPixel') {
-      //   dump(evt.doclet)
-      // }
+    if (evt.doclet.type) {
+      evt.doclet.typeExpression = catharsis.stringify(evt.doclet.type.parsedType)
+    }
+
+    if (evt.doclet.params) {
+      evt.doclet.params.forEach(param => {
+        if (param.type) {
+          param.typeExpression = catharsis.stringify(param.type.parsedType)
+        }
+      })
     }
   },
 }
 
 exports.astNodeVisitor = {
   visitNode (node, evt, parser) {
-    if (/^\s*\*\s@vueCmp\s*$/im.test(evt.comment)) {
-      handleVueCmp(evt.code.node, evt, parser)
+    if (/^\s*\*\s@vueProto\s*$/im.test(evt.comment)) {
+      handleVueProto(evt.code.node, evt, parser)
     } else if (/^\s*\*\s@vueProps\s*$/im.test(evt.comment)) {
       evt.comment = setCommentTag(evt.comment, 'private')
       setTagsForProps(evt.code.node, 'vueProp')
@@ -46,9 +53,9 @@ exports.astNodeVisitor = {
 }
 
 exports.defineTags = function (dict) {
-  dict.defineTag('vueCmp', {
+  dict.defineTag('vueProto', {
     onTagged (doclet, tag) {
-      doclet.vueCmp = tag.value
+      doclet.vueProto = tag.value
     },
   })
 
@@ -91,9 +98,16 @@ exports.defineTags = function (dict) {
       doclet.vueMethod = true
     },
   })
+
+  dict.defineTag('required', {
+    mustHaveValue: false,
+    onTagged (doclet) {
+      doclet.required = true
+    },
+  })
 }
 
-function handleVueCmp (node, evt) {
+function handleVueProto (node, evt, parser) {
   if (!isObjectExpression(node)) return
 
   let namePropertyNode, mixinsPropertyNode, propsPropertyNode, computedPropertyNode, methodsPropertyNode,
@@ -125,14 +139,17 @@ function handleVueCmp (node, evt) {
   })
 
   evt.comment = setCommentTag(evt.comment, 'extends', 'Vue')
+
   if (namePropertyNode) {
-    evt.comment = setCommentTag(evt.comment, 'vueCmp', namePropertyNode.value.value)
+    evt.comment = setCommentTag(evt.comment, 'vueProto', namePropertyNode.value.value)
   }
+
   if (mixinsPropertyNode) {
     mixinsPropertyNode.value.elements.forEach(elementNode => {
       evt.comment = setCommentTag(evt.comment, 'mixes', elementNode.name, true)
     })
   }
+  // auto tag props, computed, methods
   if (propsPropertyNode && isObjectExpression(propsPropertyNode.value)) {
     setTagsForProps(propsPropertyNode.value, 'vueProp')
   }
@@ -214,25 +231,26 @@ function handleVueProp (node, evt, parser) {
     }
   }
 
-  let moduleDoclet = parser.results().find(d => d.kind === 'module')
   handle(node)
-  evt.comment = setCommentTag(evt.comment, 'memberOf', moduleDoclet.longname + '.prototype')
+
+  let parentDoclets = parser.resolvePropertyParents(node.parent)
+  evt.comment = setCommentTag(evt.comment, 'memberOf', parentDoclets[0].memberof + '.prototype')
 }
 
 function handleVueCompProp (node, evt, parser) {
   // todo handle getter/setter expression
-  let moduleDoclet = parser.results().find(d => d.kind === 'module')
-  evt.comment = setCommentTag(evt.comment, 'memberOf', moduleDoclet.longname + '.prototype')
+  let parentDoclets = parser.resolvePropertyParents(node.parent)
+  evt.comment = setCommentTag(evt.comment, 'memberOf', parentDoclets[0].memberof + '.prototype')
 }
 
 function handleVueDataProp (node, evt, parser) {
-  let moduleDoclet = parser.results().find(d => d.kind === 'module')
-  evt.comment = setCommentTag(evt.comment, 'memberOf', moduleDoclet.longname + '.prototype')
+  let parentDoclets = parser.resolvePropertyParents(node.parent)
+  evt.comment = setCommentTag(evt.comment, 'memberOf', parentDoclets[0].memberof + '.prototype')
 }
 
 function handleVueMethod (node, evt, parser) {
-  let moduleDoclet = parser.results().find(d => d.kind === 'module')
-  evt.comment = setCommentTag(evt.comment, 'memberOf', moduleDoclet.longname + '.prototype')
+  let parentDoclets = parser.resolvePropertyParents(node.parent)
+  evt.comment = setCommentTag(evt.comment, 'memberOf', parentDoclets[0].memberof + '.prototype')
 }
 
 function isVueFile (file) {

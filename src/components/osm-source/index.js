@@ -1,6 +1,3 @@
-/**
- * @module components/source/osm
- */
 import Source from './source.vue'
 
 export default {

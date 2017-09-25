@@ -1,6 +1,3 @@
-/**
- * @module components/source/xyz
- */
 import Source from './source.vue'
 
 export default {

@@ -1,7 +1,3 @@
-/**
- * Basic mixin for ol components that depends on map instance
- * @module components/ol-use-map-cmp
- */
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/interval'
 import 'rxjs/add/operator/skipWhile'
@@ -9,6 +5,9 @@ import 'rxjs/add/operator/first'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/toPromise'
 
+/**
+ * Basic mixin for ol components that depends on map instance
+ */
 export default {
   methods: {
     /**

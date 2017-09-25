@@ -20,6 +20,7 @@
       <w>debounce</w>
       <w>debounced</w>
       <w>declarators</w>
+      <w>defaultvalue</w>
       <w>deinit</w>
       <w>deinitilize</w>
       <w>denit</w>
@@ -27,6 +28,7 @@
       <w>dest</w>
       <w>devtool</w>
       <w>dirname</w>
+      <w>doclets</w>
       <w>doesn</w>
       <w>dropdown</w>
       <w>epsg</w>
@@ -95,6 +97,7 @@
       <w>singleclick</w>
       <w>sinon</w>
       <w>sourcemap</w>
+      <w>tabindex</w>
       <w>tilegrid</w>
       <w>tmpl</w>
       <w>topo</w>
@@ -115,6 +118,7 @@
       <w>vuejs</w>
       <w>vuelayers</w>
       <w>warndbg</w>
+      <w>webgl</w>
       <w>whatwg</w>
       <w>widescreen</w>
       <w>wmts</w>

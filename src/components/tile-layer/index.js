@@ -1,6 +1,3 @@
-/**
- * @module components/layer/tile
- */
 import Layer from './layer.vue'
 
 export default {

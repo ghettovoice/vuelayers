@@ -44,6 +44,11 @@ export const REPROJ_ERR_THRESHOLD = 0.5
 export const EARTH_RADIUS = 6378137
 export const WGS84_SPHERE = new Sphere(EARTH_RADIUS)
 
+export const RENDERER_TYPE = {
+  CANVAS: 'canvas',
+  WEBGL: 'webgl',
+}
+
 export const GEOMETRY_TYPE = {
   POINT: 'Point',
   LINE_STRING: 'LineString',

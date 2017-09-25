@@ -1,6 +1,3 @@
-/**
- * @module components/style/stroke
- */
 import Style from './style.vue'
 
 export default {

@@ -1,6 +1,3 @@
-/**
- * @module components/interaction/select
- */
 import Interaction from './interaction.vue'
 
 export default {

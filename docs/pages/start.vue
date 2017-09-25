@@ -44,7 +44,7 @@
 
       h3 NPM package description
       p.
-        #[b C_PKG_FULLNAME] distributes as a set of standalone builds as well as set of separate components packages
+        #[b C_PKG_FULLNAME] distributes as a set of standalone builds as well as set of separate components modules
         compiled into different module system types (#[b ES], #[b CommonJS], #[b AMD], #[b IIFE]). All distributed files
         can be found at the #[a(href="https://unpkg.com/C_PKG_NAME/lib/", target="_blank") #[code lib] directory] of the #[b NPM] package.
       p.

@@ -1,11 +1,10 @@
-/**
- * RxJS subscriptions manager.
- * @module mixins/rx-subs
- */
 import { errordbg } from '../utils/debug'
 
 const noop = () => {}
 
+/**
+ * RxJS subscriptions manager.
+ */
 export default {
   methods: {
     /**

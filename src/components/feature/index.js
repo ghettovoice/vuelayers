@@ -1,6 +1,3 @@
-/**
- * @module components/feature
- */
 import Feature from './feature.vue'
 
 export default {

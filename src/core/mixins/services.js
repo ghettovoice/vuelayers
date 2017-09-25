@@ -1,10 +1,9 @@
-/**
- * Service container mixin
- * @module components/services
- */
 import { SERVICES_PROP } from '../consts'
 import mergeDescriptors from '../utils/multi-merge-descriptors'
 
+/**
+ * Service container mixin
+ */
 export default {
   inject: {
     $services: SERVICES_PROP,

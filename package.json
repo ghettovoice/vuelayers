@@ -26,7 +26,8 @@
     "docs-start": "cross-env PORT=8082 node build/dev-server.js --name docs",
     "docs-clean": "rm -rf dist-docs",
     "docs-build": "npm run docs-clean && cross-env NODE_ENV=production webpack --config=build/webpack.docs.prod.conf.js --progress",
-    "docs-deploy": "gh-pages -d dist-docs -m 'update doc site' -r git@github.com:VueLayers/vuelayers.github.io.git -b master"
+    "docs-deploy": "gh-pages -d dist-docs -m 'update doc site' -r git@github.com:VueLayers/vuelayers.github.io.git -b master",
+    "jsdoc-parse": "jsdoc -c .jsdoc.js -r -X > docs/jsdoc-index.json"
   },
   "directories": {
     "lib": "lib",

@@ -1,13 +1,6 @@
 /**
- * VueLayers
- * Vue components to work with OpenLayers.
- *
- * @module vuelayers
- * @author Vladimir Vershinin <ghettovoice@gmail.com>
- * @license MIT
- * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
+ * Entry file for ES environments.
  */
-
 import VueLayers from './index.cjs'
 
 export default VueLayers

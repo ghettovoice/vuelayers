@@ -1,7 +1,3 @@
-/**
- * @module components/style/container
- * @deprecated
- */
 import StyleBox from '../style-box'
 import { debug } from '../../core'
 

@@ -1,6 +1,3 @@
-/**
- * @module components/source/cluster
- */
 import Source from './source.vue'
 
 export default {

@@ -31,11 +31,12 @@ export default [
     component: () => import('./pages/demo.vue'),
   },
   {
-    path: '/packages',
-    redirect: '/packages/map',
+    path: '/modules',
+    redirect: '/modules/map',
   },
+  // todo make through single component with 'moduleName' prop, load JSDoc by module name and render common doc template.
   {
-    path: '/packages/map',
+    path: '/modules/map',
     meta: {
       title: 'Map',
     },
@@ -44,7 +45,17 @@ export default [
       subtitle: 'The Core component of C_PKG_FULLNAME',
       color: 'is-info',
     },
-    component: () => import('./pages/packages/map.vue'),
+    component: () => import('./pages/modules/map.vue'),
+  },
+  // redirects
+  // todo remove later
+  {
+    path: '/packages',
+    redirect: '/modules/map',
+  },
+  {
+    path: '/packages/map',
+    redirect: '/modules/map',
   },
   {
     path: '*',
