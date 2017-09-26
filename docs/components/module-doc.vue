@@ -25,7 +25,9 @@
           isPublicDoclet(doclet)
       })
     },
+    components () {
 
+    },
   }
 
   export default {

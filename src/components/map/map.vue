@@ -5,6 +5,9 @@
 </template>
 
 <script>
+  /**
+   * @module map/map
+   */
   import Vue from 'vue'
   import { isEqual } from 'lodash/fp'
   import Map from 'ol/map'
@@ -376,7 +379,6 @@
 
   /**
    * Map `vl-map` component.
-   * @name Map
    * @vueProto
    */
   export default {
@@ -385,7 +387,7 @@
     props,
     methods,
     /**
-     * @this module:map/Map.prototype
+     * @this module:map/map
      */
     created () {
       /**
@@ -401,7 +403,7 @@
         source: new VectorSource(),
       })
 
-      Object.defineProperties(this, /** @lends module:map/Map.prototype */{
+      Object.defineProperties(this, /** @lends module:map/map# */{
         /**
          * OpenLayers map instance.
          * @type {ol.Map|undefined}
@@ -421,7 +423,7 @@
       })
     },
     /**
-     * @this module:map/Map.prototype
+     * @this module:map/map
      */
     destroyed () {
       this._view = undefined
@@ -431,7 +433,7 @@
   /**
    * Subscribe to OL map events.
    * @return {void}
-   * @this module:map/Map.prototype
+   * @this module:map/map
    * @private
    */
   function subscribeToMapEvents () {

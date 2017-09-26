@@ -1,4 +1,7 @@
 <script>
+  /**
+   * @module map/view
+   */
   import Vue from 'vue'
   import View from 'ol/view'
   import { isEqual, isPlainObject, noop } from 'lodash/fp'

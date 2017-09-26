@@ -2,6 +2,8 @@ const generate = require('astring').generate
 const compiler = require('vue-template-compiler')
 const catharsis = require('catharsis')
 
+let currentModuleDoclet
+
 exports.handlers = {
   beforeParse (evt) {
     if (isVueFile(evt.filename)) {
@@ -10,6 +12,10 @@ exports.handlers = {
     }
   },
   newDoclet (evt) {
+    if (evt.doclet.kind === 'module') {
+      currentModuleDoclet = evt.doclet
+    }
+
     if (evt.doclet.type) {
       evt.doclet.typeExpression = catharsis.stringify(evt.doclet.type.parsedType)
     }
@@ -21,6 +27,9 @@ exports.handlers = {
         }
       })
     }
+  },
+  fileComplete () {
+    currentModuleDoclet = undefined
   },
 }
 
@@ -61,6 +70,9 @@ exports.defineTags = function (dict) {
 
   dict.defineTag('vueProps', {
     mustHaveValue: false,
+    onTagged (doclet) {
+      doclet.vueProps = true
+    },
   })
   dict.defineTag('vueProp', {
     mustHaveValue: false,
@@ -71,16 +83,22 @@ exports.defineTags = function (dict) {
 
   dict.defineTag('vueComputed', {
     mustHaveValue: false,
+    onTagged (doclet) {
+      doclet.vueComputed = true
+    },
   })
   dict.defineTag('vueComputedProp', {
     mustHaveValue: false,
     onTagged (doclet) {
-      doclet.vueCompProp = true
+      doclet.vueComputedProp = true
     },
   })
 
   dict.defineTag('vueData', {
     mustHaveValue: false,
+    onTagged (doclet) {
+      doclet.vueData = true
+    },
   })
   dict.defineTag('vueDataProp', {
     mustHaveValue: false,
@@ -91,6 +109,9 @@ exports.defineTags = function (dict) {
 
   dict.defineTag('vueMethods', {
     mustHaveValue: false,
+    onTagged (doclet) {
+      doclet.vueMethods = true
+    },
   })
   dict.defineTag('vueMethod', {
     mustHaveValue: false,
@@ -232,25 +253,26 @@ function handleVueProp (node, evt, parser) {
   }
 
   handle(node)
-
-  let parentDoclets = parser.resolvePropertyParents(node.parent)
-  evt.comment = setCommentTag(evt.comment, 'memberOf', parentDoclets[0].memberof + '.prototype')
+  setMemberOf(node.parent, evt, parser)
 }
 
 function handleVueCompProp (node, evt, parser) {
   // todo handle getter/setter expression
-  let parentDoclets = parser.resolvePropertyParents(node.parent)
-  evt.comment = setCommentTag(evt.comment, 'memberOf', parentDoclets[0].memberof + '.prototype')
+  setMemberOf(node.parent, evt, parser)
 }
 
 function handleVueDataProp (node, evt, parser) {
-  let parentDoclets = parser.resolvePropertyParents(node.parent)
-  evt.comment = setCommentTag(evt.comment, 'memberOf', parentDoclets[0].memberof + '.prototype')
+  setMemberOf(node.parent, evt, parser)
 }
 
 function handleVueMethod (node, evt, parser) {
-  let parentDoclets = parser.resolvePropertyParents(node.parent)
-  evt.comment = setCommentTag(evt.comment, 'memberOf', parentDoclets[0].memberof + '.prototype')
+  setMemberOf(node.parent, evt, parser)
+}
+
+function setMemberOf (node, evt, parser) {
+  if (currentModuleDoclet) {
+    evt.comment = setCommentTag(evt.comment, 'memberOf', currentModuleDoclet.longname)
+  }
 }
 
 function isVueFile (file) {
