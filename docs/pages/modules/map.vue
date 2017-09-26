@@ -5,7 +5,7 @@
       h2.subtitle {{ subtitle }}
 
     section.section.content
-      p #[b Map] package consists of two main components:
+      p #[b Map] module consists of two main components:
       ul
         li.
           #[code vl-map] - Container for #[b layers], #[b interactions], #[b controls] and #[b overlays].

@@ -42,7 +42,7 @@ export default [
     },
     props: {
       title: 'Map',
-      subtitle: 'The Core component of C_PKG_FULLNAME',
+      subtitle: 'The core module of C_PKG_FULLNAME',
       color: 'is-info',
     },
     component: () => import('./pages/modules/map.vue'),

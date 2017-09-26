@@ -3,7 +3,6 @@
  */
 import VueLayers from './index.cjs'
 
-export default VueLayers
 export const {
   install,
   core,

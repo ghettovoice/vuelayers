@@ -5,9 +5,6 @@
 </template>
 
 <script>
-  /**
-   * @module map/Map
-   */
   import Vue from 'vue'
   import { isEqual } from 'lodash/fp'
   import Map from 'ol/map'
@@ -378,7 +375,8 @@
   }
 
   /**
-   * Map component `vl-map`.
+   * Map `vl-map` component.
+   * @name Map
    * @vueProto
    */
   export default {
