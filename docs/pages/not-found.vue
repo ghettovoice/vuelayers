@@ -5,7 +5,7 @@
       h2.subtitle {{ subtitle }}
 
     section.section.content
-      p Go to #[router-link(to="/", title="C_PKG_FULLNAME Homepage") Home]
+      p Go to #[router-link(to="/", title="VueLayers Homepage") Home]
 </template>
 
 <script>

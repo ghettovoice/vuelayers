@@ -52,7 +52,6 @@
      * events on is the map target (i.e. the user-provided div for the map). If this is not `document` the target element
      * needs to be focused for key events to be emitted, requiring that the target element has a `tabindex` attribute.
      * @type {string|Element|Document}
-     * @default undefined
      */
     keyboardEventTarget: [String, Element, Document],
     /**
@@ -379,7 +378,12 @@
 
   /**
    * Map `vl-map` component.
+   *
+   * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
+   * rendering and low level interaction events.
+   *
    * @vueProto
+   * @alias module:map.Map
    */
   export default {
     name: 'vl-map',

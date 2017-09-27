@@ -14,7 +14,7 @@ const router = new VueRouter({
   },
 })
 router.beforeEach((to, from, next) => {
-  document.title = [to.meta.title || document.title, 'C_PKG_FULLNAME'].join(' :: ')
+  document.title = [to.meta.title || document.title, 'VueLayers'].join(' :: ')
 
   const metaKeywords = document.head.querySelector('meta[name="keywords"]')
   metaKeywords.setAttribute('content', to.meta.keywords || metaKeywords.getAttribute('content'))

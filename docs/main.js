@@ -1,7 +1,7 @@
 import 'babel-polyfill'
 import Vue from 'vue'
 import Buefy from 'buefy'
-// import C_PKG_FULLNAME modules
+// import VueLayers modules
 import * as VueLayers from 'vuelayers'
 import App from './app.vue'
 import DocsComponents from './components'
@@ -10,7 +10,7 @@ import router from './router'
 Vue.use(Buefy, {
   defaultIconPack: 'fa',
 })
-// register all C_PKG_FULLNAME components
+// register all VueLayers components
 Vue.use(VueLayers)
 Vue.use(DocsComponents)
 

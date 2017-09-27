@@ -24,8 +24,8 @@ export default [
       title: 'Live Demo',
     },
     props: {
-      title: 'C_PKG_FULLNAME demo app',
-      subtitle: 'An example app built with C_PKG_FULLNAME.js',
+      title: 'VueLayers demo app',
+      subtitle: 'An example app built with VueLayers.js',
       color: 'is-primary',
     },
     component: () => import('./pages/demo.vue'),
@@ -42,7 +42,7 @@ export default [
     },
     props: {
       title: 'Map',
-      subtitle: 'The core module of C_PKG_FULLNAME',
+      subtitle: 'The core module of VueLayers',
       color: 'is-info',
     },
     component: () => import('./pages/modules/map.vue'),

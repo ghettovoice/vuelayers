@@ -1,12 +1,16 @@
 module.exports = {
   recurseDepth: 10,
   plugins: [
-    'plugins/markdown',
     'plugins/underscore',
-    'build/jsdoc-plugins/vue',
+    'build/jsdoc/vue',
   ],
   source: {
     include: ['./src'],
     includePattern: '\\.(vue|js)$',
+  },
+  markdown: {
+    tags: [
+      'examples'
+    ],
   },
 }

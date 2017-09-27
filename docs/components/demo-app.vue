@@ -181,7 +181,7 @@
 
 <script>
   import { kebabCase, range, random } from 'lodash/fp'
-  // import C_PKG_FULLNAME core helpers
+  // import VueLayers core helpers
   import { core as vlCore } from 'vuelayers'
   import pacmanFeaturesCollection from '../static/sample-data/pacman.geojson'
 
