@@ -5,14 +5,18 @@
  * - <a @click="scrollTo('vl-view')">View `vl-view`</a> - 2D view of the map
  *
  * @module map
- * @example <caption>Install</caption>
+ * @example **Install**
+ * ```js
  * import Vue from 'vue'
  * // import module and styles
  * import { Map } from 'vuelayers'
+ * // or
+ * import Map from 'vuelayers/lib/map'
+ * // import VueLayers styles
  * import 'vuelayers/lib/style.css'
- *
  * // register vl-map and vl-view components
  * Vue.use(Map)
+ * ```
  */
 import Map from './map.vue'
 import View from './view.vue'

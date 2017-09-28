@@ -383,7 +383,6 @@
    * rendering and low level interaction events.
    *
    * @vueProto
-   * @alias module:map.Map
    */
   export default {
     name: 'vl-map',

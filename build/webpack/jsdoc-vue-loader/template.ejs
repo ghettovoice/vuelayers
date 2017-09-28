@@ -1,0 +1,54 @@
+<template>
+  <div class="content" :class="$options.name">
+    <%= doclet.description %>
+    <%
+    let examples = doclet.examples || []
+    examples.forEach(function (example) {
+    %>
+      <%= example %>
+    <% }) %>
+
+    <b-tabs v-if="props">
+      <b-tab-item label="Props">
+        <p v-for="prop in props" :key="prop.name">
+          {{ prop.name }} {{ prop.typeExpression }}
+        </p>
+      </b-tab-item>
+    </b-tabs>
+  </div>
+</template>
+
+<script>
+  const doclet = <%= JSON.stringify(doclet) %>
+  const childDoclets = <%= JSON.stringify(children) %>
+
+  const isPublic = ({ undocumented, access }) => !undocumented && (!access || access === 'public')
+
+  export default {
+    name: 'vld-module-<%= doclet.name.replace(/^module:/, '').replace('/', '-') %>-doc',
+    doclet,
+    childDoclets,
+    computed: {
+      doclet () {
+        return doclet
+      },
+      childDoclets () {
+        return childDoclets
+      },
+      props () {
+        return childDoclets.filter(d => isPublic(d) && d.vueProp && d.memberof === doclet.longname)
+      },
+    },
+    methods: {
+      scrollTo (id) {
+        let elem = this.$el.querySelector('#' + id)
+        if (elem) {
+          window.scrollTo(0, elem.offsetTop)
+        }
+      },
+    },
+  }
+</script>
+
+<style>
+</style>
