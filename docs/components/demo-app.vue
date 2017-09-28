@@ -123,7 +123,7 @@
           <component v-if="style.styles" v-for="(st, cmp) in style.styles" :key="cmp" :is="cmp" v-bind="st">
             <!-- vl-style-fill, vl-style-stroke if provided -->
             <vl-style-fill v-if="st.fill" v-bind="st.fill"/>
-            <vl-style-fill v-if="st.stroke" v-bind="st.stroke"/>
+            <vl-style-stroke v-if="st.stroke" v-bind="st.stroke"/>
           </component>
         </component>
         <!--// style -->
@@ -351,6 +351,16 @@
                   'vl-style-stroke': {
                     color: '#219e46',
                     width: 2,
+                  },
+                  'vl-style-text': {
+                    text: '\uf041',
+                    font: '24px FontAwesome',
+                    fill: {
+                      color: '#2355af',
+                    },
+                    stroke: {
+                      color: 'white',
+                    },
                   },
                 },
               },
