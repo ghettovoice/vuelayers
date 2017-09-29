@@ -1,10 +1,15 @@
 /**
+ * @module map
+ */
+import Map from './map.vue'
+import View from './view.vue'
+
+/**
  * Map module consists of two main components:
  *
  * - <a @click="scrollTo('vl-map')">Map `vl-map`</a> - viewport, map rendering and low level interactions.
  * - <a @click="scrollTo('vl-view')">View `vl-view`</a> - 2D view of the map
  *
- * @module map
  * @example **Install**
  * ```js
  * import Vue from 'vue'
@@ -17,10 +22,17 @@
  * // register vl-map and vl-view components
  * Vue.use(Map)
  * ```
+ * @example **Usage**
+ * ```html
+ * <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
+ *   <vl-view :center="[0, 0]" :zoom="3" :rotation="0" />
+ *
+ *   <vl-layer-tile>
+ *     <vl-source-osm />
+ *   </vl-layer-tile>
+ * </vl-map>
+ * ```
  */
-import Map from './map.vue'
-import View from './view.vue'
-
 export default {
   /**
    * Map `vl-map` component.
@@ -29,6 +41,7 @@ export default {
    * rendering and low level interaction events.
    *
    * @see module:map/map
+   * @vueName vl-map
    */
   Map,
   /**
@@ -38,6 +51,7 @@ export default {
    * **resolution**, and **rotation** of the map.
    *
    * @see module:map/view
+   * @vueName vl-map
    */
   View,
   /**

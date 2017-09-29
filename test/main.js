@@ -1,6 +1,6 @@
 import 'babel-polyfill'
 import Vue from 'vue'
-import * as VueLayers from '../src'
+import VueLayers from '../src'
 import App from './app.vue'
 
 Vue.use(VueLayers)

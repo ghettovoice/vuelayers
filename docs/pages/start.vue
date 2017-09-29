@@ -53,23 +53,14 @@
         Each directory includes a set of index files: #[code lib/**/index.js], #[code lib/**/index.es.js],
         #[code lib/**/index.umd.js] and #[code lib/**/index.umd.min.js]. All stylesheets are compiled to files:
         #[code lib/style.css] and #[code lib/style.min.css].
-      table.is-hidden-touch
-        tr
-          th Module system
-          th Environments
-          th JS
-          th CSS
-        tr(v-for="row in builds")
-          td {{ row.sys }}
-          td {{ row.env.join(', ') }}
-          td(v-html="row.js.map(f => `<code>${f}</code>`).join('<br />')")
-          td(v-html="row.css.map(f => `<code>${f}</code>`).join('<br />')")
-      ul.is-hidden-desktop
-        li(v-for="row in builds").
-           #[b Module system]: {{ row.sys }}#[br]
-           #[b Environments]: {{ row.env.join(', ') }}#[br]
-           #[b JS]: #[span(v-html="row.js.map(f => `<code>${f}</code>`).join(', ')")]#[br]
-           #[b CSS]: #[span(v-html="row.css.map(f => `<code>${f}</code>`).join(', ')")]#[br]
+      b-table(':data'="builds" ':mobile-cards'="true")
+        template(scope="scope")
+          b-table-column(label="Module system") {{ scope.row.sys }}
+          b-table-column(label="Environments") {{ scope.row.env.join(', ') }}
+          b-table-column(label="JS")
+            p(v-html="scope.row.js.map(f => `<code>${f}</code>`).join('<br />')")
+          b-table-column(label="CSS")
+            p(v-html="scope.row.css.map(f => `<code>${f}</code>`).join('<br />')")
 
       h3 Usage
       h4 NPM / Webpack / Rollup
@@ -77,7 +68,7 @@
       vld-code(lang="js").
         // main.js
         import Vue from 'vue'
-        import * as VueLayers from 'vuelayers'
+        import VueLayers from 'vuelayers'
         // import VueLayers styles, needs css-loader
         import 'vuelayers/lib/style.css'
         // register all vl-* components

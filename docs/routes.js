@@ -1,4 +1,5 @@
 export default [
+  // general
   {
     path: '/',
     meta: {
@@ -30,11 +31,11 @@ export default [
     },
     component: () => import('./pages/demo.vue'),
   },
+  // modules
   {
     path: '/modules',
     redirect: '/modules/map',
   },
-  // todo make through single component with 'moduleName' prop, load JSDoc by module name and render common doc template.
   {
     path: '/modules/map',
     meta: {
@@ -44,8 +45,9 @@ export default [
       title: 'Map',
       subtitle: 'The core module of VueLayers',
       color: 'is-info',
+      docCmp: () => import('!jsdoc-vue-loader!./jsdoc-index.json?name=module:map&tpl=./jsdoc-vue-cmp.ejs'),
     },
-    component: () => import('./pages/modules/map.vue'),
+    component: () => import('./pages/doc.vue'),
   },
   // redirects
   // todo remove later

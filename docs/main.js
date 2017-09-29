@@ -2,7 +2,7 @@ import 'babel-polyfill'
 import Vue from 'vue'
 import Buefy from 'buefy'
 // import VueLayers modules
-import * as VueLayers from 'vuelayers'
+import VueLayers from 'vuelayers'
 import App from './app.vue'
 import DocsComponents from './components'
 import router from './router'

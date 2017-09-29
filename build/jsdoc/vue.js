@@ -87,6 +87,15 @@ exports.handlers = {
       evt.doclet.typeExpression = catharsis.stringify(evt.doclet.type.parsedType)
     }
 
+    if (evt.doclet.returns) {
+      // evt.doclet.returnExpression = catharsis.stringify(evt.doclet.returns.parsedType)
+      evt.doclet.returns.forEach(returns => {
+        if (returns.type) {
+          returns.typeExpression = catharsis.stringify(returns.type.parsedType)
+        }
+      })
+    }
+
     if (evt.doclet.params) {
       evt.doclet.params.forEach(param => {
         if (param.type) {
@@ -133,9 +142,16 @@ exports.astNodeVisitor = {
 }
 
 exports.defineTags = function (dict) {
-  dict.defineTag('vueProto', {
+  dict.defineTag('vueName', {
+    mustHaveValue: true,
     onTagged (doclet, tag) {
-      doclet.vueProto = tag.value || true
+      doclet.vueName = tag.value
+    },
+  })
+  dict.defineTag('vueProto', {
+    mustHaveValue: false,
+    onTagged (doclet) {
+      doclet.vueProto = true
     },
   })
 
@@ -149,6 +165,12 @@ exports.defineTags = function (dict) {
     mustHaveValue: false,
     onTagged (doclet) {
       doclet.vueProp = true
+    },
+  })
+  dict.defineTag('vueSync', {
+    mustHaveValue: false,
+    onTagged (doclet) {
+      doclet.vueSync = true
     },
   })
 
@@ -215,7 +237,7 @@ function handleVueProto (node, evt, parser) {
   evt.comment = setCommentTag(evt.comment, 'extends', 'Vue')
 
   if (nameNode && isLiteral(nameNode)) {
-    evt.comment = setCommentTag(evt.comment, 'vueProto', nameNode.value)
+    evt.comment = setCommentTag(evt.comment, 'vueName', nameNode.value)
   }
 
   if (mixinsNode && isArrayExpression(mixinsNode)) {
@@ -246,7 +268,7 @@ function handleVueProp (node, evt, parser) {
         break
       case 'ArrayExpression':
         evt.comment = setCommentTag(evt.comment, 'type',
-          `{(${typeNode.elements.map(n => ctorNameToType(n.name)).join('|')})}`)
+          `{${typeNode.elements.map(n => ctorNameToType(n.name)).join('|')}}`)
         break
       case 'ObjectExpression':
         let typePropNode = typeNode.properties.find(n => n.key.name === 'type')

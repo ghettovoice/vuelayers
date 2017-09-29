@@ -165,6 +165,7 @@
     "sw-precache-webpack-plugin": "^0.11.4",
     "text-loader": "0.0.1",
     "url-loader": "^0.5.9",
+    "velocity-animate": "^1.5.0",
     "vue": "^2.4.2",
     "vue-loader": "^13.0.4",
     "vue-router": "^2.7.0",

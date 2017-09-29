@@ -2,17 +2,17 @@
   div(:class="[$options.name]")
     section.map
       vl-map(ref="map" ':def-controls'="false" ':load-tiles-while-animating'="true" ':load-tiles-while-interacting'="true")
-        vl-view(ref="view" ':zoom'="3" ':min-zoom'="2")/
+        vl-view(ref="view" ':zoom'="3" ':min-zoom'="2")
 
         vl-geoloc('@update:position'="onUpdatePosition")
           template(scope="ctx")
             vl-feature(v-if="ctx.position" id="position-feature")
-              vl-geom-point(:coordinates="ctx.position")/
+              vl-geom-point(:coordinates="ctx.position")
               vl-style-box
-                vl-style-icon(src="../static/img/marker.png" ':scale'="0.4" ':anchor'="[0.5, 1]")/
+                vl-style-icon(src="../static/img/marker.png" ':scale'="0.4" ':anchor'="[0.5, 1]")
 
         vl-layer-tile
-          vl-source-sputnik/
+          vl-source-sputnik
 
     vld-hero
       div.intro.content

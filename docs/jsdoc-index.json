@@ -220,7 +220,8 @@
                     "names": [
                         "ol.style.Circle"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Circle"
             }
         ],
         "access": "protected",
@@ -353,7 +354,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -452,7 +454,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setFill",
@@ -555,7 +558,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setStroke",
@@ -893,7 +897,8 @@
                         "ol.source.Vector",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.Vector|undefined"
             }
         ],
         "name": "getSource",
@@ -943,7 +948,8 @@
                     "names": [
                         "Builder"
                     ]
-                }
+                },
+                "typeExpression": "Builder"
             }
         ],
         "name": "setSource",
@@ -1011,7 +1017,8 @@
                     "names": [
                         "Builder"
                     ]
-                }
+                },
+                "typeExpression": "Builder"
             }
         ],
         "name": "setAttributions",
@@ -1079,7 +1086,8 @@
                     "names": [
                         "Builder"
                     ]
-                }
+                },
+                "typeExpression": "Builder"
             }
         ],
         "name": "setDistance",
@@ -1147,7 +1155,8 @@
                     "names": [
                         "Builder"
                     ]
-                }
+                },
+                "typeExpression": "Builder"
             }
         ],
         "name": "setGeometryFunction",
@@ -1215,7 +1224,8 @@
                     "names": [
                         "Builder"
                     ]
-                }
+                },
+                "typeExpression": "Builder"
             }
         ],
         "name": "setLogo",
@@ -1283,7 +1293,8 @@
                     "names": [
                         "Builder"
                     ]
-                }
+                },
+                "typeExpression": "Builder"
             }
         ],
         "name": "setProjection",
@@ -1351,7 +1362,8 @@
                     "names": [
                         "Builder"
                     ]
-                }
+                },
+                "typeExpression": "Builder"
             }
         ],
         "name": "setWrapX",
@@ -1423,7 +1435,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "set",
@@ -1510,7 +1523,8 @@
                     "names": [
                         "ol.source.Cluster"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.Cluster"
             }
         ],
         "name": "build",
@@ -1740,7 +1754,8 @@
                     "names": [
                         "Promise.<ol.source.Cluster>"
                     ]
-                }
+                },
+                "typeExpression": "Promise<ol.source.Cluster>"
             }
         ],
         "name": "promise",
@@ -2097,7 +2112,8 @@
                     "names": [
                         "Promise.<ol.source.Cluster>"
                     ]
-                }
+                },
+                "typeExpression": "Promise<ol.source.Cluster>"
             }
         ],
         "access": "protected",
@@ -2162,7 +2178,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -2196,7 +2213,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ setSource: function(ol.source.Source): void, getSource: function(): ol.source.Source }|undefined"
             }
         ],
         "access": "protected",
@@ -2834,7 +2852,8 @@
                     "names": [
                         "ol.Feature"
                     ]
-                }
+                },
+                "typeExpression": "ol.Feature"
             }
         ],
         "access": "protected",
@@ -2930,7 +2949,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -3013,7 +3033,8 @@
                         "ol.Feature",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.Feature|undefined"
             }
         ],
         "access": "protected",
@@ -3060,7 +3081,8 @@
                     "names": [
                         "boolean"
                     ]
-                }
+                },
+                "typeExpression": "boolean"
             }
         ],
         "name": "isAtPixel",
@@ -3115,7 +3137,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -3148,7 +3171,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -3181,7 +3205,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -3967,7 +3992,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "private",
@@ -4542,7 +4568,8 @@
                     "names": [
                         "ol.style.Fill"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Fill"
             }
         ],
         "access": "protected",
@@ -4599,7 +4626,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -4632,7 +4660,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -5182,7 +5211,8 @@
                     "names": [
                         "ol.Geolocation"
                     ]
-                }
+                },
+                "typeExpression": "ol.Geolocation"
             }
         ],
         "access": "private",
@@ -5287,7 +5317,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "private",
@@ -5320,7 +5351,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "private",
@@ -5353,7 +5385,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -5925,7 +5958,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "private",
@@ -7299,7 +7333,8 @@
                     "names": [
                         "ol.style.Icon"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Icon"
             }
         ],
         "access": "protected",
@@ -8062,7 +8097,8 @@
                     "names": [
                         "ol.geom.LineString"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.LineString"
             }
         ],
         "access": "protected",
@@ -8295,7 +8331,7 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n * Map module consists of two main components:\n *\n * - <a @click=\"scrollTo('vl-map')\">Map `vl-map`</a> - viewport, map rendering and low level interactions.\n * - <a @click=\"scrollTo('vl-view')\">View `vl-view`</a> - 2D view of the map\n *\n * @module map\n * @example **Install**\n * ```js\n * import Vue from 'vue'\n * // import module and styles\n * import { Map } from 'vuelayers'\n * // or\n * import Map from 'vuelayers/lib/map'\n * // import VueLayers styles\n * import 'vuelayers/lib/style.css'\n * // register vl-map and vl-view components\n * Vue.use(Map)\n * ```\n */",
+        "comment": "/**\n * @module map\n */",
         "meta": {
             "filename": "index.js",
             "lineno": 1,
@@ -8303,23 +8339,19 @@
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {}
         },
-        "description": "Map module consists of two main components:\n\n- <a @click=\"scrollTo('vl-map')\">Map `vl-map`</a> - viewport, map rendering and low level interactions.\n- <a @click=\"scrollTo('vl-view')\">View `vl-view`</a> - 2D view of the map",
         "kind": "module",
         "name": "map",
-        "examples": [
-            "**Install**\n```js\nimport Vue from 'vue'\n// import module and styles\nimport { Map } from 'vuelayers'\n// or\nimport Map from 'vuelayers/lib/map'\n// import VueLayers styles\nimport 'vuelayers/lib/style.css'\n// register vl-map and vl-view components\nVue.use(Map)\n```"
-        ],
         "longname": "module:map"
     },
     {
-        "comment": "",
+        "comment": "/**\n * Map module consists of two main components:\n *\n * - <a @click=\"scrollTo('vl-map')\">Map `vl-map`</a> - viewport, map rendering and low level interactions.\n * - <a @click=\"scrollTo('vl-view')\">View `vl-view`</a> - 2D view of the map\n *\n * @example **Install**\n * ```js\n * import Vue from 'vue'\n * // import module and styles\n * import { Map } from 'vuelayers'\n * // or\n * import Map from 'vuelayers/lib/map'\n * // import VueLayers styles\n * import 'vuelayers/lib/style.css'\n * // register vl-map and vl-view components\n * Vue.use(Map)\n * ```\n * @example **Usage**\n * ```html\n * <vl-map :load-tiles-while-animating=\"true\" :load-tiles-while-interacting=\"true\">\n *   <vl-view :center=\"[0, 0]\" :zoom=\"3\" :rotation=\"0\" />\n *\n *   <vl-layer-tile>\n *     <vl-source-osm />\n *   </vl-layer-tile>\n * </vl-map>\n * ```\n */",
         "meta": {
             "range": [
-                625,
-                1338
+                899,
+                1654
             ],
             "filename": "index.js",
-            "lineno": 24,
+            "lineno": 36,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8328,20 +8360,24 @@
                 "type": "ObjectExpression"
             }
         },
-        "undocumented": true,
+        "description": "Map module consists of two main components:\n\n- <a @click=\"scrollTo('vl-map')\">Map `vl-map`</a> - viewport, map rendering and low level interactions.\n- <a @click=\"scrollTo('vl-view')\">View `vl-view`</a> - 2D view of the map",
+        "examples": [
+            "**Install**\n```js\nimport Vue from 'vue'\n// import module and styles\nimport { Map } from 'vuelayers'\n// or\nimport Map from 'vuelayers/lib/map'\n// import VueLayers styles\nimport 'vuelayers/lib/style.css'\n// register vl-map and vl-view components\nVue.use(Map)\n```",
+            "**Usage**\n```html\n<vl-map :load-tiles-while-animating=\"true\" :load-tiles-while-interacting=\"true\">\n  <vl-view :center=\"[0, 0]\" :zoom=\"3\" :rotation=\"0\" />\n\n  <vl-layer-tile>\n    <vl-source-osm />\n  </vl-layer-tile>\n</vl-map>\n```"
+        ],
         "name": "module:map",
         "longname": "module:map",
         "kind": "member"
     },
     {
-        "comment": "/**\n   * Map `vl-map` component.\n   *\n   * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n   * rendering and low level interaction events.\n   *\n   * @see module:map/map\n   */",
+        "comment": "/**\n   * Map `vl-map` component.\n   *\n   * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n   * rendering and low level interaction events.\n   *\n   * @see module:map/map\n   * @vueName vl-map\n   */",
         "meta": {
             "range": [
-                877,
-                880
+                1172,
+                1175
             ],
             "filename": "index.js",
-            "lineno": 33,
+            "lineno": 46,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8355,6 +8391,7 @@
         "see": [
             "module:map/map"
         ],
+        "vueName": "vl-map",
         "name": "Map",
         "longname": "module:map.Map",
         "kind": "member",
@@ -8362,14 +8399,14 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n   * View `vl-view` component.\n   *\n   * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n   * **resolution**, and **rotation** of the map.\n   *\n   * @see module:map/view\n   */",
+        "comment": "/**\n   * View `vl-view` component.\n   *\n   * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n   * **resolution**, and **rotation** of the map.\n   *\n   * @see module:map/view\n   * @vueName vl-map\n   */",
         "meta": {
             "range": [
-                1122,
-                1126
+                1438,
+                1442
             ],
             "filename": "index.js",
-            "lineno": 42,
+            "lineno": 56,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8383,6 +8420,7 @@
         "see": [
             "module:map/view"
         ],
+        "vueName": "vl-map",
         "name": "View",
         "longname": "module:map.View",
         "kind": "member",
@@ -8393,11 +8431,11 @@
         "comment": "/**\n   * Registers Map and View components with default names.\n   *\n   * @param {Vue} Vue\n   * @return {void}\n   */",
         "meta": {
             "range": [
-                1248,
-                1335
+                1564,
+                1651
             ],
             "filename": "index.js",
-            "lineno": 49,
+            "lineno": 63,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8424,7 +8462,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "install",
@@ -8451,7 +8490,7 @@
         "meta": {
             "range": [
                 669,
-                3520
+                3345
             ],
             "filename": "map.vue",
             "lineno": 32,
@@ -8474,11 +8513,11 @@
         "params": []
     },
     {
-        "comment": "/**\n* Options for default controls added to the map by default. Set to `false` to disable all map controls. Object\n   * value is used to configure controls. See {@link https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults}.\n * @type {(Object|boolean)}\n   * @todo remove when vl-control-* components will be ready\n * @vueProp\n * @default true\n */",
+        "comment": "/**\n* Options for default controls added to the map by default. Set to `false` to disable all map controls. Object\n   * value is used to configure controls. See [ol.control.default()](https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults).\n * @type {Object|boolean}\n   * @todo remove when vl-control-* components will be ready\n * @vueProp\n * @default true\n */",
         "meta": {
             "range": [
-                1017,
-                1080
+                1033,
+                1096
             ],
             "filename": "map.vue",
             "lineno": 39,
@@ -8491,7 +8530,7 @@
                 "value": "{\"type\":\"\",\"default\":true}"
             }
         },
-        "description": "Options for default controls added to the map by default. Set to `false` to disable all map controls. Object\nvalue is used to configure controls. See {@link https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults}.",
+        "description": "Options for default controls added to the map by default. Set to `false` to disable all map controls. Object\nvalue is used to configure controls. See [ol.control.default()](https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults).",
         "type": {
             "names": [
                 "Object",
@@ -8508,14 +8547,14 @@
         "kind": "member",
         "memberof": "module:map/map",
         "scope": "instance",
-        "typeExpression": "(Object|boolean)"
+        "typeExpression": "Object|boolean"
     },
     {
         "comment": "",
         "meta": {
             "range": [
-                1033,
-                1056
+                1049,
+                1072
             ],
             "filename": "map.vue",
             "lineno": 40,
@@ -8539,8 +8578,8 @@
         "comment": "",
         "meta": {
             "range": [
-                1062,
-                1075
+                1078,
+                1091
             ],
             "filename": "map.vue",
             "lineno": 41,
@@ -8561,14 +8600,14 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n* The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard\n   * interactions will always trigger. If this option is not specified, the element the library listens to keyboard\n   * events on is the map target (i.e. the user-provided div for the map). If this is not `document` the target element\n   * needs to be focused for key events to be emitted, requiring that the target element has a `tabindex` attribute.\n * @type {(string|Element|Document)}\n * @vueProp\n */",
+        "comment": "/**\n* The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard\n   * interactions will always trigger. If this option is not specified, the element the library listens to keyboard\n   * events on is the component root element.\n * @type {string|Element|Document}\n * @vueProp\n */",
         "meta": {
             "range": [
-                1598,
-                1646
+                1423,
+                1471
             ],
             "filename": "map.vue",
-            "lineno": 50,
+            "lineno": 49,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8578,7 +8617,7 @@
                 "value": "[\"String\",\"Element\",\"Document\"]"
             }
         },
-        "description": "The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard\ninteractions will always trigger. If this option is not specified, the element the library listens to keyboard\nevents on is the map target (i.e. the user-provided div for the map). If this is not `document` the target element\nneeds to be focused for key events to be emitted, requiring that the target element has a `tabindex` attribute.",
+        "description": "The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard\ninteractions will always trigger. If this option is not specified, the element the library listens to keyboard\nevents on is the component root element.",
         "type": {
             "names": [
                 "string",
@@ -8592,17 +8631,17 @@
         "kind": "member",
         "memberof": "module:map/map",
         "scope": "instance",
-        "typeExpression": "(string|Element|Document)"
+        "typeExpression": "string|Element|Document"
     },
     {
         "comment": "/**\n* When set to `true`, tiles will be loaded during animations.\n   * @type {boolean}\n * @vueProp\n * @default false\n */",
         "meta": {
             "range": [
-                1748,
-                1817
+                1573,
+                1642
             ],
             "filename": "map.vue",
-            "lineno": 55,
+            "lineno": 54,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8631,11 +8670,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1779,
-                1792
+                1604,
+                1617
             ],
             "filename": "map.vue",
-            "lineno": 56,
+            "lineno": 55,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8656,11 +8695,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1798,
-                1812
+                1623,
+                1637
             ],
             "filename": "map.vue",
-            "lineno": 57,
+            "lineno": 56,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8681,11 +8720,11 @@
         "comment": "/**\n* When set to `true`, tiles will be loaded while interacting with the map.\n   * @type {boolean}\n * @vueProp\n * @default false\n */",
         "meta": {
             "range": [
-                1932,
-                2003
+                1757,
+                1828
             ],
             "filename": "map.vue",
-            "lineno": 63,
+            "lineno": 62,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8714,11 +8753,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1965,
-                1978
+                1790,
+                1803
             ],
             "filename": "map.vue",
-            "lineno": 64,
+            "lineno": 63,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8739,11 +8778,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1984,
-                1998
+                1809,
+                1823
             ],
             "filename": "map.vue",
-            "lineno": 65,
+            "lineno": 64,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8761,14 +8800,14 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n* The map logo. If a **string** is provided, it will be set as the image source of the logo. If an **object** is provided,\n   * the `src` property should be the **URL** for an image and the `href` property should be a **URL** for creating a link.\n   * If an **element** is provided, the **element** will be used. To disable the map logo, set the option to `false`.\n   * By default, the **OpenLayers** logo is shown.\n * @type {(string|Object|Element|boolean)}\n * @vueProp\n */",
+        "comment": "/**\n* The map logo. If a **string** is provided, it will be set as the image source of the logo. If an **object** is provided,\n   * the `src` property should be the **URL** for an image and the `href` property should be a **URL** for creating a link.\n   * If an **element** is provided, the **element** will be used. To disable the map logo, set the option to `false`.\n   * By default, the **OpenLayers** logo is shown.\n * @type {string|Object|Element|boolean}\n * @vueProp\n */",
         "meta": {
             "range": [
-                2481,
-                2521
+                2306,
+                2346
             ],
             "filename": "map.vue",
-            "lineno": 74,
+            "lineno": 73,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8793,17 +8832,17 @@
         "kind": "member",
         "memberof": "module:map/map",
         "scope": "instance",
-        "typeExpression": "(string|Object|Element|boolean)"
+        "typeExpression": "string|Object|Element|boolean"
     },
     {
         "comment": "/**\n* The minimum distance in pixels the cursor must move to be detected as a map move event instead of a click.\n   * Increasing this value can make it easier to click on the map.\n   * @type {Number}\n * @vueProp\n * @default 1\n */",
         "meta": {
             "range": [
-                2736,
-                2790
+                2561,
+                2615
             ],
             "filename": "map.vue",
-            "lineno": 80,
+            "lineno": 79,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8832,11 +8871,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2757,
-                2769
+                2582,
+                2594
             ],
             "filename": "map.vue",
-            "lineno": 81,
+            "lineno": 80,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8857,11 +8896,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2775,
-                2785
+                2600,
+                2610
             ],
             "filename": "map.vue",
-            "lineno": 82,
+            "lineno": 81,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8882,11 +8921,11 @@
         "comment": "/**\n* The ratio between physical pixels and device-independent pixels (dips) on the device.\n   * @type {number}\n * @vueProp\n * @default 1\n */",
         "meta": {
             "range": [
-                2917,
-                2968
+                2742,
+                2793
             ],
             "filename": "map.vue",
-            "lineno": 88,
+            "lineno": 87,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8915,11 +8954,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2935,
-                2947
+                2760,
+                2772
             ],
             "filename": "map.vue",
-            "lineno": 89,
+            "lineno": 88,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8940,11 +8979,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2953,
-                2963
+                2778,
+                2788
             ],
             "filename": "map.vue",
-            "lineno": 90,
+            "lineno": 89,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8962,14 +9001,14 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n* Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,\n   * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,\n   * but **WebGL** can only render **Point** geometries.\n * @type {(string|array)}\n * @vueProp\n * @default () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]\n */",
+        "comment": "/**\n* Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,\n   * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,\n   * but **WebGL** can only render **Point** geometries.\n * @type {string|array}\n * @vueProp\n * @default () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]\n */",
         "meta": {
             "range": [
-                3271,
-                3377
+                3096,
+                3202
             ],
             "filename": "map.vue",
-            "lineno": 98,
+            "lineno": 97,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8993,17 +9032,17 @@
         "kind": "member",
         "memberof": "module:map/map",
         "scope": "instance",
-        "typeExpression": "(string|array)"
+        "typeExpression": "string|array"
     },
     {
         "comment": "",
         "meta": {
             "range": [
-                3287,
-                3308
+                3112,
+                3133
             ],
             "filename": "map.vue",
-            "lineno": 99,
+            "lineno": 98,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9024,11 +9063,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3314,
-                3372
+                3139,
+                3197
             ],
             "filename": "map.vue",
-            "lineno": 100,
+            "lineno": 99,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9048,11 +9087,11 @@
         "comment": "/**\n* Map container element `tabindex` attribute value.\n   * @type {number}\n * @vueProp\n * @default 0\n */",
         "meta": {
             "range": [
-                3468,
-                3517
+                3293,
+                3342
             ],
             "filename": "map.vue",
-            "lineno": 106,
+            "lineno": 105,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9081,11 +9120,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3484,
-                3496
+                3309,
+                3321
             ],
             "filename": "map.vue",
-            "lineno": 107,
+            "lineno": 106,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9106,11 +9145,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3502,
-                3512
+                3327,
+                3337
             ],
             "filename": "map.vue",
-            "lineno": 108,
+            "lineno": 107,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9131,11 +9170,11 @@
         "comment": "/**\n* @vueMethods\n * @private\n */",
         "meta": {
             "range": [
-                3551,
-                9621
+                3376,
+                9446
             ],
             "filename": "map.vue",
-            "lineno": 115,
+            "lineno": 114,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9158,11 +9197,11 @@
         "comment": "/**\n* @return {ol.Map}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                3615,
-                4356
+                3440,
+                4181
             ],
             "filename": "map.vue",
-            "lineno": 120,
+            "lineno": 119,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9182,7 +9221,8 @@
                     "names": [
                         "ol.Map"
                     ]
-                }
+                },
+                "typeExpression": "ol.Map"
             }
         ],
         "access": "protected",
@@ -9197,11 +9237,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3645,
-                3979
+                3470,
+                3804
             ],
             "filename": "map.vue",
-            "lineno": 121,
+            "lineno": 120,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9223,11 +9263,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3667,
-                3679
+                3492,
+                3504
             ],
             "filename": "map.vue",
-            "lineno": 122,
+            "lineno": 121,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9248,11 +9288,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3687,
-                3740
+                3512,
+                3565
             ],
             "filename": "map.vue",
-            "lineno": 123,
+            "lineno": 122,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9273,11 +9313,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3748,
-                3805
+                3573,
+                3630
             ],
             "filename": "map.vue",
-            "lineno": 124,
+            "lineno": 123,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9298,11 +9338,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3813,
-                3840
+                3638,
+                3665
             ],
             "filename": "map.vue",
-            "lineno": 125,
+            "lineno": 124,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9323,11 +9363,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3848,
-                3871
+                3673,
+                3696
             ],
             "filename": "map.vue",
-            "lineno": 126,
+            "lineno": 125,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9348,11 +9388,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3879,
-                3894
+                3704,
+                3719
             ],
             "filename": "map.vue",
-            "lineno": 127,
+            "lineno": 126,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9373,11 +9413,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3902,
-                3947
+                3727,
+                3772
             ],
             "filename": "map.vue",
-            "lineno": 128,
+            "lineno": 127,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9398,11 +9438,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3955,
-                3971
+                3780,
+                3796
             ],
             "filename": "map.vue",
-            "lineno": 129,
+            "lineno": 128,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9423,11 +9463,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4062,
-                4088
+                3887,
+                3913
             ],
             "filename": "map.vue",
-            "lineno": 132,
+            "lineno": 131,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9450,11 +9490,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4194,
-                4262
+                4019,
+                4087
             ],
             "filename": "map.vue",
-            "lineno": 137,
+            "lineno": 136,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9476,11 +9516,11 @@
         "comment": "/**\n* @return {{\n   *    hasLayer: function(ol.Layer),\n   *    addLayer: function(ol.Layer),\n   *    removeLayer: function(ol.Layer)\n   *  }|undefined}\n   *  @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                4540,
-                4892
+                4365,
+                4717
             ],
             "filename": "map.vue",
-            "lineno": 151,
+            "lineno": 150,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9501,7 +9541,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ hasLayer: function(ol.Layer), addLayer: function(ol.Layer), removeLayer: function(ol.Layer) }|undefined"
             }
         ],
         "access": "protected",
@@ -9516,11 +9557,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4599,
-                4614
+                4424,
+                4439
             ],
             "filename": "map.vue",
-            "lineno": 154,
+            "lineno": 153,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9542,11 +9583,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4625,
-                4655
+                4450,
+                4480
             ],
             "filename": "map.vue",
-            "lineno": 155,
+            "lineno": 154,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9568,11 +9609,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4676,
-                4751
+                4501,
+                4576
             ],
             "filename": "map.vue",
-            "lineno": 158,
+            "lineno": 157,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9592,11 +9633,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4759,
-                4813
+                4584,
+                4638
             ],
             "filename": "map.vue",
-            "lineno": 161,
+            "lineno": 160,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9616,11 +9657,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4821,
-                4881
+                4646,
+                4706
             ],
             "filename": "map.vue",
-            "lineno": 164,
+            "lineno": 163,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9640,11 +9681,11 @@
         "comment": "/**\n* @return {{\n   *     hasInteraction: function(ol.interaction.Interaction): bool,\n   *     addInteraction: function(ol.interaction.Interaction): void,\n   *     removeInteraction: function(ol.interaction.Interaction): void\n   *   }|undefined}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                5169,
-                5611
+                4994,
+                5436
             ],
             "filename": "map.vue",
-            "lineno": 177,
+            "lineno": 176,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9665,7 +9706,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ hasInteraction: function(ol.interaction.Interaction): bool, addInteraction: function(ol.interaction.Interaction): void, removeInteraction: function(ol.interaction.Interaction): void }|undefined"
             }
         ],
         "access": "protected",
@@ -9680,11 +9722,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5234,
-                5249
+                5059,
+                5074
             ],
             "filename": "map.vue",
-            "lineno": 180,
+            "lineno": 179,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9706,11 +9748,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5260,
-                5302
+                5085,
+                5127
             ],
             "filename": "map.vue",
-            "lineno": 181,
+            "lineno": 180,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9732,11 +9774,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5323,
-                5422
+                5148,
+                5247
             ],
             "filename": "map.vue",
-            "lineno": 184,
+            "lineno": 183,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9756,11 +9798,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5430,
-                5508
+                5255,
+                5333
             ],
             "filename": "map.vue",
-            "lineno": 187,
+            "lineno": 186,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9780,11 +9822,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5516,
-                5600
+                5341,
+                5425
             ],
             "filename": "map.vue",
-            "lineno": 190,
+            "lineno": 189,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9804,11 +9846,11 @@
         "comment": "/**\n* @return {{\n   *     addFeature: function(ol.Feature): void,\n   *     removeFeature: function(ol.Feature): void,\n   *     hasFeature: function(ol.Feature): bool\n   *   }|undefined}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                5828,
-                6176
+                5653,
+                6001
             ],
             "filename": "map.vue",
-            "lineno": 203,
+            "lineno": 202,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9828,7 +9870,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ addFeature: function(ol.Feature): void, removeFeature: function(ol.Feature): void, hasFeature: function(ol.Feature): bool }|undefined"
             }
         ],
         "access": "protected",
@@ -9843,11 +9886,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5861,
-                5900
+                5686,
+                5725
             ],
             "filename": "map.vue",
-            "lineno": 204,
+            "lineno": 203,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9869,11 +9912,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5921,
-                6013
+                5746,
+                5838
             ],
             "filename": "map.vue",
-            "lineno": 207,
+            "lineno": 206,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9893,11 +9936,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6021,
-                6086
+                5846,
+                5911
             ],
             "filename": "map.vue",
-            "lineno": 210,
+            "lineno": 209,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9917,11 +9960,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6094,
-                6165
+                5919,
+                5990
             ],
             "filename": "map.vue",
-            "lineno": 213,
+            "lineno": 212,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9941,11 +9984,11 @@
         "comment": "/**\n* @return {{\n   *     hasOverlay: function(ol.Overlay): bool,\n   *     addOverlay: function(ol.Overlay): void,\n   *     removeOverlay: function(ol.Overlay): void\n   *   }|undefined}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                6393,
-                6799
+                6218,
+                6624
             ],
             "filename": "map.vue",
-            "lineno": 226,
+            "lineno": 225,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9966,7 +10009,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ hasOverlay: function(ol.Overlay): bool, addOverlay: function(ol.Overlay): void, removeOverlay: function(ol.Overlay): void }|undefined"
             }
         ],
         "access": "protected",
@@ -9981,11 +10025,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6454,
-                6469
+                6279,
+                6294
             ],
             "filename": "map.vue",
-            "lineno": 229,
+            "lineno": 228,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10007,11 +10051,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6480,
-                6514
+                6305,
+                6339
             ],
             "filename": "map.vue",
-            "lineno": 230,
+            "lineno": 229,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10033,11 +10077,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6535,
-                6626
+                6360,
+                6451
             ],
             "filename": "map.vue",
-            "lineno": 233,
+            "lineno": 232,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10057,11 +10101,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6634,
-                6704
+                6459,
+                6529
             ],
             "filename": "map.vue",
-            "lineno": 236,
+            "lineno": 235,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10081,11 +10125,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6712,
-                6788
+                6537,
+                6613
             ],
             "filename": "map.vue",
-            "lineno": 239,
+            "lineno": 238,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10105,11 +10149,11 @@
         "comment": "/**\n* @param {number[]} pixel\n   * @return {number[]} Coordinates in EPSG:4326\n * @vueMethod\n */",
         "meta": {
             "range": [
-                6893,
-                7079
+                6718,
+                6904
             ],
             "filename": "map.vue",
-            "lineno": 248,
+            "lineno": 247,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10136,7 +10180,8 @@
                         "Array.<number>"
                     ]
                 },
-                "description": "Coordinates in EPSG:4326"
+                "description": "Coordinates in EPSG:4326",
+                "typeExpression": "number[]"
             }
         ],
         "vueMethod": true,
@@ -10150,11 +10195,11 @@
         "comment": "/**\n* @returns {Object}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                7134,
-                7605
+                6959,
+                7430
             ],
             "filename": "map.vue",
-            "lineno": 258,
+            "lineno": 257,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10173,7 +10218,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -10188,11 +10234,11 @@
         "comment": "",
         "meta": {
             "range": [
-                7161,
-                7170
+                6986,
+                6995
             ],
             "filename": "map.vue",
-            "lineno": 259,
+            "lineno": 258,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10214,11 +10260,11 @@
         "comment": "",
         "meta": {
             "range": [
-                7472,
-                7501
+                7297,
+                7326
             ],
             "filename": "map.vue",
-            "lineno": 268,
+            "lineno": 267,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10238,11 +10284,11 @@
         "comment": "",
         "meta": {
             "range": [
-                7511,
-                7542
+                7336,
+                7367
             ],
             "filename": "map.vue",
-            "lineno": 269,
+            "lineno": 268,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10262,11 +10308,11 @@
         "comment": "",
         "meta": {
             "range": [
-                7552,
-                7586
+                7377,
+                7411
             ],
             "filename": "map.vue",
-            "lineno": 270,
+            "lineno": 269,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10286,11 +10332,11 @@
         "comment": "/**\n* Trigger focus on map container.\n   * @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                7678,
-                7713
+                7503,
+                7538
             ],
             "filename": "map.vue",
-            "lineno": 278,
+            "lineno": 277,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10306,7 +10352,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "vueMethod": true,
@@ -10320,11 +10367,11 @@
         "comment": "/**\n* @param {number[]} pixel\n   * @param {function((ol.Feature|ol.render.Feature), ?ol.layer.Layer): *} callback\n   * @param {Object} [opts]\n   * @return {T|undefined}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                7897,
-                8044
+                7722,
+                7869
             ],
             "filename": "map.vue",
-            "lineno": 287,
+            "lineno": 286,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10370,7 +10417,8 @@
                         "T",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "T|undefined"
             }
         ],
         "vueMethod": true,
@@ -10384,11 +10432,11 @@
         "comment": "/**\n* @param {number[]} pixel\n   * @param {function(ol.layer.Layer, ?(number[]|Uint8Array)): *} callback\n   * @param {function(ol.layer.Layer): boolean} [layerFilter]\n   * @return {T|undefined}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8253,
-                8416
+                8078,
+                8241
             ],
             "filename": "map.vue",
-            "lineno": 298,
+            "lineno": 297,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10434,7 +10482,8 @@
                         "T",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "T|undefined"
             }
         ],
         "vueMethod": true,
@@ -10448,11 +10497,11 @@
         "comment": "/**\n* @param {ol.View|Vue|undefined} view\n   * @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8493,
-                8715
+                8318,
+                8540
             ],
             "filename": "map.vue",
-            "lineno": 307,
+            "lineno": 306,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10484,7 +10533,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "vueMethod": true,
@@ -10498,11 +10548,11 @@
         "comment": "",
         "meta": {
             "range": [
-                8514,
-                8560
+                8339,
+                8385
             ],
             "filename": "map.vue",
-            "lineno": 308,
+            "lineno": 307,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10525,11 +10575,11 @@
         "comment": "",
         "meta": {
             "range": [
-                8599,
-                8616
+                8424,
+                8441
             ],
             "filename": "map.vue",
-            "lineno": 311,
+            "lineno": 310,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10552,11 +10602,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8767,
-                8885
+                8592,
+                8710
             ],
             "filename": "map.vue",
-            "lineno": 321,
+            "lineno": 320,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10571,7 +10621,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -10586,11 +10637,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8937,
-                9038
+                8762,
+                8863
             ],
             "filename": "map.vue",
-            "lineno": 331,
+            "lineno": 330,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10605,7 +10656,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -10620,11 +10672,11 @@
         "comment": "/**\n* Triggers map re-render.\n   * @return {Promise}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9106,
-                9205
+                8931,
+                9030
             ],
             "filename": "map.vue",
-            "lineno": 340,
+            "lineno": 339,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10643,7 +10695,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "vueMethod": true,
@@ -10657,11 +10710,11 @@
         "comment": "/**\n* @return {Promise}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9244,
-                9406
+                9069,
+                9231
             ],
             "filename": "map.vue",
-            "lineno": 349,
+            "lineno": 348,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10679,7 +10732,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "vueMethod": true,
@@ -10693,11 +10747,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9458,
-                9512
+                9283,
+                9337
             ],
             "filename": "map.vue",
-            "lineno": 361,
+            "lineno": 360,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10712,7 +10766,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -10727,11 +10782,11 @@
         "comment": "/**\n* @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9548,
-                9618
+                9373,
+                9443
             ],
             "filename": "map.vue",
-            "lineno": 367,
+            "lineno": 366,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10746,7 +10801,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "vueMethod": true,
@@ -10757,14 +10813,14 @@
         "scope": "instance"
     },
     {
-        "comment": "/**\n* Map `vl-map` component.\n *\n * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n * rendering and low level interaction events.\n *\n * @vueProto vl-map\n * @mixes olCmp\n * @mixes layersContainer\n * @mixes interactionsContainer\n * @mixes overlaysContainer\n * @mixes featuresContainer\n */",
+        "comment": "/**\n* <h3 id=\"vl-map\">Map `vl-map` component.</h3>\n *\n * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n * rendering and low level interaction events.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-map\n * @mixes olCmp\n * @mixes layersContainer\n * @mixes interactionsContainer\n * @mixes overlaysContainer\n * @mixes featuresContainer\n */",
         "meta": {
             "range": [
-                9830,
-                10783
+                9676,
+                10629
             ],
             "filename": "map.vue",
-            "lineno": 381,
+            "lineno": 380,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10773,8 +10829,12 @@
                 "type": "ObjectExpression"
             }
         },
-        "description": "Map `vl-map` component.\n\nContainer for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\nrendering and low level interaction events.",
-        "vueProto": "vl-map",
+        "description": "<h3 id=\"vl-map\">Map `vl-map` component.</h3>\n\nContainer for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\nrendering and low level interaction events.",
+        "vueProto": true,
+        "augments": [
+            "Vue"
+        ],
+        "vueName": "vl-map",
         "mixes": [
             "olCmp",
             "layersContainer",
@@ -10790,11 +10850,11 @@
         "comment": "",
         "meta": {
             "range": [
-                9849,
-                9863
+                9695,
+                9709
             ],
             "filename": "map.vue",
-            "lineno": 382,
+            "lineno": 381,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10815,11 +10875,11 @@
         "comment": "",
         "meta": {
             "range": [
-                9867,
-                9960
+                9713,
+                9806
             ],
             "filename": "map.vue",
-            "lineno": 383,
+            "lineno": 382,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10840,11 +10900,11 @@
         "comment": "",
         "meta": {
             "range": [
-                9964,
-                9969
+                9810,
+                9815
             ],
             "filename": "map.vue",
-            "lineno": 384,
+            "lineno": 383,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10865,11 +10925,11 @@
         "comment": "",
         "meta": {
             "range": [
-                9973,
-                9980
+                9819,
+                9826
             ],
             "filename": "map.vue",
-            "lineno": 385,
+            "lineno": 384,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10890,11 +10950,11 @@
         "comment": "/**\n   * @this module:map/map\n   */",
         "meta": {
             "range": [
-                10022,
-                10693
+                9868,
+                10539
             ],
             "filename": "map.vue",
-            "lineno": 389,
+            "lineno": 388,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10919,11 +10979,11 @@
         "comment": "/**\n     * @type {ol.View|undefined}\n     * @private\n     */",
         "meta": {
             "range": [
-                10104,
-                10126
+                9950,
+                9972
             ],
             "filename": "map.vue",
-            "lineno": 394,
+            "lineno": 393,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10952,11 +11012,11 @@
         "comment": "/**\n     * @type {ol.layer.Vector}\n     * @private\n     */",
         "meta": {
             "range": [
-                10194,
-                10273
+                10040,
+                10119
             ],
             "filename": "map.vue",
-            "lineno": 399,
+            "lineno": 398,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10984,11 +11044,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10239,
-                10265
+                10085,
+                10111
             ],
             "filename": "map.vue",
-            "lineno": 400,
+            "lineno": 399,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11009,11 +11069,11 @@
         "comment": "/**\n       * OpenLayers map instance.\n       * @type {ol.Map|undefined}\n       */",
         "meta": {
             "range": [
-                10434,
-                10510
+                10280,
+                10356
             ],
             "filename": "map.vue",
-            "lineno": 408,
+            "lineno": 407,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11041,11 +11101,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10450,
-                10466
+                10296,
+                10312
             ],
             "filename": "map.vue",
-            "lineno": 409,
+            "lineno": 408,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11066,11 +11126,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10476,
-                10501
+                10322,
+                10347
             ],
             "filename": "map.vue",
-            "lineno": 410,
+            "lineno": 409,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11090,11 +11150,11 @@
         "comment": "/**\n       * OpenLayers view instance.\n       * @type {ol.View|undefined}\n       */",
         "meta": {
             "range": [
-                10608,
-                10681
+                10454,
+                10527
             ],
             "filename": "map.vue",
-            "lineno": 416,
+            "lineno": 415,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11122,11 +11182,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10625,
-                10641
+                10471,
+                10487
             ],
             "filename": "map.vue",
-            "lineno": 417,
+            "lineno": 416,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11147,11 +11207,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10651,
-                10672
+                10497,
+                10518
             ],
             "filename": "map.vue",
-            "lineno": 418,
+            "lineno": 417,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11171,11 +11231,11 @@
         "comment": "/**\n   * @this module:map/map\n   */",
         "meta": {
             "range": [
-                10735,
-                10780
+                10581,
+                10626
             ],
             "filename": "map.vue",
-            "lineno": 425,
+            "lineno": 424,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11198,11 +11258,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10754,
-                10776
+                10600,
+                10622
             ],
             "filename": "map.vue",
-            "lineno": 426,
+            "lineno": 425,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11225,11 +11285,11 @@
         "comment": "/**\n * Subscribe to OL map events.\n * @return {void}\n * @this module:map/map\n * @private\n */",
         "meta": {
             "range": [
-                10878,
-                11727
+                10724,
+                11573
             ],
             "filename": "map.vue",
-            "lineno": 436,
+            "lineno": 435,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11253,7 +11313,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "this": "module:map/map",
@@ -11269,11 +11330,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10967,
-                10975
+                10813,
+                10821
             ],
             "filename": "map.vue",
-            "lineno": 440,
+            "lineno": 439,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11295,11 +11356,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10997,
-                11428
+                10843,
+                11274
             ],
             "filename": "map.vue",
-            "lineno": 442,
+            "lineno": 441,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11321,11 +11382,11 @@
         "comment": "",
         "meta": {
             "range": [
-                11346,
-                11421
+                11192,
+                11267
             ],
             "filename": "map.vue",
-            "lineno": 455,
+            "lineno": 454,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11346,11 +11407,11 @@
         "comment": "",
         "meta": {
             "range": [
-                11448,
-                11588
+                11294,
+                11434
             ],
             "filename": "map.vue",
-            "lineno": 458,
+            "lineno": 457,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11372,11 +11433,11 @@
         "comment": "",
         "meta": {
             "range": [
-                11598,
-                11663
+                11444,
+                11509
             ],
             "filename": "map.vue",
-            "lineno": 466,
+            "lineno": 465,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12401,7 +12462,8 @@
                         "Promise"
                     ]
                 },
-                "description": "Resolves when animation completes"
+                "description": "Resolves when animation completes",
+                "typeExpression": "Promise"
             }
         ],
         "name": "animate",
@@ -12459,7 +12521,8 @@
                     "names": [
                         "ol.View"
                     ]
-                }
+                },
+                "typeExpression": "ol.View"
             }
         ],
         "access": "protected",
@@ -12875,7 +12938,8 @@
                         "Promise"
                     ]
                 },
-                "description": "Resolves when view changes"
+                "description": "Resolves when view changes",
+                "typeExpression": "Promise"
             }
         ],
         "name": "fit",
@@ -13011,7 +13075,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -13044,7 +13109,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -13077,7 +13143,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -13288,7 +13355,7 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n* View `vl-view` component.\n *\n * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n * **resolution**, and **rotation** of the map.\n *\n * @vueProto vl-view\n * @mixes olVirtCmp\n */",
+        "comment": "/**\n* View `vl-view` component.\n *\n * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n * **resolution**, and **rotation** of the map.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-view\n * @mixes olVirtCmp\n */",
         "meta": {
             "range": [
                 4791,
@@ -13305,7 +13372,11 @@
             }
         },
         "description": "View `vl-view` component.\n\nRepresents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n**resolution**, and **rotation** of the map.",
-        "vueProto": "vl-view",
+        "vueProto": true,
+        "augments": [
+            "Vue"
+        ],
+        "vueName": "vl-view",
         "mixes": [
             "olVirtCmp"
         ],
@@ -13774,7 +13845,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "private",
@@ -14887,7 +14959,8 @@
                     "names": [
                         "number"
                     ]
-                }
+                },
+                "typeExpression": "number"
             }
         ],
         "access": "private",
@@ -14964,7 +15037,8 @@
                     "names": [
                         "string"
                     ]
-                }
+                },
+                "typeExpression": "string"
             }
         ],
         "access": "private",
@@ -15123,7 +15197,8 @@
                     "names": [
                         "ol.geom.MultiLineString"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.MultiLineString"
             }
         ],
         "access": "protected",
@@ -15478,7 +15553,8 @@
                     "names": [
                         "ol.geom.MultiPoint"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.MultiPoint"
             }
         ],
         "access": "protected",
@@ -15833,7 +15909,8 @@
                     "names": [
                         "ol.geom.MultiPolygon"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.MultiPolygon"
             }
         ],
         "access": "protected",
@@ -17544,7 +17621,8 @@
                     "names": [
                         "ol.Overlay"
                     ]
-                }
+                },
+                "typeExpression": "ol.Overlay"
             }
         ],
         "access": "protected",
@@ -17796,7 +17874,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -17855,7 +17934,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -17888,7 +17968,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -17925,7 +18006,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -18607,7 +18689,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "private",
@@ -18964,7 +19047,8 @@
                     "names": [
                         "ol.geom.Point"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.Point"
             }
         ],
         "access": "protected",
@@ -19319,7 +19403,8 @@
                     "names": [
                         "ol.geom.Polygon"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.Polygon"
             }
         ],
         "access": "protected",
@@ -20072,7 +20157,8 @@
                     "names": [
                         "ol.style.RegularShape"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.RegularShape"
             }
         ],
         "access": "protected",
@@ -20349,7 +20435,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -20448,7 +20535,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setFill",
@@ -20551,7 +20639,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setStroke",
@@ -21292,7 +21381,8 @@
                     "names": [
                         "ol.interaction.Select"
                     ]
-                }
+                },
+                "typeExpression": "ol.interaction.Select"
             }
         ],
         "access": "protected",
@@ -21425,7 +21515,8 @@
                     "names": [
                         "ol.StyleFunction"
                     ]
-                }
+                },
+                "typeExpression": "ol.StyleFunction"
             }
         ],
         "access": "protected",
@@ -21484,7 +21575,8 @@
                     "names": [
                         "Array.<ol.Feature>"
                     ]
-                }
+                },
+                "typeExpression": "ol.Feature[]"
             }
         ],
         "name": "getFeatures",
@@ -21516,7 +21608,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -21550,7 +21643,8 @@
                         "ol.interaction.Interaction",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.interaction.Interaction|undefined"
             }
         ],
         "access": "protected",
@@ -21583,7 +21677,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -21616,7 +21711,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -21670,7 +21766,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -21892,7 +21989,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "unselect",
@@ -22046,7 +22144,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -22109,7 +22208,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -22167,7 +22267,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -22201,7 +22302,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "unselectAll",
@@ -22786,7 +22888,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "private",
@@ -23035,7 +23138,8 @@
                         "string",
                         "number"
                     ]
-                }
+                },
+                "typeExpression": "string|number"
             }
         ],
         "exceptions": [
@@ -24254,7 +24358,8 @@
                     "names": [
                         "ol.style.Stroke"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Stroke"
             }
         ],
         "access": "protected",
@@ -24455,7 +24560,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -24488,7 +24594,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -25088,7 +25195,8 @@
                     "names": [
                         "ol.style.Style"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Style"
             }
         ],
         "access": "protected",
@@ -25269,7 +25377,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -25351,7 +25460,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -25384,7 +25494,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -25434,7 +25545,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setImage",
@@ -25537,7 +25649,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setGeometry",
@@ -25639,7 +25752,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setText",
@@ -26649,7 +26763,8 @@
                     "names": [
                         "ol.StyleFunction"
                     ]
-                }
+                },
+                "typeExpression": "ol.StyleFunction"
             }
         ],
         "access": "protected",
@@ -26760,7 +26875,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -26793,7 +26909,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -26830,7 +26947,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -26930,7 +27048,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setStyle",
@@ -26989,7 +27108,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -28090,7 +28210,8 @@
                     "names": [
                         "ol.style.Text"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Text"
             }
         ],
         "access": "protected",
@@ -28387,7 +28508,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -28420,7 +28542,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -28457,7 +28580,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -29151,7 +29275,8 @@
                     "names": [
                         "ol.layer.Tile"
                     ]
-                }
+                },
+                "typeExpression": "ol.layer.Tile"
             }
         ],
         "access": "protected",
@@ -29697,7 +29822,8 @@
                     "names": [
                         "ol.layer.Vector"
                     ]
-                }
+                },
+                "typeExpression": "ol.layer.Vector"
             }
         ],
         "access": "protected",
@@ -29994,7 +30120,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -30028,7 +30155,8 @@
                         "ol.layer.Vector",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.layer.Vector|undefined"
             }
         ],
         "access": "protected",
@@ -30714,7 +30842,8 @@
                     "names": [
                         "ol.source.Vector"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.Vector"
             }
         ],
         "access": "protected",
@@ -30987,7 +31116,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -31020,7 +31150,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -31680,7 +31811,8 @@
                     "names": [
                         "ol.LoadingStrategy"
                     ]
-                }
+                },
+                "typeExpression": "ol.LoadingStrategy"
             }
         ],
         "name": "defaultStrategyFactory",
@@ -31713,7 +31845,8 @@
                     "names": [
                         "ol.format.GeoJSON"
                     ]
-                }
+                },
+                "typeExpression": "ol.format.GeoJSON"
             }
         ],
         "name": "defaultFormatFactory",
@@ -32215,7 +32348,8 @@
                     "names": [
                         "ol.source.TileWMS"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.TileWMS"
             }
         ],
         "access": "protected",
@@ -32682,7 +32816,8 @@
                         "string",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "string|undefined"
             }
         ],
         "name": "getFeatureInfoUrl",
@@ -33708,7 +33843,8 @@
                     "names": [
                         "ol.source.WMTS"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.WMTS"
             }
         ],
         "access": "protected",
@@ -34153,7 +34289,8 @@
                     "names": [
                         "ol.tilegrid.WMTS"
                     ]
-                }
+                },
+                "typeExpression": "ol.tilegrid.WMTS"
             }
         ],
         "access": "protected",
@@ -34941,7 +35078,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ addFeature: function(ol.Feature): void, removeFeature: function(ol.Feature): void, hasFeature: function(ol.Feature): bool }|undefined"
             }
         ],
         "access": "protected",
@@ -34985,7 +35123,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "addFeatures",
@@ -35035,7 +35174,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "addFeature",
@@ -35185,7 +35325,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "removeFeatures",
@@ -35234,7 +35375,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "removeFeature",
@@ -35349,7 +35491,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "clear",
@@ -35421,7 +35564,8 @@
                         "ol.Feature",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.Feature|undefined"
             }
         ],
         "name": "getFeatureById",
@@ -35453,7 +35597,8 @@
                     "names": [
                         "Array.<ol.Feature>"
                     ]
-                }
+                },
+                "typeExpression": "ol.Feature[]"
             }
         ],
         "name": "getFeatures",
@@ -35489,7 +35634,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -35582,7 +35728,8 @@
                     "names": [
                         "ol.Feature"
                     ]
-                }
+                },
+                "typeExpression": "ol.Feature"
             }
         ],
         "access": "protected",
@@ -35830,7 +35977,8 @@
                         "ol.geom.Geometry",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.Geometry|undefined"
             }
         ],
         "name": "getGeometry",
@@ -35866,7 +36014,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -35967,7 +36116,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -36582,7 +36732,8 @@
                         "ol.geometry.Geometry",
                         "Promise.<ol.geometry.Geometry>"
                     ]
-                }
+                },
+                "typeExpression": "ol.geometry.Geometry|Promise<ol.geometry.Geometry>"
             }
         ],
         "access": "protected",
@@ -36616,7 +36767,8 @@
                         "ol.geometry.Geometry",
                         "Promise.<ol.geometry.Geometry>"
                     ]
-                }
+                },
+                "typeExpression": "ol.geometry.Geometry|Promise<ol.geometry.Geometry>"
             }
         ],
         "access": "protected",
@@ -36657,7 +36809,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "exceptions": [
@@ -36762,7 +36915,8 @@
                     "names": [
                         "Array.<number>"
                     ]
-                }
+                },
+                "typeExpression": "number[]"
             }
         ],
         "access": "protected",
@@ -36809,7 +36963,8 @@
                     "names": [
                         "Array.<number>"
                     ]
-                }
+                },
+                "typeExpression": "number[]"
             }
         ],
         "access": "protected",
@@ -36856,7 +37011,8 @@
                     "names": [
                         "Array.<number>"
                     ]
-                }
+                },
+                "typeExpression": "number[]"
             }
         ],
         "access": "protected",
@@ -36889,7 +37045,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -36922,7 +37079,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -36958,7 +37116,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -37040,7 +37199,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -37073,7 +37233,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -37106,7 +37267,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -37890,7 +38052,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "private",
@@ -38167,7 +38330,8 @@
                     "names": [
                         "boolean"
                     ]
-                }
+                },
+                "typeExpression": "boolean"
             }
         ],
         "name": "isEqualGeom",
@@ -38638,7 +38802,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "access": "protected",
@@ -38672,7 +38837,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -38705,7 +38871,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -38738,7 +38905,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -38771,7 +38939,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -38804,7 +38973,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -39309,7 +39479,8 @@
                     "names": [
                         "Promise.<ol.interaction.Interaction>"
                     ]
-                }
+                },
+                "typeExpression": "Promise<ol.interaction.Interaction>"
             }
         ],
         "access": "protected",
@@ -39369,7 +39540,8 @@
                         "ol.interaction.Interaction",
                         "Promise.<ol.interaction.Interaction>"
                     ]
-                }
+                },
+                "typeExpression": "ol.interaction.Interaction|Promise<ol.interaction.Interaction>"
             }
         ],
         "access": "protected",
@@ -39407,7 +39579,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -39490,7 +39663,8 @@
                         "Promise"
                     ]
                 },
-                "description": "Resolves when initialization completes"
+                "description": "Resolves when initialization completes",
+                "typeExpression": "Promise"
             }
         ],
         "access": "protected",
@@ -39524,7 +39698,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -39557,7 +39732,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -39590,7 +39766,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -39623,7 +39800,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -40228,7 +40406,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ hasInteraction: function(ol.interaction.Interaction): bool, addInteraction: function(ol.interaction.Interaction): void, removeInteraction: function(ol.interaction.Interaction): void }|undefined"
             }
         ],
         "access": "protected",
@@ -40278,7 +40457,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "addInteraction",
@@ -40406,7 +40586,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "removeInteraction",
@@ -40491,7 +40672,8 @@
                     "names": [
                         "Array.<ol.interaction.Interaction>"
                     ]
-                }
+                },
+                "typeExpression": "ol.interaction.Interaction[]"
             }
         ],
         "name": "getInteractions",
@@ -40536,7 +40718,8 @@
                         "ol.interaction.Interaction",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.interaction.Interaction|undefined"
             }
         ],
         "name": "getInteractionById",
@@ -40572,7 +40755,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -41267,7 +41451,8 @@
                     "names": [
                         "Promise.<ol.layer.Layer>"
                     ]
-                }
+                },
+                "typeExpression": "Promise<ol.layer.Layer>"
             }
         ],
         "access": "protected",
@@ -41327,7 +41512,8 @@
                         "ol.layer.Layer",
                         "Promise.<ol.layer.Layer>"
                     ]
-                }
+                },
+                "typeExpression": "ol.layer.Layer|Promise<ol.layer.Layer>"
             }
         ],
         "access": "protected",
@@ -41361,7 +41547,8 @@
                     "names": [
                         "Promise.<Vue.<ol.layer.Layer>>"
                     ]
-                }
+                },
+                "typeExpression": "Promise<Vue<ol.layer.Layer>>"
             }
         ],
         "access": "protected",
@@ -41395,7 +41582,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -41442,7 +41630,8 @@
                     "names": [
                         "boolean"
                     ]
-                }
+                },
+                "typeExpression": "boolean"
             }
         ],
         "name": "isAtPixel",
@@ -41478,7 +41667,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -41561,7 +41751,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ setSource: function(ol.source.Source): void, getSource: function(): ol.source.Source }|undefined"
             }
         ],
         "access": "protected",
@@ -41594,7 +41785,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -41627,7 +41819,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -41661,7 +41854,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -42500,7 +42694,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ hasLayer: function(ol.Layer): bool, addLayer: function(ol.Layer): void, removeLayer: function(ol.Layer): void }|undefined"
             }
         ],
         "access": "protected",
@@ -42550,7 +42745,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "addLayer",
@@ -42678,7 +42874,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "removeLayer",
@@ -42763,7 +42960,8 @@
                     "names": [
                         "Array.<ol.layer.Layer>"
                     ]
-                }
+                },
+                "typeExpression": "ol.layer.Layer[]"
             }
         ],
         "name": "getLayers",
@@ -42808,7 +43006,8 @@
                         "ol.layer.Layer",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.layer.Layer|undefined"
             }
         ],
         "name": "getLayerById",
@@ -42844,7 +43043,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -43163,7 +43363,8 @@
                     "names": [
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "Promise<void>"
             }
         ],
         "access": "protected",
@@ -43203,7 +43404,8 @@
                         "Promise"
                     ]
                 },
-                "description": "Resolves when initialization completes"
+                "description": "Resolves when initialization completes",
+                "typeExpression": "Promise"
             }
         ],
         "access": "protected",
@@ -43395,7 +43597,8 @@
                         "*",
                         "Promise.<T>"
                     ]
-                }
+                },
+                "typeExpression": "*|Promise<T>"
             }
         ],
         "access": "protected",
@@ -43436,7 +43639,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -43550,7 +43754,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -43584,7 +43789,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -43619,7 +43825,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -43655,7 +43862,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -44297,7 +44505,8 @@
                     "names": [
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "Promise<void>"
             }
         ],
         "name": "refresh",
@@ -44403,7 +44612,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "access": "protected",
@@ -44437,7 +44647,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -44470,7 +44681,8 @@
                     "names": [
                         "*"
                     ]
-                }
+                },
+                "typeExpression": "*"
             }
         ],
         "access": "protected",
@@ -44505,7 +44717,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -44539,7 +44752,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -44597,7 +44811,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ hasOverlay: function(ol.Overlay): bool, addOverlay: function(ol.Overlay): void, removeOverlay: function(ol.Overlay): void }|undefined"
             }
         ],
         "access": "protected",
@@ -44647,7 +44862,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "addOverlay",
@@ -44775,7 +44991,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "removeOverlay",
@@ -44860,7 +45077,8 @@
                     "names": [
                         "Array.<ol.Overlay>"
                     ]
-                }
+                },
+                "typeExpression": "ol.Overlay[]"
             }
         ],
         "name": "getOverlays",
@@ -44905,7 +45123,8 @@
                         "ol.Overlay",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.Overlay|undefined"
             }
         ],
         "name": "getOverlayById",
@@ -44941,7 +45160,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -45258,7 +45478,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -45295,7 +45516,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -45404,7 +45626,8 @@
                     "names": [
                         "Subscription"
                     ]
-                }
+                },
+                "typeExpression": "Subscription"
             }
         ],
         "access": "protected",
@@ -45721,7 +45944,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -45916,7 +46140,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ setSource: function(ol.source.Source): void, getSource: function(): ol.source.Source }|undefined"
             }
         ],
         "access": "protected",
@@ -45950,7 +46175,8 @@
                         "ol.source.Source",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.Source|undefined"
             }
         ],
         "name": "getSource",
@@ -45986,7 +46212,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -46086,7 +46313,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setSource",
@@ -46562,7 +46790,8 @@
                         "ol.source.Source",
                         "Promise.<ol.source.Source>"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.Source|Promise<ol.source.Source>"
             }
         ],
         "access": "protected",
@@ -46596,7 +46825,8 @@
                         "ol.source.Source",
                         "Promise.<ol.source.Source>"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.Source|Promise<ol.source.Source>"
             }
         ],
         "access": "protected",
@@ -46630,7 +46860,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "access": "protected",
@@ -46664,7 +46895,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -46701,7 +46933,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -46783,7 +47016,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -46816,7 +47050,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -46849,7 +47084,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -47471,7 +47707,8 @@
                     "names": [
                         "VNode"
                     ]
-                }
+                },
+                "typeExpression": "VNode"
             }
         ],
         "name": "render",
@@ -47898,7 +48135,8 @@
                         "OlStyle",
                         "Promise.<OlStyle>"
                     ]
-                }
+                },
+                "typeExpression": "OlStyle|Promise<OlStyle>"
             }
         ],
         "access": "protected",
@@ -47932,7 +48170,8 @@
                         "OlStyle",
                         "Promise.<OlStyle>"
                     ]
-                }
+                },
+                "typeExpression": "OlStyle|Promise<OlStyle>"
             }
         ],
         "access": "protected",
@@ -47966,7 +48205,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "access": "protected",
@@ -48000,7 +48240,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -48037,7 +48278,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -48119,7 +48361,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "name": "refresh",
@@ -48761,7 +49004,8 @@
                         "ol.StyleFunction",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Style[]|ol.StyleFunction|undefined"
             }
         ],
         "access": "protected",
@@ -48798,7 +49042,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -48883,7 +49128,8 @@
                         "Vue",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Style[]|ol.StyleFunction|Vue|undefined"
             }
         ],
         "name": "getStyles",
@@ -48934,7 +49180,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "addStyle",
@@ -49165,7 +49412,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "setStyle",
@@ -49268,7 +49516,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "removeStyle",
@@ -49408,7 +49657,8 @@
                     "names": [
                         "*"
                     ]
-                }
+                },
+                "typeExpression": "*"
             }
         ],
         "access": "protected",
@@ -49448,7 +49698,8 @@
                     "names": [
                         "ol.StyleFunction"
                     ]
-                }
+                },
+                "typeExpression": "ol.StyleFunction"
             }
         ],
         "access": "protected",
@@ -50546,7 +50797,8 @@
                     "names": [
                         "ol.tilegrid.TileGrid"
                     ]
-                }
+                },
+                "typeExpression": "ol.tilegrid.TileGrid"
             }
         ],
         "access": "protected",
@@ -50678,7 +50930,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "access": "protected",
@@ -50747,7 +51000,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -50807,7 +51061,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -50840,7 +51095,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -51123,7 +51379,8 @@
                     "names": [
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "Promise<void>"
             }
         ],
         "access": "protected",
@@ -51356,7 +51613,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "name": "clear",
@@ -51393,7 +51651,8 @@
                         "Object",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "{ addFeature: function(ol.Feature): void, removeFeature: function(ol.Feature): void, hasFeature: function(ol.Feature): bool }|undefined"
             }
         ],
         "access": "protected",
@@ -51521,7 +51780,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "access": "protected",
@@ -51554,7 +51814,8 @@
                     "names": [
                         "Promise"
                     ]
-                }
+                },
+                "typeExpression": "Promise"
             }
         ],
         "access": "protected",
@@ -51588,7 +51849,8 @@
                         "void",
                         "Promise.<void>"
                     ]
-                }
+                },
+                "typeExpression": "void|Promise<void>"
             }
         ],
         "access": "protected",
@@ -51621,7 +51883,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -51654,7 +51917,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -51687,7 +51951,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -52116,7 +52381,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -52220,7 +52486,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "access": "protected",
@@ -52680,7 +52947,8 @@
                     "names": [
                         "ol.source.XYZ"
                     ]
-                }
+                },
+                "typeExpression": "ol.source.XYZ"
             }
         ],
         "access": "protected",
@@ -53001,7 +53269,8 @@
                     "names": [
                         "ol.TileUrlFunction"
                     ]
-                }
+                },
+                "typeExpression": "ol.TileUrlFunction"
             }
         ],
         "access": "protected",
@@ -55326,7 +55595,8 @@
                         "ol.Extent"
                     ]
                 },
-                "description": "Extent."
+                "description": "Extent.",
+                "typeExpression": "ol.Extent"
             }
         ],
         "see": [
@@ -55525,7 +55795,8 @@
                         "ol.Coordinate"
                     ]
                 },
-                "description": "Corner coordinate."
+                "description": "Corner coordinate.",
+                "typeExpression": "ol.Coordinate"
             }
         ],
         "see": [
@@ -55739,7 +56010,8 @@
                         "ol.Extent"
                     ]
                 },
-                "description": "Extent."
+                "description": "Extent.",
+                "typeExpression": "ol.Extent"
             }
         ],
         "see": [
@@ -55926,7 +56198,8 @@
                     "names": [
                         "ol.format.GeoJSON"
                     ]
-                }
+                },
+                "typeExpression": "ol.format.GeoJSON"
             }
         ],
         "name": "geoJson",
@@ -55999,7 +56272,8 @@
                     "names": [
                         "ol.format.TopoJSON"
                     ]
-                }
+                },
+                "typeExpression": "ol.format.TopoJSON"
             }
         ],
         "name": "topoJson",
@@ -56171,7 +56445,8 @@
                         "GeoJSONFeature",
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "GeoJSONFeature|Object"
             }
         ],
         "name": "writeFeature",
@@ -56378,7 +56653,8 @@
                     "names": [
                         "ol.Feature"
                     ]
-                }
+                },
+                "typeExpression": "ol.Feature"
             }
         ],
         "name": "readFeature",
@@ -56558,7 +56834,8 @@
                         "GeoJSONGeometryCollection",
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "GeoJSONGeometry|GeoJSONGeometryCollection|Object"
             }
         ],
         "name": "writeGeometry",
@@ -56707,7 +56984,8 @@
                     "names": [
                         "ol.geom.Geometry"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.Geometry"
             }
         ],
         "name": "readGeometry",
@@ -56926,7 +57204,8 @@
                     "names": [
                         "ol.geom.Point"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.Point"
             }
         ],
         "name": "point",
@@ -57028,7 +57307,8 @@
                     "names": [
                         "ol.geom.LineString"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.LineString"
             }
         ],
         "name": "line",
@@ -57100,7 +57380,8 @@
                     "names": [
                         "ol.geom.Polygon"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.Polygon"
             }
         ],
         "name": "polygon",
@@ -57172,7 +57453,8 @@
                     "names": [
                         "ol.geom.MultiPoint"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.MultiPoint"
             }
         ],
         "name": "multiPoint",
@@ -57244,7 +57526,8 @@
                     "names": [
                         "ol.geom.MultiLineString"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.MultiLineString"
             }
         ],
         "name": "multiLine",
@@ -57316,7 +57599,8 @@
                     "names": [
                         "ol.geom.MultiPolygon"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.MultiPolygon"
             }
         ],
         "name": "multiPolygon",
@@ -57388,7 +57672,8 @@
                     "names": [
                         "ol.geom.GeometryCollection"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.GeometryCollection"
             }
         ],
         "name": "collection",
@@ -57471,7 +57756,8 @@
                     "names": [
                         "ol.geom.Polygon"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.Polygon"
             }
         ],
         "name": "circularPolygon",
@@ -57545,7 +57831,8 @@
                     "names": [
                         "boolean"
                     ]
-                }
+                },
+                "typeExpression": "boolean"
             }
         ],
         "exceptions": [
@@ -57657,7 +57944,8 @@
                         "ol.geom.SimpleGeometry",
                         "GeoJSONGeometry"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.SimpleGeometry|GeoJSONGeometry"
             }
         ],
         "exceptions": [
@@ -57796,7 +58084,8 @@
                         "ol.Coordinate",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.Coordinate|undefined"
             }
         ],
         "name": "pointOnSurface",
@@ -58269,7 +58558,8 @@
                     "names": [
                         "Array.<number>"
                     ]
-                }
+                },
+                "typeExpression": "number[]"
             }
         ],
         "name": "pointToLonLat",
@@ -58353,7 +58643,8 @@
                     "names": [
                         "Array.<number>"
                     ]
-                }
+                },
+                "typeExpression": "number[]"
             }
         ],
         "name": "pointFromLonLat",
@@ -58437,7 +58728,8 @@
                     "names": [
                         "Array.<Array.<number>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<number[]>"
             }
         ],
         "name": "lineToLonLat",
@@ -58524,7 +58816,8 @@
                     "names": [
                         "Array.<Array.<number>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<number[]>"
             }
         ],
         "name": "lineFromLonLat",
@@ -58611,7 +58904,8 @@
                     "names": [
                         "Array.<Array.<Array.<number>>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<Array<number[]>>"
             }
         ],
         "name": "polygonToLonLat",
@@ -58698,7 +58992,8 @@
                     "names": [
                         "Array.<Array.<Array.<number>>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<Array<number[]>>"
             }
         ],
         "name": "polygonFromLonLat",
@@ -58785,7 +59080,8 @@
                     "names": [
                         "Array.<Array.<number>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<number[]>"
             }
         ],
         "name": "multiPointToLonLat",
@@ -58872,7 +59168,8 @@
                     "names": [
                         "Array.<Array.<number>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<number[]>"
             }
         ],
         "name": "multiPointFromLonLat",
@@ -58959,7 +59256,8 @@
                     "names": [
                         "Array.<Array.<Array.<number>>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<Array<number[]>>"
             }
         ],
         "name": "multiLineToLonLat",
@@ -59046,7 +59344,8 @@
                     "names": [
                         "Array.<Array.<Array.<number>>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<Array<number[]>>"
             }
         ],
         "name": "multiLineFromLonLat",
@@ -59132,7 +59431,8 @@
                     "names": [
                         "Array.<Array.<Array.<Array.<number>>>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<Array<Array<number[]>>>"
             }
         ],
         "name": "multiPolygonToLonLat",
@@ -59218,7 +59518,8 @@
                     "names": [
                         "Array.<Array.<Array.<Array.<number>>>>"
                     ]
-                }
+                },
+                "typeExpression": "Array<Array<Array<number[]>>>"
             }
         ],
         "name": "multiPolygonFromLonLat",
@@ -59810,7 +60111,8 @@
                     "names": [
                         "ol.Extent"
                     ]
-                }
+                },
+                "typeExpression": "ol.Extent"
             }
         ],
         "name": "extentFromLonLat",
@@ -59895,7 +60197,8 @@
                     "names": [
                         "ol.Extent"
                     ]
-                }
+                },
+                "typeExpression": "ol.Extent"
             }
         ],
         "name": "extentToLonLat",
@@ -60522,7 +60825,8 @@
                     "names": [
                         "Array.<VlStyle>"
                     ]
-                }
+                },
+                "typeExpression": "VlStyle[]"
             }
         ],
         "name": "defaultStyle",
@@ -60675,7 +60979,8 @@
                     "names": [
                         "Object.<GEOMETRY_TYPE, Array.<VlStyle>>"
                     ]
-                }
+                },
+                "typeExpression": "Object<GEOMETRY_TYPE, VlStyle[]>"
             }
         ],
         "name": "defaultEditStyle",
@@ -61342,7 +61647,8 @@
                         "ol.style.Style",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Style|undefined"
             }
         ],
         "name": "style",
@@ -61620,7 +61926,8 @@
                     "names": [
                         "*"
                     ]
-                }
+                },
+                "typeExpression": "*"
             }
         ],
         "name": "normalizeColor",
@@ -61760,7 +62067,8 @@
                         "ol.style.Fill",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Fill|undefined"
             }
         ],
         "name": "fill",
@@ -62062,7 +62370,8 @@
                         "ol.style.Stroke",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Stroke|undefined"
             }
         ],
         "name": "stroke",
@@ -62380,7 +62689,8 @@
                         "ol.style.Image",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Image|undefined"
             }
         ],
         "todo": [
@@ -63272,7 +63582,8 @@
                         "ol.style.Text",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.style.Text|undefined"
             }
         ],
         "name": "text",
@@ -63527,7 +63838,8 @@
                         "ol.StyleGeometryFunction",
                         "undefined"
                     ]
-                }
+                },
+                "typeExpression": "ol.geom.Geometry|ol.StyleGeometryFunction|undefined"
             }
         ],
         "name": "geom",
@@ -63677,7 +63989,8 @@
                     ]
                 },
                 "nullable": false,
-                "description": "Resolutions array."
+                "description": "Resolutions array.",
+                "typeExpression": "!Array.<number>"
             }
         ],
         "see": [
@@ -64014,7 +64327,8 @@
                     ]
                 },
                 "nullable": false,
-                "description": "TileGrid instance."
+                "description": "TileGrid instance.",
+                "typeExpression": "!ol.tilegrid.TileGrid"
             }
         ],
         "see": [
@@ -64256,7 +64570,8 @@
                     ]
                 },
                 "nullable": false,
-                "description": "TileGrid instance."
+                "description": "TileGrid instance.",
+                "typeExpression": "!ol.tilegrid.TileGrid"
             }
         ],
         "see": [
@@ -64377,7 +64692,8 @@
                     "names": [
                         "Observable.<{prop: string, value: *}>"
                     ]
-                }
+                },
+                "typeExpression": "Observable<{prop: string, value: *}>"
             }
         ],
         "name": "exports",
@@ -64698,7 +65014,8 @@
                     "names": [
                         "Observable.<T>"
                     ]
-                }
+                },
+                "typeExpression": "Observable<T>"
             }
         ],
         "memberof": "{Observable}",
@@ -65302,7 +65619,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -65383,7 +65701,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -65464,7 +65783,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -65545,7 +65865,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -65626,7 +65947,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -65707,7 +66029,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -65788,7 +66111,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -65869,7 +66193,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -65950,7 +66275,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -66031,7 +66357,8 @@
                     "names": [
                         "void"
                     ]
-                }
+                },
+                "typeExpression": "void"
             }
         ],
         "exceptions": [
@@ -66114,7 +66441,8 @@
                     "names": [
                         "*"
                     ]
-                }
+                },
+                "typeExpression": "*"
             }
         ],
         "name": "exports",
@@ -66945,7 +67273,8 @@
                         "boolean"
                     ]
                 },
-                "description": "True if value is number or numeric string."
+                "description": "True if value is number or numeric string.",
+                "typeExpression": "boolean"
             }
         ],
         "name": "exports",
@@ -67019,7 +67348,8 @@
                     "names": [
                         "Object"
                     ]
-                }
+                },
+                "typeExpression": "Object"
             }
         ],
         "name": "exports",
@@ -67226,7 +67556,8 @@
                     "names": [
                         "string"
                     ]
-                }
+                },
+                "typeExpression": "string"
             }
         ],
         "name": "exports",
@@ -67567,7 +67898,7 @@
         "meta": {
             "range": [
                 80,
-                634
+                104
             ],
             "filename": "index.js",
             "lineno": 6,
@@ -67575,6 +67906,30 @@
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
                 "id": "astnode100018537",
+                "name": "module.exports",
+                "type": "Identifier"
+            }
+        },
+        "undocumented": true,
+        "name": "exports",
+        "longname": "module.exports",
+        "kind": "member",
+        "memberof": "module",
+        "scope": "static"
+    },
+    {
+        "comment": "",
+        "meta": {
+            "range": [
+                105,
+                659
+            ],
+            "filename": "index.js",
+            "lineno": 7,
+            "columnno": 0,
+            "path": "/home/ghetto/projects/vuelayers/src",
+            "code": {
+                "id": "astnode100018539",
                 "name": "exports.",
                 "type": "VariableDeclaration"
             }
@@ -67589,15 +67944,15 @@
         "comment": "",
         "meta": {
             "range": [
-                97,
-                104
+                122,
+                129
             ],
             "filename": "index.js",
-            "lineno": 7,
+            "lineno": 8,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018541",
+                "id": "astnode100018543",
                 "name": "install",
                 "type": "Identifier",
                 "value": "install"
@@ -67613,15 +67968,15 @@
         "comment": "",
         "meta": {
             "range": [
-                108,
-                112
+                133,
+                137
             ],
             "filename": "index.js",
-            "lineno": 8,
+            "lineno": 9,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018543",
+                "id": "astnode100018545",
                 "name": "core",
                 "type": "Identifier",
                 "value": "core"
@@ -67637,15 +67992,15 @@
         "comment": "",
         "meta": {
             "range": [
-                128,
-                131
+                153,
+                156
             ],
             "filename": "index.js",
-            "lineno": 10,
+            "lineno": 11,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018545",
+                "id": "astnode100018547",
                 "name": "Map",
                 "type": "Identifier",
                 "value": "Map"
@@ -67661,15 +68016,15 @@
         "comment": "",
         "meta": {
             "range": [
-                135,
-                142
+                160,
+                167
             ],
             "filename": "index.js",
-            "lineno": 11,
+            "lineno": 12,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018547",
+                "id": "astnode100018549",
                 "name": "Feature",
                 "type": "Identifier",
                 "value": "Feature"
@@ -67685,15 +68040,15 @@
         "comment": "",
         "meta": {
             "range": [
-                146,
-                152
+                171,
+                177
             ],
             "filename": "index.js",
-            "lineno": 12,
+            "lineno": 13,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018549",
+                "id": "astnode100018551",
                 "name": "Geoloc",
                 "type": "Identifier",
                 "value": "Geoloc"
@@ -67709,15 +68064,15 @@
         "comment": "",
         "meta": {
             "range": [
-                156,
-                163
+                181,
+                188
             ],
             "filename": "index.js",
-            "lineno": 13,
+            "lineno": 14,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018551",
+                "id": "astnode100018553",
                 "name": "Overlay",
                 "type": "Identifier",
                 "value": "Overlay"
@@ -67733,15 +68088,15 @@
         "comment": "",
         "meta": {
             "range": [
-                178,
-                187
+                203,
+                212
             ],
             "filename": "index.js",
-            "lineno": 15,
+            "lineno": 16,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018553",
+                "id": "astnode100018555",
                 "name": "PointGeom",
                 "type": "Identifier",
                 "value": "PointGeom"
@@ -67757,15 +68112,15 @@
         "comment": "",
         "meta": {
             "range": [
-                191,
-                205
+                216,
+                230
             ],
             "filename": "index.js",
-            "lineno": 16,
+            "lineno": 17,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018555",
+                "id": "astnode100018557",
                 "name": "LineStringGeom",
                 "type": "Identifier",
                 "value": "LineStringGeom"
@@ -67781,15 +68136,15 @@
         "comment": "",
         "meta": {
             "range": [
-                209,
-                220
+                234,
+                245
             ],
             "filename": "index.js",
-            "lineno": 17,
+            "lineno": 18,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018557",
+                "id": "astnode100018559",
                 "name": "PolygonGeom",
                 "type": "Identifier",
                 "value": "PolygonGeom"
@@ -67805,15 +68160,15 @@
         "comment": "",
         "meta": {
             "range": [
-                224,
-                238
+                249,
+                263
             ],
             "filename": "index.js",
-            "lineno": 18,
+            "lineno": 19,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018559",
+                "id": "astnode100018561",
                 "name": "MultiPointGeom",
                 "type": "Identifier",
                 "value": "MultiPointGeom"
@@ -67829,15 +68184,15 @@
         "comment": "",
         "meta": {
             "range": [
-                242,
-                261
+                267,
+                286
             ],
             "filename": "index.js",
-            "lineno": 19,
+            "lineno": 20,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018561",
+                "id": "astnode100018563",
                 "name": "MultiLineStringGeom",
                 "type": "Identifier",
                 "value": "MultiLineStringGeom"
@@ -67853,15 +68208,15 @@
         "comment": "",
         "meta": {
             "range": [
-                265,
-                281
+                290,
+                306
             ],
             "filename": "index.js",
-            "lineno": 20,
+            "lineno": 21,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018563",
+                "id": "astnode100018565",
                 "name": "MultiPolygonGeom",
                 "type": "Identifier",
                 "value": "MultiPolygonGeom"
@@ -67877,15 +68232,15 @@
         "comment": "",
         "meta": {
             "range": [
-                303,
-                320
+                328,
+                345
             ],
             "filename": "index.js",
-            "lineno": 22,
+            "lineno": 23,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018565",
+                "id": "astnode100018567",
                 "name": "SelectInteraction",
                 "type": "Identifier",
                 "value": "SelectInteraction"
@@ -67901,15 +68256,15 @@
         "comment": "",
         "meta": {
             "range": [
-                336,
-                345
+                361,
+                370
             ],
             "filename": "index.js",
-            "lineno": 24,
+            "lineno": 25,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018567",
+                "id": "astnode100018569",
                 "name": "TileLayer",
                 "type": "Identifier",
                 "value": "TileLayer"
@@ -67925,15 +68280,15 @@
         "comment": "",
         "meta": {
             "range": [
-                349,
-                360
+                374,
+                385
             ],
             "filename": "index.js",
-            "lineno": 25,
+            "lineno": 26,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018569",
+                "id": "astnode100018571",
                 "name": "VectorLayer",
                 "type": "Identifier",
                 "value": "VectorLayer"
@@ -67949,15 +68304,15 @@
         "comment": "",
         "meta": {
             "range": [
-                377,
-                390
+                402,
+                415
             ],
             "filename": "index.js",
-            "lineno": 27,
+            "lineno": 28,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018571",
+                "id": "astnode100018573",
                 "name": "ClusterSource",
                 "type": "Identifier",
                 "value": "ClusterSource"
@@ -67973,15 +68328,15 @@
         "comment": "",
         "meta": {
             "range": [
-                394,
-                406
+                419,
+                431
             ],
             "filename": "index.js",
-            "lineno": 28,
+            "lineno": 29,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018573",
+                "id": "astnode100018575",
                 "name": "MapboxSource",
                 "type": "Identifier",
                 "value": "MapboxSource"
@@ -67997,15 +68352,15 @@
         "comment": "",
         "meta": {
             "range": [
-                410,
-                419
+                435,
+                444
             ],
             "filename": "index.js",
-            "lineno": 29,
+            "lineno": 30,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018575",
+                "id": "astnode100018577",
                 "name": "OsmSource",
                 "type": "Identifier",
                 "value": "OsmSource"
@@ -68021,15 +68376,15 @@
         "comment": "",
         "meta": {
             "range": [
-                423,
-                436
+                448,
+                461
             ],
             "filename": "index.js",
-            "lineno": 30,
+            "lineno": 31,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018577",
+                "id": "astnode100018579",
                 "name": "SputnikSource",
                 "type": "Identifier",
                 "value": "SputnikSource"
@@ -68045,15 +68400,15 @@
         "comment": "",
         "meta": {
             "range": [
-                440,
-                452
+                465,
+                477
             ],
             "filename": "index.js",
-            "lineno": 31,
+            "lineno": 32,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018579",
+                "id": "astnode100018581",
                 "name": "VectorSource",
                 "type": "Identifier",
                 "value": "VectorSource"
@@ -68069,15 +68424,15 @@
         "comment": "",
         "meta": {
             "range": [
-                456,
-                465
+                481,
+                490
             ],
             "filename": "index.js",
-            "lineno": 32,
+            "lineno": 33,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018581",
+                "id": "astnode100018583",
                 "name": "WmsSource",
                 "type": "Identifier",
                 "value": "WmsSource"
@@ -68093,15 +68448,15 @@
         "comment": "",
         "meta": {
             "range": [
-                469,
-                479
+                494,
+                504
             ],
             "filename": "index.js",
-            "lineno": 33,
+            "lineno": 34,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018583",
+                "id": "astnode100018585",
                 "name": "WmtsSource",
                 "type": "Identifier",
                 "value": "WmtsSource"
@@ -68117,15 +68472,15 @@
         "comment": "",
         "meta": {
             "range": [
-                483,
-                492
+                508,
+                517
             ],
             "filename": "index.js",
-            "lineno": 34,
+            "lineno": 35,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018585",
+                "id": "astnode100018587",
                 "name": "XyzSource",
                 "type": "Identifier",
                 "value": "XyzSource"
@@ -68141,15 +68496,15 @@
         "comment": "",
         "meta": {
             "range": [
-                507,
-                518
+                532,
+                543
             ],
             "filename": "index.js",
-            "lineno": 36,
+            "lineno": 37,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018587",
+                "id": "astnode100018589",
                 "name": "CircleStyle",
                 "type": "Identifier",
                 "value": "CircleStyle"
@@ -68165,15 +68520,15 @@
         "comment": "",
         "meta": {
             "range": [
-                522,
-                531
+                547,
+                556
             ],
             "filename": "index.js",
-            "lineno": 37,
+            "lineno": 38,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018589",
+                "id": "astnode100018591",
                 "name": "FillStyle",
                 "type": "Identifier",
                 "value": "FillStyle"
@@ -68189,15 +68544,15 @@
         "comment": "",
         "meta": {
             "range": [
-                535,
-                544
+                560,
+                569
             ],
             "filename": "index.js",
-            "lineno": 38,
+            "lineno": 39,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018591",
+                "id": "astnode100018593",
                 "name": "IconStyle",
                 "type": "Identifier",
                 "value": "IconStyle"
@@ -68213,15 +68568,15 @@
         "comment": "",
         "meta": {
             "range": [
-                548,
-                561
+                573,
+                586
             ],
             "filename": "index.js",
-            "lineno": 39,
+            "lineno": 40,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018593",
+                "id": "astnode100018595",
                 "name": "RegShapeStyle",
                 "type": "Identifier",
                 "value": "RegShapeStyle"
@@ -68237,15 +68592,15 @@
         "comment": "",
         "meta": {
             "range": [
-                565,
-                576
+                590,
+                601
             ],
             "filename": "index.js",
-            "lineno": 40,
+            "lineno": 41,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018595",
+                "id": "astnode100018597",
                 "name": "StrokeStyle",
                 "type": "Identifier",
                 "value": "StrokeStyle"
@@ -68261,15 +68616,15 @@
         "comment": "",
         "meta": {
             "range": [
-                580,
-                588
+                605,
+                613
             ],
             "filename": "index.js",
-            "lineno": 41,
+            "lineno": 42,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018597",
+                "id": "astnode100018599",
                 "name": "StyleBox",
                 "type": "Identifier",
                 "value": "StyleBox"
@@ -68285,15 +68640,15 @@
         "comment": "",
         "meta": {
             "range": [
-                592,
-                606
+                617,
+                631
             ],
             "filename": "index.js",
-            "lineno": 42,
+            "lineno": 43,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018599",
+                "id": "astnode100018601",
                 "name": "StyleContainer",
                 "type": "Identifier",
                 "value": "StyleContainer"
@@ -68309,15 +68664,15 @@
         "comment": "",
         "meta": {
             "range": [
-                610,
-                619
+                635,
+                644
             ],
             "filename": "index.js",
-            "lineno": 43,
+            "lineno": 44,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018601",
+                "id": "astnode100018603",
                 "name": "StyleFunc",
                 "type": "Identifier",
                 "value": "StyleFunc"
@@ -68341,7 +68696,7 @@
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018610",
+                "id": "astnode100018612",
                 "name": "module.exports",
                 "type": "FunctionDeclaration",
                 "paramnames": [
@@ -68379,7 +68734,7 @@
             "columnno": 15,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018611",
+                "id": "astnode100018613",
                 "name": "install",
                 "type": "FunctionDeclaration",
                 "paramnames": [
@@ -68410,7 +68765,7 @@
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src",
             "code": {
-                "id": "astnode100018621",
+                "id": "astnode100018623",
                 "name": "install.installed",
                 "type": "Literal",
                 "value": true,

@@ -1,6 +1,7 @@
 /* global ga */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Velocity from 'velocity-animate'
 import routes from './routes'
 
 Vue.use(VueRouter)
@@ -24,6 +25,7 @@ router.beforeEach((to, from, next) => {
 
   next()
 })
+
 router.afterEach((to, from) => {
   if (window.ga != null) {
     ga('set', {
@@ -31,6 +33,15 @@ router.afterEach((to, from) => {
       title: to.meta.title,
     })
     ga('send', 'pageview')
+  }
+  // first load exclude
+  if (from.matched.length) {
+    Velocity(document.body, 'scroll', {
+      offset: 0,
+      delay: 300,
+      duration: 750,
+      easing: 'easeOutCube',
+    })
   }
 })
 

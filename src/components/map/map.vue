@@ -38,7 +38,7 @@
   const props = {
     /**
      * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
-     * value is used to configure controls. See {@link https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults}.
+     * value is used to configure controls. See [ol.control.default()](https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults).
      * @type {Object|boolean}
      * @todo remove when vl-control-* components will be ready
      */
@@ -49,8 +49,7 @@
     /**
      * The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard
      * interactions will always trigger. If this option is not specified, the element the library listens to keyboard
-     * events on is the map target (i.e. the user-provided div for the map). If this is not `document` the target element
-     * needs to be focused for key events to be emitted, requiring that the target element has a `tabindex` attribute.
+     * events on is the component root element.
      * @type {string|Element|Document}
      */
     keyboardEventTarget: [String, Element, Document],
@@ -278,7 +277,7 @@
       )
     },
     /**
-     * Trigger focus on map container.
+     * Triggers focus on map container.
      * @return {void}
      */
     focus () {
@@ -377,7 +376,7 @@
   }
 
   /**
-   * Map `vl-map` component.
+   * <h3 id="vl-map">Map `vl-map` component.</h3>
    *
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.

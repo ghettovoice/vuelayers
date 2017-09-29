@@ -1,0 +1,170 @@
+<%
+/* global _, doclet, children */
+let filePath = [doclet.meta.path, doclet.meta.filename].join('/')
+let components = []
+
+const kebabCase = string => _.kebabCase(_.lowerFirst(string))
+const camelCase = string => _.camelCase(_.upperFirst(string))
+
+if (/components\/[^\/]+\/index\.js$/.test(filePath)) {
+  components = children.reduce((all, child) => {
+    if (!child.vueName) return all
+
+    let cmpLongName = [
+      doclet.longname,
+      kebabCase(child.name),
+    ].join('/')
+    let importVar = camelCase([
+      'module',
+      doclet.longname.replace(/^module:/, '').replace('/', '-'),
+      child.name.replace(/^module:/, '').replace('/', '-'),
+      'doc'
+    ].join('-'))
+
+    return all.concat({
+      vueName: child.vueName,
+      cmpLongName,
+      importVar,
+    })
+  }, [])
+}
+
+let cmpName = 'vld-module-' + doclet.name.replace(/^module:/, '').replace('/', '-') + '-doc'
+%>
+
+<template>
+  <div class="content" :class="$options.name">
+    <%= doclet.description %>
+
+    <%
+    let examples = doclet.examples || []
+    examples.forEach(function (example) {
+    %>
+      <%= example %>
+    <% }) %>
+
+    <b-tabs v-if="props.length || methods.length">
+      <b-tab-item v-if="props.length" label="Props">
+        <b-table :data="props" :mobile-cards="true">
+          <template scope="scope">
+            <b-table-column label="Name">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Type">
+              <span class="type">{{ scope.row.typeExpression }}</span>
+            </b-table-column>
+            <b-table-column label="Options">
+              <p v-if="scope.row.defaultvalue">
+                Default: <code>{{ scope.row.defaultvalue }}</code>
+              </p>
+              <p v-if="scope.row.required">
+                Required: <code>{{ scope.row.required.toString() }}</code>
+              </p>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <b-tab-item v-if="methods.length" label="Methods">
+        <b-table :data="methods" :mobile-cards="true">
+          <template scope="scope">
+            <b-table-column label="Name">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Params">
+               TODO: render params list
+            </b-table-column>
+            <b-table-column label="Returns">
+              <p v-for="(ret, i) in scope.row.returns" :key="i">
+                <span class="type">{{ ret.typeExpression }}</span>
+                <template v-html="ret.description"></template>
+              </p>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+    </b-tabs>
+
+    <hr/>
+
+    <% if (components.length) { %>
+    <% components.forEach(function ({ importVar }) { %>
+    <<%= kebabCase(importVar) %> />
+    <% }) %>
+    <% } %>
+  </div>
+</template>
+
+<script>
+  import Velocity from 'velocity-animate'
+  <% components.forEach(function ({ cmpLongName, importVar, vueName }) { %>
+  import <%= importVar %> from '!jsdoc-vue-loader!./jsdoc-index.json?longname=<%= cmpLongName %>&+vueProto&vueName=<%= vueName %>&tpl=./jsdoc-vue-cmp.ejs'
+  <% }) %>
+
+  const doclet = <%= JSON.stringify(doclet) %>
+  const childDoclets = <%= JSON.stringify(children) %>
+
+  const isPublic = ({ undocumented, access }) => !undocumented && (!access || access === 'public')
+
+  export default {
+    name: '<%= cmpName %>',
+    components: { <%= _.map(components, 'importVar').join(', ') %> },
+    doclet,
+    childDoclets,
+    computed: {
+      doclet () {
+        return doclet
+      },
+      childDoclets () {
+        return childDoclets
+      },
+      props () {
+        return childDoclets.filter(d => isPublic(d) && d.vueProp && d.memberof === doclet.longname)
+          .sort((a, b) => {
+            return a.name.toLowerCase() === b.name.toLowerCase()
+              ? 0
+              : (
+                a.name.toLowerCase() < b.name.toLowerCase()
+                  ? -1
+                  : 1
+              )
+          })
+      },
+      methods () {
+        return childDoclets.filter(d => isPublic(d) && d.vueMethod && d.memberof === doclet.longname)
+          .sort((a, b) => {
+            return a.name.toLowerCase() === b.name.toLowerCase()
+              ? 0
+              : (
+                a.name.toLowerCase() < b.name.toLowerCase()
+                  ? -1
+                  : 1
+              )
+          })
+      },
+    },
+    methods: {
+      scrollTo (id) {
+        let elem = this.$el.querySelector('#' + id)
+        if (elem) {
+          Velocity(elem, 'scroll', {
+            duration: 750,
+            easing: 'easeOutCube',
+          })
+        }
+      },
+    },
+  }
+</script>
+
+<style lang="sass">
+  @import ./styles/variables
+
+  .<%= cmpName %>
+    .type
+      font-family: monospace
+      color: lighten($dark, 30%)
+</style>

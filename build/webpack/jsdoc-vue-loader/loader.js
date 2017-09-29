@@ -5,6 +5,17 @@ const loaderUtils = require('loader-utils')
 const marked = require('marked')
 const hljs = require('highlight.js')
 
+const emptyDocCmp = `
+<template>
+  <div></div>
+</template>
+<script>
+  export default {
+    name: 'empty-doc',
+  }
+</script>
+`
+
 module.exports = function (source) {
   const callback = this.async()
   this.cacheable && this.cacheable()
@@ -17,15 +28,20 @@ module.exports = function (source) {
   let tplPath = opts.tpl
   let matchObj = omit(['tpl'], opts)
   if (!path.isAbsolute(tplPath)) {
-    tplPath = path.resolve(__dirname, tplPath)
+    tplPath = path.resolve(this.context, tplPath)
   }
+  this.addDependency(tplPath)
 
   Promise.resolve(matchObj)
     .then(forSearch => {
       // find main module entry doclet and child members
       const matchesPredicate = matches(forSearch)
+      let doclet = find(doclet => !doclet.undocumented && matchesPredicate(doclet), jsdocDoclets)
+      if (!doclet) {
+        throw new Error('Doclet not found by search object: ' + JSON.stringify(forSearch))
+      }
 
-      return find(doclet => !doclet.undocumented && matchesPredicate(doclet), jsdocDoclets)
+      return doclet
     })
     .then(doclet => {
       return {
@@ -42,11 +58,20 @@ module.exports = function (source) {
         .then(tplSource => {
           let tplFunc = template(tplSource)
 
-          return tplFunc({ doclet, children })
+          return tplFunc({
+            doclet,
+            children,
+            '_': require('lodash'),
+            resourceDir: this.context,
+            resourcePath: this.resourcePath,
+          })
         })
     })
     .then(cmpSource => callback(null, cmpSource))
-    .catch(callback)
+    .catch(err => {
+      this.emitWarning(err)
+      callback(null, emptyDocCmp)
+    })
 
   // find module components
   // const components = jsdocDoclets.filter(({ memberof, undocumented, kind }) => {
