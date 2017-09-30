@@ -2,8 +2,6 @@ const path = require('path')
 const fs = require('fs-extra')
 const { template, find, matches, omit } = require('lodash/fp')
 const loaderUtils = require('loader-utils')
-const marked = require('marked')
-const hljs = require('highlight.js')
 
 const emptyDocCmp = `
 <template>
@@ -50,10 +48,6 @@ module.exports = function (source) {
       }
     })
     .then(({ doclet, children }) => {
-      let mdOpts = markdownOptions()
-      parseMarkdown(doclet, mdOpts)
-      children.forEach(doclet => parseMarkdown(doclet, mdOpts))
-
       return fs.readFile(tplPath, 'utf8')
         .then(tplSource => {
           let tplFunc = template(tplSource)
@@ -96,48 +90,4 @@ function findChildren (doclets, parent) {
 
     return all
   }, [])
-}
-
-function markdownOptions () {
-  // todo move to loader options
-  return {
-    breaks: true,
-    langPrefix: 'hljs ',
-    highlight: (code, lang) => lang ? hljs.highlight(lang, code).value : code,
-  }
-}
-
-function parseMarkdown (doclet, options) {
-  const tags = [
-    'author',
-    'classdesc',
-    'description',
-    'exceptions',
-    'params',
-    'properties',
-    'returns',
-    'see',
-    'summary',
-    'examples',
-  ]
-
-  tags.forEach(tag => {
-    if (!doclet.hasOwnProperty(tag)) {
-      return
-    }
-
-    if (typeof doclet[tag] === 'string') {
-      doclet[tag] = marked(doclet[tag], options)
-    } else if (Array.isArray(doclet[tag])) {
-      doclet[tag].forEach((value, index, original) => {
-        let inner = {}
-
-        inner[tag] = value
-        parseMarkdown(inner, options)
-        original[index] = inner[tag]
-      })
-    } else if (doclet[tag]) {
-      parseMarkdown(doclet[tag], options)
-    }
-  })
 }

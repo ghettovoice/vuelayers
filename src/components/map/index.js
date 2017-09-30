@@ -51,7 +51,7 @@ export default {
    * **resolution**, and **rotation** of the map.
    *
    * @see module:map/view
-   * @vueName vl-map
+   * @vueName vl-view
    */
   View,
   /**

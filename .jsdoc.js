@@ -3,6 +3,7 @@ module.exports = {
   plugins: [
     'plugins/underscore',
     'build/jsdoc/vue',
+    'build/jsdoc/markdown',
   ],
   source: {
     include: ['./src'],

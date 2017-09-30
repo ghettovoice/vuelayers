@@ -38,7 +38,7 @@
   const props = {
     /**
      * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
-     * value is used to configure controls. See [ol.control.default()](https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults).
+     * value is used to configure controls. See [`ol.control.default()`](https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults).
      * @type {Object|boolean}
      * @todo remove when vl-control-* components will be ready
      */

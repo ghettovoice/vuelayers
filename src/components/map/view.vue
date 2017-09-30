@@ -22,7 +22,15 @@
     assert,
   } from '../../core'
 
+  /**
+   * @vueProps
+   */
   const props = {
+    /**
+     * The center coordinate of the map view in **EPSG:4326** projection.
+     * @type {number[]}
+     * @vueSync
+     */
     center: {
       type: Array,
       default: () => [0, 0],
@@ -56,10 +64,20 @@
     },
     resolution: Number,
     resolutions: Array,
+    /**
+     * The initial rotation for the view in **radians** (positive rotation clockwise).
+     * @type {number}
+     * @vueSync
+     */
     rotation: {
       type: Number,
       default: 0,
     },
+    /**
+     * Zoom level used to calculate the resolution for the view as `int` value. Only used if `resolution` is not defined.
+     * @type {number}
+     * @vueSync
+     */
     zoom: {
       type: Number,
       default: MIN_ZOOM,
@@ -73,6 +91,9 @@
   const computed = {
   }
 
+  /**
+   * @vueMethods
+   */
   const methods = {
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
@@ -201,7 +222,7 @@
   }
 
   /**
-   * View `vl-view` component.
+   * <h3 id="vl-view">View `vl-view` component.</h3>
    *
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
    * **resolution**, and **rotation** of the map.
@@ -226,7 +247,7 @@
       }
     },
     created () {
-      Object.defineProperties(this, {
+      Object.defineProperties(this, /** @lends module:map/view# */{
         /**
          * @type {ol.View|undefined}
          */
@@ -245,6 +266,7 @@
   /**
    * Subscribe to OpenLayers significant events
    * @return {void}
+   * @this module:map/view
    * @private
    */
   function subscribeToViewChanges () {

@@ -102,7 +102,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     }),
     new SWPrecacheWebpackPlugin({
       cacheId: `${config.name}-docs-app`,
-      filename: utils.assetsPath('js/service-worker.js'),
+      filename: 'service-worker.js',
       minify: true,
       navigateFallback: config.publicPath,
       staticFileGlobsIgnorePatterns: [/dist-docs\/.*\.html/, /img\/\.cache$/],
