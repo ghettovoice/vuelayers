@@ -443,10 +443,11 @@ function isArrayExpression (node) {
 function isLiteral (node) {
   return node.type === 'Literal'
 }
-
+/* eslint-disable no-unused-vars */
 function dump (value) {
   console.dir(value, { depth: null })
 }
+/* eslint-enable no-unused-vars */
 
 function setCommentTag (commentBlock, tag, value = '', append = false, wrap = true) {
   let commentBody = extractCommentBody(commentBlock) || ''
