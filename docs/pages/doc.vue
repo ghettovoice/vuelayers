@@ -4,19 +4,26 @@
       h1.title {{ title }}
       h2.subtitle {{ subtitle }}
 
-    section.section.content
-      p Go to #[router-link(to="/", title="VueLayers Homepage") Home]
+    section.section
+      component(':is'="docCmp")
 </template>
 
 <script>
   import page from './page'
 
   const props = {
+    docCmp: {
+      type: [String, Object, Function],
+      required: true,
+    },
   }
 
   export default {
-    name: 'vld-not-found-page',
+    name: 'vld-doc-page',
     mixins: [page],
     props,
   }
 </script>
+
+<style>
+</style>

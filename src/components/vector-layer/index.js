@@ -1,6 +1,3 @@
-/**
- * @module components/layer/vector
- */
 import Layer from './layer.vue'
 
 export default {

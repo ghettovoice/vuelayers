@@ -3,6 +3,8 @@ const path = require('path')
 const { trimEnd } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
+const hljs = require('highlight.js')
+const marked = require('marked')
 const concat = require('source-map-concat')
 const postcss = require('postcss')
 const config = require('./config')
@@ -147,12 +149,13 @@ function vueLoaderConfig (extract) {
 }
 
 function markdownLoaderConfig () {
-  const hljs = require('highlight.js')
-  const renderer = new (require('marked')).Renderer()
-  renderer.code = (code, lang) => `<pre><code class="hljs ${lang}">${hljs.highlightAuto(code).value}</code></pre>`
+  const renderer = new marked.Renderer()
   renderer.html = html => `<div class="content">${html}</div>`
 
   return {
+    breaks: true,
+    langPrefix: 'hljs ',
+    highlight: (code, lang) => lang ? hljs.highlight(lang, code).value : code,
     renderer,
   }
 }

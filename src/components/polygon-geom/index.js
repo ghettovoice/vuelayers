@@ -1,6 +1,3 @@
-/**
- * @module components/geom/polygon
- */
 import Geom from './geom.vue'
 
 export default {

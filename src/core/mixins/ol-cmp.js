@@ -1,7 +1,3 @@
-/**
- * Basic ol component mixin
- * @module components/ol-cmp
- */
 import { isFunction } from 'lodash/fp'
 import 'rxjs/add/observable/interval'
 import 'rxjs/add/operator/first'
@@ -101,6 +97,9 @@ const methods = {
   refresh: refresh,
 }
 
+/**
+ * Basic ol component mixin
+ */
 export default {
   mixins: [identMap, rxSubs, services],
   props,

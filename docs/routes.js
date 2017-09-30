@@ -1,4 +1,5 @@
 export default [
+  // general
   {
     path: '/',
     meta: {
@@ -24,27 +25,39 @@ export default [
       title: 'Live Demo',
     },
     props: {
-      title: 'C_PKG_FULLNAME demo app',
-      subtitle: 'An example app built with C_PKG_FULLNAME.js',
+      title: 'VueLayers demo app',
+      subtitle: 'An example app built with VueLayers.js',
       color: 'is-primary',
     },
     component: () => import('./pages/demo.vue'),
   },
+  // modules
   {
-    path: '/packages',
-    redirect: '/packages/map',
+    path: '/modules',
+    redirect: '/modules/map',
   },
   {
-    path: '/packages/map',
+    path: '/modules/map',
     meta: {
       title: 'Map',
     },
     props: {
       title: 'Map',
-      subtitle: 'The Core component of C_PKG_FULLNAME',
+      subtitle: 'The core module of VueLayers',
       color: 'is-info',
+      docCmp: () => import('!jsdoc-vue-loader!./jsdoc-index.json?name=module:map&tpl=./jsdoc-vue-cmp.ejs'),
     },
-    component: () => import('./pages/packages/map.vue'),
+    component: () => import('./pages/doc.vue'),
+  },
+  // redirects
+  // todo remove later
+  {
+    path: '/packages',
+    redirect: '/modules/map',
+  },
+  {
+    path: '/packages/map',
+    redirect: '/modules/map',
   },
   {
     path: '*',

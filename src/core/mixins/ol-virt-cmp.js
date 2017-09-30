@@ -1,10 +1,9 @@
-/**
- * Basic ol component with stub VNode, i.e. virtual component
- * @module components/ol-virt-cmp
- */
 import cmp from './ol-cmp'
 import stubVNode from './stub-vnode'
 
+/**
+ * Basic ol component with stub VNode, i.e. virtual component
+ */
 export default {
   mixins: [stubVNode, cmp],
   methods: {

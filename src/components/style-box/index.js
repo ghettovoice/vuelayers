@@ -1,6 +1,3 @@
-/**
- * @module components/style/container
- */
 import Style from './style.vue'
 
 export default {

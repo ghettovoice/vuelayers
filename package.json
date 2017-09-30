@@ -26,7 +26,8 @@
     "docs-start": "cross-env PORT=8082 node build/dev-server.js --name docs",
     "docs-clean": "rm -rf dist-docs",
     "docs-build": "npm run docs-clean && cross-env NODE_ENV=production webpack --config=build/webpack.docs.prod.conf.js --progress",
-    "docs-deploy": "gh-pages -d dist-docs -m 'update doc site' -r git@github.com:VueLayers/vuelayers.github.io.git -b master"
+    "docs-deploy": "gh-pages -d dist-docs -m 'update doc site' -r git@github.com:VueLayers/vuelayers.github.io.git -b master",
+    "jsdoc-parse": "jsdoc -c .jsdoc.js -r -X > docs/jsdoc-index.json"
   },
   "directories": {
     "lib": "lib",
@@ -71,6 +72,7 @@
     "vue": "^2.3.0"
   },
   "devDependencies": {
+    "astring": "^1.0.5",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.26.0",
     "babel-eslint": "^7.2.3",
@@ -83,6 +85,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "buefy": "^0.5.1",
     "bulma": "^0.5.1",
+    "catharsis": "^0.8.9",
     "chai": "^4.1.1",
     "chalk": "^2.1.0",
     "chromedriver": "^2.31.0",
@@ -116,6 +119,7 @@
     "highlight.js": "^9.12.0",
     "html-loader": "^0.5.1",
     "html-webpack-plugin": "^2.30.1",
+    "jsdoc": "^3.5.5",
     "json-loader": "^0.5.7",
     "karma": "^1.7.0",
     "karma-chai": "^0.1.0",
@@ -127,6 +131,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.4",
+    "loader-utils": "^1.1.0",
     "magic-string": "^0.22.4",
     "marked": "^0.3.6",
     "mocha": "^3.5.0",
@@ -160,6 +165,7 @@
     "sw-precache-webpack-plugin": "^0.11.4",
     "text-loader": "0.0.1",
     "url-loader": "^0.5.9",
+    "velocity-animate": "^1.5.0",
     "vue": "^2.4.2",
     "vue-loader": "^13.0.4",
     "vue-router": "^2.7.0",

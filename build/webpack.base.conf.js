@@ -28,6 +28,12 @@ module.exports = {
       [ config.name ]: utils.resolve(''),
     },
   },
+  resolveLoader: {
+    modules: [
+      utils.resolve('build/webpack'),
+      utils.resolve('node_modules'),
+    ],
+  },
   module: {
     rules: [
       {

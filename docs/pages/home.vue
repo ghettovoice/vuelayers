@@ -2,30 +2,30 @@
   div(:class="[$options.name]")
     section.map
       vl-map(ref="map" ':def-controls'="false" ':load-tiles-while-animating'="true" ':load-tiles-while-interacting'="true")
-        vl-view(ref="view" ':zoom'="3" ':min-zoom'="2")/
+        vl-view(ref="view" ':zoom'="3" ':min-zoom'="2")
 
         vl-geoloc('@update:position'="onUpdatePosition")
           template(scope="ctx")
             vl-feature(v-if="ctx.position" id="position-feature")
-              vl-geom-point(:coordinates="ctx.position")/
+              vl-geom-point(:coordinates="ctx.position")
               vl-style-box
-                vl-style-icon(src="../static/img/marker.png" ':scale'="0.4" ':anchor'="[0.5, 1]")/
+                vl-style-icon(src="../static/img/marker.png" ':scale'="0.4" ':anchor'="[0.5, 1]")
 
         vl-layer-tile
-          vl-source-sputnik/
+          vl-source-sputnik
 
     vld-hero
       div.intro.content
         h1.title.
-          #[img(src="../static/img/logo.svg" width="100" alt="C_PKG_FULLNAME Logo")]
+          #[img(src="../static/img/logo.svg" width="100" alt="VueLayers Logo")]
           #[br]
-          C_PKG_FULLNAME
+          VueLayers
         p.subtitle.
           #[a(href="https://vuejs.org/" title="Vue Homepage" target="_blank") Vue 2] components to work with
           #[a(href="https://openlayers.org/" title="OpenLayers Homepage" target="_blank") OpenLayers]
 
         vld-code(lang="bash").
-          npm install --save C_PKG_NAME
+          npm install --save vuelayers
 
       section.buttons
         router-link(to="/demo" class="button is-primary is-large" title="View Live Demo")
@@ -40,7 +40,7 @@
       section.github-buttons.is-flex.is-flex-justify-center
         vld-github-btn(
           user="C_PKG_AUTHOR_USER"
-          repo="C_PKG_NAME"
+          repo="vuelayers"
           type="star"
           ':count'="true"
           size="large"
@@ -49,7 +49,7 @@
         )/
         vld-github-btn(
           user="C_PKG_AUTHOR_USER"
-          repo="C_PKG_NAME"
+          repo="vuelayers"
           type="fork"
           ':count'="true"
           size="large"

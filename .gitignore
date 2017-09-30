@@ -145,3 +145,4 @@ test/unit/coverage
 dist
 lib
 dist-docs
+out

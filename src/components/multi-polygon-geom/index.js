@@ -1,6 +1,3 @@
-/**
- * @module components/geom/multi-polygon
- */
 import Geom from './geom.vue'
 
 export default {

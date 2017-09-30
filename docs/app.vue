@@ -3,16 +3,16 @@
     div.columns.layout
       div.column.left.is-4-tablet.is-3-desktop.is-hidden-mobile.is-fullheight
         vld-sidebar
-          router-link.name(slot="logo", to="/", title="C_PKG_FULLNAME Homepage", exact-active-class="is-active")
+          router-link.name(slot="logo", to="/", title="VueLayers Homepage", exact-active-class="is-active")
             div
-              img(src="./static/img/logo.svg" alt="C_PKG_FULLNAME Logo")
+              img(src="./static/img/logo.svg" alt="VueLayers Logo")
             div
-              span C_PKG_FULLNAME
+              span VueLayers
           a(
             slot="logo"
             href="C_PKG_REPOSITORY/releases/tag/vC_PKG_VERSION"
             target="_blank"
-            title="Download latest version of C_PKG_FULLNAME"
+            title="Download latest version of VueLayers"
           )
             b-tag(type="is-info") vC_PKG_VERSION
 
@@ -30,15 +30,15 @@
 
       div.center.column.is-8-tablet.is-9-desktop.is-offset-4-tablet.is-offset-3-desktop
         vld-navbar.is-hidden-tablet(':menu-active.sync'="navbarMenuActive")
-          vld-navbar-item.logo.has-text-left(slot="brand" link="/" title="C_PKG_FULLNAME Homepage", :router="true")
+          vld-navbar-item.logo.has-text-left(slot="brand" link="/" title="VueLayers Homepage", :router="true")
             div
-              img(src="./static/img/logo.svg" alt="C_PKG_FULLNAME Logo")
+              img(src="./static/img/logo.svg" alt="VueLayers Logo")
             div
-              span C_PKG_FULLNAME
+              span VueLayers
           vld-navbar-item(
             slot="brand"
             link="C_PKG_REPOSITORY/releases/tag/vC_PKG_VERSION"
-            title="Download latest version of C_PKG_FULLNAME"
+            title="Download latest version of VueLayers"
             target="_blank"
           )
             b-tag(type="is-info") vC_PKG_VERSION
@@ -81,7 +81,7 @@
           div.content(slot="left")
             p
               small.
-                #[router-link(to="/" title="C_PKG_FULLNAME Homepage") C_PKG_FULLNAME] is licensed under
+                #[router-link(to="/" title="VueLayers Homepage") VueLayers] is licensed under
                 #[a(href="C_PKG_LICENSE_URL" target="_blank" title="View license text") C_PKG_LICENSE_NAME]
                 #[br]
                 &copy; {{ new Date().getFullYear() }} #[a(href="C_PKG_AUTHOR_HOMEPAGE" title="C_PKG_AUTHOR_NAME Homepage" target="_blank") C_PKG_AUTHOR_NAME]

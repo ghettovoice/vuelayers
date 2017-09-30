@@ -1,4 +1,7 @@
 <script>
+  /**
+   * @module map/view
+   */
   import Vue from 'vue'
   import View from 'ol/view'
   import { isEqual, isPlainObject, noop } from 'lodash/fp'
@@ -197,6 +200,14 @@
     },
   }
 
+  /**
+   * View `vl-view` component.
+   *
+   * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
+   * **resolution**, and **rotation** of the map.
+   *
+   * @vueProto
+   */
   export default {
     name: 'vl-view',
     mixins: [olVirtCmp],

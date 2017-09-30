@@ -1,6 +1,5 @@
 /**
  * Renders stub VNode for component.
- * @module mixins/stub-vnode
  */
 export default {
   /**

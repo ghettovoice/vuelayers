@@ -1,6 +1,3 @@
-/**
- * @module components/source/vector
- */
 import Source from './source.vue'
 
 export default {

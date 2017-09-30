@@ -1,5 +1,9 @@
 import * as components from './cmps'
 
+/**
+ * Registers all VueLayers components.
+ * @param {Vue} Vue
+ */
 export default function install (Vue) {
   if (install.installed) return
   install.installed = true
