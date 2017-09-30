@@ -9171,7 +9171,7 @@
         "meta": {
             "range": [
                 3376,
-                9446
+                9447
             ],
             "filename": "map.vue",
             "lineno": 114,
@@ -10329,11 +10329,11 @@
         "memberof": "module:map/map"
     },
     {
-        "comment": "/**\n* Trigger focus on map container.\n   * @return {void}\n * @vueMethod\n */",
+        "comment": "/**\n* Triggers focus on map container.\n   * @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                7503,
-                7538
+                7504,
+                7539
             ],
             "filename": "map.vue",
             "lineno": 277,
@@ -10345,7 +10345,7 @@
                 "type": "FunctionExpression"
             }
         },
-        "description": "Trigger focus on map container.",
+        "description": "Triggers focus on map container.",
         "returns": [
             {
                 "type": {
@@ -10364,11 +10364,11 @@
         "scope": "instance"
     },
     {
-        "comment": "/**\n* @param {number[]} pixel\n   * @param {function((ol.Feature|ol.render.Feature), ?ol.layer.Layer): *} callback\n   * @param {Object} [opts]\n   * @return {T|undefined}\n * @vueMethod\n */",
+        "comment": "/**\n* @param {number[]} pixel\n   * @param {function((ol.Feature|ol.render.Feature), ?ol.layer.Layer): *} callback\n   * @param {Object} [opts]\n   * @return {*|undefined}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                7722,
-                7869
+                7723,
+                7870
             ],
             "filename": "map.vue",
             "lineno": 286,
@@ -10414,11 +10414,11 @@
             {
                 "type": {
                     "names": [
-                        "T",
+                        "*",
                         "undefined"
                     ]
                 },
-                "typeExpression": "T|undefined"
+                "typeExpression": "*|undefined"
             }
         ],
         "vueMethod": true,
@@ -10429,11 +10429,11 @@
         "scope": "instance"
     },
     {
-        "comment": "/**\n* @param {number[]} pixel\n   * @param {function(ol.layer.Layer, ?(number[]|Uint8Array)): *} callback\n   * @param {function(ol.layer.Layer): boolean} [layerFilter]\n   * @return {T|undefined}\n * @vueMethod\n */",
+        "comment": "/**\n* @param {number[]} pixel\n   * @param {function(ol.layer.Layer, ?(number[]|Uint8Array)): *} callback\n   * @param {function(ol.layer.Layer): boolean} [layerFilter]\n   * @return {*|undefined}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8078,
-                8241
+                8079,
+                8242
             ],
             "filename": "map.vue",
             "lineno": 297,
@@ -10479,11 +10479,11 @@
             {
                 "type": {
                     "names": [
-                        "T",
+                        "*",
                         "undefined"
                     ]
                 },
-                "typeExpression": "T|undefined"
+                "typeExpression": "*|undefined"
             }
         ],
         "vueMethod": true,
@@ -10497,8 +10497,8 @@
         "comment": "/**\n* @param {ol.View|Vue|undefined} view\n   * @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8318,
-                8540
+                8319,
+                8541
             ],
             "filename": "map.vue",
             "lineno": 306,
@@ -10548,8 +10548,8 @@
         "comment": "",
         "meta": {
             "range": [
-                8339,
-                8385
+                8340,
+                8386
             ],
             "filename": "map.vue",
             "lineno": 307,
@@ -10575,8 +10575,8 @@
         "comment": "",
         "meta": {
             "range": [
-                8424,
-                8441
+                8425,
+                8442
             ],
             "filename": "map.vue",
             "lineno": 310,
@@ -10602,8 +10602,8 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8592,
-                8710
+                8593,
+                8711
             ],
             "filename": "map.vue",
             "lineno": 320,
@@ -10637,8 +10637,8 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8762,
-                8863
+                8763,
+                8864
             ],
             "filename": "map.vue",
             "lineno": 330,
@@ -10672,8 +10672,8 @@
         "comment": "/**\n* Triggers map re-render.\n   * @return {Promise}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8931,
-                9030
+                8932,
+                9031
             ],
             "filename": "map.vue",
             "lineno": 339,
@@ -10710,8 +10710,8 @@
         "comment": "/**\n* @return {Promise}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9069,
-                9231
+                9070,
+                9232
             ],
             "filename": "map.vue",
             "lineno": 348,
@@ -10747,8 +10747,8 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9283,
-                9337
+                9284,
+                9338
             ],
             "filename": "map.vue",
             "lineno": 360,
@@ -10782,8 +10782,8 @@
         "comment": "/**\n* @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9373,
-                9443
+                9374,
+                9444
             ],
             "filename": "map.vue",
             "lineno": 366,
@@ -10816,8 +10816,8 @@
         "comment": "/**\n* <h3 id=\"vl-map\">Map `vl-map` component.</h3>\n *\n * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n * rendering and low level interaction events.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-map\n * @mixes olCmp\n * @mixes layersContainer\n * @mixes interactionsContainer\n * @mixes overlaysContainer\n * @mixes featuresContainer\n */",
         "meta": {
             "range": [
-                9676,
-                10629
+                9677,
+                10630
             ],
             "filename": "map.vue",
             "lineno": 380,
@@ -10850,8 +10850,8 @@
         "comment": "",
         "meta": {
             "range": [
-                9695,
-                9709
+                9696,
+                9710
             ],
             "filename": "map.vue",
             "lineno": 381,
@@ -10875,8 +10875,8 @@
         "comment": "",
         "meta": {
             "range": [
-                9713,
-                9806
+                9714,
+                9807
             ],
             "filename": "map.vue",
             "lineno": 382,
@@ -10900,8 +10900,8 @@
         "comment": "",
         "meta": {
             "range": [
-                9810,
-                9815
+                9811,
+                9816
             ],
             "filename": "map.vue",
             "lineno": 383,
@@ -10925,8 +10925,8 @@
         "comment": "",
         "meta": {
             "range": [
-                9819,
-                9826
+                9820,
+                9827
             ],
             "filename": "map.vue",
             "lineno": 384,
@@ -10950,8 +10950,8 @@
         "comment": "/**\n   * @this module:map/map\n   */",
         "meta": {
             "range": [
-                9868,
-                10539
+                9869,
+                10540
             ],
             "filename": "map.vue",
             "lineno": 388,
@@ -10979,8 +10979,8 @@
         "comment": "/**\n     * @type {ol.View|undefined}\n     * @private\n     */",
         "meta": {
             "range": [
-                9950,
-                9972
+                9951,
+                9973
             ],
             "filename": "map.vue",
             "lineno": 393,
@@ -11012,8 +11012,8 @@
         "comment": "/**\n     * @type {ol.layer.Vector}\n     * @private\n     */",
         "meta": {
             "range": [
-                10040,
-                10119
+                10041,
+                10120
             ],
             "filename": "map.vue",
             "lineno": 398,
@@ -11044,8 +11044,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10085,
-                10111
+                10086,
+                10112
             ],
             "filename": "map.vue",
             "lineno": 399,
@@ -11069,8 +11069,8 @@
         "comment": "/**\n       * OpenLayers map instance.\n       * @type {ol.Map|undefined}\n       */",
         "meta": {
             "range": [
-                10280,
-                10356
+                10281,
+                10357
             ],
             "filename": "map.vue",
             "lineno": 407,
@@ -11101,8 +11101,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10296,
-                10312
+                10297,
+                10313
             ],
             "filename": "map.vue",
             "lineno": 408,
@@ -11126,8 +11126,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10322,
-                10347
+                10323,
+                10348
             ],
             "filename": "map.vue",
             "lineno": 409,
@@ -11150,8 +11150,8 @@
         "comment": "/**\n       * OpenLayers view instance.\n       * @type {ol.View|undefined}\n       */",
         "meta": {
             "range": [
-                10454,
-                10527
+                10455,
+                10528
             ],
             "filename": "map.vue",
             "lineno": 415,
@@ -11182,8 +11182,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10471,
-                10487
+                10472,
+                10488
             ],
             "filename": "map.vue",
             "lineno": 416,
@@ -11207,8 +11207,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10497,
-                10518
+                10498,
+                10519
             ],
             "filename": "map.vue",
             "lineno": 417,
@@ -11231,8 +11231,8 @@
         "comment": "/**\n   * @this module:map/map\n   */",
         "meta": {
             "range": [
-                10581,
-                10626
+                10582,
+                10627
             ],
             "filename": "map.vue",
             "lineno": 424,
@@ -11258,8 +11258,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10600,
-                10622
+                10601,
+                10623
             ],
             "filename": "map.vue",
             "lineno": 425,
@@ -11285,8 +11285,8 @@
         "comment": "/**\n * Subscribe to OL map events.\n * @return {void}\n * @this module:map/map\n * @private\n */",
         "meta": {
             "range": [
-                10724,
-                11573
+                10725,
+                11574
             ],
             "filename": "map.vue",
             "lineno": 435,
@@ -11330,8 +11330,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10813,
-                10821
+                10814,
+                10822
             ],
             "filename": "map.vue",
             "lineno": 439,
@@ -11356,8 +11356,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10843,
-                11274
+                10844,
+                11275
             ],
             "filename": "map.vue",
             "lineno": 441,
@@ -11382,8 +11382,8 @@
         "comment": "",
         "meta": {
             "range": [
-                11192,
-                11267
+                11193,
+                11268
             ],
             "filename": "map.vue",
             "lineno": 454,
@@ -11407,8 +11407,8 @@
         "comment": "",
         "meta": {
             "range": [
-                11294,
-                11434
+                11295,
+                11435
             ],
             "filename": "map.vue",
             "lineno": 457,
@@ -11433,8 +11433,8 @@
         "comment": "",
         "meta": {
             "range": [
-                11444,
-                11509
+                11445,
+                11510
             ],
             "filename": "map.vue",
             "lineno": 465,

@@ -287,7 +287,7 @@
      * @param {number[]} pixel
      * @param {function((ol.Feature|ol.render.Feature), ?ol.layer.Layer): *} callback
      * @param {Object} [opts]
-     * @return {T|undefined}
+     * @return {*|undefined}
      */
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       assert.hasMap(this)
@@ -298,7 +298,7 @@
      * @param {number[]} pixel
      * @param {function(ol.layer.Layer, ?(number[]|Uint8Array)): *} callback
      * @param {function(ol.layer.Layer): boolean} [layerFilter]
-     * @return {T|undefined}
+     * @return {*|undefined}
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
       assert.hasMap(this)
