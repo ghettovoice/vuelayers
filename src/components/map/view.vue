@@ -222,7 +222,7 @@
   }
 
   /**
-   * <h3 id="vl-view">View `vl-view` component.</h3>
+   * ### View `vl-view`
    *
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
    * **resolution**, and **rotation** of the map.

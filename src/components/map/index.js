@@ -7,8 +7,8 @@ import View from './view.vue'
 /**
  * Map module consists of two main components:
  *
- * - <a @click="scrollTo('vl-map')">Map `vl-map`</a> - viewport, map rendering and low level interactions.
- * - <a @click="scrollTo('vl-view')">View `vl-view`</a> - 2D view of the map
+ * - {@link module:map/map|Map `vl-map`} - viewport, map rendering and low level interactions.
+ * - {@link module:map/map|View `vl-view`} - 2D view of the map
  *
  * @example **Install**
  * ```js
@@ -35,23 +35,17 @@ import View from './view.vue'
  */
 export default {
   /**
-   * Map `vl-map` component.
-   *
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.
    *
-   * @see module:map/map
-   * @vueName vl-map
+   * @see {@link module:map/map}
    */
   Map,
   /**
-   * View `vl-view` component.
-   *
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
    * **resolution**, and **rotation** of the map.
    *
-   * @see module:map/view
-   * @vueName vl-view
+   * @see {@link module:map/view}
    */
   View,
   /**

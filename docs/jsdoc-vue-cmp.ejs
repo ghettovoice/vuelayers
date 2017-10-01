@@ -1,45 +1,48 @@
 <%
-/* global _, doclet, children */
+/* global _, doclet, children, allDoclets */
 let filePath = [doclet.meta.path, doclet.meta.filename].join('/')
-let components = []
 
+const nameToIdent = string => string.replace(/^module:/, '').replace('/', '-').toLowerCase()
 const kebabCase = string => _.kebabCase(_.lowerFirst(string))
 const camelCase = string => _.camelCase(_.upperFirst(string))
 
+doclet.ident = nameToIdent(doclet.name)
+doclet.longIdent = nameToIdent(doclet.longname)
+
+let cmpName = 'vld-module-' + doclet.ident + '-doc'
+let examples = doclet.examples || []
+// if current doclet is for an entry index file the find all components of that module
+let components = []
 if (/components\/[^\/]+\/index\.js$/.test(filePath)) {
   components = children.reduce((all, child) => {
-    if (!child.vueName) return all
+    let cmpDoclet = allDoclets.find(({longname, vueProto}) => {
+      return longname === child.longname.replace('.', '/').toLowerCase() && vueProto
+    })
 
-    let cmpLongName = [
-      doclet.longname,
-      kebabCase(child.name),
-    ].join('/')
+    if (!cmpDoclet) return all
+
     let importVar = camelCase([
       'module',
-      doclet.longname.replace(/^module:/, '').replace('/', '-'),
-      child.name.replace(/^module:/, '').replace('/', '-'),
+      nameToIdent(cmpDoclet.longname),
       'doc'
     ].join('-'))
 
     return all.concat({
-      vueName: child.vueName,
-      cmpLongName,
       importVar,
+      longname: cmpDoclet.longname,
+      vueName: cmpDoclet.vueName,
     })
   }, [])
 }
 
-let cmpName = 'vld-module-' + doclet.name.replace(/^module:/, '').replace('/', '-') + '-doc'
+print(JSON.stringify(components))
 %>
 
 <template>
-  <div class="content" :class="$options.name">
+  <div :id="id" class="content" :class="$options.name">
     <%= doclet.description %>
 
-    <%
-    let examples = doclet.examples || []
-    examples.forEach(function (example) {
-    %>
+    <% examples.forEach(function (example) { %>
       <%= example %>
     <% }) %>
 
@@ -93,31 +96,35 @@ let cmpName = 'vld-module-' + doclet.name.replace(/^module:/, '').replace('/', '
 
     <hr/>
 
-    <% if (components.length) { %>
     <% components.forEach(function ({ importVar }) { %>
     <<%= kebabCase(importVar) %> />
     <% }) %>
-    <% } %>
   </div>
 </template>
 
 <script>
   import Velocity from 'velocity-animate'
-  <% components.forEach(function ({ cmpLongName, importVar, vueName }) { %>
-  import <%= importVar %> from '!jsdoc-vue-loader!./jsdoc-index.json?longname=<%= cmpLongName %>&+vueProto&vueName=<%= vueName %>&tpl=./jsdoc-vue-cmp.ejs'
+  // import all module components with jsdoc-vue-loader
+  <% components.forEach(function ({longname, importVar}) { %>
+  import <%= importVar %> from '!jsdoc-vue-loader!./jsdoc-index.json?longname=<%= longname %>&+vueProto&tpl=./jsdoc-vue-cmp.ejs'
   <% }) %>
-
+  // export template variables
   const doclet = <%= JSON.stringify(doclet) %>
   const childDoclets = <%= JSON.stringify(children) %>
 
-  const isPublic = ({ undocumented, access }) => !undocumented && (!access || access === 'public')
+  const isPublic = ({undocumented, access}) => !undocumented && (!access || access === 'public')
 
   export default {
     name: '<%= cmpName %>',
-    components: { <%= _.map(components, 'importVar').join(', ') %> },
+    components: {
+      <%= _.map(components, 'importVar').join(', ') %>
+    },
     doclet,
     childDoclets,
     computed: {
+      id () {
+        return this.doclet.longIdent
+      },
       doclet () {
         return doclet
       },

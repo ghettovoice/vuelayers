@@ -55,6 +55,7 @@ module.exports = function (source) {
           return tplFunc({
             doclet,
             children,
+            allDoclets: jsdocDoclets,
             '_': require('lodash'),
             resourceDir: this.context,
             resourcePath: this.resourcePath,
@@ -66,20 +67,6 @@ module.exports = function (source) {
       this.emitWarning(err)
       callback(null, emptyDocCmp)
     })
-
-  // find module components
-  // const components = jsdocDoclets.filter(({ memberof, undocumented, kind }) => {
-  //   return memberof === moduleDoclet.longname && kind === 'member' && !undocumented
-  // }).reduce((components, { name, memberof }) => {
-  //   let cmpLongname = [memberof, kebabCase(lowerFirst(name))].join('/')
-  //   let component = jsdocDoclets.find(({ vueProto, longname, undocumented }) => vueProto && longname === cmpLongname && !undocumented)
-  //
-  //   if (component) {
-  //     component.members = jsdocDoclets.filter(({ memberof, undocumented }) => memberof === cmpLongname && !undocumented)
-  //   }
-  //
-  //   return components.concat(component)
-  // }, [])
 }
 
 function findChildren (doclets, parent) {

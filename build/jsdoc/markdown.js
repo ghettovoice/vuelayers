@@ -1,12 +1,8 @@
 const marked = require('marked')
 const hljs = require('highlight.js')
-const templateHelper = require('jsdoc/lib/jsdoc/util/templateHelper')
 
 exports.handlers = {
   newDoclet ({doclet}) {
-    // resolve jsdoc link tags
-    doclet.description = templateHelper.resolveLinks(doclet.description)
-
     let mdOpts = markdownOptions()
     parseMarkdown(doclet, mdOpts)
   },

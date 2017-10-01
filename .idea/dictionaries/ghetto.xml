@@ -60,6 +60,7 @@
       <w>minified</w>
       <w>minifier</w>
       <w>mixins</w>
+      <w>monospace</w>
       <w>moveend</w>
       <w>movestart</w>
       <w>multiline</w>
@@ -89,6 +90,7 @@
       <w>propertychange</w>
       <w>regenerator</w>
       <w>removefeature</w>
+      <w>replacers</w>
       <w>reproj</w>
       <w>reprojection</w>
       <w>screenview</w>
