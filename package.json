@@ -157,7 +157,7 @@
     "rollup-plugin-vue": "^2.5.1",
     "rollup-pluginutils": "^2.0.1",
     "sass-loader": "^6.0.6",
-    "selenium-server": "^3.6.0",
+    "selenium-server": "^3.5.3",
     "sinon": "^4.0.0",
     "sinon-chai": "^2.14.0",
     "source-map-concat": "^1.0.1",
