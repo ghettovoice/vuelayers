@@ -20,7 +20,7 @@ doclet.ident = nameToIdent(doclet.name)
 doclet.longIdent = nameToIdent(doclet.longname)
 
 let cmpName = 'vld-module-' + doclet.ident + '-doc'
-let examples = doclet.examples || []
+// vue parts
 let mixins = doclet.mixes || []
 let props = []
 let dataProps = []
@@ -61,6 +61,9 @@ methods.sort(alphabetSorter)
 // if current doclet is for an entry index file the find all components of that module
 let components = []
 if (/components\/[^\/]+\/index\.js$/.test(filePath)) {
+  // first paragraph is always should be title
+  doclet.description = doclet.description.replace(/^<p[^/]*>.*<\/p>/, '')
+
   components = children.reduce((all, child) => {
     let cmpDoclet = allDoclets.find(({longname, vueProto}) => {
       return longname === child.longname.replace('.', '/').toLowerCase() && vueProto
@@ -80,7 +83,24 @@ if (/components\/[^\/]+\/index\.js$/.test(filePath)) {
       vueName: cmpDoclet.vueName,
     })
   }, [])
+} else {
+  // first paragraph is always should be title
+  doclet.description = doclet.description.replace(/^<p([^/]*)>(.*)<\/p>(.*)/, '<h3$1>$2</h3>$3')
 }
+
+// examples
+let examples = (doclet.examples || []).map(function (example) {
+  let caption, code, lang = ''
+  let match = example.match(/^\s*(?:<caption>)?([^[\]\n\r]+?)?(?:<\/caption>)?(?:\s*\[([\w]*)])?[\n\r]([\s\S]+)$/i)
+
+  if (match) {
+    caption = match[1] || ''
+    lang = match[2] || ''
+    code = match[3] || ''
+  }
+
+  return `<vld-code title="${caption}" lang="${lang}">${_.escape(code)}</vld-code>`
+})
 %>
 
 <template>

@@ -8344,11 +8344,11 @@
         "longname": "module:map"
     },
     {
-        "comment": "/**\n * Map module consists of two main components:\n *\n * - {@link module:map/map|Map `vl-map`} - viewport, map rendering and low level interactions.\n * - {@link module:map/map|View `vl-view`} - 2D view of the map\n *\n * @example **Install**\n * ```js\n * import Vue from 'vue'\n * // import module and styles\n * import { Map } from 'vuelayers'\n * // or\n * import Map from 'vuelayers/lib/map'\n * // import VueLayers styles\n * import 'vuelayers/lib/style.css'\n * // register vl-map and vl-view components\n * Vue.use(Map)\n * ```\n * @example **Usage**\n * ```html\n * <vl-map :load-tiles-while-animating=\"true\" :load-tiles-while-interacting=\"true\">\n *   <vl-view :center=\"[0, 0]\" :zoom=\"3\" :rotation=\"0\"></vl-view>\n *\n *   <vl-layer-tile>\n *     <vl-source-osm></vl-source-osm>\n *   </vl-layer-tile>\n * </vl-map>\n * ```\n */",
+        "comment": "/**\n * Map module\n *\n * It is the start point of every **VueLayers** based application.\n * It consists of two main components:\n *\n * - {@link module:map/map|Map `vl-map`} - viewport, map rendering and low level interactions\n * - {@link module:map/view|View `vl-view`} - 2D view of the map\n *\n * @example Install\n * import Vue from 'vue'\n * // import module and styles\n * import { Map } from 'vuelayers'\n * // or\n * import Map from 'vuelayers/lib/map'\n * // import VueLayers styles\n * import 'vuelayers/lib/style.css'\n * // register vl-map and vl-view components\n * Vue.use(Map)\n *\n * @example Usage [html]\n * <vl-map :load-tiles-while-animating=\"true\" :load-tiles-while-interacting=\"true\">\n *   <vl-view :center=\"[0, 0]\" :zoom=\"3\" :rotation=\"0\"></vl-view>\n *\n *   <vl-layer-tile>\n *     <vl-source-osm></vl-source-osm>\n *   </vl-layer-tile>\n * </vl-map>\n */",
         "meta": {
             "range": [
-                896,
-                1555
+                940,
+                1522
             ],
             "filename": "index.js",
             "lineno": 36,
@@ -8360,24 +8360,24 @@
                 "type": "ObjectExpression"
             }
         },
-        "description": "<p>Map module consists of two main components:</p>\n<ul>\n<li><a @click=\"scrollTo('map-map')\">Map <code>vl-map</code></a> - viewport, map rendering and low level interactions.</li>\n<li><a @click=\"scrollTo('map-map')\">View <code>vl-view</code></a> - 2D view of the map</li>\n</ul>\n",
+        "description": "<p>Map module</p>\n<p>It is the start point of every <strong>VueLayers</strong> based application.\nIt consists of two main components:</p>\n<ul>\n<li><a @click=\"scrollTo('map-map')\">Map <code>vl-map</code></a> - viewport, map rendering and low level interactions</li>\n<li><a @click=\"scrollTo('map-view')\">View <code>vl-view</code></a> - 2D view of the map</li>\n</ul>\n",
         "examples": [
-            "<p><strong>Install</strong></p>\n<pre><code class=\"hljs js\"><span class=\"hljs-keyword\">import</span> Vue <span class=\"hljs-keyword\">from</span> <span class=\"hljs-string\">'vue'</span>\n<span class=\"hljs-comment\">// import module and styles</span>\n<span class=\"hljs-keyword\">import</span> { <span class=\"hljs-built_in\">Map</span> } <span class=\"hljs-keyword\">from</span> <span class=\"hljs-string\">'vuelayers'</span>\n<span class=\"hljs-comment\">// or</span>\n<span class=\"hljs-keyword\">import</span> <span class=\"hljs-built_in\">Map</span> <span class=\"hljs-keyword\">from</span> <span class=\"hljs-string\">'vuelayers/lib/map'</span>\n<span class=\"hljs-comment\">// import VueLayers styles</span>\n<span class=\"hljs-keyword\">import</span> <span class=\"hljs-string\">'vuelayers/lib/style.css'</span>\n<span class=\"hljs-comment\">// register vl-map and vl-view components</span>\nVue.use(<span class=\"hljs-built_in\">Map</span>)\n</code></pre>\n",
-            "<p><strong>Usage</strong></p>\n<pre><code class=\"hljs html\"><span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-map</span> <span class=\"hljs-attr\">:load-tiles-while-animating</span>=<span class=\"hljs-string\">\"true\"</span> <span class=\"hljs-attr\">:load-tiles-while-interacting</span>=<span class=\"hljs-string\">\"true\"</span>&gt;</span>\n  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-view</span> <span class=\"hljs-attr\">:center</span>=<span class=\"hljs-string\">\"[0, 0]\"</span> <span class=\"hljs-attr\">:zoom</span>=<span class=\"hljs-string\">\"3\"</span> <span class=\"hljs-attr\">:rotation</span>=<span class=\"hljs-string\">\"0\"</span>&gt;</span><span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-view</span>&gt;</span>\n\n  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-layer-tile</span>&gt;</span>\n    <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-source-osm</span>&gt;</span><span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-source-osm</span>&gt;</span>\n  <span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-layer-tile</span>&gt;</span>\n<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-map</span>&gt;</span>\n</code></pre>\n"
+            "Install\nimport Vue from 'vue'\n// import module and styles\nimport { Map } from 'vuelayers'\n// or\nimport Map from 'vuelayers/lib/map'\n// import VueLayers styles\nimport 'vuelayers/lib/style.css'\n// register vl-map and vl-view components\nVue.use(Map)",
+            "Usage [html]\n<vl-map :load-tiles-while-animating=\"true\" :load-tiles-while-interacting=\"true\">\n  <vl-view :center=\"[0, 0]\" :zoom=\"3\" :rotation=\"0\"></vl-view>\n\n  <vl-layer-tile>\n    <vl-source-osm></vl-source-osm>\n  </vl-layer-tile>\n</vl-map>"
         ],
         "name": "module:map",
         "longname": "module:map",
         "kind": "member"
     },
     {
-        "comment": "/**\n   * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n   * rendering and low level interaction events.\n   *\n   * @see {@link module:map/map}\n   */",
+        "comment": "/**\n   * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n   * rendering and low level interaction events.\n   */",
         "meta": {
             "range": [
-                1122,
-                1125
+                1128,
+                1131
             ],
             "filename": "index.js",
-            "lineno": 43,
+            "lineno": 41,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8388,9 +8388,6 @@
             }
         },
         "description": "<p>Container for <strong>layers</strong>, <strong>interactions</strong>, <strong>controls</strong> and <strong>overlays</strong>. It responsible for viewport\nrendering and low level interaction events.</p>\n",
-        "see": [
-            "<p><router-link to=\"map\">module:map/map</router-link></p>\n"
-        ],
         "name": "Map",
         "longname": "module:map.Map",
         "kind": "member",
@@ -8398,14 +8395,14 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n   * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n   * **resolution**, and **rotation** of the map.\n   *\n   * @see {@link module:map/view}\n   */",
+        "comment": "/**\n   * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n   * **resolution**, and **rotation** of the map.\n   */",
         "meta": {
             "range": [
-                1339,
-                1343
+                1306,
+                1310
             ],
             "filename": "index.js",
-            "lineno": 50,
+            "lineno": 46,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -8416,9 +8413,6 @@
             }
         },
         "description": "<p>Represents a simple <strong>2D view</strong> of the map. This is the component to act upon to change the <strong>center</strong>,\n<strong>resolution</strong>, and <strong>rotation</strong> of the map.</p>\n",
-        "see": [
-            "<p><router-link to=\"map\">module:map/view</router-link></p>\n"
-        ],
         "name": "View",
         "longname": "module:map.View",
         "kind": "member",
@@ -8429,11 +8423,11 @@
         "comment": "/**\n   * Registers Map and View components with default names.\n   *\n   * @param {Vue} Vue\n   * @return {void}\n   */",
         "meta": {
             "range": [
-                1465,
-                1552
+                1432,
+                1519
             ],
             "filename": "index.js",
-            "lineno": 57,
+            "lineno": 53,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10811,11 +10805,11 @@
         "scope": "instance"
     },
     {
-        "comment": "/**\n* ### Map `vl-map`\n *\n * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n * rendering and low level interaction events.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-map\n * @mixes olCmp\n * @mixes layersContainer\n * @mixes interactionsContainer\n * @mixes overlaysContainer\n * @mixes featuresContainer\n */",
+        "comment": "/**\n* Map `vl-map` component\n *\n * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n * rendering and low level interaction events.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-map\n * @mixes olCmp\n * @mixes layersContainer\n * @mixes interactionsContainer\n * @mixes overlaysContainer\n * @mixes featuresContainer\n */",
         "meta": {
             "range": [
-                9722,
-                10675
+                9728,
+                10681
             ],
             "filename": "map.vue",
             "lineno": 382,
@@ -10827,7 +10821,7 @@
                 "type": "ObjectExpression"
             }
         },
-        "description": "<h3 id=\"map-vl-map-\">Map <code>vl-map</code></h3>\n<p>Container for <strong>layers</strong>, <strong>interactions</strong>, <strong>controls</strong> and <strong>overlays</strong>. It responsible for viewport\nrendering and low level interaction events.</p>\n",
+        "description": "<p>Map <code>vl-map</code> component</p>\n<p>Container for <strong>layers</strong>, <strong>interactions</strong>, <strong>controls</strong> and <strong>overlays</strong>. It responsible for viewport\nrendering and low level interaction events.</p>\n",
         "vueProto": true,
         "augments": [
             "Vue"
@@ -10848,8 +10842,8 @@
         "comment": "",
         "meta": {
             "range": [
-                9741,
-                9755
+                9747,
+                9761
             ],
             "filename": "map.vue",
             "lineno": 383,
@@ -10873,8 +10867,8 @@
         "comment": "",
         "meta": {
             "range": [
-                9759,
-                9852
+                9765,
+                9858
             ],
             "filename": "map.vue",
             "lineno": 384,
@@ -10898,8 +10892,8 @@
         "comment": "",
         "meta": {
             "range": [
-                9856,
-                9861
+                9862,
+                9867
             ],
             "filename": "map.vue",
             "lineno": 385,
@@ -10923,8 +10917,8 @@
         "comment": "",
         "meta": {
             "range": [
-                9865,
-                9872
+                9871,
+                9878
             ],
             "filename": "map.vue",
             "lineno": 386,
@@ -10948,8 +10942,8 @@
         "comment": "/**\n   * @this module:map/map\n   */",
         "meta": {
             "range": [
-                9914,
-                10585
+                9920,
+                10591
             ],
             "filename": "map.vue",
             "lineno": 390,
@@ -10977,8 +10971,8 @@
         "comment": "/**\n     * @type {ol.View|undefined}\n     * @private\n     */",
         "meta": {
             "range": [
-                9996,
-                10018
+                10002,
+                10024
             ],
             "filename": "map.vue",
             "lineno": 395,
@@ -11010,8 +11004,8 @@
         "comment": "/**\n     * @type {ol.layer.Vector}\n     * @private\n     */",
         "meta": {
             "range": [
-                10086,
-                10165
+                10092,
+                10171
             ],
             "filename": "map.vue",
             "lineno": 400,
@@ -11042,8 +11036,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10131,
-                10157
+                10137,
+                10163
             ],
             "filename": "map.vue",
             "lineno": 401,
@@ -11067,8 +11061,8 @@
         "comment": "/**\n       * OpenLayers map instance.\n       * @type {ol.Map|undefined}\n       */",
         "meta": {
             "range": [
-                10326,
-                10402
+                10332,
+                10408
             ],
             "filename": "map.vue",
             "lineno": 409,
@@ -11099,8 +11093,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10342,
-                10358
+                10348,
+                10364
             ],
             "filename": "map.vue",
             "lineno": 410,
@@ -11124,8 +11118,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10368,
-                10393
+                10374,
+                10399
             ],
             "filename": "map.vue",
             "lineno": 411,
@@ -11148,8 +11142,8 @@
         "comment": "/**\n       * OpenLayers view instance.\n       * @type {ol.View|undefined}\n       */",
         "meta": {
             "range": [
-                10500,
-                10573
+                10506,
+                10579
             ],
             "filename": "map.vue",
             "lineno": 417,
@@ -11180,8 +11174,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10517,
-                10533
+                10523,
+                10539
             ],
             "filename": "map.vue",
             "lineno": 418,
@@ -11205,8 +11199,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10543,
-                10564
+                10549,
+                10570
             ],
             "filename": "map.vue",
             "lineno": 419,
@@ -11229,8 +11223,8 @@
         "comment": "/**\n   * @this module:map/map\n   */",
         "meta": {
             "range": [
-                10627,
-                10672
+                10633,
+                10678
             ],
             "filename": "map.vue",
             "lineno": 426,
@@ -11256,8 +11250,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10646,
-                10668
+                10652,
+                10674
             ],
             "filename": "map.vue",
             "lineno": 427,
@@ -11283,8 +11277,8 @@
         "comment": "/**\n * Subscribe to OL map events.\n * @return {void}\n * @this module:map/map\n * @private\n */",
         "meta": {
             "range": [
-                10770,
-                11619
+                10776,
+                11625
             ],
             "filename": "map.vue",
             "lineno": 437,
@@ -11328,8 +11322,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10859,
-                10867
+                10865,
+                10873
             ],
             "filename": "map.vue",
             "lineno": 441,
@@ -11354,8 +11348,8 @@
         "comment": "",
         "meta": {
             "range": [
-                10889,
-                11320
+                10895,
+                11326
             ],
             "filename": "map.vue",
             "lineno": 443,
@@ -11380,8 +11374,8 @@
         "comment": "",
         "meta": {
             "range": [
-                11238,
-                11313
+                11244,
+                11319
             ],
             "filename": "map.vue",
             "lineno": 456,
@@ -11405,8 +11399,8 @@
         "comment": "",
         "meta": {
             "range": [
-                11340,
-                11480
+                11346,
+                11486
             ],
             "filename": "map.vue",
             "lineno": 459,
@@ -11431,8 +11425,8 @@
         "comment": "",
         "meta": {
             "range": [
-                11490,
-                11555
+                11496,
+                11561
             ],
             "filename": "map.vue",
             "lineno": 467,
@@ -13394,11 +13388,11 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n* ### View `vl-view`\n *\n * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n * **resolution**, and **rotation** of the map.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-view\n * @mixes olVirtCmp\n */",
+        "comment": "/**\n* View `vl-view` component\n *\n * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n * **resolution**, and **rotation** of the map.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-view\n * @mixes olVirtCmp\n */",
         "meta": {
             "range": [
-                5266,
-                5850
+                5272,
+                5856
             ],
             "filename": "view.vue",
             "lineno": 233,
@@ -13410,7 +13404,7 @@
                 "type": "ObjectExpression"
             }
         },
-        "description": "<h3 id=\"view-vl-view-\">View <code>vl-view</code></h3>\n<p>Represents a simple <strong>2D view</strong> of the map. This is the component to act upon to change the <strong>center</strong>,\n<strong>resolution</strong>, and <strong>rotation</strong> of the map.</p>\n",
+        "description": "<p>View <code>vl-view</code> component</p>\n<p>Represents a simple <strong>2D view</strong> of the map. This is the component to act upon to change the <strong>center</strong>,\n<strong>resolution</strong>, and <strong>rotation</strong> of the map.</p>\n",
         "vueProto": true,
         "augments": [
             "Vue"
@@ -13427,8 +13421,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5285,
-                5300
+                5291,
+                5306
             ],
             "filename": "view.vue",
             "lineno": 234,
@@ -13452,8 +13446,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5304,
-                5323
+                5310,
+                5329
             ],
             "filename": "view.vue",
             "lineno": 235,
@@ -13477,8 +13471,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5327,
-                5332
+                5333,
+                5338
             ],
             "filename": "view.vue",
             "lineno": 236,
@@ -13502,8 +13496,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5336,
-                5344
+                5342,
+                5350
             ],
             "filename": "view.vue",
             "lineno": 237,
@@ -13527,8 +13521,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5348,
-                5355
+                5354,
+                5361
             ],
             "filename": "view.vue",
             "lineno": 238,
@@ -13552,8 +13546,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5359,
-                5364
+                5365,
+                5370
             ],
             "filename": "view.vue",
             "lineno": 239,
@@ -13577,8 +13571,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5368,
-                5438
+                5374,
+                5444
             ],
             "filename": "view.vue",
             "lineno": 240,
@@ -13602,8 +13596,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5385,
-                5433
+                5391,
+                5439
             ],
             "filename": "view.vue",
             "lineno": 241,
@@ -13626,8 +13620,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5442,
-                5488
+                5448,
+                5494
             ],
             "filename": "view.vue",
             "lineno": 245,
@@ -13650,8 +13644,8 @@
         "comment": "/**\n* @vueDataProp\n */",
         "meta": {
             "range": [
-                5471,
-                5477
+                5477,
+                5483
             ],
             "filename": "view.vue",
             "lineno": 247,
@@ -13675,8 +13669,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5492,
-                5847
+                5498,
+                5853
             ],
             "filename": "view.vue",
             "lineno": 250,
@@ -13702,8 +13696,8 @@
         "comment": "/**\n       * @type {ol.View|undefined}\n       */",
         "meta": {
             "range": [
-                5632,
-                5709
+                5638,
+                5715
             ],
             "filename": "view.vue",
             "lineno": 255,
@@ -13733,8 +13727,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5649,
-                5665
+                5655,
+                5671
             ],
             "filename": "view.vue",
             "lineno": 256,
@@ -13758,8 +13752,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5675,
-                5700
+                5681,
+                5706
             ],
             "filename": "view.vue",
             "lineno": 257,
@@ -13782,8 +13776,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5717,
-                5835
+                5723,
+                5841
             ],
             "filename": "view.vue",
             "lineno": 259,
@@ -13807,8 +13801,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5743,
-                5759
+                5749,
+                5765
             ],
             "filename": "view.vue",
             "lineno": 260,
@@ -13832,8 +13826,8 @@
         "comment": "",
         "meta": {
             "range": [
-                5769,
-                5826
+                5775,
+                5832
             ],
             "filename": "view.vue",
             "lineno": 261,
@@ -13856,8 +13850,8 @@
         "comment": "/**\n * Subscribe to OpenLayers significant events\n * @return {void}\n * @this module:map/view\n * @private\n */",
         "meta": {
             "range": [
-                5961,
-                6599
+                5967,
+                6605
             ],
             "filename": "view.vue",
             "lineno": 273,
@@ -13901,8 +13895,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6030,
-                6038
+                6036,
+                6044
             ],
             "filename": "view.vue",
             "lineno": 276,
@@ -13927,8 +13921,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6047,
-                6123
+                6053,
+                6129
             ],
             "filename": "view.vue",
             "lineno": 277,
@@ -13953,8 +13947,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6132,
-                6270
+                6138,
+                6276
             ],
             "filename": "view.vue",
             "lineno": 278,
@@ -13979,8 +13973,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6167,
-                6179
+                6173,
+                6185
             ],
             "filename": "view.vue",
             "lineno": 279,
@@ -14004,8 +13998,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6185,
-                6207
+                6191,
+                6213
             ],
             "filename": "view.vue",
             "lineno": 280,
@@ -14029,8 +14023,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6280,
-                6485
+                6286,
+                6491
             ],
             "filename": "view.vue",
             "lineno": 284,
@@ -14055,8 +14049,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6518,
-                6522
+                6524,
+                6528
             ],
             "filename": "view.vue",
             "lineno": 291,
@@ -14080,8 +14074,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6524,
-                6529
+                6530,
+                6535
             ],
             "filename": "view.vue",
             "lineno": 291,
@@ -14105,8 +14099,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6601,
-                6666
+                6607,
+                6672
             ],
             "filename": "view.vue",
             "lineno": 297,
@@ -14131,8 +14125,8 @@
         "comment": "",
         "meta": {
             "range": [
-                6668,
-                6774
+                6674,
+                6780
             ],
             "filename": "view.vue",
             "lineno": 301,
@@ -65012,7 +65006,7 @@
         },
         "description": "<p>Creates an Observable using OpenLayers event pattern that emits events coming from the given event target.</p>\n",
         "examples": [
-            "<p><strong>Subscribe on view center change events</strong>\nconst map = ol.Map({ ... })\nconst changes = Observable.fromOlEvent(map.getView(), &#39;change:center&#39;)</p>\n<p>changes.subscribe(({ coordinate }) =&gt; console.log(coordinate))</p>\n"
+            "**Subscribe on view center change events**\nconst map = ol.Map({ ... })\nconst changes = Observable.fromOlEvent(map.getView(), 'change:center')\n\nchanges.subscribe(({ coordinate }) => console.log(coordinate))"
         ],
         "params": [
             {

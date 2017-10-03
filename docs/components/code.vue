@@ -1,7 +1,9 @@
 <template lang="pug">
-  pre(:class="[$options.name]")
-    code(:class='[lang]', ref='code')
-      slot
+  p(:class="[$options.name]")
+    b(v-if="title && title.length") {{ title }}
+    pre
+      code(:class='[lang]' ref='code')
+        slot
 </template>
 
 <script>
@@ -9,10 +11,8 @@
   import hljs from 'highlight.js'
 
   const props = {
-    lang: {
-      type: String,
-      required: true,
-    },
+    title: String,
+    lang: String,
   }
 
   const methods = {

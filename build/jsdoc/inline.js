@@ -5,6 +5,7 @@ exports.handlers = {
     processDoclet(doclet, {base: doclet.longname})
   },
 }
+exports.processDoclet = processDoclet
 
 function processDoclet (doclet, options) {
   const tags = [
@@ -35,8 +36,8 @@ function processDoclet (doclet, options) {
 
 function resolveLinks (string, options) {
   let replacers = {
-    link: getLinkProcesser(options),
-    linkcode: getLinkProcesser(options),
+    link: getLinkProcessor(options),
+    linkcode: getLinkProcessor(options),
   }
 
   return inlineTag.replaceInlineTags(string, replacers).newString
@@ -44,7 +45,7 @@ function resolveLinks (string, options) {
 
 // copy-paste from jsdoc/lib/jsdoc/util/templateHelper
 // a bit adopted for Vue
-function getLinkProcesser (options) {
+function getLinkProcessor (options) {
   return function processLink (string, tagInfo) {
     const leading = extractLeadingText(string, tagInfo.completeTag)
     let linkText = leading.leadingText
