@@ -5,12 +5,59 @@ let filePath = [doclet.meta.path, doclet.meta.filename].join('/')
 const nameToIdent = string => string.replace(/^module:/, '').replace('/', '-').toLowerCase()
 const kebabCase = string => _.kebabCase(_.lowerFirst(string))
 const camelCase = string => _.camelCase(_.upperFirst(string))
+const isPublic = ({undocumented, access}) => !undocumented && (!access || access === 'public')
+const alphabetSorter = (a, b) => {
+  return a.name.toLowerCase() === b.name.toLowerCase()
+    ? 0
+    : (
+      a.name.toLowerCase() < b.name.toLowerCase()
+        ? -1
+        : 1
+    )
+}
 
 doclet.ident = nameToIdent(doclet.name)
 doclet.longIdent = nameToIdent(doclet.longname)
 
 let cmpName = 'vld-module-' + doclet.ident + '-doc'
 let examples = doclet.examples || []
+let mixins = doclet.mixes || []
+let props = []
+let dataProps = []
+let compProps = []
+let otherMembers = []
+let methods = []
+
+children.forEach(child => {
+  if (!isPublic(child) || child.memberof !== doclet.longname) {
+    return
+  }
+
+  switch (true) {
+    case child.vueProp:
+      props.push(child)
+      break
+    case child.vueComputedProp:
+      compProps.push(child)
+      break
+    case child.vueDataProp:
+      dataProps.push(child)
+      break
+    case child.kind === 'member' && child.scope === 'instance':
+      otherMembers.push(child)
+      break
+    case child.vueMethod:
+      methods.push(child)
+      break
+  }
+})
+
+props.sort(alphabetSorter)
+compProps.sort(alphabetSorter)
+dataProps.sort(alphabetSorter)
+otherMembers.sort(alphabetSorter)
+methods.sort(alphabetSorter)
+
 // if current doclet is for an entry index file the find all components of that module
 let components = []
 if (/components\/[^\/]+\/index\.js$/.test(filePath)) {
@@ -34,21 +81,30 @@ if (/components\/[^\/]+\/index\.js$/.test(filePath)) {
     })
   }, [])
 }
-
-print(JSON.stringify(components))
 %>
 
 <template>
-  <div :id="id" class="content" :class="$options.name">
+  <div id="<%= doclet.longIdent %>" class="content <%= cmpName %>">
     <%= doclet.description %>
 
     <% examples.forEach(function (example) { %>
       <%= example %>
     <% }) %>
 
-    <b-tabs v-if="props.length || methods.length">
-      <b-tab-item v-if="props.length" label="Props">
-        <b-table :data="props" :mobile-cards="true">
+    <% if (mixins.length) { %>
+    <b>Mixes in:</b>
+    <ul>
+      <% mixins.forEach(function (name) { %>
+      <li><%= name %></li>
+      <% }) %>
+    </ul>
+    <% } %>
+
+    <% if (props.length || methods.length) { %>
+    <b-tabs>
+      <% if (props.length) { %>
+      <b-tab-item label="Props">
+        <b-table :data='<%= JSON.stringify(props) %>' :mobile-cards="true">
           <template scope="scope">
             <b-table-column label="Name">
               <code>{{ scope.row.name }}</code>
@@ -72,8 +128,28 @@ print(JSON.stringify(components))
           </template>
         </b-table>
       </b-tab-item>
-      <b-tab-item v-if="methods.length" label="Methods">
-        <b-table :data="methods" :mobile-cards="true">
+      <% } %>
+
+      <% if (otherMembers.length) { %>
+      <b-tab-item label="Other members">
+        <b-table :data='<%= JSON.stringify(otherMembers) %>' :mobile-cards="true">
+          <template scope="scope">
+            <b-table-column label="Name">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Type">
+              <span class="type">{{ scope.row.typeExpression }}</span>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+
+      <% if (methods.length) { %>
+      <b-tab-item label="Methods">
+        <b-table :data='<%= JSON.stringify(methods) %>' :mobile-cards="true">
           <template scope="scope">
             <b-table-column label="Name">
               <code>{{ scope.row.name }}</code>
@@ -81,7 +157,7 @@ print(JSON.stringify(components))
             <b-table-column label="Description" v-html="scope.row.description">
             </b-table-column>
             <b-table-column label="Params">
-               TODO: render params list
+              TODO: render params list
             </b-table-column>
             <b-table-column label="Returns">
               <p v-for="(ret, i) in scope.row.returns" :key="i">
@@ -92,9 +168,11 @@ print(JSON.stringify(components))
           </template>
         </b-table>
       </b-tab-item>
+      <% } %>
     </b-tabs>
+    <% } %>
 
-    <hr/>
+    <hr>
 
     <% components.forEach(function ({ importVar }) { %>
     <<%= kebabCase(importVar) %> />
@@ -108,52 +186,36 @@ print(JSON.stringify(components))
   <% components.forEach(function ({longname, importVar}) { %>
   import <%= importVar %> from '!jsdoc-vue-loader!./jsdoc-index.json?longname=<%= longname %>&+vueProto&tpl=./jsdoc-vue-cmp.ejs'
   <% }) %>
-  // export template variables
-  const doclet = <%= JSON.stringify(doclet) %>
-  const childDoclets = <%= JSON.stringify(children) %>
-
-  const isPublic = ({undocumented, access}) => !undocumented && (!access || access === 'public')
 
   export default {
     name: '<%= cmpName %>',
     components: {
       <%= _.map(components, 'importVar').join(', ') %>
     },
-    doclet,
-    childDoclets,
     computed: {
-      id () {
-        return this.doclet.longIdent
-      },
       doclet () {
-        return doclet
+        return <%= JSON.stringify(doclet) %>
       },
       childDoclets () {
-        return childDoclets
+        return <%= JSON.stringify(children) %>
+      },
+      mixins () {
+        return <%= JSON.stringify(mixins) %>
       },
       props () {
-        return childDoclets.filter(d => isPublic(d) && d.vueProp && d.memberof === doclet.longname)
-          .sort((a, b) => {
-            return a.name.toLowerCase() === b.name.toLowerCase()
-              ? 0
-              : (
-                a.name.toLowerCase() < b.name.toLowerCase()
-                  ? -1
-                  : 1
-              )
-          })
+        return <%= JSON.stringify(props) %>
+      },
+      computedProps () {
+        return <%= JSON.stringify(compProps) %>
+      },
+      dataProps () {
+        return <%= JSON.stringify(dataProps) %>
+      },
+      otherMembers () {
+        return <%= JSON.stringify(otherMembers) %>
       },
       methods () {
-        return childDoclets.filter(d => isPublic(d) && d.vueMethod && d.memberof === doclet.longname)
-          .sort((a, b) => {
-            return a.name.toLowerCase() === b.name.toLowerCase()
-              ? 0
-              : (
-                a.name.toLowerCase() < b.name.toLowerCase()
-                  ? -1
-                  : 1
-              )
-          })
+        return <%= JSON.stringify(methods) %>
       },
     },
     methods: {

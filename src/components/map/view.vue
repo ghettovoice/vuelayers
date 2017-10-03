@@ -29,6 +29,7 @@
     /**
      * The center coordinate of the map view in **EPSG:4326** projection.
      * @type {number[]}
+     * @default [0, 0]
      * @vueSync
      */
     center: {

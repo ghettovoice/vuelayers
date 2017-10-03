@@ -8344,11 +8344,11 @@
         "longname": "module:map"
     },
     {
-        "comment": "/**\n * Map module consists of two main components:\n *\n * - {@link module:map/map|Map `vl-map`} - viewport, map rendering and low level interactions.\n * - {@link module:map/map|View `vl-view`} - 2D view of the map\n *\n * @example **Install**\n * ```js\n * import Vue from 'vue'\n * // import module and styles\n * import { Map } from 'vuelayers'\n * // or\n * import Map from 'vuelayers/lib/map'\n * // import VueLayers styles\n * import 'vuelayers/lib/style.css'\n * // register vl-map and vl-view components\n * Vue.use(Map)\n * ```\n * @example **Usage**\n * ```html\n * <vl-map :load-tiles-while-animating=\"true\" :load-tiles-while-interacting=\"true\">\n *   <vl-view :center=\"[0, 0]\" :zoom=\"3\" :rotation=\"0\" />\n *\n *   <vl-layer-tile>\n *     <vl-source-osm />\n *   </vl-layer-tile>\n * </vl-map>\n * ```\n */",
+        "comment": "/**\n * Map module consists of two main components:\n *\n * - {@link module:map/map|Map `vl-map`} - viewport, map rendering and low level interactions.\n * - {@link module:map/map|View `vl-view`} - 2D view of the map\n *\n * @example **Install**\n * ```js\n * import Vue from 'vue'\n * // import module and styles\n * import { Map } from 'vuelayers'\n * // or\n * import Map from 'vuelayers/lib/map'\n * // import VueLayers styles\n * import 'vuelayers/lib/style.css'\n * // register vl-map and vl-view components\n * Vue.use(Map)\n * ```\n * @example **Usage**\n * ```html\n * <vl-map :load-tiles-while-animating=\"true\" :load-tiles-while-interacting=\"true\">\n *   <vl-view :center=\"[0, 0]\" :zoom=\"3\" :rotation=\"0\"></vl-view>\n *\n *   <vl-layer-tile>\n *     <vl-source-osm></vl-source-osm>\n *   </vl-layer-tile>\n * </vl-map>\n * ```\n */",
         "meta": {
             "range": [
-                874,
-                1533
+                896,
+                1555
             ],
             "filename": "index.js",
             "lineno": 36,
@@ -8363,7 +8363,7 @@
         "description": "<p>Map module consists of two main components:</p>\n<ul>\n<li><a @click=\"scrollTo('map-map')\">Map <code>vl-map</code></a> - viewport, map rendering and low level interactions.</li>\n<li><a @click=\"scrollTo('map-map')\">View <code>vl-view</code></a> - 2D view of the map</li>\n</ul>\n",
         "examples": [
             "<p><strong>Install</strong></p>\n<pre><code class=\"hljs js\"><span class=\"hljs-keyword\">import</span> Vue <span class=\"hljs-keyword\">from</span> <span class=\"hljs-string\">'vue'</span>\n<span class=\"hljs-comment\">// import module and styles</span>\n<span class=\"hljs-keyword\">import</span> { <span class=\"hljs-built_in\">Map</span> } <span class=\"hljs-keyword\">from</span> <span class=\"hljs-string\">'vuelayers'</span>\n<span class=\"hljs-comment\">// or</span>\n<span class=\"hljs-keyword\">import</span> <span class=\"hljs-built_in\">Map</span> <span class=\"hljs-keyword\">from</span> <span class=\"hljs-string\">'vuelayers/lib/map'</span>\n<span class=\"hljs-comment\">// import VueLayers styles</span>\n<span class=\"hljs-keyword\">import</span> <span class=\"hljs-string\">'vuelayers/lib/style.css'</span>\n<span class=\"hljs-comment\">// register vl-map and vl-view components</span>\nVue.use(<span class=\"hljs-built_in\">Map</span>)\n</code></pre>\n",
-            "<p><strong>Usage</strong></p>\n<pre><code class=\"hljs html\"><span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-map</span> <span class=\"hljs-attr\">:load-tiles-while-animating</span>=<span class=\"hljs-string\">\"true\"</span> <span class=\"hljs-attr\">:load-tiles-while-interacting</span>=<span class=\"hljs-string\">\"true\"</span>&gt;</span>\n  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-view</span> <span class=\"hljs-attr\">:center</span>=<span class=\"hljs-string\">\"[0, 0]\"</span> <span class=\"hljs-attr\">:zoom</span>=<span class=\"hljs-string\">\"3\"</span> <span class=\"hljs-attr\">:rotation</span>=<span class=\"hljs-string\">\"0\"</span> /&gt;</span>\n\n  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-layer-tile</span>&gt;</span>\n    <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-source-osm</span> /&gt;</span>\n  <span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-layer-tile</span>&gt;</span>\n<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-map</span>&gt;</span>\n</code></pre>\n"
+            "<p><strong>Usage</strong></p>\n<pre><code class=\"hljs html\"><span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-map</span> <span class=\"hljs-attr\">:load-tiles-while-animating</span>=<span class=\"hljs-string\">\"true\"</span> <span class=\"hljs-attr\">:load-tiles-while-interacting</span>=<span class=\"hljs-string\">\"true\"</span>&gt;</span>\n  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-view</span> <span class=\"hljs-attr\">:center</span>=<span class=\"hljs-string\">\"[0, 0]\"</span> <span class=\"hljs-attr\">:zoom</span>=<span class=\"hljs-string\">\"3\"</span> <span class=\"hljs-attr\">:rotation</span>=<span class=\"hljs-string\">\"0\"</span>&gt;</span><span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-view</span>&gt;</span>\n\n  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-layer-tile</span>&gt;</span>\n    <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">vl-source-osm</span>&gt;</span><span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-source-osm</span>&gt;</span>\n  <span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-layer-tile</span>&gt;</span>\n<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">vl-map</span>&gt;</span>\n</code></pre>\n"
         ],
         "name": "module:map",
         "longname": "module:map",
@@ -8373,8 +8373,8 @@
         "comment": "/**\n   * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n   * rendering and low level interaction events.\n   *\n   * @see {@link module:map/map}\n   */",
         "meta": {
             "range": [
-                1100,
-                1103
+                1122,
+                1125
             ],
             "filename": "index.js",
             "lineno": 43,
@@ -8401,8 +8401,8 @@
         "comment": "/**\n   * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n   * **resolution**, and **rotation** of the map.\n   *\n   * @see {@link module:map/view}\n   */",
         "meta": {
             "range": [
-                1317,
-                1321
+                1339,
+                1343
             ],
             "filename": "index.js",
             "lineno": 50,
@@ -8429,8 +8429,8 @@
         "comment": "/**\n   * Registers Map and View components with default names.\n   *\n   * @param {Vue} Vue\n   * @return {void}\n   */",
         "meta": {
             "range": [
-                1443,
-                1530
+                1465,
+                1552
             ],
             "filename": "index.js",
             "lineno": 57,
@@ -8488,7 +8488,7 @@
         "meta": {
             "range": [
                 669,
-                3360
+                3418
             ],
             "filename": "map.vue",
             "lineno": 32,
@@ -8999,14 +8999,14 @@
         "scope": "static"
     },
     {
-        "comment": "/**\n* Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,\n   * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,\n   * but **WebGL** can only render **Point** geometries.\n * @type {string|array}\n * @vueProp\n * @default () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]\n */",
+        "comment": "/**\n* Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,\n   * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,\n   * but **WebGL** can only render **Point** geometries.\n * @type {string|array}\n   * @default [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]\n * @vueProp\n */",
         "meta": {
             "range": [
-                3111,
-                3217
+                3169,
+                3275
             ],
             "filename": "map.vue",
-            "lineno": 98,
+            "lineno": 99,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9023,8 +9023,8 @@
                 "array"
             ]
         },
+        "defaultvalue": "[RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]",
         "vueProp": true,
-        "defaultvalue": "() => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]",
         "name": "renderer",
         "longname": "module:map/map#renderer",
         "kind": "member",
@@ -9036,11 +9036,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3127,
-                3148
+                3185,
+                3206
             ],
             "filename": "map.vue",
-            "lineno": 99,
+            "lineno": 100,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9061,11 +9061,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3154,
-                3212
+                3212,
+                3270
             ],
             "filename": "map.vue",
-            "lineno": 100,
+            "lineno": 101,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9085,11 +9085,11 @@
         "comment": "/**\n* Map container element `tabindex` attribute value.\n   * @type {number}\n * @vueProp\n * @default 0\n */",
         "meta": {
             "range": [
-                3308,
-                3357
+                3366,
+                3415
             ],
             "filename": "map.vue",
-            "lineno": 106,
+            "lineno": 107,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9118,11 +9118,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3324,
-                3336
+                3382,
+                3394
             ],
             "filename": "map.vue",
-            "lineno": 107,
+            "lineno": 108,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9143,11 +9143,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3342,
-                3352
+                3400,
+                3410
             ],
             "filename": "map.vue",
-            "lineno": 108,
+            "lineno": 109,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9168,11 +9168,11 @@
         "comment": "/**\n* @vueMethods\n * @private\n */",
         "meta": {
             "range": [
-                3391,
-                9462
+                3449,
+                9520
             ],
             "filename": "map.vue",
-            "lineno": 115,
+            "lineno": 116,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9195,11 +9195,11 @@
         "comment": "/**\n* @return {ol.Map}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                3455,
-                4196
+                3513,
+                4254
             ],
             "filename": "map.vue",
-            "lineno": 120,
+            "lineno": 121,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9235,11 +9235,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3485,
-                3819
+                3543,
+                3877
             ],
             "filename": "map.vue",
-            "lineno": 121,
+            "lineno": 122,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9261,11 +9261,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3507,
-                3519
+                3565,
+                3577
             ],
             "filename": "map.vue",
-            "lineno": 122,
+            "lineno": 123,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9286,11 +9286,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3527,
-                3580
+                3585,
+                3638
             ],
             "filename": "map.vue",
-            "lineno": 123,
+            "lineno": 124,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9311,11 +9311,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3588,
-                3645
+                3646,
+                3703
             ],
             "filename": "map.vue",
-            "lineno": 124,
+            "lineno": 125,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9336,11 +9336,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3653,
-                3680
+                3711,
+                3738
             ],
             "filename": "map.vue",
-            "lineno": 125,
+            "lineno": 126,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9361,11 +9361,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3688,
-                3711
+                3746,
+                3769
             ],
             "filename": "map.vue",
-            "lineno": 126,
+            "lineno": 127,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9386,11 +9386,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3719,
-                3734
+                3777,
+                3792
             ],
             "filename": "map.vue",
-            "lineno": 127,
+            "lineno": 128,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9411,11 +9411,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3742,
-                3787
+                3800,
+                3845
             ],
             "filename": "map.vue",
-            "lineno": 128,
+            "lineno": 129,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9436,11 +9436,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3795,
-                3811
+                3853,
+                3869
             ],
             "filename": "map.vue",
-            "lineno": 129,
+            "lineno": 130,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9461,11 +9461,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3902,
-                3928
+                3960,
+                3986
             ],
             "filename": "map.vue",
-            "lineno": 132,
+            "lineno": 133,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9488,11 +9488,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4034,
-                4102
+                4092,
+                4160
             ],
             "filename": "map.vue",
-            "lineno": 137,
+            "lineno": 138,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9514,11 +9514,11 @@
         "comment": "/**\n* @return {{\n   *    hasLayer: function(ol.Layer),\n   *    addLayer: function(ol.Layer),\n   *    removeLayer: function(ol.Layer)\n   *  }|undefined}\n   *  @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                4380,
-                4732
+                4438,
+                4790
             ],
             "filename": "map.vue",
-            "lineno": 151,
+            "lineno": 152,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9555,11 +9555,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4439,
-                4454
+                4497,
+                4512
             ],
             "filename": "map.vue",
-            "lineno": 154,
+            "lineno": 155,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9581,11 +9581,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4465,
-                4495
+                4523,
+                4553
             ],
             "filename": "map.vue",
-            "lineno": 155,
+            "lineno": 156,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9607,11 +9607,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4516,
-                4591
+                4574,
+                4649
             ],
             "filename": "map.vue",
-            "lineno": 158,
+            "lineno": 159,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9631,11 +9631,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4599,
-                4653
+                4657,
+                4711
             ],
             "filename": "map.vue",
-            "lineno": 161,
+            "lineno": 162,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9655,11 +9655,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4661,
-                4721
+                4719,
+                4779
             ],
             "filename": "map.vue",
-            "lineno": 164,
+            "lineno": 165,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9679,11 +9679,11 @@
         "comment": "/**\n* @return {{\n   *     hasInteraction: function(ol.interaction.Interaction): bool,\n   *     addInteraction: function(ol.interaction.Interaction): void,\n   *     removeInteraction: function(ol.interaction.Interaction): void\n   *   }|undefined}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                5009,
-                5451
+                5067,
+                5509
             ],
             "filename": "map.vue",
-            "lineno": 177,
+            "lineno": 178,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9720,11 +9720,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5074,
-                5089
+                5132,
+                5147
             ],
             "filename": "map.vue",
-            "lineno": 180,
+            "lineno": 181,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9746,11 +9746,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5100,
-                5142
+                5158,
+                5200
             ],
             "filename": "map.vue",
-            "lineno": 181,
+            "lineno": 182,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9772,11 +9772,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5163,
-                5262
+                5221,
+                5320
             ],
             "filename": "map.vue",
-            "lineno": 184,
+            "lineno": 185,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9796,11 +9796,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5270,
-                5348
+                5328,
+                5406
             ],
             "filename": "map.vue",
-            "lineno": 187,
+            "lineno": 188,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9820,11 +9820,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5356,
-                5440
+                5414,
+                5498
             ],
             "filename": "map.vue",
-            "lineno": 190,
+            "lineno": 191,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9844,11 +9844,11 @@
         "comment": "/**\n* @return {{\n   *     addFeature: function(ol.Feature): void,\n   *     removeFeature: function(ol.Feature): void,\n   *     hasFeature: function(ol.Feature): bool\n   *   }|undefined}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                5668,
-                6016
+                5726,
+                6074
             ],
             "filename": "map.vue",
-            "lineno": 203,
+            "lineno": 204,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9884,11 +9884,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5701,
-                5740
+                5759,
+                5798
             ],
             "filename": "map.vue",
-            "lineno": 204,
+            "lineno": 205,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9910,11 +9910,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5761,
-                5853
+                5819,
+                5911
             ],
             "filename": "map.vue",
-            "lineno": 207,
+            "lineno": 208,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9934,11 +9934,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5861,
-                5926
+                5919,
+                5984
             ],
             "filename": "map.vue",
-            "lineno": 210,
+            "lineno": 211,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9958,11 +9958,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5934,
-                6005
+                5992,
+                6063
             ],
             "filename": "map.vue",
-            "lineno": 213,
+            "lineno": 214,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -9982,11 +9982,11 @@
         "comment": "/**\n* @return {{\n   *     hasOverlay: function(ol.Overlay): bool,\n   *     addOverlay: function(ol.Overlay): void,\n   *     removeOverlay: function(ol.Overlay): void\n   *   }|undefined}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                6233,
-                6639
+                6291,
+                6697
             ],
             "filename": "map.vue",
-            "lineno": 226,
+            "lineno": 227,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10023,11 +10023,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6294,
-                6309
+                6352,
+                6367
             ],
             "filename": "map.vue",
-            "lineno": 229,
+            "lineno": 230,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10049,11 +10049,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6320,
-                6354
+                6378,
+                6412
             ],
             "filename": "map.vue",
-            "lineno": 230,
+            "lineno": 231,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10075,11 +10075,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6375,
-                6466
+                6433,
+                6524
             ],
             "filename": "map.vue",
-            "lineno": 233,
+            "lineno": 234,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10099,11 +10099,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6474,
-                6544
+                6532,
+                6602
             ],
             "filename": "map.vue",
-            "lineno": 236,
+            "lineno": 237,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10123,11 +10123,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6552,
-                6628
+                6610,
+                6686
             ],
             "filename": "map.vue",
-            "lineno": 239,
+            "lineno": 240,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10147,11 +10147,11 @@
         "comment": "/**\n* @param {number[]} pixel\n   * @return {number[]} Coordinates in EPSG:4326\n * @vueMethod\n */",
         "meta": {
             "range": [
-                6733,
-                6919
+                6791,
+                6977
             ],
             "filename": "map.vue",
-            "lineno": 248,
+            "lineno": 249,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10193,11 +10193,11 @@
         "comment": "/**\n* @returns {Object}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                6974,
-                7445
+                7032,
+                7503
             ],
             "filename": "map.vue",
-            "lineno": 258,
+            "lineno": 259,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10232,11 +10232,11 @@
         "comment": "",
         "meta": {
             "range": [
-                7001,
-                7010
+                7059,
+                7068
             ],
             "filename": "map.vue",
-            "lineno": 259,
+            "lineno": 260,
             "columnno": 10,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10258,11 +10258,11 @@
         "comment": "",
         "meta": {
             "range": [
-                7312,
-                7341
+                7370,
+                7399
             ],
             "filename": "map.vue",
-            "lineno": 268,
+            "lineno": 269,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10282,11 +10282,11 @@
         "comment": "",
         "meta": {
             "range": [
-                7351,
-                7382
+                7409,
+                7440
             ],
             "filename": "map.vue",
-            "lineno": 269,
+            "lineno": 270,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10306,11 +10306,11 @@
         "comment": "",
         "meta": {
             "range": [
-                7392,
-                7426
+                7450,
+                7484
             ],
             "filename": "map.vue",
-            "lineno": 270,
+            "lineno": 271,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10330,11 +10330,11 @@
         "comment": "/**\n* Triggers focus on map container.\n   * @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                7519,
-                7554
+                7577,
+                7612
             ],
             "filename": "map.vue",
-            "lineno": 278,
+            "lineno": 279,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10365,11 +10365,11 @@
         "comment": "/**\n* @param {number[]} pixel\n   * @param {function((ol.Feature|ol.render.Feature), ?ol.layer.Layer): *} callback\n   * @param {Object} [opts]\n   * @return {*|undefined}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                7738,
-                7885
+                7796,
+                7943
             ],
             "filename": "map.vue",
-            "lineno": 287,
+            "lineno": 288,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10430,11 +10430,11 @@
         "comment": "/**\n* @param {number[]} pixel\n   * @param {function(ol.layer.Layer, ?(number[]|Uint8Array)): *} callback\n   * @param {function(ol.layer.Layer): boolean} [layerFilter]\n   * @return {*|undefined}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8094,
-                8257
+                8152,
+                8315
             ],
             "filename": "map.vue",
-            "lineno": 298,
+            "lineno": 299,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10495,11 +10495,11 @@
         "comment": "/**\n* @param {ol.View|Vue|undefined} view\n   * @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8334,
-                8556
+                8392,
+                8614
             ],
             "filename": "map.vue",
-            "lineno": 307,
+            "lineno": 308,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10546,11 +10546,11 @@
         "comment": "",
         "meta": {
             "range": [
-                8355,
-                8401
+                8413,
+                8459
             ],
             "filename": "map.vue",
-            "lineno": 308,
+            "lineno": 309,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10573,11 +10573,11 @@
         "comment": "",
         "meta": {
             "range": [
-                8440,
-                8457
+                8498,
+                8515
             ],
             "filename": "map.vue",
-            "lineno": 311,
+            "lineno": 312,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10600,11 +10600,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8608,
-                8726
+                8666,
+                8784
             ],
             "filename": "map.vue",
-            "lineno": 321,
+            "lineno": 322,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10635,11 +10635,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8778,
-                8879
+                8836,
+                8937
             ],
             "filename": "map.vue",
-            "lineno": 331,
+            "lineno": 332,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10670,11 +10670,11 @@
         "comment": "/**\n* Triggers map re-render.\n   * @return {Promise}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                8947,
-                9046
+                9005,
+                9104
             ],
             "filename": "map.vue",
-            "lineno": 340,
+            "lineno": 341,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10708,11 +10708,11 @@
         "comment": "/**\n* @return {Promise}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9085,
-                9247
+                9143,
+                9305
             ],
             "filename": "map.vue",
-            "lineno": 349,
+            "lineno": 350,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10745,11 +10745,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9299,
-                9353
+                9357,
+                9411
             ],
             "filename": "map.vue",
-            "lineno": 361,
+            "lineno": 362,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10780,11 +10780,11 @@
         "comment": "/**\n* @return {void}\n * @vueMethod\n */",
         "meta": {
             "range": [
-                9389,
-                9459
+                9447,
+                9517
             ],
             "filename": "map.vue",
-            "lineno": 367,
+            "lineno": 368,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10814,11 +10814,11 @@
         "comment": "/**\n* ### Map `vl-map`\n *\n * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport\n * rendering and low level interaction events.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-map\n * @mixes olCmp\n * @mixes layersContainer\n * @mixes interactionsContainer\n * @mixes overlaysContainer\n * @mixes featuresContainer\n */",
         "meta": {
             "range": [
-                9664,
-                10617
+                9722,
+                10675
             ],
             "filename": "map.vue",
-            "lineno": 381,
+            "lineno": 382,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10848,11 +10848,11 @@
         "comment": "",
         "meta": {
             "range": [
-                9683,
-                9697
+                9741,
+                9755
             ],
             "filename": "map.vue",
-            "lineno": 382,
+            "lineno": 383,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10873,11 +10873,11 @@
         "comment": "",
         "meta": {
             "range": [
-                9701,
-                9794
+                9759,
+                9852
             ],
             "filename": "map.vue",
-            "lineno": 383,
+            "lineno": 384,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10898,11 +10898,11 @@
         "comment": "",
         "meta": {
             "range": [
-                9798,
-                9803
+                9856,
+                9861
             ],
             "filename": "map.vue",
-            "lineno": 384,
+            "lineno": 385,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10923,11 +10923,11 @@
         "comment": "",
         "meta": {
             "range": [
-                9807,
-                9814
+                9865,
+                9872
             ],
             "filename": "map.vue",
-            "lineno": 385,
+            "lineno": 386,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10948,11 +10948,11 @@
         "comment": "/**\n   * @this module:map/map\n   */",
         "meta": {
             "range": [
-                9856,
-                10527
+                9914,
+                10585
             ],
             "filename": "map.vue",
-            "lineno": 389,
+            "lineno": 390,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -10977,11 +10977,11 @@
         "comment": "/**\n     * @type {ol.View|undefined}\n     * @private\n     */",
         "meta": {
             "range": [
-                9938,
-                9960
+                9996,
+                10018
             ],
             "filename": "map.vue",
-            "lineno": 394,
+            "lineno": 395,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11010,11 +11010,11 @@
         "comment": "/**\n     * @type {ol.layer.Vector}\n     * @private\n     */",
         "meta": {
             "range": [
-                10028,
-                10107
+                10086,
+                10165
             ],
             "filename": "map.vue",
-            "lineno": 399,
+            "lineno": 400,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11042,11 +11042,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10073,
-                10099
+                10131,
+                10157
             ],
             "filename": "map.vue",
-            "lineno": 400,
+            "lineno": 401,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11067,11 +11067,11 @@
         "comment": "/**\n       * OpenLayers map instance.\n       * @type {ol.Map|undefined}\n       */",
         "meta": {
             "range": [
-                10268,
-                10344
+                10326,
+                10402
             ],
             "filename": "map.vue",
-            "lineno": 408,
+            "lineno": 409,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11099,11 +11099,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10284,
-                10300
+                10342,
+                10358
             ],
             "filename": "map.vue",
-            "lineno": 409,
+            "lineno": 410,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11124,11 +11124,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10310,
-                10335
+                10368,
+                10393
             ],
             "filename": "map.vue",
-            "lineno": 410,
+            "lineno": 411,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11148,11 +11148,11 @@
         "comment": "/**\n       * OpenLayers view instance.\n       * @type {ol.View|undefined}\n       */",
         "meta": {
             "range": [
-                10442,
-                10515
+                10500,
+                10573
             ],
             "filename": "map.vue",
-            "lineno": 416,
+            "lineno": 417,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11180,11 +11180,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10459,
-                10475
+                10517,
+                10533
             ],
             "filename": "map.vue",
-            "lineno": 417,
+            "lineno": 418,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11205,11 +11205,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10485,
-                10506
+                10543,
+                10564
             ],
             "filename": "map.vue",
-            "lineno": 418,
+            "lineno": 419,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11229,11 +11229,11 @@
         "comment": "/**\n   * @this module:map/map\n   */",
         "meta": {
             "range": [
-                10569,
-                10614
+                10627,
+                10672
             ],
             "filename": "map.vue",
-            "lineno": 425,
+            "lineno": 426,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11256,11 +11256,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10588,
-                10610
+                10646,
+                10668
             ],
             "filename": "map.vue",
-            "lineno": 426,
+            "lineno": 427,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11283,11 +11283,11 @@
         "comment": "/**\n * Subscribe to OL map events.\n * @return {void}\n * @this module:map/map\n * @private\n */",
         "meta": {
             "range": [
-                10712,
-                11561
+                10770,
+                11619
             ],
             "filename": "map.vue",
-            "lineno": 436,
+            "lineno": 437,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11328,11 +11328,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10801,
-                10809
+                10859,
+                10867
             ],
             "filename": "map.vue",
-            "lineno": 440,
+            "lineno": 441,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11354,11 +11354,11 @@
         "comment": "",
         "meta": {
             "range": [
-                10831,
-                11262
+                10889,
+                11320
             ],
             "filename": "map.vue",
-            "lineno": 442,
+            "lineno": 443,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11380,11 +11380,11 @@
         "comment": "",
         "meta": {
             "range": [
-                11180,
-                11255
+                11238,
+                11313
             ],
             "filename": "map.vue",
-            "lineno": 455,
+            "lineno": 456,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11405,11 +11405,11 @@
         "comment": "",
         "meta": {
             "range": [
-                11282,
-                11422
+                11340,
+                11480
             ],
             "filename": "map.vue",
-            "lineno": 458,
+            "lineno": 459,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11431,11 +11431,11 @@
         "comment": "",
         "meta": {
             "range": [
-                11432,
-                11497
+                11490,
+                11555
             ],
             "filename": "map.vue",
-            "lineno": 466,
+            "lineno": 467,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11471,7 +11471,7 @@
         "meta": {
             "range": [
                 528,
-                1717
+                1738
             ],
             "filename": "view.vue",
             "lineno": 28,
@@ -11494,14 +11494,14 @@
         "params": []
     },
     {
-        "comment": "/**\n* The center coordinate of the map view in **EPSG:4326** projection.\n   * @type {number[]}\n   * @vueSync\n * @vueProp\n * @default () => [0, 0]\n */",
+        "comment": "/**\n* The center coordinate of the map view in **EPSG:4326** projection.\n   * @type {number[]}\n   * @default [0, 0]\n   * @vueSync\n * @vueProp\n */",
         "meta": {
             "range": [
-                660,
-                761
+                681,
+                782
             ],
             "filename": "view.vue",
-            "lineno": 34,
+            "lineno": 35,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11517,9 +11517,9 @@
                 "Array.<number>"
             ]
         },
+        "defaultvalue": "[0, 0]",
         "vueSync": true,
         "vueProp": true,
-        "defaultvalue": "() => [0, 0]",
         "name": "center",
         "longname": "module:map/view#center",
         "kind": "member",
@@ -11531,11 +11531,11 @@
         "comment": "",
         "meta": {
             "range": [
-                674,
-                685
+                695,
+                706
             ],
             "filename": "view.vue",
-            "lineno": 35,
+            "lineno": 36,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11556,11 +11556,11 @@
         "comment": "",
         "meta": {
             "range": [
-                691,
-                712
+                712,
+                733
             ],
             "filename": "view.vue",
-            "lineno": 36,
+            "lineno": 37,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11580,11 +11580,11 @@
         "comment": "",
         "meta": {
             "range": [
-                718,
-                756
+                739,
+                777
             ],
             "filename": "view.vue",
-            "lineno": 37,
+            "lineno": 38,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11604,11 +11604,11 @@
         "comment": "/**\n* @vueProp\n * @default true\n */",
         "meta": {
             "range": [
-                765,
-                827
+                786,
+                848
             ],
             "filename": "view.vue",
-            "lineno": 39,
+            "lineno": 40,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11630,11 +11630,11 @@
         "comment": "",
         "meta": {
             "range": [
-                790,
-                803
+                811,
+                824
             ],
             "filename": "view.vue",
-            "lineno": 40,
+            "lineno": 41,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11655,11 +11655,11 @@
         "comment": "",
         "meta": {
             "range": [
-                809,
-                822
+                830,
+                843
             ],
             "filename": "view.vue",
-            "lineno": 41,
+            "lineno": 42,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11680,11 +11680,11 @@
         "comment": "/**\n* @vueProp\n * @default true\n */",
         "meta": {
             "range": [
-                831,
-                890
+                852,
+                911
             ],
             "filename": "view.vue",
-            "lineno": 43,
+            "lineno": 44,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11706,11 +11706,11 @@
         "comment": "",
         "meta": {
             "range": [
-                853,
-                866
+                874,
+                887
             ],
             "filename": "view.vue",
-            "lineno": 44,
+            "lineno": 45,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11731,11 +11731,11 @@
         "comment": "",
         "meta": {
             "range": [
-                872,
-                885
+                893,
+                906
             ],
             "filename": "view.vue",
-            "lineno": 45,
+            "lineno": 46,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11756,11 +11756,11 @@
         "comment": "/**\n* @vueProp\n */",
         "meta": {
             "range": [
-                894,
-                968
+                915,
+                989
             ],
             "filename": "view.vue",
-            "lineno": 47,
+            "lineno": 48,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11781,11 +11781,11 @@
         "comment": "",
         "meta": {
             "range": [
-                908,
-                919
+                929,
+                940
             ],
             "filename": "view.vue",
-            "lineno": 48,
+            "lineno": 49,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11806,11 +11806,11 @@
         "comment": "",
         "meta": {
             "range": [
-                925,
-                963
+                946,
+                984
             ],
             "filename": "view.vue",
-            "lineno": 49,
+            "lineno": 50,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11830,11 +11830,11 @@
         "comment": "/**\n* @vueProp\n */",
         "meta": {
             "range": [
-                972,
-                993
+                993,
+                1014
             ],
             "filename": "view.vue",
-            "lineno": 51,
+            "lineno": 52,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11855,11 +11855,11 @@
         "comment": "/**\n* @vueProp\n */",
         "meta": {
             "range": [
-                997,
-                1018
+                1018,
+                1039
             ],
             "filename": "view.vue",
-            "lineno": 52,
+            "lineno": 53,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11880,11 +11880,11 @@
         "comment": "/**\n* @vueProp\n * @default MAX_ZOOM\n */",
         "meta": {
             "range": [
-                1022,
-                1077
+                1043,
+                1098
             ],
             "filename": "view.vue",
-            "lineno": 53,
+            "lineno": 54,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11906,11 +11906,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1037,
-                1049
+                1058,
+                1070
             ],
             "filename": "view.vue",
-            "lineno": 54,
+            "lineno": 55,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11931,11 +11931,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1055,
-                1072
+                1076,
+                1093
             ],
             "filename": "view.vue",
-            "lineno": 55,
+            "lineno": 56,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11956,11 +11956,11 @@
         "comment": "/**\n* @vueProp\n * @default MIN_ZOOM\n */",
         "meta": {
             "range": [
-                1081,
-                1136
+                1102,
+                1157
             ],
             "filename": "view.vue",
-            "lineno": 57,
+            "lineno": 58,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -11982,11 +11982,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1096,
-                1108
+                1117,
+                1129
             ],
             "filename": "view.vue",
-            "lineno": 58,
+            "lineno": 59,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12007,11 +12007,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1114,
-                1131
+                1135,
+                1152
             ],
             "filename": "view.vue",
-            "lineno": 59,
+            "lineno": 60,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12032,11 +12032,11 @@
         "comment": "/**\n* @vueProp\n * @default EPSG_3857\n */",
         "meta": {
             "range": [
-                1140,
-                1199
+                1161,
+                1220
             ],
             "filename": "view.vue",
-            "lineno": 61,
+            "lineno": 62,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12058,11 +12058,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1158,
-                1170
+                1179,
+                1191
             ],
             "filename": "view.vue",
-            "lineno": 62,
+            "lineno": 63,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12083,11 +12083,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1176,
-                1194
+                1197,
+                1215
             ],
             "filename": "view.vue",
-            "lineno": 63,
+            "lineno": 64,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12108,11 +12108,11 @@
         "comment": "/**\n* @vueProp\n */",
         "meta": {
             "range": [
-                1203,
-                1221
+                1224,
+                1242
             ],
             "filename": "view.vue",
-            "lineno": 65,
+            "lineno": 66,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12133,11 +12133,11 @@
         "comment": "/**\n* @vueProp\n */",
         "meta": {
             "range": [
-                1225,
-                1243
+                1246,
+                1264
             ],
             "filename": "view.vue",
-            "lineno": 66,
+            "lineno": 67,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12158,11 +12158,11 @@
         "comment": "/**\n* The initial rotation for the view in **radians** (positive rotation clockwise).\n   * @type {number}\n   * @vueSync\n * @vueProp\n * @default 0\n */",
         "meta": {
             "range": [
-                1378,
-                1427
+                1399,
+                1448
             ],
             "filename": "view.vue",
-            "lineno": 72,
+            "lineno": 73,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12192,11 +12192,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1394,
-                1406
+                1415,
+                1427
             ],
             "filename": "view.vue",
-            "lineno": 73,
+            "lineno": 74,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12217,11 +12217,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1412,
-                1422
+                1433,
+                1443
             ],
             "filename": "view.vue",
-            "lineno": 74,
+            "lineno": 75,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12242,11 +12242,11 @@
         "comment": "/**\n* Zoom level used to calculate the resolution for the view as `int` value. Only used if `resolution` is not defined.\n   * @type {number}\n   * @vueSync\n * @vueProp\n * @default MIN_ZOOM\n */",
         "meta": {
             "range": [
-                1597,
-                1649
+                1618,
+                1670
             ],
             "filename": "view.vue",
-            "lineno": 81,
+            "lineno": 82,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12276,11 +12276,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1609,
-                1621
+                1630,
+                1642
             ],
             "filename": "view.vue",
-            "lineno": 82,
+            "lineno": 83,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12301,11 +12301,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1627,
-                1644
+                1648,
+                1665
             ],
             "filename": "view.vue",
-            "lineno": 83,
+            "lineno": 84,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12326,11 +12326,11 @@
         "comment": "/**\n* @vueProp\n * @default ZOOM_FACTOR\n */",
         "meta": {
             "range": [
-                1653,
-                1714
+                1674,
+                1735
             ],
             "filename": "view.vue",
-            "lineno": 85,
+            "lineno": 86,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12352,11 +12352,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1671,
-                1683
+                1692,
+                1704
             ],
             "filename": "view.vue",
-            "lineno": 86,
+            "lineno": 87,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12377,11 +12377,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1689,
-                1709
+                1710,
+                1730
             ],
             "filename": "view.vue",
-            "lineno": 87,
+            "lineno": 88,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12402,11 +12402,11 @@
         "comment": "",
         "meta": {
             "range": [
-                1725,
-                1739
+                1746,
+                1760
             ],
             "filename": "view.vue",
-            "lineno": 91,
+            "lineno": 92,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12428,11 +12428,11 @@
         "comment": "/**\n* @vueMethods\n * @private\n */",
         "meta": {
             "range": [
-                1770,
-                4192
+                1791,
+                4213
             ],
             "filename": "view.vue",
-            "lineno": 97,
+            "lineno": 98,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12455,11 +12455,11 @@
         "comment": "/**\n* @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}\n   * @param {...(olx.AnimationOptions|function(boolean))} args\n   * @return {Promise} Resolves when animation completes\n * @vueMethod\n */",
         "meta": {
             "range": [
-                1995,
-                2261
+                2016,
+                2282
             ],
             "filename": "view.vue",
-            "lineno": 103,
+            "lineno": 104,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12510,11 +12510,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2049,
-                2111
+                2070,
+                2132
             ],
             "filename": "view.vue",
-            "lineno": 106,
+            "lineno": 107,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12536,11 +12536,11 @@
         "comment": "/**\n* @return {ol.View}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                2316,
-                2890
+                2337,
+                2911
             ],
             "filename": "view.vue",
-            "lineno": 119,
+            "lineno": 120,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12571,11 +12571,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2364,
-                2423
+                2385,
+                2444
             ],
             "filename": "view.vue",
-            "lineno": 121,
+            "lineno": 122,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12596,11 +12596,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2431,
-                2472
+                2452,
+                2493
             ],
             "filename": "view.vue",
-            "lineno": 122,
+            "lineno": 123,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12621,11 +12621,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2480,
-                2515
+                2501,
+                2536
             ],
             "filename": "view.vue",
-            "lineno": 123,
+            "lineno": 124,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12646,11 +12646,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2523,
-                2542
+                2544,
+                2563
             ],
             "filename": "view.vue",
-            "lineno": 124,
+            "lineno": 125,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12671,11 +12671,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2550,
-                2583
+                2571,
+                2604
             ],
             "filename": "view.vue",
-            "lineno": 125,
+            "lineno": 126,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12696,11 +12696,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2591,
-                2624
+                2612,
+                2645
             ],
             "filename": "view.vue",
-            "lineno": 126,
+            "lineno": 127,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12721,11 +12721,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2632,
-                2653
+                2653,
+                2674
             ],
             "filename": "view.vue",
-            "lineno": 127,
+            "lineno": 128,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12746,11 +12746,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2661,
-                2682
+                2682,
+                2703
             ],
             "filename": "view.vue",
-            "lineno": 128,
+            "lineno": 129,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12771,11 +12771,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2690,
-                2717
+                2711,
+                2738
             ],
             "filename": "view.vue",
-            "lineno": 129,
+            "lineno": 130,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12796,11 +12796,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2725,
-                2752
+                2746,
+                2773
             ],
             "filename": "view.vue",
-            "lineno": 130,
+            "lineno": 131,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12821,11 +12821,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2760,
-                2789
+                2781,
+                2810
             ],
             "filename": "view.vue",
-            "lineno": 131,
+            "lineno": 132,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12846,11 +12846,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2797,
-                2820
+                2818,
+                2841
             ],
             "filename": "view.vue",
-            "lineno": 132,
+            "lineno": 133,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12871,11 +12871,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2828,
-                2843
+                2849,
+                2864
             ],
             "filename": "view.vue",
-            "lineno": 133,
+            "lineno": 134,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12896,11 +12896,11 @@
         "comment": "",
         "meta": {
             "range": [
-                2851,
-                2878
+                2872,
+                2899
             ],
             "filename": "view.vue",
-            "lineno": 134,
+            "lineno": 135,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12921,11 +12921,11 @@
         "comment": "/**\n* @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}\n   * @param {GeoJSONFeature|ol.Extent|ol.geom.Geometry|Vue} geometryOrExtent\n   * @param {olx.view.FitOptions} [options]\n   * @return {Promise} Resolves when view changes\n * @vueMethod\n */",
         "meta": {
             "range": [
-                3152,
-                3770
+                3173,
+                3791
             ],
             "filename": "view.vue",
-            "lineno": 143,
+            "lineno": 144,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -12988,11 +12988,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3320,
-                3411
+                3341,
+                3432
             ],
             "filename": "view.vue",
-            "lineno": 148,
+            "lineno": 149,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13015,11 +13015,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3468,
-                3513
+                3489,
+                3534
             ],
             "filename": "view.vue",
-            "lineno": 150,
+            "lineno": 151,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13042,11 +13042,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3529,
-                3558
+                3550,
+                3579
             ],
             "filename": "view.vue",
-            "lineno": 153,
+            "lineno": 154,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13068,11 +13068,11 @@
         "comment": "",
         "meta": {
             "range": [
-                3665,
-                3749
+                3686,
+                3770
             ],
             "filename": "view.vue",
-            "lineno": 158,
+            "lineno": 159,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13092,11 +13092,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                3822,
-                3921
+                3843,
+                3942
             ],
             "filename": "view.vue",
-            "lineno": 169,
+            "lineno": 170,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13127,11 +13127,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                3973,
-                4081
+                3994,
+                4102
             ],
             "filename": "view.vue",
-            "lineno": 177,
+            "lineno": 178,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13162,11 +13162,11 @@
         "comment": "/**\n* @return {void}\n   * @protected\n * @vueMethod\n */",
         "meta": {
             "range": [
-                4133,
-                4189
+                4154,
+                4210
             ],
             "filename": "view.vue",
-            "lineno": 185,
+            "lineno": 186,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13197,11 +13197,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4200,
-                5039
+                4221,
+                5060
             ],
             "filename": "view.vue",
-            "lineno": 190,
+            "lineno": 191,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13223,11 +13223,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4212,
-                4383
+                4233,
+                4404
             ],
             "filename": "view.vue",
-            "lineno": 191,
+            "lineno": 192,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13247,11 +13247,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4387,
-                4517
+                4408,
+                4538
             ],
             "filename": "view.vue",
-            "lineno": 196,
+            "lineno": 197,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13271,11 +13271,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4521,
-                4658
+                4542,
+                4679
             ],
             "filename": "view.vue",
-            "lineno": 201,
+            "lineno": 202,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13298,11 +13298,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4540,
-                4565
+                4561,
+                4586
             ],
             "filename": "view.vue",
-            "lineno": 202,
+            "lineno": 203,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13325,11 +13325,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4662,
-                4786
+                4683,
+                4807
             ],
             "filename": "view.vue",
-            "lineno": 207,
+            "lineno": 208,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13349,11 +13349,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4790,
-                4911
+                4811,
+                4932
             ],
             "filename": "view.vue",
-            "lineno": 212,
+            "lineno": 213,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13373,11 +13373,11 @@
         "comment": "",
         "meta": {
             "range": [
-                4915,
-                5036
+                4936,
+                5057
             ],
             "filename": "view.vue",
-            "lineno": 217,
+            "lineno": 218,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13397,11 +13397,11 @@
         "comment": "/**\n* ### View `vl-view`\n *\n * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,\n * **resolution**, and **rotation** of the map.\n *\n * @vueProto\n * @extends Vue\n * @vueName vl-view\n * @mixes olVirtCmp\n */",
         "meta": {
             "range": [
-                5245,
-                5829
+                5266,
+                5850
             ],
             "filename": "view.vue",
-            "lineno": 232,
+            "lineno": 233,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13427,11 +13427,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5264,
-                5279
+                5285,
+                5300
             ],
             "filename": "view.vue",
-            "lineno": 233,
+            "lineno": 234,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13452,11 +13452,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5283,
-                5302
+                5304,
+                5323
             ],
             "filename": "view.vue",
-            "lineno": 234,
+            "lineno": 235,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13477,11 +13477,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5306,
-                5311
+                5327,
+                5332
             ],
             "filename": "view.vue",
-            "lineno": 235,
+            "lineno": 236,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13502,11 +13502,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5315,
-                5323
+                5336,
+                5344
             ],
             "filename": "view.vue",
-            "lineno": 236,
+            "lineno": 237,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13527,11 +13527,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5327,
-                5334
+                5348,
+                5355
             ],
             "filename": "view.vue",
-            "lineno": 237,
+            "lineno": 238,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13552,11 +13552,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5338,
-                5343
+                5359,
+                5364
             ],
             "filename": "view.vue",
-            "lineno": 238,
+            "lineno": 239,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13577,11 +13577,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5347,
-                5417
+                5368,
+                5438
             ],
             "filename": "view.vue",
-            "lineno": 239,
+            "lineno": 240,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13602,11 +13602,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5364,
-                5412
+                5385,
+                5433
             ],
             "filename": "view.vue",
-            "lineno": 240,
+            "lineno": 241,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13626,11 +13626,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5421,
-                5467
+                5442,
+                5488
             ],
             "filename": "view.vue",
-            "lineno": 244,
+            "lineno": 245,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13650,11 +13650,11 @@
         "comment": "/**\n* @vueDataProp\n */",
         "meta": {
             "range": [
-                5450,
-                5456
+                5471,
+                5477
             ],
             "filename": "view.vue",
-            "lineno": 246,
+            "lineno": 247,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13675,11 +13675,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5471,
-                5826
+                5492,
+                5847
             ],
             "filename": "view.vue",
-            "lineno": 249,
+            "lineno": 250,
             "columnno": 2,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13702,11 +13702,11 @@
         "comment": "/**\n       * @type {ol.View|undefined}\n       */",
         "meta": {
             "range": [
-                5611,
-                5688
+                5632,
+                5709
             ],
             "filename": "view.vue",
-            "lineno": 254,
+            "lineno": 255,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13733,11 +13733,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5628,
-                5644
+                5649,
+                5665
             ],
             "filename": "view.vue",
-            "lineno": 255,
+            "lineno": 256,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13758,11 +13758,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5654,
-                5679
+                5675,
+                5700
             ],
             "filename": "view.vue",
-            "lineno": 256,
+            "lineno": 257,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13782,11 +13782,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5696,
-                5814
+                5717,
+                5835
             ],
             "filename": "view.vue",
-            "lineno": 258,
+            "lineno": 259,
             "columnno": 6,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13807,11 +13807,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5722,
-                5738
+                5743,
+                5759
             ],
             "filename": "view.vue",
-            "lineno": 259,
+            "lineno": 260,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13832,11 +13832,11 @@
         "comment": "",
         "meta": {
             "range": [
-                5748,
-                5805
+                5769,
+                5826
             ],
             "filename": "view.vue",
-            "lineno": 260,
+            "lineno": 261,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13856,11 +13856,11 @@
         "comment": "/**\n * Subscribe to OpenLayers significant events\n * @return {void}\n * @this module:map/view\n * @private\n */",
         "meta": {
             "range": [
-                5940,
-                6578
+                5961,
+                6599
             ],
             "filename": "view.vue",
-            "lineno": 272,
+            "lineno": 273,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13901,11 +13901,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6009,
-                6017
+                6030,
+                6038
             ],
             "filename": "view.vue",
-            "lineno": 275,
+            "lineno": 276,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13927,11 +13927,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6026,
-                6102
+                6047,
+                6123
             ],
             "filename": "view.vue",
-            "lineno": 276,
+            "lineno": 277,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13953,11 +13953,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6111,
-                6249
+                6132,
+                6270
             ],
             "filename": "view.vue",
-            "lineno": 277,
+            "lineno": 278,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -13979,11 +13979,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6146,
-                6158
+                6167,
+                6179
             ],
             "filename": "view.vue",
-            "lineno": 278,
+            "lineno": 279,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -14004,11 +14004,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6164,
-                6186
+                6185,
+                6207
             ],
             "filename": "view.vue",
-            "lineno": 279,
+            "lineno": 280,
             "columnno": 4,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -14029,11 +14029,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6259,
-                6464
+                6280,
+                6485
             ],
             "filename": "view.vue",
-            "lineno": 283,
+            "lineno": 284,
             "columnno": 8,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -14055,11 +14055,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6497,
-                6501
+                6518,
+                6522
             ],
             "filename": "view.vue",
-            "lineno": 290,
+            "lineno": 291,
             "columnno": 31,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -14080,11 +14080,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6503,
-                6508
+                6524,
+                6529
             ],
             "filename": "view.vue",
-            "lineno": 290,
+            "lineno": 291,
             "columnno": 37,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -14105,11 +14105,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6580,
-                6645
+                6601,
+                6666
             ],
             "filename": "view.vue",
-            "lineno": 296,
+            "lineno": 297,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {
@@ -14131,11 +14131,11 @@
         "comment": "",
         "meta": {
             "range": [
-                6647,
-                6753
+                6668,
+                6774
             ],
             "filename": "view.vue",
-            "lineno": 300,
+            "lineno": 301,
             "columnno": 0,
             "path": "/home/ghetto/projects/vuelayers/src/components/map",
             "code": {

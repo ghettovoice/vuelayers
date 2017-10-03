@@ -152,6 +152,26 @@
             }]
           ]
         }
+
+      h4 Usage example
+      vld-code(lang="html").
+        &lt;main id="app"&gt;
+          &lt;vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true"&gt;
+            &lt;vl-view :zoom="2" :center="[0, 0]" :rotation="0"&gt;&lt;/vl-view&gt;
+
+            &lt;vl-geoloc&gt;
+              &lt;template scope="ctx"&gt;
+                &lt;vl-feature v-if="ctx.position" id="geoloc-feature"&gt;
+                  &lt;vl-geom-point :coordinates="ctx.position"&gt;&lt;/vl-geom-point&gt;
+                &lt;/vl-feature&gt;
+              &lt;/template&gt;
+            &lt;/vl-geoloc&gt;
+
+            &lt;vl-layer-tile id="osm"&gt;
+              &lt;vl-source-osm&gt;&lt;/vl-source-osm&gt;
+            &lt;/vl-layer-tile&gt;
+          &lt;/vl-map&gt;
+        &lt;/main&gt;
 </template>
 
 <script>

@@ -100,6 +100,7 @@
      * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,
      * but **WebGL** can only render **Point** geometries.
      * @type {string|string[]}
+     * @default [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]
      */
     renderer: {
       type: [String, Array],

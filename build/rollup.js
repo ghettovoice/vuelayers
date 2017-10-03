@@ -284,6 +284,7 @@ function makeBundle (opts = {}) {
     sourcemapFile: dest,
     globals: opts.globals,
     paths: opts.paths,
+    amd: opts.amd,
   })).then(js => {
     if (!destCss) return { js, css: undefined }
     // concat all extracted styles from Vue and Sass files

@@ -25,10 +25,10 @@ import View from './view.vue'
  * @example **Usage**
  * ```html
  * <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
- *   <vl-view :center="[0, 0]" :zoom="3" :rotation="0" />
+ *   <vl-view :center="[0, 0]" :zoom="3" :rotation="0"></vl-view>
  *
  *   <vl-layer-tile>
- *     <vl-source-osm />
+ *     <vl-source-osm></vl-source-osm>
  *   </vl-layer-tile>
  * </vl-map>
  * ```

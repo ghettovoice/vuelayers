@@ -278,7 +278,7 @@ function handleVueProp (node, evt, parser) {
         if (!typePropNode) return
 
         handle(typePropNode.value)
-        if (defaultPropNode) {
+        if (defaultPropNode && !/^\s*\*\s@default(?:value)?\s.*$/im.test(evt.comment)) {
           evt.comment = setCommentTag(evt.comment, 'default', generate(defaultPropNode.value))
         }
         if (requiredPropNode) {
