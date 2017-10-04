@@ -12467,7 +12467,7 @@
             }
         },
         "see": [
-            "<p><a href=\"https://openlayers.org/en/latest/apidoc/ol.View.html#animate\" target=\"_blank\">https://openlayers.org/en/latest/apidoc/ol.View.html#animate</a></p>\n"
+            "<a href=\"https://openlayers.org/en/latest/apidoc/ol.View.html#animate\" target=\"_blank\">https://openlayers.org/en/latest/apidoc/ol.View.html#animate</a>"
         ],
         "params": [
             {
@@ -12934,7 +12934,7 @@
             }
         },
         "see": [
-            "<p><a href=\"https://openlayers.org/en/latest/apidoc/ol.View.html#fit\" target=\"_blank\">https://openlayers.org/en/latest/apidoc/ol.View.html#fit</a></p>\n"
+            "<a href=\"https://openlayers.org/en/latest/apidoc/ol.View.html#fit\" target=\"_blank\">https://openlayers.org/en/latest/apidoc/ol.View.html#fit</a>"
         ],
         "params": [
             {
@@ -55634,7 +55634,7 @@
             }
         ],
         "see": [
-            "<p><a href=\"https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L208\"  target=\"_blank\">https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L208</a></p>\n"
+            "https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L208"
         ],
         "name": "createOrUpdate",
         "longname": "createOrUpdate",
@@ -55834,7 +55834,7 @@
             }
         ],
         "see": [
-            "<p><a href=\"https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L482\"  target=\"_blank\">https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L482</a></p>\n"
+            "https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L482"
         ],
         "name": "getCorner",
         "longname": "getCorner",
@@ -56049,7 +56049,7 @@
             }
         ],
         "see": [
-            "<p><a href=\"https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L148\"  target=\"_blank\">https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L148</a></p>\n"
+            "https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L148"
         ],
         "name": "fromProjection",
         "longname": "fromProjection",
@@ -64028,7 +64028,7 @@
             }
         ],
         "see": [
-            "<p><a href=\"https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L104\"  target=\"_blank\">https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L104</a></p>\n"
+            "https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L104"
         ],
         "name": "resolutionsFromExtent",
         "longname": "resolutionsFromExtent",
@@ -64366,7 +64366,7 @@
             }
         ],
         "see": [
-            "<p><a href=\"https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L58\"  target=\"_blank\">https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L58</a></p>\n"
+            "https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L58"
         ],
         "name": "createForExtent",
         "longname": "createForExtent",
@@ -64609,7 +64609,7 @@
             }
         ],
         "see": [
-            "<p><a href=\"https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L135\"  target=\"_blank\">https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L135</a></p>\n"
+            "https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L135"
         ],
         "name": "createForProjection",
         "longname": "createForProjection",

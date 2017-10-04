@@ -40,7 +40,6 @@ function parseMarkdown (doclet, options) {
     'params',
     'properties',
     'returns',
-    'see',
     'summary',
   ]
 
