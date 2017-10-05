@@ -1,3 +1,4 @@
+/* eslint-disable import/no-webpack-loader-syntax */
 export default [
   // general
   {
@@ -43,9 +44,13 @@ export default [
     },
     props: {
       title: 'Map',
-      subtitle: 'The core module of VueLayers',
+      subtitle: 'the start point of every VueLayers based application',
       color: 'is-info',
-      docCmp: () => import('!jsdoc-vue-loader!./jsdoc-index.json?name=module:map&tpl=./jsdoc-vue-cmp.ejs'),
+      module: () => import('!vue-jsdoc-loader?tpl=./docs/jsdoc/cmp-module.ejs!../src/components/map/index'),
+      components: [
+        // require('!vue-jsdoc-loader?tpl=./jsdoc/cmp-module.ejs!../src/components/map/map.vue'),
+        // require('!vue-jsdoc-loader?tpl=./jsdoc/cmp-module.ejs!../src/components/map/view.vue'),
+      ],
     },
     component: () => import('./pages/doc.vue'),
   },

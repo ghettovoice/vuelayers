@@ -1,27 +1,35 @@
 <template lang="pug">
-  div(:class="[$options.name]")
+  div(':id'="module"  ':class'="[$options.name]")
     vld-hero(:bold="bold", :color="color")
       h1.title {{ title }}
       h2.subtitle {{ subtitle }}
 
     section.section
-      component(':is'="docCmp")
+      component(':is'="module")
 </template>
 
 <script>
   import page from './page'
 
   const props = {
-    docCmp: {
+    module: {
       type: [String, Object, Function],
       required: true,
     },
+  }
+
+  const computed = {
+  }
+
+  const methods = {
   }
 
   export default {
     name: 'vld-doc-page',
     mixins: [page],
     props,
+    computed,
+    methods,
   }
 </script>
 

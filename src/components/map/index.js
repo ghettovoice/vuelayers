@@ -5,14 +5,14 @@ import Map from './map.vue'
 import View from './view.vue'
 
 /**
- * Map module
+ * Map module includes two components:
+ * - {@linkcode module:map/map|vl-map} - viewport rendering, interaction and map events.
+ * - {@linkcode module:map/view|vl-view} - 2D view of the map
  *
- * It is the start point of every **VueLayers** based application.
- * It consists of two main components:
+ * It can be accessed from main lib entry or by direct importing. Module has several entry files for different
+ * module systems, correct entry file will be resolved automatically with the help of local `package.json` file.
  *
- * - {@link module:map/map|Map `vl-map`} - viewport, map rendering and low level interactions
- * - {@link module:map/view|View `vl-view`} - 2D view of the map
- *
+ * @alias module:map
  * @example Install
  * import Vue from 'vue'
  * // import module and styles

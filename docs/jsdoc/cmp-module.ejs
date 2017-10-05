@@ -1,0 +1,63 @@
+<%
+/* global _, doclets */
+const nameToIdent = string => string.replace(/^module:/, '').replace('/', '-').toLowerCase()
+
+let mainDoclet = doclets.find(({name, longname}) => name === longname)
+let ident = nameToIdent(mainDoclet.name)
+let longIdent = nameToIdent(mainDoclet.longname)
+let cmpName = `vld-module-${ident}-doc`
+let description = mainDoclet.description // .replace(/^<p[^/]*>.*<\/p>/, '')
+
+// examples
+let examples = (mainDoclet.examples || []).map(function (example) {
+  let caption, code, lang = ''
+  let match = example.match(/^\s*(?:<caption>)?([^[\]\n\r]+?)?(?:<\/caption>)?(?:\s*\[([\w]*)])?[\n\r]([\s\S]+)$/i)
+
+  if (match) {
+    caption = match[1] || 'Example'
+    lang = match[2] || ''
+    code = match[3] || ''
+  }
+
+  return `<vld-code title="${caption}" lang="${lang}">${_.escape(code)}</vld-code>`
+})
+%>
+
+<template>
+  <div id="<%= longIdent %>" class="content">
+    <%= description %>
+
+    <% examples.forEach(function (example) { %>
+      <%= example %>
+    <% }) %>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: '<%= cmpName %>',
+    computed: {
+      mainDoclet () {
+        return <%= JSON.stringify(mainDoclet) %>
+      },
+      doclets () {
+        return <%= JSON.stringify(doclets) %>
+      },
+    },
+    methods: {
+    },
+  }
+</script>
+
+<style lang="sass">
+  @import "../styles/variables"
+
+  $light-dark: lighten($dark, 30%)
+
+  .<%= cmpName %>
+    .icon.checkbox.is-light
+      color: $light-dark !important
+    .type
+      font-family: monospace
+      color: $light-dark
+</style>

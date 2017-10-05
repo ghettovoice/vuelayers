@@ -32,7 +32,7 @@ $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
 // sidebar
-$sidebar-background: $dark url(../static/img/sidebar-bg.png) repeat;
+$sidebar-background: $dark; // url(../static/img/sidebar-bg.png) repeat;
 $sidebar-link-color: lighten($primary, 5%);
 $sidebar-link-hover-color: $primary-invert;
 $sidebar-icon-color: $grey-light;
