@@ -378,11 +378,10 @@
   }
 
   /**
-   * Map `vl-map` component
-   *
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.
    *
+   * @title Map `vl-map` component
    * @vueProto
    */
   export default {

@@ -1,13 +1,12 @@
 // Import Bulma's core
 @import "~bulma/sass/utilities/_all";
 
-$light-blue: #03a9f4;
-$indigo: #536dfe;
-$grey-very-lighter: lighten($grey-lighter, 8);
-
 // Set your colors
-$primary: $light-blue;
-$info: $indigo;
+$primary: #1e88e5;
+$info: #2962ff;
+$success: #00bc53;
+$grey-very-lighter: lighten($grey-lighter, 8);
+$light-dark: lighten($dark, 30%);
 
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: (

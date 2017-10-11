@@ -219,6 +219,21 @@ exports.defineTags = function (dict) {
       doclet.required = true
     },
   })
+
+  dict.defineTag('vueExample', {
+    mustHaveValue: true,
+    onTagged (doclet, tag) {
+      doclet.vueExamples || (doclet.vueExamples = [])
+      doclet.vueExamples.push(tag.value)
+    },
+  })
+
+  dict.defineTag('title', {
+    mustHaveValue: true,
+    onTagged (doclet, tag) {
+      doclet.title = tag.value
+    },
+  })
 }
 
 function handleVueProto (node, evt, parser) {

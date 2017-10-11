@@ -41,6 +41,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       inject: true,
       serviceWorker: '',
       gaUID: config.replaces.C_GOOGLE_UID,
+      primaryColor: config.themeColor,
     }),
     new FriendlyErrorsPlugin(),
     new PreloadWebpackPlugin({

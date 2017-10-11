@@ -1,17 +1,12 @@
 <template lang="pug">
   div(:class="[$options.name]")
-    div.level
-      div.level-left
-        div.level-item
-          b.title(v-if="title && title.length") {{ title }}
-      div.level-right
-        div.level-item
-          button.copy.button.is-small(ref="copy" title="Copy to clipboard")
-            b-icon(icon="copy" size="is-small")
-            span Copy
+    b.title(v-if="title && title.length") {{ title }}
     pre
       code(:class='[lang]' ref='code')
         slot
+      button.copy.button(ref="copy" title="Copy to clipboard")
+        b-icon(icon="copy" size="is-small")
+        span Copy
 </template>
 
 <script>
@@ -74,11 +69,20 @@
 
   .vld-code
     position: relative
+    pre
+      position: relative
     &:not(:last-child)
       margin-bottom: 1em
     .title
       font-size: 1.2rem
       font-weight: bold
-    .level
-      margin-bottom: .25rem
+    .copy
+      opacity: 0
+      position: absolute
+      right: .25em
+      top: .25em
+      transition: opacity .3s ease-out
+    &:hover
+      .copy
+        opacity: 1
 </style>

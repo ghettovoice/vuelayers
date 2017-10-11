@@ -1,19 +1,20 @@
 <template lang="pug">
-  div(':id'="module"  ':class'="[$options.name]")
+  div(':class'="[$options.name]")
     vld-hero(:bold="bold", :color="color")
       h1.title {{ title }}
       h2.subtitle {{ subtitle }}
 
     section.section
-      component(':is'="module")
+      template(v-for="(doc, i) in docs")
+        component(':is'="doc" ':key'="i")
 </template>
 
 <script>
   import page from './page'
 
   const props = {
-    module: {
-      type: [String, Object, Function],
+    docs: {
+      type: Array,
       required: true,
     },
   }

@@ -1,5 +1,6 @@
 const path = require('path')
 const loaderUtils = require('loader-utils')
+const hash = require('hash-sum')
 
 module.exports = function (source) {
   this.cacheable && this.cacheable()
@@ -15,10 +16,12 @@ module.exports = function (source) {
   }
 
   let templateLoader = path.resolve(__dirname, './template.js')
-  this.options.jsdocData = {
+  let id = hash(this.resourcePath + source)
+  this.options.jsdocData || (this.options.jsdocData = {})
+  this.options.jsdocData[id] = {
     doclets,
     file: this.resourcePath,
   }
 
-  return `module.exports = require('!vue-loader!${templateLoader}?raw!${tplPath}')`
+  return `module.exports = require('!vue-loader!${templateLoader}?raw&id=${id}!${tplPath}?id=${id}')`
 }

@@ -223,11 +223,10 @@
   }
 
   /**
-   * View `vl-view` component
-   *
-   * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
+   *  Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
    * **resolution**, and **rotation** of the map.
    *
+   * @title View `vl-view` component
    * @vueProto
    */
   export default {

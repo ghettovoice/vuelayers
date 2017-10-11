@@ -1,0 +1,203 @@
+<%
+/* global _, doclets */
+const nameToIdent = string => string.replace(/^module:/, '').replace('/', '-').toLowerCase()
+const isPublic = ({access, undocumented}) => ({undocumented, access}) => !undocumented && (!access || access === 'public')
+const alphabetSorter = (a, b) => {
+  return a.name.toLowerCase() === b.name.toLowerCase()
+    ? 0
+    : (
+      a.name.toLowerCase() < b.name.toLowerCase()
+        ? -1
+        : 1
+    )
+}
+
+let mainDoclet = doclets.find(({name, longname}) => name === longname)
+let ident = nameToIdent(mainDoclet.name)
+let longIdent = nameToIdent(mainDoclet.longname)
+let cmpName = `vld-${longIdent}-doc`
+let description = mainDoclet.description
+
+// examples
+let examples = (mainDoclet.examples || []).map(function (example) {
+  let caption, code, lang = ''
+  let match = example.match(/^\s*(?:<caption>)?([^[\]\n\r]+?)?(?:<\/caption>)?(?:\s*\[([\w]*)])?[\n\r]([\s\S]+)$/i)
+
+  if (match) {
+    caption = match[1] || 'Example'
+    lang = match[2] || ''
+    code = match[3] || ''
+  }
+
+  return `<vld-code title="${caption}" lang="${lang}">${_.escape(code)}</vld-code>`
+})
+
+// vue parts
+let mixins = mainDoclet.mixes || []
+let props = []
+let dataProps = []
+let compProps = []
+let otherMembers = []
+let methods = []
+doclets.forEach(child => {
+  if (!isPublic(child) || child.memberof !== mainDoclet.longname) {
+    return
+  }
+  switch (true) {
+    case child.vueProp:
+      props.push(child)
+      break
+    case child.vueComputedProp:
+      compProps.push(child)
+      break
+    case child.vueDataProp:
+      dataProps.push(child)
+      break
+    case child.kind === 'member' && child.scope === 'instance':
+      otherMembers.push(child)
+      break
+    case child.vueMethod:
+      methods.push(child)
+      break
+  }
+})
+props.sort(alphabetSorter)
+compProps.sort(alphabetSorter)
+dataProps.sort(alphabetSorter)
+otherMembers.sort(alphabetSorter)
+methods.sort(alphabetSorter)
+%>
+
+<template>
+  <div id="<%= longIdent %>" :class="$options.name" class="content">
+    <% if (mainDoclet.title) { %>
+    <h3><%= mainDoclet.title %></h3>
+    <% } %>
+
+    <%= description %>
+
+    <% examples.forEach(function (example) { %>
+    <%= example %>
+    <% }) %>
+
+    <% if (mixins.length) { %>
+    <b>Mixes in:</b>
+    <ul>
+      <% mixins.forEach(function (name) { %>
+      <li><%= name %></li>
+      <% }) %>
+    </ul>
+    <% } %>
+
+    <% if (props.length || methods.length) { %>
+    <b-tabs>
+      <% if (props.length) { %>
+      <b-tab-item label="Props">
+        <b-table class="doc-table" :data='<%= JSON.stringify(props) %>' :mobile-cards="true">
+          <template scope="scope">
+            <b-table-column label="Name">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Type">
+              <span class="type-col">{{ scope.row.typeExpression }}</span>
+            </b-table-column>
+            <b-table-column label="Required">
+              <b-icon class="checkbox" :type="scope.row.required ? 'is-info' : 'is-light'"
+                      :icon="scope.row.required ? 'check-square-o' : 'square-o'"/>
+            </b-table-column>
+            <b-table-column label="Two way sync">
+              <b-icon class="checkbox" :type="scope.row.vueSync ? 'is-info' : 'is-light'"
+                      :icon="scope.row.vueSync ? 'check-square-o' : 'square-o'"/>
+            </b-table-column>
+            <b-table-column label="Default">
+              <code>{{ scope.row.defaultvalue || 'undefined' }}</code>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+      <% if (otherMembers.length) { %>
+      <b-tab-item label="Other members">
+        <b-table class="doc-table" :data='<%= JSON.stringify(otherMembers) %>' :mobile-cards="true">
+          <template scope="scope">
+            <b-table-column label="Name">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Type">
+              <span class="type-col">{{ scope.row.typeExpression }}</span>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+      <% if (methods.length) { %>
+      <b-tab-item label="Methods">
+        <b-table class="doc-table" :data='<%= JSON.stringify(methods) %>' :mobile-cards="true">
+          <template scope="scope">
+            <b-table-column label="Name">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Params">
+              TODO: render params list
+            </b-table-column>
+            <b-table-column label="Returns">
+              <p v-for="(ret, i) in scope.row.returns" :key="i">
+                <span class="type-col">{{ ret.typeExpression }}</span>
+                <template v-html="ret.description"></template>
+              </p>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+    </b-tabs>
+    <% } %>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: '<%= cmpName %>',
+    computed: {
+      ident () {
+        return '<%= ident %>'
+      },
+      longIdent () {
+        return '<%= longIdent %>'
+      },
+      mainDoclet () {
+        return <%= JSON.stringify(mainDoclet) %>
+      },
+      doclets () {
+        return <%= JSON.stringify(doclets) %>
+      },
+      props () {
+        return <%= JSON.stringify(props) %>
+      },
+      computed () {
+        return <%= JSON.stringify(compProps) %>
+      },
+      data () {
+        return <%= JSON.stringify(dataProps) %>
+      },
+      methods () {
+        return <%= JSON.stringify(methods) %>
+      },
+      mixins () {
+        return <%= JSON.stringify(mixins) %>
+      },
+    },
+    methods: {
+    },
+  }
+</script>
+
+<style lang="sass">
+  @import ../styles/variables
+</style>

@@ -9,9 +9,10 @@ import View from './view.vue'
  * - {@linkcode module:map/map|vl-map} - viewport rendering, interaction and map events.
  * - {@linkcode module:map/view|vl-view} - 2D view of the map
  *
- * It can be accessed from main lib entry or by direct importing. Module has several entry files for different
- * module systems, correct entry file will be resolved automatically with the help of local `package.json` file.
+ * Module has several entry files for different module systems, correct entry file will be resolved automatically
+ * according to local `package.json` file.
  *
+ * @title Map module
  * @alias module:map
  * @example Install
  * import Vue from 'vue'
@@ -24,8 +25,8 @@ import View from './view.vue'
  * // register vl-map and vl-view components
  * Vue.use(Map)
  *
- * @example Usage [html]
- * <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
+ * @vueExample Usage [html]
+ * <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" style="height: 400px">
  *   <vl-view :center="[0, 0]" :zoom="3" :rotation="0"></vl-view>
  *
  *   <vl-layer-tile>

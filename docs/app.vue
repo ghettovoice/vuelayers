@@ -1,5 +1,7 @@
 <template lang="pug">
   main#app(:class="[$options.name]")
+    vue-progress-bar
+
     div.columns.layout
       div.column.left.is-4-tablet.is-3-desktop.is-hidden-mobile.is-fullheight
         vld-sidebar
@@ -75,7 +77,7 @@
 
         div.page
           transition(name="fade-delayed" appear)
-            router-view/
+            router-view
 
         vld-footer#footer(right-mods="has-text-centered has-text-right-tablet")
           div.content(slot="left")
@@ -124,6 +126,26 @@
       return {
         navbarMenuActive: false,
       }
+    },
+    created () {
+      this.$Progress.start()
+      this.$router.beforeEach((to, frm, next) => {
+        //  does the page we want to go to have a meta.progress object
+        if (to.meta.progress !== undefined) {
+          let meta = to.meta.progress
+          // parse meta tags
+          this.$Progress.parseMeta(meta)
+        }
+        //  start the progress bar
+        this.$Progress.start()
+        //  continue to next page
+        next()
+      })
+      //  hook the progress bar to finish after we've finished moving router-view
+      this.$router.afterEach((to, frm) => {
+        //  finish the progress bar
+        this.$Progress.finish()
+      })
     },
   }
 </script>

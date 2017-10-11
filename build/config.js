@@ -17,6 +17,7 @@ ${packageJson.description}
 */`
 
 const BASE_URL = process.env.BASE_URL || '/'
+const themeColor = '#1565c0'
 
 module.exports = {
   banner,
@@ -49,4 +50,5 @@ module.exports = {
     C_GOOGLE_UID: 'UA-98870917-3',
   },
   autoOpenBrowser: true,
+  themeColor,
 }

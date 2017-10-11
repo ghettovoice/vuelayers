@@ -46,10 +46,10 @@ export default [
       title: 'Map',
       subtitle: 'the start point of every VueLayers based application',
       color: 'is-info',
-      module: () => import('!vue-jsdoc-loader?tpl=./docs/jsdoc/cmp-module.ejs!../src/components/map/index'),
-      components: [
-        // require('!vue-jsdoc-loader?tpl=./jsdoc/cmp-module.ejs!../src/components/map/map.vue'),
-        // require('!vue-jsdoc-loader?tpl=./jsdoc/cmp-module.ejs!../src/components/map/view.vue'),
+      docs: [
+        () => import('!vue-jsdoc-loader?tpl=./docs/jsdoc/module.ejs!../src/components/map/index'),
+        () => import('!vue-jsdoc-loader?tpl=./docs/jsdoc/cmp.ejs!../src/components/map/map.vue'),
+        () => import('!vue-jsdoc-loader?tpl=./docs/jsdoc/cmp.ejs!../src/components/map/view.vue'),
       ],
     },
     component: () => import('./pages/doc.vue'),

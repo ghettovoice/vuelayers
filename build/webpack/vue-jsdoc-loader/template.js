@@ -7,7 +7,7 @@ module.exports = function (source) {
   const options = loaderUtils.getOptions(this) || {}
   const params = this.query ? loaderUtils.parseQuery(this.query) || {} : {}
   const opts = Object.assign({}, options, params)
-  const data = this.options.jsdocData || {}
+  const data = this.options.jsdocData[opts.id] || {}
 
   this.addDependency(data.file)
 
