@@ -11,7 +11,9 @@ module.exports = function (source) {
 
   this.addDependency(data.file)
 
-  let tplFunc = template(source)
+  let tplFunc = template(source, {
+    imports: Object.assign({}, opts.helper),
+  })
   source = tplFunc(data)
 
   return opts.raw ? source : `module.exports = ${JSON.stringify(source)}`

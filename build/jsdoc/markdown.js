@@ -41,6 +41,7 @@ function parseMarkdown (doclet, options) {
     'properties',
     'returns',
     'summary',
+    'title',
   ]
 
   tags.forEach(tag => {

@@ -29,7 +29,7 @@ let examples = (mainDoclet.examples || []).map(function (example) {
     code = match[3] || ''
   }
 
-  return `<vld-code title="${caption}" lang="${lang}">${_.escape(code)}</vld-code>`
+  return `<vld-code class="example" title="${caption}" lang="${lang}">${_.escape(code)}</vld-code>`
 })
 
 // vue parts

@@ -73,9 +73,6 @@
       position: relative
     &:not(:last-child)
       margin-bottom: 1em
-    .title
-      font-size: 1.2rem
-      font-weight: bold
     .copy
       opacity: 0
       position: absolute

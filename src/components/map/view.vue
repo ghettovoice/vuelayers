@@ -227,6 +227,7 @@
    * **resolution**, and **rotation** of the map.
    *
    * @title View `vl-view` component
+   * @alias module:map/map
    * @vueProto
    */
   export default {
