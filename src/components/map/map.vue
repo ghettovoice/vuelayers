@@ -15,10 +15,10 @@
   import VectorSource from 'ol/source/vector'
   import olcontrol from 'ol/control'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/merge'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/map'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { throttleTime } from 'rxjs/operator/throttleTime'
+  import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
+  import { map as mapObs } from 'rxjs/operator/map'
   import {
     RENDERER_TYPE,
     projHelper,
@@ -446,7 +446,7 @@
 
     const ft = 100
     // pointer
-    const pointerEvents = Observable.merge(
+    const pointerEvents = Observable::mergeObs(
       observableFromOlEvent(this.$map, [
         'click',
         'dblclick',
@@ -455,9 +455,9 @@
       observableFromOlEvent(this.$map, [
         'pointerdrag',
         'pointermove',
-      ]).throttleTime(ft)
-        .distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
-    ).map(evt => ({
+      ])::throttleTime(ft)
+        ::distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
+    )::mapObs(evt => ({
       ...evt,
       coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection()),
     }))
@@ -470,7 +470,7 @@
       'postcompose',
     ])
 
-    const events = Observable.merge(
+    const events = Observable::mergeObs(
       pointerEvents,
       otherEvents
     )

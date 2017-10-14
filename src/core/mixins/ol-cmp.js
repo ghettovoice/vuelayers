@@ -1,9 +1,10 @@
 import { isFunction } from 'lodash/fp'
-import 'rxjs/add/observable/interval'
-import 'rxjs/add/operator/first'
-import 'rxjs/add/operator/skipWhile'
-import 'rxjs/add/operator/toPromise'
 import { Observable } from 'rxjs/Observable'
+import { interval as intervalObs } from 'rxjs/observable/interval'
+import { first as firstObs } from 'rxjs/operator/first'
+import { map as mapObs } from 'rxjs/operator/map'
+import { skipWhile } from 'rxjs/operator/skipWhile'
+import { toPromise } from 'rxjs/operator/toPromise'
 import { VM_PROP } from '../consts'
 // import { logdbg } from '../utils/debug'
 import identMap from './ident-map'
@@ -124,11 +125,11 @@ export default {
      * @type {Promise<Vue<T>>}
      * @private
      */
-    this._mountPromise = Observable.interval(100)
-      .skipWhile(() => !this._mounted)
-      .first()
-      .map(() => this)
-      .toPromise()
+    this._mountPromise = Observable::intervalObs(100)
+      ::skipWhile(() => !this._mounted)
+      ::firstObs()
+      ::mapObs(() => this)
+      ::toPromise()
 
     Object.defineProperties(this, {
       $olObject: {

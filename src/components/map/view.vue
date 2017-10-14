@@ -6,10 +6,10 @@
   import View from 'ol/view'
   import { isEqual, isPlainObject, noop } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/merge'
-  import 'rxjs/add/operator/debounceTime'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/map'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { debounceTime } from 'rxjs/operator/debounceTime'
+  import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
+  import { map as mapObs } from 'rxjs/operator/map'
   import {
     MIN_ZOOM,
     MAX_ZOOM,
@@ -275,13 +275,13 @@
 
     const ft = 100
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
-    const zoom = resolution.map(() => ({
+    const zoom = resolution::mapObs(() => ({
       prop: 'zoom',
       value: this::getZoom(),
-    })).debounceTime(2 * ft)
-      .distinctUntilChanged(isEqual)
+    }))::debounceTime(2 * ft)
+      ::distinctUntilChanged(isEqual)
 
-    const changes = Observable.merge(
+    const changes = Observable::mergeObs(
       observableFromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
       observableFromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
