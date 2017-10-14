@@ -4,7 +4,7 @@
       h1.title {{ title }}
       h2.subtitle {{ subtitle }}
 
-    vld-demo-app/
+    vld-demo-app
 
     section.section.content
       h3 Demo sources

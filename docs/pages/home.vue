@@ -29,13 +29,13 @@
 
       section.buttons
         router-link(to="/demo" class="button is-primary is-large" title="View Live Demo")
-          b-icon(icon="gear")/
+          b-icon(icon="gear")
           span Live Demo
         router-link(to="/start" class="button is-success is-large" title="Quick Start Guide")
           span Get started
-          b-icon(icon="arrow-right")/
+          b-icon(icon="arrow-right")
 
-      hr/
+      hr
 
       section.github-buttons.is-flex.is-flex-justify-center
         vld-github-btn(
@@ -46,7 +46,7 @@
           size="large"
           width="120px"
           height="30px"
-        )/
+        )
         vld-github-btn(
           user="C_PKG_AUTHOR_USER"
           repo="vuelayers"
@@ -55,7 +55,7 @@
           size="large"
           width="120px"
           height="30px"
-        )/
+        )
 </template>
 
 <script>

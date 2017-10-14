@@ -6,7 +6,7 @@ import View from './view.vue'
 
 /**
  * Map module includes two components:
- * - {@linkcode module:map/map|vl-map} - viewport rendering, interaction and map events.
+ * - {@linkcode module:map/map|vl-map} - viewport rendering, interaction and map events
  * - {@linkcode module:map/view|vl-view} - 2D view of the map
  *
  * Module has several entry files for different module systems, correct entry file will be resolved automatically

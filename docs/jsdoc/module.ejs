@@ -1,14 +1,14 @@
 <%
-/* global _, doclets, nameToIdent, mapExamples, mapVueExamples */
+/* global _, doclets, helper */
 let mainDoclet = doclets.find(({name, longname}) => name === longname)
-let ident = nameToIdent(mainDoclet.name)
-let longIdent = nameToIdent(mainDoclet.longname)
+let ident = helper.nameToIdent(mainDoclet.name)
+let longIdent = helper.nameToIdent(mainDoclet.longname)
 let cmpName = `vld-${longIdent}-doc`
 let description = mainDoclet.description
 
 // examples
-let examples = mapExamples(mainDoclet.examples)
-let vueExamples = mapVueExamples(mainDoclet.vueExamples)
+let examples = helper.mapExamples(mainDoclet.examples)
+let vueExamples = helper.mapVueExamples(mainDoclet.vueExamples)
 %>
 
 <template>

@@ -10,10 +10,7 @@ module.exports = function (source) {
   const data = this.options.jsdocData[opts.id] || {}
 
   this.addDependency(data.file)
-
-  let tplFunc = template(source, {
-    imports: Object.assign({}, opts.helper),
-  })
+  let tplFunc = template(source)
   source = tplFunc(data)
 
   return opts.raw ? source : `module.exports = ${JSON.stringify(source)}`
