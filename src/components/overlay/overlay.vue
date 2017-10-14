@@ -9,7 +9,7 @@
   import { isEqual } from 'lodash/fp'
   import Overlay from 'ol/overlay'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/merge'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
   import {
     OVERLAY_POSITIONING,
     projHelper,
@@ -189,7 +189,7 @@
     assert.hasView(this)
 
     const ft = 100
-    const changes = Observable.merge(
+    const changes = Observable::mergeObs(
       observableFromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
