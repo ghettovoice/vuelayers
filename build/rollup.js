@@ -350,7 +350,6 @@ function writePackageJSON (pkgIndexPath) {
       version: config.version,
       main: `${fileName}.js`,
       module: `${fileName}.es.js`,
-      browser: `${fileName}.umd.min.js`,
       unpkg: `${fileName}.umd.js`,
     }, null, 2),
   )

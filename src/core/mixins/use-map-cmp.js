@@ -3,11 +3,11 @@
  * @module components/ol-use-map-cmp
  */
 import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/observable/interval'
-import 'rxjs/add/operator/skipWhile'
-import 'rxjs/add/operator/first'
-import 'rxjs/add/operator/map'
-import 'rxjs/add/operator/toPromise'
+import { interval as intervalObs } from 'rxjs/observable/interval'
+import { first as firstObs } from 'rxjs/operator/first'
+import { map as mapObs } from 'rxjs/operator/map'
+import { skipWhile } from 'rxjs/operator/skipWhile'
+import { toPromise } from 'rxjs/operator/toPromise'
 
 export default {
   methods: {
@@ -16,11 +16,11 @@ export default {
      * @protected
      */
     beforeInit () {
-      return Observable.interval(100)
-        .skipWhile(() => !this.$map)
-        .first()
-        .map(() => this)
-        .toPromise()
+      return Observable::intervalObs(100)
+        ::skipWhile(() => !this.$map)
+        ::firstObs()
+        ::mapObs(() => this)
+        ::toPromise()
     },
   },
 }

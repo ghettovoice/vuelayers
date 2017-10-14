@@ -1,14 +1,14 @@
 import { isEqual } from 'lodash/fp'
-import mergeDescriptors from '../utils/multi-merge-descriptors'
-import 'rxjs/add/operator/map'
-import 'rxjs/add/operator/throttleTime'
-import 'rxjs/add/operator/distinctUntilChanged'
-import observableFromOlEvent from '../rx-ext/from-ol-event'
-import cmp from './ol-virt-cmp'
-import useMapCmp from './use-map-cmp'
+import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
+import { map as mapObs } from 'rxjs/operator/map'
+import { throttleTime } from 'rxjs/operator/throttleTime'
 import * as extentHelper from '../ol-ext/extent'
 import * as projHelper from '../ol-ext/proj'
+import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../utils/assert'
+import mergeDescriptors from '../utils/multi-merge-descriptors'
+import cmp from './ol-virt-cmp'
+import useMapCmp from './use-map-cmp'
 
 const props = {
   /**
@@ -208,9 +208,9 @@ function subscribeToGeomChanges () {
       coordinates: this.toLonLat(this.$geometry.getCoordinates()),
       extent: this.extentToLonLat(this.$geometry.getExtent()),
     })
-  ).throttleTime(ft)
-    .distinctUntilChanged(isEqualGeom)
-    .map(({ coordinates }) => ({
+  )::throttleTime(ft)
+    ::distinctUntilChanged(isEqualGeom)
+    ::mapObs(({ coordinates }) => ({
       prop: 'coordinates',
       value: coordinates,
     }))

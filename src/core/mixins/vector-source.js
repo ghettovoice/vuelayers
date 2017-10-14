@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/observable/merge'
-import 'rxjs/add/operator/do'
-import observableFromOlEvent from '../rx-ext/from-ol-event'
-import { EPSG_4326 } from '../ol-ext/consts'
-import source from './source'
+import { merge as mergeObs } from 'rxjs/observable/merge'
+import { _do as doObs } from 'rxjs/operator/do'
 import featuresContainer from '../mixins/features-container'
+import { EPSG_4326 } from '../ol-ext/consts'
+import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../utils/assert'
 import mergeDescriptors from '../utils/multi-merge-descriptors'
+import source from './source'
 
 const props = {
   projection: {
@@ -117,15 +117,15 @@ function subscribeToSourceChanges () {
   assert.hasSource(this)
 
   const add = observableFromOlEvent(this.$source, 'addfeature')
-    .do(({ feature }) => {
+    ::doObs(({ feature }) => {
       this.addFeature(feature)
     })
   const remove = observableFromOlEvent(this.$source, 'removefeature')
-    .do(({ feature }) => {
+    ::doObs(({ feature }) => {
       this.removeFeature(feature)
     })
 
-  const events = Observable.merge(add, remove)
+  const events = Observable::mergeObs(add, remove)
 
   this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

@@ -1,9 +1,9 @@
-import { isFunction, isEqual } from 'lodash/fp'
+import { isEqual, isFunction } from 'lodash/fp'
 import { Observable } from 'rxjs/Observable'
-import 'rxjs/add/observable/merge'
-import 'rxjs/add/operator/throttleTime'
-import 'rxjs/add/operator/distinctUntilChanged'
-import 'rxjs/add/operator/map'
+import { merge as mergeObs } from 'rxjs/observable/merge'
+import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
+import { map as mapObs } from 'rxjs/operator/map'
+import { throttleTime } from 'rxjs/operator/throttleTime'
 import fromOlEvent from './from-ol-event'
 
 /**
@@ -18,7 +18,7 @@ import fromOlEvent from './from-ol-event'
  */
 export default function fromOlChangeEvent (target, prop, distinct, throttle, selector) {
   if (Array.isArray(prop)) {
-    return Observable.merge(...prop.map(p => fromOlChangeEvent(target, p)))
+    return Observable::mergeObs(...prop.map(p => fromOlChangeEvent(target, p)))
   }
 
   selector = selector || ((target, prop) => target.get(prop))
@@ -26,12 +26,12 @@ export default function fromOlChangeEvent (target, prop, distinct, throttle, sel
   let observable = fromOlEvent(target, event, () => selector(target, prop))
 
   if (throttle != null) {
-    observable = observable.throttleTime(throttle)
+    observable = observable::throttleTime(throttle)
   }
   if (distinct) {
     isFunction(distinct) || (distinct = isEqual)
-    observable = observable.distinctUntilChanged(distinct)
+    observable = observable::distinctUntilChanged(distinct)
   }
 
-  return observable.map(value => ({ prop, value }))
+  return observable::mapObs(value => ({ prop, value }))
 }
