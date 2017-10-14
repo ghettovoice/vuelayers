@@ -9,11 +9,11 @@
   import Feature from 'ol/feature'
   import { isEqual, merge } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
-  import 'rxjs/add/observable/merge'
-  import 'rxjs/add/operator/distinctUntilChanged'
-  import 'rxjs/add/operator/throttleTime'
-  import 'rxjs/add/operator/map'
-  import 'rxjs/add/operator/mergeAll'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
+  import { throttleTime } from 'rxjs/operator/throttleTime'
+  import { map as mapObs } from 'rxjs/operator/map'
+  import { mergeAll } from 'rxjs/operator/mergeAll'
   import {
     geoJsonHelper,
     mergeDescriptors,
@@ -211,22 +211,22 @@
       this.$feature,
       'propertychange',
       ({ key }) => ({ prop: key, value: getPropValue(key) })
-    ).throttleTime(ft)
-      .distinctUntilChanged(isEqual)
+    )::throttleTime(ft)
+      ::distinctUntilChanged(isEqual)
     // id, style and other generic changes
     const changes = observableFromOlEvent(
       this.$feature,
       'change'
-    ).map(() => Observable.create(obs => {
+    )::mapObs(() => Observable.create(obs => {
       if (this.$feature.getId() !== this.id) {
         obs.next({ prop: 'id', value: this.$feature.getId() })
       }
       // todo style?
-    })).mergeAll()
-      .throttleTime(ft)
-      .distinctUntilChanged(isEqual)
+    }))::mergeAll()
+      ::throttleTime(ft)
+      ::distinctUntilChanged(isEqual)
     // all changes
-    const allChanges = Observable.merge(
+    const allChanges = Observable::mergeObs(
       propChanges,
       changes
     )
