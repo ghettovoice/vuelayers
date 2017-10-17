@@ -84,14 +84,14 @@ exports.handlers = {
 
     // fix type expressions
     if (evt.doclet.type) {
-      evt.doclet.typeExpression = catharsis.stringify(evt.doclet.type.parsedType)
+      evt.doclet.typeExpression = toTypeExpression(evt.doclet.type.parsedType)
     }
 
     if (evt.doclet.returns) {
       // evt.doclet.returnExpression = catharsis.stringify(evt.doclet.returns.parsedType)
       evt.doclet.returns.forEach(returns => {
         if (returns.type) {
-          returns.typeExpression = catharsis.stringify(returns.type.parsedType)
+          returns.typeExpression = toTypeExpression(returns.type.parsedType)
         }
       })
     }
@@ -99,7 +99,7 @@ exports.handlers = {
     if (evt.doclet.params) {
       evt.doclet.params.forEach(param => {
         if (param.type) {
-          param.typeExpression = catharsis.stringify(param.type.parsedType)
+          param.typeExpression = toTypeExpression(param.type.parsedType)
         }
       })
     }
@@ -496,4 +496,8 @@ function ctorNameToType (ctorName) {
   }
 
   return ctorName
+}
+
+function toTypeExpression (type) {
+  return (catharsis.stringify(type) || '').split('|').join(' | ')
 }

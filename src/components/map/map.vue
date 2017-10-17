@@ -35,7 +35,7 @@
   /**
    * @vueProps
    */
-  const props = {
+  const props = /** @lends module:map/map# */{
     /**
      * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
      * value is used to configure controls.
@@ -100,7 +100,7 @@
      * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,
      * but **WebGL** can only render **Point** geometries.
      * @type {string|string[]}
-     * @default [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]
+     * @default ['canvas', 'webgl']
      */
     renderer: {
       type: [String, Array],
@@ -119,7 +119,7 @@
   /**
    * @vueMethods
    */
-  const methods = {
+  const methods = /** @lends module:map/map# */{
     /**
      * @return {ol.Map}
      * @protected
@@ -384,6 +384,17 @@
    * @title Map `vl-map` component
    * @alias module:map/map
    * @vueProto
+   *
+   * @fires module:map/map#click
+   * @fires module:map/map#dblclick
+   * @fires module:map/map#singleclick
+   * @fires module:map/map#pointerdrag
+   * @fires module:map/map#pointermove
+   * @fires module:map/map#movestart
+   * @fires module:map/map#moveend
+   * @fires module:map/map#postrender
+   * @fires module:map/map#precompose
+   * @fires module:map/map#postcompose
    */
   export default {
     name: 'vl-map',
@@ -436,8 +447,9 @@
 
   /**
    * Subscribe to OL map events.
-   * @return {void}
+   *
    * @this module:map/map
+   * @return {void}
    * @private
    */
   function subscribeToMapEvents () {
@@ -477,4 +489,10 @@
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
+
+  /**
+   * A click with no dragging. A double click will fire two of this.
+   * @event module:map/map#click
+   * @type {ol.MapBrowserEvent}
+   */
 </script>

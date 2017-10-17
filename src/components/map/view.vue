@@ -25,7 +25,7 @@
   /**
    * @vueProps
    */
-  const props = {
+  const props = /** @lends module:map/view# */{
     /**
      * The center coordinate of the map view in **EPSG:4326** projection.
      * @type {number[]}
@@ -89,13 +89,13 @@
     },
   }
 
-  const computed = {
+  const computed = /** @lends module:map/view# */{
   }
 
   /**
    * @vueMethods
    */
-  const methods = {
+  const methods = /** @lends module:map/view# */{
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
      * @param {...(olx.AnimationOptions|function(boolean))} args
@@ -227,7 +227,7 @@
    * **resolution**, and **rotation** of the map.
    *
    * @title View `vl-view` component
-   * @alias module:map/map
+   * @alias module:map/view
    * @vueProto
    */
   export default {
@@ -242,11 +242,17 @@
         return this.$options.name
       },
     },
+    /**
+     * @this module:map/view
+     */
     data () {
-      return {
+      return /** @lends module:map/view# */{
         rev: 1,
       }
     },
+    /**
+     * @this module:map/view
+     */
     created () {
       Object.defineProperties(this, /** @lends module:map/view# */{
         /**

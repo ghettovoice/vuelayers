@@ -2,7 +2,7 @@ const { escape } = require('lodash/fp')
 
 exports.nameToIdent = string => string.replace(/^module:/, '').replace('/', '-').toLowerCase()
 
-exports.isPublic = ({access, undocumented}) => ({undocumented, access}) => !undocumented && (!access || access === 'public')
+exports.isPublic = ({access, undocumented}) => !undocumented && (!access || access === 'public')
 
 exports.alphabetSorter = (a, b) => {
   return a.name.toLowerCase() === b.name.toLowerCase()
@@ -15,7 +15,8 @@ exports.alphabetSorter = (a, b) => {
 }
 
 exports.mapExamples = examples => (examples || []).map(function (example) {
-  let caption, code, lang = ''
+  let caption, code
+  let lang = ''
   let match = example.match(/^\s*(?:<caption>)?([^[\]\n\r]+?)?(?:<\/caption>)?(?:\s*\[([\w]*)])?[\n\r]([\s\S]+)$/i)
 
   if (match) {
@@ -57,6 +58,7 @@ exports.findVueProtoParts = (doclets, protoDoclet) => {
   let compProps = []
   let otherMembers = []
   let methods = []
+  let events = []
 
   doclets.forEach(child => {
     if (!exports.isPublic(child) || child.memberof !== protoDoclet.longname) {
@@ -78,6 +80,9 @@ exports.findVueProtoParts = (doclets, protoDoclet) => {
       case child.vueMethod:
         methods.push(child)
         break
+      case child.kind === 'event':
+        events.push(child)
+        break
     }
   })
   props.sort(exports.alphabetSorter)
@@ -85,6 +90,7 @@ exports.findVueProtoParts = (doclets, protoDoclet) => {
   dataProps.sort(exports.alphabetSorter)
   otherMembers.sort(exports.alphabetSorter)
   methods.sort(exports.alphabetSorter)
+  events.sort(exports.alphabetSorter)
 
   return {
     props,
@@ -92,5 +98,6 @@ exports.findVueProtoParts = (doclets, protoDoclet) => {
     dataProps,
     otherMembers,
     methods,
+    events,
   }
 }

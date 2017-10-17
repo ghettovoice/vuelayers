@@ -12,7 +12,7 @@ let vueExamples = helper.mapVueExamples(mainDoclet.vueExamples)
 
 // vue parts
 let mixins = mainDoclet.mixes || []
-let { props, dataProps, compProps, otherMembers, methods } = helper.findVueProtoParts(doclets, mainDoclet)
+let { props, dataProps, compProps, otherMembers, methods, events } = helper.findVueProtoParts(doclets, mainDoclet)
 %>
 <template>
   <div id="<%= longIdent %>" :class="$options.name" class="content">
@@ -23,6 +23,10 @@ let { props, dataProps, compProps, otherMembers, methods } = helper.findVueProto
     <%= description %>
 
     <% examples.forEach(function (example) { %>
+    <%= example %>
+    <% }) %>
+
+    <% vueExamples.forEach(function (example) { %>
     <%= example %>
     <% }) %>
 
@@ -39,15 +43,15 @@ let { props, dataProps, compProps, otherMembers, methods } = helper.findVueProto
     <b-tabs>
       <% if (props.length) { %>
       <b-tab-item label="Props">
-        <b-table class="doc-table" :data='<%= JSON.stringify(props) %>' :mobile-cards="true">
+        <b-table class="doc-table" :data="props" :mobile-cards="true">
           <template scope="scope">
-            <b-table-column label="Name">
+            <b-table-column label="Name" width="200">
               <code>{{ scope.row.name }}</code>
             </b-table-column>
             <b-table-column label="Description" v-html="scope.row.description">
             </b-table-column>
             <b-table-column label="Type">
-              <span class="type-col">{{ scope.row.typeExpression }}</span>
+              <span class="type">{{ scope.row.typeExpression }}</span>
             </b-table-column>
             <b-table-column label="Required">
               <b-icon class="checkbox" :type="scope.row.required ? 'is-info' : 'is-light'"
@@ -66,15 +70,15 @@ let { props, dataProps, compProps, otherMembers, methods } = helper.findVueProto
       <% } %>
       <% if (otherMembers.length) { %>
       <b-tab-item label="Other members">
-        <b-table class="doc-table" :data='<%= JSON.stringify(otherMembers) %>' :mobile-cards="true">
+        <b-table class="doc-table" :data="otherMembers" :mobile-cards="true">
           <template scope="scope">
-            <b-table-column label="Name">
+            <b-table-column label="Name" width="200">
               <code>{{ scope.row.name }}</code>
             </b-table-column>
             <b-table-column label="Description" v-html="scope.row.description">
             </b-table-column>
             <b-table-column label="Type">
-              <span class="type-col">{{ scope.row.typeExpression }}</span>
+              <span class="type">{{ scope.row.typeExpression }}</span>
             </b-table-column>
           </template>
         </b-table>
@@ -82,21 +86,37 @@ let { props, dataProps, compProps, otherMembers, methods } = helper.findVueProto
       <% } %>
       <% if (methods.length) { %>
       <b-tab-item label="Methods">
-        <b-table class="doc-table" :data='<%= JSON.stringify(methods) %>' :mobile-cards="true">
+        <b-table class="doc-table" :data="methods" :mobile-cards="true">
           <template scope="scope">
-            <b-table-column label="Name">
+            <b-table-column label="Name" width="200">
               <code>{{ scope.row.name }}</code>
             </b-table-column>
             <b-table-column label="Description" v-html="scope.row.description">
             </b-table-column>
-            <b-table-column label="Params">
+            <b-table-column label="Arguments">
               TODO: render params list
             </b-table-column>
             <b-table-column label="Returns">
               <p v-for="(ret, i) in scope.row.returns" :key="i">
-                <span class="type-col">{{ ret.typeExpression }}</span>
+                <span class="type">{{ ret.typeExpression }}</span>
                 <template v-html="ret.description"></template>
               </p>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+      <% if (events.length) { %>
+      <b-tab-item label="Events">
+        <b-table class="doc-table" :data="events" :mobile-cards="true">
+          <template scope="scope">
+            <b-table-column label="Name" width="200">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Argument">
+              <span class="type">{{ scope.row.typeExpression }}</span>
             </b-table-column>
           </template>
         </b-table>
@@ -132,14 +152,23 @@ let { props, dataProps, compProps, otherMembers, methods } = helper.findVueProto
       data () {
         return <%= JSON.stringify(dataProps) %>
       },
+      otherMembers () {
+        return <%= JSON.stringify(otherMembers) %>
+      },
       methods () {
         return <%= JSON.stringify(methods) %>
+      },
+      events () {
+        return <%= JSON.stringify(events) %>
       },
       mixins () {
         return <%= JSON.stringify(mixins) %>
       },
     },
     methods: {
+    },
+    mounted () {
+      console.log(this.doclets)
     },
   }
 </script>
