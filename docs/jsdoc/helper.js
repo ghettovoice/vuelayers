@@ -29,7 +29,8 @@ exports.mapExamples = examples => (examples || []).map(function (example) {
 })
 
 exports.mapVueExamples = examples => (examples || []).map(function (example) {
-  let caption, code, lang = ''
+  let caption, code
+  let lang = ''
   let match = example.match(/^\s*(?:<caption>)?([^[\]\n\r]+?)?(?:<\/caption>)?(?:\s*\[([\w]*)])?[\n\r]([\s\S]+)$/i)
 
   if (match) {
