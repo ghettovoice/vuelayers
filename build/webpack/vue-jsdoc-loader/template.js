@@ -19,6 +19,7 @@ module.exports = function (source) {
         if (!path.isAbsolute(moduleId)) {
           moduleId = path.resolve(this.context, moduleId)
         }
+        this.addDependency(require.resolve(moduleId))
 
         return require(moduleId)
       },
