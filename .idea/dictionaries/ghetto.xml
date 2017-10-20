@@ -88,6 +88,7 @@
       <w>prepatch</w>
       <w>proj</w>
       <w>propertychange</w>
+      <w>rearg</w>
       <w>regenerator</w>
       <w>removefeature</w>
       <w>replacers</w>

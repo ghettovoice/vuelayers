@@ -1,5 +1,8 @@
-const {template} = require('lodash/fp')
+const path = require('path')
+const template = require('lodash/fp/template')
 const loaderUtils = require('loader-utils')
+
+const templateWithSettings = template.convert({fixed: false, rearg: false})
 
 module.exports = function (source) {
   this.cacheable && this.cacheable()
@@ -10,7 +13,17 @@ module.exports = function (source) {
   const data = this.options.jsdocData[opts.id] || {}
 
   this.addDependency(data.file)
-  let tplFunc = template(source)
+  let tplFunc = templateWithSettings(source, {
+    imports: {
+      require: moduleId => {
+        if (!path.isAbsolute(moduleId)) {
+          moduleId = path.resolve(this.context, moduleId)
+        }
+
+        return require(moduleId)
+      },
+    },
+  })
   source = tplFunc(data)
 
   return opts.raw ? source : `module.exports = ${JSON.stringify(source)}`

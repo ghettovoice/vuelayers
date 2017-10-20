@@ -1,5 +1,7 @@
 <%
-/* global _, doclets, helper */
+/* global _, doclets */
+const helper = require('./helper')
+
 let mainDoclet = doclets.find(({name, longname}) => name === longname)
 let ident = helper.nameToIdent(mainDoclet.name)
 let longIdent = helper.nameToIdent(mainDoclet.longname)

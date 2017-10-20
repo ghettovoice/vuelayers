@@ -15,20 +15,12 @@ module.exports = function (source) {
     tplPath = path.resolve(process.cwd(), tplPath)
   }
 
-  let helper = {}
-  if (opts.helper) {
-    let helperPath = path.resolve(process.cwd(), opts.helper)
-    this.addDependency(helperPath)
-    helper = require(helperPath)
-  }
-
   let templateLoader = path.resolve(__dirname, './template.js')
   let id = hash(this.resourcePath + source)
   this.options.jsdocData || (this.options.jsdocData = {})
   this.options.jsdocData[id] = {
     file: this.resourcePath,
     doclets,
-    helper,
   }
 
   return `module.exports = require('!vue-loader!${templateLoader}?raw&id=${id}!${tplPath}?id=${id}')`
