@@ -8,6 +8,7 @@ import Sidebar from './sidebar.vue'
 import Card from './card.vue'
 import Code from './code.vue'
 import Markdown from './markdown.vue'
+import CmpApi from './cmp-api.vue'
 
 export default {
   install (Vue) {
@@ -21,5 +22,6 @@ export default {
     Vue.component(Card.name, Card)
     Vue.component(Code.name, Code)
     Vue.component(Markdown.name, Markdown)
+    Vue.component(CmpApi.name, CmpApi)
   },
 }

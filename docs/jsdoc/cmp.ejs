@@ -1,6 +1,6 @@
 <%
 /* global _, doclets */
-const helper = require('./helper')
+const helper = require('../jsdoc-helper')
 
 let mainDoclet = doclets.find(({vueProto}) => vueProto)
 helper.resolveDocletLinks(mainDoclet, {base: mainDoclet.longname})
@@ -16,7 +16,7 @@ let vueExamples = helper.mapVueExamples(mainDoclet.vueExamples)
 
 // vue parts
 let mixins = mainDoclet.mixes || []
-let { props, dataProps, compProps, otherMembers, methods, events } = helper.findVueProtoParts(doclets, mainDoclet)
+let { props, dataProps, compProps, otherMembers, methods, events } = helper.extractVueProtoParts(doclets, mainDoclet)
 %>
 <template>
   <div id="<%= longIdent %>" :class="$options.name" class="content">

@@ -1,6 +1,6 @@
 <template lang="pug">
   vue-markdown.content(
-    class="[$options.name]"
+    ':class'="[$options.name]"
     lang-prefix="hljs "
   )
     slot

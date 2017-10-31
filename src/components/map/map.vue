@@ -39,7 +39,6 @@
     /**
      * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
      * value is used to configure controls.
-     * See {@linkcode https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults|ol.control.defaults()}.
      * @type {Object|boolean}
      * @todo remove when vl-control-* components will be ready
      */
@@ -381,7 +380,7 @@
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.
    *
-   * @title Map `vl-map` component
+   * @title vl-map
    * @alias module:map/map
    * @vueProto
    *
@@ -493,6 +492,11 @@
   /**
    * A click with no dragging. A double click will fire two of this.
    * @event module:map/map#click
+   * @type {ol.MapBrowserEvent}
+   */
+  /**
+   * A true double click, with no dragging.
+   * @event module:map/map#dblclick
    * @type {ol.MapBrowserEvent}
    */
 </script>

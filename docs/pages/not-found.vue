@@ -1,8 +1,8 @@
 <template lang="pug">
   div(:class="[$options.name]")
-    vld-hero(:bold="bold", :color="color")
-      h1.title {{ title }}
-      h2.subtitle {{ subtitle }}
+    vld-hero(':bold'="true" color="is-warning")
+      h1.title 404 Not Found
+      h2.subtitle There is nothing to do here
 
     section.section.content
       p Go to #[router-link(to="/", title="VueLayers Homepage") Home]

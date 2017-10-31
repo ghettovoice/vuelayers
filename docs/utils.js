@@ -42,3 +42,9 @@ export function preFilter (text) {
 
   return newText
 }
+
+export function alphabetSorter (a, b) {
+  return a.name.toLowerCase() === b.name.toLowerCase() ? 0 : (
+    a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+  )
+}

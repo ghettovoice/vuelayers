@@ -1,8 +1,8 @@
 <template lang="pug">
   div(:class="[$options.name]")
-    vld-hero(:bold='bold', :color='color')
-      h1.title {{ title }}
-      h2.subtitle {{ subtitle }}
+    vld-hero(':bold'='true' color='is-primary')
+      h1.title VueLayers demo app
+      h2.subtitle An example app built with VueLayers
 
     vld-demo-app
 
@@ -33,7 +33,9 @@
   import mainStyleSrc from '!raw-loader!../styles/main.sass'
   /* eslint-enable import/no-webpack-loader-syntax */
 
-  const props = {}
+  const props = {
+  }
+
   const computed = {
     demo () {
       return {

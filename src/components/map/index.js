@@ -18,7 +18,7 @@ import View from './view.vue'
  * // register vl-map and vl-view components
  * Vue.use(Map)
  *
- * @example Usage
+ * @example Usage [html]
  * <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" style="height: 400px">
  *   <vl-view :center="[0, 0]" :zoom="3" :rotation="0"></vl-view>
  *

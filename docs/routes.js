@@ -1,4 +1,3 @@
-/* eslint-disable import/no-webpack-loader-syntax */
 export default [
   // general
   {
@@ -13,22 +12,12 @@ export default [
     meta: {
       title: 'Quick Start',
     },
-    props: {
-      title: 'Quick Start',
-      subtitle: 'Installation and usage guide',
-      color: 'is-primary',
-    },
     component: () => import('./pages/start.vue'),
   },
   {
     path: '/demo',
     meta: {
       title: 'Live Demo',
-    },
-    props: {
-      title: 'VueLayers demo app',
-      subtitle: 'An example app built with VueLayers.js',
-      color: 'is-primary',
     },
     component: () => import('./pages/demo.vue'),
   },
@@ -42,15 +31,7 @@ export default [
     meta: {
       title: 'Map',
     },
-    props: {
-      title: 'Map',
-      subtitle: 'Start point of every VueLayers based application',
-      color: 'is-info',
-      docs: [
-        () => import('./pages/modules/map'),
-      ],
-    },
-    component: () => import('./pages/doc.vue'),
+    component: () => import('./pages/modules/map.vue'),
   },
   // redirects
   // todo remove later
@@ -62,15 +43,11 @@ export default [
     path: '/packages/map',
     redirect: '/modules/map',
   },
+  // 404
   {
     path: '*',
     meta: {
       title: '404 Not Found',
-    },
-    props: {
-      title: '404 Not Found',
-      subtitle: 'There is nothing to do here',
-      color: 'is-warning',
     },
     component: () => import('./pages/not-found.vue'),
   },
