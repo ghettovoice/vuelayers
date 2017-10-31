@@ -5,15 +5,8 @@ import Map from './map.vue'
 import View from './view.vue'
 
 /**
- * Map module includes two components:
- * - {@linkcode module:map/map|vl-map} - viewport rendering, interaction and map events
- * - {@linkcode module:map/view|vl-view} - 2D view of the map
- *
- * Module has several entry files for different module systems, correct entry file will be resolved automatically
- * according to local `package.json` file.
- *
- * @title Map module
  * @alias module:map
+ *
  * @example Install
  * import Vue from 'vue'
  * // import module and styles
@@ -25,7 +18,7 @@ import View from './view.vue'
  * // register vl-map and vl-view components
  * Vue.use(Map)
  *
- * @vueExample Usage [html]
+ * @example Usage
  * <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" style="height: 400px">
  *   <vl-view :center="[0, 0]" :zoom="3" :rotation="0"></vl-view>
  *
@@ -38,11 +31,13 @@ export default {
   /**
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.
+   * @alias module:map/map
    */
   Map,
   /**
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
    * **resolution**, and **rotation** of the map.
+   * @alias module:map/map
    */
   View,
   /**

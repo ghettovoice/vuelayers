@@ -6,7 +6,7 @@ import routes from './routes'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-  base: 'C_BASE_URL',
+  base: location.pathname,
   routes: routes,
   scrollBehavior: (to, from, saved) => {
     if (saved) return saved

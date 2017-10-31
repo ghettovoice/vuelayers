@@ -47,17 +47,19 @@
 
   .vld-code
     position: relative
-    pre
-      position: relative
     &:not(:last-child)
       margin-bottom: 1em
-    .copy
-      opacity: 0
-      position: absolute
-      right: .25em
-      top: .25em
-      transition: opacity .3s ease-out
-    &:hover
+    pre
+      position: relative
       .copy
-        opacity: 1
+        opacity: 0
+        position: absolute
+        right: .25em
+        top: .25em
+        transition: opacity .3s ease-out
+      &:hover
+        .copy
+          opacity: 1
+    .title
+      font-size: 1.2em
 </style>

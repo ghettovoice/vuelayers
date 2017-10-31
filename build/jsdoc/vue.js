@@ -278,12 +278,16 @@ function handleVueProto (node, evt, parser) {
 function handleVueProp (node, evt, parser) {
   const handle = typeNode => {
     switch (typeNode.type) {
-      case 'Literal':
-        evt.comment = setCommentTag(evt.comment, 'type', `{${ctorNameToType(typeNode.value)}`)
+      case 'Identifier':
+        if (!/@type\s.+/.test(evt.comment)) {
+          evt.comment = setCommentTag(evt.comment, 'type', `{${ctorNameToType(typeNode.name)}}`)
+        }
         break
       case 'ArrayExpression':
-        evt.comment = setCommentTag(evt.comment, 'type',
-          `{${typeNode.elements.map(n => ctorNameToType(n.name)).join('|')}}`)
+        if (!/@type\s.+/.test(evt.comment)) {
+          evt.comment = setCommentTag(evt.comment, 'type',
+            `{${typeNode.elements.map(n => ctorNameToType(n.name)).join('|')}}`)
+        }
         break
       case 'ObjectExpression':
         let typePropNode = typeNode.properties.find(n => n.key.name === 'type')
@@ -499,5 +503,5 @@ function ctorNameToType (ctorName) {
 }
 
 function toTypeExpression (type) {
-  return (catharsis.stringify(type) || '').split('|').join(' | ')
+  return (catharsis.stringify(type) || '').split('|').join(', ')
 }

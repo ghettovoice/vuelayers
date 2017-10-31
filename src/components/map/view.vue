@@ -51,14 +51,23 @@
     },
     maxResolution: Number,
     minResolution: Number,
+    /**
+     * @default 28
+     */
     maxZoom: {
       type: Number,
       default: MAX_ZOOM,
     },
+    /**
+     * @default 0
+     */
     minZoom: {
       type: Number,
       default: MIN_ZOOM,
     },
+    /**
+     * @default EPSG:4326
+     */
     projection: {
       type: String,
       default: EPSG_3857,
@@ -77,12 +86,16 @@
     /**
      * Zoom level used to calculate the resolution for the view as `int` value. Only used if `resolution` is not defined.
      * @type {number}
+     * @default 0
      * @vueSync
      */
     zoom: {
       type: Number,
       default: MIN_ZOOM,
     },
+    /**
+     * @default 2
+     */
     zoomFactor: {
       type: Number,
       default: ZOOM_FACTOR,

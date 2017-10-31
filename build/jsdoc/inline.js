@@ -2,14 +2,14 @@ const inlineTag = require('jsdoc/lib/jsdoc/tag/inline')
 
 exports.handlers = {
   newDoclet ({doclet}) {
-    resolveDocletLink(doclet, {base: doclet.longname})
+    resolveDocletLinks(doclet, {base: doclet.longname})
   },
 }
-exports.processDoclet = resolveDocletLink
+exports.resolveDocletLinks = resolveDocletLinks
 exports.resolveExternals = resolveExternalIdents
 exports.resolveLinks = resolveLinks
 
-function resolveDocletLink (doclet, options) {
+function resolveDocletLinks (doclet, options = {}) {
   const tags = options.tags || [
     'description',
     'see',
@@ -22,19 +22,21 @@ function resolveDocletLink (doclet, options) {
     }
 
     if (typeof doclet[tag] === 'string') {
-      doclet[tag] = resolveLinks(resolveExternalIdents(doclet[tag], options), options)
+      doclet[tag] = resolveLinks(doclet[tag], options)
     } else if (Array.isArray(doclet[tag])) {
       doclet[tag].forEach((value, index, original) => {
         let inner = {}
 
         inner[tag] = value
-        resolveDocletLink(inner, options)
+        resolveDocletLinks(inner, options)
         original[index] = inner[tag]
       })
     } else if (doclet[tag]) {
-      resolveDocletLink(doclet[tag], options)
+      resolveDocletLinks(doclet[tag], options)
     }
   })
+
+  return doclet
 }
 
 function resolveExternalIdents (string, options) {

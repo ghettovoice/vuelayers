@@ -5,6 +5,7 @@ import hljs from 'highlight.js'
 import Vue from 'vue'
 import VueProgressBar from 'vue-progressbar'
 import VueAnalytics from 'vue-analytics'
+import VueMarkdown from 'vue-markdown'
 // import VueLayers modules
 import VueLayers from 'vuelayers'
 import App from './app.vue'
@@ -21,6 +22,9 @@ Vue.use(Buefy, {
 Vue.use(VueAnalytics, {
   id: 'C_GOOGLE_UID',
   router,
+})
+Vue.use(function (Vue) {
+  Vue.component('vue-markdown', VueMarkdown)
 })
 // register all VueLayers components
 Vue.use(VueLayers)

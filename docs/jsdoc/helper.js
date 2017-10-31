@@ -1,17 +1,16 @@
-const { escape } = require('lodash/fp')
+const {escape} = require('lodash/fp')
+const {resolveDocletLinks} = require('../../build/jsdoc/inline')
+
+exports.resolveDocletLinks = resolveDocletLinks
 
 exports.nameToIdent = string => string.replace(/^module:/, '').replace('/', '-').toLowerCase()
 
 exports.isPublic = ({access, undocumented}) => !undocumented && (!access || access === 'public')
 
 exports.alphabetSorter = (a, b) => {
-  return a.name.toLowerCase() === b.name.toLowerCase()
-    ? 0
-    : (
-      a.name.toLowerCase() < b.name.toLowerCase()
-        ? -1
-        : 1
-    )
+  return a.name.toLowerCase() === b.name.toLowerCase() ? 0 : (
+    a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+  )
 }
 
 exports.mapExamples = examples => (examples || []).map(function (example) {
@@ -65,25 +64,31 @@ exports.findVueProtoParts = (doclets, protoDoclet) => {
     if (!exports.isPublic(child) || child.memberof !== protoDoclet.longname) {
       return
     }
+
+    let group
     switch (true) {
       case child.vueProp:
-        props.push(child)
+        group = props
         break
       case child.vueComputedProp:
-        compProps.push(child)
+        group = compProps
         break
       case child.vueDataProp:
-        dataProps.push(child)
+        group = dataProps
         break
       case child.kind === 'member' && child.scope === 'instance':
-        otherMembers.push(child)
+        group = otherMembers
         break
       case child.vueMethod:
-        methods.push(child)
+        group = methods
         break
       case child.kind === 'event':
-        events.push(child)
+        group = events
         break
+    }
+
+    if (group) {
+      group.push(resolveDocletLinks(child, {base: child.longname}))
     }
   })
   props.sort(exports.alphabetSorter)

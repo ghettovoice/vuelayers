@@ -3,6 +3,8 @@
 const helper = require('./helper')
 
 let mainDoclet = doclets.find(({name, longname}) => name === longname)
+helper.resolveDocletLinks(mainDoclet, {base: mainDoclet.longname})
+
 let ident = helper.nameToIdent(mainDoclet.name)
 let longIdent = helper.nameToIdent(mainDoclet.longname)
 let cmpName = `vld-${longIdent}-doc`

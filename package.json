@@ -171,6 +171,7 @@
     "vue": "^2.4.4",
     "vue-analytics": "^5.1.1",
     "vue-loader": "^13.0.5",
+    "vue-markdown": "^2.2.4",
     "vue-progressbar": "^0.7.3",
     "vue-router": "^2.7.0",
     "vue-style-loader": "^3.0.3",

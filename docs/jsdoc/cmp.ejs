@@ -3,6 +3,8 @@
 const helper = require('./helper')
 
 let mainDoclet = doclets.find(({vueProto}) => vueProto)
+helper.resolveDocletLinks(mainDoclet, {base: mainDoclet.longname})
+
 let ident = helper.nameToIdent(mainDoclet.name)
 let longIdent = helper.nameToIdent(mainDoclet.longname)
 let cmpName = `vld-${longIdent}-doc`
@@ -53,7 +55,7 @@ let { props, dataProps, compProps, otherMembers, methods, events } = helper.find
             <b-table-column label="Description" v-html="scope.row.description">
             </b-table-column>
             <b-table-column label="Type">
-              <span class="type">{{ scope.row.typeExpression }}</span>
+              <span class="is-type">{{ scope.row.typeExpression }}</span>
             </b-table-column>
             <b-table-column label="Required">
               <b-icon class="checkbox" :type="scope.row.required ? 'is-info' : 'is-light'"
@@ -80,7 +82,7 @@ let { props, dataProps, compProps, otherMembers, methods, events } = helper.find
             <b-table-column label="Description" v-html="scope.row.description">
             </b-table-column>
             <b-table-column label="Type">
-              <span class="type">{{ scope.row.typeExpression }}</span>
+              <span class="is-type">{{ scope.row.typeExpression }}</span>
             </b-table-column>
           </template>
         </b-table>
@@ -100,7 +102,7 @@ let { props, dataProps, compProps, otherMembers, methods, events } = helper.find
             </b-table-column>
             <b-table-column label="Returns">
               <p v-for="(ret, i) in scope.row.returns" :key="i">
-                <span class="type">{{ ret.typeExpression }}</span>
+                <span class="is-type">{{ ret.typeExpression }}</span>
                 <template v-html="ret.description"></template>
               </p>
             </b-table-column>
@@ -118,7 +120,7 @@ let { props, dataProps, compProps, otherMembers, methods, events } = helper.find
             <b-table-column label="Description" v-html="scope.row.description">
             </b-table-column>
             <b-table-column label="Argument">
-              <span class="type">{{ scope.row.typeExpression }}</span>
+              <span class="is-type">{{ scope.row.typeExpression }}</span>
             </b-table-column>
           </template>
         </b-table>
