@@ -1,8 +1,5 @@
 const props = {
-  title: {
-    type: String,
-    required: true,
-  },
+  title: String,
   subtitle: String,
   color: String,
   bold: {

@@ -30,27 +30,30 @@
           <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
                       :position="pointOnSurface(feature.geometry)" :auto-pan="true">
             <template scope="popup">
-              <vld-card>
-                <p slot="header" class="card-header-title">
-                  Feature ID {{ feature.id }}
-                </p>
-                <a slot="header" class="card-header-icon" title="Close"
-                   @click="selectedFeatures = selectedFeatures.filter(f => f.id !== feature.id)">
-                  <b-icon icon="close"></b-icon>
-                </a>
-
-                <div class="content">
-                  <p>
-                    Overlay popup content for Feature with ID <strong>{{ feature.id }}</strong>
+              <section class="card">
+                <header class="card-header">
+                  <p class="card-header-title">
+                    Feature ID {{ feature.id }}
                   </p>
-                  <p>
-                    Popup: {{ JSON.stringify(popup) }}
-                  </p>
-                  <p>
-                    Feature: {{ JSON.stringify({ id: feature.id, properties: feature.properties }) }}
-                  </p>
+                  <a class="card-header-icon" title="Close"
+                     @click="selectedFeatures = selectedFeatures.filter(f => f.id !== feature.id)">
+                    <b-icon icon="close"></b-icon>
+                  </a>
+                </header>
+                <div class="card-content">
+                  <div class="content">
+                    <p>
+                      Overlay popup content for Feature with ID <strong>{{ feature.id }}</strong>
+                    </p>
+                    <p>
+                      Popup: {{ JSON.stringify(popup) }}
+                    </p>
+                    <p>
+                      Feature: {{ JSON.stringify({ id: feature.id, properties: feature.properties }) }}
+                    </p>
+                  </div>
                 </div>
-              </vld-card>
+              </section>
             </template>
           </vl-overlay>
           <!--// selected popup -->
@@ -64,7 +67,7 @@
           <vl-feature v-if="geoloc.position" id="position-feature">
             <vl-geom-point :coordinates="geoloc.position"></vl-geom-point>
             <vl-style-box>
-              <vl-style-icon src="../static/img/marker.png" :scale="0.4" :anchor="[0.5, 1]"></vl-style-icon>
+              <vl-style-icon src="./assets/marker.png" :scale="0.4" :anchor="[0.5, 1]"></vl-style-icon>
             </vl-style-box>
           </vl-feature>
         </template>
@@ -76,7 +79,7 @@
         <template scope="feature">
           <vl-geom-point :coordinates="[-10, -10]"></vl-geom-point>
           <vl-style-box>
-            <vl-style-icon src="../static/img/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"></vl-style-icon>
+            <vl-style-icon src="./assets/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"></vl-style-icon>
           </vl-style-box>
           <!-- overlay binded to feature -->
           <vl-overlay v-if="feature.geometry" :position="pointOnSurface(feature.geometry)" :offset="[10, 10]">
@@ -183,7 +186,7 @@
   import { kebabCase, range, random } from 'lodash/fp'
   // import VueLayers core helpers
   import { core as vlCore } from 'vuelayers'
-  import pacmanFeaturesCollection from '../static/sample-data/pacman.geojson'
+  import pacmanFeaturesCollection from './assets/pacman.geojson'
 
   const methods = {
     pointOnSurface: vlCore.geomHelper.pointOnSurface,
@@ -431,7 +434,7 @@
 </script>
 
 <style lang="sass">
-  @import ../styles/variables
+  @import ~bulma/sass/utilities/_all
 
   .vld-demo-app
     position: relative
