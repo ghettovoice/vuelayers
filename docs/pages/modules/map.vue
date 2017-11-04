@@ -18,6 +18,9 @@
         ':title'="example.caption"
         ':lang'="example.lang"
       ) {{ example.code | pre }}
+      vld-markdown.
+        The example below shows how to create a simple map with tile layer and
+        [OSM](https://www.openstreetmap.org/#map=3/69.63/-74.88) source.
       vld-example(
         v-for="(example, i) in vueExamples"
         ':key'="i"
@@ -32,8 +35,8 @@
       vld-markdown.
         ### vl-map
 
-        Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
-        rendering and low level interaction events.
+        Container for **layers**, **interactions**, **controls** and **overlays**. It has one default slot for
+        `vl-view`, `vl-layer-*`, `vl-interaction-*`, `vl-overlay` and `vl-feature` components placement.
       vld-cmp-api(':doclets'="mapDoclets")
 
       hr

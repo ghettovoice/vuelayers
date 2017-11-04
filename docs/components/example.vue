@@ -48,7 +48,6 @@
               },
             },
           })
-          console.log(tab)
         }
       })
     },
