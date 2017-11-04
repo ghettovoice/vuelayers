@@ -35,8 +35,8 @@
       vld-markdown.
         ### vl-map
 
-        Container for **layers**, **interactions**, **controls** and **overlays**. It has one default slot for
-        `vl-view`, `vl-layer-*`, `vl-interaction-*`, `vl-overlay` and `vl-feature` components placement.
+        `vl-map` component is a container for **layers**, **interactions**, **controls**, **overlays** and **features**.
+        It has only one slot `default` to place all child components.
       vld-cmp-api(':doclets'="mapDoclets")
 
       hr
@@ -44,8 +44,8 @@
       vld-markdown.
         ### vl-view
 
-        Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
-        rendering and low level interaction events.
+        Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
+        **resolution**, and **rotation** of the map.
       vld-cmp-api(':doclets'="viewDoclets")
 </template>
 

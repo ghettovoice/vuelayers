@@ -106,7 +106,7 @@
       default: () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL],
     },
     /**
-     * Map container element `tabindex` attribute value.
+     * `tabindex` value to enable keyboard interaction.
      * @type {number}
      */
     tabIndex: {
@@ -394,6 +394,8 @@
    * @fires module:map/map#postrender
    * @fires module:map/map#precompose
    * @fires module:map/map#postcompose
+   *
+   * @vueSlot default Default slot for all child components.
    */
   export default {
     name: 'vl-map',

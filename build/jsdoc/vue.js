@@ -234,6 +234,21 @@ exports.defineTags = function (dict) {
       doclet.title = tag.value
     },
   })
+
+  dict.defineTag('vueSlot', {
+    mustHaveValue: true,
+    onTagged (doclet, tag) {
+      doclet.slots || (doclet.slots = [])
+
+      let match = /(\w+)(?:\s(.*))?/iu.exec(tag.value)
+      if (match && match.length) {
+        doclet.slots.push({
+          name: match[1],
+          description: match[2],
+        })
+      }
+    },
+  })
 }
 
 function handleVueProto (node, evt, parser) {

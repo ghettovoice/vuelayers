@@ -42,6 +42,7 @@ function parseMarkdown (doclet, options) {
     'returns',
     'summary',
     'title',
+    'vueSlot',
   ]
 
   tags.forEach(tag => {

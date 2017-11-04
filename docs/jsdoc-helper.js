@@ -68,6 +68,8 @@ exports.extractVueProtoParts = doclets => {
   methods.sort(alphabetSorter)
   events.sort(alphabetSorter)
 
+  let slots = (protoDoclet.slots || []).slice().sort(alphabetSorter)
+
   return {
     props,
     compProps,
@@ -75,5 +77,6 @@ exports.extractVueProtoParts = doclets => {
     otherMembers,
     methods,
     events,
+    slots,
   }
 }

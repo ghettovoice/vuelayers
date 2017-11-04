@@ -46,6 +46,12 @@
           b-table-column(label="Description" v-html="scope.row.description")
           b-table-column(label="Argument")
             span.is-type {{ scope.row.typeExpression }}
+    b-tab-item(v-if="slots.length" label="Slots")
+      b-table.doc-table(':data'="slots" mobile-cards)
+        template(scope="scope")
+          b-table-column(label="Name")
+            code {{ scope.row.name }}
+          b-table-column(label="Description" v-html="scope.row.description")
 </template>
 
 <script>
@@ -79,6 +85,9 @@
     },
     events () {
       return this.proto.events || []
+    },
+    slots () {
+      return this.proto.slots || []
     },
   }
 
