@@ -18,6 +18,14 @@
         ':title'="example.caption"
         ':lang'="example.lang"
       ) {{ example.code | pre }}
+      vld-example(
+        v-for="(example, i) in vueExamples"
+        ':key'="i"
+        ':title'="example.caption"
+      )
+        b-tab-item(':label'="example.lang.toUpperCase()")
+          vld-code(':lang'="example.lang") {{ example.code | pre }}
+        b-tab-item(label="Result" v-html="example.code" compile)
 
       hr
 
@@ -54,6 +62,10 @@
     },
     examples () {
       let examples = (this.mainModuleDoclet && this.mainModuleDoclet.examples) || []
+      return mapExamples(examples)
+    },
+    vueExamples () {
+      let examples = (this.mainModuleDoclet && this.mainModuleDoclet.vueExamples) || []
       return mapExamples(examples)
     },
     mapDoclets: constant(mapDoclets),

@@ -21,6 +21,9 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   resolve: {
     mainFields: ['module', 'main'],
+    alias: {
+      vue$: 'vue/dist/vue.esm.js',
+    },
   },
   module: {
     rules: [

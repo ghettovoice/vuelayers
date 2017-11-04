@@ -9,14 +9,11 @@
 </template>
 
 <script>
-  import page from './page'
-
   const props = {
   }
 
   export default {
     name: 'vld-not-found-page',
-    mixins: [page],
     props,
   }
 </script>

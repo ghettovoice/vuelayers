@@ -175,8 +175,6 @@
 </template>
 
 <script>
-  import page from './page'
-
   const props = {
   }
   const computed = {
@@ -206,7 +204,6 @@
 
   export default {
     name: 'vld-start-page',
-    mixins: [page],
     props,
     computed,
   }

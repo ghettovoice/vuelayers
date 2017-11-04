@@ -15,6 +15,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   resolve: {
     alias: {
       openlayers: 'openlayers/dist/ol-debug.js',
+      vue$: 'vue/dist/vue.esm.js',
     },
     mainFields: ['module', 'main'],
   },

@@ -27,7 +27,6 @@
 </template>
 
 <script>
-  import page from './page'
   import { extractScript, extractTemplate, extractStyle } from '../utils'
   import DemoApp from '../../demo/app.vue'
   /* eslint-disable import/no-webpack-loader-syntax */
@@ -58,7 +57,6 @@
 
   export default {
     name: 'vld-demo-page',
-    mixins: [page],
     components: {
       BTabs,
       DemoApp,
