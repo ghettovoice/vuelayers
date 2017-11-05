@@ -84,14 +84,14 @@ exports.handlers = {
 
     // fix type expressions
     if (evt.doclet.type) {
-      evt.doclet.typeExpression = catharsis.stringify(evt.doclet.type.parsedType)
+      evt.doclet.typeExpression = toTypeExpression(evt.doclet.type.parsedType)
     }
 
     if (evt.doclet.returns) {
       // evt.doclet.returnExpression = catharsis.stringify(evt.doclet.returns.parsedType)
       evt.doclet.returns.forEach(returns => {
         if (returns.type) {
-          returns.typeExpression = catharsis.stringify(returns.type.parsedType)
+          returns.typeExpression = toTypeExpression(returns.type.parsedType)
         }
       })
     }
@@ -99,7 +99,7 @@ exports.handlers = {
     if (evt.doclet.params) {
       evt.doclet.params.forEach(param => {
         if (param.type) {
-          param.typeExpression = catharsis.stringify(param.type.parsedType)
+          param.typeExpression = toTypeExpression(param.type.parsedType)
         }
       })
     }
@@ -219,6 +219,36 @@ exports.defineTags = function (dict) {
       doclet.required = true
     },
   })
+
+  dict.defineTag('vueExample', {
+    mustHaveValue: true,
+    onTagged (doclet, tag) {
+      doclet.vueExamples || (doclet.vueExamples = [])
+      doclet.vueExamples.push(tag.value)
+    },
+  })
+
+  dict.defineTag('title', {
+    mustHaveValue: true,
+    onTagged (doclet, tag) {
+      doclet.title = tag.value
+    },
+  })
+
+  dict.defineTag('vueSlot', {
+    mustHaveValue: true,
+    onTagged (doclet, tag) {
+      doclet.slots || (doclet.slots = [])
+
+      let match = /(\w+)(?:\s(.*))?/iu.exec(tag.value)
+      if (match && match.length) {
+        doclet.slots.push({
+          name: match[1],
+          description: match[2],
+        })
+      }
+    },
+  })
 }
 
 function handleVueProto (node, evt, parser) {
@@ -263,12 +293,16 @@ function handleVueProto (node, evt, parser) {
 function handleVueProp (node, evt, parser) {
   const handle = typeNode => {
     switch (typeNode.type) {
-      case 'Literal':
-        evt.comment = setCommentTag(evt.comment, 'type', `{${ctorNameToType(typeNode.value)}`)
+      case 'Identifier':
+        if (!/@type\s.+/.test(evt.comment)) {
+          evt.comment = setCommentTag(evt.comment, 'type', `{${ctorNameToType(typeNode.name)}}`)
+        }
         break
       case 'ArrayExpression':
-        evt.comment = setCommentTag(evt.comment, 'type',
-          `{${typeNode.elements.map(n => ctorNameToType(n.name)).join('|')}}`)
+        if (!/@type\s.+/.test(evt.comment)) {
+          evt.comment = setCommentTag(evt.comment, 'type',
+            `{${typeNode.elements.map(n => ctorNameToType(n.name)).join('|')}}`)
+        }
         break
       case 'ObjectExpression':
         let typePropNode = typeNode.properties.find(n => n.key.name === 'type')
@@ -481,4 +515,8 @@ function ctorNameToType (ctorName) {
   }
 
   return ctorName
+}
+
+function toTypeExpression (type) {
+  return (catharsis.stringify(type) || '').split('|').join(', ')
 }

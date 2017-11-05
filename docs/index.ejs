@@ -10,28 +10,24 @@
 
   <meta name="author" content="Vladimir Vershinin">
 
+  <!-- Chrome, Firefox OS and Opera -->
+  <meta name="theme-color" content="<%= htmlWebpackPlugin.options.themeColor %>">
+  <!-- Windows Phone -->
+  <meta name="msapplication-navbutton-color" content="<%= htmlWebpackPlugin.options.themeColor %>">
+  <!-- iOS Safari -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="<%= htmlWebpackPlugin.options.themeColor %>">
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <!-- <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
   <script>
     (adsbygoogle = window.adsbygoogle || []).push({
       google_ad_client: "ca-pub-1155637778687673",
       enable_page_level_ads: true
     });
-  </script>
+  </script> -->
 </head>
 <body>
-  <script>
-    /* eslint-disable */
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    ga('create', '<%= htmlWebpackPlugin.options.gaUID %>', 'auto');
-    ga('send', 'pageview');
-    /* eslint-enable */
-  </script>
-
   <div id="app"></div>
 
   <%= htmlWebpackPlugin.options.serviceWorker %>

@@ -25,7 +25,7 @@
   /**
    * @vueProps
    */
-  const props = {
+  const props = /** @lends module:map/view# */{
     /**
      * The center coordinate of the map view in **EPSG:4326** projection.
      * @type {number[]}
@@ -51,14 +51,23 @@
     },
     maxResolution: Number,
     minResolution: Number,
+    /**
+     * @default 28
+     */
     maxZoom: {
       type: Number,
       default: MAX_ZOOM,
     },
+    /**
+     * @default 0
+     */
     minZoom: {
       type: Number,
       default: MIN_ZOOM,
     },
+    /**
+     * @default EPSG:4326
+     */
     projection: {
       type: String,
       default: EPSG_3857,
@@ -77,25 +86,29 @@
     /**
      * Zoom level used to calculate the resolution for the view as `int` value. Only used if `resolution` is not defined.
      * @type {number}
+     * @default 0
      * @vueSync
      */
     zoom: {
       type: Number,
       default: MIN_ZOOM,
     },
+    /**
+     * @default 2
+     */
     zoomFactor: {
       type: Number,
       default: ZOOM_FACTOR,
     },
   }
 
-  const computed = {
+  const computed = /** @lends module:map/view# */{
   }
 
   /**
    * @vueMethods
    */
-  const methods = {
+  const methods = /** @lends module:map/view# */{
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
      * @param {...(olx.AnimationOptions|function(boolean))} args
@@ -223,11 +236,11 @@
   }
 
   /**
-   * View `vl-view` component
-   *
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
    * **resolution**, and **rotation** of the map.
    *
+   * @title View `vl-view` component
+   * @alias module:map/view
    * @vueProto
    */
   export default {
@@ -242,11 +255,17 @@
         return this.$options.name
       },
     },
+    /**
+     * @this module:map/view
+     */
     data () {
-      return {
+      return /** @lends module:map/view# */{
         rev: 1,
       }
     },
+    /**
+     * @this module:map/view
+     */
     created () {
       Object.defineProperties(this, /** @lends module:map/view# */{
         /**

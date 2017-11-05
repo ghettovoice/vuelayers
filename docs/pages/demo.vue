@@ -1,39 +1,43 @@
 <template lang="pug">
   div(:class="[$options.name]")
-    vld-hero(:bold='bold', :color='color')
-      h1.title {{ title }}
-      h2.subtitle {{ subtitle }}
+    vld-hero(':bold'='true' color='is-primary')
+      h1.title VueLayers demo app
+      h2.subtitle An example app built with VueLayers
 
-    vld-demo-app/
+    demo-app
 
     section.section.content
       h3 Demo sources
-      b main.js
+
+      h4 main.js
       b-tabs
-        b-tab-item(label='JS')
+        b-tab-item(label="JS")
           vld-code(lang="js") {{ main.script }}
-        b-tab-item(label='SASS')
+        b-tab-item(label="SASS")
           vld-code(lang="styl") {{ main.style }}
-      b demo-app.vue
+
+      h4 demo-app.vue
       b-tabs
-        b-tab-item(label='JS')
-          vld-code(lang="js") {{ demo.script }}
         b-tab-item(label='HTML')
           vld-code(lang="html") {{ demo.template }}
+        b-tab-item(label='JS')
+          vld-code(lang="js") {{ demo.script }}
         b-tab-item(label='SASS')
           vld-code(lang="styl") {{ demo.style }}
 </template>
 
 <script>
-  import page from './page'
   import { extractScript, extractTemplate, extractStyle } from '../utils'
+  import DemoApp from '../../demo/app.vue'
   /* eslint-disable import/no-webpack-loader-syntax */
-  import demoSrc from '!raw-loader!../components/demo-app.vue'
-  import mainScriptSrc from '!raw-loader!../main'
-  import mainStyleSrc from '!raw-loader!../styles/main.sass'
+  import demoSrc from '!raw-loader!../../demo/app.vue'
+  import mainScriptSrc from '!raw-loader!../../demo/main'
+  import mainStyleSrc from '!raw-loader!../../demo/main.sass'
   /* eslint-enable import/no-webpack-loader-syntax */
 
-  const props = {}
+  const props = {
+  }
+
   const computed = {
     demo () {
       return {
@@ -52,7 +56,9 @@
 
   export default {
     name: 'vld-demo-page',
-    mixins: [page],
+    components: {
+      DemoApp,
+    },
     props,
     computed,
   }

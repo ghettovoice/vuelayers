@@ -1,0 +1,60 @@
+<%
+/* global _, doclets */
+const helper = require('../jsdoc-helper')
+
+let mainDoclet = doclets.find(({name, longname}) => name === longname)
+helper.resolveDocletLinks(mainDoclet, {base: mainDoclet.longname})
+
+let ident = helper.nameToIdent(mainDoclet.name)
+let longIdent = helper.nameToIdent(mainDoclet.longname)
+let cmpName = `vld-${longIdent}-doc`
+let description = mainDoclet.description
+
+// examples
+let examples = helper.mapExamples(mainDoclet.examples)
+let vueExamples = helper.mapVueExamples(mainDoclet.vueExamples)
+%>
+
+<template>
+  <div id="<%= longIdent %>" :class="$options.name" class="content">
+    <% if (mainDoclet.title) { %>
+    <h3><%= mainDoclet.title %></h3>
+    <% } %>
+
+    <%= description %>
+
+    <% examples.forEach(function (example) { %>
+      <%= example %>
+    <% }) %>
+
+    <% vueExamples.forEach(function (example) { %>
+      <%= example %>
+    <% }) %>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: '<%= cmpName %>',
+    computed: {
+      ident () {
+        return '<%= ident %>'
+      },
+      longIdent () {
+        return '<%= longIdent %>'
+      },
+      mainDoclet () {
+        return <%= JSON.stringify(mainDoclet) %>
+      },
+      doclets () {
+        return <%= JSON.stringify(doclets) %>
+      },
+    },
+    methods: {
+    },
+  }
+</script>
+
+<style lang="sass">
+  @import ../styles/variables
+</style>

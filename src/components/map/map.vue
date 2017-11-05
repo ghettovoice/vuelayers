@@ -35,11 +35,10 @@
   /**
    * @vueProps
    */
-  const props = {
+  const props = /** @lends module:map/map# */{
     /**
      * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
      * value is used to configure controls.
-     * See {@linkcode https://openlayers.org/en/latest/apidoc/ol.control.html#.defaults|ol.control.defaults()}.
      * @type {Object|boolean}
      * @todo remove when vl-control-* components will be ready
      */
@@ -100,14 +99,14 @@
      * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,
      * but **WebGL** can only render **Point** geometries.
      * @type {string|string[]}
-     * @default [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL]
+     * @default ['canvas', 'webgl']
      */
     renderer: {
       type: [String, Array],
       default: () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL],
     },
     /**
-     * Map container element `tabindex` attribute value.
+     * `tabindex` value to enable keyboard interaction.
      * @type {number}
      */
     tabIndex: {
@@ -119,7 +118,7 @@
   /**
    * @vueMethods
    */
-  const methods = {
+  const methods = /** @lends module:map/map# */{
     /**
      * @return {ol.Map}
      * @protected
@@ -378,12 +377,25 @@
   }
 
   /**
-   * Map `vl-map` component
-   *
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.
    *
+   * @title vl-map
+   * @alias module:map/map
    * @vueProto
+   *
+   * @fires module:map/map#click
+   * @fires module:map/map#dblclick
+   * @fires module:map/map#singleclick
+   * @fires module:map/map#pointerdrag
+   * @fires module:map/map#pointermove
+   * @fires module:map/map#movestart
+   * @fires module:map/map#moveend
+   * @fires module:map/map#postrender
+   * @fires module:map/map#precompose
+   * @fires module:map/map#postcompose
+   *
+   * @vueSlot default Default slot for all child components.
    */
   export default {
     name: 'vl-map',
@@ -436,8 +448,9 @@
 
   /**
    * Subscribe to OL map events.
-   * @return {void}
+   *
    * @this module:map/map
+   * @return {void}
    * @private
    */
   function subscribeToMapEvents () {
@@ -477,4 +490,15 @@
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
+
+  /**
+   * A click with no dragging. A double click will fire two of this.
+   * @event module:map/map#click
+   * @type {ol.MapBrowserEvent}
+   */
+  /**
+   * A true double click, with no dragging.
+   * @event module:map/map#dblclick
+   * @type {ol.MapBrowserEvent}
+   */
 </script>

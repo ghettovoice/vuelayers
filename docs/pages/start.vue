@@ -1,8 +1,8 @@
 <template lang="pug">
   div(:class="[$options.name]")
-    vld-hero(:bold="bold", :color="color")
-      h1.title {{ title }}
-      h2.subtitle {{ subtitle }}
+    vld-hero(':bold'="true" color="is-primary")
+      h1.title Quick Start
+      h2.subtitle Installation and usage guide
 
     section.section.content
       b-message(type="is-warning")
@@ -175,8 +175,6 @@
 </template>
 
 <script>
-  import page from './page'
-
   const props = {
   }
   const computed = {
@@ -206,7 +204,6 @@
 
   export default {
     name: 'vld-start-page',
-    mixins: [page],
     props,
     computed,
   }

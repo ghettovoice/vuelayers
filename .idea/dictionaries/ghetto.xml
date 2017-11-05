@@ -88,6 +88,7 @@
       <w>prepatch</w>
       <w>proj</w>
       <w>propertychange</w>
+      <w>rearg</w>
       <w>regenerator</w>
       <w>removefeature</w>
       <w>replacers</w>
@@ -99,12 +100,14 @@
       <w>singleclick</w>
       <w>sinon</w>
       <w>sourcemap</w>
+      <w>subitem</w>
       <w>tabindex</w>
       <w>tilegrid</w>
       <w>tmpl</w>
       <w>topo</w>
       <w>topp</w>
       <w>transparentize</w>
+      <w>typicalname</w>
       <w>uglify</w>
       <w>unmount</w>
       <w>unpkg</w>

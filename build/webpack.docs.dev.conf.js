@@ -15,6 +15,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   resolve: {
     alias: {
       openlayers: 'openlayers/dist/ol-debug.js',
+      vue$: 'vue/dist/vue.esm.js',
     },
     mainFields: ['module', 'main'],
   },
@@ -41,6 +42,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       inject: true,
       serviceWorker: '',
       gaUID: config.replaces.C_GOOGLE_UID,
+      primaryColor: config.themeColor,
     }),
     new FriendlyErrorsPlugin(),
     new PreloadWebpackPlugin({

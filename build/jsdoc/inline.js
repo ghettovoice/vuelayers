@@ -2,15 +2,18 @@ const inlineTag = require('jsdoc/lib/jsdoc/tag/inline')
 
 exports.handlers = {
   newDoclet ({doclet}) {
-    processDoclet(doclet, {base: doclet.longname})
+    resolveDocletLinks(doclet, {base: doclet.longname})
   },
 }
-exports.processDoclet = processDoclet
+exports.resolveDocletLinks = resolveDocletLinks
+exports.resolveExternals = resolveExternalIdents
+exports.resolveLinks = resolveLinks
 
-function processDoclet (doclet, options) {
-  const tags = [
+function resolveDocletLinks (doclet, options = {}) {
+  const tags = options.tags || [
     'description',
     'see',
+    'typeExpression',
   ]
 
   tags.forEach(tag => {
@@ -25,13 +28,19 @@ function processDoclet (doclet, options) {
         let inner = {}
 
         inner[tag] = value
-        processDoclet(inner, options)
+        resolveDocletLinks(inner, options)
         original[index] = inner[tag]
       })
     } else if (doclet[tag]) {
-      processDoclet(doclet[tag], options)
+      resolveDocletLinks(doclet[tag], options)
     }
   })
+
+  return doclet
+}
+
+function resolveExternalIdents (string, options) {
+  return string.replace(/(ol\.[^\s])/.ig, '<a href="https://openlayers.org/en/latest/apidoc/$1.html">$1</a>')
 }
 
 function resolveLinks (string, options) {

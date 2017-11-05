@@ -21,6 +21,9 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   resolve: {
     mainFields: ['module', 'main'],
+    alias: {
+      vue$: 'vue/dist/vue.esm.js',
+    },
   },
   module: {
     rules: [
@@ -70,6 +73,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       chunksSortMode: 'dependency',
       serviceWorker: `<script>${utils.getServiceWorkerSrc()}</script>`,
       gaUID: config.replaces.C_GOOGLE_UID,
+      primaryColor: config.themeColor,
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
