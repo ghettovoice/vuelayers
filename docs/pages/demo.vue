@@ -18,10 +18,10 @@
 
       h4 demo-app.vue
       b-tabs
-        b-tab-item(label='JS')
-          vld-code(lang="js") {{ demo.script }}
         b-tab-item(label='HTML')
           vld-code(lang="html") {{ demo.template }}
+        b-tab-item(label='JS')
+          vld-code(lang="js") {{ demo.script }}
         b-tab-item(label='SASS')
           vld-code(lang="styl") {{ demo.style }}
 </template>
@@ -33,7 +33,6 @@
   import demoSrc from '!raw-loader!../../demo/app.vue'
   import mainScriptSrc from '!raw-loader!../../demo/main'
   import mainStyleSrc from '!raw-loader!../../demo/main.sass'
-  import BTabs from '../../node_modules/buefy/src/components/tabs/Tabs.vue'
   /* eslint-enable import/no-webpack-loader-syntax */
 
   const props = {
@@ -58,7 +57,6 @@
   export default {
     name: 'vld-demo-page',
     components: {
-      BTabs,
       DemoApp,
     },
     props,

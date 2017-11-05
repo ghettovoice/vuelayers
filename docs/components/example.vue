@@ -7,7 +7,6 @@
 
 <script>
   import { debounce } from 'lodash/fp'
-  import Vue from 'vue'
 
   const props = {
     title: String,
@@ -27,30 +26,15 @@
       tab.$children.forEach(vm => {
         if (typeof vm.updateSize === 'function') {
           vm.updateSize()
-        }
-      })
-    }),
-    compileTabs () {
-      this.$refs.tabs.tabItems.forEach(tab => {
-        if (tab.$el.hasAttribute('compile')) {
-          /* eslint-disable no-new */
-          new Vue({
-            name: 'vld-proxy',
-            el: tab.$el.children[0],
-            parent: tab,
-            methods: {
-              updateSize () {
-                this.$children.forEach(vm => {
-                  if (typeof vm.updateSize === 'function') {
-                    vm.updateSize()
-                  }
-                })
-              },
-            },
+        } else {
+          vm.$children.forEach(vm => {
+            if (typeof vm.updateSize === 'function') {
+              vm.updateSize()
+            }
           })
         }
       })
-    },
+    }),
   }
 
   export default {
@@ -58,9 +42,6 @@
     props,
     computed,
     methods,
-    mounted () {
-      this.compileTabs()
-    },
   }
 </script>
 
