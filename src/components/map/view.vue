@@ -335,7 +335,7 @@
   function subscribeToViewChanges () {
     assert.hasView(this)
 
-    const ft = 100
+    const ft = 0
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution::mapObs(() => ({
       prop: 'zoom',
