@@ -5,7 +5,7 @@
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
         <vl-geoloc>
-          <template scope="ctx">
+          <template slot-scope="ctx">
             <vl-feature v-if="ctx.position" id="my-geoloc">
               <vl-geom-point :coordinates="ctx.position" />
               <vl-style-box>
@@ -39,7 +39,7 @@
         <vl-layer-vector>
           <vl-source-vector>
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
-              <template scope="feature">
+              <template slot-scope="feature">
                 <vl-geom-polygon :coordinates.sync="polygonCoords"/>
                 <vl-overlay v-if="selected.includes(feature.id)" :position="pointOnSurface(feature.geometry)">
                   <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">

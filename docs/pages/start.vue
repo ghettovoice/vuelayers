@@ -54,7 +54,7 @@
         #[code lib/**/index.umd.js] and #[code lib/**/index.umd.min.js]. All stylesheets are compiled to files:
         #[code lib/style.css] and #[code lib/style.min.css].
       b-table(':data'="builds" ':mobile-cards'="true")
-        template(scope="scope")
+        template(slot-scope="scope")
           b-table-column(label="Module system") {{ scope.row.sys }}
           b-table-column(label="Environments") {{ scope.row.env.join(', ') }}
           b-table-column(label="JS")

@@ -3,7 +3,7 @@
     b-tabs
       b-tab-item(v-if="props.length" label="Props")
         b-table.doc-table(':data'="props" mobile-cards)
-          template(scope="scope")
+          template(slot-scope="scope")
             b-table-column(label="Name")
               code {{ scope.row.name }}
             b-table-column(label="Description" v-html="scope.row.description")
@@ -22,7 +22,7 @@
               code {{ scope.row.default }}
       b-tab-item(v-if="members.length" label="Other members")
         b-table.doc-table(':data'="members" mobile-cards)
-          template(scope="scope")
+          template(slot-scope="scope")
             b-table-column(label="Name")
               code {{ scope.row.name }}
             b-table-column(label="Description" v-html="scope.row.description")
@@ -30,7 +30,7 @@
               span.is-type {{ scope.row.type }}
       b-tab-item(v-if="methods.length" label="Methods")
         b-table.doc-table(':data'="methods" mobile-cards)
-          template(scope="scope")
+          template(slot-scope="scope")
             b-table-column(label="Name")
               code {{ scope.row.name }}
             b-table-column(label="Description" v-html="scope.row.description")
@@ -41,7 +41,7 @@
                 template(v-html="ret.description")
       b-tab-item(v-if="events.length" label="Events")
         b-table.doc-table(':data'="events" mobile-cards)
-          template(scope="scope")
+          template(slot-scope="scope")
             b-table-column(label="Name")
               code {{ scope.row.name }}
             b-table-column(label="Description" v-html="scope.row.description")
@@ -49,7 +49,7 @@
               span.is-type {{ scope.row.argument }}
       b-tab-item(v-if="slots.length" label="Slots")
         b-table.doc-table(':data'="slots" mobile-cards)
-          template(scope="scope")
+          template(slot-scope="scope")
             b-table-column(label="Name")
               code {{ scope.row.name }}
             b-table-column(label="Description" v-html="scope.row.description")

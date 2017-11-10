@@ -48,7 +48,7 @@ let { props, dataProps, compProps, otherMembers, methods, events } = helper.extr
       <% if (props.length) { %>
       <b-tab-item label="Props">
         <b-table class="doc-table" :data="props" :mobile-cards="true">
-          <template scope="scope">
+          <template slot-scope="scope">
             <b-table-column label="Name" width="200">
               <code>{{ scope.row.name }}</code>
             </b-table-column>
@@ -75,7 +75,7 @@ let { props, dataProps, compProps, otherMembers, methods, events } = helper.extr
       <% if (otherMembers.length) { %>
       <b-tab-item label="Other members">
         <b-table class="doc-table" :data="otherMembers" :mobile-cards="true">
-          <template scope="scope">
+          <template slot-scope="scope">
             <b-table-column label="Name" width="200">
               <code>{{ scope.row.name }}</code>
             </b-table-column>
@@ -91,7 +91,7 @@ let { props, dataProps, compProps, otherMembers, methods, events } = helper.extr
       <% if (methods.length) { %>
       <b-tab-item label="Methods">
         <b-table class="doc-table" :data="methods" :mobile-cards="true">
-          <template scope="scope">
+          <template slot-scope="scope">
             <b-table-column label="Name" width="200">
               <code>{{ scope.row.name }}</code>
             </b-table-column>
@@ -113,7 +113,7 @@ let { props, dataProps, compProps, otherMembers, methods, events } = helper.extr
       <% if (events.length) { %>
       <b-tab-item label="Events">
         <b-table class="doc-table" :data="events" :mobile-cards="true">
-          <template scope="scope">
+          <template slot-scope="scope">
             <b-table-column label="Name" width="200">
               <code>{{ scope.row.name }}</code>
             </b-table-column>

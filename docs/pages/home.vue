@@ -5,7 +5,7 @@
         vl-view(ref="view" ':zoom'="3" ':min-zoom'="2")
 
         vl-geoloc('@update:position'="onUpdatePosition")
-          template(scope="ctx")
+          template(slot-scope="ctx")
             vl-feature(v-if="ctx.position" id="position-feature")
               vl-geom-point(:coordinates="ctx.position")
               vl-style-box
