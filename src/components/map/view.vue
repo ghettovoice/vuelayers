@@ -4,7 +4,7 @@
    */
   import Vue from 'vue'
   import View from 'ol/view'
-  import { isEqual, isPlainObject, noop } from 'lodash/fp'
+  import { isEqual, isPlainObject, noop, get } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import { merge as mergeObs } from 'rxjs/observable/merge'
   import { debounceTime } from 'rxjs/operator/debounceTime'
@@ -45,6 +45,11 @@
       type: Boolean,
       default: true,
     },
+    /**
+     * The extent that constrains the center defined in in **EPSG:4326** projection,
+     * in other words, center cannot be set outside this extent.
+     * @default undefined
+     */
     extent: {
       type: Array,
       validator: value => value.length === 4,
@@ -118,6 +123,12 @@
       assert.hasView(this)
 
       let cb = args.reverse().find(x => typeof x === 'function') || noop
+      args.forEach(opts => {
+        let center = get('center', opts)
+        if (Array.isArray(center) && center.length) {
+          opts.center = projHelper.fromLonLat(center, this.projection)
+        }
+      })
 
       return new Promise(
         resolve => this.$view.animate(...args, complete => {
@@ -135,7 +146,9 @@
         center: projHelper.fromLonLat(this.center, this.projection),
         constrainRotation: this.constrainRotation,
         enableRotation: this.enableRotation,
-        extent: this.extent,
+        extent: this.extent
+          ? projHelper.extentFromLonLat(this.extent, this.projection)
+          : undefined,
         maxResolution: this.maxResolution,
         minResolution: this.minResolution,
         maxZoom: this.maxZoom,

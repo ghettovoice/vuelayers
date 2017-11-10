@@ -26,7 +26,8 @@ export default {
     },
     {
       name: 'extent',
-      description: '',
+      description: `<p>The extent that constrains the center defined in in <b>EPSG:4326</b> projection,
+                    in other words, center cannot be set outside this extent.</p>`,
       type: 'array',
       required: false,
       sync: false,

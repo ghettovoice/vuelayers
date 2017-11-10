@@ -1,3 +1,6 @@
+/**
+ * @module core/mixins/ol-cmp
+ */
 import { isFunction } from 'lodash/fp'
 import { Observable } from 'rxjs/Observable'
 import { interval as intervalObs } from 'rxjs/observable/interval'
@@ -99,7 +102,15 @@ const methods = {
 }
 
 /**
- * Basic ol component mixin
+ * Basic ol component mixin.
+ *
+ * @title olCmp
+ * @vueProto
+ * @alias module:core/mixins/ol-cmp
+ *
+ * @fires module:core/mixins/ol-cmp#created
+ * @fires module:core/mixins/ol-cmp#mounted
+ * @fires module:core/mixins/ol-cmp#destroyed
  */
 export default {
   mixins: [identMap, rxSubs, services],
@@ -179,3 +190,19 @@ function refresh () {
     }
   })
 }
+
+/**
+ * Emitted when underlying ol instance created.
+ * @event module:core/mixins/ol-cmp#created
+ * @type {void}
+ */
+/**
+ * Emitted when underlying ol instance mounted to parent.
+ * @event module:core/mixins/ol-cmp#mounted
+ * @type {void}
+ */
+/**
+ * Emitted when underlying ol instance destroyed.
+ * @event module:core/mixins/ol-cmp#destroyed
+ * @type {void}
+ */

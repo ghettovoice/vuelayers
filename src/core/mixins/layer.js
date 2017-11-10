@@ -1,3 +1,6 @@
+/**
+ * @module core/mixins/layer
+ */
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 import * as assert from '../utils/assert'
@@ -6,11 +9,18 @@ import cmp from '../mixins/ol-virt-cmp'
 import sourceContainer from '../mixins/source-container'
 import useMapCmp from '../mixins/use-map-cmp'
 
-const props = {
+/**
+ * @vueProps
+ */
+const props = /** @lends module:core/mixins/layer# */{
   id: {
     type: [String, Number],
     default: () => uuid(),
   },
+  /**
+   * The bounding extent for layer rendering defined in **EPSG:4326** projection. The layer will not be rendered outside of this extent.
+   * @default undefined
+   */
   extent: {
     type: Array,
     validator: value => value.length === 4,
