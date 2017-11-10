@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div style="height: 50%">
-      <vl-map ref="map">
+      <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
         <vl-geoloc>
@@ -97,6 +97,7 @@
   }
 
   const methods = {
+    log: ::console.log,
     select ({ feature }) {
       if (feature.get('features') && feature.get('features').length > 1) {
         this.selectedFeatures = this.selectedFeatures.filter(id => id !== feature.getId())

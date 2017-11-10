@@ -117,10 +117,11 @@ export default {
      */
     this._createPromise = Promise.resolve(this.beforeInit())
       .then(this.init)
-      // .then(() => {
-      //   logdbg('created', this.$options.name)
-      //   return this
-      // })
+      .then(() => {
+        // logdbg('created', this.$options.name)
+        this.$emit('created')
+        return this
+      })
     /**
      * @type {Promise<Vue<T>>}
      * @private
@@ -150,6 +151,7 @@ export default {
     this.$createPromise.then(this.mount)
       .then(() => {
         this._mounted = true
+        this.$emit('mounted')
         // logdbg('mounted', this.$options.name)
       })
   },
@@ -157,6 +159,7 @@ export default {
     this.$mountPromise.then(this.unmount)
       .then(this.deinit)
       .then(() => {
+        this.$emit('destroyed')
         this._olObject = this._createPromise = this._mountPromise = undefined
         // logdbg('destroyed', this.$options.name)
       })
