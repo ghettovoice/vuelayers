@@ -53,6 +53,10 @@
             b-table-column(label="Name")
               code {{ scope.row.name }}
             b-table-column(label="Description" v-html="scope.row.description")
+            b-table-column(label="Scoped")
+              b-icon.checkbox(
+              ':type'="scope.row.scoped ? 'is-info' : 'is-light'"
+              ':icon'="scope.row.scoped ? 'check-square-o' : 'square-o'")
 </template>
 
 <script>

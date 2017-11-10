@@ -240,11 +240,12 @@ exports.defineTags = function (dict) {
     onTagged (doclet, tag) {
       doclet.slots || (doclet.slots = [])
 
-      let match = /(\w+)(?:\s(.*))?/iu.exec(tag.value)
+      let match = /(\w+)(?:\s(?:(?:\s?(\[scoped\])\s?)?(.*))?)?/iu.exec(tag.value)
       if (match && match.length) {
         doclet.slots.push({
           name: match[1],
-          description: match[2],
+          description: match[2] === '[scoped]' ? match[3] : match[2],
+          scoped: match[2] === '[scoped]',
         })
       }
     },

@@ -257,6 +257,7 @@ export default {
     {
       name: 'default',
       description: `<p>Default slot for all child components.</p>`,
+      scoped: false,
     },
   ],
 }

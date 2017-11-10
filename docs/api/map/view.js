@@ -177,5 +177,11 @@ export default {
     },
   ],
   events: [],
-  slots: [],
+  slots: [
+    {
+      name: 'default',
+      description: `<p>Default <b>scoped</b> slot with current state: center, zoom, rotation & etc.</p>`,
+      scoped: true,
+    },
+  ],
 }

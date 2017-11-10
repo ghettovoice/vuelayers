@@ -192,6 +192,7 @@ function makeBundle (opts = {}) {
     //   }),
     // ] : []),
     replace({
+      delimiters: ['', ''],
       sourceMap: true,
       values: opts.replaces,
     }),
