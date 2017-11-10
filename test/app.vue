@@ -2,7 +2,16 @@
   <div id="app">
     <div style="height: 50%">
       <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')">
-        <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
+        <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
+          <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
+            <div style="background: #eee; padding: 1rem">
+              Center: {{ view.center }}<br>
+              Zoom: {{ view.zoom }}<br>
+              Resolution: {{ view.resolution }}<br>
+              Rotation: {{ view.rotation }}<br>
+            </div>
+          </vl-overlay>
+        </vl-view>
 
         <vl-geoloc>
           <template slot-scope="ctx">
@@ -58,7 +67,7 @@
         </vl-layer-vector>
       </vl-map>
     </div>
-    <div style="height: 50%">
+    <!--<div style="height: 50%">
       <vl-map>
         <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
@@ -85,7 +94,7 @@
           </div>
         </vl-overlay>
       </vl-map>
-    </div>
+    </div>-->
   </div>
 </template>
 

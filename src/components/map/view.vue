@@ -1,3 +1,9 @@
+<template>
+  <i :class="[$options.name]" style="display: none !important;">
+    <slot :center="currentCenter" :zoom="currentZoom" :resolution="currentResolution" :rotation="currentRotation"></slot>
+  </i>
+</template>
+
 <script>
   /**
    * @module map/view
@@ -7,8 +13,7 @@
   import { isEqual, isPlainObject, noop, get } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import { merge as mergeObs } from 'rxjs/observable/merge'
-  import { debounceTime } from 'rxjs/operator/debounceTime'
-  import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
+  import { distinctUntilKeyChanged } from 'rxjs/operator/distinctUntilKeyChanged'
   import { map as mapObs } from 'rxjs/operator/map'
   import {
     MIN_ZOOM,
@@ -18,7 +23,7 @@
     projHelper,
     geoJsonHelper,
     observableFromOlChangeEvent,
-    olVirtCmp,
+    olCmp,
     assert,
   } from '../../core'
 
@@ -107,7 +112,38 @@
     },
   }
 
+  /**
+   * @vueComputed
+   */
   const computed = /** @lends module:map/view# */{
+    currentCenter () {
+      if (this.rev && this.$view) {
+        return this::getCenter()
+      }
+
+      return this.center
+    },
+    currentZoom () {
+      if (this.rev && this.$view) {
+        return this::getZoom()
+      }
+
+      return this.zoom
+    },
+    currentRotation () {
+      if (this.rev && this.$view) {
+        return this.$view.getRotation()
+      }
+
+      return this.rotation
+    },
+    currentResolution () {
+      if (this.rev && this.$view) {
+        return this.$view.getResolution()
+      }
+
+      return this.resolution
+    },
   }
 
   /**
@@ -258,7 +294,7 @@
    */
   export default {
     name: 'vl-view',
-    mixins: [olVirtCmp],
+    mixins: [olCmp],
     props,
     computed,
     methods,
@@ -267,14 +303,6 @@
       empty () {
         return this.$options.name
       },
-    },
-    /**
-     * @this module:map/view
-     */
-    data () {
-      return /** @lends module:map/view# */{
-        rev: 1,
-      }
     },
     /**
      * @this module:map/view
@@ -301,6 +329,8 @@
    * @return {void}
    * @this module:map/view
    * @private
+   *
+   * @vueSlot default [scoped] Default scoped slot with current state: center, zoom, rotation & etc.
    */
   function subscribeToViewChanges () {
     assert.hasView(this)
@@ -310,8 +340,7 @@
     const zoom = resolution::mapObs(() => ({
       prop: 'zoom',
       value: this::getZoom(),
-    }))::debounceTime(2 * ft)
-      ::distinctUntilChanged(isEqual)
+    }))::distinctUntilKeyChanged('value')
 
     const changes = Observable::mergeObs(
       observableFromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),

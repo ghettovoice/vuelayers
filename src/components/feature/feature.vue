@@ -163,11 +163,6 @@
     computed,
     methods,
     watch,
-    data () {
-      return {
-        rev: 1,
-      }
-    },
     created () {
       Object.defineProperties(this, {
         /**

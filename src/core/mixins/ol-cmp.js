@@ -47,6 +47,8 @@ const methods = {
     if (!this._olObject[VM_PROP].includes(this)) { // for loaded from IdentityMap
       this._olObject[VM_PROP].push(this)
     }
+
+    this.rev++
   },
   /**
    * @return {*|Promise<T>}
@@ -116,6 +118,14 @@ export default {
   mixins: [identMap, rxSubs, services],
   props,
   methods,
+  /**
+   * @this module:core/mixins/ol-cmp
+   */
+  data () {
+    return /** @lends module:core/mixins/ol-cmp# */{
+      rev: 0,
+    }
+  },
   created () {
     /**
      * @type {*}
