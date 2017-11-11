@@ -76,6 +76,14 @@ export default {
       sync: false,
       default: `['canvas', 'webgl']`,
     },
+    {
+      name: 'tabindex',
+      description: `<p>Root element <code>tabindex</code> attribute value. Value should be provided to allow keyboard events on map.</p>`,
+      type: 'number, string',
+      required: false,
+      sync: false,
+      default: 'undefined',
+    },
   ],
   members: [
     {

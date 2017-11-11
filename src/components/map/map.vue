@@ -1,5 +1,5 @@
 <template>
-  <div :class="[$options.name]">
+  <div :class="[$options.name]" :tabindex="tabindex">
     <slot></slot>
   </div>
 </template>
@@ -105,6 +105,11 @@
       type: [String, Array],
       default: () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL],
     },
+    /**
+     * Root element `tabindex` attribute value. Value should be provided to allow keyboard events on map.
+     * @type {number|string}
+     */
+    tabindex: [String, Number],
   }
 
   /**

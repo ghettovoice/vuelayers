@@ -59,7 +59,11 @@ describe('vl-map', () => {
       const div = document.createElement('div')
       document.body.appendChild(div)
 
-      const vm = new Ctor().$mount(div)
+      const vm = new Ctor({
+        propsData: {
+          tabindex: 0,
+        },
+      }).$mount(div)
 
       vm.$mountPromise.then(() => {
         vm.focus()
