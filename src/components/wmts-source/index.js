@@ -1,6 +1,3 @@
-/**
- * @module components/source/wmts
- */
 import Source from './source.vue'
 
 export default {

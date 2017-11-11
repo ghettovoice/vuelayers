@@ -1,6 +1,3 @@
-/**
- * @module components/geom/line-string
- */
 import Geom from './geom.vue'
 
 export default {

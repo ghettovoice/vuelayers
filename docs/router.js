@@ -1,12 +1,12 @@
-/* global ga */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Velocity from 'velocity-animate'
 import routes from './routes'
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-  base: 'C_BASE_URL',
+  base: location.pathname,
   routes: routes,
   scrollBehavior: (to, from, saved) => {
     if (saved) return saved
@@ -14,7 +14,7 @@ const router = new VueRouter({
   },
 })
 router.beforeEach((to, from, next) => {
-  document.title = [to.meta.title || document.title, 'C_PKG_FULLNAME'].join(' :: ')
+  document.title = [to.meta.title || document.title, 'VueLayers'].join(' :: ')
 
   const metaKeywords = document.head.querySelector('meta[name="keywords"]')
   metaKeywords.setAttribute('content', to.meta.keywords || metaKeywords.getAttribute('content'))
@@ -24,13 +24,16 @@ router.beforeEach((to, from, next) => {
 
   next()
 })
+
 router.afterEach((to, from) => {
-  if (window.ga != null) {
-    ga('set', {
-      page: to.path,
-      title: to.meta.title,
+  // first load exclude
+  if (from.matched.length) {
+    Velocity(document.body, 'scroll', {
+      offset: 0,
+      delay: 300,
+      duration: 750,
+      easing: 'easeOutCube',
     })
-    ga('send', 'pageview')
   }
 })
 

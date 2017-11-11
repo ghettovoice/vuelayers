@@ -3,6 +3,8 @@ const path = require('path')
 const { trimEnd } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
+const hljs = require('highlight.js')
+const marked = require('marked')
 const concat = require('source-map-concat')
 const postcss = require('postcss')
 const config = require('./config')
@@ -137,6 +139,7 @@ function vueLoaderConfig (extract) {
     postcss: postcssPlugins(),
     template: {
       render: require('pug').render,
+      doctype: 'html',
     },
     transformToRequire: {
       img: 'src',
@@ -147,12 +150,23 @@ function vueLoaderConfig (extract) {
 }
 
 function markdownLoaderConfig () {
-  const hljs = require('highlight.js')
-  const renderer = new (require('marked')).Renderer()
-  renderer.code = (code, lang) => `<pre><code class="hljs ${lang}">${hljs.highlightAuto(code).value}</code></pre>`
+  const renderer = new marked.Renderer()
   renderer.html = html => `<div class="content">${html}</div>`
+  renderer.link = function (href, title, text) {
+    let external = /^https?:\/\/.+$/.test(href)
+    let hrefParts = href.split('|')
+    href = hrefParts[0]
+    let tag = hrefParts[1] || 'a'
+    let target = external ? 'target="_blank"' : ''
+    title = title ? `title="${title}"` : ''
+
+    return `<${tag} href="${href}" ${title} ${target}>${text}</${tag}>`
+  }
 
   return {
+    breaks: false,
+    langPrefix: 'hljs ',
+    highlight: (code, lang) => lang ? hljs.highlight(lang, code).value : code,
     renderer,
   }
 }
@@ -226,7 +240,7 @@ function concatFiles (files, dest, banner) {
 
 function getServiceWorkerSrc () {
   let source = fs.readFileSync(resolve('build/service-worker-registration.js'), 'utf-8')
-  source = source.replace('__SCRIPT_URL__', `${trimEnd(config.publicPath, '/')}/${trimEnd(config.assetsSubDir, '/')}/js/service-worker.js`)
+  source = source.replace('__SCRIPT_URL__', `${trimEnd(config.publicPath, '/')}/service-worker.js`)
 
   return source
 }

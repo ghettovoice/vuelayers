@@ -1,52 +1,41 @@
 /**
- * VueLayers
- * Vue components to work with OpenLayers.
- *
- * @module vuelayers
- * @author Vladimir Vershinin <ghettovoice@gmail.com>
- * @license MIT
- * @copyright (c) 2017, Vladimir Vershinin <ghettovoice@gmail.com>
+ * Entry file for ES environments.
  */
-
 import VueLayers from './index.cjs'
 
 export default VueLayers
 export const {
   install,
   core,
-  // common
-  Map,
-  Feature,
-  Geoloc,
-  Overlay,
-  // geoms
-  PointGeom,
-  LineStringGeom,
-  PolygonGeom,
-  MultiPointGeom,
-  MultiLineStringGeom,
-  MultiPolygonGeom,
-  // interactions
-  SelectInteraction,
-  // layers
-  TileLayer,
-  VectorLayer,
-  // sources
-  ClusterSource,
-  MapboxSource,
-  OsmSource,
-  SputnikSource,
-  VectorSource,
-  WmsSource,
-  WmtsSource,
-  XyzSource,
-  // style
+  // components
   CircleStyle,
+  ClusterSource,
+  Feature,
   FillStyle,
+  Geoloc,
   IconStyle,
+  LineStringGeom,
+  Map,
+  MapboxSource,
+  MultiLineStringGeom,
+  MultiPointGeom,
+  MultiPolygonGeom,
+  OsmSource,
+  Overlay,
+  PointGeom,
+  PolygonGeom,
   RegShapeStyle,
+  SelectInteraction,
+  SputnikSource,
   StrokeStyle,
   StyleBox,
   StyleContainer,
   StyleFunc,
+  TextStyle,
+  TileLayer,
+  VectorLayer,
+  VectorSource,
+  WmsSource,
+  WmtsSource,
+  XyzSource,
 } = VueLayers

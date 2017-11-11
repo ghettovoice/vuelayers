@@ -5,6 +5,9 @@
 </template>
 
 <script>
+  /**
+   * @module feature/feature
+   */
   import uuid from 'uuid/v4'
   import Feature from 'ol/feature'
   import { isEqual, merge } from 'lodash/fp'
@@ -28,18 +31,38 @@
 
   const mergeNArg = merge.convert({ fixed: false })
 
-  const props = {
+  /**
+   * @vueProps
+   */
+  const props = /** @lends module:feature/feature# */{
+    /**
+     * Feature identifier.
+     * @default UUID
+     * @vueSync
+     */
     id: {
       type: [String, Number],
       default: () => uuid(),
     },
+    /**
+     * All feature properties.
+     * @default {}
+     * @vueSync
+     */
     properties: {
       type: Object,
       default: () => Object.create(null),
     },
   }
 
-  const computed = {
+  /**
+   * @vueComputed
+   */
+  const computed = /** @lends module:feature/feature# */{
+    /**
+     * **GeoJSON** encoded geometry.
+     * @type {GeoJSONFeature|undefined}
+     */
     geometry () {
       if (this.rev && this.$geometry && this.$view) {
         return geoJsonHelper.writeGeometry(this.$geometry, this.$view.getProjection())
@@ -47,7 +70,10 @@
     },
   }
 
-  const methods = {
+  /**
+   * @vueMethods
+   */
+  const methods = /** @lends module:feature/feature# */{
     /**
      * Create feature without inner style applying, feature level style
      * will be applied in the layer level style function.
@@ -67,8 +93,8 @@
     },
     /**
      * @return {{
-     *     getGeometry: function(): ol.geom.Geometry|undefined,
-     *     setGeometry: function(ol.geom.Geometry|undefined)
+     *     getGeometry: function(): (ol.geom.Geometry|undefined),
+     *     setGeometry: function((ol.geom.Geometry|undefined)): void
      *   }|ol.Feature|undefined}
      * @protected
      */
@@ -99,6 +125,7 @@
       return this.$feature
     },
     /**
+     * Checks if feature lies at `pixel`.
      * @param {number} pixel
      * @return {boolean}
      */
@@ -156,6 +183,16 @@
     },
   }
 
+  /**
+   * A vector object for geographic features with a geometry and other attribute properties,
+   * similar to the features in vector file formats like **GeoJSON**.
+   *
+   * @title vl-feature
+   * @alias module:feature/feature
+   * @vueProto
+   *
+   * @vueSlot default [scoped] Default **scoped** slot with current feature state: `id`, `properties`, GeoJSON `geometry`.
+   */
   export default {
     name: 'vl-feature',
     mixins: [olCmp, useMapCmp, geometryContainer, stylesContainer],
@@ -163,32 +200,44 @@
     computed,
     methods,
     watch,
-    data () {
-      return {
-        rev: 1,
-      }
-    },
     created () {
-      Object.defineProperties(this, {
+      Object.defineProperties(this, /** @lends module:feature/feature# */{
         /**
+         * Reference to `ol.Feature` instance.
          * @type {ol.Feature|undefined}
          */
         $feature: {
           enumerable: true,
           get: () => this.$olObject,
         },
+        /**
+         * Reference to parent `ol.Layer` instance.
+         * @type {ol.layer.Layer|undefined}
+         */
         $layer: {
           enumerable: true,
           get: () => this.$services && this.$services.layer,
         },
+        /**
+         * Reference to `ol.Map` instance.
+         * @type {ol.Map|undefined}
+         */
         $map: {
           enumerable: true,
           get: () => this.$services && this.$services.map,
         },
+        /**
+         * Reference to `ol.View` instance.
+         * @type {ol.View|undefined}
+         */
         $view: {
           enumerable: true,
           get: () => this.$services && this.$services.view,
         },
+        /**
+         * Reference to `featuresContainer`.
+         * @type {Object|undefined}
+         */
         $featuresContainer: {
           enumerable: true,
           get: () => this.$services && this.$services.featuresContainer,

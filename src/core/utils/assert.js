@@ -1,7 +1,3 @@
-/**
- * Assertion helpers
- * @module utils/assert
- */
 import isNumeric from './is-numeric'
 
 export class AssertionError extends Error {

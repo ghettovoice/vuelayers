@@ -1,6 +1,6 @@
 <script>
   import TileLayer from 'ol/layer/tile'
-  import { layer } from '../../core'
+  import { projHelper, layer } from '../../core'
 
   const props = {
     preload: Number,
@@ -19,7 +19,9 @@
         opacity: this.opacity,
         visible: this.visible,
         preload: this.preload,
-        extent: this.extent,
+        extent: this.extent
+          ? projHelper.extentFromLonLat(this.extent, this.$view.getProjection())
+          : undefined,
         zIndex: this.zIndex,
         source: this._source,
       })

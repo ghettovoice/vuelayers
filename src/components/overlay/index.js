@@ -1,6 +1,3 @@
-/**
- * @module components/overlay
- */
 import Overlay from './overlay.vue'
 
 export default {

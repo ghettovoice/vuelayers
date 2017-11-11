@@ -1,6 +1,3 @@
-/**
- * @module components/source/wms
- */
 import Source from './source.vue'
 
 export default {

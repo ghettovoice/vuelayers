@@ -1,13 +1,12 @@
 // Import Bulma's core
 @import "~bulma/sass/utilities/_all";
 
-$light-blue: #03a9f4;
-$indigo: #536dfe;
-$grey-very-lighter: lighten($grey-lighter, 8);
-
 // Set your colors
-$primary: $light-blue;
-$info: $indigo;
+$primary: #1e88e5;
+$info: #2962ff;
+$success: #00bc53;
+$grey-very-lighter: lighten($grey-lighter, 8);
+$light-dark: lighten($dark, 30%);
 
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: (
@@ -32,12 +31,12 @@ $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
 // sidebar
-$sidebar-background: $dark url(../static/img/sidebar-bg.png) repeat;
-$sidebar-link-color: lighten($primary, 20%);
+$sidebar-background: $dark; // url(../static/img/sidebar-bg.png) repeat;
+$sidebar-link-color: lighten($primary, 5%);
 $sidebar-link-hover-color: $primary-invert;
 $sidebar-icon-color: $grey-light;
 $sidebar-icon-hover-color: $light;
-$sidebar-menu-link-color: lighten($primary, 20%);
+$sidebar-menu-link-color: lighten($primary, 5%);
 $sidebar-menu-link-hover-color: $primary-invert;
 $sidebar-menu-link-active-color: $primary-invert;
 $sidebar-menu-link-background: none;

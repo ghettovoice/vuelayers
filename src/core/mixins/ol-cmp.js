@@ -1,6 +1,5 @@
 /**
- * Basic ol component mixin
- * @module components/ol-cmp
+ * @module core/mixins/ol-cmp
  */
 import { isFunction } from 'lodash/fp'
 import { Observable } from 'rxjs/Observable'
@@ -48,6 +47,8 @@ const methods = {
     if (!this._olObject[VM_PROP].includes(this)) { // for loaded from IdentityMap
       this._olObject[VM_PROP].push(this)
     }
+
+    this.rev++
   },
   /**
    * @return {*|Promise<T>}
@@ -102,10 +103,29 @@ const methods = {
   refresh: refresh,
 }
 
+/**
+ * Basic ol component mixin.
+ *
+ * @title olCmp
+ * @vueProto
+ * @alias module:core/mixins/ol-cmp
+ *
+ * @fires module:core/mixins/ol-cmp#created
+ * @fires module:core/mixins/ol-cmp#mounted
+ * @fires module:core/mixins/ol-cmp#destroyed
+ */
 export default {
   mixins: [identMap, rxSubs, services],
   props,
   methods,
+  /**
+   * @this module:core/mixins/ol-cmp
+   */
+  data () {
+    return /** @lends module:core/mixins/ol-cmp# */{
+      rev: 0,
+    }
+  },
   created () {
     /**
      * @type {*}
@@ -118,10 +138,11 @@ export default {
      */
     this._createPromise = Promise.resolve(this.beforeInit())
       .then(this.init)
-      // .then(() => {
-      //   logdbg('created', this.$options.name)
-      //   return this
-      // })
+      .then(() => {
+        // logdbg('created', this.$options.name)
+        this.$emit('created')
+        return this
+      })
     /**
      * @type {Promise<Vue<T>>}
      * @private
@@ -151,6 +172,7 @@ export default {
     this.$createPromise.then(this.mount)
       .then(() => {
         this._mounted = true
+        this.$emit('mounted')
         // logdbg('mounted', this.$options.name)
       })
   },
@@ -158,6 +180,7 @@ export default {
     this.$mountPromise.then(this.unmount)
       .then(this.deinit)
       .then(() => {
+        this.$emit('destroyed')
         this._olObject = this._createPromise = this._mountPromise = undefined
         // logdbg('destroyed', this.$options.name)
       })
@@ -177,3 +200,19 @@ function refresh () {
     }
   })
 }
+
+/**
+ * Emitted when underlying **OpenLayers** instance created.
+ * @event module:core/mixins/ol-cmp#created
+ * @type {void}
+ */
+/**
+ * Emitted when underlying **OpenLayers** instance mounted to parent.
+ * @event module:core/mixins/ol-cmp#mounted
+ * @type {void}
+ */
+/**
+ * Emitted when underlying **OpenLayers** instance destroyed.
+ * @event module:core/mixins/ol-cmp#destroyed
+ * @type {void}
+ */

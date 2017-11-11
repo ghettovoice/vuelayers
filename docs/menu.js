@@ -12,11 +12,15 @@ export default [
     title: 'Live Demo',
   },
   {
-    link: '/packages',
-    title: 'Packages',
+    link: '/modules',
+    title: 'Modules',
     items: [
       {
-        link: '/packages/map',
+        link: '/modules/feature',
+        title: 'Feature',
+      },
+      {
+        link: '/modules/map',
         title: 'Map',
       },
     ],

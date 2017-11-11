@@ -115,11 +115,6 @@
         return this.$options.name
       },
     },
-    data () {
-      return {
-        rev: 1,
-      }
-    },
     created () {
       Object.defineProperties(this, {
         /**

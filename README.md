@@ -39,7 +39,7 @@ npm install -S vue vuelayers
 **NOTE**: Node **v6+** is required.
 
 ``` bash
-git clone https://github.com/ghettovoice/vuelayers.git
+git clone --recursive -j8 https://github.com/ghettovoice/vuelayers.git
 cd vuelayers
 
 # install dependencies

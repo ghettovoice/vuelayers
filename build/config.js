@@ -17,6 +17,7 @@ ${packageJson.description}
 */`
 
 const BASE_URL = process.env.BASE_URL || '/'
+const primaryColor = '#1e88e5'
 
 module.exports = {
   banner,
@@ -47,6 +48,8 @@ module.exports = {
     C_PKG_LICENSE_NAME: packageJson.license,
     C_BASE_URL: BASE_URL,
     C_GOOGLE_UID: 'UA-98870917-3',
+    C_PRIMARY_COLOR: primaryColor,
   },
   autoOpenBrowser: true,
+  themeColor: primaryColor,
 }

@@ -1,11 +1,20 @@
 <template>
   <div id="app">
     <div style="height: 50%">
-      <vl-map ref="map">
-        <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
+      <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')">
+        <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
+          <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
+            <div style="background: #eee; padding: 1rem">
+              Center: {{ view.center }}<br>
+              Zoom: {{ view.zoom }}<br>
+              Resolution: {{ view.resolution }}<br>
+              Rotation: {{ view.rotation }}<br>
+            </div>
+          </vl-overlay>
+        </vl-view>
 
         <vl-geoloc>
-          <template scope="ctx">
+          <template slot-scope="ctx">
             <vl-feature v-if="ctx.position" id="my-geoloc">
               <vl-geom-point :coordinates="ctx.position" />
               <vl-style-box>
@@ -39,7 +48,7 @@
         <vl-layer-vector>
           <vl-source-vector>
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
-              <template scope="feature">
+              <template slot-scope="feature">
                 <vl-geom-polygon :coordinates.sync="polygonCoords"/>
                 <vl-overlay v-if="selected.includes(feature.id)" :position="pointOnSurface(feature.geometry)">
                   <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
@@ -58,7 +67,7 @@
         </vl-layer-vector>
       </vl-map>
     </div>
-    <div style="height: 50%">
+    <!--<div style="height: 50%">
       <vl-map>
         <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
@@ -85,7 +94,7 @@
           </div>
         </vl-overlay>
       </vl-map>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -97,6 +106,7 @@
   }
 
   const methods = {
+    log: ::console.log,
     select ({ feature }) {
       if (feature.get('features') && feature.get('features').length > 1) {
         this.selectedFeatures = this.selectedFeatures.filter(id => id !== feature.getId())

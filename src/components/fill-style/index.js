@@ -1,6 +1,3 @@
-/**
- * @module components/style/fill
- */
 import Style from './style.vue'
 
 export default {

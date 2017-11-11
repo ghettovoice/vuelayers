@@ -4,24 +4,24 @@
     <vl-map class="map" ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true"
             @click="clickCoordinate = $event.coordinate" @postcompose="onMapPostCompose">
       <!-- map view aka ol.View -->
-      <vl-view ref="view" :center="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
+      <vl-view ref="view" :center="center" :zoom.sync="zoom" :rotation.sync="rotation"></vl-view>
 
       <!-- interactions -->
       <vl-interaction-select :features.sync="selectedFeatures">
-        <template scope="select">
+        <template slot-scope="select">
           <!-- select styles -->
           <vl-style-box>
-            <vl-style-stroke color="#423e9e" :width="7"/>
-            <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+            <vl-style-stroke color="#423e9e" :width="7"></vl-style-stroke>
+            <vl-style-fill :color="[254, 178, 76, 0.7]"></vl-style-fill>
             <vl-style-circle :radius="5">
-              <vl-style-stroke color="#423e9e" :width="7"/>
-              <vl-style-fill :color="[254, 178, 76, 0.7]"/>
+              <vl-style-stroke color="#423e9e" :width="7"></vl-style-stroke>
+              <vl-style-fill :color="[254, 178, 76, 0.7]"></vl-style-fill>
             </vl-style-circle>
           </vl-style-box>
           <vl-style-box :z-index="1">
-            <vl-style-stroke color="#d43f45" :width="2"/>
+            <vl-style-stroke color="#d43f45" :width="2"></vl-style-stroke>
             <vl-style-circle :radius="5">
-              <vl-style-stroke color="#d43f45" :width="2"/>
+              <vl-style-stroke color="#d43f45" :width="2"></vl-style-stroke>
             </vl-style-circle>
           </vl-style-box>
           <!--// select styles -->
@@ -29,28 +29,31 @@
           <!-- selected feature popup -->
           <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
                       :position="pointOnSurface(feature.geometry)" :auto-pan="true">
-            <template scope="popup">
-              <vld-card>
-                <p slot="header" class="card-header-title">
-                  Feature ID {{ feature.id }}
-                </p>
-                <a slot="header" class="card-header-icon" title="Close"
-                   @click="selectedFeatures = selectedFeatures.filter(f => f.id !== feature.id)">
-                  <b-icon icon="close"/>
-                </a>
-
-                <div class="content">
-                  <p>
-                    Overlay popup content for Feature with ID <strong>{{ feature.id }}</strong>
+            <template slot-scope="popup">
+              <section class="card">
+                <header class="card-header">
+                  <p class="card-header-title">
+                    Feature ID {{ feature.id }}
                   </p>
-                  <p>
-                    Popup: {{ JSON.stringify(popup) }}
-                  </p>
-                  <p>
-                    Feature: {{ JSON.stringify({ id: feature.id, properties: feature.properties }) }}
-                  </p>
+                  <a class="card-header-icon" title="Close"
+                     @click="selectedFeatures = selectedFeatures.filter(f => f.id !== feature.id)">
+                    <b-icon icon="close"></b-icon>
+                  </a>
+                </header>
+                <div class="card-content">
+                  <div class="content">
+                    <p>
+                      Overlay popup content for Feature with ID <strong>{{ feature.id }}</strong>
+                    </p>
+                    <p>
+                      Popup: {{ JSON.stringify(popup) }}
+                    </p>
+                    <p>
+                      Feature: {{ JSON.stringify({ id: feature.id, properties: feature.properties }) }}
+                    </p>
+                  </div>
                 </div>
-              </vld-card>
+              </section>
             </template>
           </vl-overlay>
           <!--// selected popup -->
@@ -60,11 +63,11 @@
 
       <!-- geolocation -->
       <vl-geoloc @update:position="onUpdatePosition">
-        <template scope="geoloc">
+        <template slot-scope="geoloc">
           <vl-feature v-if="geoloc.position" id="position-feature">
-            <vl-geom-point :coordinates="geoloc.position"/>
+            <vl-geom-point :coordinates="geoloc.position"></vl-geom-point>
             <vl-style-box>
-              <vl-style-icon src="../static/img/marker.png" :scale="0.4" :anchor="[0.5, 1]"/>
+              <vl-style-icon src="./assets/marker.png" :scale="0.4" :anchor="[0.5, 1]"></vl-style-icon>
             </vl-style-box>
           </vl-feature>
         </template>
@@ -73,10 +76,10 @@
 
       <!-- overlay marker with animation -->
       <vl-feature id="marker" ref="marker" :properties="{ start: Date.now(), duration: 2500 }">
-        <template scope="feature">
-          <vl-geom-point :coordinates="[-10, -10]"/>
+        <template slot-scope="feature">
+          <vl-geom-point :coordinates="[-10, -10]"></vl-geom-point>
           <vl-style-box>
-            <vl-style-icon src="../static/img/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"/>
+            <vl-style-icon src="./assets/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"></vl-style-icon>
           </vl-style-box>
           <!-- overlay binded to feature -->
           <vl-overlay v-if="feature.geometry" :position="pointOnSurface(feature.geometry)" :offset="[10, 10]">
@@ -90,7 +93,7 @@
 
       <!-- base layer -->
       <vl-layer-tile id="sputnik">
-        <vl-source-sputnik/>
+        <vl-source-sputnik></vl-source-sputnik>
       </vl-layer-tile>
 
       <!-- other layers from config -->
@@ -101,7 +104,7 @@
           <vl-feature v-if="layer.source.staticFeatures && layer.source.staticFeatures.length"
                       v-for="feature in layer.source.staticFeatures" :key="feature.id"
                       :id="feature.id" :properties="feature.properties">
-            <component :is="geometryTypeToCmpName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
+            <component :is="geometryTypeToCmpName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"></component>
           </vl-feature>
 
           <!-- add inner source if provided (like vl-source-vector inside vl-source-cluster) -->
@@ -110,7 +113,7 @@
             <vl-feature v-if="layer.source.source.staticFeatures && layer.source.source.staticFeatures.length"
                         v-for="feature in layer.source.source.staticFeatures" :key="feature.id"
                         :id="feature.id" :properties="feature.properties">
-              <component :is="geometryTypeToCmpName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"/>
+              <component :is="geometryTypeToCmpName(feature.geometry.type)" :coordinates="feature.geometry.coordinates"></component>
             </vl-feature>
           </component>
         </component>
@@ -122,8 +125,8 @@
           <!-- create inner style components: vl-style-circle, vl-style-icon, vl-style-fill, vl-style-stroke & etc -->
           <component v-if="style.styles" v-for="(st, cmp) in style.styles" :key="cmp" :is="cmp" v-bind="st">
             <!-- vl-style-fill, vl-style-stroke if provided -->
-            <vl-style-fill v-if="st.fill" v-bind="st.fill"/>
-            <vl-style-fill v-if="st.stroke" v-bind="st.stroke"/>
+            <vl-style-fill v-if="st.fill" v-bind="st.fill"></vl-style-fill>
+            <vl-style-stroke v-if="st.stroke" v-bind="st.stroke"></vl-style-stroke>
           </component>
         </component>
         <!--// style -->
@@ -181,9 +184,9 @@
 
 <script>
   import { kebabCase, range, random } from 'lodash/fp'
-  // import C_PKG_FULLNAME core helpers
+  // import VueLayers core helpers
   import { core as vlCore } from 'vuelayers'
-  import pacmanFeaturesCollection from '../static/sample-data/pacman.geojson'
+  import pacmanFeaturesCollection from './assets/pacman.geojson'
 
   const methods = {
     pointOnSurface: vlCore.geomHelper.pointOnSurface,
@@ -352,6 +355,16 @@
                     color: '#219e46',
                     width: 2,
                   },
+                  'vl-style-text': {
+                    text: '\uf041',
+                    font: '24px FontAwesome',
+                    fill: {
+                      color: '#2355af',
+                    },
+                    stroke: {
+                      color: 'white',
+                    },
+                  },
                 },
               },
             ],
@@ -421,7 +434,7 @@
 </script>
 
 <style lang="sass">
-  @import ../styles/variables
+  @import ~bulma/sass/utilities/_all
 
   .vld-demo-app
     position: relative

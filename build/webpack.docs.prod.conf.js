@@ -21,6 +21,9 @@ const webpackConfig = merge(baseWebpackConfig, {
   },
   resolve: {
     mainFields: ['module', 'main'],
+    alias: {
+      vue$: 'vue/dist/vue.esm.js',
+    },
   },
   module: {
     rules: [
@@ -70,6 +73,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       chunksSortMode: 'dependency',
       serviceWorker: `<script>${utils.getServiceWorkerSrc()}</script>`,
       gaUID: config.replaces.C_GOOGLE_UID,
+      primaryColor: config.themeColor,
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
@@ -102,7 +106,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     }),
     new SWPrecacheWebpackPlugin({
       cacheId: `${config.name}-docs-app`,
-      filename: utils.assetsPath('js/service-worker.js'),
+      filename: 'service-worker.js',
       minify: true,
       navigateFallback: config.publicPath,
       staticFileGlobsIgnorePatterns: [/dist-docs\/.*\.html/, /img\/\.cache$/],

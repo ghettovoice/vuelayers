@@ -1,6 +1,3 @@
-/**
- * @module components/geom/multi-point
- */
 import Geom from './geom.vue'
 
 export default {

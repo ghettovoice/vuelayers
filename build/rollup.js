@@ -8,9 +8,9 @@ const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
 const uglify = require('rollup-plugin-uglify')
-const sass = require('./rollup-plugins/sass')
+const sass = require('./rollup/sass')
 // const externalize = require('./rollup-plugins/externalize')
-const resolver = require('./rollup-plugins/resolver')
+const resolver = require('./rollup/resolver')
 const notifier = require('node-notifier')
 const argv = require('yargs').argv
 const { escapeRegExp, camelCase, upperFirst } = require('lodash/fp')
@@ -192,6 +192,7 @@ function makeBundle (opts = {}) {
     //   }),
     // ] : []),
     replace({
+      delimiters: ['', ''],
       sourceMap: true,
       values: opts.replaces,
     }),
@@ -284,6 +285,7 @@ function makeBundle (opts = {}) {
     sourcemapFile: dest,
     globals: opts.globals,
     paths: opts.paths,
+    amd: opts.amd,
   })).then(js => {
     if (!destCss) return { js, css: undefined }
     // concat all extracted styles from Vue and Sass files

@@ -1,0 +1,179 @@
+<%
+/* global _, doclets */
+const helper = require('../jsdoc-helper')
+
+let mainDoclet = doclets.find(({vueProto}) => vueProto)
+helper.resolveDocletLinks(mainDoclet, {base: mainDoclet.longname})
+
+let ident = helper.nameToIdent(mainDoclet.name)
+let longIdent = helper.nameToIdent(mainDoclet.longname)
+let cmpName = `vld-${longIdent}-doc`
+let description = mainDoclet.description
+
+// examples
+let examples = helper.mapExamples(mainDoclet.examples)
+let vueExamples = helper.mapVueExamples(mainDoclet.vueExamples)
+
+// vue parts
+let mixins = mainDoclet.mixes || []
+let { props, dataProps, compProps, otherMembers, methods, events } = helper.extractVueProtoParts(doclets, mainDoclet)
+%>
+<template>
+  <div id="<%= longIdent %>" :class="$options.name" class="content">
+    <% if (mainDoclet.title) { %>
+    <h3><%= mainDoclet.title %></h3>
+    <% } %>
+
+    <%= description %>
+
+    <% examples.forEach(function (example) { %>
+    <%= example %>
+    <% }) %>
+
+    <% vueExamples.forEach(function (example) { %>
+    <%= example %>
+    <% }) %>
+
+    <% if (mixins.length) { %>
+    <b>Mixes in:</b>
+    <ul>
+      <% mixins.forEach(function (name) { %>
+      <li><%= name %></li>
+      <% }) %>
+    </ul>
+    <% } %>
+
+    <% if (props.length || methods.length) { %>
+    <b-tabs>
+      <% if (props.length) { %>
+      <b-tab-item label="Props">
+        <b-table class="doc-table" :data="props" :mobile-cards="true">
+          <template slot-scope="scope">
+            <b-table-column label="Name" width="200">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Type">
+              <span class="is-type">{{ scope.row.typeExpression }}</span>
+            </b-table-column>
+            <b-table-column label="Required">
+              <b-icon class="checkbox" :type="scope.row.required ? 'is-info' : 'is-light'"
+                      :icon="scope.row.required ? 'check-square-o' : 'square-o'"/>
+            </b-table-column>
+            <b-table-column label="Sync">
+              <b-icon class="checkbox" :type="scope.row.vueSync ? 'is-info' : 'is-light'"
+                      :icon="scope.row.vueSync ? 'check-square-o' : 'square-o'"/>
+            </b-table-column>
+            <b-table-column label="Default">
+              <code>{{ scope.row.defaultvalue || 'undefined' }}</code>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+      <% if (otherMembers.length) { %>
+      <b-tab-item label="Other members">
+        <b-table class="doc-table" :data="otherMembers" :mobile-cards="true">
+          <template slot-scope="scope">
+            <b-table-column label="Name" width="200">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Type">
+              <span class="is-type">{{ scope.row.typeExpression }}</span>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+      <% if (methods.length) { %>
+      <b-tab-item label="Methods">
+        <b-table class="doc-table" :data="methods" :mobile-cards="true">
+          <template slot-scope="scope">
+            <b-table-column label="Name" width="200">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Arguments">
+              TODO: render params list
+            </b-table-column>
+            <b-table-column label="Returns">
+              <p v-for="(ret, i) in scope.row.returns" :key="i">
+                <span class="is-type">{{ ret.typeExpression }}</span>
+                <template v-html="ret.description"></template>
+              </p>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+      <% if (events.length) { %>
+      <b-tab-item label="Events">
+        <b-table class="doc-table" :data="events" :mobile-cards="true">
+          <template slot-scope="scope">
+            <b-table-column label="Name" width="200">
+              <code>{{ scope.row.name }}</code>
+            </b-table-column>
+            <b-table-column label="Description" v-html="scope.row.description">
+            </b-table-column>
+            <b-table-column label="Argument">
+              <span class="is-type">{{ scope.row.typeExpression }}</span>
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+      <% } %>
+    </b-tabs>
+    <% } %>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: '<%= cmpName %>',
+    computed: {
+      ident () {
+        return '<%= ident %>'
+      },
+      longIdent () {
+        return '<%= longIdent %>'
+      },
+      mainDoclet () {
+        return <%= JSON.stringify(mainDoclet) %>
+      },
+      doclets () {
+        return <%= JSON.stringify(doclets) %>
+      },
+      props () {
+        return <%= JSON.stringify(props) %>
+      },
+      computed () {
+        return <%= JSON.stringify(compProps) %>
+      },
+      data () {
+        return <%= JSON.stringify(dataProps) %>
+      },
+      otherMembers () {
+        return <%= JSON.stringify(otherMembers) %>
+      },
+      methods () {
+        return <%= JSON.stringify(methods) %>
+      },
+      events () {
+        return <%= JSON.stringify(events) %>
+      },
+      mixins () {
+        return <%= JSON.stringify(mixins) %>
+      },
+    },
+    methods: {
+    },
+  }
+</script>
+
+<style lang="sass">
+  @import ../styles/variables
+</style>

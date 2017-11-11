@@ -1,6 +1,3 @@
-/**
- * @module components/source/sputnik
- */
 import Source from './source.vue'
 
 export default {

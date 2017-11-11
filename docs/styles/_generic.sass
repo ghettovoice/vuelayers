@@ -1,0 +1,100 @@
+@import variables
+
+html, body
+  height: 100%
+  width: 100%
+  box-sizing: border-box
+
+body *
+  box-sizing: border-box
+
+.hljs
+  background: $code-background
+  padding: $code-padding
+
+.content
+  .title
+    font-size: 2rem
+    font-weight: 600
+    line-height: 1.125
+  .subtitle
+    font-weight: 400
+    font-size: 1.25rem
+    line-height: 1.25
+  .tabs
+    ul
+      list-style: none
+      margin-left: 0
+      margin-top: 0
+    li + li
+      margin-top: 0
+  &:not(:last-child)
+    margin-bottom: 1em
+
+// helpers
+.is-wh-100
+  width: 100%
+  height: 100%
+
+.is-flex-column
+  display: flex
+  flex-flow: column nowrap
+
+.is-flex-grow
+  flex-grow: 1
+
+.is-flex-justify-center
+  justify-content: center
+
+.is-relative
+  position: relative
+
+.is-fullheight
+  min-height: 100vh
+
+// blocks
+.buttons
+  margin: .5rem 0
+  .button
+    margin: .25rem 0
+    display: flex
+    &:first-child
+      margin-top: 0
+    &:last-child
+      margin-bottom: 0
+  +tablet()
+    display: flex
+    justify-content: center
+    .button
+      margin: 0 .25rem
+      &:first-child
+        margin-left: 0
+      &:last-child
+        margin-right: 0
+
+.github-buttons
+  margin: .5rem 0
+  display: flex
+  justify-content: center
+  .github-button
+    margin: 0 .25em
+    display: flex
+    &:first-child
+      margin-left: 0
+    &:last-child
+      margin-right: 0
+
+.table-wrapper
+  overflow-x: auto
+
+.example
+  .title
+    font-size: 1.125em
+    font-weight: 500
+
+.doc-table
+  .icon.checkbox.is-light
+    color: $grey !important
+  .is-type
+    font-family: monospace
+    color: $grey
