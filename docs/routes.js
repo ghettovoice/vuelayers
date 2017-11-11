@@ -27,6 +27,13 @@ export default [
     redirect: '/modules/map',
   },
   {
+    path: '/modules/feature',
+    meta: {
+      title: 'Feature',
+    },
+    component: () => import('./pages/modules/feature.vue'),
+  },
+  {
     path: '/modules/map',
     meta: {
       title: 'Map',

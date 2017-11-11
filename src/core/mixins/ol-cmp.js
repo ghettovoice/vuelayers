@@ -202,17 +202,17 @@ function refresh () {
 }
 
 /**
- * Emitted when underlying ol instance created.
+ * Emitted when underlying **OpenLayers** instance created.
  * @event module:core/mixins/ol-cmp#created
  * @type {void}
  */
 /**
- * Emitted when underlying ol instance mounted to parent.
+ * Emitted when underlying **OpenLayers** instance mounted to parent.
  * @event module:core/mixins/ol-cmp#mounted
  * @type {void}
  */
 /**
- * Emitted when underlying ol instance destroyed.
+ * Emitted when underlying **OpenLayers** instance destroyed.
  * @event module:core/mixins/ol-cmp#destroyed
  * @type {void}
  */

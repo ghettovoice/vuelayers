@@ -1,5 +1,5 @@
 <template>
-  <div :class="[$options.name]" :tabindex="tabIndex">
+  <div :class="[$options.name]">
     <slot></slot>
   </div>
 </template>
@@ -105,14 +105,6 @@
       type: [String, Array],
       default: () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL],
     },
-    /**
-     * `tabindex` value to enable keyboard interaction.
-     * @type {number}
-     */
-    tabIndex: {
-      type: Number,
-      default: 0,
-    },
   }
 
   /**
@@ -148,7 +140,7 @@
     },
     /**
      * @return {{
-     *    hasLayer: function(ol.Layer),
+     *    hasLayer: function(ol.Layer): boolean,
      *    addLayer: function(ol.Layer),
      *    removeLayer: function(ol.Layer)
      *  }|undefined}
@@ -309,6 +301,7 @@
     /**
      * @param {ol.View|Vue|undefined} view
      * @return {void}
+     * @protected
      */
     setView (view) {
       view = view instanceof Vue ? view.$view : view
@@ -340,14 +333,12 @@
       this.$map.setTarget(undefined)
     },
     /**
-     * Triggers map re-render.
+     * Updates map size and re-renders map.
      * @return {Promise}
      */
     refresh () {
-      return new Promise(resolve => {
-        this.updateSize()
-        resolve()
-      })
+      this.updateSize()
+      return this.render()
     },
     /**
      * @return {Promise}
@@ -368,6 +359,7 @@
       this::subscribeToMapEvents()
     },
     /**
+     * Updates map size.
      * @return {void}
      */
     updateSize () {

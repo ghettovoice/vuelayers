@@ -59,14 +59,12 @@
 </template>
 
 <script>
-  import { core as vlCore } from 'vuelayers'
-
   const methods = {
     onUpdatePosition (coordinate) {
       if (!this.zoomedToPosition) {
         this.zoomedToPosition = true
         this.$refs.view.animate({
-          center: vlCore.projHelper.fromLonLat(coordinate, this.$refs.view.projection),
+          center: coordinate,
           zoom: 12,
           duration: 1000,
         })

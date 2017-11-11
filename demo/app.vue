@@ -8,7 +8,7 @@
 
       <!-- interactions -->
       <vl-interaction-select :features.sync="selectedFeatures">
-        <template scope="select">
+        <template slot-scope="select">
           <!-- select styles -->
           <vl-style-box>
             <vl-style-stroke color="#423e9e" :width="7"></vl-style-stroke>
@@ -29,7 +29,7 @@
           <!-- selected feature popup -->
           <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
                       :position="pointOnSurface(feature.geometry)" :auto-pan="true">
-            <template scope="popup">
+            <template slot-scope="popup">
               <section class="card">
                 <header class="card-header">
                   <p class="card-header-title">
@@ -63,7 +63,7 @@
 
       <!-- geolocation -->
       <vl-geoloc @update:position="onUpdatePosition">
-        <template scope="geoloc">
+        <template slot-scope="geoloc">
           <vl-feature v-if="geoloc.position" id="position-feature">
             <vl-geom-point :coordinates="geoloc.position"></vl-geom-point>
             <vl-style-box>
@@ -76,7 +76,7 @@
 
       <!-- overlay marker with animation -->
       <vl-feature id="marker" ref="marker" :properties="{ start: Date.now(), duration: 2500 }">
-        <template scope="feature">
+        <template slot-scope="feature">
           <vl-geom-point :coordinates="[-10, -10]"></vl-geom-point>
           <vl-style-box>
             <vl-style-icon src="./assets/flag.png" :scale="0.5" :anchor="[0.1, 0.95]" :size="[128, 128]"></vl-style-icon>

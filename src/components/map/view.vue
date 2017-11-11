@@ -43,7 +43,7 @@
       validator: value => value.length === 2,
     },
     constrainRotation: {
-      type: Boolean,
+      type: [Boolean, Number],
       default: true,
     },
     enableRotation: {
@@ -211,6 +211,8 @@
         geometryOrExtent = geoJsonHelper.readGeometry(geometryOrExtent, this.$view.getProjection())
       } else if (geometryOrExtent instanceof Vue) {
         geometryOrExtent = geometryOrExtent.$geometry
+      } else if (Array.isArray(geometryOrExtent)) {
+        geometryOrExtent = projHelper.extentFromLonLat(geometryOrExtent, this.$view.getProjection())
       }
 
       let cb = options.callback || noop
@@ -291,6 +293,8 @@
    * @title View `vl-view` component
    * @alias module:map/view
    * @vueProto
+   *
+   * @vueSlot default [scoped] Default scoped slot with current state: center, zoom, rotation & etc.
    */
   export default {
     name: 'vl-view',
@@ -329,8 +333,6 @@
    * @return {void}
    * @this module:map/view
    * @private
-   *
-   * @vueSlot default [scoped] Default scoped slot with current state: center, zoom, rotation & etc.
    */
   function subscribeToViewChanges () {
     assert.hasView(this)

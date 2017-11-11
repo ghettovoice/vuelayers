@@ -10,7 +10,7 @@ export default {
       default: 'true',
     },
     {
-      name: 'keyboardEventTarget',
+      name: 'keyboard-event-target',
       description: `<p>The element to listen to keyboard events on. For example, if this option is set to 
                     <code>document</code> the keyboard interactions will always trigger. If this option is not 
                     specified, the element the library listens to keyboard events on is the component root element.</p>`,
@@ -20,7 +20,7 @@ export default {
       default: 'this.$el',
     },
     {
-      name: 'loadTilesWhileAnimating',
+      name: 'load-tiles-while-animating',
       description: `<p>When set to <code>true</code>, tiles will be loaded during animations.</p>`,
       type: 'boolean',
       required: false,
@@ -28,7 +28,7 @@ export default {
       default: 'false',
     },
     {
-      name: 'loadTilesWhileInteracting',
+      name: 'load-tiles-while-interacting',
       description: `<p>When set to <code>true</code>, tiles will be loaded while interacting with the map.</p>`,
       type: 'boolean',
       required: false,
@@ -49,7 +49,7 @@ export default {
       default: 'undefined',
     },
     {
-      name: 'moveTolerance',
+      name: 'move-tolerance',
       description: `<p>The minimum distance in pixels the cursor must move to be detected as a map move event 
                     instead of a click. Increasing this value can make it easier to click on the map.</p>`,
       type: 'Number',
@@ -58,7 +58,7 @@ export default {
       default: 1,
     },
     {
-      name: 'pixelRatio',
+      name: 'pixel-ratio',
       description: `<p>The ratio between physical pixels and device-independent pixels (dips) on the device.</p>`,
       type: 'number',
       required: false,
@@ -76,171 +76,156 @@ export default {
       sync: false,
       default: `['canvas', 'webgl']`,
     },
+  ],
+  members: [
     {
-      name: 'tabIndex',
-      description: `<p><code>tabindex</code> value to enable keyboard interaction.</p>`,
-      type: 'number',
-      required: false,
-      sync: false,
-      default: 0,
+      name: '$createPromise',
+      description: `<p>Promise that resolves when underlying <b>OpenLayers</b> instance created.</p>`,
+      type: 'Promise',
+    },
+    {
+      name: '$map',
+      description: `<p>Reference to <code>ol.Map</code> instance.</p>`,
+      type: 'ol.Map, undefined',
+    },
+    {
+      name: '$mountPromise',
+      description: `<p>Promise that resolves when underlying <b>OpenLayers</b> instance mounted.</p>`,
+      type: 'Promise',
+    },
+    {
+      name: '$view',
+      description: `<p>Reference to <code>ol.View</code> instance.</p>`,
+      type: 'ol.View, undefined',
     },
   ],
-  members:
-    [
-      {
-        name: '$map',
-        description: `<p>OpenLayers map instance.</p>`,
-        type: 'ol.Map, undefined',
-      },
-      {
-        name: '$view',
-        description: `<p>OpenLayers view instance.</p>`,
-        type: 'ol.View, undefined',
-      },
-    ],
-  methods:
-    [
-      {
-        name: 'focus',
-        description: `<p>Triggers focus on map container.</p>`,
-        arguments: [],
-        returns: [
-          {
-            type: 'void',
-            description: '',
-          },
-        ],
-      },
-      {
-        name: 'forEachFeatureAtPixel',
-        description: '',
-        arguments: [
-          {
-            name: 'pixel',
-            description: '',
-            optional: false,
-            type: 'number[]',
-          },
-          {
-            name: 'callback',
-            description: '',
-            optional: false,
-            type: 'function((ol.Feature, ol.render.Feature), ?ol.layer.Layer): *',
-          },
-          {
-            name: 'opts',
-            description: '',
-            optional: true,
-            type: 'Object',
-          },
-        ],
-        returns: [
-          {
-            type: '*, undefined',
-            description: '',
-          },
-        ],
-      },
-      {
-        name: 'forEachLayerAtPixel',
-        description: '',
-        arguments: [
-          {
-            name: 'pixel',
-            description: '',
-            optional: false,
-            type: 'number[]',
-          },
-          {
-            name: 'callback',
-            description: '',
-            optional: false,
-            type: 'function(ol.layer.Layer, ?(number[], Uint8Array)): *',
-          },
-          {
-            name: 'layerFilter',
-            description: '',
-            optional: true,
-            type: 'function(ol.layer.Layer): boolean',
-          },
-        ],
-        returns: [
-          {
-            type: '*, undefined',
-            description: '',
-          },
-        ],
-      },
-      {
-        name: 'getCoordinateFromPixel',
-        description: '',
-        arguments: [
-          {
-            name: 'pixel',
-            description: '',
-            optional: false,
-            type: 'number[]',
-          },
-        ],
-        returns: [
-          {
-            type: 'number[]',
-            description: `<p>Coordinates in <b>EPSG:4326</b></p>`,
-          },
-        ],
-      },
-      {
-        name: 'refresh',
-        description: `<p>Triggers map re-render.</p>`,
-        arguments: [],
-        returns: [
-          {
-            type: 'Promise',
-            description: '',
-          },
-        ],
-      },
-      {
-        name: 'render',
-        description: '',
-        arguments: [],
-        returns: [
-          {
-            type: 'Promise',
-            description: '',
-          },
-        ],
-      },
-      {
-        name: 'setView',
-        description: '',
-        arguments: [
-          {
-            name: 'view',
-            description: '',
-            optional: false,
-            type: 'ol.View, Vue, undefined',
-          },
-        ],
-        returns: [
-          {
-            type: 'void',
-            description: '',
-          },
-        ],
-      },
-      {
-        name: 'updateSize',
-        description: '',
-        arguments: [],
-        returns: [
-          {
-            type: 'void',
-            description: '',
-          },
-        ],
-      },
-    ],
+  methods: [
+    {
+      name: 'focus',
+      description: `<p>Triggers focus on map container.</p>`,
+      arguments: [],
+      returns: [
+        {
+          type: 'void',
+          description: '',
+        },
+      ],
+    },
+    {
+      name: 'forEachFeatureAtPixel',
+      description: `<p>Detect features that intersect a pixel on the viewport, and execute a callback with each 
+                    intersecting feature. Layers included in the detection can be configured through the <code>layerFilter</code> 
+                    option in <code>opts</code>.</p>`,
+      arguments: [
+        {
+          name: 'pixel',
+          description: '',
+          optional: false,
+          type: 'number[]',
+        },
+        {
+          name: 'callback',
+          description: '',
+          optional: false,
+          type: 'function((ol.Feature, ol.render.Feature), ?ol.layer.Layer): *',
+        },
+        {
+          name: 'opts',
+          description: '',
+          optional: true,
+          type: 'Object',
+        },
+      ],
+      returns: [
+        {
+          type: '*, undefined',
+          description: '',
+        },
+      ],
+    },
+    {
+      name: 'forEachLayerAtPixel',
+      description: `<p>Detect layers that have a color value at a pixel on the viewport, and execute a callback with 
+                    each matching layer. Layers included in the detection can be configured through <code>layerFilter</code>.</p>`,
+      arguments: [
+        {
+          name: 'pixel',
+          description: '',
+          optional: false,
+          type: 'number[]',
+        },
+        {
+          name: 'callback',
+          description: '',
+          optional: false,
+          type: 'function(ol.layer.Layer, ?(number[], Uint8Array)): *',
+        },
+        {
+          name: 'layerFilter',
+          description: '',
+          optional: true,
+          type: 'function(ol.layer.Layer): boolean',
+        },
+      ],
+      returns: [
+        {
+          type: '*, undefined',
+          description: '',
+        },
+      ],
+    },
+    {
+      name: 'getCoordinateFromPixel',
+      description: `Get the coordinate for a given pixel. This returns a coordinate in the <b>EPSG:4326</b> projection.`,
+      arguments: [
+        {
+          name: 'pixel',
+          description: '',
+          optional: false,
+          type: 'number[]',
+        },
+      ],
+      returns: [
+        {
+          type: 'number[]',
+          description: `<p>Coordinates in <b>EPSG:4326</b></p>`,
+        },
+      ],
+    },
+    {
+      name: 'refresh',
+      description: `<p>Updates map size and re-renders map.</p>`,
+      arguments: [],
+      returns: [
+        {
+          type: 'Promise',
+          description: '',
+        },
+      ],
+    },
+    {
+      name: 'render',
+      description: `<p>Request a map rendering (at the next animation frame).</p>`,
+      arguments: [],
+      returns: [
+        {
+          type: 'Promise',
+          description: '',
+        },
+      ],
+    },
+    {
+      name: 'updateSize',
+      description: `<p>Updates map size.</p>`,
+      arguments: [],
+      returns: [
+        {
+          type: 'void',
+          description: '',
+        },
+      ],
+    },
+  ],
   events: [
     {
       name: 'click',
@@ -248,9 +233,24 @@ export default {
       argument: 'ol.MapBrowserEvent',
     },
     {
+      name: 'created',
+      description: `<p>Emitted when underlying <b>OpenLayers</b> instance created.</p>`,
+      argument: 'void',
+    },
+    {
       name: 'dblclick',
       description: `<p>A true double click, with no dragging.</p>`,
       argument: 'ol.MapBrowserEvent',
+    },
+    {
+      name: 'destroyed',
+      description: `<p>Emitted when underlying <b>OpenLayers</b> instance destroyed.</p>`,
+      argument: 'void',
+    },
+    {
+      name: 'mounted',
+      description: `<p>Emitted when underlying <b>OpenLayers</b> instance mounted to parent.</p>`,
+      argument: 'void',
     },
   ],
   slots: [

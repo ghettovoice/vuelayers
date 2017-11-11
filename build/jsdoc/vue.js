@@ -42,7 +42,7 @@ exports.handlers = {
       // computed
       if (computedNode && isObjectExpression(computedNode)) {
         let compNodes = computedNode.properties.map(({ value }) => value)
-        let computed = doclets.filter(d => d.vueComputedProp && d.meta.code && compNodes().includes(d.meta.code.node))
+        let computed = doclets.filter(d => d.vueComputedProp && d.meta.code && compNodes.includes(d.meta.code.node))
         if (computed.length) {
           // defined as separate variable declaration
           computed.forEach(d => d.setScope(jsdocName.SCOPE.NAMES.INSTANCE))

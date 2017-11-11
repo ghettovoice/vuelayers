@@ -16,6 +16,10 @@ export default [
     title: 'Modules',
     items: [
       {
+        link: '/modules/feature',
+        title: 'Feature',
+      },
+      {
         link: '/modules/map',
         title: 'Map',
       },

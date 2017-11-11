@@ -8,6 +8,7 @@ const path = require('path')
 const jsdoc = require('jsdoc-api')
 const fs = require('fs-extra')
 const util = require('util')
+const { kebabCase } = require('lodash/fp')
 
 let src = process.argv[2]
 let dest = process.argv[3]
@@ -38,7 +39,7 @@ jsdoc.explain({
 function mapProp (doclet) {
   // noinspection PointlessBooleanExpressionJS
   return {
-    name: cleanString(doclet.name),
+    name: kebabCase(cleanString(doclet.name)),
     description: cleanString(doclet.description),
     type: cleanString(doclet.typeExpression),
     required: !!doclet.required,
@@ -84,6 +85,7 @@ function mapSlot (doclet) {
   return {
     name: cleanString(doclet.name),
     description: cleanString(doclet.description),
+    scoped: !!doclet.scoped,
   }
 }
 

@@ -34,7 +34,14 @@
             b-table-column(label="Name")
               code {{ scope.row.name }}
             b-table-column(label="Description" v-html="scope.row.description")
-            b-table-column(label="Arguments") TODO: render params list
+            b-table-column(label="Arguments")
+              b-table.doc-table(v-if="scope.row.arguments && scope.row.arguments.length" ':data'="scope.row.arguments")
+                template(slot-scope="scope")
+                  b-table-column(label="Name")
+                    code {{ scope.row.name }}
+                  b-table-column(label="Description" v-html="scope.row.description")
+                  b-table-column(label="Type")
+                    span.is-type {{ scope.row.type }}
             b-table-column(label="Returns")
               p(v-for="(ret, i) in scope.row.returns" ':key'="i")
                 span.is-type {{ ret.type }}
