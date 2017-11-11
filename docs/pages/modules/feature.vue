@@ -2,9 +2,26 @@
   div(':class'="[$options.name]")
     vld-hero(':bold'="true" color="is-info")
       h1.title Feature
-      h2.subtitle A vector object for geographic features
+      h2.subtitle Components for geographic features
 
     section.section
+      vld-markdown.
+        Module provides components to work with vector geographic features. Currently it consists of:
+        - `vl-feature` - component to render one vector object
+
+        Module has several entry files for different module systems, correct entry file will be resolved automatically
+        according to local `package.json` file.
+      vld-code(title="Install" lang="js").
+        import Vue from 'vue'
+        // import module and styles
+        import { Feature } from 'vuelayers'
+        // or
+        import Feature from 'vuelayers/lib/feature'
+        // import VueLayers styles
+        import 'vuelayers/lib/style.css'
+        // register vl-feature components
+        Vue.use(Feature)
+
       hr
 
       vld-markdown.
@@ -13,7 +30,8 @@
         A vector object for geographic features with a geometry and other attribute properties,
         similar to the features in vector file formats like **GeoJSON**.
 
-        Features can be placed inside components that are mixes in `featuresContainer` mixin such as: `vl-map`, `vl-source-vector` and etc.
+        Features can be placed inside components that are mixes in `featuresContainer` mixin,
+        such as: `vl-map`, `vl-source-vector` and etc.
 
         Features can be styled individually with `vl-style-*` placed inside default slot; otherwise they use the
         style of their vector layer.
