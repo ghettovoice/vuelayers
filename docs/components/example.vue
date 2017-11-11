@@ -49,6 +49,8 @@
   @import ../styles/variables
 
   .vld-example
+    &:not(:last-child)
+      margin-bottom: 1rem
     .title
       font-size: 1.2em
 </style>

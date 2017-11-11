@@ -102,5 +102,8 @@
   }
 </script>
 
-<style>
+<style lang="sass">
+  .vld-cmp-api
+    &:not(:last-child)
+      margin-bottom: 1rem
 </style>
