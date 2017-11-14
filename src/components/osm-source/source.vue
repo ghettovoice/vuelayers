@@ -2,13 +2,14 @@
   import OSMSource from 'ol/source/osm'
   import { xyzSource } from '../../core'
 
+  const OSM_ATTRIBUTIONS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.'
   const OSM_URL_TEMPLATE = 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   const OSM_MAX_ZOOM = 19
 
   const props = {
     attributions: {
-      type: String,
-      default: OSMSource.ATTRIBUTION.getHTML(),
+      type: [String, Array],
+      default: OSM_ATTRIBUTIONS,
     },
     maxZoom: {
       type: Number,
