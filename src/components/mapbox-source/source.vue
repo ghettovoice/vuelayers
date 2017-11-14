@@ -10,7 +10,7 @@
       required: true,
     },
     attributions: {
-      type: String,
+      type: [String, Array],
       default: MAPBOX_ATTRIBUTIONS,
     },
     mapId: {

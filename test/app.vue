@@ -67,7 +67,7 @@
         </vl-layer-vector>
       </vl-map>
     </div>
-    <!--<div style="height: 50%">
+    <div style="height: 50%">
       <vl-map>
         <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
 
@@ -94,7 +94,7 @@
           </div>
         </vl-overlay>
       </vl-map>
-    </div>-->
+    </div>
   </div>
 </template>
 
