@@ -14,7 +14,7 @@ import Feature from './feature.vue'
  * import Feature from 'vuelayers/lib/feature'
  * // import VueLayers styles
  * import 'vuelayers/lib/style.css'
- * // register vl-feature components
+ * // register components
  * Vue.use(Feature)
  */
 export default {

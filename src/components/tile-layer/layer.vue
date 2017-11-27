@@ -1,12 +1,21 @@
 <script>
+  /**
+   * @module tile-layer/layer
+   */
   import TileLayer from 'ol/layer/tile'
   import { projHelper, layer } from '../../core'
 
-  const props = {
+  /**
+   * @vueProps
+   */
+  const props = /** @lends module:tile-layer/layer# */{
     preload: Number,
   }
 
-  const methods = {
+  /**
+   * @vueMethods
+   */
+  const methods = /** @lends module:tile-layer/layer# */{
     /**
      * @return {ol.layer.Tile}
      * @protected
@@ -28,6 +37,17 @@
     },
   }
 
+  /**
+   * Layer that provide pre-rendered, tiled images in grid that are organized by zoom levels for
+   * specific resolutions. `vl-tile-layer` component implements a **source container** interface, so it should be
+   * used together with tile-like `vl-source-*` components.
+   *
+   * @title vl-tile-layer
+   * @alias module:tile-layer/layer
+   * @vueProto
+   *
+   * @vueSlot default Default slot for `vl-source-*` (tile-like only) components.
+   */
   export default {
     name: 'vl-layer-tile',
     mixins: [layer],
