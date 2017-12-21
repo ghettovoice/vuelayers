@@ -81,7 +81,7 @@
         </vl-layer-tile>
 
         <vl-layer-vector id="countries">
-          <vl-source-vector url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
+          <vl-source-vector :features.sync="loadedFeatures" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
         </vl-layer-vector>
 
         <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
@@ -158,6 +158,7 @@
         polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
         selected: [],
         selectedFeatures: [],
+        loadedFeatures: [],
       }
     },
     mounted () {
