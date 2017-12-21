@@ -1,7 +1,7 @@
 <script>
   import VectorSource from 'ol/source/vector'
-  import { differenceWith, stubArray, isFunction } from 'lodash/fp'
-  import { loadStrategyHelper, formatHelper, vectorSource } from '../../core'
+  import { differenceWith, stubArray, isFunction, constant } from 'lodash/fp'
+  import { loadStrategyHelper, formatHelper, vectorSource, projHelper } from '../../core'
 
   const props = {
     /**
@@ -109,6 +109,8 @@
           enumerable: true,
           get () {
             if (this.strategyFactory) {
+              // do not transform extent in strategy cause here we need
+              // extent in map project units
               return this.strategyFactory()
             }
           },
@@ -117,7 +119,13 @@
           enumerable: true,
           get () {
             if (this.loaderFactory) {
-              return this.loaderFactory()
+              const loader = this.loaderFactory()
+              // wrap strategy function to transform map view projection to source projection
+              return (extent, resolution, projection) => loader(
+                projHelper.transformExtent(extent, projection, this.projection),
+                resolution,
+                this.projection,
+              )
             }
           },
         },
@@ -125,7 +133,16 @@
           enumerable: true,
           get () {
             if (this.url) {
-              return isFunction(this.url) ? this.url() : () => this.url
+              let url = this.url
+              if (!isFunction(url)) {
+                url = constant(this.url)
+              }
+              // wrap strategy function to transform map view projection to source projection
+              return (extent, resolution, projection) => url(
+                projHelper.transformExtent(extent, projection, this.projection),
+                resolution,
+                this.projection,
+              )
             }
           },
         },
