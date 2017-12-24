@@ -1,4 +1,4 @@
-import { pick } from 'lodash/fp'
+import { isFunction, isString, constant, pick } from 'lodash/fp'
 import {
   CACHE_SIZE,
   CROSS_ORIGIN,
@@ -51,16 +51,28 @@ const props = {
     validator: value => value.length === 2,
   },
   url: {
-    type: String,
+    type: [String, Function],
     required: true,
   },
 }
 
 const computed = {
   /**
+   * @type {ol.TileUrlFunctionType}
+   */
+  urlFunc () {
+    if (isFunction(this.url)) {
+      return this.url
+    }
+    return constant(this.urlTmpl)
+  },
+  /**
    * @type {string}
    */
   urlTmpl () {
+    if (!isString(this.url)) {
+      return ''
+    }
     return replaceTokens(this.url, pick(this.urlTokens, this))
   },
   /**
@@ -123,6 +135,11 @@ const methods = {
 }
 
 const watch = {
+  urlFunc (value) {
+    if (this.$source && this.$source.getTileUrlFunction() !== value) {
+      this.$source.setTileUrlFunction(value)
+    }
+  },
   urlTmpl (value) {
     if (this.$source && !this.$source.getUrls().includes(value)) {
       this.$source.setUrl(value)

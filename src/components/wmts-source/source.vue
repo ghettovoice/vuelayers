@@ -38,6 +38,10 @@
       type: String,
       default: WMTS_VERSION,
     },
+    url: {
+      type: String,
+      required: true,
+    },
   }
 
   const methods = {

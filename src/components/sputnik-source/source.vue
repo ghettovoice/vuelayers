@@ -12,7 +12,7 @@
 
   const props = {
     url: {
-      type: [String, Array],
+      type: String,
       default: SPUTNIK_URL_TEMPLATE,
     },
     apiKey: {

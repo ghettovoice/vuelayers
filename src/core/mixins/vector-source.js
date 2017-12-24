@@ -1,8 +1,10 @@
 import { Observable } from 'rxjs/Observable'
 import { merge as mergeObs } from 'rxjs/observable/merge'
 import { _do as doObs } from 'rxjs/operator/do'
+import { debounceTime } from 'rxjs/operator/debounceTime'
 import featuresContainer from '../mixins/features-container'
 import { EPSG_4326 } from '../ol-ext/consts'
+import * as geoJsonHelper from '../ol-ext/geojson'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../utils/assert'
 import mergeDescriptors from '../utils/multi-merge-descriptors'
@@ -128,4 +130,8 @@ function subscribeToSourceChanges () {
   const events = Observable::mergeObs(add, remove)
 
   this.subscribeTo(events, evt => this.$emit(evt.type, evt))
+  // emit event to allow `sync` modifier
+  this.subscribeTo(events::debounceTime(100), () => {
+    this.$emit('update:features', this.getFeatures().map(f => geoJsonHelper.writeFeature(f, this.$view.getProjection())))
+  })
 }
