@@ -16,6 +16,7 @@ export * as styleHelper from './ol-ext/style'
 export * as tileGridHelper from './ol-ext/tile-grid'
 export * as loadStrategyHelper from './ol-ext/load-strategy'
 export * as formatHelper from './ol-ext/format'
+export * as featureHelper from './ol-ext/feature'
 export easingHelper from 'ol/easing'
 // mixins
 export featuresContainer from './mixins/features-container'

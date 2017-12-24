@@ -1,10 +1,25 @@
+import { isFunction } from 'lodash/fp'
 import { createTileUrlFunction } from 'ol-tilecache'
 import XYZSource from 'ol/source/xyz'
-import * as assert from '../utils/assert'
 import * as extentHelper from '../ol-ext/extent'
 import tileSource from './tile-source'
 
 const props = {}
+
+const computed = {
+  urlFunc () {
+    // custom url function provided
+    if (isFunction(this.url)) {
+      return this.url
+    }
+    // or use url function from ol-tilecache
+    return createTileUrlFunction(
+      this.urlTmpl,
+      this._tileGrid,
+      extentHelper.fromProjection(this.projection)
+    )
+  },
+}
 
 const methods = {
   /**
@@ -23,35 +38,19 @@ const methods = {
       reprojectionErrorThreshold: this.reprojectionErrorThreshold,
       tileGrid: this._tileGrid,
       tilePixelRatio: this.tilePixelRatio,
-      tileUrlFunction: this.createTileUrlFunction(),
+      tileUrlFunction: this.urlFunc,
       wrapX: this.wrapX,
     })
   },
-  /**
-   * @return {ol.TileUrlFunction}
-   * @protected
-   */
-  createTileUrlFunction () {
-    assert.hasView(this)
-
-    return createTileUrlFunction(
-      this.urlTmpl,
-      this._tileGrid,
-      extentHelper.fromProjection(this.$view.getProjection())
-    )
-  },
 }
 
-// watch only url changes, other settings (like tileGrid) can't be changed at runtime
 const watch = {
-  urlTmpl () {
-    this.$source && this.$source.setTileUrlFunction(this.createTileUrlFunction())
-  },
 }
 
 export default {
   mixins: [tileSource],
   props,
+  computed,
   methods,
   watch,
 }

@@ -81,7 +81,11 @@
         </vl-layer-tile>
 
         <vl-layer-vector id="countries">
-          <vl-source-vector url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
+          <vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
+        </vl-layer-vector>
+
+        <vl-layer-vector id="wfs">
+          <vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />
         </vl-layer-vector>
 
         <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
@@ -141,6 +145,15 @@
     pointOnSurface (geometry) {
       return core.geomHelper.pointOnSurface(geometry)
     },
+    bboxStrategyFactory () {
+      return core.loadStrategyHelper.bbox
+    },
+    wfsUrlFunc (extent, resolution, projection) {
+      return 'https://ahocevar.com/geoserver/wfs?service=WFS&' +
+        'version=1.1.0&request=GetFeature&typename=osm:water_areas&' +
+        'outputFormat=application/json&srsname=' + projection + '&' +
+        'bbox=' + extent.join(',') + ',' + projection
+    },
   }
 
   export default {
@@ -149,8 +162,8 @@
     methods,
     data () {
       return {
-        zoom: 2,
-        center: [ 0, 0 ],
+        zoom: 13,
+        center: [-80.0307892780456, 43.456341754866685],
         rotation: 0,
         points: [],
         pointsLayer: true,
@@ -158,6 +171,8 @@
         polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
         selected: [],
         selectedFeatures: [],
+        countries: [],
+        wfsFeatures: [],
       }
     },
     mounted () {

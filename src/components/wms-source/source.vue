@@ -17,6 +17,10 @@
       type: String,
       default: WMS_VERSION,
     },
+    url: {
+      type: String,
+      required: true,
+    },
   }
 
   const upperCase = x => x.toUpperCase()

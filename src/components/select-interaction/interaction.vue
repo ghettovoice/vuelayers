@@ -11,15 +11,21 @@
   import {
     mapValues,
     differenceWith,
-    isPlainObject,
-    isNumber,
-    isString,
     isFunction,
     constant,
     stubArray,
     forEach,
   } from 'lodash/fp'
-  import { styleHelper, geoJsonHelper, interaction, stylesContainer, assert, mergeDescriptors, observableFromOlEvent } from '../../core'
+  import {
+    styleHelper,
+    geoJsonHelper,
+    interaction,
+    stylesContainer,
+    assert,
+    mergeDescriptors,
+    observableFromOlEvent,
+    featureHelper,
+  } from '../../core'
 
   // todo add other options, like event modifiers
   const props = {
@@ -126,7 +132,7 @@
       assert.hasMap(this)
       assert.hasInteraction(this)
 
-      let id = extractId(feature)
+      let id = featureHelper.getId(feature)
       if (!id) {
         throw new Error('Undefined feature id')
       }
@@ -134,7 +140,7 @@
         feature = feature.$feature
       }
 
-      const selectedIds = this.$features.map(extractId)
+      const selectedIds = this.$features.map(featureHelper.getId)
       if (selectedIds.includes(id)) return
 
       if (!(feature instanceof Feature)) {
@@ -159,7 +165,7 @@
     unselect (feature) {
       assert.hasInteraction(this)
 
-      let id = extractId(feature)
+      let id = featureHelper.getId(feature)
       if (!id) {
         throw new Error('Undefined feature id')
       }
@@ -167,7 +173,7 @@
         feature = feature.$feature
       }
 
-      const selectedIds = this.$features.map(extractId)
+      const selectedIds = this.$features.map(featureHelper.getId)
       const idx = selectedIds.findIndex(x => x === id)
 
       if (idx !== -1) {
@@ -220,7 +226,7 @@
     },
   }
 
-  const diffById = differenceWith((a, b) => extractId(a) === extractId(b))
+  const diffById = differenceWith((a, b) => featureHelper.getId(a) === featureHelper.getId(b))
   const watch = {
     features (value) {
       if (!this.$interaction) return
@@ -272,30 +278,10 @@
       ({ selected, deselected, mapBrowserEvent }) => {
         ++this.rev
 
-        this.$emit('update:features', this.$features.map(f => geoJsonHelper.writeFeature(f, this.$view.getProjection())))
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
+        this.$emit('update:features', this.$features.map(f => geoJsonHelper.writeFeature(f, this.$view.getProjection())))
       }
     )
-  }
-
-  /**
-   * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
-   * @return {string|number}
-   * @throws {Error}
-   */
-  function extractId (feature) {
-    let id
-    if (isPlainObject(feature) || feature instanceof Vue) {
-      id = feature.id
-    } else if (feature instanceof Feature) {
-      id = feature.getId()
-    } else if (isString(feature) || isNumber(feature)) {
-      id = feature
-    } else {
-      throw new Error('Illegal feature format')
-    }
-
-    return id
   }
 </script>
