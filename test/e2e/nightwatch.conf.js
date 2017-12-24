@@ -37,18 +37,13 @@ module.exports = {
         browserName: 'chrome',
         javascriptEnabled: true,
         acceptSslCerts: true,
+        chromeOptions: {
+          args: ['headless'],
+        },
       },
     },
 
-    firefox: {
-      desiredCapabilities: {
-        browserName: 'firefox',
-        javascriptEnabled: true,
-        acceptSslCerts: true,
-      },
-    },
-
-    travis: {
+    phantom: {
       desiredCapabilities: {
         browserName: 'phantomjs',
         javascriptEnabled: true,
