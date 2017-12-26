@@ -14,6 +14,8 @@ export const {
   FillStyle,
   Geoloc,
   IconStyle,
+  ImageLayer,
+  ImageStaticSource,
   LineStringGeom,
   Map,
   MapboxSource,
