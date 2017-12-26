@@ -42,7 +42,7 @@
    * specific resolutions. `vl-tile-layer` component implements a **source container** interface, so it should be
    * used together with tile-like `vl-source-*` components.
    *
-   * @title vl-tile-layer
+   * @title vl-layer-tile
    * @alias module:tile-layer/layer
    * @vueProto
    *
