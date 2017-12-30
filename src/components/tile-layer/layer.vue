@@ -3,7 +3,7 @@
    * @module tile-layer/layer
    */
   import TileLayer from 'ol/layer/tile'
-  import { projHelper, layer } from '../../core'
+  import { layer } from '../../core'
 
   /**
    * @vueProps
@@ -28,9 +28,7 @@
         opacity: this.opacity,
         visible: this.visible,
         preload: this.preload,
-        extent: this.extent
-          ? projHelper.extentFromLonLat(this.extent, this.$view.getProjection())
-          : undefined,
+        extent: this.extent,
         zIndex: this.zIndex,
         source: this._source,
       })
@@ -42,7 +40,7 @@
    * specific resolutions. `vl-tile-layer` component implements a **source container** interface, so it should be
    * used together with tile-like `vl-source-*` components.
    *
-   * @title vl-tile-layer
+   * @title vl-layer-tile
    * @alias module:tile-layer/layer
    * @vueProto
    *

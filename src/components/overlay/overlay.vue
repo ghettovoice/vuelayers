@@ -29,6 +29,9 @@
       default: () => [0, 0],
       validator: value => value.length === 2,
     },
+    /**
+     * Coordinates in **EPSG:4326** projection.
+     */
     position: {
       type: Array,
       validator: value => value.length === 2,

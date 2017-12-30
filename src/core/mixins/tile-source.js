@@ -13,6 +13,7 @@ import * as extentHelper from '../ol-ext/extent'
 import * as tileGridHelper from '../ol-ext/tile-grid'
 import replaceTokens from '../utils/replace-tokens'
 import source from './source'
+import withUrl from './with-url'
 import * as assert from '../utils/assert'
 
 const props = {
@@ -75,10 +76,6 @@ const computed = {
     }
     return replaceTokens(this.url, pick(this.urlTokens, this))
   },
-  /**
-   * @type {string[]}
-   */
-  urlTokens () { return [] },
 }
 
 const methods = {
@@ -148,7 +145,7 @@ const watch = {
 }
 
 export default {
-  mixins: [source],
+  mixins: [source, withUrl],
   props,
   computed,
   methods,

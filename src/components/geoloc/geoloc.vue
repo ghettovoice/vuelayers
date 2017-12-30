@@ -15,6 +15,10 @@
       default: true,
     },
     trackingOptions: Object,
+    projection: {
+      type: String,
+      default: EPSG_4326,
+    },
     // todo add autoCenter, bindToPosition
   }
 
@@ -60,7 +64,7 @@
       return new Geolocation({
         tracking: this.tracking,
         trackingOptions: this.trackingOptions,
-        projection: EPSG_4326,
+        projection: this.projection,
       })
     },
     /**
