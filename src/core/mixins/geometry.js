@@ -2,6 +2,7 @@ import { isEqual } from 'lodash/fp'
 import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
 import { map as mapObs } from 'rxjs/operator/map'
 import { throttleTime } from 'rxjs/operator/throttleTime'
+import { EPSG_4326 } from '../'
 import * as extentHelper from '../ol-ext/extent'
 import * as projHelper from '../ol-ext/proj'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
@@ -12,12 +13,22 @@ import useMapCmp from './use-map-cmp'
 
 const props = {
   /**
-   * Coordinates in EPSG:4326
+   * Coordinates in provided projection.
+   * @type {number[]|ol.Coordinate}
    */
   coordinates: {
     type: Array,
     required: true,
     validator: val => val.length,
+  },
+  /**
+   * Coordinates projection.
+   * @type {string}
+   * @default EPSG:4326
+   */
+  projection: {
+    type: String,
+    default: EPSG_4326,
   },
 }
 
@@ -32,7 +43,7 @@ const computed = {
   },
   extent () {
     if (this.rev && this.$geometry) {
-      return this.extentToLonLat(this.$geometry.getExtent())
+      return this.extentToSourceProj(this.$geometry.getExtent())
     }
   },
 }
@@ -61,28 +72,27 @@ const methods = {
   init () {
     assert.hasView(this)
     // define helper methods based on geometry type
-    const { toLonLat, fromLonLat } = projHelper.transforms[this.type]
+    const { transform } = projHelper.transforms[this.type]
     /**
      * @method
      * @param {number[]} coordinates
      * @return {number[]}
      * @protected
      */
-    this.toLonLat = coordinates => toLonLat(coordinates, this.$view.getProjection())
+    this.toSourceProj = coordinates => transform(coordinates, this.$view.getProjection(), this.projection)
     /**
      * @method
      * @param {number[]} coordinates
      * @return {number[]}
      * @protected
      */
-    this.fromLonLat = coordinates => fromLonLat(coordinates, this.$view.getProjection())
+    this.fromSourceProj = coordinates => transform(coordinates, this.projection, this.$view.getProjection())
     /**
-     * @method
-     * @param {number[]} extent
-     * @return {number[]}
+     * @param {number[]|ol.Extent} extent
+     * @return {ol.Extent}
      * @protected
      */
-    this.extentToLonLat = extent => projHelper.extentToLonLat(extent, this.$view.getProjection())
+    this.extentToSourceProj = extent => projHelper.transformExtent(extent, this.$view.getProjection(), this.projection)
 
     return this::cmp.methods.init()
   },
@@ -142,12 +152,12 @@ const watch = {
       coordinates: value,
       extent: extentHelper.boundingExtent(value),
     }, {
-      coordinates: this.toLonLat(this.$geometry.getCoordinates()),
+      coordinates: this.toSourceProj(this.$geometry.getCoordinates()),
       extent: this.extent,
     })
 
     if (!isEq) {
-      this.$geometry.setCoordinates(this.fromLonLat(value))
+      this.$geometry.setCoordinates(this.fromSourceProj(value))
     }
   },
 }
@@ -205,8 +215,8 @@ function subscribeToGeomChanges () {
     this.$geometry,
     'change',
     () => ({
-      coordinates: this.toLonLat(this.$geometry.getCoordinates()),
-      extent: this.extentToLonLat(this.$geometry.getExtent()),
+      coordinates: this.toSourceProj(this.$geometry.getCoordinates()),
+      extent: this.extentToSourceProj(this.$geometry.getExtent()),
     })
   )::throttleTime(ft)
     ::distinctUntilChanged(isEqualGeom)

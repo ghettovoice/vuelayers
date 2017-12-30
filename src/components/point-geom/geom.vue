@@ -21,7 +21,7 @@
      * @protected
      */
     createGeometry () {
-      return new Point(this.fromLonLat(this.coordinates))
+      return new Point(this.fromSourceProj(this.coordinates))
     },
   }
 

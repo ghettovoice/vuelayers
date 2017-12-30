@@ -1,15 +1,43 @@
 <script>
+  /** @module vector-layer/layer */
   import VectorLayer from 'ol/layer/vector'
-  import { mergeDescriptors, layer, stylesContainer, projHelper } from '../../core'
+  import { mergeDescriptors, layer, stylesContainer } from '../../core'
 
+  /**
+   * @vueProps
+   */
   const props = {
+    /**
+     * When set to `true`, feature batches will be recreated during animations.
+     * @type {boolean}
+     * @default false
+     */
     updateWhileAnimating: Boolean,
+    /**
+     * When set to `true`, feature batches will be recreated during interactions.
+     * @type {boolean}
+     * @default false
+     */
     updateWhileInteracting: Boolean,
+    /**
+     * Render mode for vector layers. Available values:
+     * - `image` - vector layers are rendered as images
+     * - `vector` - vector layers are rendered as vectors
+     * @type {string}
+     * @default vector
+     */
+    renderMode: {
+      type: String,
+      default: 'vector',
+    },
     // todo implement options
     // renderOrder: Function,
     // renderBuffer: Number
   }
 
+  /**
+   * @vueMethods
+   */
   const methods = {
     /**
      * @return {ol.layer.Vector}
@@ -23,13 +51,12 @@
         opacity: this.opacity,
         visible: this.visible,
         preload: this.preload,
-        extent: this.extent
-          ? projHelper.extentFromLonLat(this.extent, this.$view.getProjection())
-          : undefined,
+        extent: this.extent,
         zIndex: this.zIndex,
         updateWhileAnimating: this.updateWhileAnimating,
         updateWhileInteracting: this.updateWhileInteracting,
         source: this._source,
+        renderMode: this.renderMode,
       })
     },
     /**
@@ -51,6 +78,15 @@
     },
   }
 
+  /**
+   * Layer for data that is rendered client-side.
+   *
+   * @vueProto
+   * @title vl-layer-vector
+   * @alias module:vector-layer/layer
+   *
+   * @vueSlot default Default slot for `vl-source-*` (vector-like only) components.
+   */
   export default {
     name: 'vl-layer-vector',
     mixins: [layer, stylesContainer],

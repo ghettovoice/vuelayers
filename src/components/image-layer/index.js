@@ -1,24 +1,24 @@
-/** @module vector-layer */
+/** @module image-layer */
 import Layer from './layer.vue'
 
 /**
- * @alias module:vector-layer
+ * @alias module:image-layer
  *
  * @example Install
  * import Vue from 'vue'
  * // import module and styles
- * import { VectorLayer } from 'vuelayers'
+ * import { ImageLayer } from 'vuelayers'
  * // or
- * import VectorLayer from 'vuelayers/lib/vector-layer'
+ * import ImageLayer from 'vuelayers/lib/image-layer'
  * // import VueLayers styles
  * import 'vuelayers/lib/style.css'
  * // register components
- * Vue.use(VectorLayer)
+ * Vue.use(ImageLayer)
  */
 export default {
   /**
-   * Layer for data that is rendered client-side.
-   * @alias module:vector-layer/layer
+   * Layer for server-rendered images that are available for arbitrary extents and resolutions.
+   * @alias module:image-layer/layer
    */
   Layer,
   install (Vue) {
