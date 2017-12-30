@@ -9,6 +9,11 @@
    * @vueProps
    */
   const props = /** @lends module:tile-layer/layer# */{
+    /**
+     * Load low-resolution tiles up to `preload` levels.
+     * @type {number}
+     * @default 0
+     */
     preload: Number,
   }
 
