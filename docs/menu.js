@@ -23,6 +23,14 @@ export default [
         link: '/modules/map',
         title: 'Map',
       },
+      {
+        link: '/modules/tile-layer',
+        title: 'Tile layer',
+      },
+      // {
+      //   link: '/modules/vector-layer',
+      //   title: 'Vector layer',
+      // },
     ],
   },
 ]

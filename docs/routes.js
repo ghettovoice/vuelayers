@@ -40,6 +40,20 @@ export default [
     },
     component: () => import('./pages/modules/map.vue'),
   },
+  {
+    path: '/modules/tile-layer',
+    meta: {
+      title: 'Tile layer',
+    },
+    component: () => import('./pages/modules/tile-layer.vue'),
+  },
+  // {
+  //   path: '/modules/vector-layer',
+  //   meta: {
+  //     title: 'Vector layer',
+  //   },
+  //   component: () => import('./pages/modules/vector-layer.vue'),
+  // },
   // redirects
   // todo remove later
   {

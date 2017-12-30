@@ -1,5 +1,5 @@
 /** @module image-static-source */
-import Source from './source'
+import Source from './source.vue'
 
 /**
  * @alias module:image-static-source
