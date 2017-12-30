@@ -1,7 +1,7 @@
 <script>
   /** @module image-layer/layer */
   import ImageLayer from 'ol/layer/image'
-  import { projHelper, layer } from '../../core'
+  import { layer } from '../../core'
 
   /**
    * @vueProps
@@ -23,9 +23,7 @@
         maxResolution: this.maxResolution,
         opacity: this.opacity,
         visible: this.visible,
-        extent: this.extent
-          ? projHelper.extentFromLonLat(this.extent, this.$view.getProjection())
-          : undefined,
+        extent: this.extent,
         zIndex: this.zIndex,
         source: this._source,
       })

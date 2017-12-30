@@ -76,7 +76,7 @@
       default: MIN_ZOOM,
     },
     /**
-     * @default EPSG:4326
+     * @default EPSG:3857
      */
     projection: {
       type: String,

@@ -11,6 +11,11 @@ import mergeDescriptors from '../utils/multi-merge-descriptors'
 import source from './source'
 
 const props = {
+  /**
+   * Source data projection.
+   * @type {string}
+   * @default EPSG:4326
+   */
   projection: {
     type: String,
     default: EPSG_4326,
@@ -132,6 +137,6 @@ function subscribeToSourceChanges () {
   this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   // emit event to allow `sync` modifier
   this.subscribeTo(events::debounceTime(100), () => {
-    this.$emit('update:features', this.getFeatures().map(f => geoJsonHelper.writeFeature(f, this.$view.getProjection())))
+    this.$emit('update:features', this.getFeatures().map(f => geoJsonHelper.writeFeature(f, this.$view.getProjection(), this.projection)))
   })
 }

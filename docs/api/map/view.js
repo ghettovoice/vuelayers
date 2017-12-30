@@ -84,7 +84,7 @@ export default {
       type: 'string',
       required: false,
       sync: false,
-      default: 'EPSG:4326',
+      default: 'EPSG:3857',
     },
     {
       name: 'resolution',

@@ -1,6 +1,6 @@
 <script>
   import VectorLayer from 'ol/layer/vector'
-  import { mergeDescriptors, layer, stylesContainer, projHelper } from '../../core'
+  import { mergeDescriptors, layer, stylesContainer } from '../../core'
 
   const props = {
     updateWhileAnimating: Boolean,
@@ -23,9 +23,7 @@
         opacity: this.opacity,
         visible: this.visible,
         preload: this.preload,
-        extent: this.extent
-          ? projHelper.extentFromLonLat(this.extent, this.$view.getProjection())
-          : undefined,
+        extent: this.extent,
         zIndex: this.zIndex,
         updateWhileAnimating: this.updateWhileAnimating,
         updateWhileInteracting: this.updateWhileInteracting,

@@ -42,7 +42,7 @@
       default: false,
     },
     /**
-     * Initial selection
+     * Selected features as array of GeoJSON encoded features with coordinates in **EPSG:4326** projection.
      * @type {string[]|number[]|GeoJSONFeature[]} Initial selection as Array of ids or Array of GeoJSON features
      */
     features: {

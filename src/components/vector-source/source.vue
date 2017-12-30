@@ -5,6 +5,7 @@
 
   const props = {
     /**
+     * Array of GeoJSON encoded features with coordinates in provided projection.
      * @type {GeoJSONFeature[]} features
      */
     features: {
@@ -111,7 +112,7 @@
      */
     mount () {
       this::vectorSource.methods.mount()
-      this.addFeatures(this.features)
+      this.addFeatures(this.features, this.projection)
     },
     /**
      * @return {void}
@@ -131,7 +132,7 @@
       let forAdd = diffById(value, oldValue)
       let forRemove = diffById(oldValue, value)
 
-      this.addFeatures(forAdd)
+      this.addFeatures(forAdd, this.projection)
       this.removeFeatures(forRemove)
     },
   }

@@ -12,7 +12,6 @@ const props = {
   },
   projection: {
     type: String,
-    // TODO: what projection should be default?
     default: EPSG_3857,
   },
 }
