@@ -65,6 +65,16 @@
             <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
           </vl-style-box>
         </vl-layer-vector>
+
+
+        <vl-layer-image id="jz">
+          <vl-source-image-static
+            :url="imageUrl"
+            :size="imageSize"
+            :extent="imageExtent"
+            :projection="imageProj">
+          </vl-source-image-static>
+        </vl-layer-image>
       </vl-map>
     </div>
     <div style="height: 50%">
@@ -105,6 +115,8 @@
 <script>
   import { range, random } from 'lodash/fp'
   import { core } from '../src'
+  import proj from 'ol/proj'
+  import Projection from 'ol/proj/projection'
 
   const computed = {
   }
@@ -156,6 +168,14 @@
     },
   }
 
+  let imageExtent = [0, 0, 1024, 968]
+  let customProj = new Projection({
+    code: 'xkcd-image',
+    units: 'pixels',
+    extent: imageExtent,
+  })
+  proj.addProjection(customProj)
+
   export default {
     name: 'app',
     computed,
@@ -173,6 +193,10 @@
         selectedFeatures: [],
         countries: [],
         wfsFeatures: [],
+        imageProj: customProj.getCode(),
+        imageUrl: 'https://imgs.xkcd.com/comics/online_communities.png',
+        imageSize: [1024, 968],
+        imageExtent,
       }
     },
     mounted () {

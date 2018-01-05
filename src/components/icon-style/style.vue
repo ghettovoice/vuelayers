@@ -29,10 +29,7 @@
       default: 'fraction', // pixels, fraction
     },
     color: [Array, String],
-    crossOrigin: {
-      type: String,
-      default: 'anonymous',
-    },
+    crossOrigin: String,
     offset: {
       type: Array,
       default: () => [0, 0],
