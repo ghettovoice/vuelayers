@@ -2,7 +2,7 @@ export default {
   props: [
     {
       name: 'center',
-      description: `<p>The center coordinate of the map view in <strong>EPSG:4326</strong> projection.</p>`,
+      description: `<p>The center coordinate of the view in the view projection.</p>`,
       type: 'number[]',
       required: false,
       sync: true,
@@ -29,7 +29,7 @@ export default {
     },
     {
       name: 'extent',
-      description: `<p>The extent that constrains the center defined in in <b>EPSG:4326</b> projection,
+      description: `<p>The extent that constrains the center defined in the view projection,
                     in other words, center cannot be set outside this extent.</p>`,
       type: 'array',
       required: false,
@@ -149,7 +149,7 @@ export default {
     {
       name: 'animate',
       description: `<p>
-                      Animates the view. The view's <b>center</b> (coordinates in <b>EPSG:4326</b> projection), 
+                      Animates the view. The view's <b>center</b> (coordinates in the view projection), 
                       <b>zoom</b> (or <b>resolution</b>), and <b>rotation</b> can be animated for smooth transitions between view states.
                     </p>
                     <p>
@@ -192,7 +192,7 @@ export default {
       arguments: [
         {
           name: 'geometryOrExtent',
-          description: `<p>The geometry or extent to fit the view to. Coordinates should be in <b>EPSG:4326</b> projection.</p>`,
+          description: `<p>The geometry or extent to fit the view to. Coordinates should be in the view projection.</p>`,
           optional: false,
           type: 'GeoJSONFeature, ol.Extent',
         },

@@ -10,7 +10,7 @@
    */
   import Vue from 'vue'
   import View from 'ol/view'
-  import { isEqual, isPlainObject, noop, get } from 'lodash/fp'
+  import { isEqual, isPlainObject, noop, isFunction } from 'lodash/fp'
   import { Observable } from 'rxjs/Observable'
   import { merge as mergeObs } from 'rxjs/observable/merge'
   import { distinctUntilKeyChanged } from 'rxjs/operator/distinctUntilKeyChanged'
@@ -20,7 +20,6 @@
     MAX_ZOOM,
     EPSG_3857,
     ZOOM_FACTOR,
-    projHelper,
     geoJsonHelper,
     observableFromOlChangeEvent,
     olCmp,
@@ -32,7 +31,7 @@
    */
   const props = /** @lends module:map/view# */{
     /**
-     * The center coordinate of the map view in **EPSG:4326** projection.
+     * The center coordinate of the view in the view projection.
      * @type {number[]}
      * @default [0, 0]
      * @vueSync
@@ -51,7 +50,7 @@
       default: true,
     },
     /**
-     * The extent that constrains the center defined in in **EPSG:4326** projection,
+     * The extent that constrains the center defined in the view projection,
      * in other words, center cannot be set outside this extent.
      * @default undefined
      */
@@ -158,13 +157,11 @@
     animate (...args) {
       assert.hasView(this)
 
-      let cb = args.reverse().find(x => typeof x === 'function') || noop
-      args.forEach(opts => {
-        let center = get('center', opts)
-        if (Array.isArray(center) && center.length) {
-          opts.center = projHelper.fromLonLat(center, this.projection)
-        }
-      })
+      let cb = noop
+      if (isFunction(args[args.length - 1])) {
+        cb = args[args.length - 1]
+        args = args.slice(0, args.length - 1)
+      }
 
       return new Promise(
         resolve => this.$view.animate(...args, complete => {
@@ -179,12 +176,10 @@
      */
     createOlObject () {
       return new View({
-        center: projHelper.fromLonLat(this.center, this.projection),
+        center: this.center,
         constrainRotation: this.constrainRotation,
         enableRotation: this.enableRotation,
-        extent: this.extent
-          ? projHelper.extentFromLonLat(this.extent, this.projection)
-          : undefined,
+        extent: this.extent,
         maxResolution: this.maxResolution,
         minResolution: this.minResolution,
         maxZoom: this.maxZoom,
@@ -206,13 +201,11 @@
     fit (geometryOrExtent, options = {}) {
       assert.hasView(this)
 
-      // transform to GeoJSON, vl-feature to ol.Feature
+      // transform from GeoJSON, vl-feature to ol.Feature
       if (isPlainObject(geometryOrExtent)) {
-        geometryOrExtent = geoJsonHelper.readGeometry(geometryOrExtent, this.$view.getProjection())
+        geometryOrExtent = geoJsonHelper.readGeometry(geometryOrExtent, this.$view.getProjection(), this.projection)
       } else if (geometryOrExtent instanceof Vue) {
         geometryOrExtent = geometryOrExtent.$geometry
-      } else if (Array.isArray(geometryOrExtent)) {
-        geometryOrExtent = projHelper.extentFromLonLat(geometryOrExtent, this.$view.getProjection())
       }
 
       let cb = options.callback || noop
@@ -255,7 +248,7 @@
   const watch = {
     center (value) {
       if (this.$view && !isEqual(value, this::getCenter())) {
-        this.$view.setCenter(projHelper.fromLonLat(value, this.$view.getProjection()))
+        this.$view.setCenter(value)
       }
     },
     resolution (value) {
@@ -362,6 +355,6 @@
   }
 
   function getCenter () {
-    return projHelper.toLonLat(this.$view.getCenter(), this.$view.getProjection())
+    return this.$view.getCenter()
   }
 </script>

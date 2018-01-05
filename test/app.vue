@@ -183,7 +183,7 @@
     data () {
       return {
         zoom: 13,
-        center: [-80.0307892780456, 43.456341754866685],
+        center: proj.transform([-80.0307892780456, 43.456341754866685], 'EPSG:4326', 'EPSG:3857'),
         rotation: 0,
         points: [],
         pointsLayer: true,
