@@ -254,7 +254,7 @@ export function image (vlStyle) {
       img: vlStyle.image,
       imgSize: vlStyle.imageImgSize,
       src: vlStyle.imageSrc,
-      crossOrigin: 'anonymous',
+      crossOrigin: vlStyle.imageCrossOrigin,
     }
   } else if (vlStyle.imagePoints != null) {
     // regular shape construction

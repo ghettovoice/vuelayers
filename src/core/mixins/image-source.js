@@ -6,10 +6,7 @@ import { EPSG_3857 } from '../ol-ext/consts'
  * @vueProps
  */
 const props = {
-  crossOrigin: {
-    type: String,
-    default: 'anonymous',
-  },
+  crossOrigin: String,
   projection: {
     type: String,
     default: EPSG_3857,

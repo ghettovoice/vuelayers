@@ -1,7 +1,6 @@
 import { isFunction, isString, constant, pick } from 'lodash/fp'
 import {
   CACHE_SIZE,
-  CROSS_ORIGIN,
   EPSG_3857,
   MAX_ZOOM,
   MIN_ZOOM,
@@ -21,10 +20,7 @@ const props = {
     type: Number,
     default: CACHE_SIZE,
   },
-  crossOrigin: {
-    type: String,
-    default: CROSS_ORIGIN,
-  },
+  crossOrigin: String,
   maxZoom: {
     type: Number,
     default: MAX_ZOOM,
