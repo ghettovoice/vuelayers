@@ -12,6 +12,7 @@
   import { merge as mergeObs } from 'rxjs/observable/merge'
   import {
     OVERLAY_POSITIONING,
+    EPSG_4326,
     projHelper,
     olCmp,
     useMapCmp,
@@ -30,11 +31,15 @@
       validator: value => value.length === 2,
     },
     /**
-     * Coordinates in **EPSG:4326** projection.
+     * Coordinates in provided projection.
      */
     position: {
       type: Array,
       validator: value => value.length === 2,
+    },
+    projection: {
+      type: String,
+      default: EPSG_4326,
     },
     positioning: {
       type: String,
@@ -66,7 +71,7 @@
       return new Overlay({
         id: this.id,
         offset: this.offset,
-        position: projHelper.fromLonLat(this.position, this.$view.getProjection()),
+        position: projHelper.transform(this.position, this.projection, this.$view.getProjection()),
         positioning: this.positioning,
         stopEvent: this.stopEvent,
         insertFirst: this.insertFirst,
@@ -130,12 +135,11 @@
       }
     },
     position (value) {
-      if (
-        this.$overlay &&
-        this.$view &&
-        !isEqual(value, projHelper.toLonLat(this.$overlay.getPosition(), this.$view.getProjection()))
-      ) {
-        this.$overlay.setPosition(projHelper.fromLonLat(value, this.$view.getProjection()))
+      if (!this.$overlay || !this.$view) return
+
+      value = projHelper.transform(value, this.projection, this.$view.getProjection())
+      if (!isEqual(value, this.$overlay.getPosition())) {
+        this.$overlay.setPosition(value)
       }
     },
     positioning (value) {
@@ -202,6 +206,6 @@
   }
 
   function getPosition () {
-    return projHelper.toLonLat(this.$overlay.getPosition(), this.$view.getProjection())
+    return projHelper.transform(this.$overlay.getPosition(), this.projection, this.$view.getProjection())
   }
 </script>
