@@ -1,32 +1,33 @@
 <template>
   <i :id="[$options.name, id].join('-')" :class="[$options.name]" style="display: none !important;">
-    <slot :id="id" :properties="properties" :geometry="geometry"></slot>
+    <slot :id="id" :properties="properties" :geometry="geometry" :geometry-point="geometryPoint"></slot>
   </i>
 </template>
 
 <script>
+  import { isEqual, merge } from 'lodash/fp'
+  import Feature from 'ol/feature'
+  import { Observable } from 'rxjs/Observable'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
+  import { map as mapObs } from 'rxjs/operator/map'
+  import { mergeAll } from 'rxjs/operator/mergeAll'
+  import { throttleTime } from 'rxjs/operator/throttleTime'
   /**
    * @module feature/feature
    */
   import uuid from 'uuid/v4'
-  import Feature from 'ol/feature'
-  import { isEqual, merge } from 'lodash/fp'
-  import { Observable } from 'rxjs/Observable'
-  import { merge as mergeObs } from 'rxjs/observable/merge'
-  import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
-  import { throttleTime } from 'rxjs/operator/throttleTime'
-  import { map as mapObs } from 'rxjs/operator/map'
-  import { mergeAll } from 'rxjs/operator/mergeAll'
   import {
-    geoJsonHelper,
-    mergeDescriptors,
-    plainProps,
     assert,
-    olCmp,
-    useMapCmp,
-    stylesContainer,
+    geoJsonHelper,
+    geomHelper,
     geometryContainer,
+    mergeDescriptors,
     observableFromOlEvent,
+    olCmp,
+    plainProps,
+    stylesContainer,
+    useMapCmp,
   } from '../../core'
 
   const mergeNArg = merge.convert({ fixed: false })
@@ -37,6 +38,7 @@
   const props = /** @lends module:feature/feature# */{
     /**
      * Feature identifier.
+     * @type {string|number}
      * @default UUID
      * @vueSync
      */
@@ -46,6 +48,7 @@
     },
     /**
      * All feature properties.
+     * @type {Object}
      * @default {}
      * @vueSync
      */
@@ -65,7 +68,12 @@
      */
     geometry () {
       if (this.rev && this.$geometry && this.$view) {
-        return geoJsonHelper.writeGeometry(this.$geometry, this.$view.getProjection())
+        return geoJsonHelper.writeGeometry(this.$geometry)
+      }
+    },
+    geometryPoint () {
+      if (this.rev && this.$geometry && this.$view) {
+        return geomHelper.pointOnSurface(this.$geometry)
       }
     },
   }
@@ -81,10 +89,6 @@
      * @protected
      */
     createOlObject () {
-      /**
-       * @type {ol.Feature}
-       * @private
-       */
       let feature = new Feature(this.properties)
       feature.setId(this.id)
       feature.setGeometry(this.$geometry)

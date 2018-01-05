@@ -18,10 +18,8 @@
   import { merge as mergeObs } from 'rxjs/observable/merge'
   import { throttleTime } from 'rxjs/operator/throttleTime'
   import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
-  import { map as mapObs } from 'rxjs/operator/map'
   import {
     RENDERER_TYPE,
-    projHelper,
     observableFromOlEvent,
     mergeDescriptors,
     assert,
@@ -246,13 +244,11 @@
     },
     /**
      * @param {number[]} pixel
-     * @return {number[]} Coordinates in EPSG:4326
+     * @return {number[]} Coordinates in the map view projection.
      */
     getCoordinateFromPixel (pixel) {
       assert.hasMap(this)
-      assert.hasView(this)
-
-      return projHelper.toLonLat(this.$map.getCoordinateFromPixel(pixel), this.$view.getProjection())
+      return this.$map.getCoordinateFromPixel(pixel)
     },
     /**
      * @returns {Object}
@@ -289,7 +285,6 @@
      */
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       assert.hasMap(this)
-
       return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
     },
     /**
@@ -300,7 +295,6 @@
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
       assert.hasMap(this)
-
       return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
@@ -351,7 +345,6 @@
     render () {
       return new Promise(resolve => {
         assert.hasMap(this)
-
         this.$map.once('postrender', () => resolve())
         this.$map.render()
       })
@@ -467,10 +460,7 @@
         'pointermove',
       ])::throttleTime(ft)
         ::distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
-    )::mapObs(evt => ({
-      ...evt,
-      coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection()),
-    }))
+    )
     // other
     const otherEvents = observableFromOlEvent(this.$map, [
       'movestart',

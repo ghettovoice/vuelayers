@@ -31,7 +31,7 @@
    */
   const props = /** @lends module:map/view# */{
     /**
-     * The center coordinate of the view in the view projection.
+     * The center coordinate in the view projection.
      * @type {number[]}
      * @default [0, 0]
      * @vueSync
@@ -203,7 +203,7 @@
 
       // transform from GeoJSON, vl-feature to ol.Feature
       if (isPlainObject(geometryOrExtent)) {
-        geometryOrExtent = geoJsonHelper.readGeometry(geometryOrExtent, this.$view.getProjection(), this.projection)
+        geometryOrExtent = geoJsonHelper.readGeometry(geometryOrExtent)
       } else if (geometryOrExtent instanceof Vue) {
         geometryOrExtent = geometryOrExtent.$geometry
       }

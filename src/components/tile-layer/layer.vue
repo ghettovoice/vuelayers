@@ -14,7 +14,10 @@
      * @type {number}
      * @default 0
      */
-    preload: Number,
+    preload: {
+      type: Number,
+      default: 0,
+    },
   }
 
   /**

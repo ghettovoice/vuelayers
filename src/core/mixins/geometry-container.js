@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Geometry from 'ol/geom/geometry'
 import { isPlainObject } from 'lodash/fp'
 import * as assert from '../utils/assert'
 import * as geoJson from '../ol-ext/geojson'
@@ -40,9 +41,10 @@ const methods = {
     if (geom instanceof Vue) {
       geom = geom.$geometry
     } else if (isPlainObject(geom)) {
-      assert.hasView(this)
-      geom = geoJson.readGeometry(geom, this.$view.getProjection())
+      geom = geoJson.readGeometry(geom)
     }
+    assert.instanceOf(geom, Geometry)
+
     if (geom !== this._geometry) {
       this._geometry = geom
     }

@@ -112,7 +112,7 @@ module.exports = {
     }),
     new WebpackNotifierPlugin({
       title: config.fullname,
-      alwaysNotify: true,
+      alwaysNotify: false,
     }),
   ],
 }

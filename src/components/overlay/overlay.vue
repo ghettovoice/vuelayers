@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  /** @module overlay/overlay */
   import uuid from 'uuid/v4'
   import { isEqual } from 'lodash/fp'
   import Overlay from 'ol/overlay'
@@ -12,8 +13,6 @@
   import { merge as mergeObs } from 'rxjs/observable/merge'
   import {
     OVERLAY_POSITIONING,
-    EPSG_4326,
-    projHelper,
     olCmp,
     useMapCmp,
     assert,
@@ -31,15 +30,11 @@
       validator: value => value.length === 2,
     },
     /**
-     * Coordinates in provided projection.
+     * Coordinates in the map view projection.
      */
     position: {
       type: Array,
       validator: value => value.length === 2,
-    },
-    projection: {
-      type: String,
-      default: EPSG_4326,
     },
     positioning: {
       type: String,
@@ -62,7 +57,10 @@
   const computed = {
   }
 
-  const methods = {
+  /**
+   * @vueMethods
+   */
+  const methods = /** @lends module:overlay/overlay# */{
     /**
      * @return {ol.Overlay}
      * @protected
@@ -71,7 +69,7 @@
       return new Overlay({
         id: this.id,
         offset: this.offset,
-        position: projHelper.transform(this.position, this.projection, this.$view.getProjection()),
+        position: this.position,
         positioning: this.positioning,
         stopEvent: this.stopEvent,
         insertFirst: this.insertFirst,
@@ -135,10 +133,7 @@
       }
     },
     position (value) {
-      if (!this.$overlay || !this.$view) return
-
-      value = projHelper.transform(value, this.projection, this.$view.getProjection())
-      if (!isEqual(value, this.$overlay.getPosition())) {
+      if (this.$overlay && !isEqual(value, this::getPosition())) {
         this.$overlay.setPosition(value)
       }
     },
@@ -149,7 +144,11 @@
     },
   }
 
-  // todo add scoped slot support?
+  /**
+   * @alias module:overlay/overlay
+   * @title vl-overlay
+   * @vueProto
+   */
   export default {
     name: 'vl-overlay',
     mixins: [olCmp, useMapCmp],
@@ -158,7 +157,7 @@
     methods,
     watch,
     created () {
-      Object.defineProperties(this, {
+      Object.defineProperties(this, /** @lends module:overlay/overlay# */{
         /**
          * @type {ol.Overlay|undefined}
          */
@@ -188,7 +187,6 @@
    */
   function subscribeToOverlayChanges () {
     assert.hasOverlay(this)
-    assert.hasView(this)
 
     const ft = 100
     const changes = Observable::mergeObs(
@@ -206,6 +204,6 @@
   }
 
   function getPosition () {
-    return projHelper.transform(this.$overlay.getPosition(), this.projection, this.$view.getProjection())
+    return this.$overlay.getPosition()
   }
 </script>

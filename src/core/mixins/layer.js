@@ -18,7 +18,7 @@ const props = /** @lends module:core/mixins/layer# */{
     default: () => uuid(),
   },
   /**
-   * The bounding extent for layer rendering defined in **EPSG:4326** projection.
+   * The bounding extent for layer rendering defined in the map view projection.
    * The layer will not be rendered outside of this extent.
    * @default undefined
    * @type {ol.Extent|number[]|undefined}

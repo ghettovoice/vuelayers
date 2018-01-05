@@ -27,7 +27,7 @@
           </template>
         </vl-geoloc>
 
-        <vl-interaction-select @select="select" :features.sync="selectedFeatures"/>
+        <vl-interaction-select @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
@@ -50,7 +50,7 @@
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
               <template slot-scope="feature">
                 <vl-geom-polygon :coordinates.sync="polygonCoords"/>
-                <vl-overlay v-if="selected.includes(feature.id)" :position="pointOnSurface(feature.geometry)">
+                <vl-overlay v-if="selected.includes(feature.id)" :position="feature.geometryPoint">
                   <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
                     poly feature {{ polyId }}
                     qwerty: {{ feature.properties.qwerty }}
@@ -94,9 +94,9 @@
           <vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
         </vl-layer-vector>
 
-        <vl-layer-vector id="wfs">
-          <vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="wfs">-->
+          <!--<vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />-->
+        <!--</vl-layer-vector>-->
 
         <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
                     :position="pointOnSurface(selectedFeatures[0].geometry)">
@@ -116,21 +116,12 @@
   import { range, random } from 'lodash/fp'
   import { core } from '../src'
   import proj from 'ol/proj'
-  import Projection from 'ol/proj/projection'
 
   const computed = {
   }
 
   const methods = {
     log: ::console.log,
-    select ({ feature }) {
-      if (feature.get('features') && feature.get('features').length > 1) {
-        this.selectedFeatures = this.selectedFeatures.filter(id => id !== feature.getId())
-        this.$refs.view.fit(core.geomHelper.collection(feature.get('features').map(f => f.getGeometry())).getExtent(), {
-          duration: 500,
-        })
-      }
-    },
     loadData () {
       const points = []
       range(1, 20).forEach(i => {
@@ -142,10 +133,10 @@
           },
           geometry: {
             type: 'Point',
-            coordinates: [
+            coordinates: core.projHelper.fromLonLat([
               random(-179, 179),
               random(-89, 89),
-            ],
+            ], 'EPSG:3857'),
           },
         })
       })
@@ -169,12 +160,12 @@
   }
 
   let imageExtent = [0, 0, 1024, 968]
-  let customProj = new Projection({
+  let customProj = core.projHelper.create({
     code: 'xkcd-image',
     units: 'pixels',
     extent: imageExtent,
   })
-  proj.addProjection(customProj)
+  core.projHelper.add(customProj)
 
   export default {
     name: 'app',
@@ -188,7 +179,7 @@
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
+        polygonCoords: core.projHelper.polygonFromLonLat([[[0, 0], [10, 10], [10, 0], [0, 0]]], 'EPSG:3857'),
         selected: [],
         selectedFeatures: [],
         countries: [],
