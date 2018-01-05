@@ -1,6 +1,5 @@
 const fs = require('fs-extra')
 const path = require('path')
-const { trimEnd } = require('lodash')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
 const hljs = require('highlight.js')
@@ -238,13 +237,6 @@ function concatFiles (files, dest, banner) {
   }
 }
 
-function getServiceWorkerSrc () {
-  let source = fs.readFileSync(resolve('build/service-worker-registration.js'), 'utf-8')
-  source = source.replace('__SCRIPT_URL__', `${trimEnd(config.publicPath, '/')}/service-worker.js`)
-
-  return source
-}
-
 module.exports = {
   resolve,
   assetsPath,
@@ -260,5 +252,4 @@ module.exports = {
   compileVarsReplacement,
   compileVarsReplaceLoader,
   concatFiles,
-  getServiceWorkerSrc,
 }

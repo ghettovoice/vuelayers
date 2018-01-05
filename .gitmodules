@@ -1,6 +1,3 @@
 [submodule "modules/babel-plugin-merge-imports"]
 	path = modules/babel-plugin-merge-imports
 	url = https://github.com/ghettovoice/babel-plugin-merge-imports.git
-[submodule "modules/vuelayers-demo"]
-	path = modules/vuelayers-demo
-	url = https://github.com/ghettovoice/vuelayers-demo.git

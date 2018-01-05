@@ -1,7 +1,6 @@
 const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -114,23 +113,6 @@ module.exports = {
     new WebpackNotifierPlugin({
       title: config.fullname,
       alwaysNotify: true,
-    }),
-    new FaviconsWebpackPlugin({
-      logo: utils.resolve('docs/static/img/logo.svg'),
-      prefix: utils.assetsPath('img/'),
-      title: config.fullname,
-      icons: {
-        android: true,
-        appleIcon: true,
-        appleStartup: true,
-        coast: false,
-        favicons: true,
-        firefox: true,
-        opengraph: false,
-        twitter: false,
-        yandex: false,
-        windows: false,
-      },
     }),
   ],
 }
