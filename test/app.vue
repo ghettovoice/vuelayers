@@ -13,7 +13,7 @@
           </vl-overlay>
         </vl-view>
 
-        <vl-geoloc>
+        <vl-geoloc projection="EPSG:3857">
           <template slot-scope="ctx">
             <vl-feature v-if="ctx.position" id="my-geoloc">
               <vl-geom-point :coordinates="ctx.position" />
@@ -76,13 +76,13 @@
           </vl-source-image-static>
         </vl-layer-image>
 
-        <vl-layer-vector id="countries">
-          <vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="countries">-->
+        <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-layer-vector id="wfs">
-          <vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="wfs">-->
+        <!--<vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />-->
+        <!--</vl-layer-vector>-->
       </vl-map>
     </div>
     <!--<div style="height: 50%">-->
@@ -121,7 +121,7 @@
 </template>
 
 <script>
-  import { range, random } from 'lodash/fp'
+  import { random, range } from 'lodash/fp'
   import { core } from '../src'
 
   const computed = {
@@ -140,10 +140,10 @@
           },
           geometry: {
             type: 'Point',
-            coordinates: [
+            coordinates: core.projHelper.fromLonLat([
               random(-179, 179),
               random(-89, 89),
-            ],
+            ]),
           },
         })
       })
@@ -166,7 +166,9 @@
     },
   }
 
-  let imageExtent = [0, 0, 1024, 968]
+  let x = 1024 * 10000
+  let y = 968 * 10000
+  let imageExtent = [-x / 2, -y / 2, x / 2, y / 2]
   let customProj = core.projHelper.create({
     code: 'xkcd-image',
     units: 'pixels',
@@ -181,12 +183,12 @@
     data () {
       return {
         zoom: 13,
-        center: [-80.0307892780456, 43.456341754866685],
+        center: core.projHelper.fromLonLat([-80.0307892780456, 43.456341754866685]),
         rotation: 0,
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
+        polygonCoords: core.projHelper.polygonFromLonLat([[[0, 0], [10, 10], [10, 0], [0, 0]]]),
         selected: [],
         selectedFeatures: [],
         countries: [],

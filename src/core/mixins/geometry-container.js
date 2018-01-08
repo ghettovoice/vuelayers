@@ -1,8 +1,6 @@
 import Vue from 'vue'
-import Geometry from 'ol/geom/geometry'
 import { isPlainObject } from 'lodash/fp'
-import * as assert from '../utils/assert'
-import * as geoJson from '../ol-ext/geojson'
+import projTransforms from './proj-transforms'
 
 const methods = {
   /**
@@ -41,9 +39,8 @@ const methods = {
     if (geom instanceof Vue) {
       geom = geom.$geometry
     } else if (isPlainObject(geom)) {
-      geom = geoJson.readGeometry(geom)
+      geom = this.readGeometryInBindProj(geom)
     }
-    assert.instanceOf(geom, Geometry)
 
     if (geom !== this._geometry) {
       this._geometry = geom
@@ -57,6 +54,7 @@ const methods = {
 }
 
 export default {
+  mixins: [projTransforms],
   methods,
   created () {
     /**

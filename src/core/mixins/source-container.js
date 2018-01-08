@@ -1,6 +1,4 @@
 import Vue from 'vue'
-import Source from 'ol/source/source'
-import * as assert from '../utils/assert'
 
 const methods = {
   /**
@@ -36,7 +34,6 @@ const methods = {
    */
   setSource (source) {
     source = source instanceof Vue ? source.$source : source
-    assert.instanceOf(source, Source)
 
     if (source !== this._source) {
       this._source = source

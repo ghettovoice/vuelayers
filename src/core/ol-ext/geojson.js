@@ -1,4 +1,5 @@
 import Feature from 'ol/feature'
+import {get, isPlainObject} from 'lodash/fp'
 import { geoJson as geoJsonFactory } from './format'
 
 const geoJson = geoJsonFactory()
@@ -12,13 +13,12 @@ const geoJson = geoJsonFactory()
 export function writeFeature (feature, featureProjection, dataProjection) {
   const geoJsonFeature = geoJson.writeFeatureObject(feature, { featureProjection, dataProjection })
 
-  if (geoJsonFeature.properties && geoJsonFeature.properties.features) {
-    geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(f => {
-      if (f instanceof Feature) {
-        return writeFeature(f, featureProjection, dataProjection)
+  if (Array.isArray(get(geoJsonFeature, 'properties.features'))) {
+    geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(feature => {
+      if (feature instanceof Feature) {
+        return writeFeature(feature, featureProjection, dataProjection)
       }
-
-      return f
+      return feature
     })
   }
 
@@ -32,9 +32,18 @@ export function writeFeature (feature, featureProjection, dataProjection) {
  * @return {ol.Feature}
  */
 export function readFeature (geoJsonFeature, featureProjection, dataProjection) {
-  dataProjection = readProjection(geoJsonFeature, dataProjection)
+  let feature = geoJson.readFeature(geoJsonFeature, { featureProjection, dataProjection })
 
-  return geoJson.readFeature(geoJsonFeature, { featureProjection, dataProjection })
+  if (Array.isArray(feature.get('features'))) {
+    feature.set('features', feature.get('features').map(feature => {
+      if (isPlainObject(feature)) {
+        return readFeature(feature, featureProjection, dataProjection)
+      }
+      return feature
+    }))
+  }
+
+  return feature
 }
 
 /**

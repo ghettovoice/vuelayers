@@ -4,7 +4,7 @@ import VueLayers from '../src'
 import App from './app.vue'
 
 Vue.use(VueLayers, {
-  bindToProj: 'EPSG:4326',
+  // bindToProj: 'EPSG:4326',
 })
 console.dir(VueLayers)
 console.dir(Vue)

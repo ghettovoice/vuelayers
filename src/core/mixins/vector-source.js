@@ -34,9 +34,6 @@ const computed = {
     }
     return []
   },
-  bindProjFeatures () {
-    return this.viewProjFeatures.map(::this.writeFeatureInBindProj)
-  },
 }
 
 const methods = {
