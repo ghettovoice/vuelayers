@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { filter, flow, isFunction, map } from 'lodash/fp'
-import { warndbg } from '../utils/debug'
+import { warndbg } from '../utils/log'
 
 export default {
   created () {

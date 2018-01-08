@@ -2,6 +2,7 @@
  * Projection transform helpers
  */
 import olproj from 'ol/proj'
+import Projection from 'ol/proj/projection'
 import { EPSG_3857, EPSG_4326, GEOMETRY_TYPE } from './consts'
 
 export const {
@@ -11,8 +12,20 @@ export const {
   transformExtent,
   getPointResolution,
   get,
+  addProjection: add,
   equivalent,
+  addEquivalentProjections: addEquivalent,
+  addCoordinateTransforms,
+  getTransform,
 } = olproj
+
+/**
+ * @param {olx.ProjectionOptions|Object} options
+ * @return {ol.proj.Projection_}
+ */
+export function create (options) {
+  return new Projection(options)
+}
 
 /**
  * @param {number[]} coordinate

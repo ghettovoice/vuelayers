@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import Interaction from 'ol/interaction/interaction'
+import * as assert from '../utils/assert'
 
 const methods = {
   /**
@@ -18,8 +20,7 @@ const methods = {
    */
   addInteraction (interaction) {
     interaction = interaction instanceof Vue ? interaction.$interaction : interaction
-
-    if (!interaction) return
+    assert.instanceOf(interaction, Interaction)
 
     if (!this._interactions[interaction.get('id')]) {
       this._interactions[interaction.get('id')] = interaction
