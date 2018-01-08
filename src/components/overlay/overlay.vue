@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  /** @module overlay/overlay */
   import uuid from 'uuid/v4'
   import { isEqual } from 'lodash/fp'
   import Overlay from 'ol/overlay'
@@ -12,12 +13,11 @@
   import { merge as mergeObs } from 'rxjs/observable/merge'
   import {
     OVERLAY_POSITIONING,
-    EPSG_4326,
-    projHelper,
     olCmp,
     useMapCmp,
     assert,
     observableFromOlChangeEvent,
+    projTransforms,
   } from '../../core'
 
   const props = {
@@ -31,15 +31,13 @@
       validator: value => value.length === 2,
     },
     /**
-     * Coordinates in provided projection.
+     * Coordinates in the map view projection.
+     * @type {number[]}
      */
     position: {
       type: Array,
       validator: value => value.length === 2,
-    },
-    projection: {
-      type: String,
-      default: EPSG_4326,
+      required: true,
     },
     positioning: {
       type: String,
@@ -60,9 +58,24 @@
   }
 
   const computed = {
+    viewProjPosition () {
+      if (this.rev && this.$overlay) {
+        return this.$overlay.getPosition()
+      }
+      return []
+    },
+    bindProjPosition () {
+      if (this.rev && this.$overlay) {
+        return this.pointToBindProj(this.$overlay.getPosition())
+      }
+      return []
+    },
   }
 
-  const methods = {
+  /**
+   * @vueMethods
+   */
+  const methods = /** @lends module:overlay/overlay# */{
     /**
      * @return {ol.Overlay}
      * @protected
@@ -71,7 +84,7 @@
       return new Overlay({
         id: this.id,
         offset: this.offset,
-        position: projHelper.transform(this.position, this.projection, this.$view.getProjection()),
+        position: this.pointToViewProj(this.position),
         positioning: this.positioning,
         stopEvent: this.stopEvent,
         insertFirst: this.insertFirst,
@@ -122,7 +135,7 @@
         olCmp.methods.refresh(),
         new Promise(resolve => {
           this.$overlay.once('change:position', () => resolve())
-          this.$overlay.setPosition(this.$overlay.getPosition().slice())
+          this.$overlay.setPosition(this.viewProjPosition)
         }),
       ])
     },
@@ -135,11 +148,8 @@
       }
     },
     position (value) {
-      if (!this.$overlay || !this.$view) return
-
-      value = projHelper.transform(value, this.projection, this.$view.getProjection())
-      if (!isEqual(value, this.$overlay.getPosition())) {
-        this.$overlay.setPosition(value)
+      if (this.$overlay && !isEqual(value, this.bindProjPosition)) {
+        this.$overlay.setPosition(this.pointToViewProj(value))
       }
     },
     positioning (value) {
@@ -149,16 +159,20 @@
     },
   }
 
-  // todo add scoped slot support?
+  /**
+   * @alias module:overlay/overlay
+   * @title vl-overlay
+   * @vueProto
+   */
   export default {
     name: 'vl-overlay',
-    mixins: [olCmp, useMapCmp],
+    mixins: [olCmp, useMapCmp, projTransforms],
     props,
     computed,
     methods,
     watch,
     created () {
-      Object.defineProperties(this, {
+      Object.defineProperties(this, /** @lends module:overlay/overlay# */{
         /**
          * @type {ol.Overlay|undefined}
          */
@@ -188,11 +202,10 @@
    */
   function subscribeToOverlayChanges () {
     assert.hasOverlay(this)
-    assert.hasView(this)
 
     const ft = 100
     const changes = Observable::mergeObs(
-      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
+      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, () => this.pointToBindProj(this.$overlay.getPosition())),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
@@ -203,9 +216,5 @@
       ++this.rev
       this.$emit(`update:${prop}`, value)
     })
-  }
-
-  function getPosition () {
-    return projHelper.transform(this.$overlay.getPosition(), this.projection, this.$view.getProjection())
   }
 </script>

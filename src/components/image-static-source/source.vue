@@ -8,7 +8,7 @@
    */
   const props = /** @lends module:image-static-source/source# */{
     /**
-     * Image extent in source units projection.
+     * Image extent in the source projection.
      * @type {ol.Extent|number[]}
      */
     extent: {

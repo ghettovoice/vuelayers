@@ -5,7 +5,7 @@
    * and style target for inner style containers (vl-style-box) as fallback style.
    */
   import { isFunction, noop } from 'lodash/fp'
-  import { debug, assert, mergeDescriptors, style, stylesContainer } from '../../core'
+  import { log, assert, mergeDescriptors, style, stylesContainer } from '../../core'
 
   const props = {
     /**
@@ -21,7 +21,7 @@
     styleFunc () {
       let func = this.factory()
       if (!isFunction(func)) {
-        debug.warndbg(`Factory returned a value not of Function type, fallback style will be used`)
+        log.warndbg(`Factory returned a value not of Function type, fallback style will be used`)
         func = noop
       }
 

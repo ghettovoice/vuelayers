@@ -42,8 +42,8 @@
       default: false,
     },
     /**
-     * Selected features as array of GeoJSON encoded features with coordinates in **EPSG:4326** projection.
-     * @type {string[]|number[]|GeoJSONFeature[]} Initial selection as Array of ids or Array of GeoJSON features
+     * Selected features as array of GeoJSON features with coordinates in the map view projection.
+     * @type {string[]|number[]|GeoJSONFeature[]}
      */
     features: {
       type: Array,
@@ -239,6 +239,7 @@
     },
   }
 
+  // TODO: use featuresContainer mixin
   export default {
     name: 'vl-interaction-select',
     mixins: [interaction, stylesContainer],
@@ -280,7 +281,7 @@
 
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
-        this.$emit('update:features', this.$features.map(f => geoJsonHelper.writeFeature(f, this.$view.getProjection())))
+        this.$emit('update:features', this.$features.map(feature => geoJsonHelper.writeFeature(feature)))
       }
     )
   }

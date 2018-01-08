@@ -1,28 +1,24 @@
 import Feature from 'ol/feature'
+import {get, isPlainObject} from 'lodash/fp'
 import { geoJson as geoJsonFactory } from './format'
-import { EPSG_4326, EPSG_3857 } from './consts'
 
-const geoJson = geoJsonFactory({
-  defaultDataProjection: EPSG_4326,
-  featureProjection: EPSG_3857,
-})
+const geoJson = geoJsonFactory()
 
 /**
  * @param {ol.Feature} feature
- * @param {ol.ProjectionLike|undefined} [featureProjection=EPSG:3857]
- * @param {ol.ProjectionLike|undefined} [dataProjection=EPSG:4326]
+ * @param {ol.ProjectionLike|undefined} [featureProjection]
+ * @param {ol.ProjectionLike|undefined} [dataProjection]
  * @return {GeoJSONFeature|Object}
  */
-export function writeFeature (feature, featureProjection = EPSG_3857, dataProjection = EPSG_4326) {
+export function writeFeature (feature, featureProjection, dataProjection) {
   const geoJsonFeature = geoJson.writeFeatureObject(feature, { featureProjection, dataProjection })
 
-  if (geoJsonFeature.properties && geoJsonFeature.properties.features) {
-    geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(f => {
-      if (f instanceof Feature) {
-        return writeFeature(f, featureProjection, dataProjection)
+  if (Array.isArray(get(geoJsonFeature, 'properties.features'))) {
+    geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(feature => {
+      if (feature instanceof Feature) {
+        return writeFeature(feature, featureProjection, dataProjection)
       }
-
-      return f
+      return feature
     })
   }
 
@@ -31,23 +27,32 @@ export function writeFeature (feature, featureProjection = EPSG_3857, dataProjec
 
 /**
  * @param {GeoJSONFeature|Object} geoJsonFeature
- * @param {ol.ProjectionLike|undefined} [featureProjection=EPSG:3857]
- * @param {ol.ProjectionLike|undefined} [dataProjection=EPSG:4326]
+ * @param {ol.ProjectionLike|undefined} [featureProjection]
+ * @param {ol.ProjectionLike|undefined} [dataProjection]
  * @return {ol.Feature}
  */
-export function readFeature (geoJsonFeature, featureProjection = EPSG_3857, dataProjection = EPSG_4326) {
-  dataProjection = readProjection(geoJsonFeature, dataProjection)
+export function readFeature (geoJsonFeature, featureProjection, dataProjection) {
+  let feature = geoJson.readFeature(geoJsonFeature, { featureProjection, dataProjection })
 
-  return geoJson.readFeature(geoJsonFeature, { featureProjection, dataProjection })
+  if (Array.isArray(feature.get('features'))) {
+    feature.set('features', feature.get('features').map(feature => {
+      if (isPlainObject(feature)) {
+        return readFeature(feature, featureProjection, dataProjection)
+      }
+      return feature
+    }))
+  }
+
+  return feature
 }
 
 /**
  * @param {ol.geom.Geometry} geometry
- * @param {ol.ProjectionLike|undefined} [geometryProjection=EPSG:3857]
- * @param {ol.ProjectionLike|undefined} [dataProjection=EPSG:4326]
+ * @param {ol.ProjectionLike|undefined} [geometryProjection]
+ * @param {ol.ProjectionLike|undefined} [dataProjection]
  * @return {GeoJSONGeometry|GeoJSONGeometryCollection|Object}
  */
-export function writeGeometry (geometry, geometryProjection = EPSG_3857, dataProjection = EPSG_4326) {
+export function writeGeometry (geometry, geometryProjection, dataProjection) {
   return geoJson.writeGeometryObject(geometry, {
     featureProjection: geometryProjection,
     dataProjection,
@@ -56,11 +61,11 @@ export function writeGeometry (geometry, geometryProjection = EPSG_3857, dataPro
 
 /**
  * @param {GeoJSONGeometry|Object} geoJsonGeometry
- * @param {ol.ProjectionLike|undefined} [geometryProjection=EPSG:3857]
- * @param {ol.ProjectionLike|undefined} [dataProjection=EPSG:4326]
+ * @param {ol.ProjectionLike|undefined} [geometryProjection]
+ * @param {ol.ProjectionLike|undefined} [dataProjection]
  * @return {ol.geom.Geometry}
  */
-export function readGeometry (geoJsonGeometry, geometryProjection = EPSG_3857, dataProjection = EPSG_4326) {
+export function readGeometry (geoJsonGeometry, geometryProjection, dataProjection) {
   dataProjection = readProjection(geoJsonGeometry, dataProjection)
 
   return geoJson.readGeometry(geoJsonGeometry, {
@@ -69,6 +74,6 @@ export function readGeometry (geoJsonGeometry, geometryProjection = EPSG_3857, d
   })
 }
 
-export function readProjection (geoJsonObj, defaultProjection = EPSG_4326) {
+export function readProjection (geoJsonObj, defaultProjection) {
   return geoJson.readProjection(geoJsonObj) || defaultProjection
 }

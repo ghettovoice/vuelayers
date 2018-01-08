@@ -7,7 +7,7 @@
 
 <script>
   import Geolocation from 'ol/geolocation'
-  import { EPSG_4326, olCmp, useMapCmp, assert, observableFromOlChangeEvent } from '../../core'
+  import { EPSG_4326, olCmp, useMapCmp, assert, observableFromOlChangeEvent, projTransforms } from '../../core'
 
   const props = {
     tracking: {
@@ -51,6 +51,16 @@
     speed () {
       if (this.rev && this.$geolocation) {
         return this.$geolocation.getSpeed()
+      }
+    },
+    viewProjPosition () {
+      if (this.position) {
+        return this.pointToViewProj(this.position)
+      }
+    },
+    bindProjPosition () {
+      if (this.position) {
+        return this.pointToBindProj(this.position)
       }
     },
   }
@@ -109,7 +119,7 @@
 
   export default {
     name: 'vl-geoloc',
-    mixins: [olCmp, useMapCmp],
+    mixins: [olCmp, useMapCmp, projTransforms],
     props,
     computed,
     methods,

@@ -15,7 +15,7 @@
      * @protected
      */
     createGeometry () {
-      return new MultiLineString(this.fromSourceProj(this.coordinates))
+      return new MultiLineString(this.toViewProj(this.coordinates))
     },
   }
 

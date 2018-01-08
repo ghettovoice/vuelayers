@@ -1,6 +1,6 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
-    <slot :center="currentCenter" :zoom="currentZoom" :resolution="currentResolution" :rotation="currentRotation"></slot>
+    <slot :center="bindProjCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation"></slot>
   </i>
 </template>
 
@@ -20,10 +20,10 @@
     MAX_ZOOM,
     EPSG_3857,
     ZOOM_FACTOR,
-    geoJsonHelper,
     observableFromOlChangeEvent,
     olCmp,
     assert,
+    projTransforms,
   } from '../../core'
 
   /**
@@ -31,7 +31,7 @@
    */
   const props = /** @lends module:map/view# */{
     /**
-     * The center coordinate of the view in the view projection.
+     * The center coordinate in the view projection.
      * @type {number[]}
      * @default [0, 0]
      * @vueSync
@@ -115,33 +115,36 @@
    * @vueComputed
    */
   const computed = /** @lends module:map/view# */{
-    currentCenter () {
+    viewZoom () {
       if (this.rev && this.$view) {
-        return this::getCenter()
-      }
-
-      return this.center
-    },
-    currentZoom () {
-      if (this.rev && this.$view) {
-        return this::getZoom()
+        return Math.round(this.$view.getZoom())
       }
 
       return this.zoom
     },
-    currentRotation () {
+    viewRotation () {
       if (this.rev && this.$view) {
         return this.$view.getRotation()
       }
 
       return this.rotation
     },
-    currentResolution () {
+    viewResolution () {
       if (this.rev && this.$view) {
         return this.$view.getResolution()
       }
 
       return this.resolution
+    },
+    viewProjCenter () {
+      if (this.rev && this.$view) {
+        return this.$view.getCenter()
+      }
+    },
+    bindProjCenter () {
+      if (this.viewProjCenter) {
+        return this.pointToBindProj(this.viewProjCenter)
+      }
     },
   }
 
@@ -162,6 +165,10 @@
         cb = args[args.length - 1]
         args = args.slice(0, args.length - 1)
       }
+      args.forEach(opts => {
+        if (!Array.isArray(opts.center)) return
+        opts.center = this.pointToViewProj(opts.center)
+      })
 
       return new Promise(
         resolve => this.$view.animate(...args, complete => {
@@ -176,10 +183,10 @@
      */
     createOlObject () {
       return new View({
-        center: this.center,
+        center: this.pointToViewProj(this.center),
         constrainRotation: this.constrainRotation,
         enableRotation: this.enableRotation,
-        extent: this.extent,
+        extent: this.extent ? this.extentToViewProj(this.extent) : undefined,
         maxResolution: this.maxResolution,
         minResolution: this.minResolution,
         maxZoom: this.maxZoom,
@@ -203,7 +210,7 @@
 
       // transform from GeoJSON, vl-feature to ol.Feature
       if (isPlainObject(geometryOrExtent)) {
-        geometryOrExtent = geoJsonHelper.readGeometry(geometryOrExtent, this.$view.getProjection(), this.projection)
+        geometryOrExtent = this.readGeometryInBindProj(geometryOrExtent)
       } else if (geometryOrExtent instanceof Vue) {
         geometryOrExtent = geometryOrExtent.$geometry
       }
@@ -247,23 +254,23 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, this::getCenter())) {
-        this.$view.setCenter(value)
+      if (this.$view && !isEqual(value, this.bindProjCenter)) {
+        this.$view.setCenter(this.pointToViewProj(value))
       }
     },
     resolution (value) {
-      if (this.$view && value !== this.$view.getResolution()) {
+      if (this.$view && value !== this.viewResolution) {
         this.$view.setResolution(value)
       }
     },
     zoom (value) {
       value = Math.round(value)
-      if (this.$view && value !== this::getZoom()) {
+      if (this.$view && value !== this.viewZoom) {
         this.$view.setZoom(value)
       }
     },
     rotation (value) {
-      if (this.$view && value !== this.$view.getRotation()) {
+      if (this.$view && value !== this.viewRotation) {
         this.$view.setRotation(value)
       }
     },
@@ -291,7 +298,7 @@
    */
   export default {
     name: 'vl-view',
-    mixins: [olCmp],
+    mixins: [olCmp, projTransforms],
     props,
     computed,
     methods,
@@ -324,7 +331,6 @@
   /**
    * Subscribe to OpenLayers significant events
    * @return {void}
-   * @this module:map/view
    * @private
    */
   function subscribeToViewChanges () {
@@ -334,11 +340,11 @@
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution::mapObs(() => ({
       prop: 'zoom',
-      value: this::getZoom(),
+      value: Math.round(this.$view.getZoom()),
     }))::distinctUntilKeyChanged('value')
 
     const changes = Observable::mergeObs(
-      observableFromOlChangeEvent(this.$view, 'center', true, ft, this::getCenter),
+      observableFromOlChangeEvent(this.$view, 'center', true, ft, () => this.pointToBindProj(this.$view.getCenter())),
       observableFromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
       zoom
@@ -348,13 +354,5 @@
       ++this.rev
       this.$emit(`update:${prop}`, value)
     })
-  }
-
-  function getZoom () {
-    return Math.round(this.$view.getZoom())
-  }
-
-  function getCenter () {
-    return this.$view.getCenter()
   }
 </script>

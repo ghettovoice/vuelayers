@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div style="height: 50%">
+    <div style="height: 100%">
       <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
@@ -13,7 +13,7 @@
           </vl-overlay>
         </vl-view>
 
-        <vl-geoloc>
+        <vl-geoloc projection="EPSG:3857">
           <template slot-scope="ctx">
             <vl-feature v-if="ctx.position" id="my-geoloc">
               <vl-geom-point :coordinates="ctx.position" />
@@ -27,7 +27,7 @@
           </template>
         </vl-geoloc>
 
-        <vl-interaction-select @select="select" :features.sync="selectedFeatures"/>
+        <vl-interaction-select @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
@@ -50,7 +50,7 @@
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
               <template slot-scope="feature">
                 <vl-geom-polygon :coordinates.sync="polygonCoords"/>
-                <vl-overlay v-if="selected.includes(feature.id)" :position="pointOnSurface(feature.geometry)">
+                <vl-overlay v-if="selected.includes(feature.id)" :position="feature.geometryPoint">
                   <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
                     poly feature {{ polyId }}
                     qwerty: {{ feature.properties.qwerty }}
@@ -75,62 +75,60 @@
             :projection="imageProj">
           </vl-source-image-static>
         </vl-layer-image>
+
+        <!--<vl-layer-vector id="countries">-->
+        <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
+        <!--</vl-layer-vector>-->
+
+        <!--<vl-layer-vector id="wfs">-->
+        <!--<vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />-->
+        <!--</vl-layer-vector>-->
       </vl-map>
     </div>
-    <div style="height: 50%">
-      <vl-map>
-        <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
+    <!--<div style="height: 50%">-->
+      <!--<vl-map>-->
+        <!--<vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>-->
 
-        <vl-layer-tile>
-          <vl-source-osm/>
-        </vl-layer-tile>
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-osm/>-->
+        <!--</vl-layer-tile>-->
 
-        <vl-layer-tile id="wms">
-          <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
-                         :ext-params="{ TILED: true }" server-type="geoserver"/>
-        </vl-layer-tile>
+        <!--<vl-layer-tile id="wms">-->
+          <!--<vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"-->
+                         <!--:ext-params="{ TILED: true }" server-type="geoserver"/>-->
+        <!--</vl-layer-tile>-->
 
-        <vl-layer-vector id="countries">
-          <vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="countries">-->
+          <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-layer-vector id="wfs">
-          <vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="wfs">-->
+          <!--<vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
-                    :position="pointOnSurface(selectedFeatures[0].geometry)">
-          <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
-            Popup cluster feature {{ selectedFeatures[0].id }}<br />
-            <span v-for="feature in selectedFeatures[0].properties.features">
-              feature {{ feature.id }}
-            </span>
-          </div>
-        </vl-overlay>
-      </vl-map>
-    </div>
+        <!--<vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"-->
+                    <!--:position="pointOnSurface(selectedFeatures[0].geometry)">-->
+          <!--<div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">-->
+            <!--Popup cluster feature {{ selectedFeatures[0].id }}<br />-->
+            <!--<span v-for="feature in selectedFeatures[0].properties.features">-->
+              <!--feature {{ feature.id }}-->
+            <!--</span>-->
+          <!--</div>-->
+        <!--</vl-overlay>-->
+      <!--</vl-map>-->
+    <!--</div>-->
   </div>
 </template>
 
 <script>
-  import { range, random } from 'lodash/fp'
+  import { random, range } from 'lodash/fp'
   import { core } from '../src'
-  import proj from 'ol/proj'
-  import Projection from 'ol/proj/projection'
 
   const computed = {
   }
 
   const methods = {
     log: ::console.log,
-    select ({ feature }) {
-      if (feature.get('features') && feature.get('features').length > 1) {
-        this.selectedFeatures = this.selectedFeatures.filter(id => id !== feature.getId())
-        this.$refs.view.fit(core.geomHelper.collection(feature.get('features').map(f => f.getGeometry())).getExtent(), {
-          duration: 500,
-        })
-      }
-    },
     loadData () {
       const points = []
       range(1, 20).forEach(i => {
@@ -142,10 +140,10 @@
           },
           geometry: {
             type: 'Point',
-            coordinates: [
+            coordinates: core.projHelper.fromLonLat([
               random(-179, 179),
               random(-89, 89),
-            ],
+            ]),
           },
         })
       })
@@ -168,13 +166,15 @@
     },
   }
 
-  let imageExtent = [0, 0, 1024, 968]
-  let customProj = new Projection({
+  let x = 1024 * 10000
+  let y = 968 * 10000
+  let imageExtent = [-x / 2, -y / 2, x / 2, y / 2]
+  let customProj = core.projHelper.create({
     code: 'xkcd-image',
     units: 'pixels',
     extent: imageExtent,
   })
-  proj.addProjection(customProj)
+  core.projHelper.add(customProj)
 
   export default {
     name: 'app',
@@ -183,12 +183,12 @@
     data () {
       return {
         zoom: 13,
-        center: proj.transform([-80.0307892780456, 43.456341754866685], 'EPSG:4326', 'EPSG:3857'),
+        center: core.projHelper.fromLonLat([-80.0307892780456, 43.456341754866685]),
         rotation: 0,
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
+        polygonCoords: core.projHelper.polygonFromLonLat([[[0, 0], [10, 10], [10, 0], [0, 0]]]),
         selected: [],
         selectedFeatures: [],
         countries: [],

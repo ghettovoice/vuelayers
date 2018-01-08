@@ -9,6 +9,7 @@ import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../utils/assert'
 import mergeDescriptors from '../utils/multi-merge-descriptors'
 import source from './source'
+import projTransforms from './proj-transforms'
 
 const props = {
   /**
@@ -23,6 +24,15 @@ const props = {
   useSpatialIndex: {
     type: Boolean,
     default: true,
+  },
+}
+
+const computed = {
+  viewProjFeatures () {
+    if (this.rev && this.$source) {
+      return this.getFeatures().map(feature => geoJsonHelper.writeFeature(feature))
+    }
+    return []
   },
 }
 
@@ -107,8 +117,9 @@ const methods = {
 }
 
 export default {
-  mixins: [source, featuresContainer],
+  mixins: [source, featuresContainer, projTransforms],
   props,
+  computed,
   methods,
   stubVNode: {
     empty: false,
@@ -137,6 +148,7 @@ function subscribeToSourceChanges () {
   this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   // emit event to allow `sync` modifier
   this.subscribeTo(events::debounceTime(100), () => {
-    this.$emit('update:features', this.getFeatures().map(f => geoJsonHelper.writeFeature(f, this.$view.getProjection(), this.projection)))
+    ++this.rev
+    this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInBindProj))
   })
 }

@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import Layer from 'ol/layer/layer'
+import * as assert from '../utils/assert'
 
 const methods = {
   /**
@@ -18,8 +20,7 @@ const methods = {
    */
   addLayer (layer) {
     layer = layer instanceof Vue ? layer.$layer : layer
-
-    if (!layer) return
+    assert.instanceOf(layer, Layer)
 
     if (!this._layers[layer.get('id')]) {
       this._layers[layer.get('id')] = layer
