@@ -60,7 +60,7 @@
   const computed = {
     viewProjPosition () {
       if (this.rev && this.$overlay) {
-        return this.pointToViewProj(this.$overlay.getPosition())
+        return this.$overlay.getPosition()
       }
       return []
     },

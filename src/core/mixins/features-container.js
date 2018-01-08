@@ -3,7 +3,7 @@ import uuid from 'uuid/v4'
 import Feature from 'ol/feature'
 import { isPlainObject } from 'lodash/fp'
 import * as assert from '../utils/assert'
-import * as geoJson from '../ol-ext/geojson'
+import projTransforms from './proj-transforms'
 
 const methods = {
   /**
@@ -32,7 +32,7 @@ const methods = {
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
-      feature = geoJson.readFeature(feature)
+      feature = this.readFeatureInBindProj(feature)
     }
     assert.instanceOf(feature, Feature)
 
@@ -64,7 +64,6 @@ const methods = {
     } else if (isPlainObject(feature)) {
       feature = this._features[feature.id]
     }
-
     if (!feature) return
 
     delete this._features[feature.getId()]
@@ -119,6 +118,7 @@ const methods = {
 }
 
 export default {
+  mixins: [projTransforms],
   methods,
   created () {
     /**

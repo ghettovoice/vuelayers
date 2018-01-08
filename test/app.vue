@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div style="height: 50%">
+    <div style="height: 100%">
       <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
@@ -75,40 +75,48 @@
             :projection="imageProj">
           </vl-source-image-static>
         </vl-layer-image>
-      </vl-map>
-    </div>
-    <div style="height: 50%">
-      <vl-map>
-        <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>
-
-        <vl-layer-tile>
-          <vl-source-osm/>
-        </vl-layer-tile>
-
-        <vl-layer-tile id="wms">
-          <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"
-                         :ext-params="{ TILED: true }" server-type="geoserver"/>
-        </vl-layer-tile>
 
         <vl-layer-vector id="countries">
           <vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />
         </vl-layer-vector>
 
+        <vl-layer-vector id="wfs">
+          <vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />
+        </vl-layer-vector>
+      </vl-map>
+    </div>
+    <!--<div style="height: 50%">-->
+      <!--<vl-map>-->
+        <!--<vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>-->
+
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-osm/>-->
+        <!--</vl-layer-tile>-->
+
+        <!--<vl-layer-tile id="wms">-->
+          <!--<vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"-->
+                         <!--:ext-params="{ TILED: true }" server-type="geoserver"/>-->
+        <!--</vl-layer-tile>-->
+
+        <!--<vl-layer-vector id="countries">-->
+          <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
+        <!--</vl-layer-vector>-->
+
         <!--<vl-layer-vector id="wfs">-->
           <!--<vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />-->
         <!--</vl-layer-vector>-->
 
-        <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
-                    :position="pointOnSurface(selectedFeatures[0].geometry)">
-          <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
-            Popup cluster feature {{ selectedFeatures[0].id }}<br />
-            <span v-for="feature in selectedFeatures[0].properties.features">
-              feature {{ feature.id }}
-            </span>
-          </div>
-        </vl-overlay>
-      </vl-map>
-    </div>
+        <!--<vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"-->
+                    <!--:position="pointOnSurface(selectedFeatures[0].geometry)">-->
+          <!--<div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">-->
+            <!--Popup cluster feature {{ selectedFeatures[0].id }}<br />-->
+            <!--<span v-for="feature in selectedFeatures[0].properties.features">-->
+              <!--feature {{ feature.id }}-->
+            <!--</span>-->
+          <!--</div>-->
+        <!--</vl-overlay>-->
+      <!--</vl-map>-->
+    <!--</div>-->
   </div>
 </template>
 

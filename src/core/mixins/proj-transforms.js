@@ -70,5 +70,12 @@ export default {
     readGeometryInBindProj (geometry) {
       return geoJsonHelper.readGeometry(geometry, this.viewProjection, this.bindProjection)
     },
+
+    writeFeatureInBindProj (feature) {
+      return geoJsonHelper.writeFeature(feature, this.viewProjection, this.bindProjection)
+    },
+    readFeatureInBindProj (feature) {
+      return geoJsonHelper.readFeature(feature, this.viewProjection, this.bindProjection)
+    },
   },
 }
