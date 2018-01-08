@@ -18,6 +18,7 @@
   import { merge as mergeObs } from 'rxjs/observable/merge'
   import { throttleTime } from 'rxjs/operator/throttleTime'
   import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
+  import { map as mapObs } from 'rxjs/operator/map'
   import {
     RENDERER_TYPE,
     observableFromOlEvent,
@@ -28,6 +29,7 @@
     interactionsContainer,
     overlaysContainer,
     featuresContainer,
+    projTransforms,
   } from '../../core'
 
   /**
@@ -248,7 +250,8 @@
      */
     getCoordinateFromPixel (pixel) {
       assert.hasMap(this)
-      return this.$map.getCoordinateFromPixel(pixel)
+      let coordinate = this.$map.getCoordinateFromPixel(pixel)
+      return this.pointToBindProj(coordinate)
     },
     /**
      * @returns {Object}
@@ -389,12 +392,9 @@
    */
   export default {
     name: 'vl-map',
-    mixins: [olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer],
+    mixins: [olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer, projTransforms],
     props,
     methods,
-    /**
-     * @this module:map/map
-     */
     created () {
       /**
        * @type {ol.View|undefined}
@@ -428,9 +428,6 @@
         },
       })
     },
-    /**
-     * @this module:map/map
-     */
     destroyed () {
       this._view = undefined
     },
@@ -439,7 +436,6 @@
   /**
    * Subscribe to OL map events.
    *
-   * @this module:map/map
    * @return {void}
    * @private
    */
@@ -460,7 +456,10 @@
         'pointermove',
       ])::throttleTime(ft)
         ::distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
-    )
+    )::mapObs(evt => ({
+      ...evt,
+      coordinate: this.pointToBindProj(evt.coordinate),
+    }))
     // other
     const otherEvents = observableFromOlEvent(this.$map, [
       'movestart',

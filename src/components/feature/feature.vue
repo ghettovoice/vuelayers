@@ -5,6 +5,9 @@
 </template>
 
 <script>
+  /**
+   * @module feature/feature
+   */
   import { isEqual, merge } from 'lodash/fp'
   import Feature from 'ol/feature'
   import { Observable } from 'rxjs/Observable'
@@ -13,13 +16,9 @@
   import { map as mapObs } from 'rxjs/operator/map'
   import { mergeAll } from 'rxjs/operator/mergeAll'
   import { throttleTime } from 'rxjs/operator/throttleTime'
-  /**
-   * @module feature/feature
-   */
   import uuid from 'uuid/v4'
   import {
     assert,
-    geoJsonHelper,
     geomHelper,
     geometryContainer,
     mergeDescriptors,
@@ -28,7 +27,7 @@
     plainProps,
     stylesContainer,
     useMapCmp,
-    projHelper,
+    projTransforms,
   } from '../../core'
 
   const mergeNArg = merge.convert({ fixed: false })
@@ -68,16 +67,16 @@
      * @type {GeoJSONFeature|undefined}
      */
     geometry () {
-      if (this.rev && this.$geometry && this.$view) {
-        let geomProj = this.$view.getProjection()
-        return geoJsonHelper.writeGeometry(this.$geometry, geomProj, this.$vlOption('bindToProj', geomProj))
+      if (this.rev && this.$geometry) {
+        return this.writeGeometryInBindProj(this.$geometry)
       }
     },
+    /**
+     * @return {number[]|undefined}
+     */
     geometryPoint () {
-      if (this.rev && this.$geometry && this.$view) {
-        let geomProj = this.$view.getProjection()
-        let point = geomHelper.pointOnSurface(this.$geometry)
-        return projHelper.transformPoint(point, geomProj, this.$vlOption('bindToProj', geomProj))
+      if (this.rev && this.$geometry) {
+        return this.pointToBindProj(geomHelper.pointOnSurface(this.$geometry))
       }
     },
   }
@@ -203,7 +202,7 @@
    */
   export default {
     name: 'vl-feature',
-    mixins: [olCmp, useMapCmp, geometryContainer, stylesContainer],
+    mixins: [olCmp, useMapCmp, geometryContainer, stylesContainer, projTransforms],
     props,
     computed,
     methods,

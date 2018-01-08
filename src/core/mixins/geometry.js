@@ -10,6 +10,7 @@ import * as assert from '../utils/assert'
 import mergeDescriptors from '../utils/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
+import projTransforms from './proj-transforms'
 
 const props = {
   /**
@@ -32,17 +33,29 @@ const computed = {
   type () {
     throw new Error('Not implemented computed property')
   },
+  /**
+   * @type {number[]|ol.Extent|undefined}
+   */
   extent () {
     if (this.rev && this.$geometry && this.$view) {
       return this.extentToBindProj(this.$geometry.getExtent())
     }
-    return []
   },
+  /**
+   * @type {number[]|ol.Coordinate|undefined}
+   */
   pointOnSurface () {
     if (this.rev && this.$geometry && this.$view) {
       return this.pointToBindProj(geomHelper.pointOnSurface(this.$geometry))
     }
-    return []
+  },
+  /**
+   * @type {Array|undefined}
+   */
+  viewProjCoordinates () {
+    if (this.rev && this.$geometry) {
+      return this.$geometry.getCoordinates()
+    }
   },
 }
 
@@ -86,18 +99,7 @@ const methods = {
      * @return {number[]}
      * @protected
      */
-    this.fromBindProj = coordinates => transform(coordinates, bindProj, geomProj)
-    /**
-     * @param {number[]|ol.Extent} extent
-     * @return {ol.Extent}
-     * @protected
-     */
-    this.extentToBindProj = extent => projHelper.transformExtent(extent, geomProj, bindProj)
-    /**
-     * @param {number[]} point
-     * @return {number[]}
-     */
-    this.pointToBindProj = point => projHelper.transformPoint(point, geomProj, bindProj)
+    this.toViewProj = coordinates => transform(coordinates, bindProj, geomProj)
 
     return this::cmp.methods.init()
   },
@@ -154,7 +156,7 @@ const watch = {
   coordinates (value) {
     if (!this.$geometry || !this.$view) return
 
-    value = this.fromBindProj(value)
+    value = this.toViewProj(value)
 
     let isEq = isEqualGeom({
       coordinates: value,
@@ -171,7 +173,7 @@ const watch = {
 }
 
 export default {
-  mixins: [cmp, useMapCmp],
+  mixins: [cmp, useMapCmp, projTransforms],
   props,
   computed,
   watch,

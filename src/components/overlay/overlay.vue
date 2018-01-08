@@ -17,6 +17,7 @@
     useMapCmp,
     assert,
     observableFromOlChangeEvent,
+    projTransforms,
   } from '../../core'
 
   const props = {
@@ -31,10 +32,12 @@
     },
     /**
      * Coordinates in the map view projection.
+     * @type {number[]}
      */
     position: {
       type: Array,
       validator: value => value.length === 2,
+      required: true,
     },
     positioning: {
       type: String,
@@ -55,6 +58,18 @@
   }
 
   const computed = {
+    viewProjPosition () {
+      if (this.rev && this.$overlay) {
+        return this.pointToViewProj(this.$overlay.getPosition())
+      }
+      return []
+    },
+    bindProjPosition () {
+      if (this.rev && this.$overlay) {
+        return this.pointToBindProj(this.$overlay.getPosition())
+      }
+      return []
+    },
   }
 
   /**
@@ -69,7 +84,7 @@
       return new Overlay({
         id: this.id,
         offset: this.offset,
-        position: this.position,
+        position: this.pointToViewProj(this.position),
         positioning: this.positioning,
         stopEvent: this.stopEvent,
         insertFirst: this.insertFirst,
@@ -120,7 +135,7 @@
         olCmp.methods.refresh(),
         new Promise(resolve => {
           this.$overlay.once('change:position', () => resolve())
-          this.$overlay.setPosition(this.$overlay.getPosition().slice())
+          this.$overlay.setPosition(this.viewProjPosition)
         }),
       ])
     },
@@ -133,8 +148,8 @@
       }
     },
     position (value) {
-      if (this.$overlay && !isEqual(value, this::getPosition())) {
-        this.$overlay.setPosition(value)
+      if (this.$overlay && !isEqual(value, this.bindProjPosition)) {
+        this.$overlay.setPosition(this.pointToViewProj(value))
       }
     },
     positioning (value) {
@@ -151,7 +166,7 @@
    */
   export default {
     name: 'vl-overlay',
-    mixins: [olCmp, useMapCmp],
+    mixins: [olCmp, useMapCmp, projTransforms],
     props,
     computed,
     methods,
@@ -190,7 +205,7 @@
 
     const ft = 100
     const changes = Observable::mergeObs(
-      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, this::getPosition),
+      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, () => this.pointToBindProj(this.$overlay.getPosition())),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
@@ -201,9 +216,5 @@
       ++this.rev
       this.$emit(`update:${prop}`, value)
     })
-  }
-
-  function getPosition () {
-    return this.$overlay.getPosition()
   }
 </script>

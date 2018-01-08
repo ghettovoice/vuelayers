@@ -15,7 +15,7 @@
      * @protected
      */
     createGeometry () {
-      return new MultiPolygon(this.fromBindProj(this.coordinates))
+      return new MultiPolygon(this.toViewProj(this.coordinates))
     },
   }
 
