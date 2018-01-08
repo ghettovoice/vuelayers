@@ -5,18 +5,20 @@
 import { EPSG_3857 } from '../ol-ext/consts'
 import * as projHelper from '../ol-ext/proj'
 import * as geoJsonHelper from '../ol-ext/geojson'
+import options from './options'
 
 /**
  * @alias module:core/proj-transforms
  * @vueProto
  */
 export default {
+  mixins: [options],
   computed: {
     viewProjection () {
       return this.$view ? this.$view.getProjection().getCode() : EPSG_3857
     },
     bindProjection () {
-      return this.$vlOption('bindToProj', this.viewProjection)
+      return this.globOption('bindToProj', this.viewProjection)
     },
   },
   methods: {

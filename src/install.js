@@ -1,4 +1,3 @@
-import { getOr } from 'lodash/fp'
 import * as components from './cmps'
 import { VL_OPTIONS, projHelper, log } from './core'
 
@@ -17,9 +16,6 @@ export default function install (Vue, options = {}) {
   }
   // extend Vue with VueLayers global methods and options
   Vue[VL_OPTIONS] = Vue.prototype[VL_OPTIONS] = options
-  Vue.$vlOption = Vue.prototype.$vlOption = function (key, def) {
-    return getOr(def, key, this[VL_OPTIONS])
-  }
 
   // install all components
   Object.keys(components)

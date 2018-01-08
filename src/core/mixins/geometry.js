@@ -85,7 +85,7 @@ const methods = {
     // define helper methods based on geometry type
     const { transform } = projHelper.transforms[this.type]
     let geomProj = this.$view.getProjection()
-    let bindProj = this.$vlOption('bindToProj', geomProj)
+    let bindProj = this.globOption('bindToProj', geomProj)
     /**
      * @method
      * @param {Array} coordinates
