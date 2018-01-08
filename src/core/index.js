@@ -48,7 +48,7 @@ export xyzSource from './mixins/xyz-source'
 // utils
 export * as assert from './utils/assert'
 export coalesce from './utils/coalesce'
-export * as debug from './utils/debug'
+export * as log from './utils/log'
 export IdentityMap from './utils/identity-map'
 export isNumeric from './utils/is-numeric'
 export mergeDescriptors from './utils/multi-merge-descriptors'

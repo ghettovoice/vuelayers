@@ -28,6 +28,7 @@
     plainProps,
     stylesContainer,
     useMapCmp,
+    projHelper,
   } from '../../core'
 
   const mergeNArg = merge.convert({ fixed: false })
@@ -68,12 +69,15 @@
      */
     geometry () {
       if (this.rev && this.$geometry && this.$view) {
-        return geoJsonHelper.writeGeometry(this.$geometry)
+        let geomProj = this.$view.getProjection()
+        return geoJsonHelper.writeGeometry(this.$geometry, geomProj, this.$vlOption('bindToProj', geomProj))
       }
     },
     geometryPoint () {
       if (this.rev && this.$geometry && this.$view) {
-        return geomHelper.pointOnSurface(this.$geometry)
+        let geomProj = this.$view.getProjection()
+        let point = geomHelper.pointOnSurface(this.$geometry)
+        return projHelper.transformPoint(point, geomProj, this.$vlOption('bindToProj', geomProj))
       }
     },
   }

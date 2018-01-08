@@ -4,6 +4,7 @@ import { map as mapObs } from 'rxjs/operator/map'
 import { throttleTime } from 'rxjs/operator/throttleTime'
 import * as extentHelper from '../ol-ext/extent'
 import * as geomHelper from '../ol-ext/geom'
+import * as projHelper from '../ol-ext/proj'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../utils/assert'
 import mergeDescriptors from '../utils/multi-merge-descriptors'
@@ -32,14 +33,14 @@ const computed = {
     throw new Error('Not implemented computed property')
   },
   extent () {
-    if (this.rev && this.$geometry) {
-      return this.$geometry.getExtent()
+    if (this.rev && this.$geometry && this.$view) {
+      return this.extentToBindProj(this.$geometry.getExtent())
     }
     return []
   },
   pointOnSurface () {
-    if (this.rev && this.$geometry) {
-      return geomHelper.pointOnSurface(this.$geometry)
+    if (this.rev && this.$geometry && this.$view) {
+      return this.pointToBindProj(geomHelper.pointOnSurface(this.$geometry))
     }
     return []
   },
@@ -67,6 +68,37 @@ const methods = {
    * @protected
    */
   init () {
+    assert.hasView(this)
+    // define helper methods based on geometry type
+    const { transform } = projHelper.transforms[this.type]
+    let geomProj = this.$view.getProjection()
+    let bindProj = this.$vlOption('bindToProj', geomProj)
+    /**
+     * @method
+     * @param {Array} coordinates
+     * @return {number[]}
+     * @protected
+     */
+    this.toBindProj = coordinates => transform(coordinates, geomProj, bindProj)
+    /**
+     * @method
+     * @param {Array} coordinates
+     * @return {number[]}
+     * @protected
+     */
+    this.fromBindProj = coordinates => transform(coordinates, bindProj, geomProj)
+    /**
+     * @param {number[]|ol.Extent} extent
+     * @return {ol.Extent}
+     * @protected
+     */
+    this.extentToBindProj = extent => projHelper.transformExtent(extent, geomProj, bindProj)
+    /**
+     * @param {number[]} point
+     * @return {number[]}
+     */
+    this.pointToBindProj = point => projHelper.transformPoint(point, geomProj, bindProj)
+
     return this::cmp.methods.init()
   },
   /**
@@ -120,7 +152,9 @@ const methods = {
 
 const watch = {
   coordinates (value) {
-    if (!this.$geometry) return
+    if (!this.$geometry || !this.$view) return
+
+    value = this.fromBindProj(value)
 
     let isEq = isEqualGeom({
       coordinates: value,
@@ -189,7 +223,7 @@ function subscribeToGeomChanges () {
     this.$geometry,
     'change',
     () => ({
-      coordinates: this.$geometry.getCoordinates(),
+      coordinates: this.toBindProj(this.$geometry.getCoordinates()),
       extent: this.extent,
     })
   )::throttleTime(ft)

@@ -15,7 +15,7 @@
      * @protected
      */
     createGeometry () {
-      return new LineString(this.coordinates)
+      return new LineString(this.fromBindProj(this.coordinates))
     },
   }
 

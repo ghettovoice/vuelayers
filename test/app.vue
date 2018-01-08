@@ -115,7 +115,6 @@
 <script>
   import { range, random } from 'lodash/fp'
   import { core } from '../src'
-  import proj from 'ol/proj'
 
   const computed = {
   }
@@ -133,10 +132,10 @@
           },
           geometry: {
             type: 'Point',
-            coordinates: core.projHelper.fromLonLat([
+            coordinates: [
               random(-179, 179),
               random(-89, 89),
-            ], 'EPSG:3857'),
+            ],
           },
         })
       })
@@ -174,12 +173,12 @@
     data () {
       return {
         zoom: 13,
-        center: proj.transform([-80.0307892780456, 43.456341754866685], 'EPSG:4326', 'EPSG:3857'),
+        center: [-80.0307892780456, 43.456341754866685],
         rotation: 0,
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: core.projHelper.polygonFromLonLat([[[0, 0], [10, 10], [10, 0], [0, 0]]], 'EPSG:3857'),
+        polygonCoords: [[[0, 0], [10, 10], [10, 0], [0, 0]]],
         selected: [],
         selectedFeatures: [],
         countries: [],

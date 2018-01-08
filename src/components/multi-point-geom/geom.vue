@@ -15,7 +15,7 @@
      * @protected
      */
     createGeometry () {
-      return new MultiPoint(this.coordinates)
+      return new MultiPoint(this.fromBindProj(this.coordinates))
     },
   }
 
