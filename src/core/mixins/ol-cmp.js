@@ -9,10 +9,10 @@ import { map as mapObs } from 'rxjs/operator/map'
 import { skipWhile } from 'rxjs/operator/skipWhile'
 import { toPromise } from 'rxjs/operator/toPromise'
 import { VM_PROP } from '../consts'
-// import { logdbg } from '../utils/debug'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
 import services from './services'
+import options from './options'
 
 const props = {}
 
@@ -115,7 +115,7 @@ const methods = {
  * @fires module:core/mixins/ol-cmp#destroyed
  */
 export default {
-  mixins: [identMap, rxSubs, services],
+  mixins: [options, identMap, rxSubs, services],
   props,
   methods,
   /**

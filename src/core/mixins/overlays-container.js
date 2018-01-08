@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import Overlay from 'ol/overlay'
+import * as assert from '../utils/assert'
 
 const methods = {
   /**
@@ -18,8 +20,7 @@ const methods = {
    */
   addOverlay (overlay) {
     overlay = overlay instanceof Vue ? overlay.$overlay : overlay
-
-    if (!overlay) return
+    assert.instanceOf(overlay, Overlay)
 
     if (!this._overlays[overlay.getId()]) {
       this._overlays[overlay.getId()] = overlay

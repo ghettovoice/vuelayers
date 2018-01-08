@@ -21,7 +21,6 @@
   import { map as mapObs } from 'rxjs/operator/map'
   import {
     RENDERER_TYPE,
-    projHelper,
     observableFromOlEvent,
     mergeDescriptors,
     assert,
@@ -30,6 +29,7 @@
     interactionsContainer,
     overlaysContainer,
     featuresContainer,
+    projTransforms,
   } from '../../core'
 
   /**
@@ -246,13 +246,12 @@
     },
     /**
      * @param {number[]} pixel
-     * @return {number[]} Coordinates in EPSG:4326
+     * @return {number[]} Coordinates in the map view projection.
      */
     getCoordinateFromPixel (pixel) {
       assert.hasMap(this)
-      assert.hasView(this)
-
-      return projHelper.toLonLat(this.$map.getCoordinateFromPixel(pixel), this.$view.getProjection())
+      let coordinate = this.$map.getCoordinateFromPixel(pixel)
+      return this.pointToBindProj(coordinate)
     },
     /**
      * @returns {Object}
@@ -289,7 +288,6 @@
      */
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       assert.hasMap(this)
-
       return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
     },
     /**
@@ -300,7 +298,6 @@
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
       assert.hasMap(this)
-
       return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
@@ -351,7 +348,6 @@
     render () {
       return new Promise(resolve => {
         assert.hasMap(this)
-
         this.$map.once('postrender', () => resolve())
         this.$map.render()
       })
@@ -396,12 +392,9 @@
    */
   export default {
     name: 'vl-map',
-    mixins: [olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer],
+    mixins: [olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer, projTransforms],
     props,
     methods,
-    /**
-     * @this module:map/map
-     */
     created () {
       /**
        * @type {ol.View|undefined}
@@ -435,9 +428,6 @@
         },
       })
     },
-    /**
-     * @this module:map/map
-     */
     destroyed () {
       this._view = undefined
     },
@@ -446,7 +436,6 @@
   /**
    * Subscribe to OL map events.
    *
-   * @this module:map/map
    * @return {void}
    * @private
    */
@@ -469,7 +458,7 @@
         ::distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
     )::mapObs(evt => ({
       ...evt,
-      coordinate: projHelper.toLonLat(evt.coordinate, this.$view.getProjection()),
+      coordinate: this.pointToBindProj(evt.coordinate),
     }))
     // other
     const otherEvents = observableFromOlEvent(this.$map, [

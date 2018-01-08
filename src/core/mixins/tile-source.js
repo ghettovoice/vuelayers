@@ -55,15 +55,6 @@ const props = {
 
 const computed = {
   /**
-   * @type {ol.TileUrlFunctionType}
-   */
-  urlFunc () {
-    if (isFunction(this.url)) {
-      return this.url
-    }
-    return constant(this.urlTmpl)
-  },
-  /**
    * @type {string}
    */
   urlTmpl () {
@@ -88,6 +79,16 @@ const methods = {
       minZoom: this.minZoom,
       tileSize: this.tileSize,
     })
+  },
+  /**
+   * @return {ol.TileUrlFunctionType}
+   * @protected
+   */
+  createUrlFunc () {
+    if (isFunction(this.url)) {
+      return this.url
+    }
+    return constant(this.urlTmpl)
   },
   /**
    * @return {Promise}
@@ -128,14 +129,9 @@ const methods = {
 }
 
 const watch = {
-  urlFunc (value) {
-    if (this.$source && this.$source.getTileUrlFunction() !== value) {
-      this.$source.setTileUrlFunction(value)
-    }
-  },
-  urlTmpl (value) {
-    if (this.$source && !this.$source.getUrls().includes(value)) {
-      this.$source.setUrl(value)
+  url () {
+    if (this.$source) {
+      this.$source.setTileUrlFunction(this.createUrlFunc())
     }
   },
 }

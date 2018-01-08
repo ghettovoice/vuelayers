@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import uuid from 'uuid/v4'
+import Feature from 'ol/feature'
 import { isPlainObject } from 'lodash/fp'
-import { EPSG_4326 } from '../'
 import * as assert from '../utils/assert'
-import * as geoJson from '../ol-ext/geojson'
+import projTransforms from './proj-transforms'
 
 const methods = {
   /**
@@ -19,25 +19,22 @@ const methods = {
   },
   /**
    * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
-   * @param {string|ol.ProjectionLike} [projection=EPSG_4326]
    * @return {void}
    */
-  addFeatures (features, projection = EPSG_4326) {
-    features.forEach(feature => this.addFeature(feature, projection))
+  addFeatures (features) {
+    features.forEach(feature => this.addFeature(feature))
   },
   /**
    * @param {ol.Feature|Vue|GeoJSONFeature} feature
-   * @param {string|ol.ProjectionLike} [projection=EPSG_4326]
    * @return {void}
    */
-  addFeature (feature, projection = EPSG_4326) {
-    assert.hasView(this)
-
+  addFeature (feature) {
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
-      feature = geoJson.readFeature(feature, this.$view.getProjection(), projection)
+      feature = this.readFeatureInBindProj(feature)
     }
+    assert.instanceOf(feature, Feature)
 
     this.prepareFeature(feature)
 
@@ -67,7 +64,6 @@ const methods = {
     } else if (isPlainObject(feature)) {
       feature = this._features[feature.id]
     }
-
     if (!feature) return
 
     delete this._features[feature.getId()]
@@ -122,6 +118,7 @@ const methods = {
 }
 
 export default {
+  mixins: [projTransforms],
   methods,
   created () {
     /**

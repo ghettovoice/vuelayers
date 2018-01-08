@@ -5,7 +5,7 @@
 
   const props = {
     /**
-     * Array of GeoJSON encoded features with coordinates in provided projection.
+     * Array of GeoJSON features with coordinates in the map view projection.
      * @type {GeoJSONFeature[]} features
      */
     features: {
@@ -50,24 +50,31 @@
     featureIds () {
       return this.features.map(featureHelper.getId)
     },
-    strategy () {
-      // do not transform extent in strategy cause here we need
-      // extent in map project units
-      return this.strategyFactory()
+  }
+
+  const methods = {
+    /**
+     * @return {ol.source.Vector}
+     * @protected
+     */
+    createSource () {
+      return new VectorSource({
+        attributions: this.attributions,
+        projection: this.projection,
+        loader: this.createLoader(),
+        useSpatialIndex: this.useSpatialIndex,
+        wrapX: this.wrapX,
+        logo: this.logo,
+        strategy: this.strategyFactory(),
+        format: this.formatFactory(),
+        url: this.createUrlFunc(),
+        overlaps: this.overlaps,
+      })
     },
-    loader () {
-      if (!this.loaderFactory) {
-        return
-      }
-      const loader = this.loaderFactory()
-      // wrap strategy function to transform map view projection to source projection
-      return (extent, resolution, projection) => loader(
-        transformExtent(extent, projection, this.projection),
-        resolution,
-        this.projection,
-      )
-    },
-    urlFunc () {
+    /**
+     * @protected
+     */
+    createUrlFunc () {
       if (!this.url) {
         return
       }
@@ -82,29 +89,20 @@
         this.projection,
       )
     },
-    format () {
-      return this.formatFactory()
-    },
-  }
-
-  const methods = {
     /**
-     * @return {ol.source.Vector}
      * @protected
      */
-    createSource () {
-      return new VectorSource({
-        attributions: this.attributions,
-        projection: this.projection,
-        loader: this.loader,
-        useSpatialIndex: this.useSpatialIndex,
-        wrapX: this.wrapX,
-        logo: this.logo,
-        strategy: this.strategy,
-        format: this.format,
-        url: this.urlFunc,
-        overlaps: this.overlaps,
-      })
+    createLoader () {
+      if (!this.loaderFactory) {
+        return
+      }
+      const loader = this.loaderFactory()
+      // wrap strategy function to transform map view projection to source projection
+      return (extent, resolution, projection) => loader(
+        transformExtent(extent, projection, this.projection),
+        resolution,
+        this.projection,
+      )
     },
     /**
      * @return {void}
@@ -112,7 +110,7 @@
      */
     mount () {
       this::vectorSource.methods.mount()
-      this.addFeatures(this.features, this.projection)
+      this.addFeatures(this.features)
     },
     /**
      * @return {void}
@@ -132,7 +130,7 @@
       let forAdd = diffById(value, oldValue)
       let forRemove = diffById(oldValue, value)
 
-      this.addFeatures(forAdd, this.projection)
+      this.addFeatures(forAdd)
       this.removeFeatures(forRemove)
     },
   }

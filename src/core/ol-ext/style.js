@@ -398,6 +398,7 @@ export function geom (vlStyle) {
  * @property {IconOrigin|undefined} imageOffsetOrigin
  * @property {ol.style.Stroke|undefined} imageStroke
  * @property {ol.style.Fill|undefined} imageFill
+ * @property {string|undefined} imageCrossOrigin
  *
  * @property {ol.geom.Geometry|ol.StyleGeometryFunction|undefined} geom Coordinates should be in map projection
  */

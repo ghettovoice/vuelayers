@@ -15,7 +15,7 @@
      * @protected
      */
     createGeometry () {
-      return new Polygon(this.fromSourceProj(this.coordinates))
+      return new Polygon(this.toViewProj(this.coordinates))
     },
   }
 
