@@ -1,5 +1,6 @@
 import Feature from 'ol/feature'
 import {get, isPlainObject} from 'lodash/fp'
+// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 import { geoJson as geoJsonFactory } from './format'
 
 const geoJson = geoJsonFactory()

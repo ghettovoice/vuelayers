@@ -1,4 +1,5 @@
 <script>
+  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
   import { constant } from 'lodash/fp'
   import Polygon from 'ol/geom/polygon'
   import { GEOMETRY_TYPE, geometry } from '../../core'

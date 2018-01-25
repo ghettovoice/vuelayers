@@ -1,3 +1,4 @@
+// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 import Sphere from 'ol/sphere'
 
 export const EPSG_4326 = 'EPSG:4326'

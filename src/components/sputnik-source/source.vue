@@ -5,10 +5,12 @@
   import { xyzSource } from '../../core'
 
   const SPUTNIK_URL_TEMPLATE = 'http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png?apikey={apikey}'
+  /* eslint-disable tree-shaking/no-side-effects-in-initialization */
   const SPUTNIK_ATTRIBUTIONS = '<a href="http://maps.sputnik.ru/">Спутник</a> ' +
     '&copy; <a href="http://rt.ru/">Ростелеком</a> ' +
     '&copy; <a href="https://openstreetmap.org/">Openstreetmap</a>, ' +
     (new Date().getFullYear())
+  /* eslint-enable tree-shaking/no-side-effects-in-initialization */
 
   const props = {
     url: {

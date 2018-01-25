@@ -8,6 +8,7 @@
   import Vue from 'vue'
   import SelectInteraction from 'ol/interaction/select'
   import Feature from 'ol/feature'
+  /* eslint-disable tree-shaking/no-side-effects-in-initialization */
   import {
     mapValues,
     differenceWith,
@@ -16,6 +17,7 @@
     stubArray,
     forEach,
   } from 'lodash/fp'
+  /* eslint-enable tree-shaking/no-side-effects-in-initialization */
   import {
     styleHelper,
     geoJsonHelper,

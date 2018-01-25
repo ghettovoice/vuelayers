@@ -1,5 +1,6 @@
 <script>
   import VectorSource from 'ol/source/vector'
+  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
   import { differenceWith, stubArray, isFunction, constant, isFinite } from 'lodash/fp'
   import { loadStrategyHelper, formatHelper, vectorSource, projHelper, featureHelper } from '../../core'
 

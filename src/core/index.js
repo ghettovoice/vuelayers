@@ -2,6 +2,7 @@
  * VueLayers Core
  * @module core
  */
+/* eslint-disable tree-shaking/no-side-effects-in-initialization */
 export * from './consts'
 export * from './ol-ext/consts'
 // rx helpers

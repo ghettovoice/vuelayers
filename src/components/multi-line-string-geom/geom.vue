@@ -1,4 +1,5 @@
 <script>
+  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
   import { constant } from 'lodash/fp'
   import MultiLineString from 'ol/geom/multilinestring'
   import { GEOMETRY_TYPE, geometry } from '../../core'

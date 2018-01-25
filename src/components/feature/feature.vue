@@ -29,7 +29,7 @@
     useMapCmp,
     projTransforms,
   } from '../../core'
-
+  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
   const mergeNArg = merge.convert({ fixed: false })
 
   /**
