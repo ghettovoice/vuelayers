@@ -38,18 +38,8 @@ module.exports = {
         javascriptEnabled: true,
         acceptSslCerts: true,
         chromeOptions: {
-          args: ['headless'],
+          args: ['headless', 'no-sandbox', 'disable-gpu'],
         },
-      },
-    },
-
-    phantom: {
-      desiredCapabilities: {
-        browserName: 'phantomjs',
-        javascriptEnabled: true,
-        acceptSslCerts: true,
-        'phantomjs.binary.path': require('phantomjs-prebuilt').path,
-        'phantomjs.cli.args': [],
       },
     },
   },

@@ -18,4 +18,5 @@ install:
   - npm --version
   - npm install
 script:
-  - npm run travis
+  - npm test
+  - cat test/unit/coverage/lcov.info | node_modules/.bin/coveralls
