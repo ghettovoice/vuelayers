@@ -13,7 +13,7 @@ ${packageJson.description}
 @author ${packageJson.author}
 @version ${packageJson.version}
 @license ${packageJson.license}
-@copyright (c) ${new Date().getFullYear()}, ${packageJson.author}
+@copyright (c) 2017-${new Date().getFullYear()}, ${packageJson.author}
 */`
 
 const BASE_URL = process.env.BASE_URL || '/'
@@ -32,7 +32,7 @@ module.exports = {
   publicPath: BASE_URL,
   assetsSubDir: 'static',
   host: 'localhost',
-  port: 8081,
+  port: 8080,
   replaces: {
     C_PKG_NAME: packageJson.name,
     C_PKG_FULLNAME: packageJson.fullname,

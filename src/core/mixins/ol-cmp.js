@@ -151,7 +151,7 @@ export default {
       ::skipWhile(() => !this._mounted)
       ::firstObs()
       ::mapObs(() => this)
-      ::toPromise()
+      ::toPromise(Promise)
 
     Object.defineProperties(this, {
       $olObject: {
