@@ -19,7 +19,7 @@ export default {
         ::skipWhile(() => !this.$map)
         ::firstObs()
         ::mapObs(() => this)
-        ::toPromise()
+        ::toPromise(Promise)
     },
   },
 }

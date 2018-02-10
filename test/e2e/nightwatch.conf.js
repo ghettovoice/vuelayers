@@ -42,15 +42,5 @@ module.exports = {
         },
       },
     },
-
-    phantom: {
-      desiredCapabilities: {
-        browserName: 'phantomjs',
-        javascriptEnabled: true,
-        acceptSslCerts: true,
-        'phantomjs.binary.path': require('phantomjs-prebuilt').path,
-        'phantomjs.cli.args': [],
-      },
-    },
   },
 }

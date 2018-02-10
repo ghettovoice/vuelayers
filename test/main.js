@@ -1,4 +1,3 @@
-import 'babel-polyfill'
 import Vue from 'vue'
 import VueLayers from '../src'
 import App from './app.vue'
