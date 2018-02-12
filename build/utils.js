@@ -136,10 +136,10 @@ function vueLoaderConfig (extract) {
       })
     ),
     postcss: postcssPlugins(),
-    template: {
-      render: require('pug').render,
-      doctype: 'html',
-    },
+    // template: {
+    //   render: require('pug').render,
+    //   doctype: 'html',
+    // },
     transformToRequire: {
       img: 'src',
       image: 'xlink:href',
