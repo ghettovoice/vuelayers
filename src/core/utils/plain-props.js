@@ -1,4 +1,3 @@
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
 import { isBoolean, isNumber, isPlainObject, isString, pickBy } from 'lodash/fp'
 /**
  * @func

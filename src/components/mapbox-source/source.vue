@@ -2,7 +2,6 @@
   import { TILE_FORMAT, EPSG_3857, coalesce, xyzSource } from '../../core'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
-  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())
 
   const props = {

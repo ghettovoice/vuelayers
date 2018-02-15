@@ -18,7 +18,7 @@ module.exports = {
     'import',
     'html',
     'lodash-fp',
-    'tree-shaking',
+    'promise',
   ],
   // add your custom rules here
   'rules': {
@@ -29,6 +29,5 @@ module.exports = {
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'comma-dangle': ['error', 'always-multiline'],
-    'tree-shaking/no-side-effects-in-initialization': [2, {compatibility: 'rollup'}],
   },
 }
