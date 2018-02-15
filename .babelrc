@@ -1,29 +1,63 @@
 {
   "presets": [
-    ["env", {
-      "modules": false,
-      "useBuiltIns": true
-    }],
+    [
+      "env",
+      {
+        "modules": false,
+        "useBuiltIns": true,
+        "targets": {
+          "node": 6
+        }
+      }
+    ],
     "stage-0"
   ],
   "plugins": [
-    "transform-runtime"
+    "transform-runtime",
+    [
+      "transform-imports",
+      {
+        "lodash/fp": {
+          "transform": "lodash/fp/${member}",
+          "preventFullImport": true
+        },
+        "rxjs": {
+          "transform": "rxjs/${member}",
+          "preventFullImport": true,
+          "camelCase": true,
+          "skipDefaultConversion": true
+        },
+        "rxjs/operator": {
+          "transform": "rxjs/operator/${member}",
+          "preventFullImport": true,
+          "camelCase": true,
+          "skipDefaultConversion": true
+        },
+        "rxjs/observable": {
+          "transform": "rxjs/observable/${member}",
+          "camelCase": true,
+          "preventFullImport": true,
+          "skipDefaultConversion": true
+        }
+      }
+    ]
   ],
   "env": {
     "test": {
-      "plugins": ["istanbul"]
-    },
-    "production": {
-      "plugins": ["lodash"]
-    },
-    "production-cjs": {
       "plugins": [
-        "lodash",
-        ["./modules/babel-plugin-merge-imports", {
-          "pkg": "openlayers",
-          "pkgVar": "__ol",
-          "regex": "^ol(?:\/(.*))?$"
-        }]
+        "istanbul"
+      ]
+    },
+    "es5": {
+      "plugins": [
+        [
+          "./modules/babel-plugin-merge-imports",
+          {
+            "pkg": "openlayers",
+            "pkgVar": "__ol__",
+            "regex": "^ol(?:\/(.*))?$"
+          }
+        ]
       ]
     }
   }

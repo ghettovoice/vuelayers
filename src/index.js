@@ -42,9 +42,9 @@ const VERSION = 'C_PKG_VERSION'
  * @param {Vue} Vue
  * @param {VueLayersOptions} [options]
  */
-function install (Vue, options = {}) {
-  if (install.installed) return
-  install.installed = true
+export default function plugin (Vue, options = {}) {
+  if (plugin.installed) return
+  plugin.installed = true
 
   if (options.bindToProj && !core.projHelper.get(options.bindToProj)) {
     core.log.warn('Projection "' + options.bindToProj + '" isn\'t added to the list of known projections. ' +
@@ -89,7 +89,6 @@ function install (Vue, options = {}) {
 
 export {
   VERSION,
-  install,
   core,
   // components
   CircleStyle,
