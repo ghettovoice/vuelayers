@@ -5,9 +5,9 @@ import uuid from 'uuid/v4'
 import Vue from 'vue'
 import * as assert from '../util/assert'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from '../mixin/ol-virt-cmp'
-import sourceContainer from '../mixin/source-container'
-import useMapCmp from '../mixin/use-map-cmp'
+import cmp from './/ol-virt-cmp'
+import sourceContainer from './/source-container'
+import useMapCmp from './/use-map-cmp'
 
 /**
  * @vueProps

@@ -1,5 +1,5 @@
 /* global describe, it, expect */
-import * as style from '../../../../../src/core/ol-ext/style'
+import * as style from '../../../../../src/ol-ext/style'
 
 describe('ol style helper', () => {
   /** @test normalizeColor */

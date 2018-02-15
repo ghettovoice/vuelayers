@@ -1,5 +1,5 @@
 /* global describe, it, expect */
-import replaceTokens from '../../../../../src/core/util/replace-tokens'
+import replaceTokens from '../../../../../src/util/replace-tokens'
 
 /** @test replaceTokens */
 describe('replaceTokens', () => {

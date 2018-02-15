@@ -4,7 +4,9 @@
  * @author Vladimir Vershinin
  * @license MIT
  */
-import * as core from './core'
+import { get as getProjection } from './ol-ext/proj'
+import { VL_OPTIONS } from './consts'
+import { warn } from './util/log'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
 import Feature from './component/feature'
@@ -44,7 +46,7 @@ import './sass/main.sass'
 const VERSION = 'C_PKG_VERSION'
 /**
  * Registers all VueLayers components.
- * @param {Vue} Vue
+ * @param {Vue|VueConstructor} Vue
  * @param {VueLayersOptions} [options]
  */
 export default function plugin (Vue, options = {}) {
@@ -52,12 +54,12 @@ export default function plugin (Vue, options = {}) {
   if (plugin.installed) return
   plugin.installed = true
 
-  if (options.bindToProj && !core.projHelper.get(options.bindToProj)) {
-    core.log.warn('Projection "' + options.bindToProj + '" isn\'t added to the list of known projections. ' +
+  if (options.bindToProj && !getProjection(options.bindToProj)) {
+    warn('Projection "' + options.bindToProj + '" isn\'t added to the list of known projections. ' +
       'It should be added before VueLayers install with OpenLayers or VueLayers API.')
   }
   // extend Vue with VueLayers global methods and options
-  Vue[core.VL_OPTIONS] = Vue.prototype[core.VL_OPTIONS] = options
+  Vue[VL_OPTIONS] = Vue.prototype[VL_OPTIONS] = options
 
   // install components
   Vue.use(CircleStyle)
@@ -95,7 +97,6 @@ export default function plugin (Vue, options = {}) {
 
 export {
   VERSION,
-  core,
   // components
   CircleStyle,
   ClusterSource,

@@ -1,5 +1,5 @@
 /* global describe, it, expect */
-import isNumeric from '../../../../../src/core/util/is-numeric'
+import isNumeric from '../../../../../src/util/is-numeric'
 
 /** @test isNumeric */
 describe('isNumeric', () => {

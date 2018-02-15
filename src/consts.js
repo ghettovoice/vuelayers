@@ -1,5 +1,5 @@
 /**
- * @module core/consts
+ * @module consts
  */
 /**
  * @const {Symbol<string>}

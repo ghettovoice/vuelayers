@@ -1,6 +1,6 @@
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from '../mixin/ol-virt-cmp'
-import useMapCmp from '../mixin/use-map-cmp'
+import cmp from './/ol-virt-cmp'
+import useMapCmp from './/use-map-cmp'
 
 const props = {
   attributions: [String, Array],

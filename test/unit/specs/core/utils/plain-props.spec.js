@@ -1,5 +1,5 @@
 /* global describe, it, expect */
-import plainProps from '../../../../../src/core/util/plain-props'
+import plainProps from '../../../../../src/util/plain-props'
 
 /** @test plainProps */
 describe('plainProps', () => {
