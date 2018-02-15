@@ -2,20 +2,14 @@ const fs = require('fs-extra')
 const path = require('path')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
-const hljs = require('highlight.js')
-const marked = require('marked')
 const concat = require('source-map-concat')
 const postcss = require('postcss')
+const postcssrc = require('postcss-load-config')
+const cssnano = require('cssnano')
 const config = require('./config')
 
-function resolve (relPath) {
+function resolve (relPath = '') {
   return path.join(__dirname, '..', relPath)
-}
-
-function assetsPath (_path) {
-  const assetsSubDirectory = config.assetsSubDir
-
-  return path.posix.join(assetsSubDirectory, _path)
 }
 
 function cssLoaders (options) {
@@ -23,6 +17,12 @@ function cssLoaders (options) {
 
   const cssLoader = {
     loader: 'css-loader',
+    options: {
+      sourceMap: options.sourceMap,
+    },
+  }
+  const postcssLoader = {
+    loader: 'postcss-loader',
     options: {
       sourceMap: options.sourceMap,
     },
@@ -36,7 +36,7 @@ function cssLoaders (options) {
 
   // generate loader string to be used with extract text plugin
   function generateLoaders (loader, loaderOptions) {
-    const loaders = [cssLoader, resolveUrlLoader]
+    const loaders = [cssLoader, postcssLoader, resolveUrlLoader]
     if (loader) {
       loaders.push({
         loader: loader + '-loader',
@@ -65,14 +65,14 @@ function cssLoaders (options) {
     less: generateLoaders('less'),
     sass: generateLoaders('sass', {
       includePaths: [
-        resolve(''),
+        resolve(),
         resolve('node_modules'),
       ],
       indentedSyntax: true,
     }),
     scss: generateLoaders('sass', {
       includePaths: [
-        resolve(''),
+        resolve(),
         resolve('node_modules'),
       ],
     }),
@@ -95,35 +95,29 @@ function styleLoaders (options) {
   return output
 }
 
-function postcssPlugins (opts = {}) {
-  const plugins = [
-    require('autoprefixer')({
-      browsers: ['last 5 versions'],
-    }),
-  ]
-  if (opts.min) {
-    plugins.push(require('postcss-clean')())
-  }
-
-  return plugins
-}
-
 function postcssProcess ({ id, code, map, min }) {
-  return postcss(postcssPlugins({ min }))
-    .process(code, {
-      from: id,
-      to: id,
-      map: {
-        inline: false,
-        prev: map,
-        annotation: true,
-      },
+  return postcssrc()
+    .then(({plugins, postcssOptions}) => {
+      if (min) {
+        plugins.push(cssnano())
+      }
+
+      return postcss(plugins)
+        .process(code, Object.assign({}, postcssOptions, {
+          from: id,
+          to: id,
+          map: {
+            inline: false,
+            prev: map,
+            annotation: true,
+          },
+        }))
+        .then(({css, map}) => ({
+          id,
+          code: css,
+          map: map.toString(),
+        }))
     })
-    .then(({ css, map }) => ({
-      id,
-      code: css,
-      map: map.toString(),
-    }))
 }
 
 function vueLoaderConfig (extract) {
@@ -135,38 +129,11 @@ function vueLoaderConfig (extract) {
         extract,
       })
     ),
-    postcss: postcssPlugins(),
-    // template: {
-    //   render: require('pug').render,
-    //   doctype: 'html',
-    // },
     transformToRequire: {
       img: 'src',
       image: 'xlink:href',
       'vl-style-icon': 'src',
     },
-  }
-}
-
-function markdownLoaderConfig () {
-  const renderer = new marked.Renderer()
-  renderer.html = html => `<div class="content">${html}</div>`
-  renderer.link = function (href, title, text) {
-    let external = /^https?:\/\/.+$/.test(href)
-    let hrefParts = href.split('|')
-    href = hrefParts[0]
-    let tag = hrefParts[1] || 'a'
-    let target = external ? 'target="_blank"' : ''
-    title = title ? `title="${title}"` : ''
-
-    return `<${tag} href="${href}" ${title} ${target}>${text}</${tag}>`
-  }
-
-  return {
-    breaks: false,
-    langPrefix: 'hljs ',
-    highlight: (code, lang) => lang ? hljs.highlight(lang, code).value : code,
-    renderer,
   }
 }
 
@@ -239,12 +206,9 @@ function concatFiles (files, dest, banner) {
 
 module.exports = {
   resolve,
-  assetsPath,
   cssLoaders,
   styleLoaders,
   vueLoaderConfig,
-  markdownLoaderConfig,
-  postcssPlugins,
   postcssProcess,
   writeFile,
   readDir,

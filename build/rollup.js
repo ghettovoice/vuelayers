@@ -56,7 +56,7 @@ function getAllModules (bundleNameSuffix = '', styleNameSuffix = '') {
 }
 
 function getComponents (bundleNameSuffix = '', styleNameSuffix = '') {
-  const root = utils.resolve('src/components')
+  const root = utils.resolve('src/component')
 
   return utils.readDir(root)
     .then(files => files.filter(({ stat }) => stat.isDirectory()))
@@ -403,7 +403,7 @@ function getModuleEntryVariants (entry) {
 
   let dir
   if (/\/components\//.test(moduleDir)) {
-    dir = moduleDir.replace('components/', '')
+    dir = moduleDir.replace('component/', '')
   } else {
     dir = path.join(moduleParentDir, 'components', moduleName)
   }
