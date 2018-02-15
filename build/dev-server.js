@@ -4,7 +4,6 @@ const config = require('./config')
 process.env.NODE_ENV || (process.env.NODE_ENV = 'development')
 
 const opn = require('opn')
-let path = require('path')
 const express = require('express')
 const webpack = require('webpack')
 let webpackConfig = process.env.NODE_ENV === 'testing'
@@ -57,10 +56,6 @@ app.use(devMiddleware)
 // enable hot-reload and state-preserving
 // compilation error display
 app.use(hotMiddleware)
-
-// serve pure static assets
-const staticPath = path.posix.join(config.publicPath, config.assetsSubDir)
-app.use(staticPath, express.static('./docs/static'))
 
 const uri = 'http://' + config.host + ':' + port
 

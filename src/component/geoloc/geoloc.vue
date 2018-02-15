@@ -1,13 +1,22 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
     <slot :accuracy="accuracy" :altitude="altitude" :altitude-accuracy="altitudeAccuracy"
-          :heading="heading" :position="position" :speed="speed"></slot>
+          :heading="heading" :position="position" :speed="speed">
+    </slot>
   </i>
 </template>
 
 <script>
+  /**
+   * @module geoloc/geoloc
+   */
   import Geolocation from 'ol/geolocation'
-  import { EPSG_4326, olCmp, useMapCmp, assert, observableFromOlChangeEvent, projTransforms } from '../../core'
+  import olCmp from '../../mixin/ol-cmp'
+  import projTransforms from '../../mixin/proj-transforms'
+  import useMapCmp from '../../mixin/use-map-cmp'
+  import { EPSG_4326 } from '../../ol-ext/consts'
+  import { hasGeolocation } from '../../util/assert'
+  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
 
   const props = {
     tracking: {
@@ -89,7 +98,7 @@
      * @private
      */
     unmount () {
-      assert.hasGeolocation(this)
+      hasGeolocation(this)
 
       this.unsubscribeAll()
       this.$geolocation.setTracking(false)
@@ -151,7 +160,7 @@
    * @private
    */
   function subscribeToGeolocation () {
-    assert.hasGeolocation(this)
+    hasGeolocation(this)
 
     const ft = 100
     const changes = observableFromOlChangeEvent(

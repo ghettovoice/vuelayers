@@ -1,5 +1,11 @@
 <script>
-  import { geomHelper, vectorSource, sourceContainer, mergeDescriptors } from '../../core'
+  /**
+   * @module cluster-source/source
+   */
+  import vectorSource from '../../mixin/vector-source'
+  import sourceContainer from '../../mixin/source-container'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { pointOnSurface, point } from '../../ol-ext/geom'
   import SourceBuilder from './builder'
 
   const props = {
@@ -91,9 +97,9 @@
       const geometry = feature.getGeometry()
       if (!geometry) return
 
-      let coordinate = geomHelper.pointOnSurface(geometry)
+      let coordinate = pointOnSurface(geometry)
       if (coordinate) {
-        return geomHelper.point(coordinate)
+        return point(coordinate)
       }
     }
   }

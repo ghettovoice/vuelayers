@@ -1,7 +1,9 @@
 <script>
   /** @module vector-layer/layer */
   import VectorLayer from 'ol/layer/vector'
-  import { mergeDescriptors, layer, stylesContainer } from '../../core'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import layer from '../../mixin/layer'
+  import stylesContainer from '../../mixin/styles-container'
 
   /**
    * @vueProps

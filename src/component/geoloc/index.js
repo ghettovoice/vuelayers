@@ -1,8 +1,21 @@
+/**
+ * @module geoloc
+ */
 import Geoloc from './geoloc.vue'
 
+/**
+ * @alias module:geoloc
+ */
 export default {
+  /**
+   * @alias module:geoloc/geoloc
+   */
   Geoloc,
-  install (Vue) {
+  /**
+   * @param {Vue} Vue
+   * @param {VueLayersOptions} [options]
+   */
+  install (Vue, options = {}) {
     Vue.component(Geoloc.name, Geoloc)
   },
 }

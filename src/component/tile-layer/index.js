@@ -24,7 +24,11 @@ export default {
    * @alias module:tile-layer/layer
    */
   Layer,
-  install (Vue) {
+  /**
+   * @param {Vue} Vue
+   * @param {VueLayersOptions} [options]
+   */
+  install (Vue, options = {}) {
     Vue.component(Layer.name, Layer)
   },
 }

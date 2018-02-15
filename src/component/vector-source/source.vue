@@ -1,7 +1,14 @@
 <script>
+  /**
+   * @module vector-source/source
+   */
   import VectorSource from 'ol/source/vector'
   import { differenceWith, stubArray, isFunction, constant, isFinite } from 'lodash/fp'
-  import { loadStrategyHelper, formatHelper, vectorSource, projHelper, featureHelper } from '../../core'
+  import vectorSource from '../../mixin/vector-source'
+  import { getId as getFeatureId } from '../../ol-ext/feature'
+  import { transform } from '../../ol-ext/proj'
+  import {all as allLoadStrategy} from '../../ol-ext/load-strategy'
+  import { geoJson } from '../../ol-ext/format'
 
   const props = {
     /**
@@ -48,7 +55,7 @@
 
   const computed = {
     featureIds () {
-      return this.features.map(featureHelper.getId)
+      return this.features.map(getFeatureId)
     },
   }
 
@@ -148,23 +155,23 @@
    * @return {ol.LoadingStrategy}
    */
   function defaultStrategyFactory () {
-    return loadStrategyHelper.all
+    return allLoadStrategy
   }
 
   /**
    * @return {ol.format.GeoJSON}
    */
   function defaultFormatFactory () {
-    return formatHelper.geoJson()
+    return geoJson()
   }
 
   function transformExtent (extent, sourceProj, destProj) {
     extent = extent.slice()
     if (isFinite(extent[0]) && isFinite(extent[1])) {
-      [extent[0], extent[1]] = projHelper.transform([extent[0], extent[1]], sourceProj, destProj)
+      [extent[0], extent[1]] = transform([extent[0], extent[1]], sourceProj, destProj)
     }
     if (isFinite(extent[2]) && isFinite(extent[3])) {
-      [extent[2], extent[3]] = projHelper.transform([extent[2], extent[3]], sourceProj, destProj)
+      [extent[2], extent[3]] = transform([extent[2], extent[3]], sourceProj, destProj)
     }
     return extent
   }

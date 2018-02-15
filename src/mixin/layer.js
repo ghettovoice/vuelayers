@@ -1,13 +1,13 @@
 /**
- * @module core/mixins/layer
+ * @module mixin/layer
  */
 import uuid from 'uuid/v4'
 import Vue from 'vue'
-import * as assert from '../util/assert'
+import { hasLayer, hasMap } from '../util/assert'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './/ol-virt-cmp'
-import sourceContainer from './/source-container'
-import useMapCmp from './/use-map-cmp'
+import cmp from './ol-virt-cmp'
+import sourceContainer from './source-container'
+import useMapCmp from './use-map-cmp'
 
 /**
  * @vueProps
@@ -79,7 +79,7 @@ const methods = {
    * @return {boolean}
    */
   isAtPixel (pixel) {
-    assert.hasMap(this)
+    hasMap(this)
 
     return this.$map.forEachLayerAtPixel(pixel, l => l === this.$layer)
   },
@@ -145,7 +145,7 @@ const methods = {
    * @param {ol.Map|Vue|undefined} map
    */
   setMap (map) {
-    assert.hasLayer(this)
+    hasLayer(this)
 
     map = map instanceof Vue ? map.$map : map
     this.$layer.setMap(map)

@@ -1,14 +1,10 @@
 import olsize from 'ol/size'
 import oltilegrid from 'ol/tilegrid'
 import TileGrid from 'ol/tilegrid/tilegrid'
-import * as extentHelper from './extent'
 import { EXTENT_CORNER, MAX_ZOOM, TILE_SIZE } from './consts'
+import { fromProjection as extentFromProjection, getCorner as getExtentCorner, getHeight as getExtentHeight, getWidth as getExtentWidth } from './extent'
 
-const { createXYZ } = oltilegrid
-
-export {
-  createXYZ,
-}
+export const {createXYZ} = oltilegrid
 
 /**
  * Create a resolutions array from an extent.  A zoom factor of 2 is assumed.
@@ -23,8 +19,8 @@ export {
 export function resolutionsFromExtent (extent, maxZoom = MAX_ZOOM, tileSize = TILE_SIZE) {
   tileSize = olsize.toSize(tileSize)
 
-  const height = extentHelper.getHeight(extent)
-  const width = extentHelper.getWidth(extent)
+  const height = getExtentHeight(extent)
+  const width = getExtentWidth(extent)
 
   const maxResolution = Math.max(
     width / tileSize[0], height / tileSize[1])
@@ -52,7 +48,7 @@ export function createForExtent (extent, maxZoom = MAX_ZOOM, tileSize = TILE_SIZ
 
   return new TileGrid({
     extent,
-    origin: extentHelper.getCorner(extent, corner),
+    origin: getExtentCorner(extent, corner),
     resolutions,
     tileSize,
   })
@@ -74,5 +70,5 @@ export function createForProjection (
   tileSize = TILE_SIZE,
   corner = EXTENT_CORNER.BOTTOM_LEFT
 ) {
-  return createForExtent(extentHelper.fromProjection(projection), maxZoom, tileSize, corner)
+  return createForExtent(extentFromProjection(projection), maxZoom, tileSize, corner)
 }

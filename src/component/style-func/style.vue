@@ -3,9 +3,14 @@
    * Style function component for advanced styling.
    * Plays the role of both a style that mounts itself to style target component (vl-layer-vector, vl-feature & etc.)
    * and style target for inner style containers (vl-style-box) as fallback style.
+   * @module style-func/style
    */
   import { isFunction, noop } from 'lodash/fp'
-  import { log, assert, mergeDescriptors, style, stylesContainer } from '../../core'
+  import style from '../../mixin/style'
+  import stylesContainer from '../../mixin/styles-container'
+  import { hasMap } from '../../util/assert'
+  import { warn } from '../../util/log'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
     /**
@@ -21,7 +26,9 @@
     styleFunc () {
       let func = this.factory()
       if (!isFunction(func)) {
-        log.warndbg(`Factory returned a value not of Function type, fallback style will be used`)
+        if (process.env.NODE_ENV !== 'production') {
+          warn(`Factory returned a value not of Function type, fallback style will be used`)
+        }
         func = noop
       }
 
@@ -35,7 +42,7 @@
      * @protected
      */
     createStyle () {
-      assert.hasMap(this)
+      hasMap(this)
       // user provided style function
       const providedStyleFunc = this.styleFunc
       // fallback style function made from inner style containers

@@ -1,6 +1,9 @@
 <script>
+  /**
+   * @module osm-source/source
+   */
   import OSMSource from 'ol/source/osm'
-  import { xyzSource } from '../../core'
+  import xyzSource from '../../mixin/xyz-source'
 
   const OSM_ATTRIBUTIONS = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.'
   const OSM_URL_TEMPLATE = 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'

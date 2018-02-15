@@ -1,7 +1,7 @@
 <script>
   /** @module image-layer/layer */
   import ImageLayer from 'ol/layer/image'
-  import { layer } from '../../core'
+  import layer from '../../mixin/layer'
 
   /**
    * @vueProps

@@ -1,9 +1,6 @@
-import { Observable } from 'rxjs/Observable'
-import { interval as intervalObs } from 'rxjs/observable/interval'
-import { first as firstObs } from 'rxjs/operator/first'
-import { map as mapObs } from 'rxjs/operator/map'
-import { skipWhile } from 'rxjs/operator/skipWhile'
-import { toPromise } from 'rxjs/operator/toPromise'
+import { Observable } from 'rxjs'
+import { interval as intervalObs } from 'rxjs/observable'
+import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
 
 /**
  * Basic mixin for ol components that depends on map instance

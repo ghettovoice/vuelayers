@@ -1,4 +1,4 @@
-import { errordbg } from '../util/log'
+import { error as logError } from '../util/log'
 
 const noop = () => {}
 
@@ -30,7 +30,9 @@ export default {
      */
     subscribeTo (observable, next = noop, error = noop, complete = noop) {
       error = err => {
-        errordbg(err.stack)
+        if (process.env.NODE_ENV !== 'production') {
+          logError(err.stack)
+        }
         error(err)
       }
 

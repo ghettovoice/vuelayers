@@ -1,6 +1,9 @@
 <script>
+  /**
+   * @module fill-style/style
+   */
   import Fill from 'ol/style/fill'
-  import { style } from '../../core'
+  import style from '../../mixin/style'
 
   const props = {
     color: [String, Array],

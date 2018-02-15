@@ -1,7 +1,11 @@
 <script>
+  /**
+   * @module point-geom/geom
+   */
   import { constant } from 'lodash/fp'
   import Point from 'ol/geom/point'
-  import { GEOMETRY_TYPE, geometry } from '../../core'
+  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import geometry from '../../mixin/geometry'
 
   const props = {
     coordinates: {

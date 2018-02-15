@@ -1,6 +1,9 @@
 <script>
+  /**
+   * @module stroke-style/style
+   */
   import Stroke from 'ol/style/stroke'
-  import { style } from '../../core'
+  import style from '../../mixin/style'
 
   const props = {
     color: [Array, String],

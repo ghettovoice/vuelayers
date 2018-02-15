@@ -1,6 +1,9 @@
 <script>
+  /**
+   * @module icon-style/style
+   */
   import Icon from 'ol/style/icon'
-  import { imageStyle } from '../../core'
+  import imageStyle from '../../mixin/image-style'
 
   const props = {
     src: {

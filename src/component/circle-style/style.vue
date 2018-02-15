@@ -1,7 +1,12 @@
 <script>
+  /**
+   * @module circle-style/style
+   */
   import Vue from 'vue'
   import Circle from 'ol/style/circle'
-  import { imageStyle, withFillStrokeStyle, mergeDescriptors } from '../../core'
+  import imageStyle from '../../mixin/image-style'
+  import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
     radius: {

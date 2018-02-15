@@ -1,8 +1,8 @@
 import { isFunction } from 'lodash/fp'
 import { createTileUrlFunction } from 'ol-tilecache'
 import XYZSource from 'ol/source/xyz'
-import * as extentHelper from '../ol-ext/extent'
-import * as assert from '../util/assert'
+import { fromProjection as extentFromProjection } from '../ol-ext/extent'
+import { hasView } from '../util/assert'
 import tileSource from './tile-source'
 
 const methods = {
@@ -35,12 +35,12 @@ const methods = {
     if (isFunction(this.url)) {
       return this.url
     }
-    assert.hasView(this)
+    hasView(this)
     // or use url function from ol-tilecache
     return createTileUrlFunction(
       this.urlTmpl,
       this._tileGrid,
-      extentHelper.fromProjection(this.$view.getProjection())
+      extentFromProjection(this.$view.getProjection()),
     )
   },
 }

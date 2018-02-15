@@ -1,5 +1,5 @@
 /* global describe, it, expect */
-import * as proj from '../../../../../src/ol-ext/proj'
+import * as proj from '@/ol-ext/proj'
 
 describe('ol coordinate helper', () => {
   const point3857 = [5565974.539663679, 7361866.113051185]

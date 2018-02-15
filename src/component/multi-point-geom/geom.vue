@@ -1,7 +1,11 @@
 <script>
+  /**
+   * @module multi-point-geom/geom
+   */
   import { constant } from 'lodash/fp'
   import MultiPoint from 'ol/geom/multipoint'
-  import { GEOMETRY_TYPE, geometry } from '../../core'
+  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import geometry from '../../mixin/geometry'
 
   const props = {}
 

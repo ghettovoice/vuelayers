@@ -3,10 +3,13 @@
    * Style box component.
    * Wrapper for ol.style.Style class. Can be inserted into component with setStyle/getStyle methods (vl-layer-vector, vl-feature & etc.)
    * and acts as a box for inner style components (vl-style-fill, vl-style-stroke, icon ...)
+   * @module style-box/style
    */
   import Vue from 'vue'
   import Style from 'ol/style/style'
-  import { style, withFillStrokeStyle, mergeDescriptors } from '../../core'
+  import style from '../../mixin/style'
+  import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
     zIndex: {

@@ -9,7 +9,6 @@ const replace = require('rollup-plugin-replace')
 const vue = require('rollup-plugin-vue')
 const uglify = require('rollup-plugin-uglify')
 const sass = require('./rollup/sass')
-// const externalize = require('./rollup-plugins/externalize')
 const resolver = require('./rollup/resolver')
 const notifier = require('node-notifier')
 const argv = require('yargs').argv

@@ -24,7 +24,11 @@ export default {
    * @alias module:feature/feature
    */
   Feature,
-  install (Vue) {
+  /**
+   * @param {Vue} Vue
+   * @param {VueLayersOptions} [options]
+   */
+  install (Vue, options = {}) {
     Vue.component(Feature.name, Feature)
   },
 }

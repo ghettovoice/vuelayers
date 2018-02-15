@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
+const NpmInstallPlugin = require('npm-install-webpack-plugin')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -23,8 +24,7 @@ module.exports = {
       utils.resolve('node_modules'),
     ],
     alias: {
-      [ config.name ]: utils.resolve(''),
-      '@': utils.resolve(''),
+      '@': utils.resolve('src'),
     },
   },
   resolveLoader: {
@@ -63,12 +63,14 @@ module.exports = {
           utils.resolve('src'),
           utils.resolve('test'),
           utils.resolve('node_modules/ol-tilecache'),
+          utils.resolve('node_modules/rxjs/_esm2015'),
         ],
       },
     ],
     noParse: [/openlayers/],
   },
   plugins: [
+    new NpmInstallPlugin(),
     new StringReplacePlugin(),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin(Object.assign({}, config.replaces, {

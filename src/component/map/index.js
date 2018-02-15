@@ -44,9 +44,10 @@ export default {
    * Registers Map and View components with default names.
    *
    * @param {Vue} Vue
+   * @param {VueLayersOptions} [options]
    * @return {void}
    */
-  install (Vue) {
+  install (Vue, options = {}) {
     Vue.component(Map.name, Map)
     Vue.component(View.name, View)
   },

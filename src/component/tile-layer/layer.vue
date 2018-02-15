@@ -3,7 +3,7 @@
    * @module tile-layer/layer
    */
   import TileLayer from 'ol/layer/tile'
-  import { layer } from '../../core'
+  import layer from '../../mixin/layer'
 
   /**
    * @vueProps

@@ -1,7 +1,12 @@
 <script>
-  import TileWMSSource from 'ol/source/tilewms'
   import { omit } from 'lodash/fp'
-  import { WMS_VERSION, tileSource, assert } from '../../core'
+  /**
+   * @module wms-source/source
+   */
+  import TileWMSSource from 'ol/source/tilewms'
+  import tileSource from '../../mixin/tile-source'
+  import { WMS_VERSION } from '../../ol-ext/consts'
+  import { hasSource, hasView } from '../../util/assert'
 
   const props = {
     extParams: Object, // Additional WMS Request params
@@ -69,8 +74,8 @@
       projection,
       params = {}
     ) {
-      assert.hasView(this)
-      assert.hasSource(this)
+      hasView(this)
+      hasSource(this)
 
       resolution || (resolution = this.$view.getResolution())
       projection || (projection = this.projection)

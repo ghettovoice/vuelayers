@@ -1,5 +1,10 @@
 <script>
-  import { TILE_FORMAT, EPSG_3857, coalesce, xyzSource } from '../../core'
+  /**
+   * @module mapbox-source/source
+   */
+  import { TILE_FORMAT, EPSG_3857 } from '../../ol-ext/consts'
+  import coalesce from '../../util/coalesce'
+  import xyzSource from '../../mixin/xyz-source'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())

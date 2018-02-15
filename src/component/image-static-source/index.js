@@ -10,7 +10,11 @@ export default {
    * @alias module:image-static-source/source
    */
   Source,
-  install (Vue) {
+  /**
+   * @param {Vue} Vue
+   * @param {VueLayersOptions} [options]
+   */
+  install (Vue, options = {}) {
     Vue.component(Source.name, Source)
   },
 }

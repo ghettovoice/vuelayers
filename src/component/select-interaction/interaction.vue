@@ -1,31 +1,25 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
-    <slot :features="features"></slot>
+    <slot :features="features"/>
   </i>
 </template>
 
 <script>
-  import Vue from 'vue'
-  import SelectInteraction from 'ol/interaction/select'
+  /**
+   * @module select-interaction/interaction
+   */
+  import { constant, differenceWith, forEach, isFunction, mapValues, stubArray } from 'lodash/fp'
   import Feature from 'ol/feature'
-  import {
-    mapValues,
-    differenceWith,
-    isFunction,
-    constant,
-    stubArray,
-    forEach,
-  } from 'lodash/fp'
-  import {
-    styleHelper,
-    geoJsonHelper,
-    interaction,
-    stylesContainer,
-    assert,
-    mergeDescriptors,
-    observableFromOlEvent,
-    featureHelper,
-  } from '../../core'
+  import SelectInteraction from 'ol/interaction/select'
+  import Vue from 'vue'
+  import interaction from '../../mixin/interaction'
+  import stylesContainer from '../../mixin/styles-container'
+  import { getId as getFeatureId } from '../../ol-ext/feature'
+  import { writeFeature } from '../../ol-ext/geojson'
+  import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
+  import observableFromOlEvent from '../../rx-ext/from-ol-event'
+  import { hasInteraction, hasMap } from '../../util/assert'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   // todo add other options, like event modifiers
   const props = {
@@ -76,7 +70,7 @@
      * @protected
      */
     getDefaultStyles () {
-      const defaultStyles = mapValues(styles => styles.map(styleHelper.style), styleHelper.defaultEditStyle())
+      const defaultStyles = mapValues(styles => styles.map(createStyle), defaultEditStyle())
 
       return function __selectDefaultStyleFunc (feature) {
         if (feature.getGeometry()) {
@@ -129,10 +123,10 @@
      * @throws {Error}
      */
     select (feature) {
-      assert.hasMap(this)
-      assert.hasInteraction(this)
+      hasMap(this)
+      hasInteraction(this)
 
-      let id = featureHelper.getId(feature)
+      let id = getFeatureId(feature)
       if (!id) {
         throw new Error('Undefined feature id')
       }
@@ -140,7 +134,7 @@
         feature = feature.$feature
       }
 
-      const selectedIds = this.$features.map(featureHelper.getId)
+      const selectedIds = this.$features.map(getFeatureId)
       if (selectedIds.includes(id)) return
 
       if (!(feature instanceof Feature)) {
@@ -163,9 +157,9 @@
      * @return {void}
      */
     unselect (feature) {
-      assert.hasInteraction(this)
+      hasInteraction(this)
 
-      let id = featureHelper.getId(feature)
+      let id = getFeatureId(feature)
       if (!id) {
         throw new Error('Undefined feature id')
       }
@@ -173,7 +167,7 @@
         feature = feature.$feature
       }
 
-      const selectedIds = this.$features.map(featureHelper.getId)
+      const selectedIds = this.$features.map(getFeatureId)
       const idx = selectedIds.findIndex(x => x === id)
 
       if (idx !== -1) {
@@ -220,13 +214,12 @@
      * @return {void}
      */
     unselectAll () {
-      assert.hasInteraction(this)
-
+      hasInteraction(this)
       this.$interaction.getFeatures().clear()
     },
   }
 
-  const diffById = differenceWith((a, b) => featureHelper.getId(a) === featureHelper.getId(b))
+  const diffById = differenceWith((a, b) => getFeatureId(a) === getFeatureId(b))
   const watch = {
     features (value) {
       if (!this.$interaction) return
@@ -270,7 +263,7 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    assert.hasInteraction(this)
+    hasInteraction(this)
 
     const events = observableFromOlEvent(this.$interaction, 'select')
 
@@ -281,7 +274,7 @@
 
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
-        this.$emit('update:features', this.$features.map(feature => geoJsonHelper.writeFeature(feature)))
+        this.$emit('update:features', this.$features.map(feature => writeFeature(feature)))
       }
     )
   }

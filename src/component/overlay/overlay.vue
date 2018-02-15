@@ -1,24 +1,24 @@
 <template>
   <div :id="[$options.name, id].join('-')" :class="$options.name" style="visibility: hidden">
-    <slot :id="id" :position="position"></slot>
+    <slot :id="id" :position="position"/>
   </div>
 </template>
 
 <script>
-  /** @module overlay/overlay */
-  import uuid from 'uuid/v4'
+  /**
+   * @module overlay/overlay
+   */
   import { isEqual } from 'lodash/fp'
   import Overlay from 'ol/overlay'
-  import { Observable } from 'rxjs/Observable'
-  import { merge as mergeObs } from 'rxjs/observable/merge'
-  import {
-    OVERLAY_POSITIONING,
-    olCmp,
-    useMapCmp,
-    assert,
-    observableFromOlChangeEvent,
-    projTransforms,
-  } from '../../core'
+  import { Observable } from 'rxjs'
+  import { merge as mergeObs } from 'rxjs/observable'
+  import uuid from 'uuid/v4'
+  import olCmp from '../../mixin/ol-cmp'
+  import projTransforms from '../../mixin/proj-transforms'
+  import useMapCmp from '../../mixin/use-map-cmp'
+  import { OVERLAY_POSITIONING } from '../../ol-ext/consts'
+  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
+  import { hasOverlay } from '../../util/assert'
 
   const props = {
     id: {
@@ -98,7 +98,7 @@
      * @protected
      */
     mount () {
-      assert.hasOverlay(this)
+      hasOverlay(this)
 
       this.$overlay.once('change:element', () => {
         this.$el.style.visibility = 'visible'
@@ -113,7 +113,7 @@
      * @protected
      */
     unmount () {
-      assert.hasOverlay(this)
+      hasOverlay(this)
 
       this.unsubscribeAll()
       this.$overlay.setElement(undefined)
@@ -201,7 +201,7 @@
    * @private
    */
   function subscribeToOverlayChanges () {
-    assert.hasOverlay(this)
+    hasOverlay(this)
 
     const ft = 100
     const changes = Observable::mergeObs(

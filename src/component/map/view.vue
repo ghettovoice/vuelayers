@@ -1,6 +1,6 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
-    <slot :center="bindProjCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation"></slot>
+    <slot :center="bindProjCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation" />
   </i>
 </template>
 
@@ -11,20 +11,14 @@
   import Vue from 'vue'
   import View from 'ol/view'
   import { isEqual, isPlainObject, noop, isFunction } from 'lodash/fp'
-  import { Observable } from 'rxjs/Observable'
-  import { merge as mergeObs } from 'rxjs/observable/merge'
-  import { distinctUntilKeyChanged } from 'rxjs/operator/distinctUntilKeyChanged'
-  import { map as mapObs } from 'rxjs/operator/map'
-  import {
-    MIN_ZOOM,
-    MAX_ZOOM,
-    EPSG_3857,
-    ZOOM_FACTOR,
-    observableFromOlChangeEvent,
-    olCmp,
-    assert,
-    projTransforms,
-  } from '../../core'
+  import { Observable } from 'rxjs'
+  import { merge as mergeObs } from 'rxjs/observable'
+  import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operator'
+  import {MIN_ZOOM, MAX_ZOOM, EPSG_3857, ZOOM_FACTOR} from '../../ol-ext/consts'
+  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
+  import olCmp from '../../mixin/ol-cmp'
+  import projTransforms from '../../mixin/proj-transforms'
+  import { hasView } from '../../util/assert'
 
   /**
    * @vueProps
@@ -158,7 +152,7 @@
      * @return {Promise} Resolves when animation completes
      */
     animate (...args) {
-      assert.hasView(this)
+      hasView(this)
 
       let cb = noop
       if (isFunction(args[args.length - 1])) {
@@ -206,7 +200,7 @@
      * @return {Promise} Resolves when view changes
      */
     fit (geometryOrExtent, options = {}) {
-      assert.hasView(this)
+      hasView(this)
 
       // transform from GeoJSON, vl-feature to ol.Feature
       if (isPlainObject(geometryOrExtent)) {
@@ -334,7 +328,7 @@
    * @private
    */
   function subscribeToViewChanges () {
-    assert.hasView(this)
+    hasView(this)
 
     const ft = 0
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)

@@ -21,7 +21,11 @@ export default {
    * @alias module:image-layer/layer
    */
   Layer,
-  install (Vue) {
+  /**
+   * @param {Vue} Vue
+   * @param {VueLayersOptions} [options]
+   */
+  install (Vue, options = {}) {
     Vue.component(Layer.name, Layer)
   },
 }

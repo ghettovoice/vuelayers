@@ -122,14 +122,14 @@ function postcssProcess ({ id, code, map, min }) {
 
 function vueLoaderConfig (extract) {
   return {
-    loaders: Object.assign(
-      {},
-      cssLoaders({
-        sourceMap: true,
-        extract,
-      })
-    ),
+    loaders: cssLoaders({
+      sourceMap: true,
+      extract,
+    }),
+    cssSourceMap: true,
     transformToRequire: {
+      video: ['src', 'poster'],
+      source: 'src',
       img: 'src',
       image: 'xlink:href',
       'vl-style-icon': 'src',

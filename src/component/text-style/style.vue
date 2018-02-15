@@ -1,6 +1,11 @@
 <script>
+  /**
+   * @module text-style/style
+   */
   import Text from 'ol/style/text'
-  import { mergeDescriptors, style, withFillStrokeStyle } from '../../core'
+  import style from '../../mixin/style'
+  import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
     font: {

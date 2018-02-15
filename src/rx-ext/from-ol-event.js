@@ -1,6 +1,5 @@
-import { Observable } from 'rxjs/Observable'
-import {merge as mergeObs} from 'rxjs/observable/merge'
-import {fromEventPattern} from 'rxjs/observable/fromEventPattern'
+import { Observable } from 'rxjs'
+import { fromEventPattern, merge as mergeObs } from 'rxjs/observable'
 
 /**
  * Creates an Observable using OpenLayers event pattern that emits events coming from the given event target.
@@ -34,14 +33,14 @@ export default function fromOlEvent (target, eventName, selector) {
           }
 
           return fromOlEvent(target, eventName, selector)
-        }
-      )
+        },
+      ),
     )
   }
 
   return Observable::fromEventPattern(
     handler => target.on(eventName, handler),
     handler => target.un(eventName, handler),
-    selector
+    selector,
   )
 }

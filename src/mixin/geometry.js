@@ -1,16 +1,14 @@
 import { isEqual } from 'lodash/fp'
-import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
-import { map as mapObs } from 'rxjs/operator/map'
-import { throttleTime } from 'rxjs/operator/throttleTime'
-import * as extentHelper from '../ol-ext/extent'
-import * as geomHelper from '../ol-ext/geom'
-import * as projHelper from '../ol-ext/proj'
+import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
+import { boundingExtent } from '../ol-ext/extent'
+import { pointOnSurface } from '../ol-ext/geom'
+import { transforms } from '../ol-ext/proj'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
-import * as assert from '../util/assert'
+import { hasGeometry, hasView } from '../util/assert'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
-import useMapCmp from './use-map-cmp'
 import projTransforms from './proj-transforms'
+import useMapCmp from './use-map-cmp'
 
 const props = {
   /**
@@ -46,7 +44,7 @@ const computed = {
    */
   pointOnSurface () {
     if (this.rev && this.$geometry && this.$view) {
-      return this.pointToBindProj(geomHelper.pointOnSurface(this.$geometry))
+      return this.pointToBindProj(pointOnSurface(this.$geometry))
     }
   },
   /**
@@ -81,9 +79,9 @@ const methods = {
    * @protected
    */
   init () {
-    assert.hasView(this)
+    hasView(this)
     // define helper methods based on geometry type
-    const { transform } = projHelper.transforms[this.type]
+    const {transform} = transforms[this.type]
     let geomProj = this.$view.getProjection()
     let bindProj = this.globOption('bindToProj', geomProj)
     /**
@@ -160,7 +158,7 @@ const watch = {
 
     let isEq = isEqualGeom({
       coordinates: value,
-      extent: extentHelper.boundingExtent(value),
+      extent: boundingExtent(value),
     }, {
       coordinates: this.$geometry.getCoordinates(),
       extent: this.extent,
@@ -218,7 +216,7 @@ export default {
  * @private
  */
 function subscribeToGeomChanges () {
-  assert.hasGeometry(this)
+  hasGeometry(this)
 
   const ft = 100
   const changes = observableFromOlEvent(

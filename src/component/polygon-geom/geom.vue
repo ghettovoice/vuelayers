@@ -1,7 +1,11 @@
 <script>
+  /**
+   * @module polygon-geom/geom
+   */
   import { constant } from 'lodash/fp'
   import Polygon from 'ol/geom/polygon'
-  import { GEOMETRY_TYPE, geometry } from '../../core'
+  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import geometry from '../../mixin/geometry'
 
   const props = {}
 

@@ -1,5 +1,8 @@
 <script>
-  import { xyzSource } from '../../core'
+  /**
+   * @module xyz-source/source
+   */
+  import xyzSource from '../../mixin/xyz-source'
 
   const props = {}
 

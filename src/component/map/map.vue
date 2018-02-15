@@ -1,6 +1,6 @@
 <template>
   <div :class="[$options.name]" :tabindex="tabindex">
-    <slot></slot>
+    <slot/>
   </div>
 </template>
 
@@ -8,29 +8,25 @@
   /**
    * @module map/map
    */
-  import Vue from 'vue'
   import { isEqual } from 'lodash/fp'
-  import Map from 'ol/map'
-  import VectorLayer from 'ol/layer/vector'
-  import VectorSource from 'ol/source/vector'
   import olcontrol from 'ol/control'
-  import { Observable } from 'rxjs/Observable'
-  import { merge as mergeObs } from 'rxjs/observable/merge'
-  import { throttleTime } from 'rxjs/operator/throttleTime'
-  import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
-  import { map as mapObs } from 'rxjs/operator/map'
-  import {
-    RENDERER_TYPE,
-    observableFromOlEvent,
-    mergeDescriptors,
-    assert,
-    olCmp,
-    layersContainer,
-    interactionsContainer,
-    overlaysContainer,
-    featuresContainer,
-    projTransforms,
-  } from '../../core'
+  import VectorLayer from 'ol/layer/vector'
+  import Map from 'ol/map'
+  import VectorSource from 'ol/source/vector'
+  import { Observable } from 'rxjs'
+  import { merge as mergeObs } from 'rxjs/observable'
+  import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
+  import Vue from 'vue'
+  import featuresContainer from '../../mixin/features-container'
+  import interactionsContainer from '../../mixin/interactions-container'
+  import layersContainer from '../../mixin/layers-container'
+  import olCmp from '../../mixin/ol-cmp'
+  import overlaysContainer from '../../mixin/overlays-container'
+  import projTransforms from '../../mixin/proj-transforms'
+  import { RENDERER_TYPE } from '../../ol-ext/consts'
+  import observableFromOlEvent from '../../rx-ext/from-ol-event'
+  import { hasMap, hasView } from '../../util/assert'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   /**
    * @vueProps
@@ -249,7 +245,8 @@
      * @return {number[]} Coordinates in the map view projection.
      */
     getCoordinateFromPixel (pixel) {
-      assert.hasMap(this)
+      hasMap(this)
+
       let coordinate = this.$map.getCoordinateFromPixel(pixel)
       return this.pointToBindProj(coordinate)
     },
@@ -287,7 +284,7 @@
      * @return {*|undefined}
      */
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
-      assert.hasMap(this)
+      hasMap(this)
       return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
     },
     /**
@@ -297,7 +294,7 @@
      * @return {*|undefined}
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
-      assert.hasMap(this)
+      hasMap(this)
       return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
@@ -320,7 +317,7 @@
      * @protected
      */
     mount () {
-      assert.hasMap(this)
+      hasMap(this)
       this.$map.setTarget(this.$el)
       this.subscribeAll()
       this.updateSize()
@@ -330,7 +327,7 @@
      * @protected
      */
     unmount () {
-      assert.hasMap(this)
+      hasMap(this)
       this.unsubscribeAll()
       this.$map.setTarget(undefined)
     },
@@ -347,7 +344,7 @@
      */
     render () {
       return new Promise(resolve => {
-        assert.hasMap(this)
+        hasMap(this)
         this.$map.once('postrender', () => resolve())
         this.$map.render()
       })
@@ -364,7 +361,7 @@
      * @return {void}
      */
     updateSize () {
-      assert.hasMap(this)
+      hasMap(this)
       this.$map.updateSize()
     },
   }
@@ -440,8 +437,8 @@
    * @private
    */
   function subscribeToMapEvents () {
-    assert.hasMap(this)
-    assert.hasView(this)
+    hasMap(this)
+    hasView(this)
 
     const ft = 100
     // pointer

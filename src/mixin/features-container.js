@@ -1,8 +1,8 @@
-import Vue from 'vue'
-import uuid from 'uuid/v4'
-import Feature from 'ol/feature'
 import { isPlainObject } from 'lodash/fp'
-import * as assert from '../util/assert'
+import Feature from 'ol/feature'
+import uuid from 'uuid/v4'
+import Vue from 'vue'
+import { instanceOf } from '../util/assert'
 import projTransforms from './proj-transforms'
 
 const methods = {
@@ -34,7 +34,7 @@ const methods = {
     } else if (isPlainObject(feature)) {
       feature = this.readFeatureInBindProj(feature)
     }
-    assert.instanceOf(feature, Feature)
+    instanceOf(feature, Feature)
 
     this.prepareFeature(feature)
 

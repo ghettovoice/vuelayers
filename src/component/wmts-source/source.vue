@@ -1,16 +1,15 @@
 <script>
+  import { range } from 'lodash/fp'
+  /**
+   * @module wmts-source/source
+   */
   import WMTSSource from 'ol/source/wmts'
   import WMTSTileGrid from 'ol/tilegrid/wmts'
-  import { range } from 'lodash/fp'
-  import {
-    WMTS_VERSION,
-    WMTS_REQUEST_ENCODING,
-    WMTS_FORMAT,
-    tileGridHelper,
-    extentHelper,
-    assert,
-    tileSource,
-  } from '../../core'
+  import tileSource from '../../mixin/tile-source'
+  import { WMTS_FORMAT, WMTS_REQUEST_ENCODING, WMTS_VERSION } from '../../ol-ext/consts'
+  import { fromProjection as extentFromProjection } from '../../ol-ext/extent'
+  import { resolutionsFromExtent } from '../../ol-ext/tile-grid'
+  import { hasView } from '../../util/assert'
 
   const props = {
     dimensions: Object,
@@ -75,10 +74,10 @@
      * @protected
      */
     createTileGrid () {
-      assert.hasView(this)
+      hasView(this)
 
-      const extent = extentHelper.fromProjection(this.$view.getProjection())
-      const resolutions = tileGridHelper.resolutionsFromExtent(
+      const extent = extentFromProjection(this.$view.getProjection())
+      const resolutions = resolutionsFromExtent(
         extent,
         this.maxZoom,
         this.tileSize

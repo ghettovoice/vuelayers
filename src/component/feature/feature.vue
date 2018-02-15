@@ -1,6 +1,6 @@
 <template>
   <i :id="[$options.name, id].join('-')" :class="[$options.name]" style="display: none !important;">
-    <slot :id="id" :properties="properties" :geometry="geometry" :geometry-point="geometryPoint"></slot>
+    <slot :id="id" :properties="properties" :geometry="geometry" :geometry-point="geometryPoint"/>
   </i>
 </template>
 
@@ -10,26 +10,21 @@
    */
   import { isEqual, merge } from 'lodash/fp'
   import Feature from 'ol/feature'
-  import { Observable } from 'rxjs/Observable'
-  import { merge as mergeObs } from 'rxjs/observable/merge'
-  import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
-  import { map as mapObs } from 'rxjs/operator/map'
-  import { mergeAll } from 'rxjs/operator/mergeAll'
-  import { throttleTime } from 'rxjs/operator/throttleTime'
+  import { Observable } from 'rxjs'
+  import { merge as mergeObs } from 'rxjs/observable'
+  import { distinctUntilChanged, map as mapObs, mergeAll, throttleTime } from 'rxjs/operator'
   import uuid from 'uuid/v4'
-  import {
-    assert,
-    geomHelper,
-    geometryContainer,
-    mergeDescriptors,
-    observableFromOlEvent,
-    olCmp,
-    plainProps,
-    stylesContainer,
-    useMapCmp,
-    projTransforms,
-  } from '../../core'
-  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+  import geometryContainer from '../../mixin/geometry-container'
+  import olCmp from '../../mixin/ol-cmp'
+  import projTransforms from '../../mixin/proj-transforms'
+  import stylesContainer from '../../mixin/styles-container'
+  import useMapCmp from '../../mixin/use-map-cmp'
+  import { pointOnSurface } from '../../ol-ext/geom'
+  import observableFromOlEvent from '../../rx-ext/from-ol-event'
+  import { hasFeature, hasMap } from '../../util/assert'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import plainProps from '../../util/plain-props'
+
   const mergeNArg = merge.convert({ fixed: false })
 
   /**
@@ -76,7 +71,7 @@
      */
     geometryPoint () {
       if (this.rev && this.$geometry) {
-        return this.pointToBindProj(geomHelper.pointOnSurface(this.$geometry))
+        return this.pointToBindProj(pointOnSurface(this.$geometry))
       }
     },
   }
@@ -133,11 +128,11 @@
     },
     /**
      * Checks if feature lies at `pixel`.
-     * @param {number} pixel
+     * @param {number[]} pixel
      * @return {boolean}
      */
     isAtPixel (pixel) {
-      assert.hasMap(this)
+      hasMap(this)
 
       return this.$map.forEachFeatureAtPixel(
         pixel,
@@ -258,7 +253,7 @@
    * @private
    */
   function subscribeToFeatureChanges () {
-    assert.hasFeature(this)
+    hasFeature(this)
 
     const getPropValue = prop => this.$feature.get(prop)
     const ft = 100

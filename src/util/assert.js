@@ -12,14 +12,24 @@ export class AssertionError extends Error {
   }
 }
 
+/**
+ * @param {*} value
+ * @param {string} message
+ * @throws AssertionError
+ */
 export function assert (value, message) {
   if (!value) {
     throw new AssertionError(message || `Assertion failed`)
   }
 }
 
+/**
+ * Alias of `assert` function.
+ * @param value
+ * @param message
+ */
 export function ok (value, message) {
-  assert(ok, message)
+  return assert(value, message)
 }
 
 /**

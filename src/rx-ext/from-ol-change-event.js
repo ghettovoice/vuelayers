@@ -1,9 +1,7 @@
 import { isEqual, isFunction } from 'lodash/fp'
-import { Observable } from 'rxjs/Observable'
-import { merge as mergeObs } from 'rxjs/observable/merge'
-import { distinctUntilChanged } from 'rxjs/operator/distinctUntilChanged'
-import { map as mapObs } from 'rxjs/operator/map'
-import { throttleTime } from 'rxjs/operator/throttleTime'
+import { Observable } from 'rxjs'
+import { merge as mergeObs } from 'rxjs/observable'
+import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
 import fromOlEvent from './from-ol-event'
 
 /**

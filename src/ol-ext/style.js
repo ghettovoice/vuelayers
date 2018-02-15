@@ -14,7 +14,7 @@ import { flow, isFunction, lowerFirst, pick, reduce, upperFirst } from 'lodash/f
 import isNumeric from '../util/is-numeric'
 import { GEOMETRY_TYPE } from './consts'
 import * as geomHelper from './geom'
-// eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+
 const reduceWithKey = reduce.convert({ cap: false })
 
 /**

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { filter, flow, isFunction, map } from 'lodash/fp'
-import { warndbg } from '../util/log'
+import { warn } from '../util/log'
 
 export default {
   created () {
@@ -46,15 +46,15 @@ export default {
       let olStyle = style instanceof Vue ? style.$style : style
 
       if (isFunction(olStyle)) {
-        if (currentStyles) {
-          warndbg('Component already has style components among it\'s descendants. ' +
+        if (process.env.NODE_ENV !== 'production' && currentStyles) {
+          warn('Component already has style components among it\'s descendants. ' +
             'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level')
         }
         currentStyles = style
       } else {
         if (!Array.isArray(currentStyles)) {
-          if (currentStyles) {
-            warndbg('Component already has style components among it\'s descendants. ' +
+          if (process.env.NODE_ENV !== 'production' && currentStyles) {
+            warn('Component already has style components among it\'s descendants. ' +
               'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level')
           }
           currentStyles = []

@@ -1,4 +1,4 @@
-import { isFunction, isString, constant, pick } from 'lodash/fp'
+import { constant, isFunction, isString, pick } from 'lodash/fp'
 import {
   CACHE_SIZE,
   EPSG_3857,
@@ -8,12 +8,12 @@ import {
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
 } from '../ol-ext/consts'
-import * as extentHelper from '../ol-ext/extent'
-import * as tileGridHelper from '../ol-ext/tile-grid'
+import { fromProjection as extentFromProjection } from '../ol-ext/extent'
+import { createXYZ } from '../ol-ext/tile-grid'
+import * as assert from '../util/assert'
 import replaceTokens from '../util/replace-tokens'
 import source from './source'
 import withUrl from './with-url'
-import * as assert from '../util/assert'
 
 const props = {
   cacheSize: {
@@ -73,8 +73,8 @@ const methods = {
   createTileGrid () {
     assert.hasView(this)
 
-    return tileGridHelper.createXYZ({
-      extent: extentHelper.fromProjection(this.$view.getProjection()),
+    return createXYZ({
+      extent: extentFromProjection(this.$view.getProjection()),
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
       tileSize: this.tileSize,

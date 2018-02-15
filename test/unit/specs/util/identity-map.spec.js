@@ -1,5 +1,5 @@
 /* global expect, describe, it, beforeEach, afterEach */
-import IdentityMap from '../../../../../src/util/identity-map'
+import IdentityMap from '@/util/identity-map'
 
 describe('IdentityMap', () => {
   /**
