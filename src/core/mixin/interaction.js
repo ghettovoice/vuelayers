@@ -1,5 +1,5 @@
 import uuid from 'uuid/v4'
-import mergeDescriptors from '../utils/multi-merge-descriptors'
+import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
 

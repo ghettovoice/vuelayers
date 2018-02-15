@@ -1,5 +1,5 @@
 import { SERVICES_PROP } from '../consts'
-import mergeDescriptors from '../utils/multi-merge-descriptors'
+import mergeDescriptors from '../util/multi-merge-descriptors'
 
 /**
  * Service container mixin

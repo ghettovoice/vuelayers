@@ -2,7 +2,7 @@ import { isFunction } from 'lodash/fp'
 import { createTileUrlFunction } from 'ol-tilecache'
 import XYZSource from 'ol/source/xyz'
 import * as extentHelper from '../ol-ext/extent'
-import * as assert from '../utils/assert'
+import * as assert from '../util/assert'
 import tileSource from './tile-source'
 
 const methods = {

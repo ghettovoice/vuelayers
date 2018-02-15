@@ -1,5 +1,5 @@
 import { pick } from 'lodash/fp'
-import replaceTokens from '../utils/replace-tokens'
+import replaceTokens from '../util/replace-tokens'
 
 export default {
   props: {

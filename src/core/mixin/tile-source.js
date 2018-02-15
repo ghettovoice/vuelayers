@@ -10,10 +10,10 @@ import {
 } from '../ol-ext/consts'
 import * as extentHelper from '../ol-ext/extent'
 import * as tileGridHelper from '../ol-ext/tile-grid'
-import replaceTokens from '../utils/replace-tokens'
+import replaceTokens from '../util/replace-tokens'
 import source from './source'
 import withUrl from './with-url'
-import * as assert from '../utils/assert'
+import * as assert from '../util/assert'
 
 const props = {
   cacheSize: {

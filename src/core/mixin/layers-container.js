@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Layer from 'ol/layer/layer'
-import * as assert from '../utils/assert'
+import * as assert from '../util/assert'
 
 const methods = {
   /**

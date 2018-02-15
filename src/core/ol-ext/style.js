@@ -11,7 +11,7 @@ import RegularShape from 'ol/style/regularshape'
 import Text from 'ol/style/text'
 import ImageStyle from 'ol/style/image'
 import { flow, isFunction, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
-import isNumeric from '../utils/is-numeric'
+import isNumeric from '../util/is-numeric'
 import { GEOMETRY_TYPE } from './consts'
 import * as geomHelper from './geom'
 // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization

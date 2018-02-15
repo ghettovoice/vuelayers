@@ -108,21 +108,21 @@ const methods = {
  *
  * @title olCmp
  * @vueProto
- * @alias module:core/mixins/ol-cmp
+ * @alias module:core/mixin/ol-cmp
  *
- * @fires module:core/mixins/ol-cmp#created
- * @fires module:core/mixins/ol-cmp#mounted
- * @fires module:core/mixins/ol-cmp#destroyed
+ * @fires module:core/mixin/ol-cmp#created
+ * @fires module:core/mixin/ol-cmp#mounted
+ * @fires module:core/mixin/ol-cmp#destroyed
  */
 export default {
   mixins: [options, identMap, rxSubs, services],
   props,
   methods,
   /**
-   * @this module:core/mixins/ol-cmp
+   * @this module:core/mixin/ol-cmp
    */
   data () {
-    return /** @lends module:core/mixins/ol-cmp# */{
+    return /** @lends module:core/mixin/ol-cmp# */{
       rev: 0,
     }
   },
@@ -203,16 +203,16 @@ function refresh () {
 
 /**
  * Emitted when underlying **OpenLayers** instance created.
- * @event module:core/mixins/ol-cmp#created
+ * @event module:core/mixin/ol-cmp#created
  * @type {void}
  */
 /**
  * Emitted when underlying **OpenLayers** instance mounted to parent.
- * @event module:core/mixins/ol-cmp#mounted
+ * @event module:core/mixin/ol-cmp#mounted
  * @type {void}
  */
 /**
  * Emitted when underlying **OpenLayers** instance destroyed.
- * @event module:core/mixins/ol-cmp#destroyed
+ * @event module:core/mixin/ol-cmp#destroyed
  * @type {void}
  */

@@ -24,6 +24,7 @@ module.exports = {
     ],
     alias: {
       [ config.name ]: utils.resolve(''),
+      '@': utils.resolve(''),
     },
   },
   resolveLoader: {

@@ -1,4 +1,4 @@
-import { errordbg } from '../utils/log'
+import { errordbg } from '../util/log'
 
 const noop = () => {}
 

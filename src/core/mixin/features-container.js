@@ -2,7 +2,7 @@ import Vue from 'vue'
 import uuid from 'uuid/v4'
 import Feature from 'ol/feature'
 import { isPlainObject } from 'lodash/fp'
-import * as assert from '../utils/assert'
+import * as assert from '../util/assert'
 import projTransforms from './proj-transforms'
 
 const methods = {

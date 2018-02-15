@@ -1,9 +1,9 @@
 /**
  * Basic style mixin.
  */
-import mergeDescriptors from '../utils/multi-merge-descriptors'
-import useMapCmp from '../mixins/use-map-cmp'
-import cmp from '../mixins/ol-virt-cmp'
+import mergeDescriptors from '../util/multi-merge-descriptors'
+import useMapCmp from '../mixin/use-map-cmp'
+import cmp from '../mixin/ol-virt-cmp'
 
 const methods = {
   /**

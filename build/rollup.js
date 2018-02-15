@@ -178,13 +178,13 @@ function makeBundle (opts = {}) {
     process.env.BABEL_ENV = 'production'
   }
 
-  // const srcDir = utils.resolve('src')
+  // const srcDir = util.resolve('src')
 
   const plugins = [
     // ...(opts.modules && opts.modules.length ? [
     //   externalize({
     //     root: srcDir,
-    //     newRoot: path.relative(path.dirname(utils.resolve('')), opts.outDir),
+    //     newRoot: path.relative(path.dirname(util.resolve('')), opts.outDir),
     //     map: opts.modules.map(({ entry, bundleName }) => ({
     //       from: path.relative(srcDir, path.dirname(entry)),
     //       to: path.dirname(bundleName),

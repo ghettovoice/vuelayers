@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Interaction from 'ol/interaction/interaction'
-import * as assert from '../utils/assert'
+import * as assert from '../util/assert'
 
 const methods = {
   /**

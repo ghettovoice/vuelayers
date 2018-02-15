@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Overlay from 'ol/overlay'
-import * as assert from '../utils/assert'
+import * as assert from '../util/assert'
 
 const methods = {
   /**

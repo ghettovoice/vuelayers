@@ -3,11 +3,11 @@
  */
 import uuid from 'uuid/v4'
 import Vue from 'vue'
-import * as assert from '../utils/assert'
-import mergeDescriptors from '../utils/multi-merge-descriptors'
-import cmp from '../mixins/ol-virt-cmp'
-import sourceContainer from '../mixins/source-container'
-import useMapCmp from '../mixins/use-map-cmp'
+import * as assert from '../util/assert'
+import mergeDescriptors from '../util/multi-merge-descriptors'
+import cmp from '../mixin/ol-virt-cmp'
+import sourceContainer from '../mixin/source-container'
+import useMapCmp from '../mixin/use-map-cmp'
 
 /**
  * @vueProps

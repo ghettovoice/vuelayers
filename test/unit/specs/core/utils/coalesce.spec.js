@@ -1,5 +1,5 @@
 /* global expect, describe, it */
-import coalesce from '../../../../../src/core/utils/coalesce'
+import coalesce from '../../../../../src/core/util/coalesce'
 
 /** @test coalesce */
 describe('coalesce', () => {
