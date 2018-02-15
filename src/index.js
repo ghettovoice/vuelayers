@@ -1,4 +1,9 @@
-/** @module vuelayers */
+/**
+ * This file is a part of vuelayers package.
+ * @package vuelayers
+ * @author Vladimir Vershinin
+ * @license MIT
+ */
 import * as core from './core'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'

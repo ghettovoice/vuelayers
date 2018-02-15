@@ -3,8 +3,6 @@
  *
  * @example bash
  * node vue-proto-api.js ./src/component.vue [./api/component.js]
- *
- * @todo export raw Markdown strings
  */
 const path = require('path')
 const jsdoc = require('jsdoc-api')
