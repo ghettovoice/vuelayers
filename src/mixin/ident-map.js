@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { identity } from 'lodash/fp'
-import { IDENTITY_MAP_PROP } from '../consts'
+import { IDENTITY_MAP_PROP } from '../core'
 import IdentityMap from '../util/identity-map'
 
 export default {

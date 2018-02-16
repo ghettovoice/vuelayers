@@ -5,7 +5,7 @@ import { isFunction } from 'lodash/fp'
 import { Observable } from 'rxjs'
 import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
-import { VM_PROP } from '../consts'
+import { VM_PROP } from '../core'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
 import services from './services'
@@ -105,21 +105,21 @@ const methods = {
  *
  * @title olCmp
  * @vueProto
- * @alias module:core/mixin/ol-cmp
+ * @alias module:mixin/ol-cmp
  *
- * @fires module:core/mixin/ol-cmp#created
- * @fires module:core/mixin/ol-cmp#mounted
- * @fires module:core/mixin/ol-cmp#destroyed
+ * @fires module:mixin/ol-cmp#created
+ * @fires module:mixin/ol-cmp#mounted
+ * @fires module:mixin/ol-cmp#destroyed
  */
 export default {
   mixins: [options, identMap, rxSubs, services],
   props,
   methods,
   /**
-   * @this module:core/mixin/ol-cmp
+   * @this module:mixin/ol-cmp
    */
   data () {
-    return /** @lends module:core/mixin/ol-cmp# */{
+    return /** @lends module:mixin/ol-cmp# */{
       rev: 0,
     }
   },
@@ -200,16 +200,16 @@ function refresh () {
 
 /**
  * Emitted when underlying **OpenLayers** instance created.
- * @event module:core/mixin/ol-cmp#created
+ * @event module:mixin/ol-cmp#created
  * @type {void}
  */
 /**
  * Emitted when underlying **OpenLayers** instance mounted to parent.
- * @event module:core/mixin/ol-cmp#mounted
+ * @event module:mixin/ol-cmp#mounted
  * @type {void}
  */
 /**
  * Emitted when underlying **OpenLayers** instance destroyed.
- * @event module:core/mixin/ol-cmp#destroyed
+ * @event module:mixin/ol-cmp#destroyed
  * @type {void}
  */

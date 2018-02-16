@@ -1,12 +1,12 @@
 /**
  * Mixin for global options access.
- * @module core/options
+ * @module mixin/options
  */
 import { getOr } from 'lodash/fp'
-import { VL_OPTIONS } from '../consts'
+import { VL_OPTIONS } from '../core'
 
 /**
- * @alias module:core/options
+ * @alias module:mixin/options
  */
 export default {
   methods: {

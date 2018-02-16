@@ -1,4 +1,4 @@
-import { SERVICES_PROP } from '../consts'
+import { SERVICES_PROP } from '../core'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 
 /**

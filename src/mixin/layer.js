@@ -12,7 +12,7 @@ import useMapCmp from './use-map-cmp'
 /**
  * @vueProps
  */
-const props = /** @lends module:core/mixins/layer# */{
+const props = /** @lends module:mixin/layer# */{
   id: {
     type: [String, Number],
     default: () => uuid(),

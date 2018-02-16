@@ -8,8 +8,8 @@ const postcssrc = require('postcss-load-config')
 const cssnano = require('cssnano')
 const config = require('./config')
 
-function resolve (relPath = '') {
-  return path.join(__dirname, '..', relPath)
+function resolve (...relPath) {
+  return path.join(__dirname, '..', ...relPath)
 }
 
 function cssLoaders (options) {
@@ -65,14 +65,16 @@ function cssLoaders (options) {
     less: generateLoaders('less'),
     sass: generateLoaders('sass', {
       includePaths: [
-        resolve(),
+        resolve('src'),
+        resolve('src/sass'),
         resolve('node_modules'),
       ],
       indentedSyntax: true,
     }),
     scss: generateLoaders('sass', {
       includePaths: [
-        resolve(),
+        resolve('src'),
+        resolve('src/sass'),
         resolve('node_modules'),
       ],
     }),
@@ -95,27 +97,27 @@ function styleLoaders (options) {
   return output
 }
 
-function postcssProcess ({ id, code, map, min }) {
+function postcssProcess (css, min) {
   return postcssrc()
     .then(({plugins, postcssOptions}) => {
       if (min) {
         plugins.push(cssnano())
       }
-
+      const id = css.id
       return postcss(plugins)
-        .process(code, Object.assign({}, postcssOptions, {
-          from: id,
-          to: id,
+        .process(css.code, Object.assign({}, postcssOptions, {
+          from: css.id,
+          to: css.id,
           map: {
             inline: false,
-            prev: map,
+            prev: css.map,
             annotation: true,
           },
         }))
         .then(({css, map}) => ({
           id,
           code: css,
-          map: map.toString(),
+          map: map.toJSON(),
         }))
     })
 }
@@ -200,7 +202,7 @@ function concatFiles (files, dest, banner) {
   return {
     id: dest,
     code: code,
-    map: map.toString(),
+    map: map.toJSON(),
   }
 }
 

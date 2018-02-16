@@ -68,6 +68,7 @@ module.exports = function sass (options) {
 
             if (options.output === false) {
               return {
+                id: id,
                 code: `export default ${JSON.stringify(style.code)}`,
                 map: style.map,
               }

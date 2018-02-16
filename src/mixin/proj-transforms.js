@@ -16,7 +16,7 @@ import {
 import options from './options'
 
 /**
- * @alias module:core/proj-transforms
+ * @alias module:mixin/proj-transforms
  * @vueProto
  */
 export default {

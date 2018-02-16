@@ -49,7 +49,7 @@ const methods = {
 
 /**
  * @vueProto
- * @alias module:core/image-source
+ * @alias module:mixin/image-source
  */
 export default {
   mixins: [source],

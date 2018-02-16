@@ -4,9 +4,7 @@
  * @author Vladimir Vershinin
  * @license MIT
  */
-import { get as getProjection } from './ol-ext/proj'
-import { VL_OPTIONS } from './consts'
-import { warn } from './util/log'
+import { install } from './core'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
 import Feature from './component/feature'
@@ -49,17 +47,12 @@ const VERSION = 'C_PKG_VERSION'
  * @param {Vue|VueConstructor} Vue
  * @param {VueLayersOptions} [options]
  */
-export default function plugin (Vue, options = {}) {
+function plugin (Vue, options = {}) {
   // todo move common installation to separate module and require it in each component
   if (plugin.installed) return
   plugin.installed = true
 
-  if (options.bindToProj && !getProjection(options.bindToProj)) {
-    warn('Projection "' + options.bindToProj + '" isn\'t added to the list of known projections. ' +
-      'It should be added before VueLayers install with OpenLayers or VueLayers API.')
-  }
-  // extend Vue with VueLayers global methods and options
-  Vue[VL_OPTIONS] = Vue.prototype[VL_OPTIONS] = options
+  install(Vue, options)
 
   // install components
   Vue.use(CircleStyle)
@@ -94,9 +87,11 @@ export default function plugin (Vue, options = {}) {
   Vue.use(WmtsSource)
   Vue.use(XyzSource)
 }
-
+// TODO: check treeshaking on test project
+export default plugin
 export {
   VERSION,
+  plugin as install,
   // components
   CircleStyle,
   ClusterSource,
