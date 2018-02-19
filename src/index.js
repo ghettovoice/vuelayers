@@ -1,37 +1,42 @@
-/** @module vuelayers */
-import * as core from './core'
-import CircleStyle from './components/circle-style'
-import ClusterSource from './components/cluster-source'
-import Feature from './components/feature'
-import FillStyle from './components/fill-style'
-import Geoloc from './components/geoloc'
-import IconStyle from './components/icon-style'
-import ImageLayer from './components/image-layer'
-import ImageStaticSource from './components/image-static-source'
-import LineStringGeom from './components/line-string-geom'
-import Map from './components/map'
-import MapboxSource from './components/mapbox-source'
-import MultiLineStringGeom from './components/multi-line-string-geom'
-import MultiPointGeom from './components/multi-point-geom'
-import MultiPolygonGeom from './components/multi-polygon-geom'
-import OsmSource from './components/osm-source'
-import Overlay from './components/overlay'
-import PointGeom from './components/point-geom'
-import PolygonGeom from './components/polygon-geom'
-import RegShapeStyle from './components/reg-shape-style'
-import SelectInteraction from './components/select-interaction'
-import SputnikSource from './components/sputnik-source'
-import StrokeStyle from './components/stroke-style'
-import StyleBox from './components/style-box'
-import StyleFunc from './components/style-func'
-import TextStyle from './components/text-style'
-import TileLayer from './components/tile-layer'
-import VectorLayer from './components/vector-layer'
-import VectorSource from './components/vector-source'
-import WmsSource from './components/wms-source'
-import WmtsSource from './components/wmts-source'
-import XyzSource from './components/xyz-source'
-import './styles/main.sass'
+/**
+ * This file is a part of vuelayers package.
+ * @package vuelayers
+ * @author Vladimir Vershinin
+ * @license MIT
+ */
+import { install } from './core'
+import CircleStyle from './component/circle-style'
+import ClusterSource from './component/cluster-source'
+import Feature from './component/feature'
+import FillStyle from './component/fill-style'
+import Geoloc from './component/geoloc'
+import IconStyle from './component/icon-style'
+import ImageLayer from './component/image-layer'
+import ImageStaticSource from './component/image-static-source'
+import LineStringGeom from './component/line-string-geom'
+import Map from './component/map'
+import MapboxSource from './component/mapbox-source'
+import MultiLineStringGeom from './component/multi-line-string-geom'
+import MultiPointGeom from './component/multi-point-geom'
+import MultiPolygonGeom from './component/multi-polygon-geom'
+import OsmSource from './component/osm-source'
+import Overlay from './component/overlay'
+import PointGeom from './component/point-geom'
+import PolygonGeom from './component/polygon-geom'
+import RegShapeStyle from './component/reg-shape-style'
+import SelectInteraction from './component/select-interaction'
+import SputnikSource from './component/sputnik-source'
+import StrokeStyle from './component/stroke-style'
+import StyleBox from './component/style-box'
+import StyleFunc from './component/style-func'
+import TextStyle from './component/text-style'
+import TileLayer from './component/tile-layer'
+import VectorLayer from './component/vector-layer'
+import VectorSource from './component/vector-source'
+import WmsSource from './component/wms-source'
+import WmtsSource from './component/wmts-source'
+import XyzSource from './component/xyz-source'
+import './sass/main.sass'
 
 /**
  * @const {string} VueLayers version.
@@ -39,19 +44,15 @@ import './styles/main.sass'
 const VERSION = 'C_PKG_VERSION'
 /**
  * Registers all VueLayers components.
- * @param {Vue} Vue
+ * @param {Vue|VueConstructor} Vue
  * @param {VueLayersOptions} [options]
  */
-export default function plugin (Vue, options = {}) {
+function plugin (Vue, options = {}) {
+  // todo move common installation to separate module and require it in each component
   if (plugin.installed) return
   plugin.installed = true
 
-  if (options.bindToProj && !core.projHelper.get(options.bindToProj)) {
-    core.log.warn('Projection "' + options.bindToProj + '" isn\'t added to the list of known projections. ' +
-      'It should be added before VueLayers install with OpenLayers or VueLayers API.')
-  }
-  // extend Vue with VueLayers global methods and options
-  Vue[core.VL_OPTIONS] = Vue.prototype[core.VL_OPTIONS] = options
+  install(Vue, options)
 
   // install components
   Vue.use(CircleStyle)
@@ -86,10 +87,11 @@ export default function plugin (Vue, options = {}) {
   Vue.use(WmtsSource)
   Vue.use(XyzSource)
 }
-
+// TODO: check treeshaking on test project
+export default plugin
 export {
   VERSION,
-  core,
+  plugin as install,
   // components
   CircleStyle,
   ClusterSource,

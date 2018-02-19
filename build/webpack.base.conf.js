@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
+const NpmInstallPlugin = require('npm-install-webpack-plugin')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -12,7 +13,7 @@ module.exports = {
   },
   devtool: '#source-map',
   output: {
-    path: config.outDir,
+    path: config.outputPath,
     filename: isProduction ? '[name].min.js' : '[name].js',
     publicPath: config.publicPath,
   },
@@ -20,11 +21,10 @@ module.exports = {
     extensions: ['.js', '.vue', '.json', '.md'],
     modules: [
       utils.resolve('src'),
-      utils.resolve('docs'),
       utils.resolve('node_modules'),
     ],
     alias: {
-      [ config.name ]: utils.resolve(''),
+      '@': utils.resolve('src'),
     },
   },
   resolveLoader: {
@@ -41,7 +41,6 @@ module.exports = {
         enforce: 'pre',
         include: [
           utils.resolve('src'),
-          utils.resolve('docs'),
           utils.resolve('test'),
         ],
       },
@@ -51,7 +50,6 @@ module.exports = {
         enforce: 'pre',
         include: [
           utils.resolve('src'),
-          utils.resolve('docs'),
           utils.resolve('test'),
         ],
         options: {
@@ -63,43 +61,16 @@ module.exports = {
         loader: 'babel-loader',
         include: [
           utils.resolve('src'),
-          utils.resolve('docs'),
           utils.resolve('test'),
           utils.resolve('node_modules/ol-tilecache'),
+          utils.resolve('node_modules/rxjs/_esm2015'),
         ],
-      },
-      {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'url-loader',
-        query: {
-          limit: 10000,
-          name: utils.assetsPath('img/[name].[hash:7].[ext]'),
-        },
-      },
-      {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: utils.assetsPath('media/[name].[hash:7].[ext]'),
-        },
-      },
-      {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'url-loader',
-        query: {
-          limit: 10000,
-          name: utils.assetsPath('fonts/[name].[hash:7].[ext]'),
-        },
-      },
-      {
-        test: /\.(json|geojson)$/,
-        loader: 'json-loader',
       },
     ],
     noParse: [/openlayers/],
   },
   plugins: [
+    new NpmInstallPlugin(),
     new StringReplacePlugin(),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin(Object.assign({}, config.replaces, {
