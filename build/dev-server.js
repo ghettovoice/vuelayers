@@ -6,7 +6,7 @@ process.env.NODE_ENV || (process.env.NODE_ENV = 'development')
 const opn = require('opn')
 const express = require('express')
 const webpack = require('webpack')
-let webpackConfig = process.env.NODE_ENV === 'testing'
+let webpackConfig = process.env.NODE_ENV === 'integration'
   ? require('./webpack.prod.conf')
   : (argv.name
     ? require(`./webpack.${argv.name}.dev.conf`)

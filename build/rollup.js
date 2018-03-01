@@ -14,6 +14,8 @@ const argv = require('yargs').argv
 const utils = require('./utils')
 const config = require('./config')
 
+process.env.NODE_ENV = 'production'
+
 const formats = argv.format
   ? argv.format.split(',').map(s => s.trim())
   : ['es', 'cjs', 'umd']
@@ -34,7 +36,7 @@ getAllPackages()
             .then(() => {
               // append uglified UMD bundle
               if (format === 'umd') {
-                return makeBundle(bundleOptions(format, package, 'production'))
+                return makeBundle(bundleOptions(format, package, process.env.NODE_ENV))
               }
             })
         }, Promise.resolve())

@@ -1,5 +1,5 @@
 // 1. start the dev server using production config
-process.env.NODE_ENV = 'testing'
+process.env.NODE_ENV = 'integration'
 const server = require('../../build/dev-server.js')
 
 // 2. run the nightwatch test suite against it
