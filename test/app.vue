@@ -121,8 +121,10 @@
 </template>
 
 <script>
+  import { fromLonLat, polygonFromLonLat, create as createProj, add as addProj } from '@/ol-ext/proj'
+  import { bbox as bboxLoadStrategy } from '@/ol-ext/load-strategy'
+  import { pointOnSurface } from '@/ol-ext/geom'
   import { random, range } from 'lodash/fp'
-  import { core } from '../src'
 
   const computed = {
   }
@@ -140,7 +142,7 @@
           },
           geometry: {
             type: 'Point',
-            coordinates: core.projHelper.fromLonLat([
+            coordinates: fromLonLat([
               random(-179, 179),
               random(-89, 89),
             ]),
@@ -153,10 +155,10 @@
       return Promise.resolve(this.points)
     },
     pointOnSurface (geometry) {
-      return core.geomHelper.pointOnSurface(geometry)
+      return pointOnSurface(geometry)
     },
     bboxStrategyFactory () {
-      return core.loadStrategyHelper.bbox
+      return bboxLoadStrategy
     },
     wfsUrlFunc (extent, resolution, projection) {
       return 'https://ahocevar.com/geoserver/wfs?service=WFS&' +
@@ -169,12 +171,12 @@
   let x = 1024 * 10000
   let y = 968 * 10000
   let imageExtent = [-x / 2, -y / 2, x / 2, y / 2]
-  let customProj = core.projHelper.create({
+  let customProj = createProj({
     code: 'xkcd-image',
     units: 'pixels',
     extent: imageExtent,
   })
-  core.projHelper.add(customProj)
+  addProj(customProj)
 
   export default {
     name: 'app',
@@ -183,12 +185,12 @@
     data () {
       return {
         zoom: 13,
-        center: core.projHelper.fromLonLat([-80.0307892780456, 43.456341754866685]),
+        center: fromLonLat([-80.0307892780456, 43.456341754866685]),
         rotation: 0,
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: core.projHelper.polygonFromLonLat([[[0, 0], [10, 10], [10, 0], [0, 0]]]),
+        polygonCoords: polygonFromLonLat([[[0, 0], [10, 10], [10, 0], [0, 0]]]),
         selected: [],
         selectedFeatures: [],
         countries: [],
@@ -206,7 +208,7 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  @import "~ol/ol.css";
+  @import "~ol/ol";
 
   html, body, #app {
     width       : 100%;

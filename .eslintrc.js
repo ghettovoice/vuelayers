@@ -18,6 +18,7 @@ module.exports = {
     'import',
     'html',
     'lodash-fp',
+    'promise',
   ],
   // add your custom rules here
   'rules': {
