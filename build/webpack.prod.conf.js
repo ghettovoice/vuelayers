@@ -9,7 +9,10 @@ const utils = require('./utils')
 const baseWebpackConfig = require('./webpack.base.conf')
 
 const isProduction = process.env.NODE_ENV === 'production'
-const isTesting = process.env.NODE_ENV === 'testing'
+
+if (!isProduction) {
+  process.env.BABEL_ENV = 'production'
+}
 
 const webpackConfig = merge(baseWebpackConfig, {
   module: {

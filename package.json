@@ -5,7 +5,7 @@
   "description": "Vue 2 components to work with OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "lib/index.js",
-  "module": "lib/index.es.js",
+  "module": "lib/_esm2015/index.js",
   "unpkg": "lib/index.umd.js",
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -13,7 +13,7 @@
     "rollup": "node build/rollup.js",
     "clean": "rm -rf lib",
     "build": "npm run clean && npm run lint && npm run rollup",
-    "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
+    "unit": "cross-env NODE_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue ./",
@@ -54,6 +54,7 @@
     "ol-tilecache": "^2.1.1",
     "openlayers": "^4.6.4",
     "parse-color": "^1.0.0",
+    "postcss-loader": "^2.1.1",
     "rxjs": "^5.5.6",
     "uuid": "^3.2.1"
   },
@@ -103,6 +104,7 @@
     "glob": "^7.1.2",
     "hash-sum": "^1.0.2",
     "html-webpack-plugin": "^2.30.1",
+    "ifdef-loader": "^2.0.3",
     "jsdoc": "^3.5.5",
     "jsdoc-api": "^4.0.1",
     "karma": "^2.0.0",
@@ -168,6 +170,6 @@
   ],
   "browserslist": [
     "> 1%",
-    "ie 10"
+    "last 2 versions"
   ]
 }

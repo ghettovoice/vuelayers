@@ -16,8 +16,6 @@ const webpackConfig = merge(baseWebpackConfig, {
     ],
   },
   devtool: '#inline-source-map',
-  plugins: [
-  ],
 })
 
 // no need for app entry during tests

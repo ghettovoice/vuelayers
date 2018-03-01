@@ -2,7 +2,7 @@
 import sinon from 'sinon'
 import OlObject from 'ol/object'
 import { identity } from 'lodash/fp'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
 import observableFromOlEvent from '@/rx-ext/from-ol-event'
 
 describe('RxJS extensions', () => {
