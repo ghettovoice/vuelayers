@@ -5,7 +5,7 @@
   "description": "Vue 2 components to work with OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "lib/index.js",
-  "module": "lib/index.es.js",
+  "module": "lib/_esm2015/index.js",
   "unpkg": "lib/index.umd.js",
   "scripts": {
     "dev": "node build/dev-server.js",
