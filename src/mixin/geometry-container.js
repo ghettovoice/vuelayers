@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { isPlainObject } from 'lodash/fp'
+import { isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
 
 const methods = {

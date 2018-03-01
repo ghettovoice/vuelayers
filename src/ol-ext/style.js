@@ -1,17 +1,17 @@
 /**
  * Style helpers
  */
-import parseColor from 'parse-color'
-import Style from 'ol/style/style'
-import Fill from 'ol/style/fill'
-import Stroke from 'ol/style/stroke'
+import { flow, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
 import Circle from 'ol/style/circle'
+import Fill from 'ol/style/fill'
 import Icon from 'ol/style/icon'
-import RegularShape from 'ol/style/regularshape'
-import Text from 'ol/style/text'
 import ImageStyle from 'ol/style/image'
-import { flow, isFunction, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
-import isNumeric from '../util/is-numeric'
+import RegularShape from 'ol/style/regularshape'
+import Stroke from 'ol/style/stroke'
+import Style from 'ol/style/style'
+import Text from 'ol/style/text'
+import parseColor from 'parse-color'
+import { isFunction, isNumeric } from '../util/minilo'
 import { GEOMETRY_TYPE } from './consts'
 import * as geomHelper from './geom'
 

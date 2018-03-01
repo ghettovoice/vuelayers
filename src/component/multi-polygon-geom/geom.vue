@@ -2,10 +2,10 @@
   /**
    * @module multi-polygon-geom/geom
    */
-  import { constant } from 'lodash/fp'
   import MultiPolygon from 'ol/geom/multipolygon'
-  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import geometry from '../../mixin/geometry'
+  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import { constant } from '../../util/minilo'
 
   const props = {}
 

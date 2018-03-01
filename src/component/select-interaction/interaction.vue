@@ -8,7 +8,7 @@
   /**
    * @module select-interaction/interaction
    */
-  import { constant, differenceWith, forEach, isFunction, mapValues, stubArray } from 'lodash/fp'
+  import { differenceWith, forEach, mapValues } from 'lodash/fp'
   import Feature from 'ol/feature'
   import SelectInteraction from 'ol/interaction/select'
   import Vue from 'vue'
@@ -19,6 +19,7 @@
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
+  import { constant, stubArray, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   // todo add other options, like event modifiers

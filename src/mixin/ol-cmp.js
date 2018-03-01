@@ -1,15 +1,15 @@
 /**
  * @module mixin/ol-cmp
  */
-import { isFunction } from 'lodash/fp'
 import { Observable } from 'rxjs'
 import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
 import { VM_PROP } from '../core'
+import { isFunction } from '../util/minilo'
 import identMap from './ident-map'
+import options from './options'
 import rxSubs from './rx-subs'
 import services from './services'
-import options from './options'
 
 const props = {}
 

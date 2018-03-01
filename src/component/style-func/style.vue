@@ -5,11 +5,11 @@
    * and style target for inner style containers (vl-style-box) as fallback style.
    * @module style-func/style
    */
-  import { isFunction, noop } from 'lodash/fp'
   import style from '../../mixin/style'
   import stylesContainer from '../../mixin/styles-container'
   import { hasMap } from '../../util/assert'
   import { warn } from '../../util/log'
+  import { noop, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {

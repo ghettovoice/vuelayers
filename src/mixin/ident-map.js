@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import { identity } from 'lodash/fp'
 import { IDENTITY_MAP_PROP } from '../core'
 import IdentityMap from '../util/identity-map'
+import { identity } from '../util/minilo'
 
 export default {
   props: {

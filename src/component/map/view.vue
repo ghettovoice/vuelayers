@@ -8,17 +8,17 @@
   /**
    * @module map/view
    */
-  import Vue from 'vue'
   import View from 'ol/view'
-  import { isEqual, isPlainObject, noop, isFunction } from 'lodash/fp'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operator'
-  import {MIN_ZOOM, MAX_ZOOM, EPSG_3857, ZOOM_FACTOR} from '../../ol-ext/consts'
-  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
+  import Vue from 'vue'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
+  import { EPSG_3857, MAX_ZOOM, MIN_ZOOM, ZOOM_FACTOR } from '../../ol-ext/consts'
+  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasView } from '../../util/assert'
+  import { isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
 
   /**
    * @vueProps

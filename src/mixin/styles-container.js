@@ -1,6 +1,7 @@
+import { filter, flow, map } from 'lodash/fp'
 import Vue from 'vue'
-import { filter, flow, isFunction, map } from 'lodash/fp'
 import { warn } from '../util/log'
+import { isFunction } from '../util/minilo'
 
 export default {
   created () {

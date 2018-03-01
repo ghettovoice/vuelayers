@@ -8,7 +8,7 @@
   /**
    * @module feature/feature
    */
-  import { isEqual, merge } from 'lodash/fp'
+  import { merge } from 'lodash/fp'
   import Feature from 'ol/feature'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -22,8 +22,8 @@
   import { pointOnSurface } from '../../ol-ext/geom'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasFeature, hasMap } from '../../util/assert'
+  import { plainProps, isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import plainProps from '../../util/plain-props'
 
   const mergeNArg = merge.convert({ fixed: false })
 

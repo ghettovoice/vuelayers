@@ -8,7 +8,6 @@
   /**
    * @module overlay/overlay
    */
-  import { isEqual } from 'lodash/fp'
   import Overlay from 'ol/overlay'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -19,6 +18,7 @@
   import { OVERLAY_POSITIONING } from '../../ol-ext/consts'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasOverlay } from '../../util/assert'
+  import { isEqual } from '../../util/minilo'
 
   const props = {
     id: {

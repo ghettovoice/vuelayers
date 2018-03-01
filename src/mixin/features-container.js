@@ -1,8 +1,8 @@
-import { isPlainObject } from 'lodash/fp'
 import Feature from 'ol/feature'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 import { instanceOf } from '../util/assert'
+import { isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
 
 const methods = {

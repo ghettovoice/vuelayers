@@ -2,9 +2,9 @@
   /**
    * @module mapbox-source/source
    */
-  import { TILE_FORMAT, EPSG_3857 } from '../../ol-ext/consts'
-  import coalesce from '../../util/coalesce'
   import xyzSource from '../../mixin/xyz-source'
+  import { EPSG_3857, TILE_FORMAT } from '../../ol-ext/consts'
+  import { coalesce } from '../../util/minilo'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/">MapBox</a>, ' + (new Date().getFullYear())

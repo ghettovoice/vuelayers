@@ -8,7 +8,6 @@
   /**
    * @module map/map
    */
-  import { isEqual } from 'lodash/fp'
   import olcontrol from 'ol/control'
   import VectorLayer from 'ol/layer/vector'
   import Map from 'ol/map'
@@ -27,6 +26,7 @@
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasMap, hasView } from '../../util/assert'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { isEqual } from '../../util/minilo'
 
   /**
    * @vueProps
