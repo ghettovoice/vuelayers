@@ -134,6 +134,9 @@ function bundleOptions (format, package, env = 'development') {
       '@import ~': '@import ',
       '@import "~': '@import "',
     }, config.replaces),
+    defines: {
+      IS_STANDALONE: false,
+    },
   })
 
   // es/cjs external resolver
@@ -225,6 +228,7 @@ function bundleOptions (format, package, env = 'development') {
       options.input.external = ['vue', 'openlayers']
       options.replaces['process.env.NODE_ENV'] = `'${env}'`
       process.env.BABEL_ENV = 'es5-production'
+      options.defines.IS_STANDALONE = true
       break
     case 'cjs':
       options.input.external = external

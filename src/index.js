@@ -4,6 +4,7 @@
  * @author Vladimir Vershinin
  * @license MIT
  */
+/* eslint-disable indent */
 import { install } from './core'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
@@ -36,6 +37,11 @@ import VectorSource from './component/vector-source'
 import WmsSource from './component/wms-source'
 import WmtsSource from './component/wmts-source'
 import XyzSource from './component/xyz-source'
+// #if IS_STANDALONE
+import * as mixin from './mixin'
+import * as olExt from './ol-ext'
+import * as rxExt from './rx-ext'
+// #endif
 import './sass/main.sass'
 
 /**
@@ -87,7 +93,7 @@ function plugin (Vue, options = {}) {
   Vue.use(WmtsSource)
   Vue.use(XyzSource)
 }
-// TODO: check treeshaking on test project
+
 export default plugin
 export {
   VERSION,
@@ -124,6 +130,11 @@ export {
   WmsSource,
   WmtsSource,
   XyzSource,
+// #if IS_STANDALONE
+  mixin,
+  olExt,
+  rxExt,
+// #endif
 }
 
 /**

@@ -37,7 +37,16 @@ module.exports = {
     rules: [
       {
         test: /\.(js|vue|md)$/,
-        loader: utils.compileVarsReplaceLoader(),
+        use: [
+          utils.compileVarsReplaceLoader(),
+          {
+            loader: 'ifdef-loader',
+            options: {
+              IS_STANDALONE: false,
+              'ifdef-triple-slash': false,
+            },
+          },
+        ],
         enforce: 'pre',
         include: [
           utils.resolve('src'),

@@ -48,6 +48,7 @@
       <w>hljs</w>
       <w>hoverable</w>
       <w>ident</w>
+      <w>ifdef</w>
       <w>importee</w>
       <w>jsnext</w>
       <w>linkify</w>
