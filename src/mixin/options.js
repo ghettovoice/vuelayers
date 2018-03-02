@@ -2,7 +2,7 @@
  * Mixin for global options access.
  * @module mixin/options
  */
-import { getOr } from 'lodash/fp'
+import { get } from '../util/minilo'
 import { VL_OPTIONS } from '../core'
 
 /**
@@ -17,7 +17,7 @@ export default {
      * @return {*}
      */
     globOption (key, def) {
-      return getOr(def, key, this[VL_OPTIONS])
+      return get(this[VL_OPTIONS], key, def)
     },
   },
 }

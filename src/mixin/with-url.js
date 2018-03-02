@@ -1,5 +1,4 @@
-import { pick } from 'lodash/fp'
-import replaceTokens from '../util/replace-tokens'
+import { replaceTokens, pick } from '../util/minilo'
 
 export default {
   props: {
@@ -12,7 +11,7 @@ export default {
      * @type {string}
      */
     urlTmpl () {
-      return replaceTokens(this.url, pick(this.urlTokens, this))
+      return replaceTokens(this.url, pick(this, this.urlTokens))
     },
     /**
      * @type {string[]}

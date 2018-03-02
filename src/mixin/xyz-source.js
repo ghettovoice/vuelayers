@@ -1,8 +1,8 @@
-import { isFunction } from 'lodash/fp'
 import { createTileUrlFunction } from 'ol-tilecache'
 import XYZSource from 'ol/source/xyz'
 import { fromProjection as extentFromProjection } from '../ol-ext/extent'
 import { hasView } from '../util/assert'
+import { isFunction } from '../util/minilo'
 import tileSource from './tile-source'
 
 const methods = {

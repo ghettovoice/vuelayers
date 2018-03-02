@@ -3,12 +3,12 @@
    * @module vector-source/source
    */
   import VectorSource from 'ol/source/vector'
-  import { differenceWith, stubArray, isFunction, constant, isFinite } from 'lodash/fp'
   import vectorSource from '../../mixin/vector-source'
   import { getId as getFeatureId } from '../../ol-ext/feature'
-  import { transform } from '../../ol-ext/proj'
-  import {all as allLoadStrategy} from '../../ol-ext/load-strategy'
   import { geoJson } from '../../ol-ext/format'
+  import { all as allLoadStrategy } from '../../ol-ext/load-strategy'
+  import { transform } from '../../ol-ext/proj'
+  import { constant, stubArray, isFinite, isFunction, difference } from '../../util/minilo'
 
   const props = {
     /**
@@ -129,13 +129,13 @@
     },
   }
 
-  const diffById = differenceWith((a, b) => a.id === b.id)
+  const diffById = (a, b) => a.id === b.id
   const watch = {
     features (value, oldValue) {
       if (!this.$source) return
 
-      let forAdd = diffById(value, oldValue)
-      let forRemove = diffById(oldValue, value)
+      let forAdd = difference(value, oldValue, diffById)
+      let forRemove = difference(oldValue, value, diffById)
 
       this.addFeatures(forAdd)
       this.removeFeatures(forRemove)

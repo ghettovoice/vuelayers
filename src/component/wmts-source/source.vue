@@ -1,5 +1,5 @@
 <script>
-  import { range } from 'lodash/fp'
+  import { range } from '../../util/minilo'
   /**
    * @module wmts-source/source
    */
@@ -88,7 +88,7 @@
         resolutions,
         tileSize: this.tileSize,
         minZoom: this.minZoom,
-        matrixIds: range(this.minZoom, resolutions.length),
+        matrixIds: Array.from(range(this.minZoom, resolutions.length)),
       })
     },
   }

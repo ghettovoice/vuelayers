@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { isPlainObject, isString, isNumber } from 'lodash/fp'
+import { isPlainObject, isString, isNumber } from '../util/minilo'
 import Feature from 'ol/feature'
 
 /**

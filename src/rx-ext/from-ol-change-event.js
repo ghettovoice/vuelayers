@@ -1,15 +1,14 @@
-import { isEqual, isFunction } from 'lodash/fp'
 import { Observable } from 'rxjs'
 import { merge as mergeObs } from 'rxjs/observable'
 import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
+import { isEqual, isFunction } from '../util/minilo'
 import fromOlEvent from './from-ol-event'
 
 /**
  * Creates Observable from OpenLayers change:* event
  * @param {ol.Object} target
  * @param {string|string[]} [prop]
- * @param {boolean|function(a, b):boolean|undefined} [distinct] Distinct values by lodash isEqual values or
- *                                                              by custom comparator
+ * @param {boolean|function(a, b):boolean|undefined} [distinct] Distinct values by isEqual fn or by custom comparator
  * @param {number|undefined} [throttle] Throttle values by passed amount of ms.
  * @param {function(target: ol.Object, prop: string):*|undefined} [selector] Custom selector
  * @return {Observable<{prop: string, value: *}>}

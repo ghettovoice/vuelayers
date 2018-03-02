@@ -1,4 +1,4 @@
-import isNumeric from './is-numeric'
+import { isNumeric } from './minilo'
 
 export class AssertionError extends Error {
   constructor (message) {

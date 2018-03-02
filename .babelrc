@@ -18,10 +18,6 @@
         [
           "transform-imports",
           {
-            "lodash/fp": {
-              "transform": "lodash/fp/${member}",
-              "preventFullImport": true
-            },
             "rxjs/operator": {
               "transform": "rxjs/_esm2015/operator/${member}",
               "preventFullImport": true,
@@ -47,10 +43,6 @@
         [
           "transform-imports",
           {
-            "lodash/fp": {
-              "transform": "lodash/fp/${member}",
-              "preventFullImport": true
-            },
             "rxjs/operator": {
               "transform": "rxjs/_esm2015/operator/${member}",
               "preventFullImport": true,
@@ -75,10 +67,6 @@
         [
           "transform-imports",
           {
-            "lodash/fp": {
-              "transform": "lodash/fp/${member}",
-              "preventFullImport": true
-            },
             "rxjs/operator": {
               "transform": "rxjs/_esm2015/operator/${member}",
               "preventFullImport": true,
@@ -103,10 +91,6 @@
         [
           "transform-imports",
           {
-            "lodash/fp": {
-              "transform": "lodash/fp/${member}",
-              "preventFullImport": true
-            },
             "rxjs/operator": {
               "transform": "rxjs/operator/${member}",
               "preventFullImport": true,
