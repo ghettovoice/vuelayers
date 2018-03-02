@@ -8,7 +8,7 @@
   /**
    * @module select-interaction/interaction
    */
-  import { differenceWith } from 'lodash/fp'
+  import { differenceWith } from 'lodash-es'
   import Feature from 'ol/feature'
   import SelectInteraction from 'ol/interaction/select'
   import Vue from 'vue'
@@ -220,13 +220,13 @@
     },
   }
 
-  const diffById = differenceWith((a, b) => getFeatureId(a) === getFeatureId(b))
+  const diffById = (a, b) => getFeatureId(a) === getFeatureId(b)
   const watch = {
     features (value) {
       if (!this.$interaction) return
 
-      let forSelect = diffById(value, this.$features)
-      let forUnselect = diffById(this.$features, value)
+      let forSelect = differenceWith(value, this.$features, diffById)
+      let forUnselect = differenceWith(this.$features, value, diffById)
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)

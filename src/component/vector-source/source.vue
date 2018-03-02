@@ -2,7 +2,7 @@
   /**
    * @module vector-source/source
    */
-  import { differenceWith } from 'lodash/fp'
+  import { differenceWith } from 'lodash-es'
   import VectorSource from 'ol/source/vector'
   import vectorSource from '../../mixin/vector-source'
   import { getId as getFeatureId } from '../../ol-ext/feature'
@@ -130,13 +130,13 @@
     },
   }
 
-  const diffById = differenceWith((a, b) => a.id === b.id)
+  const diffById = (a, b) => a.id === b.id
   const watch = {
     features (value, oldValue) {
       if (!this.$source) return
 
-      let forAdd = diffById(value, oldValue)
-      let forRemove = diffById(oldValue, value)
+      let forAdd = differenceWith(value, oldValue, diffById)
+      let forRemove = differenceWith(oldValue, value, diffById)
 
       this.addFeatures(forAdd)
       this.removeFeatures(forRemove)

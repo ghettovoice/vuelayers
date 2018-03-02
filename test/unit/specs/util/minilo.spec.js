@@ -169,4 +169,11 @@ describe('minilo lib', () => {
       expect(iteratee).to.have.callCount(Object.keys(obj).length)
     })
   })
+
+  describe('range()', () => {
+    it('should produce numbers from "start" up to "end" with provided "step"', () => {
+      expect(Array.from(lo.range(0, 10))).to.be.deep.equal([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+      expect(Array.from(lo.range(0, 20, 2))).to.be.deep.equal([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
+    })
+  })
 })

@@ -8,7 +8,7 @@
   /**
    * @module feature/feature
    */
-  import { merge } from 'lodash/fp'
+  import { merge } from 'lodash-es'
   import Feature from 'ol/feature'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -24,8 +24,6 @@
   import { hasFeature, hasMap } from '../../util/assert'
   import { plainProps, isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
-
-  const mergeNArg = merge.convert({ fixed: false })
 
   /**
    * @vueProps
@@ -288,7 +286,7 @@
       if (prop === 'id') {
         this.$emit(`update:${prop}`, value)
       } else if (prop !== this.$feature.getGeometryName()) {
-        this.$emit('update:properties', mergeNArg({}, this.properties, { prop: value }))
+        this.$emit('update:properties', merge({}, this.properties, { prop: value }))
       }
     })
   }
