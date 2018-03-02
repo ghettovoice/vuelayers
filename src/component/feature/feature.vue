@@ -8,7 +8,6 @@
   /**
    * @module feature/feature
    */
-  import { merge } from 'lodash-es'
   import Feature from 'ol/feature'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -286,7 +285,7 @@
       if (prop === 'id') {
         this.$emit(`update:${prop}`, value)
       } else if (prop !== this.$feature.getGeometryName()) {
-        this.$emit('update:properties', merge({}, this.properties, { prop: value }))
+        this.$emit('update:properties', Object.assign({}, this.properties, { [prop]: value }))
       }
     })
   }

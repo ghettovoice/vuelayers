@@ -8,7 +8,6 @@
   /**
    * @module select-interaction/interaction
    */
-  import { differenceWith } from 'lodash-es'
   import Feature from 'ol/feature'
   import SelectInteraction from 'ol/interaction/select'
   import Vue from 'vue'
@@ -19,7 +18,7 @@
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
-  import { constant, stubArray, isFunction, forEach, mapValues } from '../../util/minilo'
+  import { constant, stubArray, isFunction, forEach, mapValues, difference } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   // todo add other options, like event modifiers
@@ -225,8 +224,8 @@
     features (value) {
       if (!this.$interaction) return
 
-      let forSelect = differenceWith(value, this.$features, diffById)
-      let forUnselect = differenceWith(this.$features, value, diffById)
+      let forSelect = difference(value, this.$features, diffById)
+      let forUnselect = difference(this.$features, value, diffById)
 
       forSelect.forEach(this.select)
       forUnselect.forEach(this.unselect)

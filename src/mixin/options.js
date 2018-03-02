@@ -2,7 +2,7 @@
  * Mixin for global options access.
  * @module mixin/options
  */
-import { get } from 'lodash-es'
+import { get } from '../util/minilo'
 import { VL_OPTIONS } from '../core'
 
 /**

@@ -262,6 +262,9 @@ function makeBundle (options = {}) {
       sourceMap: true,
       include: [
         'src/**/*',
+        'node_modules/ol-tilecache/**/*',
+        'node_modules/rxjs/_esm2015/**/*',
+        'node_modules/lodash-es/**/*',
       ],
     }),
     nodeResolve({

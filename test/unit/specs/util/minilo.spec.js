@@ -176,4 +176,39 @@ describe('minilo lib', () => {
       expect(Array.from(lo.range(0, 20, 2))).to.be.deep.equal([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
     })
   })
+
+  describe('get()', () => {
+    it('should return value from object by provided path', () => {
+      let obj = {
+        q: 123,
+        w: [
+          {
+            e: 333,
+            r: 555,
+          },
+          'str',
+        ],
+      }
+
+      expect(lo.get(obj, 'q')).to.be.equal(123)
+      expect(lo.get(obj, 'w[1]')).to.be.equal('str')
+      expect(lo.get(obj, 'w[0].r')).to.be.equal(555)
+    })
+  })
+
+  describe('filter()', () => {
+    it('should filter array elements', () => {
+      expect(lo.filter([0, 1, true, false, 'qwe'])).to.be.deep.equal([1, true, 'qwe'])
+    })
+    it('should filter object properties', () => {
+      expect(lo.filter({q: undefined, w: 'www', e: []})).to.be.deep.equal({w: 'www'})
+    })
+  })
+
+  describe('difference()', () => {
+    it('should return array diff', () => {
+      expect(lo.difference([1, 55, 'qwe'], [1, 54, 'qwe_'])).to.be.deep.equal([55, 'qwe'])
+      expect(lo.difference([10, 20], [20, 10])).to.be.deep.equal([])
+    })
+  })
 })

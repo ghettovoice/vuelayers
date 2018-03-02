@@ -51,6 +51,10 @@ export function isArray (value) {
   return Array.isArray(value)
 }
 
+export function isArrayLike (value) {
+  return isObjectLike(value) && value.hasOwnProperty('length')
+}
+
 export function isFinite (value) {
   return typeof value === 'number' && global.isFinite(value)
 }
@@ -169,6 +173,16 @@ export function isEqual (value, other) {
   return traverse(otherProps, valueProps)
 }
 
+export function isEmpty (value) {
+  return !value ||
+    (isArrayLike(value) && value.length === 0) ||
+    (isObjectLike(value) && Object.keys(value).length === 0)
+}
+
+export function isNotEmpty (value) {
+  return !isEmpty(value)
+}
+
 export function forEach (collection, iteratee) {
   let keys = Object.keys(collection)
   for (let i = 0, l = keys.length; i < l; i++) {
@@ -180,7 +194,7 @@ export function forEach (collection, iteratee) {
   }
 }
 
-export function reduce (collection, iteratee = identity, initial = null) {
+export function reduce (collection, iteratee, initial) {
   let result = initial
   forEach(collection, (value, key) => {
     result = iteratee(result, value, key)
@@ -188,20 +202,24 @@ export function reduce (collection, iteratee = identity, initial = null) {
   return result
 }
 
-export function filter (collection, iteratee = identity) {
+export function filter (collection, iteratee = isNotEmpty) {
   return reduce(collection, (newCollection, value, key) => {
     if (iteratee(value, key)) {
-      newCollection[key] = value
+      if (isArray(newCollection)) {
+        newCollection.push(value)
+      } else {
+        newCollection[key] = value
+      }
     }
     return newCollection
-  }, Array.isArray(collection) ? [] : {})
+  }, isArray(collection) ? [] : {})
 }
 
 export function map (collection, iteratee = identity) {
   return reduce(collection, (newCollection, value, key) => {
     newCollection[key] = iteratee(value, key)
     return newCollection
-  }, Array.isArray(collection) ? [] : {})
+  }, isArray(collection) ? [] : {})
 }
 
 export function mapValues (object, iteratee = identity) {
@@ -258,4 +276,19 @@ export function* range (start, end, step = 1) {
   for (let i = start; i < end; i += step) {
     yield i
   }
+}
+
+export function get (object, path, defaultValue) {
+  // eslint-disable-next-line no-new-func
+  let fn = new Function('object', `try { return object.${path} } catch (e) {}`)
+  return coalesce(fn(object), defaultValue)
+}
+
+export function includes (array, value, comparator = isEqual) {
+  let elems = filter(array, elem => comparator(elem, value))
+  return elems.shift()
+}
+
+export function difference (array1, array2, comparator = isEqual) {
+  return filter(array1, value => !includes(array2, value, comparator))
 }

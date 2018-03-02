@@ -1,6 +1,5 @@
-import { get } from 'lodash-es'
 import Feature from 'ol/feature'
-import { isPlainObject } from '../util/minilo'
+import { isPlainObject, get } from '../util/minilo'
 import { geoJson as geoJsonFactory } from './format'
 
 const geoJson = geoJsonFactory()
