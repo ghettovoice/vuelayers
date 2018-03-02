@@ -1,7 +1,6 @@
 /**
  * Style helpers
  */
-import { flow, lowerFirst, pick, reduce, upperFirst } from 'lodash/fp'
 import Circle from 'ol/style/circle'
 import Fill from 'ol/style/fill'
 import Icon from 'ol/style/icon'
@@ -11,11 +10,9 @@ import Stroke from 'ol/style/stroke'
 import Style from 'ol/style/style'
 import Text from 'ol/style/text'
 import parseColor from 'parse-color'
-import { isFunction, isNumeric } from '../util/minilo'
+import { isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
 import { GEOMETRY_TYPE } from './consts'
 import * as geomHelper from './geom'
-
-const reduceWithKey = reduce.convert({ cap: false })
 
 /**
  * @return {VlStyle[]}
@@ -145,25 +142,17 @@ export function fill (vlStyle, prefix = '') {
   // check on already compiled style existence
   if (vlStyle[compiledKey] instanceof Fill) return vlStyle[compiledKey]
 
-  const transform = flow(
-    pick(keys),
-    reduceWithKey(
-      (result, value, name) => {
-        name = lowerFirst(name.replace(new RegExp(prefixKey('fill')), ''))
-
-        if (name === 'color') {
-          value = normalizeColor(value)
-        }
-
-        result[name] = value
-
-        return result
-      },
-      {}
-    )
-  )
-
-  const fillStyle = transform(vlStyle)
+  const fillStyle = reduce(vlStyle, (style, value, name) => {
+    if (keys.includes(name) === false) {
+      return style
+    }
+    name = lowerFirst(name.replace(new RegExp(prefixKey('fill')), ''))
+    if (name === 'color') {
+      value = normalizeColor(value)
+    }
+    style[name] = value
+    return style
+  }, {})
 
   if (!isEmpty(fillStyle)) {
     return new Fill(fillStyle)
@@ -182,35 +171,27 @@ export function stroke (vlStyle, prefix = '') {
 
   if (vlStyle[compiledKey] instanceof Stroke) return vlStyle[compiledKey]
 
-  const transform = flow(
-    pick(keys),
-    reduceWithKey(
-      (result, value, name) => {
-        switch (name) {
-          case prefixKey('strokeColor'):
-          case prefixKey('strokeWidth'):
-            name = lowerFirst(name.replace(new RegExp(prefixKey('stroke')), ''))
-            break
-          case prefixKey('strokeDash'):
-          case prefixKey('strokeCap'):
-          case prefixKey('strokeJoin'):
-            name = 'line' + name.replace(new RegExp(prefixKey('stroke')), '')
-            break
-        }
-
-        if (name === 'color') {
-          value = normalizeColor(value)
-        }
-
-        result[name] = value
-
-        return result
-      },
-      {}
-    )
-  )
-
-  const strokeStyle = transform(vlStyle)
+  const strokeStyle = reduce(vlStyle, (style, value, name) => {
+    if (keys.includes(name) === false) {
+      return style
+    }
+    switch (name) {
+      case prefixKey('strokeColor'):
+      case prefixKey('strokeWidth'):
+        name = lowerFirst(name.replace(new RegExp(prefixKey('stroke')), ''))
+        break
+      case prefixKey('strokeDash'):
+      case prefixKey('strokeCap'):
+      case prefixKey('strokeJoin'):
+        name = 'line' + name.replace(new RegExp(prefixKey('stroke')), '')
+        break
+    }
+    if (name === 'color') {
+      value = normalizeColor(value)
+    }
+    style[name] = value
+    return style
+  }, {})
 
   if (!isEmpty(strokeStyle)) {
     return new Stroke(strokeStyle)

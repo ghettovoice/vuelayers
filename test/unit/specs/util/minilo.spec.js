@@ -1,4 +1,4 @@
-/* global describe, it, expect */
+/* global describe, it, expect, sinon */
 import * as lo from '@/util/minilo'
 
 describe('minilo lib', () => {
@@ -31,6 +31,25 @@ describe('minilo lib', () => {
       expect(lo.isBoolean('')).to.be.false
       expect(lo.isBoolean([])).to.be.false
       expect(lo.isBoolean({})).to.be.false
+    })
+  })
+
+  describe('isNumber()', () => {
+    it('should return true for number primitives', () => {
+      expect(lo.isNumber(1)).to.be.true
+      expect(lo.isNumber(0)).to.be.true
+      expect(lo.isNumber(0xfa)).to.be.true
+    })
+    it('should return true for Number instances', () => {
+      expect(lo.isNumber(new Number(123))).to.be.true
+      expect(lo.isNumber(new Number(0xfa))).to.be.true
+    })
+    it('should return false for non-number values', () => {
+      expect(lo.isNumber(true)).to.be.false
+      expect(lo.isNumber(false)).to.be.false
+      expect(lo.isNumber('123')).to.be.false
+      expect(lo.isNumber([])).to.be.false
+      expect(lo.isNumber({})).to.be.false
     })
   })
 
@@ -127,6 +146,27 @@ describe('minilo lib', () => {
         {q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: {q: 'q', w: 'w', o: {}}}
       )).to.be.false
       expect(lo.isEqual(true, false)).to.be.false
+    })
+  })
+
+  describe('forEach()', () => {
+    it('should call iteratee for each array element', () => {
+      let arr = [1, 2, 3]
+      let iteratee = sinon.spy((value, key) => {
+        expect(value).to.be.equal(arr[key])
+      })
+      lo.forEach(arr, iteratee)
+
+      expect(iteratee).to.have.callCount(arr.length)
+    })
+    it('should call iteratee for each object key/value pair', () => {
+      let obj = {q: 1, w: 2, e: 3}
+      let iteratee = sinon.spy((value, key) => {
+        expect(value).to.be.equal(obj[key])
+      })
+      lo.forEach(obj, iteratee)
+
+      expect(iteratee).to.have.callCount(Object.keys(obj).length)
     })
   })
 })

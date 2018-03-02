@@ -1,5 +1,4 @@
 <script>
-  import { omit } from 'lodash/fp'
   /**
    * @module wms-source/source
    */
@@ -7,6 +6,7 @@
   import tileSource from '../../mixin/tile-source'
   import { WMS_VERSION } from '../../ol-ext/consts'
   import { hasSource, hasView } from '../../util/assert'
+  import { omit } from '../../util/minilo'
 
   const props = {
     extParams: Object, // Additional WMS Request params
@@ -30,7 +30,7 @@
 
   const upperCase = x => x.toUpperCase()
   const keysToUpperCase = x => Object.keys(x).map(upperCase)
-  const cleanExtParams = params => omit(['LAYERS', 'VERSION', 'STYLES'], keysToUpperCase(params))
+  const cleanExtParams = params => omit(keysToUpperCase(params), ['LAYERS', 'VERSION', 'STYLES'])
 
   const methods = {
     /**

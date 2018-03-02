@@ -8,8 +8,7 @@ import fromOlEvent from './from-ol-event'
  * Creates Observable from OpenLayers change:* event
  * @param {ol.Object} target
  * @param {string|string[]} [prop]
- * @param {boolean|function(a, b):boolean|undefined} [distinct] Distinct values by lodash isEqual values or
- *                                                              by custom comparator
+ * @param {boolean|function(a, b):boolean|undefined} [distinct] Distinct values by isEqual fn or by custom comparator
  * @param {number|undefined} [throttle] Throttle values by passed amount of ms.
  * @param {function(target: ol.Object, prop: string):*|undefined} [selector] Custom selector
  * @return {Observable<{prop: string, value: *}>}

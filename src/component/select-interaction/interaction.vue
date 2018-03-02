@@ -8,7 +8,7 @@
   /**
    * @module select-interaction/interaction
    */
-  import { differenceWith, forEach, mapValues } from 'lodash/fp'
+  import { differenceWith } from 'lodash/fp'
   import Feature from 'ol/feature'
   import SelectInteraction from 'ol/interaction/select'
   import Vue from 'vue'
@@ -19,7 +19,7 @@
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
-  import { constant, stubArray, isFunction } from '../../util/minilo'
+  import { constant, stubArray, isFunction, forEach, mapValues } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   // todo add other options, like event modifiers
@@ -71,7 +71,7 @@
      * @protected
      */
     getDefaultStyles () {
-      const defaultStyles = mapValues(styles => styles.map(createStyle), defaultEditStyle())
+      const defaultStyles = mapValues(defaultEditStyle(), styles => styles.map(createStyle))
 
       return function __selectDefaultStyleFunc (feature) {
         if (feature.getGeometry()) {
@@ -140,7 +140,7 @@
 
       if (!(feature instanceof Feature)) {
         feature = undefined
-        forEach(layer => {
+        forEach(this.$map.getLayers().getArray(), layer => {
           const source = layer.getSource()
 
           if (source && isFunction(source.getFeatureById)) {
@@ -148,7 +148,7 @@
           }
 
           return !feature
-        }, this.$map.getLayers().getArray())
+        })
       }
 
       feature && this.$interaction.getFeatures().push(feature)

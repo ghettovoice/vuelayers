@@ -1,7 +1,6 @@
-import { filter, flow, map } from 'lodash/fp'
 import Vue from 'vue'
 import { warn } from '../util/log'
-import { isFunction } from '../util/minilo'
+import { isFunction, reduce } from '../util/minilo'
 
 export default {
   created () {
@@ -135,17 +134,19 @@ export default {
         }
         // styles is array of { $style: ol.style.Style, condition: (bool|function():bool) }
         else if (Array.isArray(styles)) {
-          styles = flow(
-            filter(({ condition }) => {
-              return condition == null ||
-                (condition === true) ||
-                (
-                  isFunction(condition) &&
-                  condition(feature, resolution)
-                )
-            }),
-            map('$style')
-          )(styles)
+          styles = reduce(styles, (newStyles, { $style, condition }) => {
+            if (
+              condition == null ||
+              (condition === true) ||
+              (
+                isFunction(condition) &&
+                condition(feature, resolution)
+              )
+            ) {
+              newStyles.push($style)
+            }
+            return newStyles
+          }, [])
         }
         /* eslint-enable brace-style */
         // not empty or null style

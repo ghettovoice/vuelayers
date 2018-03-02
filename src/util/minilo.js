@@ -143,7 +143,7 @@ export function isEqual (value, other) {
     for (let i = 0, l = valueProps.length; i < l; i++) {
       let valueProp = valueProps[i]
 
-      if (checked.indexOf(valueProp) !== -1) {
+      if (checked.includes(valueProp)) {
         continue
       }
       if (other.hasOwnProperty(valueProp) === false) {
@@ -167,4 +167,89 @@ export function isEqual (value, other) {
   }
 
   return traverse(otherProps, valueProps)
+}
+
+export function forEach (collection, iteratee) {
+  let keys = Object.keys(collection)
+  for (let i = 0, l = keys.length; i < l; i++) {
+    let key = keys[i]
+    let value = collection[key]
+    if (iteratee(value, key) === false) {
+      return
+    }
+  }
+}
+
+export function reduce (collection, iteratee = identity, initial = null) {
+  let result = initial
+  forEach(collection, (value, key) => {
+    result = iteratee(result, value, key)
+  })
+  return result
+}
+
+export function filter (collection, iteratee = identity) {
+  return reduce(collection, (newCollection, value, key) => {
+    if (iteratee(value, key)) {
+      newCollection[key] = value
+    }
+    return newCollection
+  }, Array.isArray(collection) ? [] : {})
+}
+
+export function map (collection, iteratee = identity) {
+  return reduce(collection, (newCollection, value, key) => {
+    newCollection[key] = iteratee(value, key)
+    return newCollection
+  }, Array.isArray(collection) ? [] : {})
+}
+
+export function mapValues (object, iteratee = identity) {
+  return map(object, iteratee)
+}
+
+export function mapKeys (object, iteratee = identity) {
+  return reduce(object, (newObject, value, key) => {
+    newObject[iteratee(value, key)] = value
+    return newObject
+  })
+}
+
+export function pick (object, key, ...keys) {
+  if (Array.isArray(key)) {
+    keys = [key]
+  } else {
+    keys = [key].concat(keys)
+  }
+  return filter(object, (value, key) => keys.includes(key))
+}
+
+export function omit (object, key, ...keys) {
+  if (Array.isArray(key)) {
+    keys = [key]
+  } else {
+    keys = [key].concat(keys)
+  }
+  if (Array.isArray(key)) {
+    keys = [key]
+  } else {
+    keys = [key].concat(keys)
+  }
+  return filter(object, (value, key) => !keys.includes(key))
+}
+
+export function upperFirst (string) {
+  string = String(string)
+  if (string.length === 0) {
+    return ''
+  }
+  return string[0].toUpperCase() + string.slice(1)
+}
+
+export function lowerFirst (string) {
+  string = String(string)
+  if (string.length === 0) {
+    return ''
+  }
+  return string[0].toLowerCase() + string.slice(1)
 }
