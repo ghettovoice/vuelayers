@@ -1,6 +1,8 @@
 <template>
-  <div :id="[$options.name, id].join('-')" :class="$options.name" style="visibility: hidden">
-    <slot :id="id" :position="position"/>
+  <div :id="[$options.name, id].join('-')" :class="$options.name" style="display: none">
+    <div>
+      <slot :id="id" :position="position"/>
+    </div>
   </div>
 </template>
 
@@ -100,10 +102,7 @@
     mount () {
       hasOverlay(this)
 
-      this.$overlay.once('change:element', () => {
-        this.$el.style.visibility = 'visible'
-      })
-      this.$overlay.setElement(this.$el)
+      this.$overlay.setElement(this.$el.children[0])
       this.$overlaysContainer && this.$overlaysContainer.addOverlay(this.$overlay)
       this.subscribeAll()
       this.refresh()

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div style="height: 100%">
-      <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')">
+      <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')" @singleclick="clickCoord = $event.coordinate">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
             <div style="background: #eee; padding: 1rem">
@@ -75,6 +75,13 @@
             :projection="imageProj">
           </vl-source-image-static>
         </vl-layer-image>
+
+        <vl-overlay v-if="clickCoord" :position="clickCoord">
+          <div style="background: white; padding: 10px">
+            {{ clickCoord }}
+            <button @click="clickCoord = undefined">close</button>
+          </div>
+        </vl-overlay>
 
         <!--<vl-layer-vector id="countries">-->
         <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
@@ -199,6 +206,7 @@
         imageUrl: 'https://imgs.xkcd.com/comics/online_communities.png',
         imageSize: [1024, 968],
         imageExtent,
+        clickCoord: undefined,
       }
     },
     mounted () {
