@@ -139,7 +139,7 @@
     "rollup-plugin-vue": "^3.0.0",
     "rollup-pluginutils": "^2.0.1",
     "sass-loader": "^6.0.7",
-    "selenium-server": "^3.10.0",
+    "selenium-server": "^3.9.1",
     "sinon": "^4.4.2",
     "sinon-chai": "^2.14.0",
     "source-map-concat": "^1.0.1",
