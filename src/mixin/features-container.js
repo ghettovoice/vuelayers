@@ -22,7 +22,7 @@ const methods = {
    * @return {void}
    */
   addFeatures (features) {
-    features.forEach(feature => this.addFeature(feature))
+    features.forEach(::this.addFeature)
   },
   /**
    * @param {ol.Feature|Vue|GeoJSONFeature} feature
@@ -52,7 +52,7 @@ const methods = {
    * @return {void}
    */
   removeFeatures (features) {
-    features.forEach(this.removeFeature)
+    features.forEach(::this.removeFeature)
   },
   /**
    * @param {ol.Feature|Vue|GeoJSONFeature} feature

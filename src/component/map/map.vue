@@ -27,6 +27,7 @@
   import { hasMap, hasView } from '../../util/assert'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { isEqual } from '../../util/minilo'
+  import { PRIORITY_PROP_NAME } from '../../core'
 
   /**
    * @vueProps
@@ -185,6 +186,13 @@
         },
         addInteraction (interaction) {
           map.addInteraction(interaction)
+          // sort interactions by priority in asc order
+          // the higher the priority, the earlier the interaction handles the event
+          map.getInteractions().getArray().sort((a, b) => {
+            let ap = a.get(PRIORITY_PROP_NAME) || 0
+            let bp = b.get(PRIORITY_PROP_NAME) || 0
+            return ap === bp ? 0 : ap - bp
+          })
         },
         removeInteraction (interaction) {
           map.removeInteraction(interaction)

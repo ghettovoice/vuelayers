@@ -3,12 +3,15 @@
    * @module draw-interaction/interaction
    */
   import DrawInteraction from 'ol/interaction/draw'
+  import SnapInteraction from 'ol/interaction/snap'
+  import { AUTO_SNAP_INTERACTION_ID, PRIORITY_PROP_NAME } from '../../core'
+  import featuresContainer from '../../mixin/features-container'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import { hasInteraction } from '../../util/assert'
-  import { mapValues } from '../../util/minilo'
+  import { mapValues, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   // TODO bind with external destination source
@@ -16,6 +19,19 @@
    * @vueProps
    */
   const props = {
+    /**
+     * Initial set of features.
+     * @type {GeoJSONFeature[]}
+     */
+    features: {
+      type: Array,
+      default: stubArray,
+    },
+    /**
+     * Target source identifier from IdentityMap.
+     * @type {String}
+     */
+    source: String,
     /**
      * The maximum distance in pixels between "down" and "up" for a "up" event to be considered a "click" event and
      * actually add a point/vertex to the geometry being drawn. Default is 6 pixels. That value was chosen for the
@@ -72,6 +88,10 @@
      * @type {ol.DrawGeometryFunctionType|function|undefined}
      */
     geometryFunction: Function,
+    /**
+     * Name of the geometry attribute for newly created features.
+     * @type {string}
+     */
     geometryName: {
       type: String,
       default: 'geometry',
@@ -117,7 +137,9 @@
      * @protected
      */
     createInteraction () {
+      // todo create internal features collection
       return new DrawInteraction({
+        source: this.$identityMap.get(this.source),
         clickTolerance: this.clickTolerance,
         snapTolerance: this.snapTolerance,
         type: this.type,
@@ -148,6 +170,17 @@
       }
     },
     /**
+     * @return {{
+   *     addFeature: function(ol.Feature): void,
+   *     removeFeature: function(ol.Feature): void,
+   *     hasFeature: function(ol.Feature): bool
+   *   }|undefined}
+     * @protected
+     */
+    getFeaturesTarget () {
+      // todo use internal features collection
+    },
+    /**
      * @returns {Object}
      * @protected
      */
@@ -170,6 +203,18 @@
      */
     mount () {
       this::interaction.methods.mount()
+
+      if (
+        this.$interactionsContainer &&
+        this.$interactionsContainer.getInteractionById(AUTO_SNAP_INTERACTION_ID) == null
+      ) {
+        let snap = new SnapInteraction()
+        snap.setProperties({
+          id: AUTO_SNAP_INTERACTION_ID,
+          [PRIORITY_PROP_NAME]: 10,
+        })
+        this.$interactionsContainer.addInteraction(snap)
+      }
     },
     /**
      * @return {void}
@@ -207,7 +252,7 @@
    */
   export default {
     name: 'vl-interaction-draw',
-    mixins: [interaction, stylesContainer],
+    mixins: [interaction, featuresContainer, stylesContainer],
     props,
     methods,
     watch,
