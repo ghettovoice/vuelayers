@@ -14,12 +14,12 @@
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { getId as getFeatureId } from '../../ol-ext/feature'
-  import { writeFeature } from '../../ol-ext/geojson'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
   import { constant, stubArray, isFunction, forEach, mapValues, difference } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import projTransforms from '../../mixin/proj-transforms'
 
   // todo add other options, like event modifiers
   const props = {
@@ -235,7 +235,7 @@
   // TODO: use featuresContainer mixin
   export default {
     name: 'vl-interaction-select',
-    mixins: [interaction, stylesContainer],
+    mixins: [interaction, stylesContainer, projTransforms],
     props,
     computed,
     methods,
@@ -274,7 +274,7 @@
 
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
-        this.$emit('update:features', this.$features.map(feature => writeFeature(feature)))
+        this.$emit('update:features', this.$features.map(::this.writeFeatureInBindProj))
       }
     )
   }

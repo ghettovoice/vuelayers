@@ -2,10 +2,14 @@
   /**
    * @module draw-interaction/interaction
    */
-  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import DrawInteraction from 'ol/interaction/draw'
   import interaction from '../../mixin/interaction'
-  import featuresContainer from '../../mixin/features-container'
   import stylesContainer from '../../mixin/styles-container'
+  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
+  import { hasInteraction } from '../../util/assert'
+  import { mapValues } from '../../util/minilo'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   // TODO bind with external destination source
   /**
@@ -107,7 +111,94 @@
   /**
    * @vueMethods
    */
-  const methods = {}
+  const methods = {
+    /**
+     * @return {ol.interaction.Draw}
+     * @protected
+     */
+    createInteraction () {
+      return new DrawInteraction({
+        clickTolerance: this.clickTolerance,
+        snapTolerance: this.snapTolerance,
+        type: this.type,
+        stopClick: this.stopClick,
+        maxPoints: this.maxPoints,
+        minPoints: this.minPoints,
+        finishCondition: this.finishCondition,
+        style: this.createStyle(),
+        geometryFunction: this.geometryFunction,
+        geometryName: this.geometryName,
+        condition: this.condition,
+        freehand: this.freehand,
+        freehandCondition: this.freehandCondition,
+        wrapX: this.wrapX,
+      })
+    },
+    /**
+     * @return {ol.StyleFunction}
+     * @protected
+     */
+    getDefaultStyles () {
+      const defaultStyles = mapValues(defaultEditStyle(), styles => styles.map(createStyle))
+
+      return function __selectDefaultStyleFunc (feature) {
+        if (feature.getGeometry()) {
+          return defaultStyles[feature.getGeometry().getType()]
+        }
+      }
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(
+        this::interaction.methods.getServices(),
+        this::stylesContainer.methods.getServices(),
+      )
+    },
+    /**
+     * @return {ol.interaction.Interaction|undefined}
+     * @protected
+     */
+    getStyleTarget () {
+      return this.$interaction
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      this::interaction.methods.mount()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      this::interaction.methods.unmount()
+    },
+    /**
+     * @param {Array<{style: ol.style.Style, condition: (function|boolean|undefined)}>|ol.StyleFunction|Vue|undefined} styles
+     * @return {void}
+     * @protected
+     */
+    setStyle (styles) {
+      if (styles !== this._styles) {
+        this._styles = styles
+        this.refresh()
+      }
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToInteractionChanges()
+    },
+  }
+
+  const watch = {}
 
   /**
    * @alias module:draw-interaction/interaction
@@ -116,8 +207,29 @@
    */
   export default {
     name: 'vl-interaction-draw',
-    mixins: [interaction, featuresContainer, stylesContainer],
+    mixins: [interaction, stylesContainer],
     props,
     methods,
+    watch,
+    stubVNode: {
+      empty: false,
+      attrs () {
+        return {
+          class: this.$options.name,
+        }
+      },
+    },
+    created () {
+      Object.defineProperties(this, {
+      })
+    },
+  }
+
+  /**
+   * @return {void}
+   * @private
+   */
+  function subscribeToInteractionChanges () {
+    hasInteraction(this)
   }
 </script>
