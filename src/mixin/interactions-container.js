@@ -4,6 +4,7 @@ import {instanceOf} from '../util/assert'
 
 const methods = {
   /**
+   * TODO need refactoring, like in feature-container
    * @return {{
    *     hasInteraction: function(ol.interaction.Interaction): bool,
    *     addInteraction: function(ol.interaction.Interaction): void,

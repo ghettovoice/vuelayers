@@ -8,6 +8,7 @@
 import { install } from './core'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
+import DrawInteraction from './component/draw-interaction'
 import Feature from './component/feature'
 import FillStyle from './component/fill-style'
 import Geoloc from './component/geoloc'
@@ -63,6 +64,7 @@ function plugin (Vue, options = {}) {
   // install components
   Vue.use(CircleStyle)
   Vue.use(ClusterSource)
+  Vue.use(DrawInteraction)
   Vue.use(Feature)
   Vue.use(FillStyle)
   Vue.use(Geoloc)
@@ -101,6 +103,7 @@ export {
   // components
   CircleStyle,
   ClusterSource,
+  DrawInteraction,
   Feature,
   FillStyle,
   Geoloc,

@@ -2,14 +2,20 @@
   /**
    * @module draw-interaction/interaction
    */
+  import Collection from 'ol/collection'
   import DrawInteraction from 'ol/interaction/draw'
   import SnapInteraction from 'ol/interaction/snap'
+  import { Observable } from 'rxjs'
+  import { merge as mergeObs } from 'rxjs/observable'
+  import { map as mapObs } from 'rxjs/operator'
   import { AUTO_SNAP_INTERACTION_ID, PRIORITY_PROP_NAME } from '../../core'
-  import featuresContainer from '../../mixin/features-container'
+  import { CollectionFeaturesTarget, featuresContainer } from '../../mixin/features-container'
   import interaction from '../../mixin/interaction'
+  import projTransforms from '../../mixin/proj-transforms'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
+  import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
   import { mapValues, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -133,13 +139,15 @@
    */
   const methods = {
     /**
-     * @return {ol.interaction.Draw}
+     * @return {Promise<ol.interaction.Draw>}
      * @protected
      */
-    createInteraction () {
-      // todo create internal features collection
+    async createInteraction () {
+      let source = await this.$identityMap.get(`vl-source-vector:${this.source}:instancePromise`)
+
       return new DrawInteraction({
-        source: this.$identityMap.get(this.source),
+        source: source,
+        features: this.getFeaturesTarget().getAdaptee(),
         clickTolerance: this.clickTolerance,
         snapTolerance: this.snapTolerance,
         type: this.type,
@@ -147,7 +155,7 @@
         maxPoints: this.maxPoints,
         minPoints: this.minPoints,
         finishCondition: this.finishCondition,
-        style: this.createStyle(),
+        style: this.createStyleFunc(),
         geometryFunction: this.geometryFunction,
         geometryName: this.geometryName,
         condition: this.condition,
@@ -170,15 +178,15 @@
       }
     },
     /**
-     * @return {{
-   *     addFeature: function(ol.Feature): void,
-   *     removeFeature: function(ol.Feature): void,
-   *     hasFeature: function(ol.Feature): bool
-   *   }|undefined}
+     * @return {FeaturesTarget}
      * @protected
      */
     getFeaturesTarget () {
-      // todo use internal features collection
+      if (this._featuresTarget == null) {
+        this._featuresTarget = new CollectionFeaturesTarget(new Collection())
+      }
+
+      return this._featuresTarget
     },
     /**
      * @returns {Object}
@@ -208,13 +216,16 @@
         this.$interactionsContainer &&
         this.$interactionsContainer.getInteractionById(AUTO_SNAP_INTERACTION_ID) == null
       ) {
+        // todo source should be provided
         let snap = new SnapInteraction()
         snap.setProperties({
           id: AUTO_SNAP_INTERACTION_ID,
           [PRIORITY_PROP_NAME]: 10,
         })
-        this.$interactionsContainer.addInteraction(snap)
+        // this.$interactionsContainer.addInteraction(snap)
       }
+
+      this.addFeatures(this.features)
     },
     /**
      * @return {void}
@@ -252,7 +263,7 @@
    */
   export default {
     name: 'vl-interaction-draw',
-    mixins: [interaction, featuresContainer, stylesContainer],
+    mixins: [interaction, featuresContainer, stylesContainer, projTransforms],
     props,
     methods,
     watch,
@@ -264,10 +275,6 @@
         }
       },
     },
-    created () {
-      Object.defineProperties(this, {
-      })
-    },
   }
 
   /**
@@ -276,5 +283,21 @@
    */
   function subscribeToInteractionChanges () {
     hasInteraction(this)
+
+    const drawEvents = Observable::mergeObs(
+      observableFromOlEvent(this.$interaction, 'drawstart')
+        ::mapObs(evt => {
+          this.prepareFeature(evt.feature)
+          return evt
+        }),
+      observableFromOlEvent(this.$interaction, 'drawend'),
+    )
+    this.subscribeTo(drawEvents, evt => this.$emit(evt.type, evt))
+
+    const changeEvents = observableFromOlEvent(this.getFeaturesTarget().getAdaptee(), ['add', 'remove'])
+    this.subscribeTo(changeEvents, () => {
+      ++this.rev
+      this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInBindProj))
+    })
   }
 </script>

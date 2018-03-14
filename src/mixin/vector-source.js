@@ -2,7 +2,7 @@ import { Observable } from 'rxjs'
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime } from 'rxjs/operator'
 import { _do as doObs } from 'rxjs/operator/do'
-import featuresContainer from './features-container'
+import { featuresContainer, SourceFeaturesTarget } from './features-container'
 import { EPSG_4326 } from '../ol-ext/consts'
 import * as geoJsonHelper from '../ol-ext/geojson'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
@@ -45,29 +45,15 @@ const methods = {
     this.$source && this.$source.clear()
   },
   /**
-   * @return {{
-   *     addFeature: function(ol.Feature): void,
-   *     removeFeature: function(ol.Feature): void,
-   *     hasFeature: function(ol.Feature): bool
-   *   }|undefined}
+   * @return {FeaturesTarget}
    * @protected
    */
   getFeaturesTarget () {
-    if (!this.$source) return
-
-    const source = this.$source
-
-    return {
-      hasFeature (feature) {
-        return source.getFeatureById(feature.getId()) != null
-      },
-      addFeature (feature) {
-        source.addFeature(feature)
-      },
-      removeFeature (feature) {
-        source.removeFeature(feature)
-      },
+    if (this._featuresTarget == null) {
+      this._featuresTarget = new SourceFeaturesTarget(/** @type {ol.source.Vector} */this.$source)
     }
+
+    return this._featuresTarget
   },
   /**
    * @return {Object}

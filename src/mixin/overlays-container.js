@@ -4,6 +4,7 @@ import { instanceOf } from '../util/assert'
 
 const methods = {
   /**
+   * TODO need refactoring, like in feature-container
    * @return {{
    *     hasOverlay: function(ol.Overlay): bool,
    *     addOverlay: function(ol.Overlay): void,

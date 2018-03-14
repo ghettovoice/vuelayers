@@ -28,6 +28,7 @@
         </vl-geoloc>
 
         <vl-interaction-select @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
+        <vl-interaction-draw type="Polygon" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
@@ -46,7 +47,7 @@
         </vl-layer-tile>
 
         <vl-layer-vector>
-          <vl-source-vector>
+          <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" @addfeature="log('addfeature', $event)">
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
               <template slot-scope="feature">
                 <vl-geom-polygon :coordinates.sync="polygonCoords"/>
@@ -66,7 +67,6 @@
           </vl-style-box>
         </vl-layer-vector>
 
-
         <vl-layer-image id="jz">
           <vl-source-image-static
             :url="imageUrl"
@@ -76,12 +76,12 @@
           </vl-source-image-static>
         </vl-layer-image>
 
-        <vl-overlay v-if="clickCoord" :position="clickCoord">
-          <div style="background: white; padding: 10px">
-            {{ clickCoord }}
-            <button @click="clickCoord = undefined">close</button>
-          </div>
-        </vl-overlay>
+        <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
+          <!--<div style="background: white; padding: 10px">-->
+        <!--    {{ clickCoord }}-->
+        <!--    <button @click="clickCoord = undefined">close</button>-->
+          <!--</div>-->
+      <!--  </vl-overlay>-->
 
         <!--<vl-layer-vector id="countries">-->
         <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
@@ -207,6 +207,7 @@
         imageSize: [1024, 968],
         imageExtent,
         clickCoord: undefined,
+        drawnFeatures: [],
       }
     },
     mounted () {
