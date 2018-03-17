@@ -117,6 +117,7 @@ const methods = {
  * @fires module:mixin/ol-cmp#destroyed
  */
 export default {
+  VM_PROP,
   INSTANCE_PROMISE_IDENT_SUFFIX,
   mixins: [options, identMap, rxSubs, services],
   props,

@@ -5,7 +5,7 @@
  * @license MIT
  */
 /* eslint-disable indent */
-import basicInstall from './install'
+import { install as basicInstall } from './install'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
 import DrawInteraction from './component/draw-interaction'

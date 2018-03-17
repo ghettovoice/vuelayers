@@ -2,7 +2,6 @@
 import olView from 'ol/view'
 import Vue from 'vue'
 import Map from '@/component/map'
-import { VM_PROP } from '@/consts'
 
 describe('view component', () => {
   const Ctor = Vue.extend(Map.View)
@@ -17,7 +16,7 @@ describe('view component', () => {
       vm.$createPromise.then(() => {
         expect(vm.$olObject).to.be.instanceof(olView)
         expect(vm.$view).to.equal(vm.$olObject)
-        expect(vm.$view[VM_PROP].includes(vm)).to.be.true
+        expect(vm.$view[vm.$options.VM_PROP].includes(vm)).to.be.true
 
         vm.$destroy()
         Vue.nextTick(done)

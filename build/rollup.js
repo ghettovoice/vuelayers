@@ -147,7 +147,7 @@ function bundleOptions (format, package, env = 'development') {
       return false
     }
     // embeddable
-    const embeddableRegExp = /(\.\/|src\/)(install|consts)/i
+    const embeddableRegExp = /(\.\/|src\/)(install)/i
     console.log(id, parentId, embeddableRegExp.test(id))
     if (embeddableRegExp.test(id)) {
       return false

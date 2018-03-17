@@ -3,7 +3,7 @@
  * @module mixin/options
  */
 import { get } from '../util/minilo'
-import { VL_OPTIONS_KEY } from '../consts'
+import { VL_OPTIONS_KEY } from '../install'
 
 /**
  * @alias module:mixin/options

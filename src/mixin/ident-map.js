@@ -10,6 +10,7 @@ const IDENTITY_MAP_PROP = Symbol('identityMap')
  * @vueProto
  */
 export default {
+  IDENTITY_MAP_PROP,
   props: {
     /**
      * Unique key for saving to identity map
