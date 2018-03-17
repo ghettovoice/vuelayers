@@ -50,8 +50,7 @@ const methods = {
    * @return {Promise}
    */
   refresh () {
-    return Promise.resolve(this.unmount())
-      .then(this.mount)
+    return this.remount()
   },
 }
 

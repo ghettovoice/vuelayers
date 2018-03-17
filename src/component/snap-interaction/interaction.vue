@@ -2,6 +2,7 @@
   /** @module snap-interaction/interaction */
   import SnapInteraction from 'ol/interaction/snap'
   import interaction from '../../mixin/interaction'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   /**
    * @vueProps
@@ -79,6 +80,10 @@
     },
   }
 
+  const watch = makeWatchers(['source'], function () {
+    this.recreate()
+  })
+
   /**
    * @alias module:snap-interaction/interaction
    * @title vl-interaction-snap
@@ -89,5 +94,6 @@
     mixins: [interaction],
     props,
     methods,
+    watch,
   }
 </script>

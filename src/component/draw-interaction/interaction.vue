@@ -18,6 +18,7 @@
   import { hasInteraction } from '../../util/assert'
   import { mapValues, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   // TODO bind with external destination source
   /**
@@ -239,8 +240,10 @@
       this::subscribeToInteractionChanges()
     },
   }
-  // todo listen type changes (recreate interaction)
-  const watch = {}
+  // todo other props?
+  const watch = makeWatchers(['source', 'type'], function () {
+    this.recreate()
+  })
 
   /**
    * @alias module:draw-interaction/interaction

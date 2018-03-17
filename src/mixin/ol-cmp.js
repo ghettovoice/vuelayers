@@ -103,6 +103,26 @@ const methods = {
    * @return {Promise}
    */
   refresh: refresh,
+  /**
+   * Internal usage only in components that doesn't support refreshing.
+   * @return {Promise<void>}
+   * @protected
+   */
+  async remount () {
+    await this.unmount()
+    await this.mount()
+  },
+  /**
+   * Only for internal purpose to support watching for properties
+   * for which OpenLayers doesn't provide setters.
+   * @return {Promise}
+   * @protected
+   */
+  async recreate () {
+    await this.unmount()
+    await this.init()
+    await this.mount()
+  },
 }
 
 /**

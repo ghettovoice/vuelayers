@@ -3,6 +3,7 @@
   import ImageStaticSource from 'ol/source/imagestatic'
   import imageSource from '../../mixin/image-source'
   import withUrl from '../../mixin/with-url'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   /**
    * @vueProps
@@ -63,6 +64,10 @@
     },
   }
 
+  const watch = makeWatchers(Object.keys(props), function () {
+    this.recreate()
+  })
+
   /**
    * A layer source for displaying a single, static image.
    *
@@ -75,5 +80,6 @@
     mixins: [imageSource, withUrl],
     props,
     methods,
+    watch,
   }
 </script>

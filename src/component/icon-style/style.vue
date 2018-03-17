@@ -4,6 +4,7 @@
    */
   import Icon from 'ol/style/icon'
   import imageStyle from '../../mixin/image-style'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   const props = {
     src: {
@@ -86,20 +87,9 @@
     },
   }
   // todo other watchers
-  const watch = {
-    src () {
-      this.refresh()
-    },
-    size () {
-      this.refresh()
-    },
-    anchor () {
-      this.refresh()
-    },
-    scale () {
-      this.refresh()
-    },
-  }
+  const watch = makeWatchers(['src', 'size', 'anchor', 'scale'], function () {
+    this.refresh()
+  })
 
   export default {
     name: 'vl-style-icon',

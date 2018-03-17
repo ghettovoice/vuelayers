@@ -48,8 +48,7 @@ const methods = {
    */
   refresh () {
     // recreate style
-    return Promise.resolve(this.init())
-      .then(this.mount)
+    return this.recreate()
   },
 }
 
