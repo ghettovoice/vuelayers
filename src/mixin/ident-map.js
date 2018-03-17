@@ -1,9 +1,16 @@
+/** @module mixin/ident-map */
 import Vue from 'vue'
-import { IDENTITY_MAP_PROP } from '../core'
 import IdentityMap from '../util/identity-map'
 import { identity } from '../util/minilo'
 
+const IDENTITY_MAP_PROP = Symbol('identityMap')
+/**
+ * @alias module:mixin/ident-map
+ * @title identMap
+ * @vueProto
+ */
 export default {
+  IDENTITY_MAP_PROP,
   props: {
     /**
      * Unique key for saving to identity map
@@ -13,10 +20,22 @@ export default {
     ident: [String, Number],
   },
   methods: {
-    getFullIdent (...parts) {
+    /**
+     * @param parts
+     * @return {string|undefined}
+     * @protected
+     */
+    makeSelfIdent (...parts) {
       if (!this.ident) return
 
-      return [this.$options.name, this.ident, ...parts].filter(identity).join(':')
+      return this.makeIdent(this.ident, ...parts)
+    },
+    /**
+     * @param parts
+     * @return {string}
+     */
+    makeIdent (...parts) {
+      return parts.filter(identity).join('.')
     },
   },
   created () {
@@ -24,6 +43,9 @@ export default {
   },
 }
 
+/**
+ * @private
+ */
 function initIdentityMap () {
   if (!this[IDENTITY_MAP_PROP]) {
     Vue[IDENTITY_MAP_PROP] = Vue.prototype[IDENTITY_MAP_PROP] = new IdentityMap()

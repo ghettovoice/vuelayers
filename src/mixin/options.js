@@ -3,7 +3,7 @@
  * @module mixin/options
  */
 import { get } from '../util/minilo'
-import { VL_OPTIONS } from '../core'
+import { VL_OPTIONS_KEY } from '../install'
 
 /**
  * @alias module:mixin/options
@@ -17,7 +17,7 @@ export default {
      * @return {*}
      */
     globOption (key, def) {
-      return get(this[VL_OPTIONS], key, def)
+      return get(this[VL_OPTIONS_KEY], key, def)
     },
   },
 }

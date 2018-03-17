@@ -3,7 +3,6 @@ import olMap from 'ol/map'
 import olView from 'ol/view'
 import Vue from 'vue'
 import Map from '@/component/map'
-import { VM_PROP } from '@/core/consts'
 
 describe('vl-map', () => {
   const Ctor = Vue.extend(Map.Map)
@@ -18,7 +17,7 @@ describe('vl-map', () => {
       vm.$createPromise.then(() => {
         expect(vm.$olObject).to.be.instanceof(olMap)
         expect(vm.$map).to.equal(vm.$olObject)
-        expect(vm.$map[VM_PROP].includes(vm)).to.be.true
+        expect(vm.$map[vm.$options.VM_PROP].includes(vm)).to.be.true
 
         vm.$destroy()
         Vue.nextTick(done)

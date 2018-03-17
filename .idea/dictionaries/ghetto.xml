@@ -2,6 +2,7 @@
   <dictionary name="ghetto">
     <words>
       <w>accuracygeometry</w>
+      <w>adaptee</w>
       <w>addfeature</w>
       <w>altitudeaccuracy</w>
       <w>apidoc</w>
@@ -30,6 +31,8 @@
       <w>dirname</w>
       <w>doclets</w>
       <w>doesn</w>
+      <w>drawend</w>
+      <w>drawstart</w>
       <w>dropdown</w>
       <w>epsg</w>
       <w>errordbg</w>

@@ -1,6 +1,6 @@
-import { SERVICES_PROP } from '../core'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 
+const SERVICES_PROP = Symbol('services')
 /**
  * Service container mixin
  */

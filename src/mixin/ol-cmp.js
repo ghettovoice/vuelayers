@@ -4,16 +4,21 @@
 import { Observable } from 'rxjs'
 import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
-import { VM_PROP } from '../core'
 import { isFunction } from '../util/minilo'
 import identMap from './ident-map'
 import options from './options'
 import rxSubs from './rx-subs'
 import services from './services'
 
+const VM_PROP = 'vm'
+const INSTANCE_PROMISE_IDENT_SUFFIX = 'instance_promise'
+/**
+ * @vueProps
+ */
 const props = {}
-
-const INSTANCE_PROMISE = 'instancePromise'
+/**
+ * @vueMethods
+ */
 const methods = {
   /**
    * @return {Promise<void>}
@@ -27,7 +32,7 @@ const methods = {
   async init () {
     let createPromise
 
-    const ident = this.getFullIdent(INSTANCE_PROMISE)
+    const ident = this.makeSelfIdent(INSTANCE_PROMISE_IDENT_SUFFIX)
     if (ident && this.$identityMap.has(ident)) {
       createPromise = this.$identityMap.get(ident)
     } else {
@@ -60,7 +65,7 @@ const methods = {
    * @protected
    */
   deinit () {
-    const ident = this.getFullIdent(INSTANCE_PROMISE)
+    const ident = this.makeSelfIdent(INSTANCE_PROMISE_IDENT_SUFFIX)
     if (ident) {
       this.$identityMap.unset(ident)
     }
@@ -112,6 +117,8 @@ const methods = {
  * @fires module:mixin/ol-cmp#destroyed
  */
 export default {
+  VM_PROP,
+  INSTANCE_PROMISE_IDENT_SUFFIX,
   mixins: [options, identMap, rxSubs, services],
   props,
   methods,

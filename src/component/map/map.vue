@@ -16,7 +16,7 @@
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
   import Vue from 'vue'
-  import featuresContainer from '../../mixin/features-container'
+  import { featuresContainer, SourceFeaturesTarget } from '../../mixin/features-container'
   import interactionsContainer from '../../mixin/interactions-container'
   import layersContainer from '../../mixin/layers-container'
   import olCmp from '../../mixin/ol-cmp'
@@ -108,6 +108,12 @@
     tabindex: [String, Number],
   }
 
+  const prioritySorter = (a, b) => {
+    let ap = a.get('priority') || 0
+    let bp = b.get('priority') || 0
+    return ap === bp ? 0 : ap - bp
+  }
+
   /**
    * @vueMethods
    */
@@ -185,6 +191,9 @@
         },
         addInteraction (interaction) {
           map.addInteraction(interaction)
+          // sort interactions by priority in asc order
+          // the higher the priority, the earlier the interaction handles the event
+          map.getInteractions().getArray().sort(prioritySorter)
         },
         removeInteraction (interaction) {
           map.removeInteraction(interaction)
@@ -192,27 +201,15 @@
       }
     },
     /**
-     * @return {{
-     *     addFeature: function(ol.Feature): void,
-     *     removeFeature: function(ol.Feature): void,
-     *     hasFeature: function(ol.Feature): bool
-     *   }|undefined}
+     * @return {FeaturesTarget}
      * @protected
      */
     getFeaturesTarget () {
-      const source = this._defaultLayer.getSource()
-
-      return {
-        hasFeature (feature) {
-          return source.getFeatureById(feature.getId()) != null
-        },
-        addFeature (feature) {
-          source.addFeature(feature)
-        },
-        removeFeature (feature) {
-          source.removeFeature(feature)
-        },
+      if (this._featuresTarget == null) {
+        this._featuresTarget = new SourceFeaturesTarget(/** @type {ol.source.Vector} */this._defaultLayer.getSource())
       }
+
+      return this._featuresTarget
     },
     /**
      * @return {{

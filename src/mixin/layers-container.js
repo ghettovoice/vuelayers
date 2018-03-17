@@ -4,6 +4,7 @@ import { instanceOf } from '../util/assert'
 
 const methods = {
   /**
+   * TODO need refactoring, like in feature-container
    * @return {{
    *     hasLayer: function(ol.Layer): bool,
    *     addLayer: function(ol.Layer): void,
