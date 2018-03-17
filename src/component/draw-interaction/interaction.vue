@@ -4,11 +4,9 @@
    */
   import Collection from 'ol/collection'
   import DrawInteraction from 'ol/interaction/draw'
-  import SnapInteraction from 'ol/interaction/snap'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operator'
-  import { AUTO_SNAP_INTERACTION_ID, PRIORITY_PROP_NAME } from '../../core'
   import { CollectionFeaturesTarget, featuresContainer } from '../../mixin/features-container'
   import interaction from '../../mixin/interaction'
   import projTransforms from '../../mixin/proj-transforms'
@@ -143,7 +141,7 @@
      * @protected
      */
     async createInteraction () {
-      let source = await this.$identityMap.get(`vl-source-vector:${this.source}:instancePromise`)
+      let source = await this.$identityMap.get(`${this.source}.instance_promise`)
 
       return new DrawInteraction({
         source: source,
@@ -211,20 +209,6 @@
      */
     mount () {
       this::interaction.methods.mount()
-
-      if (
-        this.$interactionsContainer &&
-        this.$interactionsContainer.getInteractionById(AUTO_SNAP_INTERACTION_ID) == null
-      ) {
-        // todo source should be provided
-        let snap = new SnapInteraction()
-        snap.setProperties({
-          id: AUTO_SNAP_INTERACTION_ID,
-          [PRIORITY_PROP_NAME]: 10,
-        })
-        // this.$interactionsContainer.addInteraction(snap)
-      }
-
       this.addFeatures(this.features)
     },
     /**

@@ -1,6 +1,12 @@
 <template>
   <div id="app">
     <div style="height: 100%">
+      <div>
+        <button @click="drawType = 'Point'">Point</button>
+        <button @click="drawType = 'LineString'">LineString</button>
+        <button @click="drawType = 'Polygon'">Polygon</button>
+        <button @click="drawType = undefined">Reset</button>
+      </div>
       <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')" @singleclick="clickCoord = $event.coordinate">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
@@ -26,9 +32,6 @@
             </vl-feature>
           </template>
         </vl-geoloc>
-
-        <vl-interaction-select @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
-        <vl-interaction-draw type="Polygon" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
 
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
@@ -64,6 +67,10 @@
           <vl-style-box>
             <vl-style-fill :color="[45, 156, 201, 0.4]"/>
             <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
+            <vl-style-circle>
+              <vl-style-fill :color="[45, 156, 201, 0.4]"/>
+              <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
+            </vl-style-circle>
           </vl-style-box>
         </vl-layer-vector>
 
@@ -75,6 +82,9 @@
             :projection="imageProj">
           </vl-source-image-static>
         </vl-layer-image>
+
+        <vl-interaction-select @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
+        <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
 
         <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
           <!--<div style="background: white; padding: 10px">-->
@@ -208,6 +218,7 @@
         imageExtent,
         clickCoord: undefined,
         drawnFeatures: [],
+        drawType: undefined
       }
     },
     mounted () {

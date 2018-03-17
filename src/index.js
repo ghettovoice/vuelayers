@@ -5,7 +5,7 @@
  * @license MIT
  */
 /* eslint-disable indent */
-import { install } from './core'
+import basicInstall from './install'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
 import DrawInteraction from './component/draw-interaction'
@@ -59,7 +59,7 @@ function plugin (Vue, options = {}) {
   if (plugin.installed) return
   plugin.installed = true
 
-  install(Vue, options)
+  basicInstall(Vue, options)
 
   // install components
   Vue.use(CircleStyle)

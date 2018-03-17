@@ -2,48 +2,95 @@
  * Simple Identity map with refs count
  */
 export default class IdentityMap {
-  map = Object.create(null)
+  pools = Object.create(null)
 
-  set (id, value) {
+  /**
+   * @param {string} pool
+   * @private
+   */
+  _preparePool (pool) {
+    this.pools[pool] || (this.pools[pool] = Object.create(null))
+  }
+
+  /**
+   * @param {string} id
+   * @param {mixed} value
+   * @param {string} pool
+   */
+  set (id, value, pool = 'default') {
     if (value == null) return
 
-    this.map[id] = {
+    this._preparePool(pool)
+
+    this.pools[pool][id] = {
       value,
       refs: 1,
     }
   }
 
-  get (id) {
-    let rec = this.map[id]
+  /**
+   * @param {string} id
+   * @param {string} pool
+   */
+  get (id, pool = 'default') {
+    this._preparePool(pool)
+
+    let rec = this.pools[pool][id]
     if (!rec || rec.value == null) return
 
     rec.refs++
-    this.map[id] = rec
+    this.pools[pool][id] = rec
 
     return rec.value
   }
 
-  unset (id) {
-    let rec = this.map[id]
+  /**
+   * @param {string} id
+   * @param {string} pool
+   */
+  unset (id, pool = 'default') {
+    this._preparePool(pool)
+
+    let rec = this.pools[pool][id]
     if (!rec || rec.value == null) return
 
     rec.refs--
     if (rec.refs === 0) {
-      delete this.map[id]
+      delete this.pools[pool][id]
     } else {
-      this.map[id] = rec
+      this.pools[pool][id] = rec
     }
   }
 
-  has (id) {
-    return !!this.map[id]
+  /**
+   * @param {string} id
+   * @param {string} pool
+   * @return {boolean}
+   */
+  has (id, pool = 'default') {
+    this._preparePool(pool)
+
+    return !!this.pools[pool][id]
   }
 
-  ids () {
-    return Object.keys(this.map)
+  /**
+   * @param {string} pool
+   * @return {string[]}
+   */
+  ids (pool = 'default') {
+    this._preparePool(pool)
+
+    return Object.keys(this.pools[pool])
   }
 
-  refs (id) {
-    return this.has(id) ? this.map[id].refs : undefined
+  /**
+   * @param {string} id
+   * @param {string} pool
+   * @return {*}
+   */
+  refs (id, pool = 'default') {
+    this._preparePool(pool)
+
+    return this.has(id, pool) ? this.pools[pool][id].refs : undefined
   }
 }

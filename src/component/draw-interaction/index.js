@@ -1,7 +1,7 @@
 /**
  * @module draw-interaction
  */
-import Interaction from './interaction'
+import Interaction from './interaction.vue'
 
 /**
  * @alias module:draw-interaction

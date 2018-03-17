@@ -1,6 +1,6 @@
-import { get as getProjection } from '../ol-ext/proj'
-import { warn } from '../util/log'
-import { VL_OPTIONS } from './consts'
+import { get as getProjection } from './ol-ext/proj'
+import { warn } from './util/log'
+import { VL_OPTIONS_KEY } from './consts'
 
 /**
  * Shared install.
@@ -19,5 +19,5 @@ export default function install (Vue, options = {}) {
       'It should be added before VueLayers install with OpenLayers or VueLayers API.')
   }
   // extend Vue with VueLayers global methods and options
-  Vue[VL_OPTIONS] = Vue.prototype[VL_OPTIONS] = options
+  Vue[VL_OPTIONS_KEY] = Vue.prototype[VL_OPTIONS_KEY] = options
 }

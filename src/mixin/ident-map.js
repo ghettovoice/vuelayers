@@ -1,12 +1,12 @@
 /** @module mixin/ident-map */
 import Vue from 'vue'
-import { IDENTITY_MAP_PROP } from '../core'
 import IdentityMap from '../util/identity-map'
 import { identity } from '../util/minilo'
 
+const IDENTITY_MAP_PROP = Symbol('identityMap')
 /**
  * @alias module:mixin/ident-map
- * @title ident-map
+ * @title identMap
  * @vueProto
  */
 export default {
@@ -24,10 +24,10 @@ export default {
      * @return {string|undefined}
      * @protected
      */
-    getFullIdent (...parts) {
+    makeIdent (...parts) {
       if (!this.ident) return
 
-      return [this.$options.name, this.ident, ...parts].filter(identity).join(':')
+      return [this.ident, ...parts].filter(identity).join('.')
     },
   },
   created () {

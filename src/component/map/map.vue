@@ -22,12 +22,11 @@
   import olCmp from '../../mixin/ol-cmp'
   import overlaysContainer from '../../mixin/overlays-container'
   import projTransforms from '../../mixin/proj-transforms'
-  import { RENDERER_TYPE } from '../../ol-ext/consts'
+  import { RENDERER_TYPE, PRIORITY_PROP_NAME } from '../../ol-ext/consts'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasMap, hasView } from '../../util/assert'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { isEqual } from '../../util/minilo'
-  import { PRIORITY_PROP_NAME } from '../../core'
 
   /**
    * @vueProps
@@ -109,6 +108,12 @@
     tabindex: [String, Number],
   }
 
+  const prioritySorter = (a, b) => {
+    let ap = a.get(PRIORITY_PROP_NAME) || 0
+    let bp = b.get(PRIORITY_PROP_NAME) || 0
+    return ap === bp ? 0 : ap - bp
+  }
+
   /**
    * @vueMethods
    */
@@ -188,11 +193,7 @@
           map.addInteraction(interaction)
           // sort interactions by priority in asc order
           // the higher the priority, the earlier the interaction handles the event
-          map.getInteractions().getArray().sort((a, b) => {
-            let ap = a.get(PRIORITY_PROP_NAME) || 0
-            let bp = b.get(PRIORITY_PROP_NAME) || 0
-            return ap === bp ? 0 : ap - bp
-          })
+          map.getInteractions().getArray().sort(prioritySorter)
         },
         removeInteraction (interaction) {
           map.removeInteraction(interaction)

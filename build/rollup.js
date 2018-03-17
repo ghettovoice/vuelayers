@@ -67,12 +67,6 @@ function getAllPackages () {
       globName: config.fullname,
       amdName: config.name,
     },
-    // core package
-    {
-      entry: utils.resolve('src/core/index.js'),
-      jsName: 'core/index',
-      pkgName: 'core',
-    },
   ]
 
   return Promise.all([
@@ -150,6 +144,12 @@ function bundleOptions (format, package, env = 'development') {
         coreRegExp.test(id)
       )
     ) {
+      return false
+    }
+    // embeddable
+    const embeddableRegExp = /(\.\/|src\/)(install|consts)/i
+    console.log(id, parentId, embeddableRegExp.test(id))
+    if (embeddableRegExp.test(id)) {
       return false
     }
     // check internal component imports
