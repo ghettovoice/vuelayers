@@ -1,3 +1,4 @@
+import { IndexedCollectionAdapter, SourceCollectionAdapter } from '@/ol-ext/collection'
 import Feature from 'ol/feature'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
@@ -7,7 +8,7 @@ import projTransforms from './proj-transforms'
 
 const methods = {
   /**
-   * @return {FeaturesTarget}
+   * @return {IndexedCollectionAdapter|SourceCollectionAdapter}
    * @protected
    */
   getFeaturesTarget () {
@@ -123,7 +124,7 @@ const methods = {
   },
 }
 
-export const featuresContainer = {
+export default {
   mixins: [projTransforms],
   methods,
   created () {
@@ -137,191 +138,4 @@ export const featuresContainer = {
   destroyed () {
     this.clear()
   },
-}
-
-/**
- * @interface FeaturesTarget
- */
-/**
- * @function
- * @name FeaturesTarget#add
- * @param {ol.Feature} feature
- * @return {void}
- */
-/**
- * @function
- * @name FeaturesTarget#remove
- * @param {ol.Feature} feature
- * @return {void}
- */
-/**
- * @function
- * @name FeaturesTarget#has
- * @param {ol.Feature} feature
- * @return {boolean}
- */
-/**
- * @function
- * @name FeaturesTarget#clear
- * @return {void}
- */
-/**
- * @function
- * @name FeaturesTarget#getById
- * @param {*} id
- * @return {ol.Feature|undefined}
- */
-/**
- * @function
- * @name FeaturesTarget#all
- * @return {ol.Feature[]}
- */
-/**
- * @function
- * @name FeaturesTarget#getAdaptee
- * @return {*}
- */
-
-/**
- * @implements FeaturesTarget
- */
-export class CollectionFeaturesTarget {
-  /**
-   * @param {ol.Collection} collection
-   */
-  constructor (collection) {
-    /**
-     * @type {ol.Collection}
-     * @private
-     */
-    this._target = collection
-    /**
-     * @type {Object<mixed, number>}
-     * @private
-     */
-    this._index = Object.create(null)
-  }
-
-  /**
-   * @return {ol.Collection}
-   */
-  getAdaptee () {
-    return this._target
-  }
-
-  /**
-   * @param {ol.Feature} feature
-   */
-  add (feature) {
-    let length = this._target.push(feature)
-    this._index[feature.getId()] = length - 1
-  }
-
-  /**
-   * @param {ol.Feature} feature
-   */
-  remove (feature) {
-    if (this._target.remove(feature)) {
-      delete this._index[feature.getId()]
-    }
-  }
-
-  /**
-   * @param {ol.Feature} feature
-   * @return {boolean}
-   */
-  has (feature) {
-    return !!this.getById(feature.getId())
-  }
-
-  /**
-   * @return {void}
-   */
-  clear () {
-    this._target.clear()
-  }
-
-  /**
-   * @param {*} id
-   * @return {ol.Feature|undefined}
-   */
-  getById (id) {
-    if (this._index[id] == null) return
-
-    return this._target.item(this._index[id])
-  }
-
-  /**
-   * @return {ol.Feature[]}
-   */
-  all () {
-    return this._target.getArray()
-  }
-}
-
-/**
- * @implements FeaturesTarget
- */
-export class SourceFeaturesTarget {
-  /**
-   * @param {ol.source.Vector} source
-   */
-  constructor (source) {
-    /**
-     * @type {ol.source.Vector}
-     * @private
-     */
-    this._target = source
-  }
-
-  /**
-   * @return {ol.source.Vector}
-   */
-  getAdaptee () {
-    return this._target
-  }
-
-  /**
-   * @param {ol.Feature} feature
-   */
-  add (feature) {
-    this._target.addFeature(feature)
-  }
-
-  /**
-   * @param {ol.Feature} feature
-   */
-  remove (feature) {
-    this._target.removeFeature(feature)
-  }
-
-  /**
-   * @param {ol.Feature} feature
-   * @return {boolean}
-   */
-  has (feature) {
-    return !!this.getById(feature.getId())
-  }
-
-  /**
-   * @return {void}
-   */
-  clear () {
-    this._target.clear()
-  }
-
-  /**
-   * @param {*} id
-   * @return {ol.Feature|undefined}
-   */
-  getById (id) {
-    return this._target.getFeatureById(id)
-  }
-
-  /**
-   * @return {ol.Feature[]}
-   */
-  all () {
-    return this._target.getFeatures()
-  }
 }

@@ -1,26 +1,22 @@
-import Collection from 'ol/collection'
 /**
  * Wraps OpenLayers collection to provide indexed access to elements.
  */
 export class IndexedCollectionAdapter {
   /**
    * @param {ol.Collection} collection
-   * @param {function} extractKey
+   * @param {function} getElementKey
    */
-  constructor (collection, extractKey) {
+  constructor (collection, getElementKey) {
     /**
      * @type {ol.Collection}
      * @private
      */
     this._adaptee = collection
-    if (this._adaptee instanceof Collection) {
-      throw new Error('Invalid collection provided')
-    }
     /**
      * @type {Function}
      * @private
      */
-    this._extractKey = extractKey
+    this._getElementKey = getElementKey
     /**
      * @type {Object<mixed, number>}
      * @private
@@ -28,7 +24,7 @@ export class IndexedCollectionAdapter {
     this._index = Object.create(null)
 
     this._adaptee.forEach((element, idx) => {
-      let key = this._extractKey(element)
+      let key = this._getElementKey(element)
       this._index[key] = idx
     })
   }
@@ -36,15 +32,26 @@ export class IndexedCollectionAdapter {
   /**
    * @return {ol.Collection}
    */
-  getAdaptee () {
+  get adaptee () {
     return this._adaptee
+  }
+
+  get elements () {
+    return this._adaptee.getArray()
+  }
+
+  /**
+   * @param {function} iteratee
+   */
+  forEach (iteratee) {
+    this._adaptee.forEach(iteratee)
   }
 
   /**
    * @param {*} element
    */
   add (element) {
-    let key = this._extractKey(element)
+    let key = this._getElementKey(element)
     if (key == null) return
 
     let length = this._adaptee.push(element)
@@ -55,7 +62,7 @@ export class IndexedCollectionAdapter {
    * @param {*} element
    */
   remove (element) {
-    let key = this._extractKey(element)
+    let key = this._getElementKey(element)
     if (!key) return
 
     if (this._adaptee.remove(element)) {
@@ -68,7 +75,7 @@ export class IndexedCollectionAdapter {
    * @return {boolean}
    */
   has (element) {
-    return !!this.getById(this._extractKey(element))
+    return !!this.findByKey(this._getElementKey(element))
   }
 
   /**
@@ -80,19 +87,100 @@ export class IndexedCollectionAdapter {
   }
 
   /**
-   * @param {*} id
+   * @param {*} key
    * @return {ol.Feature|undefined}
    */
-  getById (id) {
-    if (this._index[id] == null) return
+  findByKey (key) {
+    if (this._index[key] == null) return
 
-    return this._adaptee.item(this._index[id])
+    return this._adaptee.item(this._index[key])
   }
 
   /**
-   * @return {ol.Feature[]}
+   * @param {function} sorter
    */
-  all () {
-    return this._adaptee.getArray()
+  sort (sorter) {
+    this.elements.sort(sorter)
+  }
+}
+
+/**
+ * Wraps vector source to provide collection like API.
+ */
+export class SourceCollectionAdapter {
+  /**
+   * @param {ol.source.Vector} source
+   */
+  constructor (source) {
+    /**
+     * @type {ol.source.Vector}
+     * @private
+     */
+    this._adaptee = source
+  }
+
+  /**
+   * @return {ol.source.Vector}
+   */
+  get adaptee () {
+    return this._adaptee
+  }
+
+  /**
+   * @return {Array<ol.Feature>}
+   */
+  get elements () {
+    return this._adaptee.getFeatures()
+  }
+
+  /**
+   * @param {function} iteratee
+   */
+  forEach (iteratee) {
+    this.elements.forEach(iteratee)
+  }
+
+  /**
+   * @param {ol.Feature} feature
+   */
+  add (feature) {
+    this._adaptee.addFeature(feature)
+  }
+
+  /**
+   * @param {ol.Feature} feature
+   */
+  remove (feature) {
+    this._adaptee.removeFeature(feature)
+  }
+
+  /**
+   * @param {ol.Feature} feature
+   * @return {boolean}
+   */
+  has (feature) {
+    return !!this.findByKey(feature.getId())
+  }
+
+  /**
+   * @return {void}
+   */
+  clear () {
+    this._adaptee.clear()
+  }
+
+  /**
+   * @param {*} key
+   * @return {ol.Feature|undefined}
+   */
+  findByKey (key) {
+    return this._adaptee.getFeatureById(key)
+  }
+
+  /**
+   * @param {function} sorter
+   */
+  sort (sorter) {
+    throw new Error('Not supported')
   }
 }

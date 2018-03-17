@@ -16,13 +16,14 @@
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
   import Vue from 'vue'
-  import { featuresContainer, SourceFeaturesTarget } from '../../mixin/features-container'
+  import featuresContainer from '../../mixin/features-container'
   import interactionsContainer from '../../mixin/interactions-container'
   import layersContainer from '../../mixin/layers-container'
   import olCmp from '../../mixin/ol-cmp'
   import overlaysContainer from '../../mixin/overlays-container'
   import projTransforms from '../../mixin/proj-transforms'
   import { RENDERER_TYPE } from '../../ol-ext/consts'
+  import { SourceCollectionAdapter, IndexedCollectionAdapter } from '../../ol-ext/collection'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasMap, hasView } from '../../util/assert'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -174,43 +175,28 @@
       }
     },
     /**
-     * @return {{
-     *     hasInteraction: function(ol.interaction.Interaction): bool,
-     *     addInteraction: function(ol.interaction.Interaction): void,
-     *     removeInteraction: function(ol.interaction.Interaction): void
-     *   }|undefined}
+     * @return {IndexedCollectionAdapter}
      * @protected
      */
     getInteractionsTarget () {
       if (!this.$map) return
 
-      const map = this.$map
-      const interactions = this.$map.getInteractions()
-
-      return {
-        hasInteraction (interaction) {
-          return interactions.getArray().includes(interaction)
-        },
-        addInteraction (interaction) {
-          map.addInteraction(interaction)
-          this.sortInteractions()
-        },
-        removeInteraction (interaction) {
-          map.removeInteraction(interaction)
-        },
-        sortInteractions () {
-          map.getInteractions().getArray().sort(prioritySorter)
-          console.log(map.getInteractions().getArray())
-        },
+      if (this._interactionsTarget == null) {
+        this._interactionsTarget = new IndexedCollectionAdapter(
+          this.$map.getInteractions(),
+          interaction => interaction.get('id')
+        )
       }
+
+      return this._interactionsTarget
     },
     /**
-     * @return {FeaturesTarget}
+     * @return {SourceCollectionAdapter}
      * @protected
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new SourceFeaturesTarget(/** @type {ol.source.Vector} */this._defaultLayer.getSource())
+        this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */this._defaultLayer.getSource())
       }
 
       return this._featuresTarget

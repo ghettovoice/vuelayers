@@ -7,11 +7,12 @@
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operator'
-  import { CollectionFeaturesTarget, featuresContainer } from '../../mixin/features-container'
+  import featuresContainer from '../../mixin/features-container'
   import interaction from '../../mixin/interaction'
   import projTransforms from '../../mixin/proj-transforms'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import { IndexedCollectionAdapter } from '../../ol-ext/collection'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
@@ -177,12 +178,12 @@
       }
     },
     /**
-     * @return {FeaturesTarget}
+     * @return {IndexedCollectionAdapter}
      * @protected
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new CollectionFeaturesTarget(new Collection())
+        this._featuresTarget = new IndexedCollectionAdapter(new Collection(), feature => feature.getId())
       }
 
       return this._featuresTarget
