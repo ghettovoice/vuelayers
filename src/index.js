@@ -6,6 +6,7 @@
  */
 /* eslint-disable indent */
 import { install as basicInstall } from './install'
+import CircleGeom from './component/circle-geom'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
 import DrawInteraction from './component/draw-interaction'
@@ -62,6 +63,7 @@ function plugin (Vue, options = {}) {
   basicInstall(Vue, options)
 
   // install components
+  Vue.use(CircleGeom)
   Vue.use(CircleStyle)
   Vue.use(ClusterSource)
   Vue.use(DrawInteraction)
@@ -101,6 +103,7 @@ export {
   VERSION,
   plugin as install,
   // components
+  CircleGeom,
   CircleStyle,
   ClusterSource,
   DrawInteraction,

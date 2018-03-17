@@ -6,6 +6,7 @@ import MultiPoint from 'ol/geom/multipoint'
 import MultiPolygon from 'ol/geom/multipolygon'
 import Point from 'ol/geom/point'
 import Polygon from 'ol/geom/polygon'
+import Circle from 'ol/geom/circle'
 import { GEOMETRY_TYPE, WGS84_SPHERE } from './consts'
 
 /**
@@ -100,12 +101,18 @@ export function isMulti (geom) {
  * @throws {Error}
  */
 export function toSimpleGeom (geom) {
+  if (geom instanceof Circle) {
+    geom = point(geom.getCenter())
+  }
+
   const type = geom.type || geom.getType()
   const complexTypes = [
     GEOMETRY_TYPE.GEOMETRY_COLLECTION,
   ]
 
-  if (!complexTypes.includes(type)) return geom
+  if (complexTypes.includes(type) === false) {
+    return geom
+  }
 
   return (geom.geometries || geom.getGeometries())[0]
 }
