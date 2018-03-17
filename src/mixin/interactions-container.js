@@ -4,12 +4,7 @@ import {instanceOf} from '../util/assert'
 
 const methods = {
   /**
-   * TODO need refactoring, like in feature-container
-   * @return {{
-   *     hasInteraction: function(ol.interaction.Interaction): bool,
-   *     addInteraction: function(ol.interaction.Interaction): void,
-   *     removeInteraction: function(ol.interaction.Interaction): void
-   *   }|undefined}
+   * @return {IndexedCollectionAdapter}
    * @protected
    */
   getInteractionsTarget () {
@@ -23,13 +18,9 @@ const methods = {
     interaction = interaction instanceof Vue ? interaction.$interaction : interaction
     instanceOf(interaction, Interaction)
 
-    if (!this._interactions[interaction.get('id')]) {
-      this._interactions[interaction.get('id')] = interaction
-    }
-
-    const interactionsTarget = this.getInteractionsTarget()
-    if (interactionsTarget && !interactionsTarget.hasInteraction(interaction)) {
-      interactionsTarget.addInteraction(interaction)
+    if (this.getInteractionsTarget().has(interaction) === false) {
+      this.getInteractionsTarget().add(interaction)
+      this.sortInteractions()
     }
   },
   /**
@@ -41,25 +32,43 @@ const methods = {
 
     if (!interaction) return
 
-    delete this._interactions[interaction.get('id')]
-
-    const interactionsTarget = this.getInteractionsTarget()
-    if (interactionsTarget && interactionsTarget.hasInteraction(interaction)) {
-      interactionsTarget.removeInteraction(interaction)
+    if (this.getInteractionsTarget().has(interaction)) {
+      this.getInteractionsTarget().remove(interaction)
+      this.sortInteractions()
     }
   },
   /**
    * @return {ol.interaction.Interaction[]}
    */
   getInteractions () {
-    return Object.values(this._interactions)
+    return this.getInteractionsTarget().elements
   },
   /**
    * @param {string|number} id
    * @return {ol.interaction.Interaction|undefined}
    */
   getInteractionById (id) {
-    return this._interactions[id]
+    return this.getInteractionsTarget().findByKey(id)
+  },
+  /**
+   * @return {void}
+   */
+  sortInteractions (sorter) {
+    sorter || (sorter = this.getDefaultInteractionsSorter())
+    this.getInteractionsTarget().sort(sorter)
+  },
+  /**
+   * @return {function}
+   * @protected
+   */
+  getDefaultInteractionsSorter () {
+    return () => 0
+  },
+  /**
+   * @return {void}
+   */
+  clearInteractions () {
+    this.getInteractionsTarget().clear()
   },
   /**
    * @returns {Object}
@@ -72,24 +81,11 @@ const methods = {
       get interactionsContainer () { return vm },
     }
   },
-  sortInteractions () {
-    const interactionsTarget = this.getInteractionsTarget()
-    if (interactionsTarget) {
-      interactionsTarget.sortInteractions()
-    }
-  },
 }
 
 export default {
   methods,
-  created () {
-    /**
-     * @type {Object<string, ol.interaction.Interaction>}
-     * @private
-     */
-    this._interactions = Object.create(null)
-  },
   destroyed () {
-    this._interactions = Object.create(null)
+    this.clearInteractions()
   },
 }

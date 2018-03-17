@@ -147,7 +147,7 @@
 
       return new DrawInteraction({
         source: source,
-        features: this.getFeaturesTarget().getAdaptee(),
+        features: this.getFeaturesTarget().adaptee,
         clickTolerance: this.clickTolerance,
         snapTolerance: this.snapTolerance,
         type: this.type,
@@ -280,7 +280,7 @@
     )
     this.subscribeTo(drawEvents, evt => this.$emit(evt.type, evt))
 
-    const changeEvents = observableFromOlEvent(this.getFeaturesTarget().getAdaptee(), ['add', 'remove'])
+    const changeEvents = observableFromOlEvent(this.getFeaturesTarget().adaptee, ['add', 'remove'])
     this.subscribeTo(changeEvents, () => {
       ++this.rev
       this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInBindProj))

@@ -1,7 +1,7 @@
 /**
  * @module mixin
  */
-export * from './features-container'
+export featuresContainer from './features-container'
 export geometry from './geometry'
 export geometryContainer from './geometry-container'
 export identMap from './ident-map'

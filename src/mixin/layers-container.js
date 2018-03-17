@@ -4,12 +4,7 @@ import { instanceOf } from '../util/assert'
 
 const methods = {
   /**
-   * TODO need refactoring, like in feature-container
-   * @return {{
-   *     hasLayer: function(ol.Layer): bool,
-   *     addLayer: function(ol.Layer): void,
-   *     removeLayer: function(ol.Layer): void
-   *   }|undefined}
+   * @return {IndexedCollectionAdapter}
    * @protected
    */
   getLayersTarget () {
@@ -23,13 +18,8 @@ const methods = {
     layer = layer instanceof Vue ? layer.$layer : layer
     instanceOf(layer, Layer)
 
-    if (!this._layers[layer.get('id')]) {
-      this._layers[layer.get('id')] = layer
-    }
-
-    const layersTarget = this.getLayersTarget()
-    if (layersTarget && !layersTarget.hasLayer(layer)) {
-      layersTarget.addLayer(layer)
+    if (this.getLayersTarget().has(layer) === false) {
+      this.getLayersTarget().add(layer)
     }
   },
   /**
@@ -41,25 +31,28 @@ const methods = {
 
     if (!layer) return
 
-    delete this._layers[layer.get('id')]
-
-    const layersTarget = this.getLayersTarget()
-    if (layersTarget && layersTarget.hasLayer(layer)) {
-      layersTarget.removeLayer(layer)
+    if (this.getLayersTarget().has(layer)) {
+      this.getLayersTarget().remove(layer)
     }
   },
   /**
    * @return {ol.layer.Layer[]}
    */
   getLayers () {
-    return Object.values(this._layers)
+    return this.getLayersTarget().elements
   },
   /**
    * @param {string|number} id
    * @return {ol.layer.Layer|undefined}
    */
   getLayerById (id) {
-    return this._layers[id]
+    return this.getLayersTarget().findByKey(id)
+  },
+  /**
+   * @return {void}
+   */
+  clearLayers () {
+    this.getLayersTarget().clear()
   },
   /**
    * @returns {Object}
@@ -76,14 +69,7 @@ const methods = {
 
 export default {
   methods,
-  created () {
-    /**
-     * @type {Object<string, ol.layer.Layer>}
-     * @private
-     */
-    this._layers = Object.create(null)
-  },
   destroyed () {
-    this._layers = Object.create(null)
+    this.clearLayers()
   },
 }

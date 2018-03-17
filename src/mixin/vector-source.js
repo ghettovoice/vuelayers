@@ -2,8 +2,9 @@ import { Observable } from 'rxjs'
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime } from 'rxjs/operator'
 import { _do as doObs } from 'rxjs/operator/do'
-import { featuresContainer, SourceFeaturesTarget } from './features-container'
+import featuresContainer from './features-container'
 import { EPSG_4326 } from '../ol-ext/consts'
+import { SourceCollectionAdapter } from '../ol-ext/collection'
 import * as geoJsonHelper from '../ol-ext/geojson'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../util/assert'
@@ -41,16 +42,15 @@ const methods = {
    * @return {void}
    */
   clear () {
-    this::featuresContainer.methods.clear()
-    this.$source && this.$source.clear()
+    this::featuresContainer.methods.clearFeatures()
   },
   /**
-   * @return {FeaturesTarget}
+   * @return {SourceCollectionAdapter}
    * @protected
    */
   getFeaturesTarget () {
     if (this._featuresTarget == null) {
-      this._featuresTarget = new SourceFeaturesTarget(/** @type {ol.source.Vector} */this.$source)
+      this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */this.$source)
     }
 
     return this._featuresTarget

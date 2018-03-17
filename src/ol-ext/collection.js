@@ -88,7 +88,7 @@ export class IndexedCollectionAdapter {
 
   /**
    * @param {*} key
-   * @return {ol.Feature|undefined}
+   * @return {*|undefined}
    */
   findByKey (key) {
     if (this._index[key] == null) return
