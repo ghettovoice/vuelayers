@@ -1,0 +1,93 @@
+<script>
+  /** @module snap-interaction/interaction */
+  import SnapInteraction from 'ol/interaction/snap'
+  import interaction from '../../mixin/interaction'
+
+  /**
+   * @vueProps
+   */
+  const props = {
+    /**
+     * Target source identifier from IdentityMap.
+     * @type {string}
+     */
+    source: {
+      type: String,
+      required: true,
+    },
+    /**
+     * Snap to edges
+     * @type {boolean}
+     */
+    edge: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * Snap to vertices.
+     * @type {boolean}
+     */
+    vertex: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * Pixel tolerance for considering the pointer close enough to a segment or vertex for snapping.
+     * @type {number}
+     */
+    pixelTolerance: {
+      type: Number,
+      default: 10,
+    },
+  }
+
+  /**
+   * @vueMethods
+   */
+  const methods = {
+    /**
+     * @return {Promise<ol.interaction.Draw>}
+     * @protected
+     */
+    async createInteraction () {
+      let sourceIdent = this.makeIdent(this.source, this.$options.INSTANCE_PROMISE_IDENT_SUFFIX)
+      let source = await this.$identityMap.get(sourceIdent)
+
+      return new SnapInteraction({
+        source: source,
+      })
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      this::interaction.methods.mount()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      this::interaction.methods.unmount()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+    },
+  }
+
+  /**
+   * @alias module:snap-interaction/interaction
+   * @title vl-interaction-snap
+   * @vueProto
+   */
+  export default {
+    name: 'vl-interaction-snap',
+    mixins: [interaction],
+    props,
+    methods,
+  }
+</script>

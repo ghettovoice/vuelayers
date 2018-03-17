@@ -14,6 +14,7 @@ const props = {
   },
   /**
    * Priority of interactions in the event handling stream.
+   * The higher the value, the sooner it will handle map event.
    * @type {number}
    */
   priority: {
@@ -99,6 +100,12 @@ const watch = {
     if (this.$interaction && value !== this.$interaction.getActive()) {
       this.$interaction.setActive(value)
     }
+  },
+  priority (value) {
+    if (!this.$interactionsContainer) return
+
+    this.$interaction.set('priority', value)
+    this.$interactionsContainer.sortInteractions()
   },
 }
 

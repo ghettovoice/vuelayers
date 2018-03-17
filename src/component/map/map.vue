@@ -16,17 +16,18 @@
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
   import Vue from 'vue'
-  import { featuresContainer, SourceFeaturesTarget } from '../../mixin/features-container'
+  import featuresContainer from '../../mixin/features-container'
   import interactionsContainer from '../../mixin/interactions-container'
   import layersContainer from '../../mixin/layers-container'
   import olCmp from '../../mixin/ol-cmp'
   import overlaysContainer from '../../mixin/overlays-container'
   import projTransforms from '../../mixin/proj-transforms'
+  import { IndexedCollectionAdapter, SourceCollectionAdapter } from '../../ol-ext/collection'
   import { RENDERER_TYPE } from '../../ol-ext/consts'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasMap, hasView } from '../../util/assert'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { isEqual } from '../../util/minilo'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   /**
    * @vueProps
@@ -108,12 +109,6 @@
     tabindex: [String, Number],
   }
 
-  const prioritySorter = (a, b) => {
-    let ap = a.get('priority') || 0
-    let bp = b.get('priority') || 0
-    return ap === bp ? 0 : ap - bp
-  }
-
   /**
    * @vueMethods
    */
@@ -146,96 +141,76 @@
       return map
     },
     /**
-     * @return {{
-     *    hasLayer: function(ol.Layer): boolean,
-     *    addLayer: function(ol.Layer),
-     *    removeLayer: function(ol.Layer)
-     *  }|undefined}
+     * @return {IndexedCollectionAdapter}
      *  @protected
      */
     getLayersTarget () {
-      if (!this.$map) return
+      hasMap(this)
 
-      const map = this.$map
-      const layers = this.$map.getLayers()
-
-      return {
-        hasLayer (layer) {
-          return layers.getArray().includes(layer)
-        },
-        addLayer (layer) {
-          map.addLayer(layer)
-        },
-        removeLayer (layer) {
-          map.removeLayer(layer)
-        },
+      if (this._layersTarget == null) {
+        this._layersTarget = new IndexedCollectionAdapter(
+          this.$map.getLayers(),
+          layer => layer.get('id'),
+        )
       }
+
+      return this._layersTarget
     },
     /**
-     * @return {{
-     *     hasInteraction: function(ol.interaction.Interaction): bool,
-     *     addInteraction: function(ol.interaction.Interaction): void,
-     *     removeInteraction: function(ol.interaction.Interaction): void
-     *   }|undefined}
+     * @return {IndexedCollectionAdapter}
      * @protected
      */
     getInteractionsTarget () {
-      if (!this.$map) return
+      hasMap(this)
 
-      const map = this.$map
-      const interactions = this.$map.getInteractions()
+      if (this._interactionsTarget == null) {
+        this._interactionsTarget = new IndexedCollectionAdapter(
+          this.$map.getInteractions(),
+          interaction => interaction.get('id')
+        )
+      }
 
-      return {
-        hasInteraction (interaction) {
-          return interactions.getArray().includes(interaction)
-        },
-        addInteraction (interaction) {
-          map.addInteraction(interaction)
-          // sort interactions by priority in asc order
-          // the higher the priority, the earlier the interaction handles the event
-          map.getInteractions().getArray().sort(prioritySorter)
-        },
-        removeInteraction (interaction) {
-          map.removeInteraction(interaction)
-        },
+      return this._interactionsTarget
+    },
+    /**
+     * @return {function}
+     * @protected
+     */
+    getDefaultInteractionsSorter () {
+      // sort interactions by priority in asc order
+      // the higher the priority, the earlier the interaction handles the event
+      return (a, b) => {
+        let ap = a.get('priority') || 0
+        let bp = b.get('priority') || 0
+        return ap === bp ? 0 : ap - bp
       }
     },
     /**
-     * @return {FeaturesTarget}
+     * @return {SourceCollectionAdapter}
      * @protected
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new SourceFeaturesTarget(/** @type {ol.source.Vector} */this._defaultLayer.getSource())
+        this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */this._defaultLayer.getSource())
       }
 
       return this._featuresTarget
     },
     /**
-     * @return {{
-     *     hasOverlay: function(ol.Overlay): bool,
-     *     addOverlay: function(ol.Overlay): void,
-     *     removeOverlay: function(ol.Overlay): void
-     *   }|undefined}
+     * @return {IndexedCollectionAdapter}
      * @protected
      */
     getOverlaysTarget () {
-      if (!this.$map) return
+      hasMap(this)
 
-      const map = this.$map
-      const overlays = this.$map.getOverlays()
-
-      return {
-        hasOverlay (interaction) {
-          return overlays.getArray().includes(interaction)
-        },
-        addOverlay (interaction) {
-          map.addOverlay(interaction)
-        },
-        removeOverlay (interaction) {
-          map.removeOverlay(interaction)
-        },
+      if (this._overlaysTarget == null) {
+        this._overlaysTarget = new IndexedCollectionAdapter(
+          this.$map.getOverlays(),
+          overlay => overlay.getId(),
+        )
       }
+
+      return this._overlaysTarget
     },
     /**
      * @param {number[]} pixel
@@ -423,7 +398,12 @@
       })
     },
     destroyed () {
-      this._view = undefined
+      this._view =
+        this._defaultLayer =
+          this._layersTarget =
+            this._featuresTarget =
+              this._interactionsTarget =
+                this._overlaysTarget = undefined
     },
   }
 

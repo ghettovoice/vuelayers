@@ -28,6 +28,7 @@ import PointGeom from './component/point-geom'
 import PolygonGeom from './component/polygon-geom'
 import RegShapeStyle from './component/reg-shape-style'
 import SelectInteraction from './component/select-interaction'
+import SnapInteraction from './component/snap-interaction'
 import SputnikSource from './component/sputnik-source'
 import StrokeStyle from './component/stroke-style'
 import StyleBox from './component/style-box'
@@ -85,6 +86,7 @@ function plugin (Vue, options = {}) {
   Vue.use(PolygonGeom)
   Vue.use(RegShapeStyle)
   Vue.use(SelectInteraction)
+  Vue.use(SnapInteraction)
   Vue.use(SputnikSource)
   Vue.use(StrokeStyle)
   Vue.use(StyleBox)
@@ -125,6 +127,7 @@ export {
   PolygonGeom,
   RegShapeStyle,
   SelectInteraction,
+  SnapInteraction,
   SputnikSource,
   StrokeStyle,
   StyleBox,

@@ -4,12 +4,7 @@ import { instanceOf } from '../util/assert'
 
 const methods = {
   /**
-   * TODO need refactoring, like in feature-container
-   * @return {{
-   *     hasOverlay: function(ol.Overlay): bool,
-   *     addOverlay: function(ol.Overlay): void,
-   *     removeOverlay: function(ol.Overlay): void
-   *   }|undefined}
+   * @return {IndexedCollectionAdapter}
    * @protected
    */
   getOverlaysTarget () {
@@ -23,13 +18,8 @@ const methods = {
     overlay = overlay instanceof Vue ? overlay.$overlay : overlay
     instanceOf(overlay, Overlay)
 
-    if (!this._overlays[overlay.getId()]) {
-      this._overlays[overlay.getId()] = overlay
-    }
-
-    const overlaysTarget = this.getOverlaysTarget()
-    if (overlaysTarget && !overlaysTarget.hasOverlay(overlay)) {
-      overlaysTarget.addOverlay(overlay)
+    if (this.getOverlaysTarget().has(overlay) === false) {
+      this.getOverlaysTarget().add(overlay)
     }
   },
   /**
@@ -41,25 +31,28 @@ const methods = {
 
     if (!overlay) return
 
-    delete this._overlays[overlay.getId()]
-
-    const overlaysTarget = this.getOverlaysTarget()
-    if (overlaysTarget && overlaysTarget.hasOverlay(overlay)) {
-      overlaysTarget.removeOverlay(overlay)
+    if (this.getOverlaysTarget().has(overlay)) {
+      this.getOverlaysTarget().remove(overlay)
     }
   },
   /**
    * @return {ol.Overlay[]}
    */
   getOverlays () {
-    return Object.values(this._overlays)
+    return this.getOverlaysTarget().elements
   },
   /**
    * @param {string|number} id
    * @return {ol.Overlay|undefined}
    */
   getOverlayById (id) {
-    return this._overlays[id]
+    return this.getOverlaysTarget().findByKey(id)
+  },
+  /**
+   * @return {void}
+   */
+  clearOverlays () {
+    this.getOverlaysTarget().clear()
   },
   /**
    * @returns {Object}
@@ -76,14 +69,7 @@ const methods = {
 
 export default {
   methods,
-  created () {
-    /**
-     * @type {Object<string, ol.Overlay>}
-     * @private
-     */
-    this._overlays = Object.create(null)
-  },
   destroyed () {
-    this._overlays = Object.create(null)
+    this.clearOverlays()
   },
 }
