@@ -1,10 +1,8 @@
-/**
- * @module point-geom
- */
+/** @module circle-geom */
 import Geom from './geom.vue'
 
 /**
- * @alias module:point-geom
+ * @alias module:circle-geom
  */
 export default {
   /**

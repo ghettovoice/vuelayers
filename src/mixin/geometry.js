@@ -52,7 +52,7 @@ const computed = {
    */
   viewProjCoordinates () {
     if (this.rev && this.$geometry) {
-      return this.$geometry.getCoordinates()
+      return this.getCoordinates()
     }
   },
 }
@@ -72,6 +72,20 @@ const methods = {
    */
   createGeometry () {
     throw new Error('Not implemented method')
+  },
+  /**
+   * @return {ol.Coordinate}
+   */
+  getCoordinates () {
+    hasGeometry(this)
+    return this.$geometry.getCoordinates()
+  },
+  /**
+   * @param {ol.Coordinate} coordinate
+   */
+  setCoordinates (coordinate) {
+    hasGeometry(this)
+    this.$geometry.setCoordinates(coordinate)
   },
   /**
    * @return {Promise}
@@ -160,12 +174,12 @@ const watch = {
       coordinates: value,
       extent: boundingExtent(value),
     }, {
-      coordinates: this.$geometry.getCoordinates(),
+      coordinates: this.getCoordinates(),
       extent: this.extent,
     })
 
     if (!isEq) {
-      this.$geometry.setCoordinates(value)
+      this.setCoordinates(value)
     }
   },
 }
@@ -223,7 +237,7 @@ function subscribeToGeomChanges () {
     this.$geometry,
     'change',
     () => ({
-      coordinates: this.toBindProj(this.$geometry.getCoordinates()),
+      coordinates: this.toBindProj(this.getCoordinates()),
       extent: this.extent,
     })
   )::throttleTime(ft)

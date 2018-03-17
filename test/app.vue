@@ -62,6 +62,10 @@
                 </vl-overlay>
               </template>
             </vl-feature>
+
+            <vl-feature id="circle">
+              <vl-geom-circle :coordinates="[-5000000, -500000]" :radius="5000000"></vl-geom-circle>
+            </vl-feature>
           </vl-source-vector>
 
           <vl-style-box>
