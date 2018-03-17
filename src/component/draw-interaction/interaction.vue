@@ -141,7 +141,8 @@
      * @protected
      */
     async createInteraction () {
-      let source = await this.$identityMap.get(`${this.source}.instance_promise`)
+      let sourceIdent = this.makeIdent(this.source, this.$options.INSTANCE_PROMISE_IDENT_SUFFIX)
+      let source = await this.$identityMap.get(sourceIdent)
 
       return new DrawInteraction({
         source: source,

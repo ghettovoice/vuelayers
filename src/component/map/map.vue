@@ -22,7 +22,7 @@
   import olCmp from '../../mixin/ol-cmp'
   import overlaysContainer from '../../mixin/overlays-container'
   import projTransforms from '../../mixin/proj-transforms'
-  import { RENDERER_TYPE, PRIORITY_PROP_NAME } from '../../ol-ext/consts'
+  import { RENDERER_TYPE } from '../../ol-ext/consts'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasMap, hasView } from '../../util/assert'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -109,8 +109,8 @@
   }
 
   const prioritySorter = (a, b) => {
-    let ap = a.get(PRIORITY_PROP_NAME) || 0
-    let bp = b.get(PRIORITY_PROP_NAME) || 0
+    let ap = a.get('priority') || 0
+    let bp = b.get('priority') || 0
     return ap === bp ? 0 : ap - bp
   }
 

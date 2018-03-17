@@ -12,6 +12,14 @@ const props = {
     type: Boolean,
     default: true,
   },
+  /**
+   * Priority of interactions in the event handling stream.
+   * @type {number}
+   */
+  priority: {
+    type: Number,
+    default: 0,
+  },
 }
 
 const methods = {
@@ -22,7 +30,10 @@ const methods = {
   async createOlObject () {
     const interaction = await this.createInteraction()
     interaction.setActive(this.active)
-    interaction.set('id', this.id)
+    interaction.setProperties({
+      id: this.id,
+      priority: this.priority,
+    })
 
     return interaction
   },

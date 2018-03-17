@@ -39,11 +39,6 @@ export const CROSS_ORIGIN = 'anonymous'
  */
 export const REPROJ_ERR_THRESHOLD = 0.5
 /**
- * Property name to hold priority value.
- * @type {string}
- */
-export const PRIORITY_PROP_NAME = 'priority'
-/**
  * @type {number} Earth radius in meters
  */
 export const EARTH_RADIUS = 6378137

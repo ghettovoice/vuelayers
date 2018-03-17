@@ -11,7 +11,7 @@ import rxSubs from './rx-subs'
 import services from './services'
 
 const VM_PROP = 'vm'
-const INSTANCE_PROMISE = 'instance_promise'
+const INSTANCE_PROMISE_IDENT_SUFFIX = 'instance_promise'
 /**
  * @vueProps
  */
@@ -32,7 +32,7 @@ const methods = {
   async init () {
     let createPromise
 
-    const ident = this.makeIdent(INSTANCE_PROMISE)
+    const ident = this.makeSelfIdent(INSTANCE_PROMISE_IDENT_SUFFIX)
     if (ident && this.$identityMap.has(ident)) {
       createPromise = this.$identityMap.get(ident)
     } else {
@@ -65,7 +65,7 @@ const methods = {
    * @protected
    */
   deinit () {
-    const ident = this.makeIdent(INSTANCE_PROMISE)
+    const ident = this.makeSelfIdent(INSTANCE_PROMISE_IDENT_SUFFIX)
     if (ident) {
       this.$identityMap.unset(ident)
     }
@@ -117,7 +117,7 @@ const methods = {
  * @fires module:mixin/ol-cmp#destroyed
  */
 export default {
-  INSTANCE_PROMISE,
+  INSTANCE_PROMISE_IDENT_SUFFIX,
   mixins: [options, identMap, rxSubs, services],
   props,
   methods,

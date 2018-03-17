@@ -24,10 +24,17 @@ export default {
      * @return {string|undefined}
      * @protected
      */
-    makeIdent (...parts) {
+    makeSelfIdent (...parts) {
       if (!this.ident) return
 
-      return [this.ident, ...parts].filter(identity).join('.')
+      return this.makeIdent(this.ident, ...parts)
+    },
+    /**
+     * @param parts
+     * @return {string}
+     */
+    makeIdent (...parts) {
+      return parts.filter(identity).join('.')
     },
   },
   created () {
