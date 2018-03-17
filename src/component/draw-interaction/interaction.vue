@@ -238,7 +238,7 @@
       this::subscribeToInteractionChanges()
     },
   }
-
+  // todo listen type changes (recreate interaction)
   const watch = {}
 
   /**

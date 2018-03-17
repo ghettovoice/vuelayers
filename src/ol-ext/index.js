@@ -1,6 +1,7 @@
 /**
  * @module ol-ext
  */
+export * from './collection'
 export * from './consts'
 export * as extent from './extent'
 export * as feature from './feature'

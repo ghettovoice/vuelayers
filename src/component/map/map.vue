@@ -108,6 +108,8 @@
     tabindex: [String, Number],
   }
 
+  // sort interactions by priority in asc order
+  // the higher the priority, the earlier the interaction handles the event
   const prioritySorter = (a, b) => {
     let ap = a.get('priority') || 0
     let bp = b.get('priority') || 0
@@ -191,12 +193,14 @@
         },
         addInteraction (interaction) {
           map.addInteraction(interaction)
-          // sort interactions by priority in asc order
-          // the higher the priority, the earlier the interaction handles the event
-          map.getInteractions().getArray().sort(prioritySorter)
+          this.sortInteractions()
         },
         removeInteraction (interaction) {
           map.removeInteraction(interaction)
+        },
+        sortInteractions () {
+          map.getInteractions().getArray().sort(prioritySorter)
+          console.log(map.getInteractions().getArray())
         },
       }
     },

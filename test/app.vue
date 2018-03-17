@@ -89,6 +89,7 @@
 
         <vl-interaction-select @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
         <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
+        <vl-interaction-snap source="draw-target" :priority="10"></vl-interaction-snap>
 
         <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
           <!--<div style="background: white; padding: 10px">-->

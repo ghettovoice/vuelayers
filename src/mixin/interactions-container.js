@@ -72,6 +72,12 @@ const methods = {
       get interactionsContainer () { return vm },
     }
   },
+  sortInteractions () {
+    const interactionsTarget = this.getInteractionsTarget()
+    if (interactionsTarget) {
+      interactionsTarget.sortInteractions()
+    }
+  },
 }
 
 export default {
