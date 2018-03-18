@@ -1,3 +1,4 @@
+/** @module ol-ext/feature */
 import Vue from 'vue'
 import { isPlainObject, isString, isNumber } from '../util/minilo'
 import Feature from 'ol/feature'
@@ -7,7 +8,7 @@ import Feature from 'ol/feature'
  * @return {string|number}
  * @throws {Error}
  */
-export function getId (feature) {
+export function getFeatureId (feature) {
   let id
   if (isPlainObject(feature) || feature instanceof Vue) {
     id = feature.id

@@ -12,7 +12,7 @@
   import Vue from 'vue'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
-  import { getId as getFeatureId } from '../../ol-ext/feature'
+  import { getFeatureId } from '../../ol-ext/feature'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
@@ -130,6 +130,10 @@
         wrapX: this.wrapX,
         filter: this.filter,
         style: this.createStyleFunc(),
+        addCondition: this.addCondition,
+        condition: this.condition,
+        removeCondition: this.removeCondition,
+        toggleCondition: this.toggleCondition,
       })
     },
     /**
