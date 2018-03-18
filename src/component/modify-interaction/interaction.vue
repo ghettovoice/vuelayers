@@ -1,5 +1,7 @@
 <script>
   /** @module modify-interaction/interaction */
+  import Source from 'ol/source/source'
+  import Collection from 'ol/collection'
   import ModifyInteraction from 'ol/interaction/modify'
   import eventCondition from 'ol/events/condition'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
@@ -81,7 +83,8 @@
       let source = await this.$identityMap.get(sourceIdent)
 
       return new ModifyInteraction({
-        source: source,
+        source: source instanceof Source ? source : undefined,
+        features: source instanceof Collection ? source : undefined,
         deleteCondition: this.deleteCondition,
         insertVertexCondition: this.insertVertexCondition,
         pixelTolerance: this.pixelTolerance,

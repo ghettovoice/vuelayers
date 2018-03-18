@@ -1,7 +1,7 @@
 <script>
-  /**
-   * @module draw-interaction/interaction
-   */
+  /** @module draw-interaction/interaction */
+  import Source from 'ol/source/source'
+  import Collection from 'ol/collection'
   import DrawInteraction from 'ol/interaction/draw'
   import eventCondition from 'ol/events/condition'
   import { Observable } from 'rxjs'
@@ -145,7 +145,8 @@
       let source = await this.$identityMap.get(sourceIdent)
 
       return new DrawInteraction({
-        source: source,
+        source: source instanceof Source ? source : undefined,
+        features: source instanceof Collection ? source : undefined,
         clickTolerance: this.clickTolerance,
         snapTolerance: this.snapTolerance,
         type: this.type,
