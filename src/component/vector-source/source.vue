@@ -4,7 +4,7 @@
    */
   import VectorSource from 'ol/source/vector'
   import vectorSource from '../../mixin/vector-source'
-  import { getId as getFeatureId } from '../../ol-ext/feature'
+  import { getFeatureId } from '../../ol-ext/feature'
   import { geoJson } from '../../ol-ext/format'
   import { all as allLoadStrategy } from '../../ol-ext/load-strategy'
   import { transform } from '../../ol-ext/proj'

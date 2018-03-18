@@ -5,15 +5,14 @@
 </template>
 
 <script>
-  /**
-   * @module select-interaction/interaction
-   */
+  /** @module select-interaction/interaction */
   import Feature from 'ol/feature'
   import SelectInteraction from 'ol/interaction/select'
+  import eventCondition from 'ol/events/condition'
   import Vue from 'vue'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
-  import { getId as getFeatureId } from '../../ol-ext/feature'
+  import { getFeatureId } from '../../ol-ext/feature'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
@@ -21,16 +20,32 @@
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import projTransforms from '../../mixin/proj-transforms'
 
-  // todo add other options, like event modifiers
+  /**
+   * @vueProps
+   */
   const props = {
+    /**
+     * A function that takes an `ol.Feature` and an `ol.layer.Layer` and returns `true` if the feature may be selected or `false` otherwise.
+     * @type {ol.SelectFilterFunction|undefined}
+     */
     filter: {
       type: Function,
       default: constant(true),
     },
+    /**
+     * Hit-detection tolerance. Pixels inside the radius around the given position will be checked for features.
+     * This only works for the canvas renderer and not for WebGL.
+     * @type {number}
+     */
     hitTolerance: {
       type: Number,
       default: 0,
     },
+    /**
+     * A boolean that determines if the default behaviour should select only single features or all (overlapping)
+     * features at the clicked map position.
+     * @type {boolean}
+     */
     multi: {
       type: Boolean,
       default: false,
@@ -43,15 +58,67 @@
       type: Array,
       default: stubArray,
     },
+    /**
+     * Wrap the world horizontally on the selection overlay.
+     * @type {boolean}
+     */
     wrapX: {
       type: Boolean,
       default: true,
     },
+    /**
+     * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should
+     * be handled. By default, this is `ol.events.condition.never`. Use this if you want to use different events
+     * for `add` and `remove` instead of `toggle`.
+     * @type {ol.EventsConditionType|undefined}
+     */
+    addCondition: {
+      type: Function,
+      default: eventCondition.never,
+    },
+    /**
+     * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
+     * This is the event for the selected features as a whole. By default, this is `ol.events.condition.singleClick`.
+     * Clicking on a feature selects that feature and removes any that were in the selection. Clicking outside any feature
+     * removes all from the selection.
+     * @type {ol.EventsConditionType|undefined}
+     */
+    condition: {
+      type: Function,
+      default: eventCondition.singleClick,
+    },
+    /**
+     * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
+     * By default, this is `ol.events.condition.never`. Use this if you want to use different events for `add` and `remove`
+     * instead of `toggle`.
+     * @type {ol.EventsConditionType|undefined}
+     */
+    removeCondition: {
+      type: Function,
+      default: eventCondition.never,
+    },
+    /**
+     * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
+     * This is in addition to the `condition` event. By default, `ol.events.condition.shiftKeyOnly`, i.e. pressing `shift`
+     * as well as the `condition` event, adds that feature to the current selection if it is not currently selected,
+     * and removes it if it is.
+     * @type {ol.EventsConditionType|undefined}
+     */
+    toggleCondition: {
+      type: Function,
+      default: eventCondition.shiftKeyOnly,
+    },
   }
 
+  /**
+   * @vueComputed
+   */
   const computed = {
   }
 
+  /**
+   * @vueMethods
+   */
   const methods = {
     /**
      * @return {ol.interaction.Select}
@@ -63,6 +130,10 @@
         wrapX: this.wrapX,
         filter: this.filter,
         style: this.createStyleFunc(),
+        addCondition: this.addCondition,
+        condition: this.condition,
+        removeCondition: this.removeCondition,
+        toggleCondition: this.toggleCondition,
       })
     },
     /**
@@ -219,11 +290,11 @@
     },
   }
 
-  const diffById = (a, b) => getFeatureId(a) === getFeatureId(b)
   const watch = {
     features (value) {
       if (!this.$interaction) return
 
+      let diffById = (a, b) => getFeatureId(a) === getFeatureId(b)
       let forSelect = difference(value, this.$features, diffById)
       let forUnselect = difference(this.$features, value, diffById)
 
@@ -232,7 +303,11 @@
     },
   }
 
-  // TODO: use featuresContainer mixin
+  /**
+   * @vueProto
+   * @alias module:select-interaction/interaction
+   * @title vl-interaction-select
+   */
   export default {
     name: 'vl-interaction-select',
     mixins: [interaction, stylesContainer, projTransforms],
