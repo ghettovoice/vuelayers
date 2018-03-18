@@ -4,6 +4,7 @@
    */
   import Collection from 'ol/collection'
   import DrawInteraction from 'ol/interaction/draw'
+  import eventCondition from 'ol/events/condition'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operator'
@@ -16,7 +17,7 @@
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
-  import { mapValues, stubArray } from '../../util/minilo'
+  import { mapValues, stubArray, camelCase, difference } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -63,7 +64,7 @@
     type: {
       type: String,
       required: true,
-      validator: value => Object.keys(GEOMETRY_TYPE),
+      validator: value => Object.keys(GEOMETRY_TYPE).includes(camelCase(value)),
     },
     /**
      * Stop click, singleclick, and doubleclick events from firing during drawing.
@@ -107,7 +108,10 @@
      * By default `ol.events.condition.noModifierKeys`, i.e. a click, adds a vertex or deactivates freehand drawing.
      * @type {ol.EventsConditionType|function|undefined}
      */
-    condition: Function,
+    condition: {
+      type: Function,
+      default: eventCondition.noModifierKeys,
+    },
     /**
      * Operate in freehand mode for lines, polygons, and circles. This makes the interaction always operate in
      * freehand mode and takes precedence over any `freehandCondition` option.
@@ -123,7 +127,10 @@
      * meaning that the Shift key activates freehand drawing.
      * @type {ol.EventsConditionType|function|undefined}
      */
-    freehandCondition: Function,
+    freehandCondition: {
+      type: Function,
+      default: eventCondition.shiftKeyOnly,
+    },
     /**
      * Wrap the world horizontally on the sketch overlay.
      * @type {boolean}
@@ -241,9 +248,19 @@
     },
   }
   // todo other props?
-  const watch = makeWatchers(['source', 'type'], function () {
-    this.recreate()
-  })
+  const watch = {
+    ...makeWatchers(['source', 'type'], function () {
+      this.recreate()
+    }),
+    features (value, oldValue) {
+      const diffById = (a, b) => a.id === b.id
+      let forAdd = difference(value, oldValue, diffById)
+      let forRemove = difference(oldValue, value, diffById)
+
+      this.addFeatures(forAdd)
+      this.removeFeatures(forRemove)
+    },
+  }
 
   /**
    * @alias module:draw-interaction/interaction
