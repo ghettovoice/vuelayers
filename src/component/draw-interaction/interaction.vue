@@ -2,22 +2,18 @@
   /**
    * @module draw-interaction/interaction
    */
-  import Collection from 'ol/collection'
   import DrawInteraction from 'ol/interaction/draw'
   import eventCondition from 'ol/events/condition'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operator'
-  import featuresContainer from '../../mixin/features-container'
   import interaction from '../../mixin/interaction'
-  import projTransforms from '../../mixin/proj-transforms'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
-  import { IndexedCollectionAdapter } from '../../ol-ext/collection'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
-  import { mapValues, stubArray, camelCase, difference } from '../../util/minilo'
+  import { mapValues, camelCase } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -27,18 +23,13 @@
    */
   const props = {
     /**
-     * Initial set of features.
-     * @type {GeoJSONFeature[]}
-     */
-    features: {
-      type: Array,
-      default: stubArray,
-    },
-    /**
      * Target source identifier from IdentityMap.
      * @type {String}
      */
-    source: String,
+    source: {
+      type: String,
+      required: true,
+    },
     /**
      * The maximum distance in pixels between "down" and "up" for a "up" event to be considered a "click" event and
      * actually add a point/vertex to the geometry being drawn. Default is 6 pixels. That value was chosen for the
@@ -155,7 +146,6 @@
 
       return new DrawInteraction({
         source: source,
-        features: this.getFeaturesTarget().adaptee,
         clickTolerance: this.clickTolerance,
         snapTolerance: this.snapTolerance,
         type: this.type,
@@ -186,17 +176,6 @@
       }
     },
     /**
-     * @return {IndexedCollectionAdapter}
-     * @protected
-     */
-    getFeaturesTarget () {
-      if (this._featuresTarget == null) {
-        this._featuresTarget = new IndexedCollectionAdapter(new Collection(), feature => feature.getId())
-      }
-
-      return this._featuresTarget
-    },
-    /**
      * @returns {Object}
      * @protected
      */
@@ -219,7 +198,6 @@
      */
     mount () {
       this::interaction.methods.mount()
-      this.addFeatures(this.features)
     },
     /**
      * @return {void}
@@ -248,19 +226,9 @@
     },
   }
   // todo other props?
-  const watch = {
-    ...makeWatchers(['source', 'type'], function () {
-      this.recreate()
-    }),
-    features (value, oldValue) {
-      const diffById = (a, b) => a.id === b.id
-      let forAdd = difference(value, oldValue, diffById)
-      let forRemove = difference(oldValue, value, diffById)
-
-      this.addFeatures(forAdd)
-      this.removeFeatures(forRemove)
-    },
-  }
+  const watch = makeWatchers(['source', 'type'], function () {
+    this.recreate()
+  })
 
   /**
    * @alias module:draw-interaction/interaction
@@ -269,7 +237,7 @@
    */
   export default {
     name: 'vl-interaction-draw',
-    mixins: [interaction, featuresContainer, stylesContainer, projTransforms],
+    mixins: [interaction, stylesContainer],
     props,
     methods,
     watch,
@@ -299,11 +267,5 @@
       observableFromOlEvent(this.$interaction, 'drawend'),
     )
     this.subscribeTo(drawEvents, evt => this.$emit(evt.type, evt))
-
-    const changeEvents = observableFromOlEvent(this.getFeaturesTarget().adaptee, ['add', 'remove'])
-    this.subscribeTo(changeEvents, () => {
-      ++this.rev
-      this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInBindProj))
-    })
   }
 </script>
