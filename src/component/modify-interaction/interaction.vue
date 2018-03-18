@@ -2,6 +2,7 @@
   /** @module modify-interaction/interaction */
   import ModifyInteraction from 'ol/interaction/modify'
   import eventCondition from 'ol/events/condition'
+  import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
@@ -174,5 +175,8 @@
    */
   function subscribeToInteractionChanges () {
     hasInteraction(this)
+
+    const modifyEvents = observableFromOlEvent(this.$interaction, ['modifystart', 'modifyend'])
+    this.subscribeTo(modifyEvents, evt => this.$emit(evt.type, evt))
   }
 </script>
