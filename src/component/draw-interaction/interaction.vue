@@ -10,6 +10,7 @@
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import { initFeature } from '../../ol-ext/feature'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
@@ -55,7 +56,7 @@
     type: {
       type: String,
       required: true,
-      validator: value => Object.keys(GEOMETRY_TYPE).includes(camelCase(value)),
+      validator: value => Object.values(GEOMETRY_TYPE).includes(camelCase(value)),
     },
     /**
      * Stop click, singleclick, and doubleclick events from firing during drawing.
@@ -141,8 +142,8 @@
      * @protected
      */
     async createInteraction () {
-      let sourceIdent = this.makeIdent(this.source, this.$options.INSTANCE_PROMISE_IDENT_SUFFIX)
-      let source = await this.$identityMap.get(sourceIdent)
+      let sourceIdent = this.makeIdent(this.source)
+      let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
 
       return new DrawInteraction({
         source: source instanceof Source ? source : undefined,
@@ -262,7 +263,7 @@
     const drawEvents = Observable::mergeObs(
       observableFromOlEvent(this.$interaction, 'drawstart')
         ::mapObs(evt => {
-          this.prepareFeature(evt.feature)
+          initFeature(evt.feature)
           return evt
         }),
       observableFromOlEvent(this.$interaction, 'drawend'),

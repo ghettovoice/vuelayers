@@ -79,8 +79,8 @@
      * @protected
      */
     async createInteraction () {
-      let sourceIdent = this.makeIdent(this.source, this.$options.INSTANCE_PROMISE_IDENT_SUFFIX)
-      let source = await this.$identityMap.get(sourceIdent)
+      let sourceIdent = this.makeIdent(this.source)
+      let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
 
       return new ModifyInteraction({
         source: source instanceof Source ? source : undefined,

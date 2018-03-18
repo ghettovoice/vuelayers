@@ -78,18 +78,19 @@
           </vl-style-box>
         </vl-layer-vector>
 
-        <vl-layer-image id="jz">
-          <vl-source-image-static
-            :url="imageUrl"
-            :size="imageSize"
-            :extent="imageExtent"
-            :projection="imageProj">
-          </vl-source-image-static>
-        </vl-layer-image>
+        <!--<vl-layer-image id="jz">-->
+          <!--<vl-source-image-static-->
+            <!--:url="imageUrl"-->
+            <!--:size="imageSize"-->
+            <!--:extent="imageExtent"-->
+            <!--:projection="imageProj">-->
+          <!--</vl-source-image-static>-->
+        <!--</vl-layer-image>-->
 
         <vl-interaction-select @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
         <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
-        <vl-interaction-snap source="draw-target" :priority="10"></vl-interaction-snap>
+        <vl-interaction-modify source="draw-target" @drawstart="log('modifystart', $event)" @drawend="log('modifyend', $event)" />
+        <vl-interaction-snap source="draw-target" :priority="10" />
 
         <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
           <!--<div style="background: white; padding: 10px">-->

@@ -1,6 +1,19 @@
+import uuid from 'uuid/v4'
 import Vue from 'vue'
 import { isPlainObject, isString, isNumber } from '../util/minilo'
 import Feature from 'ol/feature'
+
+/**
+ * Basic feature initialization
+ * @param feature
+ */
+export function initFeature (feature) {
+  if (feature.getId() == null) {
+    feature.setId(uuid())
+  }
+
+  return feature
+}
 
 /**
  * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
