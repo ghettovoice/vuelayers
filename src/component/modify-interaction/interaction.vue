@@ -1,6 +1,7 @@
 <script>
   /** @module modify-interaction/interaction */
   import Source from 'ol/source/source'
+  import SelectInteraction from 'ol/interaction/select'
   import Collection from 'ol/collection'
   import ModifyInteraction from 'ol/interaction/modify'
   import eventCondition from 'ol/events/condition'
@@ -81,6 +82,9 @@
     async createInteraction () {
       let sourceIdent = this.makeIdent(this.source)
       let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
+      if (source instanceof SelectInteraction) {
+        source = source.getFeatures()
+      }
 
       return new ModifyInteraction({
         source: source instanceof Source ? source : undefined,
@@ -180,6 +184,9 @@
     hasInteraction(this)
 
     const modifyEvents = observableFromOlEvent(this.$interaction, ['modifystart', 'modifyend'])
-    this.subscribeTo(modifyEvents, evt => this.$emit(evt.type, evt))
+    this.subscribeTo(modifyEvents, evt => {
+      ++this.rev
+      this.$emit(evt.type, evt)
+    })
   }
 </script>

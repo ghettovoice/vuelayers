@@ -268,6 +268,9 @@
         }),
       observableFromOlEvent(this.$interaction, 'drawend'),
     )
-    this.subscribeTo(drawEvents, evt => this.$emit(evt.type, evt))
+    this.subscribeTo(drawEvents, evt => {
+      ++this.rev
+      this.$emit(evt.type, evt)
+    })
   }
 </script>

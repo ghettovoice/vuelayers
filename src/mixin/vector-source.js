@@ -131,10 +131,12 @@ function subscribeToSourceChanges () {
 
   const events = Observable::mergeObs(add, remove)
 
-  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
+  this.subscribeTo(events, evt => {
+    ++this.rev
+    this.$emit(evt.type, evt)
+  })
   // emit event to allow `sync` modifier
   this.subscribeTo(events::debounceTime(100), () => {
-    ++this.rev
     this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInBindProj))
   })
 }
