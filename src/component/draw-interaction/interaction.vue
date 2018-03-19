@@ -1,43 +1,35 @@
 <script>
-  /**
-   * @module draw-interaction/interaction
-   */
-  import Collection from 'ol/collection'
+  /** @module draw-interaction/interaction */
   import DrawInteraction from 'ol/interaction/draw'
+  import eventCondition from 'ol/events/condition'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operator'
-  import featuresContainer from '../../mixin/features-container'
   import interaction from '../../mixin/interaction'
-  import projTransforms from '../../mixin/proj-transforms'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
-  import { IndexedCollectionAdapter } from '../../ol-ext/collection'
+  import { initFeature } from '../../ol-ext/feature'
+  import { isCollection, isVectorSource } from '../../ol-ext/util'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
-  import { mapValues, stubArray } from '../../util/minilo'
+  import { mapValues, camelCase, isFunction, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
-  // TODO bind with external destination source
+  const transformType = type => upperFirst(camelCase(type))
   /**
    * @vueProps
    */
   const props = {
     /**
-     * Initial set of features.
-     * @type {GeoJSONFeature[]}
-     */
-    features: {
-      type: Array,
-      default: stubArray,
-    },
-    /**
-     * Target source identifier from IdentityMap.
+     * Target source or collection identifier from IdentityMap.
      * @type {String}
      */
-    source: String,
+    source: {
+      type: String,
+      required: true,
+    },
     /**
      * The maximum distance in pixels between "down" and "up" for a "up" event to be considered a "click" event and
      * actually add a point/vertex to the geometry being drawn. Default is 6 pixels. That value was chosen for the
@@ -63,7 +55,7 @@
     type: {
       type: String,
       required: true,
-      validator: value => Object.keys(GEOMETRY_TYPE),
+      validator: value => Object.values(GEOMETRY_TYPE).includes(transformType(value)),
     },
     /**
      * Stop click, singleclick, and doubleclick events from firing during drawing.
@@ -107,7 +99,10 @@
      * By default `ol.events.condition.noModifierKeys`, i.e. a click, adds a vertex or deactivates freehand drawing.
      * @type {ol.EventsConditionType|function|undefined}
      */
-    condition: Function,
+    condition: {
+      type: Function,
+      default: eventCondition.noModifierKeys,
+    },
     /**
      * Operate in freehand mode for lines, polygons, and circles. This makes the interaction always operate in
      * freehand mode and takes precedence over any `freehandCondition` option.
@@ -123,7 +118,10 @@
      * meaning that the Shift key activates freehand drawing.
      * @type {ol.EventsConditionType|function|undefined}
      */
-    freehandCondition: Function,
+    freehandCondition: {
+      type: Function,
+      default: eventCondition.shiftKeyOnly,
+    },
     /**
      * Wrap the world horizontally on the sketch overlay.
      * @type {boolean}
@@ -143,15 +141,22 @@
      * @protected
      */
     async createInteraction () {
-      let sourceIdent = this.makeIdent(this.source, this.$options.INSTANCE_PROMISE_IDENT_SUFFIX)
-      let source = await this.$identityMap.get(sourceIdent)
+      let sourceIdent = this.makeIdent(this.source)
+      let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
+
+      if (isFunction(source.getFeatures)) {
+        let features = source.getFeatures()
+        if (isCollection(features)) {
+          source = features
+        }
+      }
 
       return new DrawInteraction({
-        source: source,
-        features: this.getFeaturesTarget().adaptee,
+        source: isVectorSource(source) ? source : undefined,
+        features: isCollection(source) ? source : undefined,
         clickTolerance: this.clickTolerance,
         snapTolerance: this.snapTolerance,
-        type: this.type,
+        type: transformType(this.type),
         stopClick: this.stopClick,
         maxPoints: this.maxPoints,
         minPoints: this.minPoints,
@@ -179,17 +184,6 @@
       }
     },
     /**
-     * @return {IndexedCollectionAdapter}
-     * @protected
-     */
-    getFeaturesTarget () {
-      if (this._featuresTarget == null) {
-        this._featuresTarget = new IndexedCollectionAdapter(new Collection(), feature => feature.getId())
-      }
-
-      return this._featuresTarget
-    },
-    /**
      * @returns {Object}
      * @protected
      */
@@ -212,7 +206,6 @@
      */
     mount () {
       this::interaction.methods.mount()
-      this.addFeatures(this.features)
     },
     /**
      * @return {void}
@@ -252,7 +245,7 @@
    */
   export default {
     name: 'vl-interaction-draw',
-    mixins: [interaction, featuresContainer, stylesContainer, projTransforms],
+    mixins: [interaction, stylesContainer],
     props,
     methods,
     watch,
@@ -276,17 +269,14 @@
     const drawEvents = Observable::mergeObs(
       observableFromOlEvent(this.$interaction, 'drawstart')
         ::mapObs(evt => {
-          this.prepareFeature(evt.feature)
+          initFeature(evt.feature)
           return evt
         }),
       observableFromOlEvent(this.$interaction, 'drawend'),
     )
-    this.subscribeTo(drawEvents, evt => this.$emit(evt.type, evt))
-
-    const changeEvents = observableFromOlEvent(this.getFeaturesTarget().adaptee, ['add', 'remove'])
-    this.subscribeTo(changeEvents, () => {
+    this.subscribeTo(drawEvents, evt => {
       ++this.rev
-      this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInBindProj))
+      this.$emit(evt.type, evt)
     })
   }
 </script>

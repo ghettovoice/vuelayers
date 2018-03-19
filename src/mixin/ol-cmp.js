@@ -11,7 +11,7 @@ import rxSubs from './rx-subs'
 import services from './services'
 
 const VM_PROP = 'vm'
-const INSTANCE_PROMISE_IDENT_SUFFIX = 'instance_promise'
+const INSTANCE_PROMISE_POOL = 'instance_promise'
 /**
  * @vueProps
  */
@@ -32,14 +32,14 @@ const methods = {
   async init () {
     let createPromise
 
-    const ident = this.makeSelfIdent(INSTANCE_PROMISE_IDENT_SUFFIX)
-    if (ident && this.$identityMap.has(ident)) {
-      createPromise = this.$identityMap.get(ident)
+    const ident = this.makeSelfIdent()
+    if (ident && this.$identityMap.has(ident, INSTANCE_PROMISE_POOL)) {
+      createPromise = this.$identityMap.get(ident, INSTANCE_PROMISE_POOL)
     } else {
       createPromise = Promise.resolve(this.createOlObject())
 
       if (ident) {
-        this.$identityMap.set(ident, createPromise)
+        this.$identityMap.set(ident, createPromise, INSTANCE_PROMISE_POOL)
       }
     }
 
@@ -65,9 +65,9 @@ const methods = {
    * @protected
    */
   deinit () {
-    const ident = this.makeSelfIdent(INSTANCE_PROMISE_IDENT_SUFFIX)
+    const ident = this.makeSelfIdent()
     if (ident) {
-      this.$identityMap.unset(ident)
+      this.$identityMap.unset(ident, INSTANCE_PROMISE_POOL)
     }
     if (this._olObject) {
       this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
@@ -138,7 +138,7 @@ const methods = {
  */
 export default {
   VM_PROP,
-  INSTANCE_PROMISE_IDENT_SUFFIX,
+  INSTANCE_PROMISE_POOL,
   mixins: [options, identMap, rxSubs, services],
   props,
   methods,

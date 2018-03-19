@@ -1,6 +1,6 @@
 import Feature from 'ol/feature'
-import uuid from 'uuid/v4'
 import Vue from 'vue'
+import { initFeature } from '../ol-ext/feature'
 import { instanceOf } from '../util/assert'
 import { isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
@@ -98,11 +98,7 @@ const methods = {
    * @protected
    */
   prepareFeature (feature) {
-    if (feature.getId() == null) {
-      feature.setId(uuid())
-    }
-
-    return feature
+    return initFeature(feature)
   },
 }
 

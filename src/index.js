@@ -19,6 +19,7 @@ import ImageStaticSource from './component/image-static-source'
 import LineStringGeom from './component/line-string-geom'
 import Map from './component/map'
 import MapboxSource from './component/mapbox-source'
+import ModifyInteraction from './component/modify-interaction'
 import MultiLineStringGeom from './component/multi-line-string-geom'
 import MultiPointGeom from './component/multi-point-geom'
 import MultiPolygonGeom from './component/multi-polygon-geom'
@@ -77,6 +78,7 @@ function plugin (Vue, options = {}) {
   Vue.use(LineStringGeom)
   Vue.use(Map)
   Vue.use(MapboxSource)
+  Vue.use(ModifyInteraction)
   Vue.use(MultiLineStringGeom)
   Vue.use(MultiPointGeom)
   Vue.use(MultiPolygonGeom)
@@ -118,6 +120,7 @@ export {
   LineStringGeom,
   Map,
   MapboxSource,
+  ModifyInteraction,
   MultiLineStringGeom,
   MultiPointGeom,
   MultiPolygonGeom,

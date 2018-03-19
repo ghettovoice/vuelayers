@@ -1,3 +1,6 @@
+import eventType from 'ol/events/eventtype'
+import { forEach } from '../util/minilo'
+
 /**
  * Wraps OpenLayers collection to provide indexed access to elements.
  */
@@ -23,10 +26,7 @@ export class IndexedCollectionAdapter {
      */
     this._index = Object.create(null)
 
-    this._adaptee.forEach((element, idx) => {
-      let key = this._getElementKey(element)
-      this._index[key] = idx
-    })
+    this._adaptee.forEach(element => this._addToIndex(this._getElementKey(element), element))
   }
 
   /**
@@ -44,7 +44,7 @@ export class IndexedCollectionAdapter {
    * @param {function} iteratee
    */
   forEach (iteratee) {
-    this._adaptee.forEach(iteratee)
+    forEach(this.elements, iteratee)
   }
 
   /**
@@ -52,21 +52,19 @@ export class IndexedCollectionAdapter {
    */
   add (element) {
     let key = this._getElementKey(element)
-    if (key == null) return
 
-    let length = this._adaptee.push(element)
-    this._index[key] = length - 1
+    if (key != null) {
+      this._adaptee.push(element)
+      this._index[key] = element
+    }
   }
 
   /**
    * @param {*} element
    */
   remove (element) {
-    let key = this._getElementKey(element)
-    if (!key) return
-
     if (this._adaptee.remove(element)) {
-      delete this._index[key]
+      this._removeFromIndex(this._getElementKey(element))
     }
   }
 
@@ -83,7 +81,7 @@ export class IndexedCollectionAdapter {
    */
   clear () {
     this._adaptee.clear()
-    this._index = Object.create(null)
+    this._resetIndex()
   }
 
   /**
@@ -91,9 +89,7 @@ export class IndexedCollectionAdapter {
    * @return {*|undefined}
    */
   findByKey (key) {
-    if (this._index[key] == null) return
-
-    return this._adaptee.item(this._index[key])
+    return key && this._index[key]
   }
 
   /**
@@ -101,6 +97,64 @@ export class IndexedCollectionAdapter {
    */
   sort (sorter) {
     this.elements.sort(sorter)
+  }
+
+  /**
+   * @private
+   */
+  _resetIndex () {
+    this._index = Object.create(null)
+  }
+
+  /**
+   * @param {string} key
+   * @param {*} element
+   * @private
+   */
+  _addToIndex (key, element) {
+    if (key == null) {
+      return false
+    }
+
+    this._index[key] = element
+    element.on(eventType.PROPERTYCHANGE, this._handleElementChange, this)
+
+    return true
+  }
+
+  /**
+   * @param {string} key
+   * @private
+   */
+  _removeFromIndex (key) {
+    let element = this.findByKey(key)
+
+    if (element) {
+      element.un(eventType.PROPERTYCHANGE, this._handleElementChange, this)
+      delete this._index[key]
+    }
+
+    return !!element
+  }
+
+  /**
+   * Updates index
+   * @param {*} target
+   * @private
+   */
+  _handleElementChange ({ target }) {
+    let key = this._getElementKey(target)
+    // remove by old key
+    if (this.findByKey(key) !== target) {
+      for (let k in this._index) {
+        if (this._index[k] === target) {
+          this._removeFromIndex(k)
+          break
+        }
+      }
+    }
+
+    this._addToIndex(key, target)
   }
 }
 

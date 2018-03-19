@@ -292,3 +292,13 @@ export function includes (array, value, comparator = isEqual) {
 export function difference (array1, array2, comparator = isEqual) {
   return filter(array1, value => !includes(array2, value, comparator))
 }
+
+/**
+ * @param {string} str
+ * @return {string}
+ */
+export function camelCase (str) {
+  let regExp = /([-_]\w)/g
+
+  return str.replace(regExp, matches => matches[1].toUpperCase())
+}
