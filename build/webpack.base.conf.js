@@ -80,7 +80,7 @@ module.exports = {
     noParse: [/openlayers/],
   },
   plugins: [
-    new NpmInstallPlugin(),
+    // new NpmInstallPlugin(),
     new StringReplacePlugin(),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin(Object.assign({}, config.replaces, {
