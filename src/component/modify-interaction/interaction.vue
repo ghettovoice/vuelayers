@@ -1,15 +1,13 @@
 <script>
   /** @module modify-interaction/interaction */
-  import Source from 'ol/source/source'
-  import SelectInteraction from 'ol/interaction/select'
-  import Collection from 'ol/collection'
   import ModifyInteraction from 'ol/interaction/modify'
   import eventCondition from 'ol/events/condition'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
-  import { mapValues } from '../../util/minilo'
+  import { isCollection, isVectorSource } from '../../ol-ext/util'
+  import { mapValues, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { hasInteraction } from '../../util/assert'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -19,7 +17,7 @@
    */
   const props = {
     /**
-     * Target source identifier from IdentityMap.
+     * Source or collection identifier from IdentityMap.
      * @type {String}
      */
     source: {
@@ -82,13 +80,17 @@
     async createInteraction () {
       let sourceIdent = this.makeIdent(this.source)
       let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
-      if (source instanceof SelectInteraction) {
-        source = source.getFeatures()
+
+      if (isFunction(source.getFeatures)) {
+        let features = source.getFeatures()
+        if (isCollection(features)) {
+          source = features
+        }
       }
 
       return new ModifyInteraction({
-        source: source instanceof Source ? source : undefined,
-        features: source instanceof Collection ? source : undefined,
+        source: isVectorSource(source) ? source : undefined,
+        features: isCollection(source) ? source : undefined,
         deleteCondition: this.deleteCondition,
         insertVertexCondition: this.insertVertexCondition,
         pixelTolerance: this.pixelTolerance,

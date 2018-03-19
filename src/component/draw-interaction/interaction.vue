@@ -1,7 +1,5 @@
 <script>
   /** @module draw-interaction/interaction */
-  import Source from 'ol/source/source'
-  import Collection from 'ol/collection'
   import DrawInteraction from 'ol/interaction/draw'
   import eventCondition from 'ol/events/condition'
   import { Observable } from 'rxjs'
@@ -11,20 +9,21 @@
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { initFeature } from '../../ol-ext/feature'
+  import { isCollection, isVectorSource } from '../../ol-ext/util'
   import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
-  import { mapValues, camelCase } from '../../util/minilo'
+  import { mapValues, camelCase, isFunction, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
-  // TODO bind with external destination source
+  const transformType = type => upperFirst(camelCase(type))
   /**
    * @vueProps
    */
   const props = {
     /**
-     * Target source identifier from IdentityMap.
+     * Target source or collection identifier from IdentityMap.
      * @type {String}
      */
     source: {
@@ -56,7 +55,7 @@
     type: {
       type: String,
       required: true,
-      validator: value => Object.values(GEOMETRY_TYPE).includes(camelCase(value)),
+      validator: value => Object.values(GEOMETRY_TYPE).includes(transformType(value)),
     },
     /**
      * Stop click, singleclick, and doubleclick events from firing during drawing.
@@ -145,12 +144,19 @@
       let sourceIdent = this.makeIdent(this.source)
       let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
 
+      if (isFunction(source.getFeatures)) {
+        let features = source.getFeatures()
+        if (isCollection(features)) {
+          source = features
+        }
+      }
+
       return new DrawInteraction({
-        source: source instanceof Source ? source : undefined,
-        features: source instanceof Collection ? source : undefined,
+        source: isVectorSource(source) ? source : undefined,
+        features: isCollection(source) ? source : undefined,
         clickTolerance: this.clickTolerance,
         snapTolerance: this.snapTolerance,
-        type: this.type,
+        type: transformType(this.type),
         stopClick: this.stopClick,
         maxPoints: this.maxPoints,
         minPoints: this.minPoints,

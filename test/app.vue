@@ -2,9 +2,10 @@
   <div id="app">
     <div style="height: 100%">
       <div>
-        <button @click="drawType = 'Point'">Point</button>
-        <button @click="drawType = 'LineString'">LineString</button>
-        <button @click="drawType = 'Polygon'">Polygon</button>
+        <button @click="drawType = 'point'">Point</button>
+        <button @click="drawType = 'line_string'">LineString</button>
+        <button @click="drawType = 'polygon'">Polygon</button>
+        <button @click="drawType = 'circle'">Circle</button>
         <button @click="drawType = undefined">Reset</button>
       </div>
       <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')" @singleclick="clickCoord = $event.coordinate">
@@ -50,7 +51,7 @@
         </vl-layer-tile>
 
         <vl-layer-vector>
-          <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" @addfeature="log('addfeature', $event)">
+          <vl-source-vector :features.sync="drawnFeatures" @addfeature="log('addfeature', $event)">
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
               <template slot-scope="feature">
                 <vl-geom-polygon :coordinates.sync="polygonCoords"/>
@@ -78,6 +79,10 @@
           </vl-style-box>
         </vl-layer-vector>
 
+        <vl-layer-vector id="draw-layer">
+          <vl-source-vector ident="draw-target" />
+        </vl-layer-vector>
+
         <!--<vl-layer-image id="jz">-->
           <!--<vl-source-image-static-->
             <!--:url="imageUrl"-->
@@ -90,7 +95,7 @@
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
         <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
         <vl-interaction-modify source="draw-target" @drawstart="log('modifystart', $event)" @drawend="log('modifyend', $event)" />
-        <vl-interaction-snap source="select" :priority="10" />
+        <vl-interaction-snap source="draw-target" :priority="10" />
 
         <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
           <!--<div style="background: white; padding: 10px">-->
@@ -213,7 +218,7 @@
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: polygonFromLonLat([[[0, 0], [10, 10], [10, 0], [0, 0]]]),
+        polygonCoords: polygonFromLonLat([[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]]),
         selected: [],
         selectedFeatures: [],
         countries: [],
