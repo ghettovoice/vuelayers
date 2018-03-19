@@ -15,6 +15,9 @@ if (!isProduction) {
 }
 
 const webpackConfig = merge(baseWebpackConfig, {
+  mode: ['production', 'development'].includes(process.env.NODE_ENV)
+    ? process.env.NODE_ENV
+    : 'production',
   module: {
     rules: [
       {
