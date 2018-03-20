@@ -5,7 +5,7 @@ import TopoJSON from 'ol/format/topojson'
  * @param {olx.format.GeoJSONOptions} [options]
  * @return {ol.format.GeoJSON}
  */
-export function geoJson (options) {
+export function createGeoJsonFmt (options) {
   return new GeoJSON(options)
 }
 
@@ -13,6 +13,6 @@ export function geoJson (options) {
  * @param {olx.format.TopoJSONOptions} [options]
  * @return {ol.format.TopoJSON}
  */
-export function topoJson (options) {
+export function createTopoJsonFmt (options) {
   return new TopoJSON(options)
 }

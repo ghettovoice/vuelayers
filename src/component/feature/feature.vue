@@ -18,7 +18,7 @@
   import projTransforms from '../../mixin/proj-transforms'
   import stylesContainer from '../../mixin/styles-container'
   import useMapCmp from '../../mixin/use-map-cmp'
-  import { pointOnSurface } from '../../ol-ext/geom'
+  import { findPointOnSurface } from '../../ol-ext/geom'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasFeature, hasMap } from '../../util/assert'
   import { plainProps, isEqual } from '../../util/minilo'
@@ -68,7 +68,7 @@
      */
     geometryPoint () {
       if (this.rev && this.$geometry) {
-        return this.pointToBindProj(pointOnSurface(this.$geometry))
+        return this.pointToBindProj(findPointOnSurface(this.$geometry))
       }
     },
   }

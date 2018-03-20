@@ -1,6 +1,6 @@
 import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
 import { boundingExtent } from '../ol-ext/extent'
-import { pointOnSurface } from '../ol-ext/geom'
+import { findPointOnSurface } from '../ol-ext/geom'
 import { transforms } from '../ol-ext/proj'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import { hasGeometry, hasView } from '../util/assert'
@@ -44,7 +44,7 @@ const computed = {
    */
   pointOnSurface () {
     if (this.rev && this.$geometry && this.$view) {
-      return this.pointToBindProj(pointOnSurface(this.$geometry))
+      return this.pointToBindProj(findPointOnSurface(this.$geometry))
     }
   },
   /**

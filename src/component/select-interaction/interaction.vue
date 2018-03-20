@@ -13,7 +13,7 @@
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { getFeatureId } from '../../ol-ext/feature'
-  import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
+  import { defaultEditStyle, createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
   import { constant, stubArray, isFunction, forEach, mapValues, difference } from '../../util/minilo'

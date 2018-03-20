@@ -6,24 +6,17 @@ import Projection from 'ol/proj/projection'
 import { EPSG_3857, EPSG_4326, GEOMETRY_TYPE } from './consts'
 
 export const {
-  fromLonLat,
-  toLonLat,
   transform,
   transformExtent,
-  getPointResolution,
-  get,
-  addProjection: add,
-  equivalent,
-  addEquivalentProjections: addEquivalent,
-  addCoordinateTransforms,
-  getTransform,
+  get: getProj,
+  addProjection: addProj,
 } = olproj
 
 /**
  * @param {olx.ProjectionOptions|Object} options
  * @return {ol.proj.Projection_}
  */
-export function create (options) {
+export function createProj (options) {
   return new Projection(options)
 }
 
@@ -33,7 +26,7 @@ export function create (options) {
  * @return {number[]}
  */
 export function pointToLonLat (coordinate, projection = EPSG_3857) {
-  return toLonLat(coordinate, projection)
+  return olproj.toLonLat(coordinate, projection)
 }
 /**
  * @param {number[]} coordinate
@@ -41,7 +34,7 @@ export function pointToLonLat (coordinate, projection = EPSG_3857) {
  * @return {number[]}
  */
 export function pointFromLonLat (coordinate, projection = EPSG_3857) {
-  return fromLonLat(coordinate, projection)
+  return olproj.fromLonLat(coordinate, projection)
 }
 
 export function transformPoint (coordinate, sourceProjection, destProjection) {

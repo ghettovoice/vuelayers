@@ -40,7 +40,7 @@
    * @vueSlot default Default slot for `vl-source-*` (image-like only) components.
    */
   export default {
-    name: 'vl-layer-image',
+    name: 'vl-layer-createImageStyle',
     mixins: [layer],
     props,
     methods,

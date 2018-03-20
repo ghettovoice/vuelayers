@@ -5,7 +5,7 @@
   import vectorSource from '../../mixin/vector-source'
   import sourceContainer from '../../mixin/source-container'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { pointOnSurface, point } from '../../ol-ext/geom'
+  import { findPointOnSurface, createPointGeom } from '../../ol-ext/geom'
   import SourceBuilder from './builder'
 
   const props = {
@@ -97,9 +97,9 @@
       const geometry = feature.getGeometry()
       if (!geometry) return
 
-      let coordinate = pointOnSurface(geometry)
+      let coordinate = findPointOnSurface(geometry)
       if (coordinate) {
-        return point(coordinate)
+        return createPointGeom(coordinate)
       }
     }
   }

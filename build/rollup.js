@@ -164,16 +164,6 @@ function bundleOptions (format, package, env = 'development') {
   // es/cjs path replacements in 2 phases
   const patterns = [
     [
-      // core sub-path -> core replacement
-      {
-        exclude: [
-          'src/core/**/*',
-        ],
-        test: /'((?:\.{1,2}\/)+core)\/[^']*'/ig,
-        replace: (m1, m2) => `'${m2}'`,
-      },
-    ],
-    [
       // component/**/* -> **/* replacement
       {
         test: /'(\.{1,2})\/component\/([^']*)'/ig,
