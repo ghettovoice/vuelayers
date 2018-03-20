@@ -5,7 +5,7 @@
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
-  import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
+  import { defaultEditStyle, createStyle } from '../../ol-ext/style'
   import { isCollection, isVectorSource } from '../../ol-ext/util'
   import { mapValues, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'

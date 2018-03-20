@@ -7,8 +7,8 @@ import {
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
 } from '../ol-ext/consts'
-import { fromProjection as extentFromProjection } from '../ol-ext/extent'
-import { createXYZ } from '../ol-ext/tile-grid'
+import { createExtentFromProjection } from '../ol-ext/extent'
+import { createXyzGrid } from '../ol-ext/tile-grid'
 import * as assert from '../util/assert'
 import { replaceTokens, constant, isFunction, isString, pick } from '../util/minilo'
 import source from './source'
@@ -72,8 +72,8 @@ const methods = {
   createTileGrid () {
     assert.hasView(this)
 
-    return createXYZ({
-      extent: extentFromProjection(this.$view.getProjection()),
+    return createXyzGrid({
+      extent: createExtentFromProjection(this.$view.getProjection()),
       maxZoom: this.maxZoom,
       minZoom: this.minZoom,
       tileSize: this.tileSize,

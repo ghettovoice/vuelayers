@@ -136,16 +136,6 @@ function bundleOptions (format, package, env = 'development') {
     if (/\.(sass|vue)$/i.test(id)) {
       return false
     }
-    // check internal core imports
-    const coreRegExp = /core\/.*/i
-    if (
-      coreRegExp.test(parentId) && (
-        id.slice(0, 2) === './' ||
-        coreRegExp.test(id)
-      )
-    ) {
-      return false
-    }
     // embeddable
     const embeddableRegExp = /(\.\/|src\/)(install)/i
     if (embeddableRegExp.test(id)) {
@@ -163,16 +153,6 @@ function bundleOptions (format, package, env = 'development') {
   }
   // es/cjs path replacements in 2 phases
   const patterns = [
-    [
-      // core sub-path -> core replacement
-      {
-        exclude: [
-          'src/core/**/*',
-        ],
-        test: /'((?:\.{1,2}\/)+core)\/[^']*'/ig,
-        replace: (m1, m2) => `'${m2}'`,
-      },
-    ],
     [
       // component/**/* -> **/* replacement
       {

@@ -31,7 +31,7 @@ const props = {
 const computed = {
   viewProjFeatures () {
     if (this.rev && this.$source) {
-      return this.getFeatures().map(feature => geoJsonHelper.writeFeature(feature))
+      return this.getFeatures().map(feature => geoJsonHelper.writeGeoJsonFeature(feature))
     }
     return []
   },

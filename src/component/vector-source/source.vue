@@ -5,8 +5,8 @@
   import VectorSource from 'ol/source/vector'
   import vectorSource from '../../mixin/vector-source'
   import { getFeatureId } from '../../ol-ext/feature'
-  import { geoJson } from '../../ol-ext/format'
-  import { all as allLoadStrategy } from '../../ol-ext/load-strategy'
+  import { createGeoJsonFmt } from '../../ol-ext/format'
+  import { loadingAll } from '../../ol-ext/load-strategy'
   import { transform } from '../../ol-ext/proj'
   import { constant, stubArray, isFinite, isFunction, difference } from '../../util/minilo'
 
@@ -155,14 +155,14 @@
    * @return {ol.LoadingStrategy}
    */
   function defaultStrategyFactory () {
-    return allLoadStrategy
+    return loadingAll
   }
 
   /**
    * @return {ol.format.GeoJSON}
    */
   function defaultFormatFactory () {
-    return geoJson()
+    return createGeoJsonFmt()
   }
 
   function transformExtent (extent, sourceProj, destProj) {

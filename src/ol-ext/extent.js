@@ -6,12 +6,9 @@ import olproj from 'ol/proj'
 import { EXTENT_CORNER, PROJ_UNIT } from './consts'
 
 export const {
-  getWidth,
-  getHeight,
+  getWidth: getExtentWidth,
+  getHeight: getExtentHeight,
   boundingExtent,
-  buffer,
-  equals,
-  extend,
 } = olextent
 
 /**
@@ -24,7 +21,7 @@ export const {
  * @return {ol.Extent} Extent.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L208
  */
-export function createOrUpdate (minX, minY, maxX, maxY, extent) {
+export function createOrUpdateExtent (minX, minY, maxX, maxY, extent) {
   if (extent) {
     extent[0] = minX
     extent[1] = minY
@@ -44,7 +41,7 @@ export function createOrUpdate (minX, minY, maxX, maxY, extent) {
  * @return {ol.Coordinate} Corner coordinate.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L482
  */
-export function getCorner (extent, corner) {
+export function getExtentCorner (extent, corner) {
   let coordinate
   if (corner === EXTENT_CORNER.BOTTOM_LEFT) {
     coordinate = olextent.getBottomLeft(extent)
@@ -67,14 +64,14 @@ export function getCorner (extent, corner) {
  * @return {ol.Extent} Extent.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L148
  */
-export function fromProjection (projection) {
+export function createExtentFromProjection (projection) {
   projection = olproj.get(projection)
   let extent = projection.getExtent()
 
   if (!extent) {
     let half = 180 * olproj.METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
       projection.getMetersPerUnit()
-    extent = createOrUpdate(-half, -half, half, half)
+    extent = createOrUpdateExtent(-half, -half, half, half)
   }
   return extent
 }

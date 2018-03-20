@@ -96,15 +96,15 @@ const isEmpty = x => {
  * @param {VlStyle} vlStyle
  * @return {ol.style.Style|undefined}
  */
-export function style (vlStyle) {
+export function createStyle (vlStyle) {
   if (isEmpty(vlStyle)) return
 
   const olStyle = {
-    text: text(vlStyle),
-    fill: fill(vlStyle),
-    stroke: stroke(vlStyle),
-    image: image(vlStyle),
-    geometry: geom(vlStyle),
+    text: createTextStyle(vlStyle),
+    fill: createFillStyle(vlStyle),
+    stroke: createStrokeStyle(vlStyle),
+    image: createImageStyle(vlStyle),
+    geometry: createGeomStyle(vlStyle),
     zIndex: vlStyle.zIndex,
   }
 
@@ -134,7 +134,7 @@ export function normalizeColor (color) {
  * @param {string} [prefix]
  * @returns {ol.style.Fill|undefined}
  */
-export function fill (vlStyle, prefix = '') {
+export function createFillStyle (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
   const keys = ['fillColor'].map(prefixKey)
   const compiledKey = prefixKey('fill')
@@ -164,7 +164,7 @@ export function fill (vlStyle, prefix = '') {
  * @param {string} [prefix]
  * @returns {ol.style.Stroke|undefined}
  */
-export function stroke (vlStyle, prefix = '') {
+export function createStrokeStyle (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
   const keys = ['strokeColor', 'strokeWidth', 'strokeDash', 'strokeCap', 'strokeJoin'].map(prefixKey)
   const compiledKey = prefixKey('stroke')
@@ -203,7 +203,7 @@ export function stroke (vlStyle, prefix = '') {
  * @returns {ol.style.Image|undefined}
  * @todo split to separate circle, regShape, Icon
  */
-export function image (vlStyle) {
+export function createImageStyle (vlStyle) {
   if (
     isEmpty(vlStyle.imageSrc) &&
     isEmpty(vlStyle.image) &&
@@ -262,8 +262,8 @@ export function image (vlStyle) {
 
   imageStyle = {
     ...imageStyle,
-    fill: fill(vlStyle, 'image') || fill(vlStyle),
-    stroke: stroke(vlStyle, 'image') || stroke(vlStyle),
+    fill: createFillStyle(vlStyle, 'image') || createFillStyle(vlStyle),
+    stroke: createStrokeStyle(vlStyle, 'image') || createStrokeStyle(vlStyle),
     snapToPixel: true,
   }
 
@@ -276,7 +276,7 @@ export function image (vlStyle) {
  * @param {VlStyle} vlStyle
  * @returns {ol.style.Text|undefined}
  */
-export function text (vlStyle) {
+export function createTextStyle (vlStyle) {
   // noinspection JSValidateTypes
   if (vlStyle.text == null) return
   if (vlStyle.text instanceof Text) return vlStyle.text
@@ -293,8 +293,8 @@ export function text (vlStyle) {
     pick(['textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign'], vlStyle),
     {
       font,
-      fill: fill(vlStyle, 'text') || fill(vlStyle),
-      stroke: stroke(vlStyle, 'text') || stroke(vlStyle),
+      fill: createFillStyle(vlStyle, 'text') || createFillStyle(vlStyle),
+      stroke: createStrokeStyle(vlStyle, 'text') || createStrokeStyle(vlStyle),
     }
   )
 
@@ -307,7 +307,7 @@ export function text (vlStyle) {
  * @param {VlStyle} vlStyle
  * @return {ol.geom.Geometry|ol.StyleGeometryFunction|undefined}
  */
-export function geom (vlStyle) {
+export function createGeomStyle (vlStyle) {
   if (isFunction(vlStyle.geom)) {
     return function __styleGeomFunc (feature) {
       return vlStyle.geom(feature, geomHelper)

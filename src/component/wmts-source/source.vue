@@ -1,13 +1,13 @@
 <script>
-  import { range } from '../../util/minilo'
   /**
    * @module wmts-source/source
    */
   import WMTSSource from 'ol/source/wmts'
   import WMTSTileGrid from 'ol/tilegrid/wmts'
+  import { range } from '../../util/minilo'
   import tileSource from '../../mixin/tile-source'
   import { WMTS_FORMAT, WMTS_REQUEST_ENCODING, WMTS_VERSION } from '../../ol-ext/consts'
-  import { fromProjection as extentFromProjection } from '../../ol-ext/extent'
+  import { createExtentFromProjection } from '../../ol-ext/extent'
   import { resolutionsFromExtent } from '../../ol-ext/tile-grid'
   import { hasView } from '../../util/assert'
 
@@ -76,7 +76,7 @@
     createTileGrid () {
       hasView(this)
 
-      const extent = extentFromProjection(this.$view.getProjection())
+      const extent = createExtentFromProjection(this.$view.getProjection())
       const resolutions = resolutionsFromExtent(
         extent,
         this.maxZoom,

@@ -3,7 +3,7 @@
  * @module mixin/proj-transforms
  */
 import { EPSG_3857 } from '../ol-ext/consts'
-import { readFeature, readGeometry, writeFeature, writeGeometry } from '../ol-ext/geojson'
+import { readGeoJsonFeature, readGeoJsonGeometry, writeGeoJsonFeature, writeGeoJsonGeometry } from '../ol-ext/geojson'
 import {
   transformExtent,
   transformLine,
@@ -75,17 +75,17 @@ export default {
     },
 
     writeGeometryInBindProj (geometry) {
-      return writeGeometry(geometry, this.viewProjection, this.bindProjection)
+      return writeGeoJsonGeometry(geometry, this.viewProjection, this.bindProjection)
     },
     readGeometryInBindProj (geometry) {
-      return readGeometry(geometry, this.viewProjection, this.bindProjection)
+      return readGeoJsonGeometry(geometry, this.viewProjection, this.bindProjection)
     },
 
     writeFeatureInBindProj (feature) {
-      return writeFeature(feature, this.viewProjection, this.bindProjection)
+      return writeGeoJsonFeature(feature, this.viewProjection, this.bindProjection)
     },
     readFeatureInBindProj (feature) {
-      return readFeature(feature, this.viewProjection, this.bindProjection)
+      return readGeoJsonFeature(feature, this.viewProjection, this.bindProjection)
     },
   },
 }

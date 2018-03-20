@@ -1,8 +1,8 @@
 import Feature from 'ol/feature'
 import { isPlainObject, get } from '../util/minilo'
-import { geoJson as geoJsonFactory } from './format'
+import { createGeoJsonFmt } from './format'
 
-const geoJson = geoJsonFactory()
+const geoJsonFmt = createGeoJsonFmt()
 
 /**
  * @param {ol.Feature} feature
@@ -10,13 +10,13 @@ const geoJson = geoJsonFactory()
  * @param {ol.ProjectionLike|undefined} [dataProjection]
  * @return {GeoJSONFeature|Object}
  */
-export function writeFeature (feature, featureProjection, dataProjection) {
-  const geoJsonFeature = geoJson.writeFeatureObject(feature, { featureProjection, dataProjection })
+export function writeGeoJsonFeature (feature, featureProjection, dataProjection) {
+  const geoJsonFeature = geoJsonFmt.writeFeatureObject(feature, { featureProjection, dataProjection })
 
   if (Array.isArray(get(geoJsonFeature, 'properties.features'))) {
     geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(feature => {
       if (feature instanceof Feature) {
-        return writeFeature(feature, featureProjection, dataProjection)
+        return writeGeoJsonFeature(feature, featureProjection, dataProjection)
       }
       return feature
     })
@@ -31,13 +31,13 @@ export function writeFeature (feature, featureProjection, dataProjection) {
  * @param {ol.ProjectionLike|undefined} [dataProjection]
  * @return {ol.Feature}
  */
-export function readFeature (geoJsonFeature, featureProjection, dataProjection) {
-  let feature = geoJson.readFeature(geoJsonFeature, { featureProjection, dataProjection })
+export function readGeoJsonFeature (geoJsonFeature, featureProjection, dataProjection) {
+  let feature = geoJsonFmt.readFeature(geoJsonFeature, { featureProjection, dataProjection })
 
   if (Array.isArray(feature.get('features'))) {
     feature.set('features', feature.get('features').map(feature => {
       if (isPlainObject(feature)) {
-        return readFeature(feature, featureProjection, dataProjection)
+        return readGeoJsonFeature(feature, featureProjection, dataProjection)
       }
       return feature
     }))
@@ -52,8 +52,8 @@ export function readFeature (geoJsonFeature, featureProjection, dataProjection) 
  * @param {ol.ProjectionLike|undefined} [dataProjection]
  * @return {GeoJSONGeometry|GeoJSONGeometryCollection|Object}
  */
-export function writeGeometry (geometry, geometryProjection, dataProjection) {
-  return geoJson.writeGeometryObject(geometry, {
+export function writeGeoJsonGeometry (geometry, geometryProjection, dataProjection) {
+  return geoJsonFmt.writeGeometryObject(geometry, {
     featureProjection: geometryProjection,
     dataProjection,
   })
@@ -65,15 +65,15 @@ export function writeGeometry (geometry, geometryProjection, dataProjection) {
  * @param {ol.ProjectionLike|undefined} [dataProjection]
  * @return {ol.geom.Geometry}
  */
-export function readGeometry (geoJsonGeometry, geometryProjection, dataProjection) {
+export function readGeoJsonGeometry (geoJsonGeometry, geometryProjection, dataProjection) {
   dataProjection = readProjection(geoJsonGeometry, dataProjection)
 
-  return geoJson.readGeometry(geoJsonGeometry, {
+  return geoJsonFmt.readGeometry(geoJsonGeometry, {
     featureProjection: geometryProjection,
     dataProjection,
   })
 }
 
 export function readProjection (geoJsonObj, defaultProjection) {
-  return geoJson.readProjection(geoJsonObj) || defaultProjection
+  return geoJsonFmt.readProjection(geoJsonObj) || defaultProjection
 }

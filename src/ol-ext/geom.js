@@ -14,7 +14,7 @@ import { GEOMETRY_TYPE, WGS84_SPHERE } from './consts'
  * @param {number} [lat]
  * @return {ol.geom.Point}
  */
-export function point (lonOrCoordinates, lat) {
+export function createPointGeom (lonOrCoordinates, lat) {
   const coordinates = Array.isArray(lonOrCoordinates)
     ? lonOrCoordinates
     : [lonOrCoordinates, lat]
@@ -26,7 +26,7 @@ export function point (lonOrCoordinates, lat) {
  * @param {Array<number[]>} points
  * @returns {ol.geom.LineString}
  */
-export function line (points) {
+export function createLineGeom (points) {
   return new LineString(points)
 }
 
@@ -34,7 +34,7 @@ export function line (points) {
  * @param {Array<Array<number[]>>} rings
  * @returns {ol.geom.Polygon}
  */
-export function polygon (rings) {
+export function createPolygonGeom (rings) {
   return new Polygon(rings)
 }
 
@@ -42,7 +42,7 @@ export function polygon (rings) {
  * @param {Array<number[]>} points
  * @returns {ol.geom.MultiPoint}
  */
-export function multiPoint (points) {
+export function createMultiPointGeom (points) {
   return new MultiPoint(points)
 }
 
@@ -50,7 +50,7 @@ export function multiPoint (points) {
  * @param {Array<Array<number[]>>} lines
  * @returns {ol.geom.MultiLineString}
  */
-export function multiLine (lines) {
+export function createMultiLineGeom (lines) {
   return new MultiLineString(lines)
 }
 
@@ -58,7 +58,7 @@ export function multiLine (lines) {
  * @param {Array<Array<Array<number[]>>>} polygons
  * @returns {ol.geom.MultiPolygon}
  */
-export function multiPolygon (polygons) {
+export function createMultiPolygonGeom (polygons) {
   return new MultiPolygon(polygons)
 }
 
@@ -66,7 +66,7 @@ export function multiPolygon (polygons) {
  * @param {ol.geom.Geometry[]} geoms
  * @returns {ol.geom.GeometryCollection}
  */
-export function collection (geoms) {
+export function createGeomCollection (geoms) {
   return new GeometryCollection(geoms)
 }
 
@@ -75,7 +75,7 @@ export function collection (geoms) {
  * @param {number} radius
  * @return {ol.geom.Polygon}
  */
-export function circularPolygon (center, radius) {
+export function createCircularPolygon (center, radius) {
   return Polygon.circular(WGS84_SPHERE, center, radius)
 }
 
@@ -84,7 +84,7 @@ export function circularPolygon (center, radius) {
  * @return {boolean}
  * @throws {Error}
  */
-export function isMulti (geom) {
+export function isMultiGeom (geom) {
   let multiTypes = [
     GEOMETRY_TYPE.MULTI_POINT,
     GEOMETRY_TYPE.MULTI_LINE_STRING,
@@ -102,7 +102,7 @@ export function isMulti (geom) {
  */
 export function toSimpleGeom (geom) {
   if (geom instanceof Circle) {
-    geom = point(geom.getCenter())
+    geom = createPointGeom(geom.getCenter())
   }
 
   const type = geom.type || geom.getType()
@@ -121,7 +121,7 @@ export function toSimpleGeom (geom) {
  * @param {ol.geom.Geometry|GeoJSONGeometry} geom
  * @return {ol.Coordinate|undefined}
  */
-export function pointOnSurface (geom) {
+export function findPointOnSurface (geom) {
   const simpleGeom = toSimpleGeom(geom)
   const pointFeature = turfPointOnSurface({
     type: simpleGeom.type || simpleGeom.getType(),

@@ -135,7 +135,7 @@
         <!--</vl-layer-vector>-->
 
         <!--<vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"-->
-                    <!--:position="pointOnSurface(selectedFeatures[0].geometry)">-->
+                    <!--:position="findPointOnSurface(selectedFeatures[0].geometry)">-->
           <!--<div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">-->
             <!--Popup cluster feature {{ selectedFeatures[0].id }}<br />-->
             <!--<span v-for="feature in selectedFeatures[0].properties.features">-->
@@ -149,9 +149,9 @@
 </template>
 
 <script>
-  import { fromLonLat, polygonFromLonLat, create as createProj, add as addProj } from '@/ol-ext/proj'
-  import { bbox as bboxLoadStrategy } from '@/ol-ext/load-strategy'
-  import { pointOnSurface } from '@/ol-ext/geom'
+  import { pointFromLonLat, polygonFromLonLat, createProj, addProj } from '@/ol-ext/proj'
+  import { loadingBBox } from '@/ol-ext/load-strategy'
+  import { findPointOnSurface } from '@/ol-ext/geom'
   import { random, range } from 'lodash/fp'
 
   const computed = {
@@ -170,7 +170,7 @@
           },
           geometry: {
             type: 'Point',
-            coordinates: fromLonLat([
+            coordinates: pointFromLonLat([
               random(-179, 179),
               random(-89, 89),
             ]),
@@ -183,10 +183,10 @@
       return Promise.resolve(this.points)
     },
     pointOnSurface (geometry) {
-      return pointOnSurface(geometry)
+      return findPointOnSurface(geometry)
     },
     bboxStrategyFactory () {
-      return bboxLoadStrategy
+      return loadingBBox
     },
     wfsUrlFunc (extent, resolution, projection) {
       return 'https://ahocevar.com/geoserver/wfs?service=WFS&' +

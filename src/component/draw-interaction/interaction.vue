@@ -10,7 +10,7 @@
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { initFeature } from '../../ol-ext/feature'
   import { isCollection, isVectorSource } from '../../ol-ext/util'
-  import { defaultEditStyle, style as createStyle } from '../../ol-ext/style'
+  import { defaultEditStyle, createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
   import { mapValues, camelCase, isFunction, upperFirst } from '../../util/minilo'
