@@ -21,14 +21,6 @@ export function createTopoJsonFmt (options) {
 }
 
 class GeoJSON extends BaseGeoJSON {
-  adaptOptions (options) {
-    return {
-      dataProjection: this.defaultDataProjection,
-      featureProjection: this.defaultFeatureProjection,
-      ...options,
-    }
-  }
-
   writeGeometryObject (geometry, options) {
     if (isCircle(geometry)) {
       geometry = createCircularPolygon(geometry.getCenter(), geometry.getRadius())
@@ -37,7 +29,6 @@ class GeoJSON extends BaseGeoJSON {
   }
 
   writeFeatureObject (feature, options) {
-    options = this.adaptOptions(options)
     const object = /** @type {GeoJSONFeature} */ ({
       'type': 'Feature',
     })
