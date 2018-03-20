@@ -1,16 +1,23 @@
 // This the Webpack config for running e2e tests
-const utils = require('./utils')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const utils = require('./utils')
 const baseWebpackConfig = require('./webpack.base.conf')
 
 const isProduction = process.env.NODE_ENV === 'production'
-const isTesting = process.env.NODE_ENV === 'testing'
+
+if (!isProduction) {
+  process.env.BABEL_ENV = 'production'
+}
 
 const webpackConfig = merge(baseWebpackConfig, {
+  mode: ['production', 'development'].includes(process.env.NODE_ENV)
+    ? process.env.NODE_ENV
+    : 'production',
   module: {
     rules: [
       {
@@ -25,35 +32,43 @@ const webpackConfig = merge(baseWebpackConfig, {
     ],
   },
   plugins: [
-    ...(isProduction ? [
-      new webpack.optimize.UglifyJsPlugin({
-        mangle: true,
-        sourceMap: true,
-        compress: {
-          warnings: false,
-        },
-      }),
-    ] : []),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: '[name].css',
+      filename: isProduction ? '[name].min.css' : '[name].css',
+      allChunks: false,
     }),
-    // Compress extracted CSS. We are using this plugin so that possible
-    // duplicated CSS from different components can be deduped.
-    new OptimizeCSSPlugin(),
+    // keep module.id stable when vendor modules does not change
+    new webpack.HashedModuleIdsPlugin(),
+    // enable scope hoisting
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    // js css uglification
+    ...(isProduction ? [
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: {
+            warnings: false
+          },
+        },
+        sourceMap: true,
+        parallel: true,
+      }),
+      // Compress extracted CSS. We are using this plugin so that possible
+      // duplicated CSS from different components can be deduped.
+      new OptimizeCSSPlugin({
+        cssProcessorOptions: {safe: true, map: {inline: false}},
+      }),
+    ] : []),
     // generate dist index.html with correct asset hash for caching.
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
-      filename: isTesting ? 'index.html' : utils.resolve('dist/index.html'),
+      filename: 'index.html',
       template: 'test/index.html',
       inject: true,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
         removeAttributeQuotes: true,
-        // more options:
-        // https://github.com/kangax/html-minifier#options-quick-reference
       },
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency',

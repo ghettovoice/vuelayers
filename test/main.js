@@ -1,13 +1,12 @@
 import Vue from 'vue'
-import VueLayers from '../src'
+import VueLayers from '@'
 import App from './app.vue'
 
 Vue.use(VueLayers, {
   // bindToProj: 'EPSG:4326',
 })
+console.log(process.env.NODE_ENV)
 console.dir(VueLayers)
-console.dir(Vue)
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

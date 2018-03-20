@@ -4,6 +4,7 @@ const pluginUtils = require('rollup-pluginutils')
 const utils = require('../utils')
 
 // originally taken from https://github.com/differui/rollup-plugin-sass/blob/master/src/index.js
+// adds source map from Sass compiler.
 module.exports = function sass (options) {
   options = Object.assign({
     include: [
@@ -67,6 +68,7 @@ module.exports = function sass (options) {
 
             if (options.output === false) {
               return {
+                id: id,
                 code: `export default ${JSON.stringify(style.code)}`,
                 map: style.map,
               }

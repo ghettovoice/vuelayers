@@ -7,8 +7,12 @@ const utils = require('./utils')
 const baseWebpackConfig = require('./webpack.base.conf')
 
 const webpackConfig = merge(baseWebpackConfig, {
+  mode: ['production', 'development'].includes(process.env.NODE_ENV)
+    ? process.env.NODE_ENV
+    : 'development',
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
+  // devtool: '#inline-source-map',
   module: {
     rules: [
       {
@@ -24,6 +28,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     // https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({

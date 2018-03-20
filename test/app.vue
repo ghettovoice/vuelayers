@@ -1,7 +1,14 @@
 <template>
   <div id="app">
     <div style="height: 100%">
-      <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')">
+      <div>
+        <button @click="drawType = 'point'">Point</button>
+        <button @click="drawType = 'line_string'">LineString</button>
+        <button @click="drawType = 'polygon'">Polygon</button>
+        <button @click="drawType = 'circle'">Circle</button>
+        <button @click="drawType = undefined">Reset</button>
+      </div>
+      <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')" @singleclick="clickCoord = $event.coordinate">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
             <div style="background: #eee; padding: 1rem">
@@ -27,8 +34,6 @@
           </template>
         </vl-geoloc>
 
-        <vl-interaction-select @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
-
         <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
         </vl-layer-tile>
@@ -46,7 +51,7 @@
         </vl-layer-tile>
 
         <vl-layer-vector>
-          <vl-source-vector>
+          <vl-source-vector :features.sync="drawnFeatures" @addfeature="log('addfeature', $event)">
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
               <template slot-scope="feature">
                 <vl-geom-polygon :coordinates.sync="polygonCoords"/>
@@ -58,23 +63,46 @@
                 </vl-overlay>
               </template>
             </vl-feature>
+
+            <vl-feature id="circle">
+              <vl-geom-circle :coordinates="[-5000000, -500000]" :radius="5000000"></vl-geom-circle>
+            </vl-feature>
           </vl-source-vector>
 
           <vl-style-box>
             <vl-style-fill :color="[45, 156, 201, 0.4]"/>
             <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
+            <vl-style-circle>
+              <vl-style-fill :color="[45, 156, 201, 0.4]"/>
+              <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
+            </vl-style-circle>
           </vl-style-box>
         </vl-layer-vector>
 
+        <vl-layer-vector id="draw-layer">
+          <vl-source-vector ident="draw-target" />
+        </vl-layer-vector>
 
-        <vl-layer-image id="jz">
-          <vl-source-image-static
-            :url="imageUrl"
-            :size="imageSize"
-            :extent="imageExtent"
-            :projection="imageProj">
-          </vl-source-image-static>
-        </vl-layer-image>
+        <!--<vl-layer-image id="jz">-->
+          <!--<vl-source-image-static-->
+            <!--:url="imageUrl"-->
+            <!--:size="imageSize"-->
+            <!--:extent="imageExtent"-->
+            <!--:projection="imageProj">-->
+          <!--</vl-source-image-static>-->
+        <!--</vl-layer-image>-->
+
+        <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
+        <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
+        <vl-interaction-modify source="draw-target" @drawstart="log('modifystart', $event)" @drawend="log('modifyend', $event)" />
+        <vl-interaction-snap source="draw-target" :priority="10" />
+
+        <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
+          <!--<div style="background: white; padding: 10px">-->
+        <!--    {{ clickCoord }}-->
+        <!--    <button @click="clickCoord = undefined">close</button>-->
+          <!--</div>-->
+      <!--  </vl-overlay>-->
 
         <!--<vl-layer-vector id="countries">-->
         <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
@@ -107,7 +135,7 @@
         <!--</vl-layer-vector>-->
 
         <!--<vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"-->
-                    <!--:position="pointOnSurface(selectedFeatures[0].geometry)">-->
+                    <!--:position="findPointOnSurface(selectedFeatures[0].geometry)">-->
           <!--<div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">-->
             <!--Popup cluster feature {{ selectedFeatures[0].id }}<br />-->
             <!--<span v-for="feature in selectedFeatures[0].properties.features">-->
@@ -121,8 +149,10 @@
 </template>
 
 <script>
+  import { pointFromLonLat, polygonFromLonLat, createProj, addProj } from '@/ol-ext/proj'
+  import { loadingBBox } from '@/ol-ext/load-strategy'
+  import { findPointOnSurface } from '@/ol-ext/geom'
   import { random, range } from 'lodash/fp'
-  import { core } from '../src'
 
   const computed = {
   }
@@ -140,7 +170,7 @@
           },
           geometry: {
             type: 'Point',
-            coordinates: core.projHelper.fromLonLat([
+            coordinates: pointFromLonLat([
               random(-179, 179),
               random(-89, 89),
             ]),
@@ -153,10 +183,10 @@
       return Promise.resolve(this.points)
     },
     pointOnSurface (geometry) {
-      return core.geomHelper.pointOnSurface(geometry)
+      return findPointOnSurface(geometry)
     },
     bboxStrategyFactory () {
-      return core.loadStrategyHelper.bbox
+      return loadingBBox
     },
     wfsUrlFunc (extent, resolution, projection) {
       return 'https://ahocevar.com/geoserver/wfs?service=WFS&' +
@@ -169,12 +199,12 @@
   let x = 1024 * 10000
   let y = 968 * 10000
   let imageExtent = [-x / 2, -y / 2, x / 2, y / 2]
-  let customProj = core.projHelper.create({
+  let customProj = createProj({
     code: 'xkcd-image',
     units: 'pixels',
     extent: imageExtent,
   })
-  core.projHelper.add(customProj)
+  addProj(customProj)
 
   export default {
     name: 'app',
@@ -183,12 +213,12 @@
     data () {
       return {
         zoom: 13,
-        center: core.projHelper.fromLonLat([-80.0307892780456, 43.456341754866685]),
+        center: fromLonLat([-80.0307892780456, 43.456341754866685]),
         rotation: 0,
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: core.projHelper.polygonFromLonLat([[[0, 0], [10, 10], [10, 0], [0, 0]]]),
+        polygonCoords: polygonFromLonLat([[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]]),
         selected: [],
         selectedFeatures: [],
         countries: [],
@@ -197,6 +227,9 @@
         imageUrl: 'https://imgs.xkcd.com/comics/online_communities.png',
         imageSize: [1024, 968],
         imageExtent,
+        clickCoord: undefined,
+        drawnFeatures: [],
+        drawType: undefined
       }
     },
     mounted () {
@@ -206,7 +239,7 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  @import "~ol/ol.css";
+  @import "~ol/ol";
 
   html, body, #app {
     width       : 100%;

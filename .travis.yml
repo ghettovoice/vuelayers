@@ -2,6 +2,7 @@ branches:
   only:
     - master
     - develop
+    - next
 language: java
 jdk:
   - oraclejdk8

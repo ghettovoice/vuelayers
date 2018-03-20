@@ -2,6 +2,7 @@
   <dictionary name="ghetto">
     <words>
       <w>accuracygeometry</w>
+      <w>adaptee</w>
       <w>addfeature</w>
       <w>altitudeaccuracy</w>
       <w>apidoc</w>
@@ -30,6 +31,8 @@
       <w>dirname</w>
       <w>doclets</w>
       <w>doesn</w>
+      <w>drawend</w>
+      <w>drawstart</w>
       <w>dropdown</w>
       <w>epsg</w>
       <w>errordbg</w>
@@ -48,6 +51,7 @@
       <w>hljs</w>
       <w>hoverable</w>
       <w>ident</w>
+      <w>ifdef</w>
       <w>importee</w>
       <w>jsnext</w>
       <w>linkify</w>
@@ -59,7 +63,10 @@
       <w>memberof</w>
       <w>minified</w>
       <w>minifier</w>
+      <w>minilo</w>
       <w>mixins</w>
+      <w>modifyend</w>
+      <w>modifystart</w>
       <w>monospace</w>
       <w>moveend</w>
       <w>movestart</w>
@@ -95,6 +102,7 @@
       <w>replacers</w>
       <w>reproj</w>
       <w>reprojection</w>
+      <w>rxjs</w>
       <w>screenview</w>
       <w>scss</w>
       <w>shik</w>
@@ -109,12 +117,14 @@
       <w>topp</w>
       <w>transparentize</w>
       <w>typicalname</w>
+      <w>uglified</w>
       <w>uglify</w>
       <w>unmount</w>
       <w>unpkg</w>
       <w>unselect</w>
       <w>unshare</w>
       <w>unsubscribe</w>
+      <w>usfeet</w>
       <w>vershinin</w>
       <w>viewchanged</w>
       <w>virt</w>
@@ -128,6 +138,8 @@
       <w>whatwg</w>
       <w>widescreen</w>
       <w>wmts</w>
+      <w>xkcd</w>
+      <w>xlink</w>
       <w>yargs</w>
       <w>zakas</w>
     </words>
