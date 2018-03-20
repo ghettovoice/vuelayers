@@ -1,7 +1,9 @@
 import BaseGeoJSON from 'ol/format/geojson'
 import TopoJSON from 'ol/format/topojson'
 import { isEmpty } from '../util/minilo'
+import { EPSG_4326 } from './consts'
 import { createCircularPolygon } from './geom'
+import { transformPoint } from './proj'
 import { isCircle } from './util'
 
 /**
@@ -21,23 +23,22 @@ export function createTopoJsonFmt (options) {
 }
 
 class GeoJSON extends BaseGeoJSON {
-  adaptOptions (options) {
-    return {
-      dataProjection: this.defaultDataProjection,
-      featureProjection: this.defaultFeatureProjection,
-      ...options,
-    }
-  }
-
   writeGeometryObject (geometry, options) {
     if (isCircle(geometry)) {
-      geometry = createCircularPolygon(geometry.getCenter(), geometry.getRadius())
+      geometry = createCircularPolygon(
+        transformPoint(
+          geometry.getCenter(),
+          options.featureProjection || this.defaultFeatureProjection,
+          EPSG_4326,
+        ),
+        geometry.getRadius(),
+      )
+      options.featureProjection = EPSG_4326
     }
     return super.writeGeometryObject(geometry, options)
   }
 
   writeFeatureObject (feature, options) {
-    options = this.adaptOptions(options)
     const object = /** @type {GeoJSONFeature} */ ({
       'type': 'Feature',
     })
