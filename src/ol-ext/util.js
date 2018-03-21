@@ -18,3 +18,11 @@ export function isCollection (value) {
 export function isVectorSource (value) {
   return value && isFunction(value.getAttributions) && isFunction(value.getFeatureById)
 }
+
+/**
+ * @param value
+ * @return {*}
+ */
+export function isCircle (value) {
+  return isFunction(value.getCenter) && isFunction(value.getRadius)
+}
