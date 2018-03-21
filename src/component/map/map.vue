@@ -397,14 +397,6 @@
         },
       })
     },
-    destroyed () {
-      this._view =
-        this._defaultLayer =
-          this._layersTarget =
-            this._featuresTarget =
-              this._interactionsTarget =
-                this._overlaysTarget = undefined
-    },
   }
 
   /**

@@ -55,7 +55,4 @@ export default {
      */
     this._source = undefined
   },
-  destroyed () {
-    this._source = undefined
-  },
 }

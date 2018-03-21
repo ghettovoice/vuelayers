@@ -141,8 +141,5 @@
        */
       this._geometry = undefined
     },
-    destroyed () {
-      this._image = this._text = this._geometry = undefined
-    },
   }
 </script>

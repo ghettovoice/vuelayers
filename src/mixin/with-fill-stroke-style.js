@@ -57,7 +57,4 @@ export default {
      */
     this._stroke = undefined
   },
-  destroyed () {
-    this._fill = this._stroke = undefined
-  },
 }

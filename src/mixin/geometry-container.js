@@ -70,7 +70,4 @@ export default {
       },
     })
   },
-  destroyed () {
-    this._geometry = undefined
-  },
 }

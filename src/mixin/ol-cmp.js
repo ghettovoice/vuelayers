@@ -205,7 +205,6 @@ export default {
       .then(this.deinit)
       .then(() => {
         this.$emit('destroyed')
-        this._olObject = this._createPromise = this._mountPromise = undefined
         // logdbg('destroyed', this.$options.name)
       })
   },

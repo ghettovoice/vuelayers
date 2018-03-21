@@ -10,9 +10,6 @@ export default {
      */
     this._styles = undefined
   },
-  destroyed () {
-    this._styles = undefined
-  },
   methods: {
     /**
      * Default style factory
