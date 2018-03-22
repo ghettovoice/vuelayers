@@ -1,4 +1,4 @@
-import turfPointOnSurface from '@turf/point-on-surface'
+import pointOnFeature from '@turf/point-on-feature'
 import GeometryCollection from 'ol/geom/geometrycollection'
 import LineString from 'ol/geom/linestring'
 import MultiLineString from 'ol/geom/multilinestring'
@@ -123,7 +123,7 @@ export function toSimpleGeom (geom) {
  */
 export function findPointOnSurface (geom) {
   const simpleGeom = toSimpleGeom(geom)
-  const pointFeature = turfPointOnSurface({
+  const pointFeature = pointOnFeature({
     type: simpleGeom.type || simpleGeom.getType(),
     coordinates: simpleGeom.coordinates || simpleGeom.getCoordinates(),
   })
