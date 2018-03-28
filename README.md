@@ -5,7 +5,7 @@
 </p>
 
 # [VueLayers](https://vuelayers.github.io/)
-> [Vue 2](https://vuejs.org/) components to work with [OpenLayers](https://openlayers.org)
+> Web map [Vue](https://vuejs.org/ "Vue Homepage") components with the power of [OpenLayers](https://openlayers.org/ "OpenLayers Homepage")
 
 [![Build Status](https://travis-ci.org/ghettovoice/vuelayers.svg?branch=master)](https://travis-ci.org/ghettovoice/vuelayers)
 [![Coverage Status](https://coveralls.io/repos/github/ghettovoice/vuelayers/badge.svg?branch=master)](https://coveralls.io/github/ghettovoice/vuelayers?branch=master)
