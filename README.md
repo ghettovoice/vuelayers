@@ -16,6 +16,11 @@
 [![Dependencies](https://img.shields.io/david/ghettovoice/vuelayers.svg)](https://david-dm.org/ghettovoice/vuelayers)
 [![Dev dependencies](https://img.shields.io/david/dev/ghettovoice/vuelayers.svg)](https://david-dm.org/ghettovoice/vuelayers?type=dev)
 
+## Overview
+
+**VueLayers** is components library that brings the powerful **OpenLayers API** to the **Vue.js** reactive world. 
+It can display maps with tiled, raster or vector layers loaded from different sources.
+
 ## Links
 
 - [Documentation](https://vuelayers.github.io/)
