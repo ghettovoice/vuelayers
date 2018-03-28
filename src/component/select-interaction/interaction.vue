@@ -8,7 +8,7 @@
   /** @module select-interaction/interaction */
   import Feature from 'ol/feature'
   import SelectInteraction from 'ol/interaction/select'
-  import eventCondition from 'ol/events/condition'
+  import condition from 'ol/events/condition'
   import Vue from 'vue'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
@@ -74,7 +74,7 @@
      */
     addCondition: {
       type: Function,
-      default: eventCondition.never,
+      default: condition.never,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
@@ -85,7 +85,7 @@
      */
     condition: {
       type: Function,
-      default: eventCondition.singleClick,
+      default: condition.singleClick,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
@@ -95,7 +95,7 @@
      */
     removeCondition: {
       type: Function,
-      default: eventCondition.never,
+      default: condition.never,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
@@ -106,7 +106,7 @@
      */
     toggleCondition: {
       type: Function,
-      default: eventCondition.shiftKeyOnly,
+      default: condition.shiftKeyOnly,
     },
   }
 

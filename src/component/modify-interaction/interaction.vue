@@ -1,7 +1,7 @@
 <script>
   /** @module modify-interaction/interaction */
   import ModifyInteraction from 'ol/interaction/modify'
-  import eventCondition from 'ol/events/condition'
+  import condition from 'ol/events/condition'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
@@ -31,7 +31,7 @@
      */
     condition: {
       type: Function,
-      default: eventCondition.primaryAction,
+      default: condition.primaryAction,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
@@ -40,7 +40,7 @@
      */
     deleteCondition: {
       type: Function,
-      default: eventCondition.altKeyOnly,
+      default: condition.altKeyOnly,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether a new vertex can be added
@@ -49,7 +49,7 @@
      */
     insertVertexCondition: {
       type: Function,
-      default: eventCondition.always,
+      default: condition.always,
     },
     /**
      * Pixel tolerance for considering the pointer close enough to a segment or vertex for editing.

@@ -1,7 +1,7 @@
 <script>
   /** @module draw-interaction/interaction */
   import DrawInteraction from 'ol/interaction/draw'
-  import eventCondition from 'ol/events/condition'
+  import condition from 'ol/events/condition'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operator'
@@ -101,7 +101,7 @@
      */
     condition: {
       type: Function,
-      default: eventCondition.noModifierKeys,
+      default: condition.noModifierKeys,
     },
     /**
      * Operate in freehand mode for lines, polygons, and circles. This makes the interaction always operate in
@@ -120,7 +120,7 @@
      */
     freehandCondition: {
       type: Function,
-      default: eventCondition.shiftKeyOnly,
+      default: condition.shiftKeyOnly,
     },
     /**
      * Wrap the world horizontally on the sketch overlay.
