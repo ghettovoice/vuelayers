@@ -11,12 +11,14 @@
    * @module geoloc/geoloc
    */
   import Geolocation from 'ol/geolocation'
+  import { Observable } from 'rxjs'
+  import { merge } from 'rxjs/observable'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
   import useMapCmp from '../../mixin/use-map-cmp'
   import { EPSG_3857 } from '../../ol-ext/consts'
-  import { hasGeolocation } from '../../util/assert'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
+  import { hasGeolocation } from '../../util/assert'
 
   const props = {
     tracking: {
@@ -163,18 +165,26 @@
     hasGeolocation(this)
 
     const ft = 100
-    const changes = observableFromOlChangeEvent(
-      this.$geolocation,
-      [
-        'accuracy',
-        'altitude',
-        'altitudeaccuracy',
-        'heading',
+    const changes = Observable::merge(
+      observableFromOlChangeEvent(
+        this.$geolocation,
+        [
+          'accuracy',
+          'altitude',
+          'altitudeaccuracy',
+          'heading',
+          'speed',
+        ],
+        true,
+        ft,
+      ),
+      observableFromOlChangeEvent(
+        this.$geolocation,
         'position',
-        'speed',
-      ],
-      true,
-      ft
+        true,
+        ft,
+        () => this.dataProjPosition,
+      )
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {

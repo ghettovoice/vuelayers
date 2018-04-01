@@ -8,6 +8,7 @@
         <button @click="drawType = 'circle'">Circle</button>
         <button @click="drawType = undefined">Reset</button>
       </div>
+
       <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')" @singleclick="clickCoord = $event.coordinate">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
@@ -20,7 +21,7 @@
           </vl-overlay>
         </vl-view>
 
-        <vl-geoloc projection="EPSG:3857">
+        <vl-geoloc data-projection="EPSG:4326" @update:position="log($event)">
           <template slot-scope="ctx">
             <vl-feature v-if="ctx.position" id="my-geoloc">
               <vl-geom-point :coordinates="ctx.position" />
@@ -213,7 +214,7 @@
     data () {
       return {
         zoom: 13,
-        center: fromLonLat([-80.0307892780456, 43.456341754866685]),
+        center: pointFromLonLat([-80.0307892780456, 43.456341754866685]),
         rotation: 0,
         points: [],
         pointsLayer: true,
