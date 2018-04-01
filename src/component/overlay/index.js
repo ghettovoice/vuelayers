@@ -1,6 +1,5 @@
-/**
- * @module overlay
- */
+/** @module overlay */
+import { pick } from '../../util/minilo'
 import Overlay from './overlay.vue'
 
 /**
@@ -16,6 +15,9 @@ export default {
    * @param {VueLayersOptions} [options]
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Overlay, options)
+
     Vue.component(Overlay.name, Overlay)
   },
 }

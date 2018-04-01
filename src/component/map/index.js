@@ -1,6 +1,5 @@
-/**
- * @module map
- */
+/** @module map */
+import { pick } from '../../util/minilo'
 import Map from './map.vue'
 import View from './view.vue'
 
@@ -48,6 +47,10 @@ export default {
    * @return {void}
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Map, options)
+    Object.assign(View, options)
+
     Vue.component(Map.name, Map)
     Vue.component(View.name, View)
   },

@@ -1,6 +1,6 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
-    <slot :center="bindProjCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation" />
+    <slot :center="dataProjCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation" />
   </i>
 </template>
 
@@ -135,9 +135,9 @@
         return this.$view.getCenter()
       }
     },
-    bindProjCenter () {
+    dataProjCenter () {
       if (this.viewProjCenter) {
-        return this.pointToBindProj(this.viewProjCenter)
+        return this.pointToDataProj(this.viewProjCenter)
       }
     },
   }
@@ -204,7 +204,7 @@
 
       // transform from GeoJSON, vl-feature to ol.Feature
       if (isPlainObject(geometryOrExtent)) {
-        geometryOrExtent = this.readGeometryInBindProj(geometryOrExtent)
+        geometryOrExtent = this.readGeometryInDataProj(geometryOrExtent)
       } else if (geometryOrExtent instanceof Vue) {
         geometryOrExtent = geometryOrExtent.$geometry
       }
@@ -248,7 +248,7 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, this.bindProjCenter)) {
+      if (this.$view && !isEqual(value, this.dataProjCenter)) {
         this.$view.setCenter(this.pointToViewProj(value))
       }
     },
@@ -338,7 +338,7 @@
     }))::distinctUntilKeyChanged('value')
 
     const changes = Observable::mergeObs(
-      observableFromOlChangeEvent(this.$view, 'center', true, ft, () => this.pointToBindProj(this.$view.getCenter())),
+      observableFromOlChangeEvent(this.$view, 'center', true, ft, () => this.pointToDataProj(this.$view.getCenter())),
       observableFromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
       zoom

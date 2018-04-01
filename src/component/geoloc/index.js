@@ -1,6 +1,5 @@
-/**
- * @module geoloc
- */
+/** @module geoloc */
+import { pick } from '../../util/minilo'
 import Geoloc from './geoloc.vue'
 
 /**
@@ -16,6 +15,9 @@ export default {
    * @param {VueLayersOptions} [options]
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Geoloc, options)
+
     Vue.component(Geoloc.name, Geoloc)
   },
 }

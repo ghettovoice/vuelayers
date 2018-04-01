@@ -13,79 +13,91 @@ import {
   transformPoint,
   transformPolygon,
 } from '../ol-ext/proj'
-import options from './options'
+import { coalesce } from '../util/minilo'
 
 /**
  * @alias module:mixin/proj-transforms
  * @vueProto
  */
 export default {
-  mixins: [options],
+  props: {
+    /**
+     * Projection for input/output coordinates in plain data.
+     * @type {string}
+     */
+    dataProjection: String,
+  },
   computed: {
+    /**
+     * @return {ol.ProjectionLike}
+     */
     viewProjection () {
       return this.$view ? this.$view.getProjection().getCode() : EPSG_3857
     },
-    bindProjection () {
-      return this.globOption('bindToProj', this.viewProjection)
+    /**
+     * @return {ol.ProjectionLike}
+     */
+    resolvedDataProjection () {
+      return coalesce(this.dataProjection, this.$options.dataProjection, this.viewProjection)
     },
   },
   methods: {
     pointToViewProj (point) {
-      return transformPoint(point, this.bindProjection, this.viewProjection)
+      return transformPoint(point, this.resolvedDataProjection, this.viewProjection)
     },
-    pointToBindProj (point) {
-      return transformPoint(point, this.viewProjection, this.bindProjection)
+    pointToDataProj (point) {
+      return transformPoint(point, this.viewProjection, this.resolvedDataProjection)
     },
     lineToViewProj (line) {
-      return transformLine(line, this.bindProjection, this.viewProjection)
+      return transformLine(line, this.resolvedDataProjection, this.viewProjection)
     },
-    lineToBindProj (line) {
-      return transformLine(line, this.viewProjection, this.bindProjection)
+    lineToDataProj (line) {
+      return transformLine(line, this.viewProjection, this.resolvedDataProjection)
     },
     polygonToViewProj (polygon) {
-      return transformPolygon(polygon, this.bindProjection, this.viewProjection)
+      return transformPolygon(polygon, this.resolvedDataProjection, this.viewProjection)
     },
-    polygonToBindProj (polygon) {
-      return transformPolygon(polygon, this.viewProjection, this.bindProjection)
+    polygonToDataProj (polygon) {
+      return transformPolygon(polygon, this.viewProjection, this.resolvedDataProjection)
     },
     multiPointToViewProj (multiPoint) {
-      return transformMultiPoint(multiPoint, this.bindProjection, this.viewProjection)
+      return transformMultiPoint(multiPoint, this.resolvedDataProjection, this.viewProjection)
     },
-    multiPointToBindProj (multiPoint) {
-      return transformMultiPoint(multiPoint, this.viewProjection, this.bindProjection)
+    multiPointToDataProj (multiPoint) {
+      return transformMultiPoint(multiPoint, this.viewProjection, this.resolvedDataProjection)
     },
     multiLineToViewProj (multiLine) {
-      return transformMultiLine(multiLine, this.bindProjection, this.viewProjection)
+      return transformMultiLine(multiLine, this.resolvedDataProjection, this.viewProjection)
     },
-    multiLineToBindProj (multiLine) {
-      return transformMultiLine(multiLine, this.viewProjection, this.bindProjection)
+    multiLineToDataProj (multiLine) {
+      return transformMultiLine(multiLine, this.viewProjection, this.resolvedDataProjection)
     },
     multiPolygonToViewProj (multiPolygon) {
-      return transformMultiPolygon(multiPolygon, this.bindProjection, this.viewProjection)
+      return transformMultiPolygon(multiPolygon, this.resolvedDataProjection, this.viewProjection)
     },
-    multiPolygonToBindProj (multiPolygon) {
-      return transformMultiPolygon(multiPolygon, this.viewProjection, this.bindProjection)
+    multiPolygonToDataProj (multiPolygon) {
+      return transformMultiPolygon(multiPolygon, this.viewProjection, this.resolvedDataProjection)
     },
 
     extentToViewProj (extent) {
-      return transformExtent(extent, this.bindProjection, this.viewProjection)
+      return transformExtent(extent, this.resolvedDataProjection, this.viewProjection)
     },
-    extentToBindProj (extent) {
-      return transformExtent(extent, this.viewProjection, this.bindProjection)
-    },
-
-    writeGeometryInBindProj (geometry) {
-      return writeGeoJsonGeometry(geometry, this.viewProjection, this.bindProjection)
-    },
-    readGeometryInBindProj (geometry) {
-      return readGeoJsonGeometry(geometry, this.viewProjection, this.bindProjection)
+    extentToDataProj (extent) {
+      return transformExtent(extent, this.viewProjection, this.resolvedDataProjection)
     },
 
-    writeFeatureInBindProj (feature) {
-      return writeGeoJsonFeature(feature, this.viewProjection, this.bindProjection)
+    writeGeometryInDataProj (geometry) {
+      return writeGeoJsonGeometry(geometry, this.viewProjection, this.resolvedDataProjection)
     },
-    readFeatureInBindProj (feature) {
-      return readGeoJsonFeature(feature, this.viewProjection, this.bindProjection)
+    readGeometryInDataProj (geometry) {
+      return readGeoJsonGeometry(geometry, this.viewProjection, this.resolvedDataProjection)
+    },
+
+    writeFeatureInDataProj (feature) {
+      return writeGeoJsonFeature(feature, this.viewProjection, this.resolvedDataProjection)
+    },
+    readFeatureInDataProj (feature) {
+      return readGeoJsonFeature(feature, this.viewProjection, this.resolvedDataProjection)
     },
   },
 }

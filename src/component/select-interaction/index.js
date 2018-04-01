@@ -1,6 +1,5 @@
-/**
- * @module select-interaction
- */
+/** @module select-interaction */
+import { pick } from '../../util/minilo'
 import Interaction from './interaction.vue'
 
 /**
@@ -16,6 +15,9 @@ export default {
    * @param {VueLayersOptions} [options]
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Interaction, options)
+
     Vue.component(Interaction.name, Interaction)
   },
 }

@@ -137,6 +137,6 @@ function subscribeToSourceChanges () {
   })
   // emit event to allow `sync` modifier
   this.subscribeTo(events::debounceTime(100), () => {
-    this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInBindProj))
+    this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInDataProj))
   })
 }

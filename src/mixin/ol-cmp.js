@@ -6,7 +6,6 @@ import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
 import { isFunction } from '../util/minilo'
 import identMap from './ident-map'
-import options from './options'
 import rxSubs from './rx-subs'
 import services from './services'
 
@@ -139,7 +138,7 @@ const methods = {
 export default {
   VM_PROP,
   INSTANCE_PROMISE_POOL,
-  mixins: [options, identMap, rxSubs, services],
+  mixins: [identMap, rxSubs, services],
   props,
   methods,
   /**

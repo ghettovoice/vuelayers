@@ -1,6 +1,7 @@
 /**
  * @module feature
  */
+import { pick } from '../../util/minilo'
 import Feature from './feature.vue'
 
 /**
@@ -29,6 +30,9 @@ export default {
    * @param {VueLayersOptions} [options]
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Feature, options)
+
     Vue.component(Feature.name, Feature)
   },
 }

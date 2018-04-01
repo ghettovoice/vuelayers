@@ -36,7 +36,7 @@ const computed = {
    */
   extent () {
     if (this.rev && this.$geometry && this.$view) {
-      return this.extentToBindProj(this.$geometry.getExtent())
+      return this.extentToDataProj(this.$geometry.getExtent())
     }
   },
   /**
@@ -44,7 +44,7 @@ const computed = {
    */
   pointOnSurface () {
     if (this.rev && this.$geometry && this.$view) {
-      return this.pointToBindProj(findPointOnSurface(this.$geometry))
+      return this.pointToDataProj(findPointOnSurface(this.$geometry))
     }
   },
   /**
@@ -97,21 +97,21 @@ const methods = {
     // define helper methods based on geometry type
     const {transform} = transforms[this.type]
     let geomProj = this.$view.getProjection()
-    let bindProj = this.globOption('bindToProj', geomProj)
+    let dataProj = this.resolvedDataProjection
     /**
      * @method
      * @param {Array} coordinates
      * @return {number[]}
      * @protected
      */
-    this.toBindProj = coordinates => transform(coordinates, geomProj, bindProj)
+    this.toBindProj = coordinates => transform(coordinates, geomProj, dataProj)
     /**
      * @method
      * @param {Array} coordinates
      * @return {number[]}
      * @protected
      */
-    this.toViewProj = coordinates => transform(coordinates, bindProj, geomProj)
+    this.toViewProj = coordinates => transform(coordinates, dataProj, geomProj)
 
     return this::cmp.methods.init()
   },

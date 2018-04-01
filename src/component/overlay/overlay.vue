@@ -66,9 +66,9 @@
       }
       return []
     },
-    bindProjPosition () {
+    dataProjPosition () {
       if (this.rev && this.$overlay) {
-        return this.pointToBindProj(this.$overlay.getPosition())
+        return this.pointToDataProj(this.$overlay.getPosition())
       }
       return []
     },
@@ -204,7 +204,7 @@
 
     const ft = 100
     const changes = Observable::mergeObs(
-      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, () => this.pointToBindProj(this.$overlay.getPosition())),
+      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, () => this.pointToDataProj(this.$overlay.getPosition())),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',

@@ -60,7 +60,7 @@
      */
     geometry () {
       if (this.rev && this.$geometry) {
-        return this.writeGeometryInBindProj(this.$geometry)
+        return this.writeGeometryInDataProj(this.$geometry)
       }
     },
     /**
@@ -68,7 +68,7 @@
      */
     geometryPoint () {
       if (this.rev && this.$geometry) {
-        return this.pointToBindProj(findPointOnSurface(this.$geometry))
+        return this.pointToDataProj(findPointOnSurface(this.$geometry))
       }
     },
   }

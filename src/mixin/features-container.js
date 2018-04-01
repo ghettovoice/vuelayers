@@ -28,7 +28,7 @@ const methods = {
     if (feature instanceof Vue) {
       feature = feature.$feature
     } else if (isPlainObject(feature)) {
-      feature = this.readFeatureInBindProj(feature)
+      feature = this.readFeatureInDataProj(feature)
     }
     instanceOf(feature, Feature)
 

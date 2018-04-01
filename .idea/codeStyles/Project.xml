@@ -25,9 +25,6 @@
       <option name="KEEP_RPAREN_AND_LBRACE_ON_ONE_LINE" value="true" />
       <option name="FORCE_SHORT_DECLARATION_ARRAY_STYLE" value="true" />
     </PHPCodeStyleSettings>
-    <SqlCodeStyleSettings>
-      <option name="KEYWORD_CASE" value="2" />
-    </SqlCodeStyleSettings>
     <codeStyleSettings language="CFML">
       <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
     </codeStyleSettings>

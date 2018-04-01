@@ -220,7 +220,7 @@
       hasMap(this)
 
       let coordinate = this.$map.getCoordinateFromPixel(pixel)
-      return this.pointToBindProj(coordinate)
+      return this.pointToDataProj(coordinate)
     },
     /**
      * @returns {Object}
@@ -424,7 +424,7 @@
         ::distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
     )::mapObs(evt => ({
       ...evt,
-      coordinate: this.pointToBindProj(evt.coordinate),
+      coordinate: this.pointToDataProj(evt.coordinate),
     }))
     // other
     const otherEvents = observableFromOlEvent(this.$map, [

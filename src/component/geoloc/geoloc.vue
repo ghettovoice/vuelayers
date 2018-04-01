@@ -67,9 +67,9 @@
         return this.pointToViewProj(this.position)
       }
     },
-    bindProjPosition () {
+    dataProjPosition () {
       if (this.position) {
-        return this.pointToBindProj(this.position)
+        return this.pointToDataProj(this.position)
       }
     },
   }

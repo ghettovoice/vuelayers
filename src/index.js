@@ -4,8 +4,6 @@
  * @author Vladimir Vershinin
  * @license MIT
  */
-/* eslint-disable indent */
-import { install as basicInstall } from './install'
 import CircleGeom from './component/circle-geom'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
@@ -58,51 +56,46 @@ const VERSION = 'C_PKG_VERSION'
  * @param {VueLayersOptions} [options]
  */
 function plugin (Vue, options = {}) {
-  // todo move common installation to separate module and require it in each component
-  if (plugin.installed) return
-  plugin.installed = true
-
-  basicInstall(Vue, options)
-
   // install components
-  Vue.use(CircleGeom)
-  Vue.use(CircleStyle)
-  Vue.use(ClusterSource)
-  Vue.use(DrawInteraction)
-  Vue.use(Feature)
-  Vue.use(FillStyle)
-  Vue.use(Geoloc)
-  Vue.use(IconStyle)
-  Vue.use(ImageLayer)
-  Vue.use(ImageStaticSource)
-  Vue.use(LineStringGeom)
-  Vue.use(Map)
-  Vue.use(MapboxSource)
-  Vue.use(ModifyInteraction)
-  Vue.use(MultiLineStringGeom)
-  Vue.use(MultiPointGeom)
-  Vue.use(MultiPolygonGeom)
-  Vue.use(OsmSource)
-  Vue.use(Overlay)
-  Vue.use(PointGeom)
-  Vue.use(PolygonGeom)
-  Vue.use(RegShapeStyle)
-  Vue.use(SelectInteraction)
-  Vue.use(SnapInteraction)
-  Vue.use(SputnikSource)
-  Vue.use(StrokeStyle)
-  Vue.use(StyleBox)
-  Vue.use(StyleFunc)
-  Vue.use(TextStyle)
-  Vue.use(TileLayer)
-  Vue.use(VectorLayer)
-  Vue.use(VectorSource)
-  Vue.use(WmsSource)
-  Vue.use(WmtsSource)
-  Vue.use(XyzSource)
+  Vue.use(CircleGeom, options)
+  Vue.use(CircleStyle, options)
+  Vue.use(ClusterSource, options)
+  Vue.use(DrawInteraction, options)
+  Vue.use(Feature, options)
+  Vue.use(FillStyle, options)
+  Vue.use(Geoloc, options)
+  Vue.use(IconStyle, options)
+  Vue.use(ImageLayer, options)
+  Vue.use(ImageStaticSource, options)
+  Vue.use(LineStringGeom, options)
+  Vue.use(Map, options)
+  Vue.use(MapboxSource, options)
+  Vue.use(ModifyInteraction, options)
+  Vue.use(MultiLineStringGeom, options)
+  Vue.use(MultiPointGeom, options)
+  Vue.use(MultiPolygonGeom, options)
+  Vue.use(OsmSource, options)
+  Vue.use(Overlay, options)
+  Vue.use(PointGeom, options)
+  Vue.use(PolygonGeom, options)
+  Vue.use(RegShapeStyle, options)
+  Vue.use(SelectInteraction, options)
+  Vue.use(SnapInteraction, options)
+  Vue.use(SputnikSource, options)
+  Vue.use(StrokeStyle, options)
+  Vue.use(StyleBox, options)
+  Vue.use(StyleFunc, options)
+  Vue.use(TextStyle, options)
+  Vue.use(TileLayer, options)
+  Vue.use(VectorLayer, options)
+  Vue.use(VectorSource, options)
+  Vue.use(WmsSource, options)
+  Vue.use(WmtsSource, options)
+  Vue.use(XyzSource, options)
 }
 
 export default plugin
+/* eslint-disable indent */
 export {
   VERSION,
   plugin as install,
@@ -151,5 +144,5 @@ export {
 
 /**
  * @typedef {Object} VueLayersOptions
- * @property {string} [bindToProj] Bind all props to the provided projection.
+ * @property {string} [dataProjection] Projection for all properties, events and other plain values.
  */

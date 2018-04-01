@@ -39,7 +39,7 @@ const methods = {
     if (geom instanceof Vue) {
       geom = geom.$geometry
     } else if (isPlainObject(geom)) {
-      geom = this.readGeometryInBindProj(geom)
+      geom = this.readGeometryInDataProj(geom)
     }
 
     if (geom !== this._geometry) {

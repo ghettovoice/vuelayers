@@ -349,7 +349,7 @@
 
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
-        this.$emit('update:features', this.$features.map(::this.writeFeatureInBindProj))
+        this.$emit('update:features', this.$features.map(::this.writeFeatureInDataProj))
       }
     )
   }
