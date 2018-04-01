@@ -14,7 +14,7 @@
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
   import useMapCmp from '../../mixin/use-map-cmp'
-  import { EPSG_4326 } from '../../ol-ext/consts'
+  import { EPSG_3857 } from '../../ol-ext/consts'
   import { hasGeolocation } from '../../util/assert'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
 
@@ -26,7 +26,7 @@
     trackingOptions: Object,
     projection: {
       type: String,
-      default: EPSG_4326,
+      default: EPSG_3857,
     },
     // todo add autoCenter, bindToPosition
   }
