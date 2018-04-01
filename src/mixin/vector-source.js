@@ -5,7 +5,6 @@ import { _do as doObs } from 'rxjs/operator/do'
 import featuresContainer from './features-container'
 import { EPSG_4326 } from '../ol-ext/consts'
 import { SourceCollectionAdapter } from '../ol-ext/collection'
-import * as geoJsonHelper from '../ol-ext/geojson'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../util/assert'
 import mergeDescriptors from '../util/multi-merge-descriptors'
@@ -31,7 +30,7 @@ const props = {
 const computed = {
   viewProjFeatures () {
     if (this.rev && this.$source) {
-      return this.getFeatures().map(feature => geoJsonHelper.writeGeoJsonFeature(feature))
+      return this.getFeatures().map(::this.writeFeatureInDataProj)
     }
     return []
   },
