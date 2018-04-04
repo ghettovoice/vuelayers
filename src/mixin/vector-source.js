@@ -89,6 +89,22 @@ const methods = {
   subscribeAll () {
     this::subscribeToSourceChanges()
   },
+  /**
+   * @param feature
+   * @return {ReadonlyArray<any>}
+   * @protected
+   */
+  writeFeatureInDataProj (feature) {
+    return Object.freeze(this::projTransforms.methods.writeFeatureInDataProj(feature))
+  },
+  /**
+   * @param feature
+   * @return {ReadonlyArray<any>}
+   * @protected
+   */
+  writeGeometryInViewProj (feature) {
+    return Object.freeze(this::projTransforms.methods.writeFeatureInViewProj(feature))
+  },
 }
 
 export default {
@@ -126,6 +142,6 @@ function subscribeToSourceChanges () {
   })
   // emit event to allow `sync` modifier
   this.subscribeTo(events::debounceTime(100), () => {
-    this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInDataProj))
+    this.$emit('update:features', this.getFeatures().map(feature => this.writeFeatureInDataProj(feature)))
   })
 }

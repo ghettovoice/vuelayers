@@ -296,9 +296,11 @@
       if (this.$map && view !== this.$map.getView()) {
         this.$map.setView(view)
       }
-      view[olCmp.VM_PROP].forEach(vm => {
-        vm.dataProjection = this.dataProjection
-      })
+      if (view != null) {
+        view[olCmp.VM_PROP].forEach(vm => {
+          vm.dataProjection = this.dataProjection
+        })
+      }
     },
     /**
      * @return {void}

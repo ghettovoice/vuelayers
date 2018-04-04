@@ -188,7 +188,7 @@ function bundleOptions (format, package, env = 'development') {
       process.env.BABEL_ENV = 'es5-production'
       break
     case 'es':
-      options.outputPath = path.join(options.outputPath, '_esm2015')
+      options.outputPath = path.join(options.outputPath, '_esm')
       options.input.external = external
       options.cssName = undefined
       options.patterns = patterns

@@ -1,4 +1,3 @@
-import eventType from 'ol/events/eventtype'
 import { forEach } from '../util/minilo'
 
 /**
@@ -117,7 +116,7 @@ export class IndexedCollectionAdapter {
     }
 
     this._index[key] = element
-    element.on(eventType.PROPERTYCHANGE, this._handleElementChange, this)
+    element.on('propertychange', this._handleElementChange, this)
 
     return true
   }
@@ -130,7 +129,7 @@ export class IndexedCollectionAdapter {
     let element = this.findByKey(key)
 
     if (element) {
-      element.un(eventType.PROPERTYCHANGE, this._handleElementChange, this)
+      element.un('propertychange', this._handleElementChange, this)
       delete this._index[key]
     }
 
