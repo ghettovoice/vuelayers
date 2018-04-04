@@ -1,6 +1,6 @@
 <template>
   <i :id="[$options.name, id].join('-')" :class="[$options.name]" style="display: none !important;">
-    <slot :id="id" :properties="properties" :geometry="geometry" :geometry-point="geometryPoint"/>
+    <slot :id="id" :properties="properties" :geometry="geometry" :point="point"/>
   </i>
 </template>
 
@@ -66,9 +66,19 @@
     /**
      * @return {number[]|undefined}
      */
-    geometryPoint () {
+    point () {
       if (this.rev && this.$geometry) {
         return this.pointToDataProj(findPointOnSurface(this.$geometry))
+      }
+    },
+    geometryViewProj () {
+      if (this.rev && this.$geometry) {
+        return this.writeGeometryInViewProj(this.$geometry)
+      }
+    },
+    pointViewProj () {
+      if (this.rev && this.$geometry) {
+        return this.pointToViewProj(findPointOnSurface(this.$geometry))
       }
     },
   }

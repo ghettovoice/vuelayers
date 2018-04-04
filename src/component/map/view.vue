@@ -1,6 +1,6 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
-    <slot :center="dataProjCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation" />
+    <slot :center="viewCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation" />
   </i>
 </template>
 
@@ -69,6 +69,7 @@
       default: MIN_ZOOM,
     },
     /**
+     * @type {string}
      * @default EPSG:3857
      */
     projection: {
@@ -130,14 +131,14 @@
 
       return this.resolution
     },
-    viewProjCenter () {
+    viewCenter () {
       if (this.rev && this.$view) {
-        return this.$view.getCenter()
+        return this.pointToDataProj(this.$view.getCenter())
       }
     },
-    dataProjCenter () {
-      if (this.viewProjCenter) {
-        return this.pointToDataProj(this.viewProjCenter)
+    viewCenterViewProj () {
+      if (this.rev && this.$view) {
+        return this.$view.getCenter()
       }
     },
   }
@@ -248,7 +249,7 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, this.dataProjCenter)) {
+      if (this.$view && !isEqual(value, this.viewCenter)) {
         this.$view.setCenter(this.pointToViewProj(value))
       }
     },
@@ -276,6 +277,12 @@
     maxZoom (value) {
       if (this.$view && value !== this.$view.getMaxZoom()) {
         this.$view.setMaxZoom(value)
+      }
+    },
+    dataProjection (value) {
+      if (this.$view) {
+        this.$view.set('dataProjection', value)
+        this.refresh()
       }
     },
   }
@@ -319,6 +326,11 @@
           get: () => this.$services && this.$services.viewContainer,
         },
       })
+    },
+    data () {
+      return {
+        dataProjection: undefined,
+      }
     },
   }
 

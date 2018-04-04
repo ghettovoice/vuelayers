@@ -67,7 +67,7 @@
     createSource () {
       return new VectorSource({
         attributions: this.attributions,
-        projection: this.projection,
+        projection: this.resolvedDataProjection,
         loader: this.createLoader(),
         useSpatialIndex: this.useSpatialIndex,
         wrapX: this.wrapX,
@@ -91,9 +91,9 @@
       }
       // wrap strategy function to transform map view projection to source projection
       return (extent, resolution, projection) => url(
-        transformExtent(extent, projection, this.projection),
+        transformExtent(extent, projection, this.resolvedDataProjection),
         resolution,
-        this.projection,
+        this.resolvedDataProjection,
       )
     },
     /**
@@ -106,9 +106,9 @@
       const loader = this.loaderFactory()
       // wrap strategy function to transform map view projection to source projection
       return (extent, resolution, projection) => loader(
-        transformExtent(extent, projection, this.projection),
+        transformExtent(extent, projection, this.resolvedDataProjection),
         resolution,
-        this.projection,
+        this.resolvedDataProjection,
       )
     },
     /**

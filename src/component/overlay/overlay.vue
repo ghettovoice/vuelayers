@@ -20,7 +20,6 @@
   import { OVERLAY_POSITIONING } from '../../ol-ext/consts'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasOverlay } from '../../util/assert'
-  import { isEqual } from '../../util/minilo'
 
   const props = {
     id: {
@@ -59,18 +58,14 @@
     autoPanAnimation: Object,
   }
 
+  /**
+   * @vueComputed
+   */
   const computed = {
-    viewProjPosition () {
+    positionViewProj () {
       if (this.rev && this.$overlay) {
-        return this.$overlay.getPosition()
+        return this.pointToViewProj(this.$overlay.getPosition())
       }
-      return []
-    },
-    dataProjPosition () {
-      if (this.rev && this.$overlay) {
-        return this.pointToDataProj(this.$overlay.getPosition())
-      }
-      return []
     },
   }
 
@@ -134,7 +129,7 @@
         olCmp.methods.refresh(),
         new Promise(resolve => {
           this.$overlay.once('change:position', () => resolve())
-          this.$overlay.setPosition(this.viewProjPosition)
+          this.$overlay.setPosition(this.$overlay.getPosition())
         }),
       ])
     },
@@ -142,17 +137,17 @@
 
   const watch = {
     offset (value) {
-      if (this.$overlay && !isEqual(value, this.$overlay.getOffset())) {
+      if (this.$overlay) {
         this.$overlay.setOffset(value)
       }
     },
     position (value) {
-      if (this.$overlay && !isEqual(value, this.bindProjPosition)) {
+      if (this.$overlay) {
         this.$overlay.setPosition(this.pointToViewProj(value))
       }
     },
     positioning (value) {
-      if (this.$overlay && value !== this.$overlay.getPositioning()) {
+      if (this.$overlay) {
         this.$overlay.setPositioning(value)
       }
     },

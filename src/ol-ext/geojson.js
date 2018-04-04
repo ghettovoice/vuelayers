@@ -55,7 +55,7 @@ export function readGeoJsonFeature (geoJsonFeature, featureProjection, dataProje
 export function writeGeoJsonGeometry (geometry, geometryProjection, dataProjection) {
   return geoJsonFmt.writeGeometryObject(geometry, {
     featureProjection: geometryProjection,
-    dataProjection: dataProjection,
+    dataProjection,
   })
 }
 
@@ -70,7 +70,7 @@ export function readGeoJsonGeometry (geoJsonGeometry, geometryProjection, dataPr
 
   return geoJsonFmt.readGeometry(geoJsonGeometry, {
     featureProjection: geometryProjection,
-    dataProjection: dataProjection,
+    dataProjection,
   })
 }
 

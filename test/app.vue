@@ -9,7 +9,8 @@
         <button @click="drawType = undefined">Reset</button>
       </div>
 
-      <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')" @singleclick="clickCoord = $event.coordinate">
+      <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')"
+              @singleclick="clickCoord = $event.coordinate" data-projection="EPSG:4326">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
             <div style="background: #eee; padding: 1rem">
@@ -21,7 +22,7 @@
           </vl-overlay>
         </vl-view>
 
-        <vl-geoloc data-projection="EPSG:4326" @update:position="log($event)">
+        <vl-geoloc @update:position="log($event)">
           <template slot-scope="ctx">
             <vl-feature v-if="ctx.position" id="my-geoloc">
               <vl-geom-point :coordinates="ctx.position" />
@@ -66,7 +67,7 @@
             </vl-feature>
 
             <vl-feature id="circle">
-              <vl-geom-circle :coordinates="[-5000000, -500000]" :radius="5000000"></vl-geom-circle>
+              <vl-geom-circle :coordinates="circleCoordinates" :radius="5000000"></vl-geom-circle>
             </vl-feature>
           </vl-source-vector>
 
@@ -84,14 +85,14 @@
           <vl-source-vector ident="draw-target" />
         </vl-layer-vector>
 
-        <!--<vl-layer-image id="jz">-->
-          <!--<vl-source-image-static-->
-            <!--:url="imageUrl"-->
-            <!--:size="imageSize"-->
-            <!--:extent="imageExtent"-->
-            <!--:projection="imageProj">-->
-          <!--</vl-source-image-static>-->
-        <!--</vl-layer-image>-->
+        <vl-layer-image id="jz">
+          <vl-source-image-static
+            :url="imageUrl"
+            :size="imageSize"
+            :extent="imageExtent"
+            :projection="imageProj">
+          </vl-source-image-static>
+        </vl-layer-image>
 
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
         <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
@@ -150,10 +151,10 @@
 </template>
 
 <script>
-  import { pointFromLonLat, polygonFromLonLat, createProj, addProj } from '@/ol-ext/proj'
+  import { random, range } from 'lodash/fp'
+  import { createProj, addProj } from '@/ol-ext/proj'
   import { loadingBBox } from '@/ol-ext/load-strategy'
   import { findPointOnSurface } from '@/ol-ext/geom'
-  import { random, range } from 'lodash/fp'
 
   const computed = {
   }
@@ -171,10 +172,10 @@
           },
           geometry: {
             type: 'Point',
-            coordinates: pointFromLonLat([
+            coordinates: [
               random(-179, 179),
               random(-89, 89),
-            ]),
+            ],
           },
         })
       })
@@ -213,13 +214,13 @@
     methods,
     data () {
       return {
-        zoom: 13,
-        center: pointFromLonLat([-80.0307892780456, 43.456341754866685]),
+        zoom: 3,
+        center: [-80.0307892780456, 43.456341754866685],
         rotation: 0,
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: polygonFromLonLat([[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]]),
+        polygonCoords: [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]],
         selected: [],
         selectedFeatures: [],
         countries: [],
@@ -230,7 +231,8 @@
         imageExtent,
         clickCoord: undefined,
         drawnFeatures: [],
-        drawType: undefined
+        drawType: undefined,
+        circleCoordinates: [-40, -40],
       }
     },
     mounted () {

@@ -107,6 +107,17 @@
      * @type {number|string}
      */
     tabindex: [String, Number],
+    /**
+     * Projection for input/output coordinates in plain data.
+     * @type {string}
+     */
+    dataProjection: String,
+  }
+
+  /**
+   * @vueComputed
+   */
+  const computed = {
   }
 
   /**
@@ -137,6 +148,8 @@
         let opts = typeof this.controls === 'object' ? this.controls : undefined
         map.getControls().extend(olcontrol.defaults(opts).getArray())
       }
+
+      map.set('dataProjection', this.dataProjection)
 
       return map
     },
@@ -283,6 +296,9 @@
       if (this.$map && view !== this.$map.getView()) {
         this.$map.setView(view)
       }
+      view[olCmp.VM_PROP].forEach(vm => {
+        vm.dataProjection = this.dataProjection
+      })
     },
     /**
      * @return {void}
@@ -338,6 +354,15 @@
     },
   }
 
+  const watch = {
+    dataProjection (value) {
+      if (this.$map) {
+        this.$map.set('dataProjection', value)
+        this.refresh()
+      }
+    },
+  }
+
   /**
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.
@@ -363,7 +388,9 @@
     name: 'vl-map',
     mixins: [olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer, projTransforms],
     props,
+    computed,
     methods,
+    watch,
     created () {
       /**
        * @type {ol.View|undefined}

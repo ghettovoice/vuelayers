@@ -20,13 +20,6 @@ import { coalesce } from '../util/minilo'
  * @vueProto
  */
 export default {
-  props: {
-    /**
-     * Projection for input/output coordinates in plain data.
-     * @type {string}
-     */
-    dataProjection: String,
-  },
   computed: {
     /**
      * @return {ol.ProjectionLike}
@@ -38,7 +31,13 @@ export default {
      * @return {ol.ProjectionLike}
      */
     resolvedDataProjection () {
-      return coalesce(this.dataProjection, this.$options.dataProjection, this.viewProjection)
+      return coalesce(
+        this.dataProjection, // may or may not be present
+        this.projection, // may or may not be present
+        this.$map && this.$map.get('dataProjection'),
+        this.$options.dataProjection,
+        this.viewProjection
+      )
     },
   },
   methods: {
@@ -89,12 +88,18 @@ export default {
     writeGeometryInDataProj (geometry) {
       return writeGeoJsonGeometry(geometry, this.viewProjection, this.resolvedDataProjection)
     },
+    writeGeometryInViewProj (geometry) {
+      return writeGeoJsonGeometry(geometry)
+    },
     readGeometryInDataProj (geometry) {
       return readGeoJsonGeometry(geometry, this.viewProjection, this.resolvedDataProjection)
     },
 
     writeFeatureInDataProj (feature) {
       return writeGeoJsonFeature(feature, this.viewProjection, this.resolvedDataProjection)
+    },
+    writeFeatureInViewProj (feature) {
+      return writeGeoJsonFeature(feature)
     },
     readFeatureInDataProj (feature) {
       return readGeoJsonFeature(feature, this.viewProjection, this.resolvedDataProjection)

@@ -7,16 +7,13 @@
 </template>
 
 <script>
-  /**
-   * @module geoloc/geoloc
-   */
+  /** @module geoloc/geoloc */
   import Geolocation from 'ol/geolocation'
   import { Observable } from 'rxjs'
   import { merge } from 'rxjs/observable'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
   import useMapCmp from '../../mixin/use-map-cmp'
-  import { EPSG_3857 } from '../../ol-ext/consts'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasGeolocation } from '../../util/assert'
 
@@ -26,10 +23,10 @@
       default: true,
     },
     trackingOptions: Object,
-    projection: {
-      type: String,
-      default: EPSG_3857,
-    },
+    /**
+     * @type {string}
+     */
+    projection: String,
     // todo add autoCenter, bindToPosition
   }
 
@@ -54,24 +51,19 @@
         return this.$geolocation.getHeading()
       }
     },
-    position () {
-      if (this.rev && this.$geolocation) {
-        return this.$geolocation.getPosition()
-      }
-    },
     speed () {
       if (this.rev && this.$geolocation) {
         return this.$geolocation.getSpeed()
       }
     },
-    viewProjPosition () {
-      if (this.position) {
-        return this.pointToViewProj(this.position)
+    position () {
+      if (this.rev && this.$geolocation) {
+        return this.$geolocation.getPosition()
       }
     },
-    dataProjPosition () {
+    positionViewProj () {
       if (this.position) {
-        return this.pointToDataProj(this.position)
+        return this.pointToViewProj(this.position)
       }
     },
   }
@@ -85,7 +77,7 @@
       return new Geolocation({
         tracking: this.tracking,
         trackingOptions: this.trackingOptions,
-        projection: this.projection,
+        projection: this.resolvedDataProjection,
       })
     },
     /**
@@ -153,6 +145,14 @@
           enumerable: true,
           get: () => this.$services && this.$services.map,
         },
+        /**
+         * Reference to `ol.View` instance.
+         * @type {ol.View|undefined}
+         */
+        $view: {
+          enumerable: true,
+          get: () => this.$services && this.$services.view,
+        },
       })
     },
   }
@@ -183,7 +183,7 @@
         'position',
         true,
         ft,
-        () => this.dataProjPosition,
+        () => this.position,
       )
     )
 

@@ -2,25 +2,15 @@ import { Observable } from 'rxjs'
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime } from 'rxjs/operator'
 import { _do as doObs } from 'rxjs/operator/do'
-import featuresContainer from './features-container'
-import { EPSG_4326 } from '../ol-ext/consts'
 import { SourceCollectionAdapter } from '../ol-ext/collection'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../util/assert'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import source from './source'
+import featuresContainer from './features-container'
 import projTransforms from './proj-transforms'
+import source from './source'
 
 const props = {
-  /**
-   * Source data projection.
-   * @type {string}
-   * @default EPSG:4326
-   */
-  projection: {
-    type: String,
-    default: EPSG_4326,
-  },
   useSpatialIndex: {
     type: Boolean,
     default: true,
@@ -28,9 +18,9 @@ const props = {
 }
 
 const computed = {
-  viewProjFeatures () {
+  featuresViewProj () {
     if (this.rev && this.$source) {
-      return this.getFeatures().map(::this.writeFeatureInDataProj)
+      return this.getFeatures().map(::this.writeFeatureInViewProj)
     }
     return []
   },

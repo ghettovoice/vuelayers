@@ -42,17 +42,17 @@ const computed = {
   /**
    * @type {number[]|ol.Coordinate|undefined}
    */
-  pointOnSurface () {
-    if (this.rev && this.$geometry && this.$view) {
+  point () {
+    if (this.rev && this.$geometry) {
       return this.pointToDataProj(findPointOnSurface(this.$geometry))
     }
   },
   /**
    * @type {Array|undefined}
    */
-  viewProjCoordinates () {
+  coordinatesViewProj () {
     if (this.rev && this.$geometry) {
-      return this.getCoordinates()
+      return this.toViewProj(this.getCoordinates())
     }
   },
 }
@@ -96,7 +96,7 @@ const methods = {
     hasView(this)
     // define helper methods based on geometry type
     const {transform} = transforms[this.type]
-    let geomProj = this.$view.getProjection()
+    let geomProj = this.viewProjection
     let dataProj = this.resolvedDataProjection
     /**
      * @method
@@ -104,7 +104,7 @@ const methods = {
      * @return {number[]}
      * @protected
      */
-    this.toBindProj = coordinates => transform(coordinates, geomProj, dataProj)
+    this.toDataProj = coordinates => transform(coordinates, geomProj, dataProj)
     /**
      * @method
      * @param {Array} coordinates
@@ -237,7 +237,7 @@ function subscribeToGeomChanges () {
     this.$geometry,
     'change',
     () => ({
-      coordinates: this.toBindProj(this.getCoordinates()),
+      coordinates: this.toDataProj(this.getCoordinates()),
       extent: this.extent,
     })
   )::throttleTime(ft)
