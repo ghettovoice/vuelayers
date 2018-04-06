@@ -24,6 +24,7 @@ const methods = {
       tilePixelRatio: this.tilePixelRatio,
       tileUrlFunction: this.createUrlFunc(),
       wrapX: this.wrapX,
+      transition: this.transition,
     })
   },
   /**

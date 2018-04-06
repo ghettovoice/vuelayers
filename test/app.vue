@@ -40,6 +40,10 @@
           <vl-source-sputnik/>
         </vl-layer-tile>
 
+        <vl-layer-tile id="bing-maps">
+          <vl-source-bing-maps :api-key="bingMapsKey" :imagery-set="bingMapsImagerySet"></vl-source-bing-maps>
+        </vl-layer-tile>
+
         <vl-layer-vector id="points" v-if="pointsLayer">
           <vl-source-cluster>
             <vl-source-vector :features="points"/>
@@ -233,6 +237,8 @@
         drawnFeatures: [],
         drawType: undefined,
         circleCoordinates: [-40, -40],
+        bingMapsKey: 'ArbsA9NX-AZmebC6VyXAnDqjXk6mo2wGCmeYM8EwyDaxKfQhUYyk0jtx6hX5fpMn',
+        bingMapsImagerySet: 'Aerial',
       }
     },
     mounted () {
