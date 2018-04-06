@@ -50,6 +50,11 @@ const props = {
     type: [String, Function],
     required: true,
   },
+  /**
+   * Duration of the opacity transition for rendering. To disable the opacity transition, pass `0`.
+   * @type {number}
+   */
+  transition: Number,
 }
 
 const computed = {

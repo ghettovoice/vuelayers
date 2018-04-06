@@ -67,6 +67,7 @@
         version: this.version,
         url: this.urlTmpl,
         wrapX: this.wrapX,
+        transition: this.transition,
       })
     },
     /**

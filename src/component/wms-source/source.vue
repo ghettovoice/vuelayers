@@ -57,6 +57,7 @@
         serverType: this.serverType,
         wrapX: this.wrapX,
         url: this.urlTmpl,
+        transition: this.transition,
       })
     },
     /**

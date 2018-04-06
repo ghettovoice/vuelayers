@@ -4,6 +4,7 @@
  * @author Vladimir Vershinin
  * @license MIT
  */
+import BingMapsSource from './component/bing-maps-source'
 import CircleGeom from './component/circle-geom'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
@@ -57,6 +58,7 @@ const VERSION = 'C_PKG_VERSION'
  */
 function plugin (Vue, options = {}) {
   // install components
+  Vue.use(BingMapsSource, options)
   Vue.use(CircleGeom, options)
   Vue.use(CircleStyle, options)
   Vue.use(ClusterSource, options)
@@ -100,6 +102,7 @@ export {
   VERSION,
   plugin as install,
   // components
+  BingMapsSource,
   CircleGeom,
   CircleStyle,
   ClusterSource,

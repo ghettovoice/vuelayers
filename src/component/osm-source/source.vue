@@ -36,6 +36,7 @@
         opaque: this.opaque,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         wrapX: this.wrapX,
+        transition: this.transition,
       })
     },
   }
