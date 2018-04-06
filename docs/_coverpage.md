@@ -2,7 +2,7 @@
 
 ![VueLayers Logo](_media/logo.svg)
 
-# VueLayers <small>v0.10.0</small>
+# VueLayers <small>v0.10.1</small>
 
 > Web map [Vue](https://vuejs.org/ "Vue Homepage") components with the power of [OpenLayers](https://openlayers.org/ "OpenLayers Homepage")
 

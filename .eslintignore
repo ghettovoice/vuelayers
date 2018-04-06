@@ -4,3 +4,4 @@ test/e2e/reports/*
 test/unit/coverage/*
 build/*
 test/*
+docs/*
