@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VueLayers Homepage</title>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+  <meta name="description" content="Web map Vue components with the power of OpenLayers">
+  <meta name="keywords" content="vuelayers, vuejs, vuejs plugins, vuejs components, openlayers, ol, web maps, vuejs maps">
+
+  <meta name="theme-color" content="#1976d2">
+  <meta name="msapplication-navbutton-color" content="#1976d2">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#1976d2">
+  <meta name="application-name" content="VueLayers Documentation">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="_media/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="_media/favicon-16x16.png">
+  <link rel="shortcut icon" href="_media/favicon.ico">
+
+  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css">
+  <link rel="stylesheet" href="//unpkg.com/docsify-copy-code/styles.css">
+
+  <link rel="stylesheet" href="//unpkg.com/vuep/dist/vuep.min.css">
+  <link rel="stylesheet" href="//unpkg.com/vuelayers@next/lib/style.min.css">
+
+  <style>
+    .cover-main pre {
+      position: relative;
+      -webkit-font-smoothing: initial;
+      line-height: 1.5rem;
+      margin: 1.2em 0;
+      overflow: auto;
+      padding: 0 1.4rem;
+      position: relative;
+      word-wrap: normal;
+      ackground-color: #f8f8f8;
+      font-family: Roboto Mono,Monaco,courier,monospace;
+    }
+
+    .markdown-section {
+      max-width: 1000px;
+    }
+
+    .vuep {
+      flex-direction: column;
+      clear: both;
+      overflow: hidden;
+      box-shadow: 0 0 13px #a0a0a0;
+      height: auto;
+      margin: 30px 0;
+    }
+
+    .vuep-editor {
+      height: 400px;
+    }
+
+    .vuep-editor,
+    .vuep-preview {
+      width: auto;
+      overflow: visible;
+      margin-right: 0;
+    }
+
+    .vuep-preview {
+      padding: 0;
+    }
+
+    .overlay-content {
+      background: #efefef; 
+      box-shadow: 0 5px 10px rgba(2, 2, 2, 0.2);
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div data-app id="app">
+    Please wait...
+  </div>
+
+  <script src="//unpkg.com/openlayers/dist/ol.js"></script>
+  <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
+  <script src="//unpkg.com/vue/dist/vue.min.js"></script>
+  <script src="//unpkg.com/vuep/dist/vuep.min.js"></script>  
+  <script src="//unpkg.com/vuelayers@next/lib/index.umd.min.js"></script>
+
+  <script src="//unpkg.com/docsify-edit-on-github@1.0.1/index.js"></script>
+  <script src="//unpkg.com/docsify-copy-code/index.js"></script>
+
+  <script>
+    if (typeof navigator.serviceWorker !== 'undefined') {
+      navigator.serviceWorker.register('sw.js')
+    }
+
+    Vue.use(VueLayers)
+
+    window.$docsify = {
+      el: '#app',
+      name: 'VueLayers',
+      repo: 'ghettovoice/vuelayers',
+      auto2top: true,
+      homepage: 'home.md',
+      basePath: '/',
+      themeColor: '#1e88e5',
+      externalLinkTarget: '_blank',
+      ga: 'UA-98870917-3',
+      coverpage: true,
+      executeScript: true,
+      loadSidebar: true,
+      maxLevel: 4,
+      subMaxLevel: 2,
+      plugins: [
+        EditOnGithubPlugin.create('https://github.com/ghettovoice/vuelayers-docs/blob/master/pages/'),
+        DocsifyCopyCodePlugin.init(),
+      ],
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md',
+      },
+    }
+  </script>
+
+  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/ga.min.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/front-matter.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-bash.min.js"></script>
+</body>
+</html>

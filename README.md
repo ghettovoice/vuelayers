@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://vuelayers.github.io/" target="_blank" title="VueLayers Homepage">
-    <img width="100" src="https://vuelayers.github.io/static/img/logo.svg"><br />
+    <img width="100" src="https://vuelayers.github.io/_media/logo.svg"><br />
   </a>
 </p>
 
@@ -24,8 +24,8 @@ It can display maps with tiled, raster or vector layers loaded from different so
 ## Links
 
 - [Documentation](https://vuelayers.github.io/)
-- [Install & Quick Start Guide](https://vuelayers.github.io/#/start)
-- [Live Demo](https://vuelayers.github.io/#/demo)
+- [Install & Quick start guide](https://vuelayers.github.io/#/quickstart)
+- [Official Demo app](https://vuelayers.github.io/#/demo)
 
 ## Requirements
 
