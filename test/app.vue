@@ -10,7 +10,7 @@
       </div>
 
       <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')"
-              @singleclick="clickCoord = $event.coordinate" data-projection="EPSG:4326">
+              @singleclick="clickCoord = $event.coordinate">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
             <div style="background: #eee; padding: 1rem">

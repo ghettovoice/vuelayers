@@ -18,7 +18,7 @@
   import { EPSG_3857, MAX_ZOOM, MIN_ZOOM, ZOOM_FACTOR } from '../../ol-ext/consts'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasView } from '../../util/assert'
-  import { isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
+  import { isEqual, isFunction, isPlainObject, noop, coalesce } from '../../util/minilo'
 
   /**
    * @vueProps
@@ -140,6 +140,19 @@
       if (this.rev && this.$view) {
         return this.$view.getCenter()
       }
+    },
+    /**
+     * @return {ol.ProjectionLike}
+     */
+    resolvedDataProjection () {
+      // exclude this.projection from lookup to allow view rendering in projection
+      // that differs from data projection
+      return coalesce(
+        this.dataProjection, // may or may not be present
+        this.$map && this.$map.get('dataProjection'),
+        this.$options.dataProjection,
+        this.viewProjection
+      )
     },
   }
 

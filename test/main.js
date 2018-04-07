@@ -3,7 +3,7 @@ import VueLayers from '@'
 import App from './app.vue'
 
 Vue.use(VueLayers, {
-  // bindToProj: 'EPSG:4326',
+  dataProjection: 'EPSG:4326',
 })
 console.log(process.env.NODE_ENV)
 console.dir(VueLayers)
