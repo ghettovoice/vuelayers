@@ -6,7 +6,7 @@
 
 > Web map [Vue](https://vuejs.org/ "Vue Homepage") components with the power of [OpenLayers](https://openlayers.org/ "OpenLayers Homepage")
 
-* Raster, vector, tiled layers
+* Maps with raster, vector, tiled layers
 * Easy to extend
 * Free to use
 
