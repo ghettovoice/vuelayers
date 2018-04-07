@@ -14,7 +14,7 @@ this source you should get **API key** at https://www.bingmapsportal.com.
 
 ## Usage
 
-Basic example of `vl-source-bing-maps` usage
+Example of `vl-source-bing-maps` usage
 
 <vuep template="#usage-example"></vuep>
 
