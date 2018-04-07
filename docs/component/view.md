@@ -14,33 +14,33 @@ and **rotation** of the map.
 
 ## Usage
 
-Example of simple map.   
+Example of simple map with view in **EPSG:4326** projection.   
 See also documentation of [`vl-map`](component/view.md) component.
 
 <vuep template="#usage-example"></vuep>
 
 <script v-pre type="text/x-template" id="usage-example">
-  <template>
-    <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" style="height: 400px">
-        <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
+<template>
+  <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" style="height: 400px">
+      <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation" projection="EPSG:4326"></vl-view>
 
-        <vl-layer-tile id="osm">
-            <vl-source-osm></vl-source-osm>
-        </vl-layer-tile>
-    </vl-map>
-  </template>
+      <vl-layer-tile>
+          <vl-source-osm></vl-source-osm>
+      </vl-layer-tile>
+  </vl-map>
+</template>
 
-  <script>
-    export default {
-      data () {
-        return { 
-          zoom: 2,
-          center: [0, 0],
-          rotation: 0,
-        }
-      },
-    }
-  </script>
+<script>
+  export default {
+    data () {
+      return { 
+        zoom: 2,
+        center: [0, 0],
+        rotation: 0,
+      }
+    },
+  }
+</script>
 </script>
 
 ## Properties

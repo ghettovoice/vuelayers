@@ -19,29 +19,29 @@ Example of `vl-source-bing-maps` usage
 <vuep template="#usage-example"></vuep>
 
 <script v-pre type="text/x-template" id="usage-example">
-  <template>
-    <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" style="height: 400px">
-        <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
+<template>
+  <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" style="height: 400px">
+      <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
 
-        <vl-layer-tile id="bing-maps">
-            <vl-source-bing-maps :api-key="apiKey" :imagery-set="imagerySet"></vl-source-bing-maps>
-        </vl-layer-tile>
-    </vl-map>
-  </template>
+      <vl-layer-tile id="bing-maps">
+          <vl-source-bing-maps :api-key="apiKey" :imagery-set="imagerySet"></vl-source-bing-maps>
+      </vl-layer-tile>
+  </vl-map>
+</template>
 
-  <script>
-    export default {
-      data () {
-        return { 
-          zoom: 2,
-          center: [0, 0],
-          rotation: 0,
-          apiKey: 'ArbsA9NX-AZmebC6VyXAnDqjXk6mo2wGCmeYM8EwyDaxKfQhUYyk0jtx6hX5fpMn',
-          imagerySet: 'AerialWithLabels',
-        }
-      },
-    }
-  </script>
+<script>
+  export default {
+    data () {
+      return { 
+        zoom: 2,
+        center: [0, 0],
+        rotation: 0,
+        apiKey: 'ArbsA9NX-AZmebC6VyXAnDqjXk6mo2wGCmeYM8EwyDaxKfQhUYyk0jtx6hX5fpMn',
+        imagerySet: 'AerialWithLabels',
+      }
+    },
+  }
+</script>
 </script>
 
 ## Properties
