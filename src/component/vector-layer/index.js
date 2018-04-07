@@ -1,3 +1,5 @@
+import { pick } from '../../util/minilo'
+
 /** @module vector-layer */
 import Layer from './layer.vue'
 
@@ -26,6 +28,9 @@ export default {
    * @param {VueLayersOptions} [options]
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Layer, options)
+
     Vue.component(Layer.name, Layer)
   },
 }

@@ -1,3 +1,5 @@
+import { pick } from '../../util/minilo'
+
 /** @module image-static-source */
 import Source from './source.vue'
 
@@ -15,6 +17,9 @@ export default {
    * @param {VueLayersOptions} [options]
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Source, options)
+
     Vue.component(Source.name, Source)
   },
 }

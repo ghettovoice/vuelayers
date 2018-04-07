@@ -1,3 +1,5 @@
+import { pick } from '../../util/minilo'
+
 /**
  * @module point-geom
  */
@@ -13,9 +15,12 @@ export default {
   Geom,
   /**
    * @param {Vue} Vue
-   * @param {VueLayersOptions} [option]
+   * @param {VueLayersOptions} [options]
    */
-  install (Vue, option = {}) {
+  install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Geom, options)
+
     Vue.component(Geom.name, Geom)
   },
 }

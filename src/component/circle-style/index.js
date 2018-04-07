@@ -1,3 +1,5 @@
+import { pick } from '../../util/minilo'
+
 /**
  * @module circle-style
  */
@@ -16,6 +18,9 @@ export default {
    * @param {VueLayersOptions} [options]
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Style, options)
+
     Vue.component(Style.name, Style)
   },
 }

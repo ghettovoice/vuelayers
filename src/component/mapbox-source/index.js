@@ -1,3 +1,5 @@
+import { pick } from '../../util/minilo'
+
 /**
  * @module mapbox-source
  */
@@ -16,6 +18,9 @@ export default {
    * @param {VueLayersOptions} [options]
    */
   install (Vue, options = {}) {
+    options = pick(options, 'dataProjection')
+    Object.assign(Source, options)
+
     Vue.component(Source.name, Source)
   },
 }
