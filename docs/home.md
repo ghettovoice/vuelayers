@@ -6,6 +6,12 @@
 [![NPM version](https://img.shields.io/npm/v/vuelayers.svg)](https://www.npmjs.com/package/vuelayers)
 [![License](https://img.shields.io/github/license/ghettovoice/vuelayers.svg)](https://github.com/ghettovoice/vuelayers/blob/master/LICENSE)
 
+<iframe src="https://ghbtns.com/github-btn.html?user=ghettovoice&amp;repo=vuelayers&amp;type=star&amp;count=true&amp;size=large" 
+    frameborder="0" scrolling="0" class="github-button vld-github-btn" width="120px" height="30px"></iframe>
+
+<iframe src="https://ghbtns.com/github-btn.html?user=ghettovoice&amp;repo=vuelayers&amp;type=fork&amp;count=true&amp;size=large" 
+    frameborder="0" scrolling="0" class="github-button vld-github-btn" width="120px" height="30px"></iframe>
+
 ## Overview
 
 **VueLayers** is components library that brings the powerful **OpenLayers API** to the **Vue.js** reactive world. 

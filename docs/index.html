@@ -39,6 +39,11 @@
       font-family: Roboto Mono,Monaco,courier,monospace;
     }
 
+    .cover-main .logo {
+      width: 100px;
+      height: 100px;
+    }
+
     .markdown-section {
       max-width: 1000px;
     }
@@ -68,7 +73,7 @@
     }
 
     .overlay-content {
-      background: #efefef; 
+      background: #efefef;
       box-shadow: 0 5px 10px rgba(2, 2, 2, 0.2);
       padding: 10px 20px;
       font-size: 16px;
@@ -83,7 +88,7 @@
   <script src="//unpkg.com/openlayers/dist/ol.js"></script>
   <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
   <script src="//unpkg.com/vue/dist/vue.min.js"></script>
-  <script src="//unpkg.com/vuep/dist/vuep.min.js"></script>  
+  <script src="//unpkg.com/vuep/dist/vuep.min.js"></script>
   <script src="//unpkg.com/vuelayers@next/lib/index.umd.min.js"></script>
 
   <script src="//unpkg.com/docsify-edit-on-github@1.0.1/index.js"></script>
@@ -112,7 +117,7 @@
       maxLevel: 4,
       subMaxLevel: 2,
       plugins: [
-        EditOnGithubPlugin.create('https://github.com/ghettovoice/vuelayers-docs/blob/master/pages/'),
+        EditOnGithubPlugin.create('https://github.com/ghettovoice/vuelayers/blob/master/docs/'),
         DocsifyCopyCodePlugin.init(),
       ],
       alias: {
