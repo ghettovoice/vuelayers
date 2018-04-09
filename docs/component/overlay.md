@@ -57,3 +57,40 @@ Example below shows how to add custom content on to the map.
 
 - **Type**: `number[]`
 - **Required**
+
+Coordinate of the overlay position in view [`projection`](component/view.md#projection) or 
+[data projection](quickstart#global-data-projection).
+
+### id
+
+- **Type**: `string | number`
+- **Default**: `uuid.v4()` 
+
+Unique identifier of the overlay.
+
+### offset
+
+- **Type**: `number[]`
+- **Default**: `[0, 0]`
+
+XY axis offset in pixels used when positioning the overlay.
+
+### positioning
+
+- **Type**: `string`
+- **Default**: `top-left`
+
+The overlay positioning relative to its [`position`](#position).  Possible values: `bottom-left`, 
+`bottom-center`, `bottom-right`, `center-left`, `center-center`, `center-right`, `top-left`, `top-center`, 
+and `top-right`.
+
+### stop-event
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Whether pointer event propagation from overlay element to the map viewport should be stopped.
+
+### insert-first
+
+- **Type**: `boolean`
