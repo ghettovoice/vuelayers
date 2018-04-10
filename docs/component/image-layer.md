@@ -27,7 +27,8 @@ Taken from OpenLayers [Static Image Example](http://openlayers.org/en/latest/exa
     <vl-view :projection="projection" :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
 
     <vl-layer-image id="xkcd">
-      <vl-source-image-static :url="imgUrl" :size="imgSize" :extent="imgExtent" :projection="projection"></vl-source-image-static>
+      <vl-source-image-static :url="imgUrl" :size="imgSize" :extent="imgExtent" :projection="projection"
+                              :attributions="imgCopyright"></vl-source-image-static>
     </vl-layer-tile>
   </vl-map>
 </template>
