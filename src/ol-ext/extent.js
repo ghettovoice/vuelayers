@@ -6,6 +6,7 @@ import olproj from 'ol/proj'
 import { EXTENT_CORNER, PROJ_UNIT } from './consts'
 
 export const {
+  getCenter: getExtentCenter,
   getWidth: getExtentWidth,
   getHeight: getExtentHeight,
   boundingExtent,

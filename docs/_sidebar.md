@@ -13,13 +13,14 @@
 
   * Layer
 
-    * [vl-layer-vector](component/vector-layer.md)
     * [vl-layer-image](component/image-layer.md)
     * [vl-layer-tile](component/tile-layer.md)
+    * [vl-layer-vector](component/vector-layer.md)
 
   * Source
 
     * [vl-source-bing-maps](component/bing-maps-source.md)
+    * [vl-source-image-static](component/image-static-source.md)
     * [vl-source-osm](component/osm-source.md)
     * [vl-source-vector](component/vector-source.md)
 
@@ -35,6 +36,6 @@
 
   * Style
 
-    * [vl-style-box](component/style-box)
+    * [vl-style-box](component/style-box.md)
 
 * Mixins

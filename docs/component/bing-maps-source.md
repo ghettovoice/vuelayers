@@ -9,8 +9,8 @@ this source you should get **API key** at https://www.bingmapsportal.com.
 
 `vl-source-bing-maps` is a part of **BingMapsSource** module:
 
-* **ES6**: https://unpkg.com/vuelayers/lib/_esm/bing-maps-source/
-* **CommonJS**: https://unpkg.com/vuelayers/lib/bing-maps-source/
+- **ES6**: https://unpkg.com/vuelayers/lib/_esm/bing-maps-source/
+- **CommonJS**: https://unpkg.com/vuelayers/lib/bing-maps-source/
 
 ## Usage
 

@@ -10,8 +10,8 @@ component to setup `zoom`, `center`, `projection` and other view related propeti
 
 `vl-map` component is a part of **Map** module:
 
-* **ES6**: https://unpkg.com/vuelayers/lib/_esm/map/
-* **CommonJS**: https://unpkg.com/vuelayers/lib/map/
+- **ES6**: https://unpkg.com/vuelayers/lib/_esm/map/
+- **CommonJS**: https://unpkg.com/vuelayers/lib/map/
 
 ## Usage
 

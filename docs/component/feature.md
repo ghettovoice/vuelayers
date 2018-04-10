@@ -17,8 +17,8 @@ components placed inside default slot.
 
 `vl-feature` component is a part of **Feature** module:
 
-* **ES6**: https://unpkg.com/vuelayers/lib/_esm/feature/
-* **CommonJS**: https://unpkg.com/vuelayers/lib/feature/
+- **ES6**: https://unpkg.com/vuelayers/lib/_esm/feature/
+- **CommonJS**: https://unpkg.com/vuelayers/lib/feature/
 
 ## Usage
 

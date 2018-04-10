@@ -33,7 +33,10 @@ const props = /** @lends module:mixin/layer# */{
     type: Number,
     default: 1,
   },
-  overlay: Boolean,
+  overlay: {
+    type: Boolean,
+    default: false,
+  },
   visible: {
     type: Boolean,
     default: true,
