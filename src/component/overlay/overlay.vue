@@ -1,7 +1,7 @@
 <template>
   <div :id="[$options.name, id].join('-')" :class="$options.name" style="display: none">
     <div>
-      <slot :id="id" :position="position"/>
+      <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
     </div>
   </div>
 </template>
@@ -49,8 +49,14 @@
       type: Boolean,
       default: true,
     },
-    insertFirst: Boolean,
-    autoPan: Boolean,
+    insertFirst: {
+      type: Boolean,
+      default: true,
+    },
+    autoPan: {
+      type: Boolean,
+      default: false,
+    },
     autoPanMargin: {
       type: Number,
       default: 20,
@@ -199,7 +205,8 @@
 
     const ft = 100
     const changes = Observable::mergeObs(
-      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, () => this.pointToDataProj(this.$overlay.getPosition())),
+      observableFromOlChangeEvent(this.$overlay, 'position', true, ft,
+        () => this.pointToDataProj(this.$overlay.getPosition())),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
