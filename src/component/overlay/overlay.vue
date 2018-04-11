@@ -69,8 +69,8 @@
    */
   const computed = {
     positionViewProj () {
-      if (this.rev && this.resolvedDataProjection && this.$overlay) {
-        return this.pointToViewProj(this.$overlay.getPosition())
+      if (this.rev && this.$overlay) {
+        return this.$overlay.getPosition()
       }
     },
   }
