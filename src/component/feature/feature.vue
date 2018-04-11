@@ -67,8 +67,8 @@
      * @return {number[]|undefined}
      */
     point () {
-      if (this.rev && this.resolvedDataProjection && this.$geometry) {
-        return this.pointToDataProj(findPointOnSurface(this.$geometry))
+      if (this.pointViewProj && this.resolvedDataProjection) {
+        return this.pointToDataProj(this.pointViewProj)
       }
     },
     geometryViewProj () {
@@ -77,8 +77,8 @@
       }
     },
     pointViewProj () {
-      if (this.rev && this.resolvedDataProjection && this.$geometry) {
-        return this.pointToViewProj(findPointOnSurface(this.$geometry))
+      if (this.rev && this.$geometry) {
+        return findPointOnSurface(this.$geometry)
       }
     },
   }

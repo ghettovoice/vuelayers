@@ -3,7 +3,7 @@ import { boundingExtent } from '../ol-ext/extent'
 import { findPointOnSurface } from '../ol-ext/geom'
 import { transforms } from '../ol-ext/proj'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
-import { hasGeometry, hasView } from '../util/assert'
+import { hasGeometry } from '../util/assert'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
@@ -35,15 +35,15 @@ const computed = {
    * @type {number[]|ol.Extent|undefined}
    */
   extent () {
-    if (this.rev && this.resolvedDataProjection && this.$geometry && this.$view) {
-      return this.extentToDataProj(this.$geometry.getExtent())
+    if (this.extentViewProj && this.resolvedDataProjection) {
+      return this.extentToDataProj(this.extentViewProj)
     }
   },
   /**
    * @type {number[]|ol.Extent|undefined}
    */
   extentViewProj () {
-    if (this.rev && this.$geometry && this.$view) {
+    if (this.rev && this.$geometry) {
       return this.$geometry.getExtent()
     }
   },
@@ -51,8 +51,8 @@ const computed = {
    * @type {number[]|ol.Coordinate|undefined}
    */
   point () {
-    if (this.rev && this.resolvedDataProjection && this.$geometry) {
-      return this.pointToDataProj(findPointOnSurface(this.$geometry))
+    if (this.pointViewProj && this.resolvedDataProjection) {
+      return this.pointToDataProj(this.pointViewProj)
     }
   },
   /**
@@ -109,7 +109,6 @@ const methods = {
    * @protected
    */
   init () {
-    hasView(this)
     this.setupTransformFunctions()
 
     return this::cmp.methods.init()
@@ -120,22 +119,20 @@ const methods = {
   setupTransformFunctions () {
     // define helper methods based on geometry type
     const {transform} = transforms[this.type]
-    let geomProj = this.viewProjection
-    let dataProj = this.resolvedDataProjection
     /**
      * @method
      * @param {Array} coordinates
      * @return {number[]}
      * @protected
      */
-    this.toDataProj = coordinates => transform(coordinates, geomProj, dataProj)
+    this.toDataProj = coordinates => transform(coordinates, this.viewProjection, this.resolvedDataProjection)
     /**
      * @method
      * @param {Array} coordinates
      * @return {number[]}
      * @protected
      */
-    this.toViewProj = coordinates => transform(coordinates, dataProj, geomProj)
+    this.toViewProj = coordinates => transform(coordinates, this.resolvedDataProjection, this.viewProjection)
   },
   /**
    * @return {void|Promise<void>}
