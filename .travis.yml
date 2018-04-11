@@ -2,9 +2,9 @@ branches:
   only:
     - master
     - develop
-    - /^stable-.*$/
-    - /^feature-.*$/
-    - /^issue-.*$/
+    - /stable/
+    - /feature/
+    - /issue/
 language: java
 jdk:
   - oraclejdk8
