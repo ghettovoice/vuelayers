@@ -10,7 +10,7 @@
       </div>
 
       <vl-map ref="map" @created="log('created')" @mounted="log('mounted')" @destroyed="log('destroyed')"
-              @singleclick="clickCoord = $event.coordinate">
+              @singleclick="clickCoord = $event.coordinate" data-projection="EPSG:4326">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
             <div style="background: #eee; padding: 1rem">
@@ -61,7 +61,7 @@
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
               <template slot-scope="feature">
                 <vl-geom-polygon :coordinates.sync="polygonCoords"/>
-                <vl-overlay v-if="selected.includes(feature.id)" :position="feature.geometryPoint">
+                <vl-overlay v-if="selected.includes(feature.id)" :position="feature.point">
                   <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
                     poly feature {{ polyId }}
                     qwerty: {{ feature.properties.qwerty }}
@@ -89,14 +89,14 @@
           <vl-source-vector ident="draw-target" />
         </vl-layer-vector>
 
-        <vl-layer-image id="jz">
-          <vl-source-image-static
-            :url="imageUrl"
-            :size="imageSize"
-            :extent="imageExtent"
-            :projection="imageProj">
-          </vl-source-image-static>
-        </vl-layer-image>
+        <!--<vl-layer-image id="jz">-->
+          <!--<vl-source-image-static-->
+            <!--:url="imageUrl"-->
+            <!--:size="imageSize"-->
+            <!--:extent="imageExtent"-->
+            <!--:projection="imageProj">-->
+          <!--</vl-source-image-static>-->
+        <!--</vl-layer-image>-->
 
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
         <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
@@ -161,6 +161,9 @@
   import { findPointOnSurface } from '@/ol-ext/geom'
 
   const computed = {
+    selected () {
+      return this.selectedFeatures.map(feature => feature.id)
+    },
   }
 
   const methods = {
@@ -225,7 +228,6 @@
         pointsLayer: true,
         polyId: '123',
         polygonCoords: [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]],
-        selected: [],
         selectedFeatures: [],
         countries: [],
         wfsFeatures: [],

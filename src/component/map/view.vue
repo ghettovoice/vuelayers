@@ -148,8 +148,7 @@
       // exclude this.projection from lookup to allow view rendering in projection
       // that differs from data projection
       return coalesce(
-        this.dataProjection, // may or may not be present
-        this.$map && this.$map.get('dataProjection'),
+        this.$viewContainer && this.$viewContainer.resolvedDataProjection,
         this.$options.dataProjection,
         this.viewProjection
       )
@@ -292,10 +291,9 @@
         this.$view.setMaxZoom(value)
       }
     },
-    dataProjection (value) {
+    resolvedDataProjection () {
       if (this.$view) {
-        this.$view.set('dataProjection', value)
-        this.refresh()
+        this.$view.setCenter(this.pointToViewProj(this.center))
       }
     },
   }
@@ -339,11 +337,6 @@
           get: () => this.$services && this.$services.viewContainer,
         },
       })
-    },
-    data () {
-      return {
-        dataProjection: undefined,
-      }
     },
   }
 

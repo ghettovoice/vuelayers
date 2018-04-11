@@ -49,7 +49,7 @@ const methods = {
       this._olObject[VM_PROP].push(this)
     }
 
-    this.rev++
+    ++this.rev
   },
   /**
    * @return {*|Promise<T>}
@@ -99,9 +99,22 @@ const methods = {
   },
   /**
    * Refresh internal ol objects
-   * @return {Promise}
+   * @return {Promise<void>}
    */
-  refresh: refresh,
+  refresh () {
+    return new Promise(resolve => {
+      let done = () => {
+        ++this.rev
+        resolve()
+      }
+      if (this.$olObject && isFunction(this.$olObject.changed)) {
+        this.$olObject.once('change', done)
+        this.$olObject.changed()
+      } else {
+        done()
+      }
+    })
+  },
   /**
    * Internal usage only in components that doesn't support refreshing.
    * @return {Promise<void>}
@@ -207,20 +220,6 @@ export default {
         // logdbg('destroyed', this.$options.name)
       })
   },
-}
-
-/**
- * @return {Promise<void>}
- */
-function refresh () {
-  return new Promise(resolve => {
-    if (this.$olObject && isFunction(this.$olObject.changed)) {
-      this.$olObject.once('change', () => resolve())
-      this.$olObject.changed()
-    } else {
-      resolve()
-    }
-  })
 }
 
 /**

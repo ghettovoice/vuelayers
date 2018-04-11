@@ -19,7 +19,7 @@ const props = {
 
 const computed = {
   featuresViewProj () {
-    if (this.rev && this.$source) {
+    if (this.rev && this.resolvedDataProjection && this.$source) {
       return this.getFeatures().map(::this.writeFeatureInViewProj)
     }
     return []

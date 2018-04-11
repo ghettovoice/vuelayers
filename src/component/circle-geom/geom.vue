@@ -26,6 +26,14 @@
    */
   const computed = {
     type: constant(GEOMETRY_TYPE.POINT),
+    /**
+     * @type {Array|undefined}
+     */
+    coordinatesViewProj () {
+      if (this.rev && this.$geometry) {
+        return this.$geometry.getCenter()
+      }
+    },
   }
 
   /**
@@ -44,14 +52,16 @@
      */
     getCoordinates () {
       hasGeometry(this)
-      return this.$geometry.getCenter()
+
+      return this.toDataProj(this.$geometry.getCenter())
     },
     /**
      * @param {ol.Coordinate} coordinate
      */
     setCoordinates (coordinate) {
       hasGeometry(this)
-      this.$geometry.setCenter(coordinate)
+
+      this.$geometry.setCenter(this.toViewProj(coordinate))
     },
   }
 
