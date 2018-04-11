@@ -59,7 +59,7 @@
      * @type {GeoJSONFeature|undefined}
      */
     geometry () {
-      if (this.rev && this.$geometry) {
+      if (this.rev && this.resolvedDataProjection && this.$geometry) {
         return this.writeGeometryInDataProj(this.$geometry)
       }
     },
@@ -67,17 +67,17 @@
      * @return {number[]|undefined}
      */
     point () {
-      if (this.rev && this.$geometry) {
+      if (this.rev && this.resolvedDataProjection && this.$geometry) {
         return this.pointToDataProj(findPointOnSurface(this.$geometry))
       }
     },
     geometryViewProj () {
-      if (this.rev && this.$geometry) {
+      if (this.rev && this.resolvedDataProjection && this.$geometry) {
         return this.writeGeometryInViewProj(this.$geometry)
       }
     },
     pointViewProj () {
-      if (this.rev && this.$geometry) {
+      if (this.rev && this.resolvedDataProjection && this.$geometry) {
         return this.pointToViewProj(findPointOnSurface(this.$geometry))
       }
     },

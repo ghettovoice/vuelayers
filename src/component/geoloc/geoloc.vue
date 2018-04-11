@@ -62,7 +62,7 @@
       }
     },
     positionViewProj () {
-      if (this.position) {
+      if (this.position && this.resolvedDataProjection) {
         return this.pointToViewProj(this.position)
       }
     },
@@ -117,6 +117,11 @@
     },
     tracingOptions (value) {
       this.$geolocation && this.$geolocation.setTrackingOptions(value)
+    },
+    resolvedDataProjection (value) {
+      if (this.$geolocation) {
+        this.$geolocation.setProjection(value)
+      }
     },
   }
 

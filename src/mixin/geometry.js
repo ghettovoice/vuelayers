@@ -35,16 +35,32 @@ const computed = {
    * @type {number[]|ol.Extent|undefined}
    */
   extent () {
-    if (this.rev && this.$geometry && this.$view) {
+    if (this.rev && this.resolvedDataProjection && this.$geometry && this.$view) {
       return this.extentToDataProj(this.$geometry.getExtent())
+    }
+  },
+  /**
+   * @type {number[]|ol.Extent|undefined}
+   */
+  extentViewProj () {
+    if (this.rev && this.$geometry && this.$view) {
+      return this.$geometry.getExtent()
     }
   },
   /**
    * @type {number[]|ol.Coordinate|undefined}
    */
   point () {
-    if (this.rev && this.$geometry) {
+    if (this.rev && this.resolvedDataProjection && this.$geometry) {
       return this.pointToDataProj(findPointOnSurface(this.$geometry))
+    }
+  },
+  /**
+   * @type {Array<number>}
+   */
+  pointViewProj () {
+    if (this.rev && this.$geometry) {
+      return findPointOnSurface(this.$geometry)
     }
   },
   /**
@@ -52,7 +68,7 @@ const computed = {
    */
   coordinatesViewProj () {
     if (this.rev && this.$geometry) {
-      return this.toViewProj(this.getCoordinates())
+      return this.$geometry.getCoordinates()
     }
   },
 }
@@ -78,14 +94,14 @@ const methods = {
    */
   getCoordinates () {
     hasGeometry(this)
-    return this.$geometry.getCoordinates()
+    return this.toDataProj(this.$geometry.getCoordinates())
   },
   /**
-   * @param {ol.Coordinate} coordinate
+   * @param {ol.Coordinate} coordinates
    */
-  setCoordinates (coordinate) {
+  setCoordinates (coordinates) {
     hasGeometry(this)
-    this.$geometry.setCoordinates(coordinate)
+    this.$geometry.setCoordinates(this.toViewProj(coordinates))
   },
   /**
    * @return {Promise}
@@ -94,6 +110,14 @@ const methods = {
    */
   init () {
     hasView(this)
+    this.setupTransformFunctions()
+
+    return this::cmp.methods.init()
+  },
+  /**
+   * @protected
+   */
+  setupTransformFunctions () {
     // define helper methods based on geometry type
     const {transform} = transforms[this.type]
     let geomProj = this.viewProjection
@@ -112,8 +136,6 @@ const methods = {
      * @protected
      */
     this.toViewProj = coordinates => transform(coordinates, dataProj, geomProj)
-
-    return this::cmp.methods.init()
   },
   /**
    * @return {void|Promise<void>}
@@ -169,7 +191,7 @@ const watch = {
     if (!this.$geometry || !this.$view) return
 
     value = this.toViewProj(value)
-
+    // compares in data projection
     let isEq = isEqualGeom({
       coordinates: value,
       extent: boundingExtent(value),
@@ -180,6 +202,12 @@ const watch = {
 
     if (!isEq) {
       this.setCoordinates(value)
+    }
+  },
+  resolvedDataProjection () {
+    if (this.$geometry) {
+      this.setupTransformFunctions()
+      this.setCoordinates(this.coordinates)
     }
   },
 }
@@ -194,11 +222,6 @@ export default {
     empty () {
       return this.$options.name
     },
-  },
-  data () {
-    return {
-      rev: 1,
-    }
   },
   created () {
     Object.defineProperties(this, {
@@ -237,7 +260,7 @@ function subscribeToGeomChanges () {
     this.$geometry,
     'change',
     () => ({
-      coordinates: this.toDataProj(this.getCoordinates()),
+      coordinates: this.getCoordinates(),
       extent: this.extent,
     })
   )::throttleTime(ft)

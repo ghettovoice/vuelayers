@@ -25,7 +25,10 @@ export default {
      * @return {ol.ProjectionLike}
      */
     viewProjection () {
-      return this.$view ? this.$view.getProjection().getCode() : EPSG_3857
+      if (this.rev && this.$view) {
+        return this.$view.getProjection().getCode()
+      }
+      return EPSG_3857
     },
     /**
      * @return {ol.ProjectionLike}

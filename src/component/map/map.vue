@@ -296,11 +296,6 @@
       if (this.$map && view !== this.$map.getView()) {
         this.$map.setView(view)
       }
-      if (view != null) {
-        view[olCmp.VM_PROP].forEach(vm => {
-          vm.dataProjection = this.dataProjection
-        })
-      }
     },
     /**
      * @return {void}
@@ -327,7 +322,9 @@
      */
     refresh () {
       this.updateSize()
+
       return this.render()
+        .then(() => this::olCmp.methods.refresh())
     },
     /**
      * @return {Promise}

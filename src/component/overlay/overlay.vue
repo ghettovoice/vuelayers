@@ -69,7 +69,7 @@
    */
   const computed = {
     positionViewProj () {
-      if (this.rev && this.$overlay) {
+      if (this.rev && this.resolvedDataProjection && this.$overlay) {
         return this.pointToViewProj(this.$overlay.getPosition())
       }
     },
@@ -106,7 +106,6 @@
       this.$overlay.setElement(this.$el.children[0])
       this.$overlaysContainer && this.$overlaysContainer.addOverlay(this.$overlay)
       this.subscribeAll()
-      this.refresh()
     },
     /**
      * @return {void}
@@ -126,19 +125,6 @@
     subscribeAll () {
       this::subscribeToOverlayChanges()
     },
-    /**
-     * Refresh internal ol objects
-     * @return {Promise}
-     */
-    refresh () {
-      return Promise.all([
-        olCmp.methods.refresh(),
-        new Promise(resolve => {
-          this.$overlay.once('change:position', () => resolve())
-          this.$overlay.setPosition(this.$overlay.getPosition())
-        }),
-      ])
-    },
   }
 
   const watch = {
@@ -155,6 +141,11 @@
     positioning (value) {
       if (this.$overlay) {
         this.$overlay.setPositioning(value)
+      }
+    },
+    resolvedDataProjection () {
+      if (this.$overlay) {
+        this.$overlay.setPosition(this.pointToViewProj(this.position))
       }
     },
   }
