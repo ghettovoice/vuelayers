@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div style="height: 100%">
-      <div>
+      <div class="controls">
         <button @click="drawType = 'point'">Point</button>
         <button @click="drawType = 'line_string'">LineString</button>
         <button @click="drawType = 'polygon'">Polygon</button>
@@ -159,6 +159,7 @@
   import { createProj, addProj } from '@/ol-ext/proj'
   import { loadingBBox } from '@/ol-ext/load-strategy'
   import { findPointOnSurface } from '@/ol-ext/geom'
+  import ScaleLine from 'ol/control/scaleline'
 
   const computed = {
     selected () {
@@ -245,6 +246,10 @@
     },
     mounted () {
       this.loadData()
+
+      this.$refs.map.$createPromise.then(() => {
+        this.$refs.map.$map.addControl(new ScaleLine())
+      })
     },
   }
 </script>
