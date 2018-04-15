@@ -1,6 +1,6 @@
 # vl-layer-image
 
-> Any image from raster source
+> Renders any image from raster source
 
 `vl-layer-image` components can render any server-rendered image, it is a container for
 raster source, like [`vl-source-image-static`](component/image-static-source.md).
@@ -14,7 +14,7 @@ raster source, like [`vl-source-image-static`](component/image-static-source.md)
 
 ## Usage
 
-Example below show how to use `vl-layer-image` component together with [`vl-source-image-static`](component/image-static-source.md)
+Example below shows how to use `vl-layer-image` component together with [`vl-source-image-static`](component/image-static-source.md)
 to render custom image on the map. The map view is configured with a custom projection that translates image coordinates 
 directly into map coordinates. Information about `olExt` usage mini library you can find [here](misc/ol-ext.md).   
 Taken from OpenLayers [Static Image Example](http://openlayers.org/en/latest/examples/static-image.html) 
