@@ -187,7 +187,6 @@ const watch = {
   coordinates (value) {
     if (!this.$geometry || !this.$view) return
 
-    value = this.toViewProj(value)
     // compares in data projection
     let isEq = isEqualGeom({
       coordinates: value,

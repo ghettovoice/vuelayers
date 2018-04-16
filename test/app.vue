@@ -57,10 +57,10 @@
         </vl-layer-tile>
 
         <vl-layer-vector>
-          <vl-source-vector :features.sync="drawnFeatures" @addfeature="log('addfeature', $event)">
+          <vl-source-vector @addfeature="log('addfeature', $event)">
             <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
               <template slot-scope="feature">
-                <vl-geom-polygon :coordinates.sync="polygonCoords"/>
+                <vl-geom-polygon v-if="polygonCoords.length" :coordinates="polygonCoords"/>
                 <vl-overlay v-if="selected.includes(feature.id)" :position="feature.point">
                   <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
                     poly feature {{ polyId }}
@@ -86,7 +86,7 @@
         </vl-layer-vector>
 
         <vl-layer-vector id="draw-layer">
-          <vl-source-vector ident="draw-target" />
+          <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />
         </vl-layer-vector>
 
         <!--<vl-layer-image id="jz">-->
@@ -228,7 +228,7 @@
         points: [],
         pointsLayer: true,
         polyId: '123',
-        polygonCoords: [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]],
+        polygonCoords: [],
         selectedFeatures: [],
         countries: [],
         wfsFeatures: [],
@@ -250,6 +250,13 @@
       this.$refs.map.$createPromise.then(() => {
         this.$refs.map.$map.addControl(new ScaleLine())
       })
+
+      setTimeout(() => {
+        this.polygonCoords = [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]]
+      }, 1000)
+      setTimeout(() => {
+        this.polygonCoords = [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]]
+      }, 3000)
     },
   }
 </script>
