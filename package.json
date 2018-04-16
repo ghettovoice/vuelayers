@@ -169,7 +169,8 @@
     "LICENSE",
     "README.md",
     "lib",
-    "src"
+    "src",
+    "docs"
   ],
   "browserslist": [
     "> 1%",
