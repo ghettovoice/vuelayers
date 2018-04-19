@@ -44,14 +44,25 @@
           <vl-source-bing-maps :api-key="bingMapsKey" :imagery-set="bingMapsImagerySet"></vl-source-bing-maps>
         </vl-layer-tile>
 
-        <vl-layer-tile>
+        <!-- <vl-layer-tile>
           <vl-source-mapbox access-token="qwerty" map-id="mapbox.light" tile-format="png"></vl-source-mapbox>
-        </vl-layer-tile>
+        </vl-layer-tile> -->
 
         <vl-layer-vector id="points" v-if="pointsLayer">
           <vl-source-cluster>
             <vl-source-vector :features="points"/>
           </vl-source-cluster>
+        </vl-layer-vector>
+
+        <vl-layer-vector id="event-sourced">
+          <vl-source-vector :features.sync="eventSourcedFeatures"></vl-source-vector>
+
+          <vl-style-box>
+            <vl-style-circle :radius="6">
+              <vl-style-stroke color="#6ff9ff" :width="3"></vl-style-stroke>
+              <vl-style-fill color="#00e676"></vl-style-fill>
+            </vl-style-circle>
+          </vl-style-box>
         </vl-layer-vector>
 
         <vl-layer-tile id="wmts">
@@ -165,9 +176,14 @@
   import { findPointOnSurface } from '@/ol-ext/geom'
   import ScaleLine from 'ol/control/scaleline'
 
+  let fakerator = Fakerator()
+
   const computed = {
     selected () {
       return this.selectedFeatures.map(feature => feature.id)
+    },
+    eventSourcedFeatureIds () {
+      return this.eventSourcedFeatures.map(feature => feature.id)
     },
   }
 
@@ -208,6 +224,52 @@
         'outputFormat=application/json&srsname=' + projection + '&' +
         'bbox=' + extent.join(',') + ',' + projection
     },
+
+    // request remote source for the new features
+  	requestNewFeatures () {
+    	this.loadFeatures().then(features => {
+      	let newFeatures = features.reduce((newFeatures, feature) => {
+          if (this.eventSourcedFeatureIds.includes(feature.id) === false) {
+            newFeatures.push(Object.freeze(feature))
+          }
+          return newFeatures
+        }, [])
+        this.eventSourcedFeatures = this.eventSourcedFeatures.concat(newFeatures)
+
+        setTimeout(() => {
+        	this.requestNewFeatures()
+        }, 5 * 1000)
+      })
+    },
+  	// emulates external source
+  	loadFeatures () {
+    	return new Promise(resolve => {
+      	setTimeout(() => {
+        	// generate GeoJSON random features
+          let geolocation = fakerator.address.geoLocation()
+        	let features = Array.from({
+          	length: fakerator.random.number(1, 5),
+          }).map(() => {
+          	return {
+              type: "Feature",
+              id: fakerator.misc.uuid(),
+              geometry: {
+                type: 'Point',
+                coordinates: [geolocation.longitude, geolocation.latitude],
+              },
+              properties: {
+                name: fakerator.names.name(),
+                country:  fakerator.address.country(),
+                city: fakerator.address.city(),
+                street: fakerator.address.street(),
+              },
+            }
+          })
+
+          resolve(features)
+        }, fakerator.random.number(1, 3) * 1000)
+      })
+    },
   }
 
   let x = 1024 * 10000
@@ -246,6 +308,7 @@
         circleCoordinates: [-40, -40],
         bingMapsKey: 'ArbsA9NX-AZmebC6VyXAnDqjXk6mo2wGCmeYM8EwyDaxKfQhUYyk0jtx6hX5fpMn',
         bingMapsImagerySet: 'Aerial',
+        eventSourcedFeatures: [],
       }
     },
     mounted () {
@@ -261,6 +324,8 @@
       setTimeout(() => {
         this.polygonCoords = [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]]
       }, 3000)
+
+      this.requestNewFeatures()
     },
   }
 </script>
