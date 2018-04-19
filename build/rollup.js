@@ -8,7 +8,6 @@ const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-re')
 const vue = require('rollup-plugin-vue')
 const uglify = require('rollup-plugin-uglify')
-const nodeGlobals = require('rollup-plugin-node-globals')
 const sass = require('./rollup/sass')
 const notifier = require('node-notifier')
 const argv = require('yargs').argv
@@ -247,7 +246,6 @@ function makeBundle (options = {}) {
         'node_modules/lodash-es/**/*',
       ],
     }),
-    nodeGlobals(),
     nodeResolve({
       main: true,
       module: true,

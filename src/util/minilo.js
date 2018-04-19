@@ -2,6 +2,9 @@
  * Mini Lodash.
  * @module util/minilo
  */
+const glob = typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : {}
+const globIsFinite = glob.isFinite || noop
+
 const objectProto = Object.prototype
 const funcProto = Object.prototype
 
@@ -56,7 +59,7 @@ export function isArrayLike (value) {
 }
 
 export function isFinite (value) {
-  return typeof value === 'number' && global.isFinite(value)
+  return typeof value === 'number' && globIsFinite(value)
 }
 
 export function isFunction (value) {
@@ -68,7 +71,7 @@ export function isFunction (value) {
  * @return {boolean} True if value is number or numeric string.
  */
 export function isNumeric (value) {
-  return !isNaN(parseFloat(value)) && global.isFinite(value)
+  return !isNaN(parseFloat(value)) && globIsFinite(value)
 }
 
 export function isObjectLike (value) {
