@@ -211,4 +211,28 @@ describe('minilo lib', () => {
       expect(lo.difference([10, 20], [20, 10])).to.be.deep.equal([])
     })
   })
+
+  describe('pick()', () => {
+    describe('with object', () => {
+      it('should return new object with picked props', () => {
+        let obj = {
+          tileSize: [256, 256],
+          get tileFormat () { return 'png' },
+          id: 123,
+          get mapId () { return 'qwerty' },
+          apiKey: '1234567890',
+          asd: undefined,
+          z: '',
+        }
+
+        expect(lo.pick(obj, ['tileFormat', 'mapId', 'apiKey', 'asd', 'z'])).to.deep.equal({
+          tileFormat: 'png',
+          mapId: 'qwerty',
+          apiKey: '1234567890',
+          asd: undefined,
+          z: '',
+        })
+      })
+    })
+  })
 })

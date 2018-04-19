@@ -44,6 +44,10 @@
           <vl-source-bing-maps :api-key="bingMapsKey" :imagery-set="bingMapsImagerySet"></vl-source-bing-maps>
         </vl-layer-tile>
 
+        <vl-layer-tile>
+          <vl-source-mapbox access-token="qwerty" map-id="mapbox.light" tile-format="png"></vl-source-mapbox>
+        </vl-layer-tile>
+
         <vl-layer-vector id="points" v-if="pointsLayer">
           <vl-source-cluster>
             <vl-source-vector :features="points"/>

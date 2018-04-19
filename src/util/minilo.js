@@ -235,21 +235,19 @@ export function mapKeys (object, iteratee = identity) {
 
 export function pick (object, key, ...keys) {
   if (Array.isArray(key)) {
-    keys = [key]
+    keys = key
   } else {
     keys = [key].concat(keys)
   }
-  return filter(object, (value, key) => keys.includes(key))
+  return reduce(keys, (picked, key) => {
+    picked[key] = object[key]
+    return picked
+  }, {})
 }
 
 export function omit (object, key, ...keys) {
   if (Array.isArray(key)) {
-    keys = [key]
-  } else {
-    keys = [key].concat(keys)
-  }
-  if (Array.isArray(key)) {
-    keys = [key]
+    keys = key
   } else {
     keys = [key].concat(keys)
   }
