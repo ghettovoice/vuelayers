@@ -55,14 +55,11 @@
         </vl-layer-vector>
 
         <vl-layer-vector id="event-sourced">
-          <vl-source-vector :features.sync="eventSourcedFeatures"></vl-source-vector>
+          <vl-source-cluster :distance="100">
+            <vl-source-vector projection="EPSG:4326" :features.sync="eventSourcedFeatures"></vl-source-vector>
+          </vl-source-cluster>
 
-          <vl-style-box>
-            <vl-style-circle :radius="6">
-              <vl-style-stroke color="#6ff9ff" :width="3"></vl-style-stroke>
-              <vl-style-fill color="#00e676"></vl-style-fill>
-            </vl-style-circle>
-          </vl-style-box>
+          <vl-style-func :factory="clusterStyleFunc" />
         </vl-layer-vector>
 
         <vl-layer-tile id="wmts">
@@ -174,6 +171,7 @@
   import { createProj, addProj } from '@/ol-ext/proj'
   import { loadingBBox } from '@/ol-ext/load-strategy'
   import { findPointOnSurface } from '@/ol-ext/geom'
+  import { createStyle } from '@/ol-ext/style'
   import ScaleLine from 'ol/control/scaleline'
 
   let fakerator = Fakerator()
@@ -246,10 +244,11 @@
     	return new Promise(resolve => {
       	setTimeout(() => {
         	// generate GeoJSON random features
-          let geolocation = fakerator.address.geoLocation()
         	let features = Array.from({
           	length: fakerator.random.number(1, 5),
           }).map(() => {
+            let geolocation = fakerator.address.geoLocation()
+
           	return {
               type: "Feature",
               id: fakerator.misc.uuid(),
@@ -269,6 +268,29 @@
           resolve(features)
         }, fakerator.random.number(1, 3) * 1000)
       })
+    },
+    clusterStyleFunc () {
+      const cache = Object.create(null)
+
+      return function __clusterStyleFunc (feature) {
+        const size = feature.get('features').length
+        let style = cache[size]
+
+        if (!style) {
+          style = createStyle({
+            imageRadius: 10,
+            strokeColor: '#6ff9ff',
+            strokeWidth: 3,
+            fillColor: '#00e676',
+            text: size.toString(),
+            textStrokeColor: '#222',
+            textStrokeWidth: 2,
+            textFillColor: '#fff',
+          })
+          cache[size] = style
+        }
+        return [style]
+      }
     },
   }
 
