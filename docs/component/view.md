@@ -159,37 +159,37 @@ multiple `vl-view` components in multiple `vl-map` components.
 <vuep template="#ident-example"></vuep>
 
 <script v-pre type="text/x-template" id="ident-example">
-  <template>
-    <div style="height: 400px; display: flex">
-      <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
-        <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"></vl-view>
+<template>
+  <div style="height: 400px; display: flex">
+    <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
+      <vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"></vl-view>
 
-        <vl-layer-tile>
-          <vl-source-osm></vl-source-osm>
-        </vl-layer-tile>
-      </vl-map>
+      <vl-layer-tile>
+        <vl-source-osm></vl-source-osm>
+      </vl-layer-tile>
+    </vl-map>
 
-      <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
-        <vl-view ident="view"></vl-view>
+    <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true">
+      <vl-view ident="view"></vl-view>
 
-        <vl-layer-tile>
-          <vl-source-sputnik></vl-source-sputnik>
-        </vl-layer-tile>
-      </vl-map>
-    </div>
-  </template>
+      <vl-layer-tile>
+        <vl-source-sputnik></vl-source-sputnik>
+      </vl-layer-tile>
+    </vl-map>
+  </div>
+</template>
 
-  <script>
-    export default {
-      data () {
-        return { 
-          zoom: 2,
-          center: [0, 0],
-          rotation: 0,
-        }
-      },
-    }
-  </script>
+<script>
+  export default {
+    data () {
+      return { 
+        zoom: 2,
+        center: [0, 0],
+        rotation: 0,
+      }
+    },
+  }
+</script>
 </script>
 
 ### zoom-factor

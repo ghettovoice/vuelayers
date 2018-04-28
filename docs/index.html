@@ -19,10 +19,10 @@
   <link rel="icon" type="image/png" sizes="16x16" href="_media/favicon-16x16.png">
   <link rel="shortcut icon" href="_media/favicon.ico">
 
-  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css">
+  <link rel="stylesheet" href="//unpkg.com/docsify@4.6.10/lib/themes/vue.css">
 
-  <link rel="stylesheet" href="//unpkg.com/vuep/dist/vuep.min.css">
-  <link rel="stylesheet" href="//unpkg.com/vuelayers@next/lib/style.min.css">
+  <link rel="stylesheet" href="//unpkg.com/vuep@0.8.0/dist/vuep.min.css">
+  <link rel="stylesheet" href="//unpkg.com/vuelayers@0.10.6/lib/style.min.css">
 
   <style>
     .cover-main pre {
@@ -84,19 +84,22 @@
     Please wait...
   </div>
 
-  <script src="//unpkg.com/openlayers/dist/ol.js"></script>
-  <script src="//unpkg.com/babel-standalone/babel.min.js"></script>
-  <script src="//unpkg.com/vue/dist/vue.min.js"></script>
-  <script src="//unpkg.com/vuep/dist/vuep.min.js"></script>
-  <script src="//unpkg.com/vuelayers/lib/index.umd.min.js"></script>
+  <script src="//unpkg.com/openlayers@4.6.5/dist/ol.js"></script>
+  <script src="//unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+  <script src="//unpkg.com/vue@2.5.16/dist/vue.min.js"></script>
+  <script src="//unpkg.com/vuep@0.8.0/dist/vuep.min.js"></script>
+  <script src="//unpkg.com/vuelayers@0.10.6/lib/index.umd.min.js"></script>
+  <script src="//unpkg.com/fakerator@0.3.0/dist/fakerator.js"></script>
 
-  <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
-  <script src="//unpkg.com/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+  <script src="//unpkg.com/docsify-edit-on-github@1.0.1/index.js"></script>
+  <script src="//unpkg.com/docsify-copy-code@2.0.2/dist/docsify-copy-code.min.js"></script>
 
   <script>
     if (typeof navigator.serviceWorker !== 'undefined') {
       navigator.serviceWorker.register('sw.js')
     }
+
+    window.fakerator = new Fakerator()
 
     Vue.use(VueLayers)
 
@@ -125,10 +128,10 @@
     }
   </script>
 
-  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
-  <script src="//unpkg.com/docsify/lib/plugins/ga.min.js"></script>
-  <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
-  <script src="//unpkg.com/docsify/lib/plugins/front-matter.min.js"></script>
-  <script src="//unpkg.com/prismjs/components/prism-bash.min.js"></script>
+  <script src="//unpkg.com/docsify@4.6.10/lib/docsify.min.js"></script>
+  <script src="//unpkg.com/docsify@4.6.10/lib/plugins/ga.min.js"></script>
+  <script src="//unpkg.com/docsify@4.6.10/lib/plugins/search.min.js"></script>
+  <script src="//unpkg.com/docsify@4.6.10/lib/plugins/front-matter.min.js"></script>
+  <script src="//unpkg.com/prismjs@1.14.0/components/prism-bash.min.js"></script>
 </body>
 </html>

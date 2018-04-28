@@ -34,7 +34,8 @@
     },
     // todo implement options
     // renderOrder: Function,
-    // renderBuffer: Number
+    // renderBuffer: Number,
+    // declutter: Boolean,
   }
 
   /**
