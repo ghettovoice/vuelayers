@@ -101,6 +101,11 @@
           <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />
         </vl-layer-vector>
 
+        <vl-layer-vector-tile>
+          <vl-source-vector-tile
+            url="https://basemaps.arcgis.com/v1/arcgis/rest/services/World_Basemap/VectorTileServer/tile/{z}/{y}/{x}.pbf"></vl-source-vector-tile>
+        </vl-layer-vector-tile>
+
         <!--<vl-layer-image id="jz">-->
           <!--<vl-source-image-static-->
             <!--:url="imageUrl"-->
@@ -167,11 +172,11 @@
 </template>
 
 <script>
-  import { random, range } from 'lodash/fp'
-  import { createProj, addProj } from '@/ol-ext/proj'
-  import { loadingBBox } from '@/ol-ext/load-strategy'
   import { findPointOnSurface } from '@/ol-ext/geom'
+  import { loadingBBox } from '@/ol-ext/load-strategy'
+  import { addProj, createProj } from '@/ol-ext/proj'
   import { createStyle } from '@/ol-ext/style'
+  import { random, range } from 'lodash/fp'
   import ScaleLine from 'ol/control/scaleline'
 
   let fakerator = Fakerator()

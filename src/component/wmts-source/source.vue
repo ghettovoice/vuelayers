@@ -68,6 +68,7 @@
         url: this.urlTmpl,
         wrapX: this.wrapX,
         transition: this.transition,
+        tileLoadFunction: this.tileLoadFunction,
       })
     },
     /**

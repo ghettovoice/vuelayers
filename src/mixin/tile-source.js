@@ -1,16 +1,16 @@
+import { createTileUrlFunction } from 'ol-tilecache'
 import {
   CACHE_SIZE,
   EPSG_3857,
   MAX_ZOOM,
   MIN_ZOOM,
-  PIXEL_RATIO,
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
 } from '../ol-ext/consts'
 import { createExtentFromProjection } from '../ol-ext/extent'
 import { createXyzGrid } from '../ol-ext/tile-grid'
-import * as assert from '../util/assert'
-import { replaceTokens, constant, isFunction, isString, pick } from '../util/minilo'
+import { hasView } from '../util/assert'
+import { replaceTokens, isFunction, isString, pick } from '../util/minilo'
 import source from './source'
 import withUrl from './with-url'
 
@@ -39,13 +39,14 @@ const props = {
   },
   tilePixelRatio: {
     type: Number,
-    default: PIXEL_RATIO,
+    default: () => window.devicePixelRatio || 1,
   },
   tileSize: {
     type: Array,
     default: () => [TILE_SIZE, TILE_SIZE],
     validator: value => value.length === 2,
   },
+  tileLoadFunction: Function,
   url: {
     type: [String, Function],
     required: true,
@@ -75,7 +76,7 @@ const methods = {
    * @protected
    */
   createTileGrid () {
-    assert.hasView(this)
+    hasView(this)
 
     return createXyzGrid({
       extent: createExtentFromProjection(this.$view.getProjection()),
@@ -85,14 +86,21 @@ const methods = {
     })
   },
   /**
-   * @return {ol.TileUrlFunctionType}
+   * @return {ol.TileUrlFunction}
    * @protected
    */
   createUrlFunc () {
+    // custom url function provided
     if (isFunction(this.url)) {
       return this.url
     }
-    return constant(this.urlTmpl)
+    hasView(this)
+    // or use url function from ol-tilecache
+    return createTileUrlFunction(
+      this.urlTmpl,
+      this._tileGrid,
+      createExtentFromProjection(this.$view.getProjection()),
+    )
   },
   /**
    * @return {Promise}
@@ -136,6 +144,7 @@ const watch = {
   url () {
     if (this.$source) {
       this.$source.setTileUrlFunction(this.createUrlFunc())
+      this.refresh()
     }
   },
 }

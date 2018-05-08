@@ -1,5 +1,6 @@
 import BaseGeoJSON from 'ol/format/geojson'
 import TopoJSON from 'ol/format/topojson'
+import MVT from 'ol/format/mvt'
 import { isEmpty } from '../util/minilo'
 import { EPSG_4326 } from './consts'
 import { createCircularPolygon } from './geom'
@@ -20,6 +21,14 @@ export function createGeoJsonFmt (options) {
  */
 export function createTopoJsonFmt (options) {
   return new TopoJSON(options)
+}
+
+/**
+ * @param [options]
+ * @return {ol.format.MVT}
+ */
+export function createMvtFmt (options) {
+  return new MVT(options)
 }
 
 class GeoJSON extends BaseGeoJSON {

@@ -68,6 +68,7 @@
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         wrapX: this.wrapX,
         transition: this.transition,
+        tileLoadFunction: this.tileLoadFunction,
       })
     },
   }
