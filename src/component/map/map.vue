@@ -89,7 +89,7 @@
      */
     pixelRatio: {
       type: Number,
-      default: 1,
+      default: () => window.devicePixelRatio || 1,
     },
     /**
      * Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,
