@@ -1,3 +1,4 @@
+import { isFunction } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
@@ -70,10 +71,25 @@ const methods = {
     this.$sourceContainer && this.$sourceContainer.setSource(undefined)
   },
   /**
-   * @return {Promise}
+   * @return {Promise<void>}
    */
   refresh () {
-    return this::cmp.methods.refresh()
+    if (this.$source && !isFunction(this.$source.clear)) {
+      return this::cmp.methods.refresh()
+    }
+
+    return new Promise(resolve => {
+      let done = () => {
+        ++this.rev
+        resolve()
+      }
+      if (this.$source) {
+        this.$source.once('change', done)
+        this.$source.clear()
+      } else {
+        done()
+      }
+    })
   },
 }
 

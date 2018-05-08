@@ -144,6 +144,7 @@ const watch = {
   url () {
     if (this.$source) {
       this.$source.setTileUrlFunction(this.createUrlFunc())
+      this.refresh()
     }
   },
 }
