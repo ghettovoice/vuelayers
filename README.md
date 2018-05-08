@@ -41,7 +41,7 @@ npm install -S vue vuelayers
 
 ## Build Setup
 
-**NOTE**: Node **v6+** is required.
+**NOTE**: Node **v8+** is required.
 
 ``` bash
 git clone --recursive -j8 https://github.com/ghettovoice/vuelayers.git
