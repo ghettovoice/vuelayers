@@ -37,6 +37,7 @@ import TextStyle from './component/text-style'
 import TileLayer from './component/tile-layer'
 import VectorLayer from './component/vector-layer'
 import VectorSource from './component/vector-source'
+import VectorTileLayer from './component/vector-tile-layer'
 import WmsSource from './component/wms-source'
 import WmtsSource from './component/wmts-source'
 import XyzSource from './component/xyz-source'
@@ -91,6 +92,7 @@ function plugin (Vue, options = {}) {
   Vue.use(TileLayer, options)
   Vue.use(VectorLayer, options)
   Vue.use(VectorSource, options)
+  Vue.use(VectorTileLayer, options)
   Vue.use(WmsSource, options)
   Vue.use(WmtsSource, options)
   Vue.use(XyzSource, options)
@@ -135,6 +137,7 @@ export {
   TileLayer,
   VectorLayer,
   VectorSource,
+  VectorTileLayer,
   WmsSource,
   WmtsSource,
   XyzSource,

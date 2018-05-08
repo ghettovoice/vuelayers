@@ -1,43 +1,34 @@
 <script>
-  /** @module vector-layer/layer */
-  import VectorLayer from 'ol/layer/vector'
+  import VectorTileLayer from 'ol/layer/vectortile'
   import { vectorLayer } from '../../mixin'
 
-  const RENDER_MODES = ['vector', 'image']
+  const RENDER_MODES = ['vector', 'image', 'hybrid']
 
-  /**
-   * @vueProps
-   */
   const props = {
-    /**
-     * Render mode for vector layers. Available values:
-     * - `image` - vector layers are rendered as images
-     * - `vector` - vector layers are rendered as vectors
-     * @type {string}
-     * @default vector
-     */
     renderMode: {
       type: String,
-      default: 'vector',
+      default: 'hybrid',
       validator: val => RENDER_MODES.includes(val),
+    },
+    preload: {
+      type: Number,
+      default: 0,
     },
   }
 
-  /**
-   * @vueMethods
-   */
   const methods = {
     /**
      * @return {ol.layer.Vector}
      * @protected
      */
     createLayer () {
-      return new VectorLayer({
+      return new VectorTileLayer({
         id: this.id,
         minResolution: this.minResolution,
         maxResolution: this.maxResolution,
         opacity: this.opacity,
         visible: this.visible,
+        preload: this.preload,
         extent: this.extent,
         zIndex: this.zIndex,
         updateWhileAnimating: this.updateWhileAnimating,
@@ -51,17 +42,8 @@
     },
   }
 
-  /**
-   * Layer for data that is rendered client-side.
-   *
-   * @vueProto
-   * @title vl-layer-vector
-   * @alias module:vector-layer/layer
-   *
-   * @vueSlot default Default slot for `vl-source-*` (vector-like only) components.
-   */
   export default {
-    name: 'vl-layer-vector',
+    name: 'vl-layer-vector-tile',
     mixins: [vectorLayer],
     props,
     methods,
