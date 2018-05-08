@@ -1,5 +1,5 @@
 import { pick } from '../../util/minilo'
-import Source from './source'
+import Source from './source.vue'
 
 export default {
   Source,
