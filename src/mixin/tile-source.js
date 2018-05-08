@@ -6,6 +6,7 @@ import {
   MIN_ZOOM,
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
+  PIXEL_RATIO,
 } from '../ol-ext/consts'
 import { createExtentFromProjection } from '../ol-ext/extent'
 import { createXyzGrid } from '../ol-ext/tile-grid'
@@ -39,7 +40,7 @@ const props = {
   },
   tilePixelRatio: {
     type: Number,
-    default: () => window.devicePixelRatio || 1,
+    default: PIXEL_RATIO,
   },
   tileSize: {
     type: Array,
