@@ -3,7 +3,7 @@
 > Renders vector data
 
 `vl-layer-vector` can render vector from verious backend services. It should be
-used with together with [`vl-source-vector`](component/vl-source-vector) component.
+used with together with [`vl-source-vector`](component/vector-source.md) component.
 
 ## Versions
 
@@ -330,6 +330,29 @@ Comparison of two render modes, try to zoom in/out to see differences
   }
 </script>
 </script>
+
+### render-buffer
+
+- **Type**: `number`
+- **Default**: `100`
+
+The buffer around the viewport extent used by the renderer when getting features from the vector source for the 
+rendering or hit-detection. **Recommended value**: the size of the largest symbol, line width or label.
+
+### render-order
+
+- **Type**: `function(feature1 ol.Feature, feature2 ol.Feature)`
+- **Default**: `undefined`
+
+A function to be used when sorting features before rendering.
+
+### declutter
+
+- **Type**: `boolean`
+- **Default**: `false`
+
+Declutter images and text. Decluttering is applied to all image and text styles, and the priority is defined by 
+the `z-index` of the style. Lower `z-index` means higher priority. 
 
 ### update-while-animating
 

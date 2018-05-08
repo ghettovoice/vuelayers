@@ -10,7 +10,7 @@ components, without geometry component nothing will be rendered.
 [`featuresContainer`](mixin/features-container.md) mixin, such as [`vl-map`](component/map.md), 
 [`vl-source-vector`](component/vector-source.md) and etc.
 
-Custom feature styles can be applied with [`vl-style-*`](component/vl-style-circle.md) 
+Custom feature styles can be applied with [`vl-style-*`](component/circle-style.md) 
 components placed inside default slot.
 
 ## Versions
