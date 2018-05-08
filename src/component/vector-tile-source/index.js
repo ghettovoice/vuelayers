@@ -1,19 +1,8 @@
-/** @module vector-source */
 import { pick } from '../../util/minilo'
-import Source from './source.vue'
+import Source from './source'
 
-/**
- * @alias module:vector-source
- */
 export default {
-  /**
-   * @alias module:vector-source/source
-   */
   Source,
-  /**
-   * @param {Vue} Vue
-   * @param {VueLayersOptions} [options]
-   */
   install (Vue, options = {}) {
     options = pick(options, 'dataProjection')
     Object.assign(Source, options)
