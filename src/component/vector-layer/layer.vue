@@ -1,7 +1,7 @@
 <script>
   /** @module vector-layer/layer */
   import VectorLayer from 'ol/layer/vector'
-  import { vectorLayer } from '../../mixin'
+  import vectorLayer from '../../mixin/vector-layer'
 
   const RENDER_MODES = ['vector', 'image']
 

@@ -1,6 +1,6 @@
 <script>
   import VectorTileLayer from 'ol/layer/vectortile'
-  import { vectorLayer } from '../../mixin'
+  import vectorLayer from '../../mixin/vector-layer'
 
   const RENDER_MODES = ['vector', 'image', 'hybrid']
 
