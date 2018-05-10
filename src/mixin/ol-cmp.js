@@ -176,7 +176,7 @@ export default {
       .then(this.init)
       .then(() => {
         // logdbg('created', this.$options.name)
-        this.$emit('created')
+        this.$emit('created', this)
         return this
       })
     /**
@@ -208,7 +208,7 @@ export default {
     this.$createPromise.then(this.mount)
       .then(() => {
         this._mounted = true
-        this.$emit('mounted')
+        this.$emit('mounted', this)
         // logdbg('mounted', this.$options.name)
       })
   },
@@ -216,7 +216,7 @@ export default {
     this.$mountPromise.then(this.unmount)
       .then(this.deinit)
       .then(() => {
-        this.$emit('destroyed')
+        this.$emit('destroyed', this)
         // logdbg('destroyed', this.$options.name)
       })
   },
