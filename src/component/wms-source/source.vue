@@ -49,7 +49,7 @@
      * @protected
      */
     createSource () {
-      let s = new TileWMSSource({
+      return new TileWMSSource({
         attributions: this.attributions,
         cacheSize: this.cacheSize,
         params: {
@@ -71,8 +71,6 @@
         transition: this.transition,
         tileLoadFunction: this.tileLoadFunction,
       })
-      console.log(s)
-      return s
     },
     /**
      * @param {number[]} coordinate
