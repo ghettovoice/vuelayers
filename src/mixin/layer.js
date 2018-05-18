@@ -8,6 +8,7 @@ import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import sourceContainer from './source-container'
 import useMapCmp from './use-map-cmp'
+import { isEqual } from '../util/minilo'
 
 /**
  * @vueProps
@@ -184,6 +185,11 @@ const watch = {
   zIndex (value) {
     if (this.$layer && value !== this.$layer.getZIndex()) {
       this.$layer.setZIndex(value)
+    }
+  },
+  extent (value) {
+    if (this.$layer && !isEqual(value, this.$layer.getExtent())) {
+      this.$layer.setExtent(value)
     }
   },
 }

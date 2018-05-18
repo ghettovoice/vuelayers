@@ -37,7 +37,7 @@
           </template>
         </vl-geoloc>
 
-        <vl-layer-tile id="sputnik">
+        <vl-layer-tile id="sputnik" :extent="layerExtent">
           <vl-source-sputnik/>
         </vl-layer-tile>
 
@@ -115,11 +115,6 @@
             <!--:projection="imageProj">-->
           <!--</vl-source-image-static>-->
         <!--</vl-layer-image>-->
-
-        <vl-layer-tile id="wms-test">
-          <vl-source-wms url="http://mapy.geoportal.gov.pl/wss/service/img/guest/ORTO/MapServer/WMSServer"
-            layers="ORTOFOTOMAPA" styles="default" projection="EPSG:4326"></vl-source-wms>
-        </vl-layer-tile>
 
         <!-- <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
         <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
@@ -342,6 +337,7 @@
         bingMapsKey: 'ArbsA9NX-AZmebC6VyXAnDqjXk6mo2wGCmeYM8EwyDaxKfQhUYyk0jtx6hX5fpMn',
         bingMapsImagerySet: 'Aerial',
         eventSourcedFeatures: [],
+        layerExtent: [-10000000, -10000000, 10000000, 10000000],
       }
     },
     mounted () {
