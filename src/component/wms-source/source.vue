@@ -6,7 +6,7 @@
   import tileSource from '../../mixin/tile-source'
   import { WMS_VERSION } from '../../ol-ext/consts'
   import { hasSource, hasView } from '../../util/assert'
-  import { omit } from '../../util/minilo'
+  import { reduce } from '../../util/minilo'
 
   const props = {
     extParams: Object, // Additional WMS Request params
@@ -28,9 +28,20 @@
     },
   }
 
-  const upperCase = x => x.toUpperCase()
-  const keysToUpperCase = x => Object.keys(x).map(upperCase)
-  const cleanExtParams = params => omit(keysToUpperCase(params), ['LAYERS', 'VERSION', 'STYLES'])
+  const cleanExtParams = params => reduce(params, (cleanedParams, value, key) => {
+    key = key.toUpperCase()
+    if (['LAYERS', 'VERSION', 'STYLES'].includes(key)) {
+      return cleanedParams
+    }
+    cleanedParams[key] = value
+    return cleanedParams
+  }, {})
+
+  const computed = {
+    preparedExtParams () {
+      return this.extParams ? cleanExtParams(this.extParams) : undefined
+    },
+  }
 
   const methods = {
     /**
@@ -38,11 +49,11 @@
      * @protected
      */
     createSource () {
-      return new TileWMSSource({
+      let s = new TileWMSSource({
         attributions: this.attributions,
         cacheSize: this.cacheSize,
         params: {
-          ...cleanExtParams(this.extParams),
+          ...this.preparedExtParams,
           LAYERS: this.layers,
           STYLES: this.styles,
           VERSION: this.version,
@@ -60,6 +71,8 @@
         transition: this.transition,
         tileLoadFunction: this.tileLoadFunction,
       })
+      console.log(s)
+      return s
     },
     /**
      * @param {number[]} coordinate
@@ -86,7 +99,7 @@
         coordinate,
         resolution,
         projection,
-        cleanExtParams(params)
+        this.preparedExtParams
       )
     },
   }
@@ -102,7 +115,7 @@
       this.$source && this.$source.updateParams({ STYLES })
     },
     extParams (value) {
-      this.$source && this.$source.updateParams(cleanExtParams(value))
+      this.$source && this.$source.updateParams(this.preparedExtParams)
     },
   }
 
@@ -110,6 +123,7 @@
     name: 'vl-source-wms',
     mixins: [tileSource],
     props,
+    computed,
     methods,
     watch,
   }

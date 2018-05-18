@@ -41,15 +41,15 @@
           <vl-source-sputnik/>
         </vl-layer-tile>
 
-        <vl-layer-tile id="bing-maps">
+        <!-- <vl-layer-tile id="bing-maps">
           <vl-source-bing-maps :api-key="bingMapsKey" :imagery-set="bingMapsImagerySet"></vl-source-bing-maps>
-        </vl-layer-tile>
+        </vl-layer-tile> -->
 
         <!-- <vl-layer-tile>
           <vl-source-mapbox access-token="qwerty" map-id="mapbox.light" tile-format="png"></vl-source-mapbox>
         </vl-layer-tile> -->
 
-        <vl-layer-vector id="points" v-if="pointsLayer">
+        <!-- <vl-layer-vector id="points" v-if="pointsLayer">
           <vl-source-cluster>
             <vl-source-vector :features="points"/>
           </vl-source-cluster>
@@ -100,12 +100,12 @@
 
         <vl-layer-vector id="draw-layer">
           <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />
-        </vl-layer-vector>
+        </vl-layer-vector> -->
 
-        <vl-layer-vector-tile>
+        <!-- <vl-layer-vector-tile>
           <vl-source-vector-tile
             url="https://basemaps.arcgis.com/v1/arcgis/rest/services/World_Basemap/VectorTileServer/tile/{z}/{y}/{x}.pbf"></vl-source-vector-tile>
-        </vl-layer-vector-tile>
+        </vl-layer-vector-tile> -->
 
         <!--<vl-layer-image id="jz">-->
           <!--<vl-source-image-static-->
@@ -116,10 +116,15 @@
           <!--</vl-source-image-static>-->
         <!--</vl-layer-image>-->
 
-        <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
+        <vl-layer-tile id="wms-test">
+          <vl-source-wms url="http://mapy.geoportal.gov.pl/wss/service/img/guest/ORTO/MapServer/WMSServer"
+            layers="ORTOFOTOMAPA" styles="default" projection="EPSG:4326"></vl-source-wms>
+        </vl-layer-tile>
+
+        <!-- <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
         <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
         <vl-interaction-modify source="draw-target" @drawstart="log('modifystart', $event)" @drawend="log('modifyend', $event)" />
-        <vl-interaction-snap source="draw-target" :priority="10" />
+        <vl-interaction-snap source="draw-target" :priority="10" /> -->
 
         <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
           <!--<div style="background: white; padding: 10px">-->
@@ -353,7 +358,7 @@
         this.polygonCoords = [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]]
       }, 3000)
 
-      this.requestNewFeatures()
+      // this.requestNewFeatures()
     },
   }
 </script>

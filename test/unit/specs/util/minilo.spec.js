@@ -235,4 +235,25 @@ describe('minilo lib', () => {
       })
     })
   })
+
+  describe('omit()', () => {
+    describe('with object', () => {
+      it('should return new object without omitted props', () => {
+        let obj = {
+          tileSize: [256, 256],
+          get tileFormat () { return 'png' },
+          id: 123,
+          get mapId () { return 'qwerty' },
+          apiKey: '1234567890',
+          asd: undefined,
+          z: '',
+        }
+
+        expect(lo.omit(obj, ['tileFormat', 'mapId', 'apiKey', 'asd', 'z'])).to.deep.equal({
+          tileSize: [256, 256],
+          id: 123,
+        })
+      })
+    })
+  })
 })
