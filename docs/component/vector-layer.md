@@ -14,7 +14,7 @@ used with together with [`vl-source-vector`](component/vector-source.md) compone
 
 ## Usage
 
-Example below shows how you can use `vl-layer-vector` and [`vl-source-vector`](component/vector-source) to render some 
+Example below shows how you can use `vl-layer-vector` and [`vl-source-vector`](component/vector-source.md) to render some 
 vector vector features from remote backend.
 
 <vuep template="#usage-example"></vuep>
@@ -31,6 +31,11 @@ vector vector features from remote backend.
       
       <vl-layer-vector>
         <vl-source-vector :features.sync="features"></vl-source-vector>
+        
+        <vl-style-box>
+          <vl-style-stroke color="green" :width="3"></vl-style-stroke>
+          <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+        </vl-style-box>
       </vl-layer-vector>
     </vl-map>
     <p v-if="loading">
