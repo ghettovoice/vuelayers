@@ -11,6 +11,7 @@
   import olcontrol from 'ol/control'
   import VectorLayer from 'ol/layer/vector'
   import Map from 'ol/map'
+  import View from 'ol/view'
   import VectorSource from 'ol/source/vector'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -289,6 +290,7 @@
      */
     setView (view) {
       view = view instanceof Vue ? view.$view : view
+      view || (view = new View())
 
       if (view !== this._view) {
         this._view = view
