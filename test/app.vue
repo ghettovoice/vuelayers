@@ -2,6 +2,7 @@
   <div id="app">
     <div style="height: 100%">
       <div class="controls">
+        <button @click="showMap = !showMap">Toggle map</button>
         <button @click="drawType = 'point'">Point</button>
         <button @click="drawType = 'line_string'">LineString</button>
         <button @click="drawType = 'polygon'">Polygon</button>
@@ -9,7 +10,7 @@
         <button @click="drawType = undefined">Reset</button>
       </div>
 
-      <vl-map ref="map" @created="log('created', $event)" @mounted="log('mounted', $event)"
+      <vl-map v-if="showMap" ref="map" @created="log('created', $event)" @mounted="log('mounted', $event)"
               @destroyed="log('destroyed', $event)" @singleclick="clickCoord = $event.coordinate"
               data-projection="EPSG:4326">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
@@ -37,7 +38,7 @@
           </template>
         </vl-geoloc>
 
-        <vl-layer-tile id="sputnik" :extent="layerExtent">
+        <vl-layer-tile id="sputnik">
           <vl-source-sputnik/>
         </vl-layer-tile>
 
@@ -316,6 +317,7 @@
     methods,
     data () {
       return {
+        showMap: true,
         zoom: 3,
         center: [-80.0307892780456, 43.456341754866685],
         rotation: 0,
@@ -385,6 +387,7 @@
     box-shadow : 0 0 20px rgba(2, 2, 2, 0.1);
     padding    : 5px;
     text-align : center;
+    z-index    : 1;
 
     > button {
       margin         : 5px;
