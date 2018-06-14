@@ -42,66 +42,67 @@
           <vl-source-sputnik/>
         </vl-layer-tile>
 
-        <!-- <vl-layer-tile id="bing-maps">
-          <vl-source-bing-maps :api-key="bingMapsKey" :imagery-set="bingMapsImagerySet"></vl-source-bing-maps>
-        </vl-layer-tile> -->
+        <!--<vl-layer-tile id="bing-maps">-->
+          <!--<vl-source-bing-maps :api-key="bingMapsKey" :imagery-set="bingMapsImagerySet"></vl-source-bing-maps>-->
+        <!--</vl-layer-tile>-->
 
-        <!-- <vl-layer-tile>
-          <vl-source-mapbox access-token="qwerty" map-id="mapbox.light" tile-format="png"></vl-source-mapbox>
-        </vl-layer-tile> -->
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-mapbox access-token="qwerty" map-id="mapbox.light" tile-format="png"></vl-source-mapbox>-->
+        <!--</vl-layer-tile>-->
 
-        <!-- <vl-layer-vector id="points" v-if="pointsLayer">
+        <vl-layer-vector id="points" v-if="pointsLayer">
           <vl-source-cluster>
             <vl-source-vector :features="points"/>
           </vl-source-cluster>
+          <vl-style-func :factory="clusterStyleFunc"></vl-style-func>
         </vl-layer-vector>
 
-        <vl-layer-vector id="event-sourced">
-          <vl-source-cluster :distance="100">
-            <vl-source-vector projection="EPSG:4326" :features.sync="eventSourcedFeatures"></vl-source-vector>
-          </vl-source-cluster>
+        <!--<vl-layer-vector id="event-sourced">-->
+          <!--<vl-source-cluster :distance="100">-->
+            <!--<vl-source-vector projection="EPSG:4326" :features.sync="eventSourcedFeatures"></vl-source-vector>-->
+          <!--</vl-source-cluster>-->
 
-          <vl-style-func :factory="clusterStyleFunc" />
-        </vl-layer-vector>
+          <!--<vl-style-func :factory="clusterStyleFunc" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-layer-tile id="wmts">
-          <vl-source-wmts
-            url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
-            layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>
-        </vl-layer-tile>
+        <!--<vl-layer-tile id="wmts">-->
+          <!--<vl-source-wmts-->
+            <!--url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"-->
+            <!--layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>-->
+        <!--</vl-layer-tile>-->
 
-        <vl-layer-vector>
-          <vl-source-vector @addfeature="log('addfeature', $event)">
-            <vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">
-              <template slot-scope="feature">
-                <vl-geom-polygon v-if="polygonCoords.length" :coordinates="polygonCoords"/>
-                <vl-overlay v-if="selected.includes(feature.id)" :position="feature.point">
-                  <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
-                    poly feature {{ polyId }}
-                    qwerty: {{ feature.properties.qwerty }}
-                  </div>
-                </vl-overlay>
-              </template>
-            </vl-feature>
+        <!--<vl-layer-vector>-->
+          <!--<vl-source-vector @addfeature="log('addfeature', $event)">-->
+            <!--<vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">-->
+              <!--<template slot-scope="feature">-->
+                <!--<vl-geom-polygon v-if="polygonCoords.length" :coordinates="polygonCoords"/>-->
+                <!--<vl-overlay v-if="selected.includes(feature.id)" :position="feature.point">-->
+                  <!--<div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">-->
+                    <!--poly feature {{ polyId }}-->
+                    <!--qwerty: {{ feature.properties.qwerty }}-->
+                  <!--</div>-->
+                <!--</vl-overlay>-->
+              <!--</template>-->
+            <!--</vl-feature>-->
 
-            <vl-feature id="circle">
-              <vl-geom-circle :coordinates="circleCoordinates" :radius="5000000"></vl-geom-circle>
-            </vl-feature>
-          </vl-source-vector>
+            <!--<vl-feature id="circle">-->
+              <!--<vl-geom-circle :coordinates="circleCoordinates" :radius="5000000"></vl-geom-circle>-->
+            <!--</vl-feature>-->
+          <!--</vl-source-vector>-->
 
-          <vl-style-box>
-            <vl-style-fill :color="[45, 156, 201, 0.4]"/>
-            <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
-            <vl-style-circle>
-              <vl-style-fill :color="[45, 156, 201, 0.4]"/>
-              <vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>
-            </vl-style-circle>
-          </vl-style-box>
-        </vl-layer-vector>
+          <!--<vl-style-box>-->
+            <!--<vl-style-fill :color="[45, 156, 201, 0.4]"/>-->
+            <!--<vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>-->
+            <!--<vl-style-circle>-->
+              <!--<vl-style-fill :color="[45, 156, 201, 0.4]"/>-->
+              <!--<vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>-->
+            <!--</vl-style-circle>-->
+          <!--</vl-style-box>-->
+        <!--</vl-layer-vector>-->
 
-        <vl-layer-vector id="draw-layer">
-          <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />
-        </vl-layer-vector> -->
+        <!--<vl-layer-vector id="draw-layer">-->
+          <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
+        <!--</vl-layer-vector>-->
 
         <!-- <vl-layer-vector-tile>
           <vl-source-vector-tile
@@ -293,6 +294,8 @@
             textStrokeColor: '#222',
             textStrokeWidth: 2,
             textFillColor: '#fff',
+            textOffsetX: -10,
+            textOffsetY: -10,
           })
           cache[size] = style
         }

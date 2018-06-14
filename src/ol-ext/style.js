@@ -290,11 +290,22 @@ export function createTextStyle (vlStyle) {
 
   Object.assign(
     textStyle,
-    pick(['textScale', 'textRotation', 'textOffsetX', 'textOffsetY', 'textAlign'], vlStyle),
+    pick(['textAlign', 'textBaseline'], vlStyle),
     {
       font,
       fill: createFillStyle(vlStyle, 'text') || createFillStyle(vlStyle),
       stroke: createStrokeStyle(vlStyle, 'text') || createStrokeStyle(vlStyle),
+      scale: vlStyle.textScale,
+      rotation: vlStyle.textRotation,
+      offsetX: vlStyle.textOffsetX,
+      offsetY: vlStyle.textOffsetY,
+      rotateWithView: vlStyle.textRotateWithView,
+      padding: vlStyle.textPadding,
+      maxAngle: vlStyle.textMaxAngle,
+      overflow: vlStyle.textOverflow,
+      placement: vlStyle.textPlacement,
+      backgroundFill: createFillStyle(vlStyle, 'textBackground'),
+      backgroundStroke: createStrokeStyle(vlStyle, 'textBackground'),
     }
   )
 
@@ -352,6 +363,18 @@ export function createGeomStyle (vlStyle) {
  * @property {number|undefined} textOffsetY
  * @property {ol.style.Stroke|undefined} textStroke
  * @property {ol.style.Fill|undefined} textFill
+ * @property {boolean|undefined} textRotateWithView
+ * @property {number[]|undefined} textPadding
+ * @property {number|undefined} textMaxAngle
+ * @property {boolean|undefined} textOverflow
+ * @property {string|undefined} textPlacement
+ * @property {string|undefined} textBaseline
+ * @property {ol.style.Fill|undefined} textBackgroundFillColor
+ * @property {ol.style.Stroke|undefined} textBackgroundStrokeColor
+ * @property {ol.style.Stroke|undefined} textBackgroundStrokeWidth
+ * @property {ol.style.Stroke|undefined} textBackgroundStrokeDash
+ * @property {ol.style.Stroke|undefined} textBackgroundStrokeCap
+ * @property {ol.style.Stroke|undefined} textBackgroundStrokeJoin
  *
  * Image only
  * @property {ol.style.Image|undefined} image
