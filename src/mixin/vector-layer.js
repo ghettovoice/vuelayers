@@ -23,7 +23,7 @@ const props = {
     default: 100,
   },
   /**
-   * @type {ol.RenderOrderFunction|undefined}
+   * @type {RenderOrderFunction|undefined}
    */
   renderOrder: Function,
   /**
@@ -34,7 +34,7 @@ const props = {
 
 const methods = {
   /**
-   * @return {Promise<Vue<ol.layer.Layer>>}
+   * @return {Promise<Vue<Layer>>}
    * @protected
    */
   init () {
@@ -58,7 +58,7 @@ const methods = {
     )
   },
   /**
-   * @return {ol.layer.Vector|undefined}
+   * @return {Vector|undefined}
    * @protected
    */
   getStyleTarget () {

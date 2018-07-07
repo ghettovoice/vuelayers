@@ -39,7 +39,7 @@ const methods = {
    */
   getFeaturesTarget () {
     if (this._featuresTarget == null) {
-      this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */this.$source)
+      this._featuresTarget = new SourceCollectionAdapter(/** @type {Vector} */this.$source)
     }
 
     return this._featuresTarget

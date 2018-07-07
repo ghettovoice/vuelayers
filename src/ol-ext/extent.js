@@ -1,16 +1,26 @@
 /**
  * Extent extensions
  */
-import olextent from 'ol/extent'
-import olproj from 'ol/proj'
+import {
+  getBottomLeft,
+  getBottomRight,
+  getTopLeft,
+  getTopRight,
+  getCenter as getExtentCenter,
+  getWidth as getExtentWidth,
+  getHeight as getExtentHeight,
+  boundingExtent,
+} from 'ol/extent'
+import {get as getProj} from 'ol/proj'
+import {METERS_PER_UNIT} from 'ol/proj/Units'
 import { EXTENT_CORNER, PROJ_UNIT } from './consts'
 
-export const {
-  getCenter: getExtentCenter,
-  getWidth: getExtentWidth,
-  getHeight: getExtentHeight,
+export {
+  getExtentCenter,
+  getExtentWidth,
+  getExtentHeight,
   boundingExtent,
-} = olextent
+}
 
 /**
  * Create a new extent or update the provided extent.
@@ -18,8 +28,8 @@ export const {
  * @param {number} minY Minimum Y.
  * @param {number} maxX Maximum X.
  * @param {number} maxY Maximum Y.
- * @param {ol.Extent=} extent Destination extent.
- * @return {ol.Extent} Extent.
+ * @param {Extent=} extent Destination extent.
+ * @return {Extent} Extent.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L208
  */
 export function createOrUpdateExtent (minX, minY, maxX, maxY, extent) {
@@ -37,21 +47,21 @@ export function createOrUpdateExtent (minX, minY, maxX, maxY, extent) {
 
 /**
  * Get a corner coordinate of an extent.
- * @param {ol.Extent} extent Extent.
- * @param {ol.extent.Corner} corner Corner.
- * @return {ol.Coordinate} Corner coordinate.
+ * @param {Extent|number[]} extent Extent.
+ * @param {string} corner Corner.
+ * @return {Coordinate} Corner coordinate.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/extent.js#L482
  */
 export function getExtentCorner (extent, corner) {
   let coordinate
   if (corner === EXTENT_CORNER.BOTTOM_LEFT) {
-    coordinate = olextent.getBottomLeft(extent)
+    coordinate = getBottomLeft(extent)
   } else if (corner === EXTENT_CORNER.BOTTOM_RIGHT) {
-    coordinate = olextent.getBottomRight(extent)
+    coordinate = getBottomRight(extent)
   } else if (corner === EXTENT_CORNER.TOP_LEFT) {
-    coordinate = olextent.getTopLeft(extent)
+    coordinate = getTopLeft(extent)
   } else if (corner === EXTENT_CORNER.TOP_RIGHT) {
-    coordinate = olextent.getTopRight(extent)
+    coordinate = getTopRight(extent)
   } else {
     throw new Error('Invalid corner')
   }
@@ -61,16 +71,16 @@ export function getExtentCorner (extent, corner) {
 /**
  * Generate a tile grid extent from a projection.  If the projection has an
  * extent, it is used.  If not, a global extent is assumed.
- * @param {ol.ProjectionLike} projection Projection.
- * @return {ol.Extent} Extent.
+ * @param {Projection} projection Projection.
+ * @return {Extent} Extent.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L148
  */
 export function createExtentFromProjection (projection) {
-  projection = olproj.get(projection)
+  projection = getProj(projection)
   let extent = projection.getExtent()
 
   if (!extent) {
-    let half = 180 * olproj.METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
+    let half = 180 * METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
       projection.getMetersPerUnit()
     extent = createOrUpdateExtent(-half, -half, half, half)
   }

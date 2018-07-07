@@ -1,6 +1,6 @@
 /* global describe, it, expect */
-import olMap from 'ol/map'
-import olView from 'ol/view'
+import olMap from 'ol/Map'
+import olView from 'ol/View'
 import Vue from 'vue'
 import Map from '@/component/map'
 

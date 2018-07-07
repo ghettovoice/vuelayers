@@ -3,8 +3,8 @@ import Vue from 'vue'
 const methods = {
   /**
    * @return {{
-   *     setSource: function(ol.source.Source): void,
-   *     getSource: function(): ol.source.Source
+   *     setSource: function(Source): void,
+   *     getSource: function(): Source
    *   }|undefined}
    * @protected
    */
@@ -12,7 +12,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {ol.source.Source|undefined}
+   * @return {Source|undefined}
    */
   getSource () {
     return this._source
@@ -29,7 +29,7 @@ const methods = {
     }
   },
   /**
-   * @param {ol.source.Source|Vue|undefined} source
+   * @param {Source|Vue|undefined} source
    * @return {void}
    */
   setSource (source) {
@@ -50,7 +50,7 @@ export default {
   methods,
   created () {
     /**
-     * @type {ol.source.Source|undefined}
+     * @type {Source|undefined}
      * @private
      */
     this._source = undefined

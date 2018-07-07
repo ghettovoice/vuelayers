@@ -5,8 +5,8 @@ import projTransforms from './proj-transforms'
 const methods = {
   /**
    * @return {{
-   *     getGeometry: function(): ol.geom.Geometry|undefined,
-   *     setGeometry: function(ol.geom.Geometry|undefined)
+   *     getGeometry: function(): Geometry|undefined,
+   *     setGeometry: function(Geometry|undefined)
    *   }|undefined}
    * @protected
    */
@@ -14,7 +14,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {ol.geom.Geometry|undefined}
+   * @return {Geometry|undefined}
    */
   getGeometry () {
     return this._geometry
@@ -31,7 +31,7 @@ const methods = {
     }
   },
   /**
-   * @param {ol.geom.Geometry|Vue|GeoJSONGeometry|undefined} geom
+   * @param {Geometry|Vue|Object|undefined} geom
    * @return {void}
    * @throws {AssertionError}
    */
@@ -58,7 +58,7 @@ export default {
   methods,
   created () {
     /**
-     * @type {ol.geom.Geometry|undefined}
+     * @type {Geometry|undefined}
      * @private
      */
     this._geometry = undefined

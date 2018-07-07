@@ -8,11 +8,11 @@
   /**
    * @module map/map
    */
-  import olcontrol from 'ol/control'
-  import VectorLayer from 'ol/layer/vector'
-  import Map from 'ol/map'
-  import View from 'ol/view'
-  import VectorSource from 'ol/source/vector'
+  import {defaults as defaultsControl} from 'ol/control'
+  import VectorLayer from 'ol/layer/Vector'
+  import Map from 'ol/Map'
+  import View from 'ol/View'
+  import VectorSource from 'ol/source/Vector'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
@@ -126,7 +126,7 @@
    */
   const methods = /** @lends module:map/map# */{
     /**
-     * @return {ol.Map}
+     * @return {Map}
      * @protected
      */
     createOlObject () {
@@ -147,7 +147,7 @@
 
       if (this.controls) {
         let opts = typeof this.controls === 'object' ? this.controls : undefined
-        map.getControls().extend(olcontrol.defaults(opts).getArray())
+        map.getControls().extend(defaultsControl(opts).getArray())
       }
 
       map.set('dataProjection', this.dataProjection)
@@ -265,7 +265,7 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function((ol.Feature|ol.render.Feature), ?ol.layer.Layer): *} callback
+     * @param {function((Feature), ?Layer): *} callback
      * @param {Object} [opts]
      * @return {*|undefined}
      */
@@ -275,8 +275,8 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function(ol.layer.Layer, ?(number[]|Uint8Array)): *} callback
-     * @param {function(ol.layer.Layer): boolean} [layerFilter]
+     * @param {function(Layer, ?(number[]|Uint8Array)): *} callback
+     * @param {function(Layer): boolean} [layerFilter]
      * @return {*|undefined}
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
@@ -284,7 +284,7 @@
       return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
-     * @param {ol.View|Vue|undefined} view
+     * @param {View|Vue|undefined} view
      * @return {void}
      * @protected
      */
@@ -394,12 +394,12 @@
     watch,
     created () {
       /**
-       * @type {ol.View|undefined}
+       * @type {View|undefined}
        * @private
        */
       this._view = undefined
       /**
-       * @type {ol.layer.Vector}
+       * @type {Vector}
        * @private
        */
       this._defaultLayer = new VectorLayer({
@@ -409,7 +409,7 @@
       Object.defineProperties(this, /** @lends module:map/map# */{
         /**
          * OpenLayers map instance.
-         * @type {ol.Map|undefined}
+         * @type {Map|undefined}
          */
         $map: {
           enumerable: true,
@@ -417,7 +417,7 @@
         },
         /**
          * OpenLayers view instance.
-         * @type {ol.View|undefined}
+         * @type {View|undefined}
          */
         $view: {
           enumerable: true,
@@ -474,11 +474,11 @@
   /**
    * A click with no dragging. A double click will fire two of this.
    * @event module:map/map#click
-   * @type {ol.MapBrowserEvent}
+   * @type {MapBrowserEvent}
    */
   /**
    * A true double click, with no dragging.
    * @event module:map/map#dblclick
-   * @type {ol.MapBrowserEvent}
+   * @type {MapBrowserEvent}
    */
 </script>

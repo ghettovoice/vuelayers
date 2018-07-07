@@ -2,7 +2,7 @@
   /**
    * @module stroke-style/style
    */
-  import Stroke from 'ol/style/stroke'
+  import Stroke from 'ol/style/Stroke'
   import style from '../../mixin/style'
 
   const props = {
@@ -32,7 +32,7 @@
 
   const methods = {
     /**
-     * @return {ol.style.Stroke}
+     * @return {Stroke}
      * @protected
      */
     createStyle () {

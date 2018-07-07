@@ -8,7 +8,7 @@
   /**
    * @module feature/feature
    */
-  import Feature from 'ol/feature'
+  import Feature from 'ol/Feature'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, mergeAll, throttleTime } from 'rxjs/operator'
@@ -56,7 +56,7 @@
   const computed = /** @lends module:feature/feature# */{
     /**
      * **GeoJSON** encoded geometry.
-     * @type {GeoJSONFeature|undefined}
+     * @type {Object|undefined}
      */
     geometry () {
       if (this.rev && this.resolvedDataProjection && this.$geometry) {
@@ -90,7 +90,7 @@
     /**
      * Create feature without inner style applying, feature level style
      * will be applied in the layer level style function.
-     * @return {ol.Feature}
+     * @return {Feature}
      * @protected
      */
     createOlObject () {
@@ -102,9 +102,9 @@
     },
     /**
      * @return {{
-     *     getGeometry: function(): (ol.geom.Geometry|undefined),
-     *     setGeometry: function((ol.geom.Geometry|undefined)): void
-     *   }|ol.Feature|undefined}
+     *     getGeometry: function(): (Geometry|undefined),
+     *     setGeometry: function((Geometry|undefined)): void
+     *   }|Feature|undefined}
      * @protected
      */
     getGeometryTarget () {
@@ -127,7 +127,7 @@
       )
     },
     /**
-     * @return {ol.Feature|undefined}
+     * @return {Feature|undefined}
      * @protected
      */
     getStyleTarget () {
@@ -213,15 +213,15 @@
       Object.defineProperties(this, /** @lends module:feature/feature# */{
         /**
          * Reference to `ol.Feature` instance.
-         * @type {ol.Feature|undefined}
+         * @type {Feature|undefined}
          */
         $feature: {
           enumerable: true,
           get: () => this.$olObject,
         },
         /**
-         * Reference to parent `ol.Layer` instance.
-         * @type {ol.layer.Layer|undefined}
+         * Reference to parent `Layer` instance.
+         * @type {Layer|undefined}
          */
         $layer: {
           enumerable: true,
@@ -229,7 +229,7 @@
         },
         /**
          * Reference to `ol.Map` instance.
-         * @type {ol.Map|undefined}
+         * @type {Map|undefined}
          */
         $map: {
           enumerable: true,
@@ -237,7 +237,7 @@
         },
         /**
          * Reference to `ol.View` instance.
-         * @type {ol.View|undefined}
+         * @type {View|undefined}
          */
         $view: {
           enumerable: true,

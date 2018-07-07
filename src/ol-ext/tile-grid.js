@@ -1,25 +1,25 @@
-import olsize from 'ol/size'
-import oltilegrid from 'ol/tilegrid'
-import TileGrid from 'ol/tilegrid/tilegrid'
+import {toSize} from 'ol/size'
+import {createXYZ as createXyzGrid} from 'ol/tilegrid'
+import TileGrid from 'ol/tilegrid/TileGrid'
 import { EXTENT_CORNER, MAX_ZOOM, TILE_SIZE } from './consts'
 import { createExtentFromProjection, getExtentCorner, getExtentHeight, getExtentWidth } from './extent'
 
-export const {
-  createXYZ: createXyzGrid,
-} = oltilegrid
+export {
+  createXyzGrid,
+}
 
 /**
  * Create a resolutions array from an extent.  A zoom factor of 2 is assumed.
- * @param {ol.Extent} extent Extent.
+ * @param {Extent} extent Extent.
  * @param {number=} maxZoom Maximum zoom level (default is
  *     ol.DEFAULT_MAX_ZOOM).
- * @param {number|ol.Size=} tileSize Tile size (default uses
+ * @param {number|Size=} tileSize Tile size (default uses
  *     ol.DEFAULT_TILE_SIZE).
  * @return {!Array.<number>} Resolutions array.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L104
  */
 export function resolutionsFromExtent (extent, maxZoom = MAX_ZOOM, tileSize = TILE_SIZE) {
-  tileSize = olsize.toSize(tileSize)
+  tileSize = toSize(tileSize)
 
   const height = getExtentHeight(extent)
   const width = getExtentWidth(extent)
@@ -38,11 +38,11 @@ export function resolutionsFromExtent (extent, maxZoom = MAX_ZOOM, tileSize = TI
 }
 
 /**
- * @param {ol.Extent} extent Extent.
+ * @param {Extent} extent Extent.
  * @param {number=} maxZoom Maximum zoom level (default is MAX_ZOOM).
- * @param {number|ol.Size=} tileSize Tile size (default uses TILE_SIZE).
- * @param {string|ol.extent.Corner} [corner] Extent corner (default is EXTENT_CORNER.TOP_LEFT).
- * @return {!ol.tilegrid.TileGrid} TileGrid instance.
+ * @param {number|Size=} tileSize Tile size (default uses TILE_SIZE).
+ * @param {string} [corner] Extent corner (default is EXTENT_CORNER.TOP_LEFT).
+ * @return {TileGrid} TileGrid instance.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L58
  */
 export function createGridForExtent (extent, maxZoom = MAX_ZOOM, tileSize = TILE_SIZE, corner = EXTENT_CORNER.TOP_LEFT) {
@@ -57,13 +57,13 @@ export function createGridForExtent (extent, maxZoom = MAX_ZOOM, tileSize = TILE
 }
 
 /**
- * @param {ol.ProjectionLike} projection Projection.
+ * @param {ProjectionLike} projection Projection.
  * @param {number=} maxZoom Maximum zoom level (default is
  *     ol.DEFAULT_MAX_ZOOM).
- * @param {number|ol.Size=} tileSize Tile size (default uses ol.DEFAULT_TILE_SIZE).
- * @param {string|ol.extent.Corner=} corner Extent corner (default is
+ * @param {number|Size=} tileSize Tile size (default uses ol.DEFAULT_TILE_SIZE).
+ * @param {string} corner Extent corner (default is
  *     ol.extent.Corner.BOTTOM_LEFT).
- * @return {!ol.tilegrid.TileGrid} TileGrid instance.
+ * @return {TileGrid} TileGrid instance.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L135
  */
 export function createGridForProjection (

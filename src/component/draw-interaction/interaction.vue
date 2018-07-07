@@ -1,7 +1,7 @@
 <script>
   /** @module draw-interaction/interaction */
-  import DrawInteraction from 'ol/interaction/draw'
-  import condition from 'ol/events/condition'
+  import DrawInteraction from 'ol/interaction/Draw'
+  import {noModifierKeys, shiftKeyOnly} from 'ol/events/condition'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operator'
@@ -78,12 +78,12 @@
     minPoints: Number,
     /**
      * A function that takes an ol.MapBrowserEvent and returns a boolean to indicate whether the drawing can be finished.
-     * @type {ol.EventsConditionType|function|undefined}
+     * @type {function|undefined}
      */
     finishCondition: Function,
     /**
      * Function that is called when a geometry's coordinates are updated.
-     * @type {ol.DrawGeometryFunctionType|function|undefined}
+     * @type {function|undefined}
      */
     geometryFunction: Function,
     /**
@@ -97,11 +97,11 @@
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
      * By default `ol.events.condition.noModifierKeys`, i.e. a click, adds a vertex or deactivates freehand drawing.
-     * @type {ol.EventsConditionType|function|undefined}
+     * @type {function|undefined}
      */
     condition: {
       type: Function,
-      default: condition.noModifierKeys,
+      default: noModifierKeys,
     },
     /**
      * Operate in freehand mode for lines, polygons, and circles. This makes the interaction always operate in
@@ -116,11 +116,11 @@
      * Condition that activates freehand drawing for lines and polygons. This function takes an `ol.MapBrowserEvent` and
      * returns a boolean to indicate whether that event should be handled. The default is `ol.events.condition.shiftKeyOnly`,
      * meaning that the Shift key activates freehand drawing.
-     * @type {ol.EventsConditionType|function|undefined}
+     * @type {function|undefined}
      */
     freehandCondition: {
       type: Function,
-      default: condition.shiftKeyOnly,
+      default: shiftKeyOnly,
     },
     /**
      * Wrap the world horizontally on the sketch overlay.
@@ -137,7 +137,7 @@
    */
   const methods = {
     /**
-     * @return {Promise<ol.interaction.Draw>}
+     * @return {Promise<Draw>}
      * @protected
      */
     async createInteraction () {
@@ -171,7 +171,7 @@
       })
     },
     /**
-     * @return {ol.StyleFunction}
+     * @return {function(feature: Feature): Style}
      * @protected
      */
     getDefaultStyles () {
@@ -194,7 +194,7 @@
       )
     },
     /**
-     * @return {ol.interaction.Interaction|undefined}
+     * @return {Interaction|undefined}
      * @protected
      */
     getStyleTarget () {
@@ -215,7 +215,7 @@
       this::interaction.methods.unmount()
     },
     /**
-     * @param {Array<{style: ol.style.Style, condition: (function|boolean|undefined)}>|ol.StyleFunction|Vue|undefined} styles
+     * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|function(feature: Feature): Style|Vue|undefined} styles
      * @return {void}
      * @protected
      */

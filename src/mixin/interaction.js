@@ -25,7 +25,7 @@ const props = {
 
 const methods = {
   /**
-   * @return {Promise<ol.interaction.Interaction>}
+   * @return {Promise<Interaction>}
    * @protected
    */
   async createOlObject () {
@@ -39,7 +39,7 @@ const methods = {
     return interaction
   },
   /**
-   * @return {ol.interaction.Interaction|Promise<ol.interaction.Interaction>}
+   * @return {Interaction|Promise<Interaction>}
    * @protected
    * @abstract
    */
@@ -122,7 +122,7 @@ export default {
   created () {
     Object.defineProperties(this, {
       /**
-       * @type {ol.interaction.Interaction|undefined}
+       * @type {Interaction|undefined}
        */
       $interaction: {
         enumerable: true,

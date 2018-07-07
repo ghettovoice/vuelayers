@@ -2,7 +2,7 @@
   /**
    * @module point-geom/geom
    */
-  import Point from 'ol/geom/point'
+  import Point from 'ol/geom/Point'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { constant } from '../../util/minilo'
@@ -21,7 +21,7 @@
 
   const methods = {
     /**
-     * @return {ol.geom.Point}
+     * @return {Point}
      * @protected
      */
     createGeometry () {

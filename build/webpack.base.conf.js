@@ -2,6 +2,7 @@ const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
 const NpmInstallPlugin = require('npm-install-webpack-plugin')
+const {VueLoaderPlugin} = require('vue-loader')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -11,6 +12,7 @@ module.exports = {
   entry: {
     [ config.name ]: config.entry,
   },
+  mode: process.env.NODE_ENV || 'development',
   devtool: '#source-map',
   output: {
     path: config.outputPath,
@@ -80,6 +82,7 @@ module.exports = {
     noParse: [/openlayers/],
   },
   plugins: [
+    new VueLoaderPlugin(),
     // new NpmInstallPlugin(),
     new StringReplacePlugin(),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html

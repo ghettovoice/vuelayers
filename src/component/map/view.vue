@@ -8,7 +8,7 @@
   /**
    * @module map/view
    */
-  import View from 'ol/view'
+  import View from 'ol/View'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operator'
@@ -142,7 +142,7 @@
       }
     },
     /**
-     * @return {ol.ProjectionLike}
+     * @return {ProjectionLike}
      */
     resolvedDataProjection () {
       // exclude this.projection from lookup to allow view rendering in projection
@@ -161,7 +161,7 @@
   const methods = /** @lends module:map/view# */{
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
-     * @param {...(olx.AnimationOptions|function(boolean))} args
+     * @param {...(AnimationOptions|function(boolean))} args
      * @return {Promise} Resolves when animation completes
      */
     animate (...args) {
@@ -185,7 +185,7 @@
       )
     },
     /**
-     * @return {ol.View}
+     * @return {View}
      * @protected
      */
     createOlObject () {
@@ -208,8 +208,8 @@
     },
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
-     * @param {GeoJSONFeature|ol.Extent|ol.geom.Geometry|Vue} geometryOrExtent
-     * @param {olx.view.FitOptions} [options]
+     * @param {Object|Extent|Geometry|Vue} geometryOrExtent
+     * @param {FitOptions} [options]
      * @return {Promise} Resolves when view changes
      */
     fit (geometryOrExtent, options = {}) {
@@ -326,7 +326,7 @@
     created () {
       Object.defineProperties(this, /** @lends module:map/view# */{
         /**
-         * @type {ol.View|undefined}
+         * @type {View|undefined}
          */
         $view: {
           enumerable: true,

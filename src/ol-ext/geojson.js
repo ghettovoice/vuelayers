@@ -1,14 +1,14 @@
-import Feature from 'ol/feature'
+import Feature from 'ol/Feature'
 import { isPlainObject, get } from '../util/minilo'
 import { createGeoJsonFmt } from './format'
 
 const geoJsonFmt = createGeoJsonFmt()
 
 /**
- * @param {ol.Feature} feature
- * @param {ol.ProjectionLike|undefined} [featureProjection]
- * @param {ol.ProjectionLike|undefined} [dataProjection]
- * @return {GeoJSONFeature|Object}
+ * @param {Feature} feature
+ * @param {ProjectionLike|undefined} [featureProjection]
+ * @param {ProjectionLike|undefined} [dataProjection]
+ * @return {Object}
  */
 export function writeGeoJsonFeature (feature, featureProjection, dataProjection) {
   const geoJsonFeature = geoJsonFmt.writeFeatureObject(feature, { featureProjection, dataProjection: dataProjection })
@@ -26,10 +26,10 @@ export function writeGeoJsonFeature (feature, featureProjection, dataProjection)
 }
 
 /**
- * @param {GeoJSONFeature|Object} geoJsonFeature
- * @param {ol.ProjectionLike|undefined} [featureProjection]
- * @param {ol.ProjectionLike|undefined} [dataProjection]
- * @return {ol.Feature}
+ * @param {Object} geoJsonFeature
+ * @param {ProjectionLike|undefined} [featureProjection]
+ * @param {ProjectionLike|undefined} [dataProjection]
+ * @return {Feature}
  */
 export function readGeoJsonFeature (geoJsonFeature, featureProjection, dataProjection) {
   let feature = geoJsonFmt.readFeature(geoJsonFeature, { featureProjection, dataProjection: dataProjection })
@@ -47,10 +47,10 @@ export function readGeoJsonFeature (geoJsonFeature, featureProjection, dataProje
 }
 
 /**
- * @param {ol.geom.Geometry} geometry
- * @param {ol.ProjectionLike|undefined} [geometryProjection]
- * @param {ol.ProjectionLike|undefined} [dataProjection]
- * @return {GeoJSONGeometry|GeoJSONGeometryCollection|Object}
+ * @param {Geometry} geometry
+ * @param {ProjectionLike|undefined} [geometryProjection]
+ * @param {ProjectionLike|undefined} [dataProjection]
+ * @return {Object}
  */
 export function writeGeoJsonGeometry (geometry, geometryProjection, dataProjection) {
   return geoJsonFmt.writeGeometryObject(geometry, {
@@ -60,10 +60,10 @@ export function writeGeoJsonGeometry (geometry, geometryProjection, dataProjecti
 }
 
 /**
- * @param {GeoJSONGeometry|Object} geoJsonGeometry
- * @param {ol.ProjectionLike|undefined} [geometryProjection]
- * @param {ol.ProjectionLike|undefined} [dataProjection]
- * @return {ol.geom.Geometry}
+ * @param {Object|Object} geoJsonGeometry
+ * @param {ProjectionLike|undefined} [geometryProjection]
+ * @param {ProjectionLike|undefined} [dataProjection]
+ * @return {Geometry}
  */
 export function readGeoJsonGeometry (geoJsonGeometry, geometryProjection, dataProjection) {
   dataProjection = readProjection(geoJsonGeometry, dataProjection)

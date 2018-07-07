@@ -73,7 +73,7 @@ const computed = {
 
 const methods = {
   /**
-   * @return {ol.tilegrid.TileGrid}
+   * @return {TileGrid}
    * @protected
    */
   createTileGrid () {
@@ -87,7 +87,7 @@ const methods = {
     })
   },
   /**
-   * @return {ol.TileUrlFunction}
+   * @return {TileUrlFunction}
    * @protected
    */
   createUrlFunc () {
@@ -109,7 +109,7 @@ const methods = {
    */
   init () {
     /**
-     * @type {ol.tilegrid.TileGrid}
+     * @type {TileGrid}
      * @protected
      */
     this._tileGrid = this.createTileGrid()

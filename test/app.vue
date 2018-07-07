@@ -180,7 +180,7 @@
   import { addProj, createProj } from '@/ol-ext/proj'
   import { createStyle } from '@/ol-ext/style'
   import { random, range } from 'lodash/fp'
-  import ScaleLine from 'ol/control/scaleline'
+  import ScaleLine from 'ol/control/ScaleLine'
 
   let fakerator = Fakerator()
 

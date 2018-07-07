@@ -5,7 +5,7 @@ import { isFunction, reduce } from '../util/minilo'
 export default {
   created () {
     /**
-     * @type {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
+     * @type {Style[]|StyleFunction|Vue|undefined}
      * @private
      */
     this._styles = undefined
@@ -13,7 +13,7 @@ export default {
   methods: {
     /**
      * Default style factory
-     * @return {ol.style.Style[]|ol.StyleFunction|undefined}
+     * @return {Style[]|StyleFunction|undefined}
      * @protected
      */
     getDefaultStyles () {},
@@ -29,13 +29,13 @@ export default {
       }
     },
     /**
-     * @return {ol.style.Style[]|ol.StyleFunction|Vue|undefined}
+     * @return {Style[]|StyleFunction|Vue|undefined}
      */
     getStyles () {
       return this._styles
     },
     /**
-     * @param {ol.style.Style|ol.StyleFunction|Vue|undefined} style
+     * @param {Style|StyleFunction|Vue|undefined} style
      * @return {void}
      */
     addStyle (style) {
@@ -65,7 +65,7 @@ export default {
       this.setStyle(currentStyles)
     },
     /**
-     * @param {Array<{style: ol.style.Style, condition: (function|boolean|undefined)}>|ol.StyleFunction|Vue|undefined} styles
+     * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|StyleFunction|Vue|undefined} styles
      * @return {void}
      */
     setStyle (styles) {
@@ -82,7 +82,7 @@ export default {
       }
     },
     /**
-     * @param {ol.style.Style|ol.StyleFunction|Vue|undefined} style
+     * @param {Style|StyleFunction|Vue|undefined} style
      * @return {void}
      */
     removeStyle (style) {
@@ -112,7 +112,7 @@ export default {
     },
     /**
      * Style function factory
-     * @returns {ol.StyleFunction}
+     * @returns {StyleFunction}
      * @protected
      */
     createStyleFunc () {
@@ -124,12 +124,12 @@ export default {
         let styles = vm.getStyles()
         /* eslint-disable brace-style */
         // handle provided styles
-        // styles - ol.StyleFunction or vl-style-func
+        // styles - StyleFunction or vl-style-func
         if (styles && (isFunction(styles) || isFunction(styles.$style))) {
           let styleFunc = isFunction(styles) ? styles : styles.$style
           styles = styleFunc(feature, resolution)
         }
-        // styles is array of { $style: ol.style.Style, condition: (bool|function():bool) }
+        // styles is array of { $style: Style, condition: (bool|function():bool) }
         else if (Array.isArray(styles)) {
           styles = reduce(styles, (newStyles, { $style, condition }) => {
             if (

@@ -1,20 +1,20 @@
 /**
  * Projection transform helpers
  */
-import olproj from 'ol/proj'
-import Projection from 'ol/proj/projection'
+import {transform, transformExtent, get as getProj, addProjection as addProj, toLonLat, fromLonLat} from 'ol/proj'
+import Projection from 'ol/proj/Projection'
 import { EPSG_3857, EPSG_4326, GEOMETRY_TYPE } from './consts'
 
-export const {
+export {
   transform,
   transformExtent,
-  get: getProj,
-  addProjection: addProj,
-} = olproj
+  getProj,
+  addProj,
+}
 
 /**
- * @param {olx.ProjectionOptions|Object} options
- * @return {ol.proj.Projection_}
+ * @param {Object} options
+ * @return {Projection}
  */
 export function createProj (options) {
   return new Projection(options)
@@ -22,19 +22,19 @@ export function createProj (options) {
 
 /**
  * @param {number[]} coordinate
- * @param {ol.ProjectionLike} [projection]
- * @return {number[]}
+ * @param {ProjectionLike} [projection]
+ * @return {Coordinate|number[]}
  */
 export function pointToLonLat (coordinate, projection = EPSG_3857) {
-  return olproj.toLonLat(coordinate, projection)
+  return toLonLat(coordinate, projection)
 }
 /**
  * @param {number[]} coordinate
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {number[]}
  */
 export function pointFromLonLat (coordinate, projection = EPSG_3857) {
-  return olproj.fromLonLat(coordinate, projection)
+  return fromLonLat(coordinate, projection)
 }
 
 export function transformPoint (coordinate, sourceProjection, destProjection) {
@@ -43,7 +43,7 @@ export function transformPoint (coordinate, sourceProjection, destProjection) {
 
 /**
  * @param {Array<number[]>} coordinates
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {Array<number[]>}
  */
 export function lineToLonLat (coordinates, projection = EPSG_3857) {
@@ -51,7 +51,7 @@ export function lineToLonLat (coordinates, projection = EPSG_3857) {
 }
 /**
  * @param {Array<number[]>} coordinates
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {Array<number[]>}
  */
 export function lineFromLonLat (coordinates, projection = EPSG_3857) {
@@ -64,7 +64,7 @@ export function transformLine (coordinates, sourceProjection, destProjection) {
 
 /**
  * @param {Array<Array<number[]>>} coordinates
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {Array<Array<number[]>>}
  */
 export function polygonToLonLat (coordinates, projection = EPSG_3857) {
@@ -72,7 +72,7 @@ export function polygonToLonLat (coordinates, projection = EPSG_3857) {
 }
 /**
  * @param {Array<Array<number[]>>} coordinates
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {Array<Array<number[]>>}
  */
 export function polygonFromLonLat (coordinates, projection = EPSG_3857) {
@@ -85,7 +85,7 @@ export function transformPolygon (coordinates, sourceProjection, destProjection)
 
 /**
  * @param {Array<number[]>} coordinates
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {Array<number[]>}
  */
 export function multiPointToLonLat (coordinates, projection = EPSG_3857) {
@@ -93,7 +93,7 @@ export function multiPointToLonLat (coordinates, projection = EPSG_3857) {
 }
 /**
  * @param {Array<number[]>} coordinates
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {Array<number[]>}
  */
 export function multiPointFromLonLat (coordinates, projection = EPSG_3857) {
@@ -106,7 +106,7 @@ export function transformMultiPoint (coordinates, sourceProjection, destProjecti
 
 /**
  * @param {Array<Array<number[]>>} coordinates
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {Array<Array<number[]>>}
  */
 export function multiLineToLonLat (coordinates, projection = EPSG_3857) {
@@ -114,7 +114,7 @@ export function multiLineToLonLat (coordinates, projection = EPSG_3857) {
 }
 /**
  * @param {Array<Array<number[]>>} coordinates
- * @param {ol.ProjectionLike} [projection]
+ * @param {ProjectionLike} [projection]
  * @return {Array<Array<number[]>>}
  */
 export function multiLineFromLonLat (coordinates, projection = EPSG_3857) {
@@ -127,7 +127,7 @@ export function transformMultiLine (coordinates, sourceProjection, destProjectio
 
 /**
  * @param {Array<Array<Array<number[]>>>} coordinates
- * @param {ol.ProjectionLike} projection
+ * @param {ProjectionLike} projection
  * @return {Array<Array<Array<number[]>>>}
  */
 export function multiPolygonToLonLat (coordinates, projection = EPSG_3857) {
@@ -135,7 +135,7 @@ export function multiPolygonToLonLat (coordinates, projection = EPSG_3857) {
 }
 /**
  * @param {Array<Array<Array<number[]>>>} coordinates
- * @param {ol.ProjectionLike} projection
+ * @param {ProjectionLike} projection
  * @return {Array<Array<Array<number[]>>>}
  */
 export function multiPolygonFromLonLat (coordinates, projection = EPSG_3857) {
@@ -184,18 +184,18 @@ export const transforms = {
 }
 
 /**
- * @param {ol.Extent} extent
- * @param {ol.ProjectionLike} [projection=EPSG:3857]
- * @return {ol.Extent}
+ * @param {Extent} extent
+ * @param {ProjectionLike} [projection=EPSG:3857]
+ * @return {Extent}
  */
 export function extentFromLonLat (extent, projection = EPSG_3857) {
   return transformExtent(extent, EPSG_4326, projection)
 }
 
 /**
- * @param {ol.Extent} extent
- * @param {ol.ProjectionLike} [projection=EPSG:3857]
- * @return {ol.Extent}
+ * @param {Extent} extent
+ * @param {ProjectionLike} [projection=EPSG:3857]
+ * @return {Extent}
  */
 export function extentToLonLat (extent, projection = EPSG_3857) {
   return transformExtent(extent, projection, EPSG_4326)

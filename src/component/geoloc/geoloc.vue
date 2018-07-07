@@ -8,7 +8,7 @@
 
 <script>
   /** @module geoloc/geoloc */
-  import Geolocation from 'ol/geolocation'
+  import Geolocation from 'ol/Geolocation'
   import { Observable } from 'rxjs'
   import { merge } from 'rxjs/observable'
   import olCmp from '../../mixin/ol-cmp'
@@ -70,7 +70,7 @@
 
   const methods = {
     /**
-     * @return {ol.Geolocation}
+     * @return {Geolocation}
      * @private
      */
     createOlObject () {
@@ -140,7 +140,7 @@
     created () {
       Object.defineProperties(this, {
         /**
-         * @type {ol.Geolocation|undefined}
+         * @type {Geolocation|undefined}
          */
         $geolocation: {
           enumerable: true,
@@ -152,7 +152,7 @@
         },
         /**
          * Reference to `ol.View` instance.
-         * @type {ol.View|undefined}
+         * @type {View|undefined}
          */
         $view: {
           enumerable: true,

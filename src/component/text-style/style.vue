@@ -2,7 +2,7 @@
   /**
    * @module text-style/style
    */
-  import Text from 'ol/style/text'
+  import Text from 'ol/style/Text'
   import style from '../../mixin/style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -45,7 +45,7 @@
 
   const methods = {
     /**
-     * @returns {ol.style.Text}
+     * @returns {Text}
      * @protected
      */
     createStyle () {

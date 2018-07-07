@@ -1,6 +1,6 @@
-import BaseGeoJSON from 'ol/format/geojson'
-import TopoJSON from 'ol/format/topojson'
-import MVT from 'ol/format/mvt'
+import BaseGeoJSON from 'ol/format/GeoJSON'
+import TopoJSON from 'ol/format/TopoJSON'
+import MVT from 'ol/format/MVT'
 import { isEmpty } from '../util/minilo'
 import { EPSG_4326 } from './consts'
 import { createCircularPolygon } from './geom'
@@ -8,16 +8,16 @@ import { transformPoint } from './proj'
 import { isCircle } from './util'
 
 /**
- * @param {olx.format.GeoJSONOptions} [options]
- * @return {ol.format.GeoJSON}
+ * @param {Object} [options]
+ * @return {GeoJSON}
  */
 export function createGeoJsonFmt (options) {
   return new GeoJSON(options)
 }
 
 /**
- * @param {olx.format.TopoJSONOptions} [options]
- * @return {ol.format.TopoJSON}
+ * @param {Object} [options]
+ * @return {TopoJSON}
  */
 export function createTopoJsonFmt (options) {
   return new TopoJSON(options)
@@ -25,7 +25,7 @@ export function createTopoJsonFmt (options) {
 
 /**
  * @param [options]
- * @return {ol.format.MVT}
+ * @return {MVT}
  */
 export function createMvtFmt (options) {
   return new MVT(options)
@@ -48,7 +48,7 @@ class GeoJSON extends BaseGeoJSON {
   }
 
   writeFeatureObject (feature, options) {
-    const object = /** @type {GeoJSONFeature} */ ({
+    const object = /** @type {Object} */ ({
       'type': 'Feature',
     })
     const id = feature.getId()

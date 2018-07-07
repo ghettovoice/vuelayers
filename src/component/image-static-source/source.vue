@@ -1,6 +1,6 @@
 <script>
   /** @module image-static-source/source */
-  import ImageStaticSource from 'ol/source/imagestatic'
+  import ImageStaticSource from 'ol/source/ImageStatic'
   import imageSource from '../../mixin/image-source'
   import withUrl from '../../mixin/with-url'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -11,7 +11,7 @@
   const props = /** @lends module:image-static-source/source# */{
     /**
      * Image extent in the source projection.
-     * @type {ol.Extent|number[]}
+     * @type {number[]}
      */
     extent: {
       type: Array,
@@ -25,7 +25,7 @@
     loadFunc: Function,
     /**
      * Image size in pixels.
-     * @type {ol.Size|number[]}
+     * @type {number[]}
      */
     size: {
       type: Array,
@@ -47,7 +47,7 @@
    */
   const methods = /** @lends module:image-static-source/source# */{
     /**
-     * @return {ol.source.ImageStatic}
+     * @return {ImageStatic}
      * @protected
      */
     createSource () {

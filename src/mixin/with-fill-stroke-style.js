@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 const methods = {
   /**
-   * @param {ol.style.Fill|Vue|undefined} fill
+   * @param {Fill|Vue|undefined} fill
    * @return {void}
    * @protected
    */
@@ -18,7 +18,7 @@ const methods = {
     }
   },
   /**
-   * @param {ol.style.Stroke|Vue|undefined} stroke
+   * @param {Stroke|Vue|undefined} stroke
    * @return {void}
    * @protected
    */
@@ -47,12 +47,12 @@ export default {
   },
   created () {
     /**
-     * @type {ol.style.Fill|undefined}
+     * @type {Fill|undefined}
      * @private
      */
     this._fill = undefined
     /**
-     * @type {ol.style.Stroke|undefined}
+     * @type {Stroke|undefined}
      * @private
      */
     this._stroke = undefined

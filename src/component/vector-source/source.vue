@@ -2,7 +2,7 @@
   /**
    * @module vector-source/source
    */
-  import VectorSource from 'ol/source/vector'
+  import VectorSource from 'ol/source/Vector'
   import vectorSource from '../../mixin/vector-source'
   import { getFeatureId } from '../../ol-ext/feature'
   import { createGeoJsonFmt } from '../../ol-ext/format'
@@ -13,7 +13,7 @@
   const props = {
     /**
      * Array of GeoJSON features with coordinates in the map view projection.
-     * @type {GeoJSONFeature[]} features
+     * @type {Object[]} features
      */
     features: {
       type: Array,
@@ -22,12 +22,12 @@
     /**
      * Source loader factory.
      * Source loader should load features from some remote service, decode them and pas to `features` prop to render.
-     * @type {(function(): ol.FeatureLoader|undefined)} loaderFactory
+     * @type {(function(): FeatureLoader|undefined)} loaderFactory
      */
     loaderFactory: Function,
     /**
      * Source format factory
-     * @type {(function(): ol.format.Feature|undefined)} formatFactory
+     * @type {(function(): Feature|undefined)} formatFactory
      */
     formatFactory: {
       type: Function,
@@ -35,13 +35,13 @@
     },
     /**
      * String or url factory
-     * @type {(string|function(): string|ol.FeatureUrlFunction|undefined)} url
+     * @type {(string|function(): string|FeatureUrlFunction|undefined)} url
      */
     url: [String, Function],
     /**
      * Loading strategy factory.
      * Extent here in map view projection.
-     * @type {(function(): ol.LoadingStrategy|undefined)} strategyFactory
+     * @type {(function(): LoadingStrategy|undefined)} strategyFactory
      */
     strategyFactory: {
       type: Function,
@@ -61,7 +61,7 @@
 
   const methods = {
     /**
-     * @return {ol.source.Vector}
+     * @return {VectorSource}
      * @protected
      */
     createSource () {
@@ -152,14 +152,14 @@
   }
 
   /**
-   * @return {ol.LoadingStrategy}
+   * @return {LoadingStrategy}
    */
   function defaultStrategyFactory () {
     return loadingAll
   }
 
   /**
-   * @return {ol.format.GeoJSON}
+   * @return {GeoJSON}
    */
   function defaultFormatFactory () {
     return createGeoJsonFmt()

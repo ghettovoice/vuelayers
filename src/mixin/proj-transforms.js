@@ -22,7 +22,7 @@ import { coalesce } from '../util/minilo'
 export default {
   computed: {
     /**
-     * @return {ol.ProjectionLike}
+     * @return {ProjectionLike}
      */
     viewProjection () {
       if (this.rev && this.$view) {
@@ -31,7 +31,7 @@ export default {
       return EPSG_3857
     },
     /**
-     * @return {ol.ProjectionLike}
+     * @return {ProjectionLike}
      */
     resolvedDataProjection () {
       return coalesce(

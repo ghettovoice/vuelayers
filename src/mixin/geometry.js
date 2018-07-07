@@ -13,7 +13,7 @@ import useMapCmp from './use-map-cmp'
 const props = {
   /**
    * Coordinates in the map view projection.
-   * @type {number[]|ol.Coordinate}
+   * @type {number[]|Coordinate}
    */
   coordinates: {
     type: Array,
@@ -32,7 +32,7 @@ const computed = {
     throw new Error('Not implemented computed property')
   },
   /**
-   * @type {number[]|ol.Extent|undefined}
+   * @type {number[]|Extent|undefined}
    */
   extent () {
     if (this.extentViewProj && this.resolvedDataProjection) {
@@ -40,7 +40,7 @@ const computed = {
     }
   },
   /**
-   * @type {number[]|ol.Extent|undefined}
+   * @type {number[]|Extent|undefined}
    */
   extentViewProj () {
     if (this.rev && this.$geometry) {
@@ -48,7 +48,7 @@ const computed = {
     }
   },
   /**
-   * @type {number[]|ol.Coordinate|undefined}
+   * @type {number[]|Coordinate|undefined}
    */
   point () {
     if (this.pointViewProj && this.resolvedDataProjection) {
@@ -75,14 +75,14 @@ const computed = {
 
 const methods = {
   /**
-   * @return {ol.geometry.Geometry|Promise<ol.geometry.Geometry>}
+   * @return {Geometry|Promise<Geometry>}
    * @protected
    */
   createOlObject () {
     return this.createGeometry()
   },
   /**
-   * @return {ol.geometry.Geometry|Promise<ol.geometry.Geometry>}
+   * @return {Geometry|Promise<Geometry>}
    * @protected
    * @abstract
    */
@@ -90,14 +90,14 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {ol.Coordinate}
+   * @return {Coordinate}
    */
   getCoordinates () {
     hasGeometry(this)
     return this.toDataProj(this.$geometry.getCoordinates())
   },
   /**
-   * @param {ol.Coordinate} coordinates
+   * @param {Coordinate} coordinates
    */
   setCoordinates (coordinates) {
     hasGeometry(this)
@@ -222,7 +222,7 @@ export default {
   created () {
     Object.defineProperties(this, {
       /**
-       * @type {ol.geom.Geometry|undefined}
+       * @type {Geometry|undefined}
        */
       $geometry: {
         enumerable: true,

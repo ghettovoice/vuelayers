@@ -10,7 +10,7 @@
   /**
    * @module overlay/overlay
    */
-  import Overlay from 'ol/overlay'
+  import Overlay from 'ol/Overlay'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import uuid from 'uuid/v4'
@@ -80,7 +80,7 @@
    */
   const methods = /** @lends module:overlay/overlay# */{
     /**
-     * @return {ol.Overlay}
+     * @return {Overlay}
      * @protected
      */
     createOlObject () {
@@ -165,7 +165,7 @@
     created () {
       Object.defineProperties(this, /** @lends module:overlay/overlay# */{
         /**
-         * @type {ol.Overlay|undefined}
+         * @type {Overlay|undefined}
          */
         $overlay: {
           enumerable: true,

@@ -1,4 +1,4 @@
-import Feature from 'ol/feature'
+import Feature from 'ol/Feature'
 import Vue from 'vue'
 import { initFeature } from '../ol-ext/feature'
 import { instanceOf } from '../util/assert'
@@ -14,14 +14,14 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
+   * @param {Array<(Feature|Vue|Object)>} features
    * @return {void}
    */
   addFeatures (features) {
     features.forEach(::this.addFeature)
   },
   /**
-   * @param {ol.Feature|Vue|GeoJSONFeature} feature
+   * @param {Feature|Vue|Object} feature
    * @return {void}
    */
   addFeature (feature) {
@@ -39,14 +39,14 @@ const methods = {
     }
   },
   /**
-   * @param {Array<(ol.Feature|Vue|GeoJSONFeature)>} features
+   * @param {Array<(Feature|Vue|Object)>} features
    * @return {void}
    */
   removeFeatures (features) {
     features.forEach(::this.removeFeature)
   },
   /**
-   * @param {ol.Feature|Vue|GeoJSONFeature} feature
+   * @param {Feature|Vue|Object} feature
    * @return {void}
    */
   removeFeature (feature) {
@@ -70,13 +70,13 @@ const methods = {
   },
   /**
    * @param {string|number} id
-   * @return {ol.Feature|undefined}
+   * @return {Feature|undefined}
    */
   getFeatureById (id) {
     return this.getFeaturesTarget().findByKey(id)
   },
   /**
-   * @return {ol.Feature[]}
+   * @return {Feature[]}
    */
   getFeatures () {
     return this.getFeaturesTarget().elements
@@ -93,8 +93,8 @@ const methods = {
     }
   },
   /**
-   * @param {ol.Feature} feature
-   * @return {ol.Feature}
+   * @param {Feature} feature
+   * @return {Feature}
    * @protected
    */
   prepareFeature (feature) {

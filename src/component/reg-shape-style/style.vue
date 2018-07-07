@@ -3,7 +3,7 @@
    * @module reg-shape-style/style
    */
   import Vue from 'vue'
-  import RegularShape from 'ol/style/regularshape'
+  import RegularShape from 'ol/style/RegularShape'
   import imageStyle from '../../mixin/image-style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -32,7 +32,7 @@
 
   const methods = {
     /**
-     * @return {ol.style.RegularShape}
+     * @return {RegularShape}
      * @protected
      */
     createStyle () {
@@ -61,7 +61,7 @@
       })
     },
     /**
-     * @param {ol.style.Fill|Vue|undefined} fill
+     * @param {Fill|Vue|undefined} fill
      * @return {void}
      */
     setFill (fill) {
@@ -73,7 +73,7 @@
       }
     },
     /**
-     * @param {ol.style.Stroke|Vue|undefined} stroke
+     * @param {Stroke|Vue|undefined} stroke
      * @return {void}
      */
     setStroke (stroke) {

@@ -14,7 +14,7 @@
 
   const props = {
     /**
-     * @type {function(): ol.StyleFunction}
+     * @type {function(): function(feature: Feature): Style}
      */
     factory: {
       type: Function,
@@ -38,7 +38,7 @@
 
   const methods = {
     /**
-     * @return {ol.StyleFunction}
+     * @return {function(feature: Feature): Style}
      * @protected
      */
     createStyle () {
@@ -87,7 +87,7 @@
     },
     /**
      * Overrides stylesContainer `setStyle` method
-     * @param {Array<{ style: ol.style.Style, condition: (function|boolean|undefined) }>|ol.StyleFunction|Vue|undefined} styles
+     * @param {Array<{ style: Style, condition: (function|boolean|undefined) }>|function(feature: Feature): Style|Vue|undefined} styles
      * @return {void}
      */
     setStyle (styles) {

@@ -1,7 +1,7 @@
-import loadingstrategy from 'ol/loadingstrategy'
+import { all as loadingAll, bbox as loadingBBox, tile as loadingTile } from 'ol/loadingstrategy'
 
-export const {
-  all: loadingAll,
-  bbox: loadingBBox,
-  tile: loadingTile,
-} = loadingstrategy
+export {
+  loadingAll,
+  loadingBBox,
+  loadingTile,
+}

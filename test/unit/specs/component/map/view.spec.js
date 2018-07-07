@@ -1,5 +1,5 @@
 /* global describe, it, expect */
-import olView from 'ol/view'
+import olView from 'ol/View'
 import Vue from 'vue'
 import Map from '@/component/map'
 
