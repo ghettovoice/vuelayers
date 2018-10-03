@@ -1,7 +1,6 @@
 const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
-const NpmInstallPlugin = require('npm-install-webpack-plugin')
 const {VueLoaderPlugin} = require('vue-loader')
 const utils = require('./utils')
 const config = require('./config')

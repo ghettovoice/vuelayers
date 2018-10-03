@@ -9,9 +9,8 @@
    * @module map/view
    */
   import View from 'ol/View'
-  import { Observable } from 'rxjs'
-  import { merge as mergeObs } from 'rxjs/observable'
-  import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operator'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
   import Vue from 'vue'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
@@ -350,12 +349,15 @@
 
     const ft = 0
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
-    const zoom = resolution::mapObs(() => ({
-      prop: 'zoom',
-      value: Math.round(this.$view.getZoom()),
-    }))::distinctUntilKeyChanged('value')
+    const zoom = resolution.pipe(
+      mapObs(() => ({
+        prop: 'zoom',
+        value: Math.round(this.$view.getZoom()),
+      })),
+      distinctUntilKeyChanged('value')
+    )
 
-    const changes = Observable::mergeObs(
+    const changes = mergeObs(
       observableFromOlChangeEvent(this.$view, 'center', true, ft, () => this.pointToDataProj(this.$view.getCenter())),
       observableFromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,

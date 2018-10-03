@@ -10,8 +10,8 @@
    */
   import Feature from 'ol/Feature'
   import { Observable } from 'rxjs'
-  import { merge as mergeObs } from 'rxjs/observable'
-  import { distinctUntilChanged, map as mapObs, mergeAll, throttleTime } from 'rxjs/operator'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { distinctUntilChanged, map as mapObs, mergeAll, throttleTime } from 'rxjs/operators'
   import uuid from 'uuid/v4'
   import geometryContainer from '../../mixin/geometry-container'
   import olCmp from '../../mixin/ol-cmp'
@@ -21,7 +21,7 @@
   import { findPointOnSurface } from '../../ol-ext/geom'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasFeature, hasMap } from '../../util/assert'
-  import { plainProps, isEqual } from '../../util/minilo'
+  import { isEqual, plainProps } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   /**
@@ -123,7 +123,7 @@
         this::stylesContainer.methods.getServices(),
         {
           get feature () { return vm.$feature },
-        }
+        },
       )
     },
     /**
@@ -144,7 +144,7 @@
       return this.$map.forEachFeatureAtPixel(
         pixel,
         f => f === this.$feature,
-        { layerFilter: l => l === this.$layer }
+        { layerFilter: l => l === this.$layer },
       )
     },
     /**
@@ -268,26 +268,28 @@
     const propChanges = observableFromOlEvent(
       this.$feature,
       'propertychange',
-      ({ key }) => ({ prop: key, value: getPropValue(key) })
-    )::throttleTime(ft)
-      ::distinctUntilChanged(isEqual)
+      ({ key }) => ({ prop: key, value: getPropValue(key) }),
+    ).pipe(
+      throttleTime(ft),
+      distinctUntilChanged(isEqual),
+    )
     // id, style and other generic changes
     const changes = observableFromOlEvent(
       this.$feature,
-      'change'
-    )::mapObs(() => Observable.create(obs => {
-      if (this.$feature.getId() !== this.id) {
-        obs.next({ prop: 'id', value: this.$feature.getId() })
-      }
-      // todo style?
-    }))::mergeAll()
-      ::throttleTime(ft)
-      ::distinctUntilChanged(isEqual)
-    // all changes
-    const allChanges = Observable::mergeObs(
-      propChanges,
-      changes
+      'change',
+    ).pipe(
+      mapObs(() => Observable.create(obs => {
+        if (this.$feature.getId() !== this.id) {
+          obs.next({ prop: 'id', value: this.$feature.getId() })
+        }
+        // todo style?
+      })),
+      mergeAll(),
+      throttleTime(ft),
+      distinctUntilChanged(isEqual),
     )
+    // all changes
+    const allChanges = mergeObs(propChanges, changes)
 
     this.subscribeTo(allChanges, ({ prop, value }) => {
       ++this.rev

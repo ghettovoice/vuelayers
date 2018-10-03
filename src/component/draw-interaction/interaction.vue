@@ -1,19 +1,18 @@
 <script>
+  import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   /** @module draw-interaction/interaction */
   import DrawInteraction from 'ol/interaction/Draw'
-  import {noModifierKeys, shiftKeyOnly} from 'ol/events/condition'
-  import { Observable } from 'rxjs'
-  import { merge as mergeObs } from 'rxjs/observable'
-  import { map as mapObs } from 'rxjs/operator'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { map as mapObs } from 'rxjs/operators'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { initFeature } from '../../ol-ext/feature'
+  import { createStyle, defaultEditStyle } from '../../ol-ext/style'
   import { isCollection, isVectorSource } from '../../ol-ext/util'
-  import { defaultEditStyle, createStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
-  import { mapValues, camelCase, isFunction, upperFirst } from '../../util/minilo'
+  import { camelCase, isFunction, mapValues, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -266,12 +265,14 @@
   function subscribeToInteractionChanges () {
     hasInteraction(this)
 
-    const drawEvents = Observable::mergeObs(
+    const drawEvents = mergeObs(
       observableFromOlEvent(this.$interaction, 'drawstart')
-        ::mapObs(evt => {
-          initFeature(evt.feature)
-          return evt
-        }),
+        .pipe(
+          mapObs(evt => {
+            initFeature(evt.feature)
+            return evt
+          })
+        ),
       observableFromOlEvent(this.$interaction, 'drawend'),
     )
     this.subscribeTo(drawEvents, evt => {

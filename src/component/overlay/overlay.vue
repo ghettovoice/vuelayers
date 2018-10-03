@@ -11,8 +11,7 @@
    * @module overlay/overlay
    */
   import Overlay from 'ol/Overlay'
-  import { Observable } from 'rxjs'
-  import { merge as mergeObs } from 'rxjs/observable'
+  import { merge as mergeObs } from 'rxjs/observable/merge'
   import uuid from 'uuid/v4'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
@@ -195,9 +194,8 @@
     hasOverlay(this)
 
     const ft = 100
-    const changes = Observable::mergeObs(
-      observableFromOlChangeEvent(this.$overlay, 'position', true, ft,
-        () => this.pointToDataProj(this.$overlay.getPosition())),
+    const changes = mergeObs(
+      observableFromOlChangeEvent(this.$overlay, 'position', true, ft, () => this.pointToDataProj(this.$overlay.getPosition())),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',

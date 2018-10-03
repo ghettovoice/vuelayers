@@ -1,9 +1,8 @@
 /**
  * @module mixin/ol-cmp
  */
-import { Observable } from 'rxjs'
-import { interval as intervalObs } from 'rxjs/observable'
-import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
+import { interval as intervalObs } from 'rxjs/observable/interval'
+import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
 import { isFunction } from '../util/minilo'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
@@ -183,11 +182,11 @@ export default {
      * @type {Promise<Vue<T>>}
      * @private
      */
-    this._mountPromise = Observable::intervalObs(100)
-      ::skipWhile(() => !this._mounted)
-      ::firstObs()
-      ::mapObs(() => this)
-      ::toPromise(Promise)
+    this._mountPromise = intervalObs(100).pipe(
+      skipWhile(() => !this._mounted),
+      firstObs(),
+      mapObs(() => this)
+    ).toPromise(Promise)
 
     Object.defineProperties(this, {
       $olObject: {

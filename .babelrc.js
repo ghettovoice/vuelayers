@@ -25,26 +25,6 @@ module.exports = function () {
     '@babel/plugin-proposal-json-strings',
     // Other
     '@babel/plugin-transform-runtime',
-    [
-      'transform-imports',
-      {
-        'rxjs/operator': {
-          transform: 'rxjs/_esm2015/operator/${member}',
-          preventFullImport: true,
-          skipDefaultConversion: true,
-        },
-        'rxjs/observable': {
-          transform: 'rxjs/_esm2015/observable/${member}',
-          preventFullImport: true,
-          skipDefaultConversion: true,
-        },
-        rxjs: {
-          transform: 'rxjs/_esm2015/${member}',
-          preventFullImport: true,
-          skipDefaultConversion: true,
-        },
-      },
-    ],
   ]
   const env = {
     test: {
