@@ -38,7 +38,9 @@ const methods = {
     if (source !== this._source) {
       this._source = source
     }
-
+    /**
+     * @type {Layer|Builder}
+     */
     const sourceTarget = this.getSourceTarget()
     if (sourceTarget && source !== sourceTarget.getSource()) {
       sourceTarget.setSource(source)

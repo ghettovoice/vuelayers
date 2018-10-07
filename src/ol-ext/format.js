@@ -1,6 +1,6 @@
 import BaseGeoJSON from 'ol/format/GeoJSON'
-import TopoJSON from 'ol/format/TopoJSON'
 import MVT from 'ol/format/MVT'
+import TopoJSON from 'ol/format/TopoJSON'
 import { isEmpty } from '../util/minilo'
 import { EPSG_4326 } from './consts'
 import { createCircularPolygon } from './geom'

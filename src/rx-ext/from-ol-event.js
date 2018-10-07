@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs'
 import { fromEventPattern, merge as mergeObs } from 'rxjs/observable'
 
 /**
@@ -20,7 +19,7 @@ import { fromEventPattern, merge as mergeObs } from 'rxjs/observable'
  */
 export default function fromOlEvent (target, eventName, selector) {
   if (Array.isArray(eventName)) {
-    return Observable::mergeObs(
+    return mergeObs(
       ...eventName.map(
         elem => {
           let eventName, selector
@@ -38,7 +37,7 @@ export default function fromOlEvent (target, eventName, selector) {
     )
   }
 
-  return Observable::fromEventPattern(
+  return fromEventPattern(
     handler => target.on(eventName, handler),
     handler => target.un(eventName, handler),
     selector,

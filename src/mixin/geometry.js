@@ -1,4 +1,4 @@
-import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
+import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
 import { boundingExtent } from '../ol-ext/extent'
 import { findPointOnSurface } from '../ol-ext/geom'
 import { transforms } from '../ol-ext/proj'
@@ -118,7 +118,7 @@ const methods = {
    */
   setupTransformFunctions () {
     // define helper methods based on geometry type
-    const {transform} = transforms[this.type]
+    const { transform } = transforms[this.type]
     /**
      * @method
      * @param {Array} coordinates
@@ -258,13 +258,15 @@ function subscribeToGeomChanges () {
     () => ({
       coordinates: this.getCoordinates(),
       extent: this.extent,
-    })
-  )::throttleTime(ft)
-    ::distinctUntilChanged(isEqualGeom)
-    ::mapObs(({ coordinates }) => ({
+    }),
+  ).pipe(
+    throttleTime(ft),
+    distinctUntilChanged(isEqualGeom),
+    mapObs(({ coordinates }) => ({
       prop: 'coordinates',
       value: coordinates,
-    }))
+    })),
+  )
 
   this.subscribeTo(changes, ({ prop, value }) => {
     ++this.rev

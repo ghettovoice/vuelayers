@@ -42,17 +42,13 @@ import VectorTileSource from './component/vector-tile-source'
 import WmsSource from './component/wms-source'
 import WmtsSource from './component/wmts-source'
 import XyzSource from './component/xyz-source'
-// #if IS_STANDALONE
-import * as mixin from './mixin'
-import * as olExt from './ol-ext'
-import * as rxExt from './rx-ext'
-// #endif
 import './sass/main.sass'
 
 /**
  * @const {string} VueLayers version.
  */
 const VERSION = 'C_PKG_VERSION'
+
 /**
  * Registers all VueLayers components.
  * @param {Vue|VueConstructor} Vue
@@ -144,11 +140,6 @@ export {
   WmsSource,
   WmtsSource,
   XyzSource,
-// #if IS_STANDALONE
-  mixin,
-  olExt,
-  rxExt,
-// #endif
 }
 
 /**

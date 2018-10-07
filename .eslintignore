@@ -1,4 +1,3 @@
-modules/*
 lib/*
 test/e2e/reports/*
 test/unit/coverage/*

@@ -1,5 +1,4 @@
 import { pick } from '../../util/minilo'
-
 /** @module vector-layer */
 import Layer from './layer.vue'
 

@@ -1,4 +1,4 @@
-import { replaceTokens, pick } from '../util/minilo'
+import { pick, replaceTokens } from '../util/minilo'
 
 export default {
   props: {

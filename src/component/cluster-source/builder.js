@@ -1,13 +1,9 @@
 import Cluster from 'ol/source/Cluster'
-import { Observable } from 'rxjs'
 import { interval } from 'rxjs/observable'
-import { first, map, skipWhile, toPromise } from 'rxjs/operator'
+import { first, map, skipWhile } from 'rxjs/operators'
 import { ok } from '../../util/assert'
 
 export default class Builder {
-  /**
-   * @return {Vector|undefined}
-   */
   getSource () {
     return this.source
   }
@@ -108,10 +104,10 @@ export default class Builder {
    * @return {Promise<Cluster>}
    */
   promise () {
-    return Observable::interval(100)
-      ::skipWhile(() => !this.source)
-      ::first()
-      ::map(::this.build)
-      ::toPromise(Promise)
+    return interval(100).pipe(
+      skipWhile(() => !this.source),
+      first(),
+      map(::this.build),
+    ).toPromise(Promise)
   }
 }

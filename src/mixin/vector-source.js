@@ -1,7 +1,5 @@
-import { Observable } from 'rxjs'
 import { merge as mergeObs } from 'rxjs/observable'
-import { debounceTime } from 'rxjs/operator'
-import { _do as doObs } from 'rxjs/operator/do'
+import { debounceTime, tap } from 'rxjs/operators'
 import { SourceCollectionAdapter } from '../ol-ext/collection'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../util/assert'
@@ -51,7 +49,7 @@ const methods = {
   getServices () {
     return mergeDescriptors(
       this::source.methods.getServices(),
-      this::featuresContainer.methods.getServices()
+      this::featuresContainer.methods.getServices(),
     )
   },
   /**
@@ -125,23 +123,25 @@ export default {
 function subscribeToSourceChanges () {
   assert.hasSource(this)
 
-  const add = observableFromOlEvent(this.$source, 'addfeature')
-    ::doObs(({ feature }) => {
+  const add = observableFromOlEvent(this.$source, 'addfeature').pipe(
+    tap(({ feature }) => {
       this.addFeature(feature)
-    })
-  const remove = observableFromOlEvent(this.$source, 'removefeature')
-    ::doObs(({ feature }) => {
+    }),
+  )
+  const remove = observableFromOlEvent(this.$source, 'removefeature').pipe(
+    tap(({ feature }) => {
       this.removeFeature(feature)
-    })
+    }),
+  )
 
-  const events = Observable::mergeObs(add, remove)
+  const events = mergeObs(add, remove)
 
   this.subscribeTo(events, evt => {
     ++this.rev
     this.$emit(evt.type, evt)
   })
   // emit event to allow `sync` modifier
-  this.subscribeTo(events::debounceTime(100), () => {
+  this.subscribeTo(events.pipe(debounceTime(100)), () => {
     this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInDataProj))
   })
 }

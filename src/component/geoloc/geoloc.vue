@@ -9,7 +9,6 @@
 <script>
   /** @module geoloc/geoloc */
   import Geolocation from 'ol/Geolocation'
-  import { Observable } from 'rxjs'
   import { merge } from 'rxjs/observable'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
@@ -170,7 +169,7 @@
     hasGeolocation(this)
 
     const ft = 100
-    const changes = Observable::merge(
+    const changes = merge(
       observableFromOlChangeEvent(
         this.$geolocation,
         [
@@ -189,7 +188,7 @@
         true,
         ft,
         () => this.position,
-      )
+      ),
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {

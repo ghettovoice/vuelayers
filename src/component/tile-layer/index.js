@@ -1,5 +1,4 @@
 import { pick } from '../../util/minilo'
-
 /**
  * @module tile-layer
  */

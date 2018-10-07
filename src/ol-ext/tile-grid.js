@@ -1,5 +1,5 @@
-import {toSize} from 'ol/size'
-import {createXYZ as createXyzGrid} from 'ol/tilegrid'
+import { toSize } from 'ol/size'
+import { createXYZ as createXyzGrid } from 'ol/tilegrid'
 import TileGrid from 'ol/tilegrid/TileGrid'
 import { EXTENT_CORNER, MAX_ZOOM, TILE_SIZE } from './consts'
 import { createExtentFromProjection, getExtentCorner, getExtentHeight, getExtentWidth } from './extent'
@@ -45,7 +45,12 @@ export function resolutionsFromExtent (extent, maxZoom = MAX_ZOOM, tileSize = TI
  * @return {TileGrid} TileGrid instance.
  * @see https://github.com/openlayers/openlayers/blob/master/src/ol/tilegrid.js#L58
  */
-export function createGridForExtent (extent, maxZoom = MAX_ZOOM, tileSize = TILE_SIZE, corner = EXTENT_CORNER.TOP_LEFT) {
+export function createGridForExtent (
+  extent,
+  maxZoom = MAX_ZOOM,
+  tileSize = TILE_SIZE,
+  corner = EXTENT_CORNER.TOP_LEFT,
+) {
   const resolutions = resolutionsFromExtent(extent, maxZoom, tileSize)
 
   return new TileGrid({
@@ -70,7 +75,7 @@ export function createGridForProjection (
   projection,
   maxZoom = MAX_ZOOM,
   tileSize = TILE_SIZE,
-  corner = EXTENT_CORNER.BOTTOM_LEFT
+  corner = EXTENT_CORNER.BOTTOM_LEFT,
 ) {
   return createGridForExtent(createExtentFromProjection(projection), maxZoom, tileSize, corner)
 }

@@ -8,14 +8,13 @@
   /**
    * @module map/map
    */
-  import {defaults as defaultsControl} from 'ol/control'
+  import { defaults as defaultsControl } from 'ol/control'
   import VectorLayer from 'ol/layer/Vector'
   import Map from 'ol/Map'
-  import View from 'ol/View'
   import VectorSource from 'ol/source/Vector'
-  import { Observable } from 'rxjs'
+  import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
+  import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
   import featuresContainer from '../../mixin/features-container'
   import interactionsContainer from '../../mixin/interactions-container'
@@ -118,8 +117,7 @@
   /**
    * @vueComputed
    */
-  const computed = {
-  }
+  const computed = {}
 
   /**
    * @vueMethods
@@ -180,7 +178,7 @@
       if (this._interactionsTarget == null) {
         this._interactionsTarget = new IndexedCollectionAdapter(
           this.$map.getInteractions(),
-          interaction => interaction.get('id')
+          interaction => interaction.get('id'),
         )
       }
 
@@ -205,7 +203,8 @@
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */this._defaultLayer.getSource())
+        this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */
+          this._defaultLayer.getSource())
       }
 
       return this._featuresTarget
@@ -253,7 +252,7 @@
           get map () { return vm.$map },
           get view () { return vm.$view },
           get viewContainer () { return vm },
-        }
+        },
       )
     },
     /**
@@ -439,7 +438,7 @@
 
     const ft = 100
     // pointer
-    const pointerEvents = Observable::mergeObs(
+    const pointerEvents = mergeObs(
       observableFromOlEvent(this.$map, [
         'click',
         'dblclick',
@@ -448,12 +447,16 @@
       observableFromOlEvent(this.$map, [
         'pointerdrag',
         'pointermove',
-      ])::throttleTime(ft)
-        ::distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
-    )::mapObs(evt => ({
-      ...evt,
-      coordinate: this.pointToDataProj(evt.coordinate),
-    }))
+      ]).pipe(
+        throttleTime(ft),
+        distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
+      ),
+    ).pipe(
+      mapObs(evt => ({
+        ...evt,
+        coordinate: this.pointToDataProj(evt.coordinate),
+      })),
+    )
     // other
     const otherEvents = observableFromOlEvent(this.$map, [
       'movestart',
@@ -463,10 +466,7 @@
       'postcompose',
     ])
 
-    const events = Observable::mergeObs(
-      pointerEvents,
-      otherEvents
-    )
+    const events = mergeObs(pointerEvents, otherEvents)
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }

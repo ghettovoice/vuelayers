@@ -26,8 +26,7 @@ const methods = {
   },
 }
 
-const watch = {
-}
+const watch = {}
 
 export default {
   mixins: [tileSource],

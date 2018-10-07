@@ -85,7 +85,7 @@
       coordinate,
       resolution,
       projection,
-      params = {}
+      params = {},
     ) {
       hasView(this)
       hasSource(this)
@@ -97,7 +97,7 @@
         coordinate,
         resolution,
         projection,
-        this.preparedExtParams
+        this.preparedExtParams,
       )
     },
   }

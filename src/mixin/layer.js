@@ -4,11 +4,11 @@
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 import { hasLayer, hasMap } from '../util/assert'
+import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import sourceContainer from './source-container'
 import useMapCmp from './use-map-cmp'
-import { isEqual } from '../util/minilo'
 
 /**
  * @vueProps
@@ -99,7 +99,7 @@ const methods = {
       this::sourceContainer.methods.getServices(),
       {
         get layer () { return vm.$layer },
-      }
+      },
     )
   },
   /**

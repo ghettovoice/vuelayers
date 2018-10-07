@@ -12,6 +12,6 @@ export default function multiMergeDescriptors (...args) {
 
   return args.slice(1).reduce(
     (dest, src, i) => mergeDescriptors(dest, src, redefine),
-    args[0]
+    args[0],
   )
 }
