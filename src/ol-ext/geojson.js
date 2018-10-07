@@ -1,5 +1,5 @@
 import Feature from 'ol/Feature'
-import { isPlainObject, get } from '../util/minilo'
+import { get, isPlainObject } from '../util/minilo'
 import { createGeoJsonFmt } from './format'
 
 const geoJsonFmt = createGeoJsonFmt()

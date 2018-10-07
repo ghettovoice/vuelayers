@@ -1,6 +1,6 @@
-import Vue from 'vue'
 import Interaction from 'ol/interaction/Interaction'
-import {instanceOf} from '../util/assert'
+import Vue from 'vue'
+import { instanceOf } from '../util/assert'
 
 const methods = {
   /**

@@ -1,9 +1,9 @@
 <script>
+  import RegularShape from 'ol/style/RegularShape'
   /**
    * @module reg-shape-style/style
    */
   import Vue from 'vue'
-  import RegularShape from 'ol/style/RegularShape'
   import imageStyle from '../../mixin/image-style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -44,7 +44,6 @@
         angle: this.angle,
         rotation: this.rotation,
         rotateWithView: this.rotateWithView,
-        snapToPixel: this.snapToPixel,
         fill: this._fill,
         stroke: this._stroke,
       })

@@ -1,7 +1,7 @@
 <script>
   import VectorTileSource from 'ol/source/VectorTile'
-  import { createMvtFmt } from '../../ol-ext/format'
   import tileSource from '../../mixin/tile-source'
+  import { createMvtFmt } from '../../ol-ext/format'
 
   const props = {
     cacheSize: {

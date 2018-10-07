@@ -2,7 +2,7 @@
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   /** @module draw-interaction/interaction */
   import DrawInteraction from 'ol/interaction/Draw'
-  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operators'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
@@ -271,7 +271,7 @@
           mapObs(evt => {
             initFeature(evt.feature)
             return evt
-          })
+          }),
         ),
       observableFromOlEvent(this.$interaction, 'drawend'),
     )

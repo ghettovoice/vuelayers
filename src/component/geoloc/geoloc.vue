@@ -9,7 +9,7 @@
 <script>
   /** @module geoloc/geoloc */
   import Geolocation from 'ol/Geolocation'
-  import { merge } from 'rxjs/observable/merge'
+  import { merge } from 'rxjs/observable'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
   import useMapCmp from '../../mixin/use-map-cmp'
@@ -188,7 +188,7 @@
         true,
         ft,
         () => this.position,
-      )
+      ),
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {

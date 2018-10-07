@@ -1,6 +1,26 @@
-module.exports = function () {
+const importTransforms = {
+  'rxjs/operators': {
+    transform: 'rxjs/_esm5/internal/operators/${member}',
+    preventFullImport: true,
+    skipDefaultConversion: true,
+  },
+  'rxjs/observable': {
+    transform: 'rxjs/_esm5/internal/observable/${member}',
+    preventFullImport: true,
+    skipDefaultConversion: true,
+  },
+  'rxjs': {
+    transform: 'rxjs/_esm5/internal/${member}',
+    preventFullImport: true,
+    skipDefaultConversion: true,
+  },
+}
+
+module.exports = function (api) {
+  api.cache.using(() => process.env.NODE_ENV)
+
   const presets = [
-    ['@babel/preset-env', { modules: false, useBuiltIns: true }],
+    ['@babel/preset-env', { modules: false }],
   ]
   const plugins = [
     // Stage 0
@@ -25,6 +45,7 @@ module.exports = function () {
     '@babel/plugin-proposal-json-strings',
     // Other
     '@babel/plugin-transform-runtime',
+    ['transform-imports', importTransforms],
   ]
   const env = {
     test: {

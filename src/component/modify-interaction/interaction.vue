@@ -1,15 +1,15 @@
 <script>
+  import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
   /** @module modify-interaction/interaction */
   import ModifyInteraction from 'ol/interaction/Modify'
-  import {primaryAction, altKeyOnly, always} from 'ol/events/condition'
-  import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
-  import { defaultEditStyle, createStyle } from '../../ol-ext/style'
+  import { createStyle, defaultEditStyle } from '../../ol-ext/style'
   import { isCollection, isVectorSource } from '../../ol-ext/util'
-  import { mapValues, isFunction } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
+  import { isFunction, mapValues } from '../../util/minilo'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**

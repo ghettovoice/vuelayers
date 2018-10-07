@@ -5,20 +5,20 @@
 </template>
 
 <script>
+  import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   /** @module select-interaction/interaction */
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
-  import {never, singleClick, shiftKeyOnly} from 'ol/events/condition'
   import Vue from 'vue'
   import interaction from '../../mixin/interaction'
+  import projTransforms from '../../mixin/proj-transforms'
   import stylesContainer from '../../mixin/styles-container'
   import { getFeatureId } from '../../ol-ext/feature'
-  import { defaultEditStyle, createStyle } from '../../ol-ext/style'
+  import { createStyle, defaultEditStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
-  import { constant, stubArray, isFunction, forEach, mapValues, difference } from '../../util/minilo'
+  import { constant, difference, forEach, isFunction, mapValues, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import projTransforms from '../../mixin/proj-transforms'
 
   /**
    * @vueProps
@@ -113,8 +113,7 @@
   /**
    * @vueComputed
    */
-  const computed = {
-  }
+  const computed = {}
 
   /**
    * @vueMethods
@@ -162,7 +161,7 @@
     getServices () {
       return mergeDescriptors(
         this::interaction.methods.getServices(),
-        this::stylesContainer.methods.getServices()
+        this::stylesContainer.methods.getServices(),
       )
     },
     /**
@@ -350,7 +349,7 @@
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
         this.$emit('update:features', this.$features.map(::this.writeFeatureInDataProj))
-      }
+      },
     )
   }
 </script>

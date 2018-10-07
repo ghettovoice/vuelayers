@@ -2,17 +2,17 @@
  * Extent extensions
  */
 import {
+  boundingExtent,
   getBottomLeft,
   getBottomRight,
+  getCenter as getExtentCenter,
+  getHeight as getExtentHeight,
   getTopLeft,
   getTopRight,
-  getCenter as getExtentCenter,
   getWidth as getExtentWidth,
-  getHeight as getExtentHeight,
-  boundingExtent,
 } from 'ol/extent'
-import {get as getProj} from 'ol/proj'
-import {METERS_PER_UNIT} from 'ol/proj/Units'
+import { get as getProj } from 'ol/proj'
+import { METERS_PER_UNIT } from 'ol/proj/Units'
 import { EXTENT_CORNER, PROJ_UNIT } from './consts'
 
 export {

@@ -258,14 +258,14 @@ function subscribeToGeomChanges () {
     () => ({
       coordinates: this.getCoordinates(),
       extent: this.extent,
-    })
+    }),
   ).pipe(
     throttleTime(ft),
     distinctUntilChanged(isEqualGeom),
     mapObs(({ coordinates }) => ({
       prop: 'coordinates',
       value: coordinates,
-    }))
+    })),
   )
 
   this.subscribeTo(changes, ({ prop, value }) => {

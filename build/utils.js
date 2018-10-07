@@ -1,7 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const concat = require('source-map-concat')
 const postcss = require('postcss')
 const postcssrc = require('postcss-load-config')
@@ -48,14 +48,10 @@ function cssLoaders (options) {
 
     // Extract CSS when that option is specified
     // (which is the case during production build)
-    if (options.extract) {
-      return ExtractTextPlugin.extract({
-        use: loaders,
-        fallback: 'vue-style-loader',
-      })
-    } else {
-      return ['vue-style-loader'].concat(loaders)
-    }
+    return [
+      options.extract ? MiniCssExtractPlugin.loader : 'vue-style-loader',
+      ...loaders,
+    ]
   }
 
   // http://vuejs.github.io/vue-loader/en/configurations/extract-css.html
@@ -99,7 +95,7 @@ function styleLoaders (options) {
 
 function postcssProcess (css, min) {
   return postcssrc()
-    .then(({plugins, postcssOptions}) => {
+    .then(({ plugins, postcssOptions }) => {
       if (min) {
         plugins.push(cssnano())
       }
@@ -114,7 +110,7 @@ function postcssProcess (css, min) {
             annotation: true,
           },
         }))
-        .then(({css, map}) => ({
+        .then(({ css, map }) => ({
           id,
           code: css,
           map: map.toJSON(),

@@ -60,7 +60,7 @@ export function defaultEditStyle () {
 
   styles[GEOMETRY_TYPE.CIRCLE] =
     styles[GEOMETRY_TYPE.POLYGON].concat(
-      styles[GEOMETRY_TYPE.LINE_STRING]
+      styles[GEOMETRY_TYPE.LINE_STRING],
     )
 
   styles[GEOMETRY_TYPE.POINT] = [
@@ -78,7 +78,7 @@ export function defaultEditStyle () {
   styles[GEOMETRY_TYPE.GEOMETRY_COLLECTION] =
     styles[GEOMETRY_TYPE.POLYGON].concat(
       styles[GEOMETRY_TYPE.LINE_STRING],
-      styles[GEOMETRY_TYPE.POINT]
+      styles[GEOMETRY_TYPE.POINT],
     )
 
   return styles
@@ -306,7 +306,7 @@ export function createTextStyle (vlStyle) {
       placement: vlStyle.textPlacement,
       backgroundFill: createFillStyle(vlStyle, 'textBackground'),
       backgroundStroke: createStrokeStyle(vlStyle, 'textBackground'),
-    }
+    },
   )
 
   if (!isEmpty(textStyle)) {

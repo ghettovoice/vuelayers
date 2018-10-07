@@ -1,4 +1,4 @@
-import { merge as mergeObs } from 'rxjs/observable/merge'
+import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime, tap } from 'rxjs/operators'
 import { SourceCollectionAdapter } from '../ol-ext/collection'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
@@ -49,7 +49,7 @@ const methods = {
   getServices () {
     return mergeDescriptors(
       this::source.methods.getServices(),
-      this::featuresContainer.methods.getServices()
+      this::featuresContainer.methods.getServices(),
     )
   },
   /**
@@ -126,12 +126,12 @@ function subscribeToSourceChanges () {
   const add = observableFromOlEvent(this.$source, 'addfeature').pipe(
     tap(({ feature }) => {
       this.addFeature(feature)
-    })
+    }),
   )
   const remove = observableFromOlEvent(this.$source, 'removefeature').pipe(
     tap(({ feature }) => {
       this.removeFeature(feature)
-    })
+    }),
   )
 
   const events = mergeObs(add, remove)

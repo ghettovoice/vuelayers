@@ -1,10 +1,6 @@
 import style from './style'
 
 const props = {
-  snapToPixel: {
-    type: Boolean,
-    default: true,
-  },
 }
 
 const methods = {

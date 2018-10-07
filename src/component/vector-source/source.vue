@@ -8,7 +8,7 @@
   import { createGeoJsonFmt } from '../../ol-ext/format'
   import { loadingAll } from '../../ol-ext/load-strategy'
   import { transform } from '../../ol-ext/proj'
-  import { constant, stubArray, isFinite, isFunction, difference } from '../../util/minilo'
+  import { constant, difference, isFinite, isFunction, stubArray } from '../../util/minilo'
 
   const props = {
     /**

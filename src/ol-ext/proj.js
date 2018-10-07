@@ -1,7 +1,7 @@
 /**
  * Projection transform helpers
  */
-import {transform, transformExtent, get as getProj, addProjection as addProj, toLonLat, fromLonLat} from 'ol/proj'
+import { addProjection as addProj, fromLonLat, get as getProj, toLonLat, transform, transformExtent } from 'ol/proj'
 import Projection from 'ol/proj/Projection'
 import { EPSG_3857, EPSG_4326, GEOMETRY_TYPE } from './consts'
 
@@ -28,6 +28,7 @@ export function createProj (options) {
 export function pointToLonLat (coordinate, projection = EPSG_3857) {
   return toLonLat(coordinate, projection)
 }
+
 /**
  * @param {number[]} coordinate
  * @param {ProjectionLike} [projection]
@@ -49,6 +50,7 @@ export function transformPoint (coordinate, sourceProjection, destProjection) {
 export function lineToLonLat (coordinates, projection = EPSG_3857) {
   return coordinates.map(point => pointToLonLat(point, projection))
 }
+
 /**
  * @param {Array<number[]>} coordinates
  * @param {ProjectionLike} [projection]
@@ -70,6 +72,7 @@ export function transformLine (coordinates, sourceProjection, destProjection) {
 export function polygonToLonLat (coordinates, projection = EPSG_3857) {
   return coordinates.map(line => lineToLonLat(line, projection))
 }
+
 /**
  * @param {Array<Array<number[]>>} coordinates
  * @param {ProjectionLike} [projection]
@@ -91,6 +94,7 @@ export function transformPolygon (coordinates, sourceProjection, destProjection)
 export function multiPointToLonLat (coordinates, projection = EPSG_3857) {
   return coordinates.map(point => pointToLonLat(point, projection))
 }
+
 /**
  * @param {Array<number[]>} coordinates
  * @param {ProjectionLike} [projection]
@@ -112,6 +116,7 @@ export function transformMultiPoint (coordinates, sourceProjection, destProjecti
 export function multiLineToLonLat (coordinates, projection = EPSG_3857) {
   return coordinates.map(line => lineToLonLat(line, projection))
 }
+
 /**
  * @param {Array<Array<number[]>>} coordinates
  * @param {ProjectionLike} [projection]
@@ -133,6 +138,7 @@ export function transformMultiLine (coordinates, sourceProjection, destProjectio
 export function multiPolygonToLonLat (coordinates, projection = EPSG_3857) {
   return coordinates.map(polygon => polygonToLonLat(polygon, projection))
 }
+
 /**
  * @param {Array<Array<Array<number[]>>>} coordinates
  * @param {ProjectionLike} projection
@@ -151,32 +157,32 @@ export function transformMultiPolygon (coordinates, sourceProjection, destProjec
  * @type {Object<string, function>}
  */
 export const transforms = {
-  [ GEOMETRY_TYPE.POINT ]: {
+  [GEOMETRY_TYPE.POINT]: {
     toLonLat: pointToLonLat,
     fromLonLat: pointFromLonLat,
     transform: transformPoint,
   },
-  [ GEOMETRY_TYPE.LINE_STRING ]: {
+  [GEOMETRY_TYPE.LINE_STRING]: {
     toLonLat: lineToLonLat,
     fromLonLat: lineFromLonLat,
     transform: transformLine,
   },
-  [ GEOMETRY_TYPE.POLYGON ]: {
+  [GEOMETRY_TYPE.POLYGON]: {
     toLonLat: polygonToLonLat,
     fromLonLat: polygonFromLonLat,
     transform: transformPolygon,
   },
-  [ GEOMETRY_TYPE.MULTI_POINT ]: {
+  [GEOMETRY_TYPE.MULTI_POINT]: {
     toLonLat: multiPointToLonLat,
     fromLonLat: multiPointFromLonLat,
     transform: transformMultiPoint,
   },
-  [ GEOMETRY_TYPE.MULTI_LINE_STRING ]: {
+  [GEOMETRY_TYPE.MULTI_LINE_STRING]: {
     toLonLat: multiLineToLonLat,
     fromLonLat: multiLineFromLonLat,
     transform: transformMultiLine,
   },
-  [ GEOMETRY_TYPE.MULTI_POLYGON ]: {
+  [GEOMETRY_TYPE.MULTI_POLYGON]: {
     toLonLat: multiPolygonToLonLat,
     fromLonLat: multiPolygonFromLonLat,
     transform: transformMultiPolygon,

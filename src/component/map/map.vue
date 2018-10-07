@@ -13,7 +13,7 @@
   import Map from 'ol/Map'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
-  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
   import featuresContainer from '../../mixin/features-container'
@@ -449,13 +449,13 @@
         'pointermove',
       ]).pipe(
         throttleTime(ft),
-        distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
+        distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
       ),
     ).pipe(
       mapObs(evt => ({
         ...evt,
         coordinate: this.pointToDataProj(evt.coordinate),
-      }))
+      })),
     )
     // other
     const otherEvents = observableFromOlEvent(this.$map, [

@@ -1,9 +1,12 @@
 import Cluster from 'ol/source/Cluster'
-import { interval } from 'rxjs/observable/interval'
+import { interval } from 'rxjs/observable'
 import { first, map, skipWhile } from 'rxjs/operators'
 import { ok } from '../../util/assert'
 
 export default class Builder {
+  getSource () {
+    return this.source
+  }
   /**
    * @param {Vector|undefined} value
    * @returns {Builder}

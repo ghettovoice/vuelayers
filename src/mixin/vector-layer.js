@@ -1,6 +1,6 @@
+import mergeDescriptors from '../util/multi-merge-descriptors'
 import layer from './layer'
 import stylesContainer from './styles-container'
-import mergeDescriptors from '../util/multi-merge-descriptors'
 
 const props = {
   /**
@@ -54,7 +54,7 @@ const methods = {
   getServices () {
     return mergeDescriptors(
       this::layer.methods.getServices(),
-      this::stylesContainer.methods.getServices()
+      this::stylesContainer.methods.getServices(),
     )
   },
   /**

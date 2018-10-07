@@ -1,4 +1,4 @@
-import { interval as intervalObs } from 'rxjs/observable/interval'
+import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
 
 /**

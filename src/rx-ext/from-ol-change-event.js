@@ -1,4 +1,4 @@
-import { merge as mergeObs } from 'rxjs/observable/merge'
+import { merge as mergeObs } from 'rxjs/observable'
 import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
 import { isEqual, isFunction } from '../util/minilo'
 import fromOlEvent from './from-ol-event'

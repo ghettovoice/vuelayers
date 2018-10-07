@@ -10,7 +10,7 @@
    */
   import Feature from 'ol/Feature'
   import { Observable } from 'rxjs'
-  import { merge as mergeObs } from 'rxjs/observable/merge'
+  import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, mergeAll, throttleTime } from 'rxjs/operators'
   import uuid from 'uuid/v4'
   import geometryContainer from '../../mixin/geometry-container'

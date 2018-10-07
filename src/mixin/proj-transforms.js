@@ -39,7 +39,7 @@ export default {
         this.projection, // may or may not be present
         this.$map && this.$map.get('dataProjection'),
         this.$options.dataProjection,
-        this.viewProjection
+        this.viewProjection,
       )
     },
   },

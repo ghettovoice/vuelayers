@@ -9,7 +9,7 @@
   import stylesContainer from '../../mixin/styles-container'
   import { hasMap } from '../../util/assert'
   import { warn } from '../../util/log'
-  import { noop, isFunction } from '../../util/minilo'
+  import { isFunction, noop } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {

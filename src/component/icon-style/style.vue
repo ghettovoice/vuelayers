@@ -78,7 +78,6 @@
         offsetOrigin: this.offsetOrigin,
         opacity: this.opacity,
         scale: this.scale,
-        snapToPixel: this.snapToPixel,
         rotateWithView: this.rotateWithView,
         rotation: this.rotation,
         size: this.size,

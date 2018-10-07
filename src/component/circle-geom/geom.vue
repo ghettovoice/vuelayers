@@ -3,8 +3,8 @@
   import Circle from 'ol/geom/Circle'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
-  import { constant } from '../../util/minilo'
   import { hasGeometry } from '../../util/assert'
+  import { constant } from '../../util/minilo'
 
   /**
    * @vueProps

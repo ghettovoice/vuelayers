@@ -1,7 +1,7 @@
 /**
  * @module mixin/ol-cmp
  */
-import { interval as intervalObs } from 'rxjs/observable/interval'
+import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
 import { isFunction } from '../util/minilo'
 import identMap from './ident-map'
@@ -185,7 +185,7 @@ export default {
     this._mountPromise = intervalObs(100).pipe(
       skipWhile(() => !this._mounted),
       firstObs(),
-      mapObs(() => this)
+      mapObs(() => this),
     ).toPromise(Promise)
 
     Object.defineProperties(this, {
