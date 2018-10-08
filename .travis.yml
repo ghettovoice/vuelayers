@@ -16,9 +16,7 @@ cache:
 install:
   - nvm install --lts $NODE_VERSION
   - nvm use --lts $NODE_VERSION
-  - node --version
   - npm install -g npm@latest
-  - npm --version
   - npm install
 script:
   - npm test

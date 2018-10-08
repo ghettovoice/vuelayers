@@ -6,7 +6,7 @@ const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-re')
-const vue = require('rollup-plugin-vue')
+const vue = require('rollup-plugin-vue').default
 const uglify = require('rollup-plugin-uglify')
 const sass = require('./rollup/sass')
 const notifier = require('node-notifier')
@@ -188,9 +188,9 @@ function bundleOptions (format, package, env = 'development') {
       process.env.BABEL_ENV = 'es5-production'
       break
     case 'es':
-      options.outputPath = path.join(options.outputPath, '_esm')
+      // options.outputPath = path.join(options.outputPath, '_esm')
       options.input.external = external
-      options.cssName = undefined
+      // options.cssName = undefined
       options.patterns = patterns
       break
   }

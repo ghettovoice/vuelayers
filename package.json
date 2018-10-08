@@ -4,14 +4,13 @@
   "version": "0.11.0",
   "description": "Web map Vue components with the power of OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
-  "main": "lib/index.js",
-  "module": "lib/_esm/index.js",
-  "unpkg": "lib/index.umd.js",
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "webpack-dev-server --config=build/webpack.dev.config.js",
     "start": "npm run dev",
-    "rollup": "node build/rollup.js",
-    "clean": "rm -rf lib",
+    "rollup": "node build/rollup.js --format=es",
+    "clean": "rm -rf lib/*",
+    "prepare-package": "node build/prepare-package",
     "build": "npm run clean && npm run lint && npm run rollup",
     "unit": "cross-env NODE_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
@@ -22,8 +21,9 @@
     "docs-deploy": "gh-pages -t -d ./docs -r git@github.com:VueLayers/vuelayers.github.io.git -b master"
   },
   "directories": {
-    "lib": "lib",
-    "test": "test"
+    "lib": "./lib",
+    "doc": "./docs",
+    "test": "./test"
   },
   "repository": {
     "type": "git",

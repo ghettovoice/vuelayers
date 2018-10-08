@@ -23,7 +23,7 @@ module.exports = {
   version: packageJson.version,
   license: packageJson.license,
   entry: path.join(__dirname, '../src/index.js'),
-  outputPath: path.join(__dirname, '../dist'),
+  outputPath: path.join(__dirname, '../lib'),
   publicPath: '/',
   host: 'localhost',
   port: 8080,
