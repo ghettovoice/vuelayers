@@ -17,7 +17,7 @@
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue ./",
     "lint-fix": "eslint --ext .js,.vue --fix ./",
-    "docs-start": "docsify start ./docs",
+    "docs-start": "docsify serve ./docs",
     "docs-deploy": "gh-pages -t -d ./docs -r git@github.com:VueLayers/vuelayers.github.io.git -b master"
   },
   "directories": {
