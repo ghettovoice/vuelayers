@@ -17,7 +17,7 @@ const importTransforms = {
 }
 
 module.exports = function (api) {
-  api.cache.using(() => process.env.NODE_ENV)
+  api.cache(true)
 
   const presets = [
     ['@babel/preset-env', { modules: false }],

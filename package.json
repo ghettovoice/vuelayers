@@ -8,10 +8,10 @@
   "scripts": {
     "dev": "webpack-dev-server --config=build/webpack.dev.config.js",
     "start": "npm run dev",
-    "rollup": "node build/rollup.js --format=es",
+    "rollup": "node build/rollup.js",
     "clean": "rm -rf lib/*",
     "prepare-package": "node build/prepare-package",
-    "build": "npm run clean && npm run lint && npm run rollup",
+    "build": "npm run clean && npm run lint && npm run rollup -- --format=es,umd",
     "unit": "cross-env NODE_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",

@@ -7,7 +7,7 @@ const cjs = require('rollup-plugin-commonjs')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-re')
 const vue = require('rollup-plugin-vue').default
-const uglify = require('rollup-plugin-uglify')
+const uglify = require('rollup-plugin-uglify').uglify
 const sass = require('./rollup/sass')
 const notifier = require('node-notifier')
 const argv = require('yargs').argv
@@ -29,16 +29,11 @@ getAllPackages()
       return prev.then(() => {
         if (format === 'umd') {
           packages = packages.slice(0, 1)
+          packages[0].entry = config.umdEntry
         }
         // bundle each package in provided format
         return packages.reduce((prev, package) => {
-          return prev.then(() => makeBundle(bundleOptions(format, package)))
-            .then(() => {
-              // append uglified UMD bundle
-              if (format === 'umd') {
-                return makeBundle(bundleOptions(format, package, process.env.NODE_ENV))
-              }
-            })
+          return prev.then(() => makeBundle(bundleOptions(format, package, process.env.NODE_ENV)))
         }, Promise.resolve())
       })
     }, Promise.resolve())
@@ -123,9 +118,9 @@ function bundleOptions (format, package, env = 'development') {
       '@import ~': '@import ',
       '@import "~': '@import "',
     }, config.replaces),
-    defines: {
-      IS_STANDALONE: false,
-    },
+    // defines: {
+    //   IS_STANDALONE: false,
+    // },
   })
 
   // es/cjs external resolver
@@ -146,6 +141,7 @@ function bundleOptions (format, package, env = 'development') {
     return !(
       componentsRegExp.test(parentId) && (
         id.slice(0, 2) === './' ||
+        path.basename(id) === id ||
         componentsRegExp.test(id) &&
         path.basename(path.dirname(id)) === path.basename(path.dirname(parentId))
       )
@@ -173,25 +169,27 @@ function bundleOptions (format, package, env = 'development') {
   switch (format) {
     case 'umd':
       options.jsName += '.' + format
+      options.cssName = undefined
       options.output.globals = {
         vue: 'Vue',
         openlayers: 'ol',
       }
       options.input.external = ['vue', 'openlayers']
       options.replaces['process.env.NODE_ENV'] = `'${env}'`
-      process.env.BABEL_ENV = 'es5-production'
-      options.defines.IS_STANDALONE = true
+      options.minify = true
+      // process.env.BABEL_ENV = 'es5-production'
+      // options.defines.IS_STANDALONE = true
       break
     case 'cjs':
       options.input.external = external
       options.patterns = patterns
-      process.env.BABEL_ENV = 'es5-production'
+      // process.env.BABEL_ENV = 'es5-production'
       break
     case 'es':
-      // options.outputPath = path.join(options.outputPath, '_esm')
       options.input.external = external
-      // options.cssName = undefined
       options.patterns = patterns
+      // options.outputPath = path.join(options.outputPath, '_esm')
+      // options.cssName = undefined
       break
   }
 
@@ -212,15 +210,7 @@ function makeBundle (options = {}) {
       defines: options.defines,
     }),
     vue({
-      compileTemplate: true,
-      htmlMinifier: { collapseBooleanAttributes: false },
       sourceMap: true,
-      scss: {
-        sourceMapContents: true,
-        includePaths: [
-          utils.resolve('node_modules'),
-        ],
-      },
       css: false,
     }),
     sass({
@@ -245,6 +235,7 @@ function makeBundle (options = {}) {
         'node_modules/rxjs/_esm2015/**/*',
         'node_modules/lodash-es/**/*',
       ],
+      extensions: ['.js', '.jsx', '.es6', '.es', '.mjs', '.vue'],
     }),
     nodeResolve({
       main: true,
@@ -267,16 +258,16 @@ function makeBundle (options = {}) {
     ),
   ]
 
-  if (options.env === 'production') {
-    options.jsName += '.min'
-    if (options.cssName) {
-      options.cssName += '.min'
-    }
+  if (options.minify) {
+    // options.jsName += '.min'
+    // if (options.cssName) {
+    //   options.cssName += '.min'
+    // }
 
     plugins.push(
       uglify({
         mangle: true,
-        sourceMap: true,
+        sourcemap: true,
         compress: {
           warnings: false,
         },
@@ -327,7 +318,7 @@ function makeBundle (options = {}) {
 
       const css = utils.concatFiles(files, cssOutputPath, options.output.banner)
 
-      return utils.postcssProcess(css, options.env === 'production')
+      return utils.postcssProcess(css, options.minify)
     }).then(css => ({ js, css }))
   }).then(({ js, css }) => {
     // write js / css bundles to output path
