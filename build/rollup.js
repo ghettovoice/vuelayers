@@ -141,7 +141,7 @@ function bundleOptions (format, package, env = 'development') {
     return !(
       componentsRegExp.test(parentId) && (
         id.slice(0, 2) === './' ||
-        path.basename(id) === id ||
+        id.match(/\.vue\?rollup-plugin-vue/i) ||
         componentsRegExp.test(id) &&
         path.basename(path.dirname(id)) === path.basename(path.dirname(parentId))
       )
