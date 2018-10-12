@@ -4,11 +4,11 @@
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 import { hasLayer, hasMap } from '../util/assert'
+import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import sourceContainer from './source-container'
 import useMapCmp from './use-map-cmp'
-import { isEqual } from '../util/minilo'
 
 /**
  * @vueProps
@@ -22,7 +22,7 @@ const props = /** @lends module:mixin/layer# */{
    * The bounding extent for layer rendering defined in the map view projection.
    * The layer will not be rendered outside of this extent.
    * @default undefined
-   * @type {ol.Extent|number[]|undefined}
+   * @type {Extent|number[]|undefined}
    */
   extent: {
     type: Array,
@@ -47,7 +47,7 @@ const props = /** @lends module:mixin/layer# */{
 
 const methods = {
   /**
-   * @return {Promise<ol.layer.Layer>}
+   * @return {Promise<Layer>}
    * @protected
    */
   async createOlObject () {
@@ -57,7 +57,7 @@ const methods = {
     return layer
   },
   /**
-   * @return {ol.layer.Layer|Promise<ol.layer.Layer>}
+   * @return {Layer|Promise<Layer>}
    * @protected
    * @abstract
    */
@@ -65,7 +65,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {Promise<Vue<ol.layer.Layer>>}
+   * @return {Promise<Vue<Layer>>}
    * @protected
    */
   init () {
@@ -99,13 +99,13 @@ const methods = {
       this::sourceContainer.methods.getServices(),
       {
         get layer () { return vm.$layer },
-      }
+      },
     )
   },
   /**
    * @return {{
-   *     setSource: function(ol.source.Source): void,
-   *     getSource: function(): ol.source.Source
+   *     setSource: function(Source): void,
+   *     getSource: function(): Source
    *   }|undefined}
    * @protected
    */
@@ -146,7 +146,7 @@ const methods = {
     return this::cmp.methods.refresh()
   },
   /**
-   * @param {ol.Map|Vue|undefined} map
+   * @param {Map|Vue|undefined} map
    */
   setMap (map) {
     hasLayer(this)
@@ -210,7 +210,7 @@ export default {
   created () {
     Object.defineProperties(this, {
       /**
-       * @type {ol.layer.Layer|undefined}
+       * @type {Layer|undefined}
        */
       $layer: {
         enumerable: true,

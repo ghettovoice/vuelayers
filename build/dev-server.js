@@ -7,10 +7,10 @@ const opn = require('opn')
 const express = require('express')
 const webpack = require('webpack')
 let webpackConfig = process.env.NODE_ENV === 'integration'
-  ? require('./webpack.prod.conf')
+  ? require('./webpack.prod.config')
   : (argv.name
     ? require(`./webpack.${argv.name}.dev.conf`)
-    : require('./webpack.dev.conf'))
+    : require('./webpack.dev.config'))
 
 if (typeof webpackConfig === 'function') {
   webpackConfig = webpackConfig()

@@ -1,14 +1,14 @@
 /**
  * Style helpers
  */
-import Circle from 'ol/style/circle'
-import Fill from 'ol/style/fill'
-import Icon from 'ol/style/icon'
-import ImageStyle from 'ol/style/image'
-import RegularShape from 'ol/style/regularshape'
-import Stroke from 'ol/style/stroke'
-import Style from 'ol/style/style'
-import Text from 'ol/style/text'
+import Circle from 'ol/style/Circle'
+import Fill from 'ol/style/Fill'
+import Icon from 'ol/style/Icon'
+import ImageStyle from 'ol/style/Image'
+import RegularShape from 'ol/style/RegularShape'
+import Stroke from 'ol/style/Stroke'
+import Style from 'ol/style/Style'
+import Text from 'ol/style/Text'
 import parseColor from 'parse-color'
 import { isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
 import { GEOMETRY_TYPE } from './consts'
@@ -60,7 +60,7 @@ export function defaultEditStyle () {
 
   styles[GEOMETRY_TYPE.CIRCLE] =
     styles[GEOMETRY_TYPE.POLYGON].concat(
-      styles[GEOMETRY_TYPE.LINE_STRING]
+      styles[GEOMETRY_TYPE.LINE_STRING],
     )
 
   styles[GEOMETRY_TYPE.POINT] = [
@@ -78,7 +78,7 @@ export function defaultEditStyle () {
   styles[GEOMETRY_TYPE.GEOMETRY_COLLECTION] =
     styles[GEOMETRY_TYPE.POLYGON].concat(
       styles[GEOMETRY_TYPE.LINE_STRING],
-      styles[GEOMETRY_TYPE.POINT]
+      styles[GEOMETRY_TYPE.POINT],
     )
 
   return styles
@@ -94,7 +94,7 @@ const isEmpty = x => {
 
 /**
  * @param {VlStyle} vlStyle
- * @return {ol.style.Style|undefined}
+ * @return {Style|undefined}
  */
 export function createStyle (vlStyle) {
   if (isEmpty(vlStyle)) return
@@ -132,7 +132,7 @@ export function normalizeColor (color) {
 /**
  * @param {VlStyle} vlStyle
  * @param {string} [prefix]
- * @returns {ol.style.Fill|undefined}
+ * @returns {Fill|undefined}
  */
 export function createFillStyle (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
@@ -162,7 +162,7 @@ export function createFillStyle (vlStyle, prefix = '') {
 /**
  * @param {VlStyle} vlStyle
  * @param {string} [prefix]
- * @returns {ol.style.Stroke|undefined}
+ * @returns {Stroke|undefined}
  */
 export function createStrokeStyle (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
@@ -200,7 +200,7 @@ export function createStrokeStyle (vlStyle, prefix = '') {
 
 /**
  * @param {VlStyle} vlStyle
- * @returns {ol.style.Image|undefined}
+ * @returns {Image|undefined}
  * @todo split to separate circle, regShape, Icon
  */
 export function createImageStyle (vlStyle) {
@@ -274,7 +274,7 @@ export function createImageStyle (vlStyle) {
 
 /**
  * @param {VlStyle} vlStyle
- * @returns {ol.style.Text|undefined}
+ * @returns {Text|undefined}
  */
 export function createTextStyle (vlStyle) {
   // noinspection JSValidateTypes
@@ -306,7 +306,7 @@ export function createTextStyle (vlStyle) {
       placement: vlStyle.textPlacement,
       backgroundFill: createFillStyle(vlStyle, 'textBackground'),
       backgroundStroke: createStrokeStyle(vlStyle, 'textBackground'),
-    }
+    },
   )
 
   if (!isEmpty(textStyle)) {
@@ -316,7 +316,7 @@ export function createTextStyle (vlStyle) {
 
 /**
  * @param {VlStyle} vlStyle
- * @return {ol.geom.Geometry|ol.StyleGeometryFunction|undefined}
+ * @return {Geometry|function|undefined}
  */
 export function createGeomStyle (vlStyle) {
   if (isFunction(vlStyle.geom)) {
@@ -329,7 +329,7 @@ export function createGeomStyle (vlStyle) {
 }
 
 /**
- * @typedef {ol.style.Style|ol.style.Image|ol.style.Fill|ol.style.Stroke|ol.style.Text|ol.StyleFunction} OlStyle
+ * @typedef {Style|Image|Fill|Stroke|Text|StyleFunction} OlStyle
  */
 
 /**
@@ -343,11 +343,11 @@ export function createGeomStyle (vlStyle) {
  * @property {string|undefined} strokeCap
  * @property {string|undefined} strokeJoin
  * @property {number|undefined} zIndex
- * @property {ol.style.Fill|undefined} fill
- * @property {ol.style.Stroke|undefined} stroke
+ * @property {Fill|undefined} fill
+ * @property {Stroke|undefined} stroke
  *
  * Text only
- * @property {string|ol.style.Text|undefined} text
+ * @property {string|Text|undefined} text
  * @property {string|undefined} textFont
  * @property {number|undefined} textFontSize
  * @property {string|number[]|undefined} textFillColor
@@ -361,23 +361,23 @@ export function createGeomStyle (vlStyle) {
  * @property {number|undefined} textRotation
  * @property {number|undefined} textOffsetX
  * @property {number|undefined} textOffsetY
- * @property {ol.style.Stroke|undefined} textStroke
- * @property {ol.style.Fill|undefined} textFill
+ * @property {Stroke|undefined} textStroke
+ * @property {Fill|undefined} textFill
  * @property {boolean|undefined} textRotateWithView
  * @property {number[]|undefined} textPadding
  * @property {number|undefined} textMaxAngle
  * @property {boolean|undefined} textOverflow
  * @property {string|undefined} textPlacement
  * @property {string|undefined} textBaseline
- * @property {ol.style.Fill|undefined} textBackgroundFillColor
- * @property {ol.style.Stroke|undefined} textBackgroundStrokeColor
- * @property {ol.style.Stroke|undefined} textBackgroundStrokeWidth
- * @property {ol.style.Stroke|undefined} textBackgroundStrokeDash
- * @property {ol.style.Stroke|undefined} textBackgroundStrokeCap
- * @property {ol.style.Stroke|undefined} textBackgroundStrokeJoin
+ * @property {Fill|undefined} textBackgroundFillColor
+ * @property {Stroke|undefined} textBackgroundStrokeColor
+ * @property {Stroke|undefined} textBackgroundStrokeWidth
+ * @property {Stroke|undefined} textBackgroundStrokeDash
+ * @property {Stroke|undefined} textBackgroundStrokeCap
+ * @property {Stroke|undefined} textBackgroundStrokeJoin
  *
  * Image only
- * @property {ol.style.Image|undefined} image
+ * @property {Image|undefined} image
  * @property {string|undefined} imageSrc
  * @property {number[]|undefined} imageSize
  * @property {number[]|undefined} imageImgSize
@@ -400,9 +400,9 @@ export function createGeomStyle (vlStyle) {
  * @property {IconOrigin|undefined} imageAnchorOrigin
  * @property {ColorLike|undefined} imageColor
  * @property {IconOrigin|undefined} imageOffsetOrigin
- * @property {ol.style.Stroke|undefined} imageStroke
- * @property {ol.style.Fill|undefined} imageFill
+ * @property {Stroke|undefined} imageStroke
+ * @property {Fill|undefined} imageFill
  * @property {string|undefined} imageCrossOrigin
  *
- * @property {ol.geom.Geometry|ol.StyleGeometryFunction|undefined} geom Coordinates should be in map projection
+ * @property {Geometry|function|undefined} geom Coordinates should be in map projection
  */

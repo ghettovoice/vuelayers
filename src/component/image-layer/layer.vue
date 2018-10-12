@@ -1,6 +1,6 @@
 <script>
   /** @module image-layer/layer */
-  import ImageLayer from 'ol/layer/image'
+  import ImageLayer from 'ol/layer/Image'
   import layer from '../../mixin/layer'
 
   /**
@@ -13,7 +13,7 @@
    */
   const methods = /** @lends module:image-layer/layer# */{
     /**
-     * @return {ol.layer.Image}
+     * @return {Image}
      * @protected
      */
     createLayer () {

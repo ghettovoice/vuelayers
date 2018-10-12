@@ -10,8 +10,7 @@
   /**
    * @module overlay/overlay
    */
-  import Overlay from 'ol/overlay'
-  import { Observable } from 'rxjs'
+  import Overlay from 'ol/Overlay'
   import { merge as mergeObs } from 'rxjs/observable'
   import uuid from 'uuid/v4'
   import olCmp from '../../mixin/ol-cmp'
@@ -80,7 +79,7 @@
    */
   const methods = /** @lends module:overlay/overlay# */{
     /**
-     * @return {ol.Overlay}
+     * @return {Overlay}
      * @protected
      */
     createOlObject () {
@@ -165,7 +164,7 @@
     created () {
       Object.defineProperties(this, /** @lends module:overlay/overlay# */{
         /**
-         * @type {ol.Overlay|undefined}
+         * @type {Overlay|undefined}
          */
         $overlay: {
           enumerable: true,
@@ -195,13 +194,13 @@
     hasOverlay(this)
 
     const ft = 100
-    const changes = Observable::mergeObs(
+    const changes = mergeObs(
       observableFromOlChangeEvent(this.$overlay, 'position', true, ft,
         () => this.pointToDataProj(this.$overlay.getPosition())),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
-      ], true, ft)
+      ], true, ft),
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {

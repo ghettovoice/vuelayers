@@ -8,8 +8,7 @@
 
 <script>
   /** @module geoloc/geoloc */
-  import Geolocation from 'ol/geolocation'
-  import { Observable } from 'rxjs'
+  import Geolocation from 'ol/Geolocation'
   import { merge } from 'rxjs/observable'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
@@ -70,7 +69,7 @@
 
   const methods = {
     /**
-     * @return {ol.Geolocation}
+     * @return {Geolocation}
      * @private
      */
     createOlObject () {
@@ -140,7 +139,7 @@
     created () {
       Object.defineProperties(this, {
         /**
-         * @type {ol.Geolocation|undefined}
+         * @type {Geolocation|undefined}
          */
         $geolocation: {
           enumerable: true,
@@ -152,7 +151,7 @@
         },
         /**
          * Reference to `ol.View` instance.
-         * @type {ol.View|undefined}
+         * @type {View|undefined}
          */
         $view: {
           enumerable: true,
@@ -170,7 +169,7 @@
     hasGeolocation(this)
 
     const ft = 100
-    const changes = Observable::merge(
+    const changes = merge(
       observableFromOlChangeEvent(
         this.$geolocation,
         [
@@ -189,7 +188,7 @@
         true,
         ft,
         () => this.position,
-      )
+      ),
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {

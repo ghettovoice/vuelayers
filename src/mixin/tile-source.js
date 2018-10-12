@@ -4,14 +4,14 @@ import {
   EPSG_3857,
   MAX_ZOOM,
   MIN_ZOOM,
+  PIXEL_RATIO,
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
-  PIXEL_RATIO,
 } from '../ol-ext/consts'
 import { createExtentFromProjection } from '../ol-ext/extent'
 import { createXyzGrid } from '../ol-ext/tile-grid'
 import { hasView } from '../util/assert'
-import { replaceTokens, isFunction, isString, pick } from '../util/minilo'
+import { isFunction, isString, pick, replaceTokens } from '../util/minilo'
 import source from './source'
 import withUrl from './with-url'
 
@@ -73,7 +73,7 @@ const computed = {
 
 const methods = {
   /**
-   * @return {ol.tilegrid.TileGrid}
+   * @return {TileGrid}
    * @protected
    */
   createTileGrid () {
@@ -87,7 +87,7 @@ const methods = {
     })
   },
   /**
-   * @return {ol.TileUrlFunction}
+   * @return {TileUrlFunction}
    * @protected
    */
   createUrlFunc () {
@@ -109,7 +109,7 @@ const methods = {
    */
   init () {
     /**
-     * @type {ol.tilegrid.TileGrid}
+     * @type {TileGrid}
      * @protected
      */
     this._tileGrid = this.createTileGrid()

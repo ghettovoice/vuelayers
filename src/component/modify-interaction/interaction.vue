@@ -1,15 +1,15 @@
 <script>
+  import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
   /** @module modify-interaction/interaction */
-  import ModifyInteraction from 'ol/interaction/modify'
-  import condition from 'ol/events/condition'
-  import observableFromOlEvent from '../../rx-ext/from-ol-event'
+  import ModifyInteraction from 'ol/interaction/Modify'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
-  import { defaultEditStyle, createStyle } from '../../ol-ext/style'
+  import { createStyle, defaultEditStyle } from '../../ol-ext/style'
   import { isCollection, isVectorSource } from '../../ol-ext/util'
-  import { mapValues, isFunction } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction } from '../../util/assert'
+  import { isFunction, mapValues } from '../../util/minilo'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**
@@ -27,29 +27,29 @@
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event will be
      * considered to add or move a vertex to the sketch. Default is `ol.events.condition.primaryAction`.
-     * @type {ol.EventsConditionType|function|undefined}
+     * @type {function|undefined}
      */
     condition: {
       type: Function,
-      default: condition.primaryAction,
+      default: primaryAction,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
      * By default, `ol.events.condition.singleClick` with `ol.events.condition.altKeyOnly` results in a vertex deletion.
-     * @type {ol.EventsConditionType|function|undefined}
+     * @type {function|undefined}
      */
     deleteCondition: {
       type: Function,
-      default: condition.altKeyOnly,
+      default: altKeyOnly,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether a new vertex can be added
      * to the sketch features. Default is `ol.events.condition.always`.
-     * @type {ol.EventsConditionType|undefined}
+     * @type {function|undefined}
      */
     insertVertexCondition: {
       type: Function,
-      default: condition.always,
+      default: always,
     },
     /**
      * Pixel tolerance for considering the pointer close enough to a segment or vertex for editing.
@@ -74,7 +74,7 @@
    */
   const methods = {
     /**
-     * @return {Promise<ol.interaction.Modify>}
+     * @return {Promise<Modify>}
      * @protected
      */
     async createInteraction () {
@@ -99,7 +99,7 @@
       })
     },
     /**
-     * @return {ol.StyleFunction}
+     * @return {function(feature: Feature): Style}
      * @protected
      */
     getDefaultStyles () {
@@ -122,7 +122,7 @@
       )
     },
     /**
-     * @return {ol.interaction.Interaction|undefined}
+     * @return {Interaction|undefined}
      * @protected
      */
     getStyleTarget () {
@@ -143,7 +143,7 @@
       this::interaction.methods.unmount()
     },
     /**
-     * @param {Array<{style: ol.style.Style, condition: (function|boolean|undefined)}>|ol.StyleFunction|Vue|undefined} styles
+     * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|function(feature: Feature): Style|Vue|undefined} styles
      * @return {void}
      * @protected
      */

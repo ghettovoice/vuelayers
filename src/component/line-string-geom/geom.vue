@@ -2,9 +2,9 @@
   /**
    * @module line-string-geom/geom
    */
-  import LineString from 'ol/geom/linestring'
-  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import LineString from 'ol/geom/LineString'
   import geometry from '../../mixin/geometry'
+  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { constant } from '../../util/minilo'
 
   const props = {}
@@ -15,7 +15,7 @@
 
   const methods = {
     /**
-     * @returns {ol.geom.LineString}
+     * @returns {LineString}
      * @protected
      */
     createGeometry () {

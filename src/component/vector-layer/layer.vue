@@ -1,6 +1,6 @@
 <script>
   /** @module vector-layer/layer */
-  import VectorLayer from 'ol/layer/vector'
+  import VectorLayer from 'ol/layer/Vector'
   import vectorLayer from '../../mixin/vector-layer'
 
   const RENDER_MODES = ['vector', 'image']
@@ -28,7 +28,7 @@
    */
   const methods = {
     /**
-     * @return {ol.layer.Vector}
+     * @return {Vector}
      * @protected
      */
     createLayer () {

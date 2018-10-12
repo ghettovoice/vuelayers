@@ -2,7 +2,7 @@
   /**
    * @module polygon-geom/geom
    */
-  import Polygon from 'ol/geom/polygon'
+  import Polygon from 'ol/geom/Polygon'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { constant } from '../../util/minilo'
@@ -15,7 +15,7 @@
 
   const methods = {
     /**
-     * @returns {ol.geom.Polygon}
+     * @returns {Polygon}
      * @protected
      */
     createGeometry () {

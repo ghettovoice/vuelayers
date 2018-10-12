@@ -2,7 +2,7 @@
   /**
    * @module multi-polygon-geom/geom
    */
-  import MultiPolygon from 'ol/geom/multipolygon'
+  import MultiPolygon from 'ol/geom/MultiPolygon'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
   import { constant } from '../../util/minilo'
@@ -15,7 +15,7 @@
 
   const methods = {
     /**
-     * @returns {ol.geom.MultiPolygon}
+     * @returns {MultiPolygon}
      * @protected
      */
     createGeometry () {

@@ -1,6 +1,6 @@
+import { EPSG_3857 } from '../ol-ext/consts'
 /** @module mixin/image-source */
 import source from './source'
-import { EPSG_3857 } from '../ol-ext/consts'
 
 /**
  * @vueProps

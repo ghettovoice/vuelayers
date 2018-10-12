@@ -2,7 +2,7 @@
   /**
    * @module wms-source/source
    */
-  import TileWMSSource from 'ol/source/tilewms'
+  import TileWMSSource from 'ol/source/TileWMS'
   import tileSource from '../../mixin/tile-source'
   import { WMS_VERSION } from '../../ol-ext/consts'
   import { hasSource, hasView } from '../../util/assert'
@@ -45,7 +45,7 @@
 
   const methods = {
     /**
-     * @returns {ol.source.TileWMS}
+     * @returns {TileWMS}
      * @protected
      */
     createSource () {
@@ -85,7 +85,7 @@
       coordinate,
       resolution,
       projection,
-      params = {}
+      params = {},
     ) {
       hasView(this)
       hasSource(this)
@@ -97,7 +97,7 @@
         coordinate,
         resolution,
         projection,
-        this.preparedExtParams
+        this.preparedExtParams,
       )
     },
   }

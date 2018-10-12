@@ -1,6 +1,6 @@
 <script>
   /** @module bing-maps-source/source */
-  import BingMapsSource from 'ol/source/bingmaps'
+  import BingMapsSource from 'ol/source/BingMaps'
   import tileSource from '../../mixin/tile-source'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -54,7 +54,7 @@
    */
   const methods = {
     /**
-     * @return {ol.source.BingMaps}
+     * @return {BingMaps}
      * @protected
      */
     createSource () {

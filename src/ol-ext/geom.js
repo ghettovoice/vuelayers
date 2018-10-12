@@ -1,18 +1,18 @@
 import pointOnFeature from '@turf/point-on-feature'
-import GeometryCollection from 'ol/geom/geometrycollection'
-import LineString from 'ol/geom/linestring'
-import MultiLineString from 'ol/geom/multilinestring'
-import MultiPoint from 'ol/geom/multipoint'
-import MultiPolygon from 'ol/geom/multipolygon'
-import Point from 'ol/geom/point'
-import Polygon from 'ol/geom/polygon'
-import Circle from 'ol/geom/circle'
-import { GEOMETRY_TYPE, WGS84_SPHERE } from './consts'
+import Circle from 'ol/geom/Circle'
+import GeometryCollection from 'ol/geom/GeometryCollection'
+import LineString from 'ol/geom/LineString'
+import MultiLineString from 'ol/geom/MultiLineString'
+import MultiPoint from 'ol/geom/MultiPoint'
+import MultiPolygon from 'ol/geom/MultiPolygon'
+import Point from 'ol/geom/Point'
+import Polygon from 'ol/geom/Polygon'
+import { GEOMETRY_TYPE } from './consts'
 
 /**
  * @param {number|number[]} lonOrCoordinates
  * @param {number} [lat]
- * @return {ol.geom.Point}
+ * @return {Point}
  */
 export function createPointGeom (lonOrCoordinates, lat) {
   const coordinates = Array.isArray(lonOrCoordinates)
@@ -24,7 +24,7 @@ export function createPointGeom (lonOrCoordinates, lat) {
 
 /**
  * @param {Array<number[]>} points
- * @returns {ol.geom.LineString}
+ * @returns {LineString}
  */
 export function createLineGeom (points) {
   return new LineString(points)
@@ -32,7 +32,7 @@ export function createLineGeom (points) {
 
 /**
  * @param {Array<Array<number[]>>} rings
- * @returns {ol.geom.Polygon}
+ * @returns {Polygon}
  */
 export function createPolygonGeom (rings) {
   return new Polygon(rings)
@@ -40,7 +40,7 @@ export function createPolygonGeom (rings) {
 
 /**
  * @param {Array<number[]>} points
- * @returns {ol.geom.MultiPoint}
+ * @returns {MultiPoint}
  */
 export function createMultiPointGeom (points) {
   return new MultiPoint(points)
@@ -48,7 +48,7 @@ export function createMultiPointGeom (points) {
 
 /**
  * @param {Array<Array<number[]>>} lines
- * @returns {ol.geom.MultiLineString}
+ * @returns {MultiLineString}
  */
 export function createMultiLineGeom (lines) {
   return new MultiLineString(lines)
@@ -56,31 +56,31 @@ export function createMultiLineGeom (lines) {
 
 /**
  * @param {Array<Array<Array<number[]>>>} polygons
- * @returns {ol.geom.MultiPolygon}
+ * @returns {MultiPolygon}
  */
 export function createMultiPolygonGeom (polygons) {
   return new MultiPolygon(polygons)
 }
 
 /**
- * @param {ol.geom.Geometry[]} geoms
- * @returns {ol.geom.GeometryCollection}
+ * @param {Geometry[]} geoms
+ * @returns {GeometryCollection}
  */
 export function createGeomCollection (geoms) {
   return new GeometryCollection(geoms)
 }
 
 /**
- * @param {ol.Coordinate|number[]} center
+ * @param {Coordinate|number[]} center
  * @param {number} radius
- * @return {ol.geom.Polygon}
+ * @return {Polygon}
  */
 export function createCircularPolygon (center, radius) {
-  return Polygon.circular(WGS84_SPHERE, center, radius)
+  return Polygon.circular(center, radius)
 }
 
 /**
- * @param {ol.geom.Geometry|GeoJSONGeometry} geom
+ * @param {Geometry|Object} geom
  * @return {boolean}
  * @throws {Error}
  */
@@ -96,8 +96,8 @@ export function isMultiGeom (geom) {
 }
 
 /**
- * @param {ol.geom.Geometry|GeoJSONGeometry} geom
- * @return {ol.geom.SimpleGeometry|GeoJSONGeometry}
+ * @param {Geometry|Object} geom
+ * @return {SimpleGeometry|Object}
  * @throws {Error}
  */
 export function toSimpleGeom (geom) {
@@ -118,8 +118,8 @@ export function toSimpleGeom (geom) {
 }
 
 /**
- * @param {ol.geom.Geometry|GeoJSONGeometry} geom
- * @return {ol.Coordinate|undefined}
+ * @param {Geometry|Object} geom
+ * @return {Coordinate|undefined}
  */
 export function findPointOnSurface (geom) {
   const simpleGeom = toSimpleGeom(geom)

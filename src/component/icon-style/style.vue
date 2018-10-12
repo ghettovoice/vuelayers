@@ -2,7 +2,7 @@
   /**
    * @module icon-style/style
    */
-  import Icon from 'ol/style/icon'
+  import Icon from 'ol/style/Icon'
   import imageStyle from '../../mixin/image-style'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -63,7 +63,7 @@
 
   const methods = {
     /**
-     * @return {ol.style.Icon}
+     * @return {Icon}
      * @protected
      */
     createStyle () {
@@ -78,7 +78,6 @@
         offsetOrigin: this.offsetOrigin,
         opacity: this.opacity,
         scale: this.scale,
-        snapToPixel: this.snapToPixel,
         rotateWithView: this.rotateWithView,
         rotation: this.rotation,
         size: this.size,

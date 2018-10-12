@@ -1,12 +1,12 @@
 <script>
+  import Style from 'ol/style/Style'
   /**
    * Style box component.
-   * Wrapper for ol.style.Style class. Can be inserted into component with setStyle/getStyle methods (vl-layer-vector, vl-feature & etc.)
+   * Wrapper for Style class. Can be inserted into component with setStyle/getStyle methods (vl-layer-vector, vl-feature & etc.)
    * and acts as a box for inner style components (vl-style-fill, vl-style-stroke, icon ...)
    * @module style-box/style
    */
   import Vue from 'vue'
-  import Style from 'ol/style/style'
   import style from '../../mixin/style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -24,7 +24,7 @@
 
   const methods = {
     /**
-     * @return {ol.style.Style}
+     * @return {Style}
      * @protected
      */
     createStyle () {
@@ -63,7 +63,7 @@
       this.$stylesContainer && this.$stylesContainer.removeStyle(this)
     },
     /**
-     * @param {ol.style.Image|Vue|undefined} image
+     * @param {Image|Vue|undefined} image
      * @return {void}
      */
     setImage (image) {
@@ -78,7 +78,7 @@
       }
     },
     /**
-     * @param {ol.geom.Geometry|Vue|undefined} geom
+     * @param {Geometry|Vue|undefined} geom
      * @return {void}
      */
     setGeometry (geom) {
@@ -93,7 +93,7 @@
       }
     },
     /**
-     * @param {ol.style.Text|undefined} text
+     * @param {Text|undefined} text
      * @return {void}
      */
     setText (text) {
@@ -126,17 +126,17 @@
     watch,
     created () {
       /**
-       * @type {ol.style.Image|undefined}
+       * @type {Image|undefined}
        * @private
        */
       this._image = undefined
       /**
-       * @type {ol.style.Text|undefined}
+       * @type {Text|undefined}
        * @private
        */
       this._text = undefined
       /**
-       * @type {ol.geom.Geometry|undefined}
+       * @type {Geometry|undefined}
        * @private
        */
       this._geometry = undefined

@@ -1,9 +1,9 @@
-import XYZSource from 'ol/source/xyz'
+import XYZSource from 'ol/source/XYZ'
 import tileSource from './tile-source'
 
 const methods = {
   /**
-   * @return {ol.source.XYZ}
+   * @return {XYZ}
    * @protected
    */
   createSource () {
@@ -26,8 +26,7 @@ const methods = {
   },
 }
 
-const watch = {
-}
+const watch = {}
 
 export default {
   mixins: [tileSource],

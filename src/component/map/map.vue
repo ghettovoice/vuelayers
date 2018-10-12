@@ -8,14 +8,13 @@
   /**
    * @module map/map
    */
-  import olcontrol from 'ol/control'
-  import VectorLayer from 'ol/layer/vector'
-  import Map from 'ol/map'
-  import View from 'ol/view'
-  import VectorSource from 'ol/source/vector'
-  import { Observable } from 'rxjs'
+  import { defaults as defaultsControl } from 'ol/control'
+  import VectorLayer from 'ol/layer/Vector'
+  import Map from 'ol/Map'
+  import VectorSource from 'ol/source/Vector'
+  import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
+  import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
   import featuresContainer from '../../mixin/features-container'
   import interactionsContainer from '../../mixin/interactions-container'
@@ -118,15 +117,14 @@
   /**
    * @vueComputed
    */
-  const computed = {
-  }
+  const computed = {}
 
   /**
    * @vueMethods
    */
   const methods = /** @lends module:map/map# */{
     /**
-     * @return {ol.Map}
+     * @return {Map}
      * @protected
      */
     createOlObject () {
@@ -147,7 +145,7 @@
 
       if (this.controls) {
         let opts = typeof this.controls === 'object' ? this.controls : undefined
-        map.getControls().extend(olcontrol.defaults(opts).getArray())
+        map.getControls().extend(defaultsControl(opts).getArray())
       }
 
       map.set('dataProjection', this.dataProjection)
@@ -180,7 +178,7 @@
       if (this._interactionsTarget == null) {
         this._interactionsTarget = new IndexedCollectionAdapter(
           this.$map.getInteractions(),
-          interaction => interaction.get('id')
+          interaction => interaction.get('id'),
         )
       }
 
@@ -205,7 +203,8 @@
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */this._defaultLayer.getSource())
+        this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */
+          this._defaultLayer.getSource())
       }
 
       return this._featuresTarget
@@ -253,7 +252,7 @@
           get map () { return vm.$map },
           get view () { return vm.$view },
           get viewContainer () { return vm },
-        }
+        },
       )
     },
     /**
@@ -265,7 +264,7 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function((ol.Feature|ol.render.Feature), ?ol.layer.Layer): *} callback
+     * @param {function((Feature), ?Layer): *} callback
      * @param {Object} [opts]
      * @return {*|undefined}
      */
@@ -275,8 +274,8 @@
     },
     /**
      * @param {number[]} pixel
-     * @param {function(ol.layer.Layer, ?(number[]|Uint8Array)): *} callback
-     * @param {function(ol.layer.Layer): boolean} [layerFilter]
+     * @param {function(Layer, ?(number[]|Uint8Array)): *} callback
+     * @param {function(Layer): boolean} [layerFilter]
      * @return {*|undefined}
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
@@ -284,7 +283,7 @@
       return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
-     * @param {ol.View|Vue|undefined} view
+     * @param {View|Vue|undefined} view
      * @return {void}
      * @protected
      */
@@ -394,12 +393,12 @@
     watch,
     created () {
       /**
-       * @type {ol.View|undefined}
+       * @type {View|undefined}
        * @private
        */
       this._view = undefined
       /**
-       * @type {ol.layer.Vector}
+       * @type {Vector}
        * @private
        */
       this._defaultLayer = new VectorLayer({
@@ -409,7 +408,7 @@
       Object.defineProperties(this, /** @lends module:map/map# */{
         /**
          * OpenLayers map instance.
-         * @type {ol.Map|undefined}
+         * @type {Map|undefined}
          */
         $map: {
           enumerable: true,
@@ -417,7 +416,7 @@
         },
         /**
          * OpenLayers view instance.
-         * @type {ol.View|undefined}
+         * @type {View|undefined}
          */
         $view: {
           enumerable: true,
@@ -439,7 +438,7 @@
 
     const ft = 100
     // pointer
-    const pointerEvents = Observable::mergeObs(
+    const pointerEvents = mergeObs(
       observableFromOlEvent(this.$map, [
         'click',
         'dblclick',
@@ -448,12 +447,16 @@
       observableFromOlEvent(this.$map, [
         'pointerdrag',
         'pointermove',
-      ])::throttleTime(ft)
-        ::distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate))
-    )::mapObs(evt => ({
-      ...evt,
-      coordinate: this.pointToDataProj(evt.coordinate),
-    }))
+      ]).pipe(
+        throttleTime(ft),
+        distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
+      ),
+    ).pipe(
+      mapObs(evt => ({
+        ...evt,
+        coordinate: this.pointToDataProj(evt.coordinate),
+      })),
+    )
     // other
     const otherEvents = observableFromOlEvent(this.$map, [
       'movestart',
@@ -463,10 +466,7 @@
       'postcompose',
     ])
 
-    const events = Observable::mergeObs(
-      pointerEvents,
-      otherEvents
-    )
+    const events = mergeObs(pointerEvents, otherEvents)
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
@@ -474,11 +474,11 @@
   /**
    * A click with no dragging. A double click will fire two of this.
    * @event module:map/map#click
-   * @type {ol.MapBrowserEvent}
+   * @type {MapBrowserEvent}
    */
   /**
    * A true double click, with no dragging.
    * @event module:map/map#dblclick
-   * @type {ol.MapBrowserEvent}
+   * @type {MapBrowserEvent}
    */
 </script>

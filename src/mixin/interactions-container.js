@@ -1,6 +1,6 @@
+import Interaction from 'ol/interaction/Interaction'
 import Vue from 'vue'
-import Interaction from 'ol/interaction/interaction'
-import {instanceOf} from '../util/assert'
+import { instanceOf } from '../util/assert'
 
 const methods = {
   /**
@@ -11,7 +11,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @param {ol.interaction.Interaction|Vue} interaction
+   * @param {Interaction|Vue} interaction
    * @return {void}
    */
   addInteraction (interaction) {
@@ -24,7 +24,7 @@ const methods = {
     }
   },
   /**
-   * @param {ol.interaction.Interaction|Vue} interaction
+   * @param {Interaction|Vue} interaction
    * @return {void}
    */
   removeInteraction (interaction) {
@@ -38,14 +38,14 @@ const methods = {
     }
   },
   /**
-   * @return {ol.interaction.Interaction[]}
+   * @return {Interaction[]}
    */
   getInteractions () {
     return this.getInteractionsTarget().elements
   },
   /**
    * @param {string|number} id
-   * @return {ol.interaction.Interaction|undefined}
+   * @return {Interaction|undefined}
    */
   getInteractionById (id) {
     return this.getInteractionsTarget().findByKey(id)

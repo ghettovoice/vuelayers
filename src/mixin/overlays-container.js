@@ -1,4 +1,4 @@
-import Overlay from 'ol/overlay'
+import Overlay from 'ol/Overlay'
 import Vue from 'vue'
 import { instanceOf } from '../util/assert'
 
@@ -11,7 +11,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @param {ol.Overlay|Vue} overlay
+   * @param {Overlay|Vue} overlay
    * @return {void}
    */
   addOverlay (overlay) {
@@ -23,7 +23,7 @@ const methods = {
     }
   },
   /**
-   * @param {ol.Overlay|Vue} overlay
+   * @param {Overlay|Vue} overlay
    * @return {void}
    */
   removeOverlay (overlay) {
@@ -36,14 +36,14 @@ const methods = {
     }
   },
   /**
-   * @return {ol.Overlay[]}
+   * @return {Overlay[]}
    */
   getOverlays () {
     return this.getOverlaysTarget().elements
   },
   /**
    * @param {string|number} id
-   * @return {ol.Overlay|undefined}
+   * @return {Overlay|undefined}
    */
   getOverlayById (id) {
     return this.getOverlaysTarget().findByKey(id)

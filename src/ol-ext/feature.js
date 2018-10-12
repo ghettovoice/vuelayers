@@ -1,8 +1,8 @@
+import Feature from 'ol/Feature'
 /** @module ol-ext/feature */
 import uuid from 'uuid/v4'
 import Vue from 'vue'
-import { isPlainObject, isString, isNumber } from '../util/minilo'
-import Feature from 'ol/feature'
+import { isNumber, isPlainObject, isString } from '../util/minilo'
 
 /**
  * Basic feature initialization
@@ -17,7 +17,7 @@ export function initFeature (feature) {
 }
 
 /**
- * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
+ * @param {Object|Vue|Feature|string|number} feature
  * @return {string|number}
  * @throws {Error}
  */

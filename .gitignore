@@ -140,9 +140,10 @@ $RECYCLE.BIN/
 
 ### App
 .DS_Store
-test/e2e/reports
-test/unit/coverage
-dist
-lib
-dist-docs
-out
+/test/e2e/reports
+/test/unit/coverage
+/dist
+/lib
+/dist-docs
+/out
+/docs/releases

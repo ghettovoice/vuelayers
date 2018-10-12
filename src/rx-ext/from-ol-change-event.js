@@ -1,6 +1,5 @@
-import { Observable } from 'rxjs'
 import { merge as mergeObs } from 'rxjs/observable'
-import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operator'
+import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
 import { isEqual, isFunction } from '../util/minilo'
 import fromOlEvent from './from-ol-event'
 
@@ -15,7 +14,7 @@ import fromOlEvent from './from-ol-event'
  */
 export default function fromOlChangeEvent (target, prop, distinct, throttle, selector) {
   if (Array.isArray(prop)) {
-    return Observable::mergeObs(...prop.map(p => fromOlChangeEvent(target, p)))
+    return mergeObs(...prop.map(p => fromOlChangeEvent(target, p)))
   }
 
   selector = selector || ((target, prop) => target.get(prop))
@@ -23,12 +22,12 @@ export default function fromOlChangeEvent (target, prop, distinct, throttle, sel
   let observable = fromOlEvent(target, event, () => selector(target, prop))
 
   if (throttle != null) {
-    observable = observable::throttleTime(throttle)
+    observable = observable.pipe(throttleTime(throttle))
   }
   if (distinct) {
     isFunction(distinct) || (distinct = isEqual)
-    observable = observable::distinctUntilChanged(distinct)
+    observable = observable.pipe(distinctUntilChanged(distinct))
   }
 
-  return observable::mapObs(value => ({ prop, value }))
+  return observable.pipe(mapObs(value => ({ prop, value })))
 }

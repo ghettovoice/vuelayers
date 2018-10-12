@@ -5,20 +5,20 @@
 </template>
 
 <script>
+  import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   /** @module select-interaction/interaction */
-  import Feature from 'ol/feature'
-  import SelectInteraction from 'ol/interaction/select'
-  import condition from 'ol/events/condition'
+  import Feature from 'ol/Feature'
+  import SelectInteraction from 'ol/interaction/Select'
   import Vue from 'vue'
   import interaction from '../../mixin/interaction'
+  import projTransforms from '../../mixin/proj-transforms'
   import stylesContainer from '../../mixin/styles-container'
   import { getFeatureId } from '../../ol-ext/feature'
-  import { defaultEditStyle, createStyle } from '../../ol-ext/style'
+  import { createStyle, defaultEditStyle } from '../../ol-ext/style'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
   import { hasInteraction, hasMap } from '../../util/assert'
-  import { constant, stubArray, isFunction, forEach, mapValues, difference } from '../../util/minilo'
+  import { constant, difference, forEach, isFunction, mapValues, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import projTransforms from '../../mixin/proj-transforms'
 
   /**
    * @vueProps
@@ -26,7 +26,7 @@
   const props = {
     /**
      * A function that takes an `ol.Feature` and an `ol.layer.Layer` and returns `true` if the feature may be selected or `false` otherwise.
-     * @type {ol.SelectFilterFunction|undefined}
+     * @type {function|undefined}
      */
     filter: {
       type: Function,
@@ -52,7 +52,7 @@
     },
     /**
      * Selected features as array of GeoJSON features with coordinates in the map view projection.
-     * @type {string[]|number[]|GeoJSONFeature[]}
+     * @type {string[]|number[]|Object[]}
      */
     features: {
       type: Array,
@@ -70,58 +70,57 @@
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should
      * be handled. By default, this is `ol.events.condition.never`. Use this if you want to use different events
      * for `add` and `remove` instead of `toggle`.
-     * @type {ol.EventsConditionType|undefined}
+     * @type {function|undefined}
      */
     addCondition: {
       type: Function,
-      default: condition.never,
+      default: never,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
      * This is the event for the selected features as a whole. By default, this is `ol.events.condition.singleClick`.
      * Clicking on a feature selects that feature and removes any that were in the selection. Clicking outside any feature
      * removes all from the selection.
-     * @type {ol.EventsConditionType|undefined}
+     * @type {function|undefined}
      */
     condition: {
       type: Function,
-      default: condition.singleClick,
+      default: singleClick,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
      * By default, this is `ol.events.condition.never`. Use this if you want to use different events for `add` and `remove`
      * instead of `toggle`.
-     * @type {ol.EventsConditionType|undefined}
+     * @type {function|undefined}
      */
     removeCondition: {
       type: Function,
-      default: condition.never,
+      default: never,
     },
     /**
      * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should be handled.
      * This is in addition to the `condition` event. By default, `ol.events.condition.shiftKeyOnly`, i.e. pressing `shift`
      * as well as the `condition` event, adds that feature to the current selection if it is not currently selected,
      * and removes it if it is.
-     * @type {ol.EventsConditionType|undefined}
+     * @type {function|undefined}
      */
     toggleCondition: {
       type: Function,
-      default: condition.shiftKeyOnly,
+      default: shiftKeyOnly,
     },
   }
 
   /**
    * @vueComputed
    */
-  const computed = {
-  }
+  const computed = {}
 
   /**
    * @vueMethods
    */
   const methods = {
     /**
-     * @return {ol.interaction.Select}
+     * @return {Select}
      * @protected
      */
     createInteraction () {
@@ -137,7 +136,7 @@
       })
     },
     /**
-     * @return {ol.StyleFunction}
+     * @return {function(feature: Feature): Style}
      * @protected
      */
     getDefaultStyles () {
@@ -150,7 +149,7 @@
       }
     },
     /**
-     * @return {ol.Feature[]}
+     * @return {Feature[]}
      */
     getFeatures () {
       return (this.$interaction && this.$interaction.getFeatures().getArray()) || []
@@ -162,11 +161,11 @@
     getServices () {
       return mergeDescriptors(
         this::interaction.methods.getServices(),
-        this::stylesContainer.methods.getServices()
+        this::stylesContainer.methods.getServices(),
       )
     },
     /**
-     * @return {ol.interaction.Interaction|undefined}
+     * @return {Interaction|undefined}
      * @protected
      */
     getStyleTarget () {
@@ -189,7 +188,7 @@
       this::interaction.methods.unmount()
     },
     /**
-     * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
+     * @param {Object|Vue|Feature|string|number} feature
      * @return {void}
      * @throws {Error}
      */
@@ -224,7 +223,7 @@
       feature && this.$interaction.getFeatures().push(feature)
     },
     /**
-     * @param {GeoJSONFeature|Vue|ol.Feature|string|number} feature
+     * @param {Object|Vue|Feature|string|number} feature
      * @return {void}
      */
     unselect (feature) {
@@ -246,7 +245,7 @@
       }
     },
     /**
-     * @param {Array<{style: ol.style.Style, condition: (function|boolean|undefined)}>|ol.StyleFunction|Vue|undefined} styles
+     * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|function(feature: Feature): Style|Vue|undefined} styles
      * @return {void}
      * @protected
      */
@@ -350,7 +349,7 @@
         deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
         selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
         this.$emit('update:features', this.$features.map(::this.writeFeatureInDataProj))
-      }
+      },
     )
   }
 </script>

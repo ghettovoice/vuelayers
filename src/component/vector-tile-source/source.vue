@@ -1,7 +1,7 @@
 <script>
-  import VectorTileSource from 'ol/source/vectortile'
-  import { createMvtFmt } from '../../ol-ext/format'
+  import VectorTileSource from 'ol/source/VectorTile'
   import tileSource from '../../mixin/tile-source'
+  import { createMvtFmt } from '../../ol-ext/format'
 
   const props = {
     cacheSize: {
@@ -10,7 +10,7 @@
     },
     /**
      * Source format factory
-     * @type {(function(): ol.format.Feature|undefined)} formatFactory
+     * @type {(function(): Feature|undefined)} formatFactory
      */
     formatFactory: {
       type: Function,
@@ -24,7 +24,7 @@
 
   const methods = {
     /**
-     * @return {ol.source.VectorTile}
+     * @return {VectorTileSource}
      */
     createSource () {
       return new VectorTileSource({
@@ -51,7 +51,7 @@
   }
 
   /**
-   * @return {ol.format.TopoJSON}
+   * @return {TopoJSON}
    */
   function defaultFormatFactory () {
     return createMvtFmt()

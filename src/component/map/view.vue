@@ -1,6 +1,6 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
-    <slot :center="viewCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation" />
+    <slot :center="viewCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation"/>
   </i>
 </template>
 
@@ -8,17 +8,16 @@
   /**
    * @module map/view
    */
-  import View from 'ol/view'
-  import { Observable } from 'rxjs'
+  import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operator'
+  import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
   import Vue from 'vue'
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
   import { EPSG_3857, MAX_ZOOM, MIN_ZOOM, ZOOM_FACTOR } from '../../ol-ext/consts'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasView } from '../../util/assert'
-  import { isEqual, isFunction, isPlainObject, noop, coalesce } from '../../util/minilo'
+  import { coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
 
   /**
    * @vueProps
@@ -142,7 +141,7 @@
       }
     },
     /**
-     * @return {ol.ProjectionLike}
+     * @return {ProjectionLike}
      */
     resolvedDataProjection () {
       // exclude this.projection from lookup to allow view rendering in projection
@@ -150,7 +149,7 @@
       return coalesce(
         this.$viewContainer && this.$viewContainer.resolvedDataProjection,
         this.$options.dataProjection,
-        this.viewProjection
+        this.viewProjection,
       )
     },
   }
@@ -161,7 +160,7 @@
   const methods = /** @lends module:map/view# */{
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#animate}
-     * @param {...(olx.AnimationOptions|function(boolean))} args
+     * @param {...(AnimationOptions|function(boolean))} args
      * @return {Promise} Resolves when animation completes
      */
     animate (...args) {
@@ -181,11 +180,11 @@
         resolve => this.$view.animate(...args, complete => {
           cb(complete)
           resolve(complete)
-        })
+        }),
       )
     },
     /**
-     * @return {ol.View}
+     * @return {View}
      * @protected
      */
     createOlObject () {
@@ -208,8 +207,8 @@
     },
     /**
      * @see {@link https://openlayers.org/en/latest/apidoc/ol.View.html#fit}
-     * @param {GeoJSONFeature|ol.Extent|ol.geom.Geometry|Vue} geometryOrExtent
-     * @param {olx.view.FitOptions} [options]
+     * @param {Object|Extent|Geometry|Vue} geometryOrExtent
+     * @param {FitOptions} [options]
      * @return {Promise} Resolves when view changes
      */
     fit (geometryOrExtent, options = {}) {
@@ -326,7 +325,7 @@
     created () {
       Object.defineProperties(this, /** @lends module:map/view# */{
         /**
-         * @type {ol.View|undefined}
+         * @type {View|undefined}
          */
         $view: {
           enumerable: true,
@@ -350,16 +349,19 @@
 
     const ft = 0
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
-    const zoom = resolution::mapObs(() => ({
-      prop: 'zoom',
-      value: Math.round(this.$view.getZoom()),
-    }))::distinctUntilKeyChanged('value')
+    const zoom = resolution.pipe(
+      mapObs(() => ({
+        prop: 'zoom',
+        value: Math.round(this.$view.getZoom()),
+      })),
+      distinctUntilKeyChanged('value'),
+    )
 
-    const changes = Observable::mergeObs(
+    const changes = mergeObs(
       observableFromOlChangeEvent(this.$view, 'center', true, ft, () => this.pointToDataProj(this.$view.getCenter())),
       observableFromOlChangeEvent(this.$view, 'rotation', true, ft),
       resolution,
-      zoom
+      zoom,
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {

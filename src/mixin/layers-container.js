@@ -1,4 +1,4 @@
-import Layer from 'ol/layer/layer'
+import Layer from 'ol/layer/Layer'
 import Vue from 'vue'
 import { instanceOf } from '../util/assert'
 
@@ -11,7 +11,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @param {ol.layer.Layer|Vue} layer
+   * @param {Layer|Vue} layer
    * @return {void}
    */
   addLayer (layer) {
@@ -23,7 +23,7 @@ const methods = {
     }
   },
   /**
-   * @param {ol.layer.Layer|Vue} layer
+   * @param {Layer|Vue} layer
    * @return {void}
    */
   removeLayer (layer) {
@@ -36,14 +36,14 @@ const methods = {
     }
   },
   /**
-   * @return {ol.layer.Layer[]}
+   * @return {Layer[]}
    */
   getLayers () {
     return this.getLayersTarget().elements
   },
   /**
    * @param {string|number} id
-   * @return {ol.layer.Layer|undefined}
+   * @return {Layer|undefined}
    */
   getLayerById (id) {
     return this.getLayersTarget().findByKey(id)

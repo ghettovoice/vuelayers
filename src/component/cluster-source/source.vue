@@ -1,11 +1,11 @@
 <script>
+  import sourceContainer from '../../mixin/source-container'
   /**
    * @module cluster-source/source
    */
   import vectorSource from '../../mixin/vector-source'
-  import sourceContainer from '../../mixin/source-container'
+  import { createPointGeom, findPointOnSurface } from '../../ol-ext/geom'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { findPointOnSurface, createPointGeom } from '../../ol-ext/geom'
   import SourceBuilder from './builder'
 
   const props = {
@@ -57,7 +57,7 @@
     getServices () {
       return mergeDescriptors(
         this::vectorSource.methods.getServices(),
-        this::sourceContainer.methods.getServices()
+        this::sourceContainer.methods.getServices(),
       )
     },
     /**

@@ -23,6 +23,7 @@ module.exports = {
   version: packageJson.version,
   license: packageJson.license,
   entry: path.join(__dirname, '../src/index.js'),
+  umdEntry: path.join(__dirname, '../src/index.umd.js'),
   outputPath: path.join(__dirname, '../lib'),
   publicPath: '/',
   host: 'localhost',

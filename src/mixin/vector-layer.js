@@ -1,6 +1,6 @@
+import mergeDescriptors from '../util/multi-merge-descriptors'
 import layer from './layer'
 import stylesContainer from './styles-container'
-import mergeDescriptors from '../util/multi-merge-descriptors'
 
 const props = {
   /**
@@ -23,7 +23,7 @@ const props = {
     default: 100,
   },
   /**
-   * @type {ol.RenderOrderFunction|undefined}
+   * @type {RenderOrderFunction|undefined}
    */
   renderOrder: Function,
   /**
@@ -34,7 +34,7 @@ const props = {
 
 const methods = {
   /**
-   * @return {Promise<Vue<ol.layer.Layer>>}
+   * @return {Promise<Vue<Layer>>}
    * @protected
    */
   init () {
@@ -54,11 +54,11 @@ const methods = {
   getServices () {
     return mergeDescriptors(
       this::layer.methods.getServices(),
-      this::stylesContainer.methods.getServices()
+      this::stylesContainer.methods.getServices(),
     )
   },
   /**
-   * @return {ol.layer.Vector|undefined}
+   * @return {Vector|undefined}
    * @protected
    */
   getStyleTarget () {

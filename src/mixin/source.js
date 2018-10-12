@@ -15,14 +15,14 @@ const props = {
 
 const methods = {
   /**
-   * @return {ol.source.Source|Promise<ol.source.Source>}
+   * @return {Source|Promise<Source>}
    * @protected
    */
   createOlObject () {
     return this.createSource()
   },
   /**
-   * @return {ol.source.Source|Promise<ol.source.Source>}
+   * @return {Source|Promise<Source>}
    * @protected
    * @abstract
    */
@@ -112,7 +112,7 @@ export default {
   created () {
     Object.defineProperties(this, {
       /**
-       * @type {ol.source.Source|undefined}
+       * @type {Source|undefined}
        */
       $source: {
         enumerable: true,

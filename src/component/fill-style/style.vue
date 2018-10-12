@@ -2,7 +2,7 @@
   /**
    * @module fill-style/style
    */
-  import Fill from 'ol/style/fill'
+  import Fill from 'ol/style/Fill'
   import style from '../../mixin/style'
 
   const props = {
@@ -11,7 +11,7 @@
 
   const methods = {
     /**
-     * @return {ol.style.Fill}
+     * @return {Fill}
      * @protected
      */
     createStyle () {

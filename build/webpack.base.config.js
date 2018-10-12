@@ -1,9 +1,13 @@
 const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
-const NpmInstallPlugin = require('npm-install-webpack-plugin')
+const {VueLoaderPlugin} = require('vue-loader')
+const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const utils = require('./utils')
 const config = require('./config')
+
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -11,11 +15,16 @@ module.exports = {
   entry: {
     [ config.name ]: config.entry,
   },
+  mode: ['production', 'development'].includes(process.env.NODE_ENV)
+    ? process.env.NODE_ENV
+    : 'development',
   devtool: '#source-map',
   output: {
     path: config.outputPath,
     filename: isProduction ? '[name].min.js' : '[name].js',
     publicPath: config.publicPath,
+    hotUpdateChunkFilename: '[hash].hot-update.js',
+    crossOriginLoading: 'anonymous',
   },
   resolve: {
     extensions: ['.js', '.vue', '.json', '.md'],
@@ -33,26 +42,30 @@ module.exports = {
       utils.resolve('node_modules'),
     ],
   },
+  optimization: {
+    minimizer: [
+      // UglifyJs do not support ES6+, you can also use babel-minify for better treeshaking: https://github.com/babel/minify
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: {
+            warnings: false,
+          },
+        },
+        cache: true,
+        sourceMap: true,
+        parallel: true,
+      }),
+      // Compress extracted CSS. We are using this plugin so that possible
+      // duplicated CSS from different components can be deduped.
+      new OptimizeCSSPlugin({
+        cssProcessorOptions: {
+          map: {inline: false},
+        },
+      }),
+    ],
+  },
   module: {
     rules: [
-      {
-        test: /\.(js|vue|md)$/,
-        use: [
-          utils.compileVarsReplaceLoader(),
-          {
-            loader: 'ifdef-loader',
-            options: {
-              IS_STANDALONE: false,
-              'ifdef-triple-slash': false,
-            },
-          },
-        ],
-        enforce: 'pre',
-        include: [
-          utils.resolve('src'),
-          utils.resolve('test'),
-        ],
-      },
       {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
@@ -76,10 +89,19 @@ module.exports = {
           utils.resolve('node_modules/lodash-es'),
         ],
       },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: utils.vueLoaderConfig(isProduction),
+      },
+      ...utils.styleLoaders({
+        sourceMap: isProduction,
+      }),
     ],
     noParse: [/openlayers/],
   },
   plugins: [
+    new VueLoaderPlugin(),
     // new NpmInstallPlugin(),
     new StringReplacePlugin(),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
@@ -96,4 +118,20 @@ module.exports = {
       alwaysNotify: false,
     }),
   ],
+  performance: {
+    maxEntrypointSize: 1024 * 1024, // 1Mb
+    maxAssetSize: 10 * 1024 * 1024, // 10Mb
+  },
+  stats: {
+    colors: true,
+    children: false,
+    chunks: false,
+    modules: false,
+    chunkModules: false,
+  },
+  devServer: {
+    open: true,
+    hot: true,
+    contentBase: config.outputPath,
+  },
 }

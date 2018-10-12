@@ -1,26 +1,21 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module stroke-style
- */
 import Style from './style.vue'
 
-/**
- * @alias module:stroke-style
- */
-export default {
-  /**
-   * @alias module:stroke-style/style
-   */
-  Style,
-  /**
-   * @param {Vue} Vue
-   * @param {VueLayersOptions} [options]
-   */
-  install (Vue, options = {}) {
-    options = pick(options, 'dataProjection')
-    Object.assign(Style, options)
+function plugin (Vue, options = {}) {
+  if (plugin.installed) {
+    return
+  }
+  plugin.installed = true
 
-    Vue.component(Style.name, Style)
-  },
+  options = pick(options, 'dataProjection')
+  Object.assign(Style, options)
+
+  Vue.component(Style.name, Style)
+}
+
+export default plugin
+
+export {
+  Style,
+  plugin as install,
 }

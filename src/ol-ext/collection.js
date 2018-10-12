@@ -5,12 +5,12 @@ import { forEach } from '../util/minilo'
  */
 export class IndexedCollectionAdapter {
   /**
-   * @param {ol.Collection} collection
+   * @param {Collection} collection
    * @param {function} getElementKey
    */
   constructor (collection, getElementKey) {
     /**
-     * @type {ol.Collection}
+     * @type {Collection}
      * @private
      */
     this._adaptee = collection
@@ -29,7 +29,7 @@ export class IndexedCollectionAdapter {
   }
 
   /**
-   * @return {ol.Collection}
+   * @return {Collection}
    */
   get adaptee () {
     return this._adaptee
@@ -162,25 +162,25 @@ export class IndexedCollectionAdapter {
  */
 export class SourceCollectionAdapter {
   /**
-   * @param {ol.source.Vector} source
+   * @param {Vector} source
    */
   constructor (source) {
     /**
-     * @type {ol.source.Vector}
+     * @type {Vector}
      * @private
      */
     this._adaptee = source
   }
 
   /**
-   * @return {ol.source.Vector}
+   * @return {Vector}
    */
   get adaptee () {
     return this._adaptee
   }
 
   /**
-   * @return {Array<ol.Feature>}
+   * @return {Array<Feature>}
    */
   get elements () {
     return this._adaptee.getFeatures()
@@ -194,21 +194,21 @@ export class SourceCollectionAdapter {
   }
 
   /**
-   * @param {ol.Feature} feature
+   * @param {Feature} feature
    */
   add (feature) {
     this._adaptee.addFeature(feature)
   }
 
   /**
-   * @param {ol.Feature} feature
+   * @param {Feature} feature
    */
   remove (feature) {
     this._adaptee.removeFeature(feature)
   }
 
   /**
-   * @param {ol.Feature} feature
+   * @param {Feature} feature
    * @return {boolean}
    */
   has (feature) {
@@ -224,7 +224,7 @@ export class SourceCollectionAdapter {
 
   /**
    * @param {*} key
-   * @return {ol.Feature|undefined}
+   * @return {Feature|undefined}
    */
   findByKey (key) {
     return this._adaptee.getFeatureById(key)

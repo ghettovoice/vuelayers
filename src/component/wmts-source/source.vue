@@ -2,14 +2,14 @@
   /**
    * @module wmts-source/source
    */
-  import WMTSSource from 'ol/source/wmts'
-  import WMTSTileGrid from 'ol/tilegrid/wmts'
-  import { range } from '../../util/minilo'
+  import WMTSSource from 'ol/source/WMTS'
+  import WMTSTileGrid from 'ol/tilegrid/WMTS'
   import tileSource from '../../mixin/tile-source'
   import { WMTS_FORMAT, WMTS_REQUEST_ENCODING, WMTS_VERSION } from '../../ol-ext/consts'
   import { createExtentFromProjection } from '../../ol-ext/extent'
   import { resolutionsFromExtent } from '../../ol-ext/tile-grid'
   import { hasView } from '../../util/assert'
+  import { range } from '../../util/minilo'
 
   const props = {
     dimensions: Object,
@@ -45,7 +45,7 @@
 
   const methods = {
     /**
-     * @returns {ol.source.WMTS}
+     * @returns {WMTS}
      * @protected
      */
     createSource () {
@@ -72,7 +72,7 @@
       })
     },
     /**
-     * @return {ol.tilegrid.WMTS}
+     * @return {WMTS}
      * @protected
      */
     createTileGrid () {
@@ -82,7 +82,7 @@
       const resolutions = resolutionsFromExtent(
         extent,
         this.maxZoom,
-        this.tileSize
+        this.tileSize,
       )
 
       return new WMTSTileGrid({

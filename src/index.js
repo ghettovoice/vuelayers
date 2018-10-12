@@ -1,64 +1,59 @@
-/**
- * This file is a part of vuelayers package.
- * @package vuelayers
- * @author Vladimir Vershinin
- * @license MIT
- */
-import BingMapsSource from './component/bing-maps-source'
-import CircleGeom from './component/circle-geom'
-import CircleStyle from './component/circle-style'
-import ClusterSource from './component/cluster-source'
-import DrawInteraction from './component/draw-interaction'
-import Feature from './component/feature'
-import FillStyle from './component/fill-style'
-import Geoloc from './component/geoloc'
-import IconStyle from './component/icon-style'
-import ImageLayer from './component/image-layer'
-import ImageStaticSource from './component/image-static-source'
-import LineStringGeom from './component/line-string-geom'
-import Map from './component/map'
-import MapboxSource from './component/mapbox-source'
-import ModifyInteraction from './component/modify-interaction'
-import MultiLineStringGeom from './component/multi-line-string-geom'
-import MultiPointGeom from './component/multi-point-geom'
-import MultiPolygonGeom from './component/multi-polygon-geom'
-import OsmSource from './component/osm-source'
-import Overlay from './component/overlay'
-import PointGeom from './component/point-geom'
-import PolygonGeom from './component/polygon-geom'
-import RegShapeStyle from './component/reg-shape-style'
-import SelectInteraction from './component/select-interaction'
-import SnapInteraction from './component/snap-interaction'
-import SputnikSource from './component/sputnik-source'
-import StrokeStyle from './component/stroke-style'
-import StyleBox from './component/style-box'
-import StyleFunc from './component/style-func'
-import TextStyle from './component/text-style'
-import TileLayer from './component/tile-layer'
-import VectorLayer from './component/vector-layer'
-import VectorSource from './component/vector-source'
-import VectorTileLayer from './component/vector-tile-layer'
-import VectorTileSource from './component/vector-tile-source'
-import WmsSource from './component/wms-source'
-import WmtsSource from './component/wmts-source'
-import XyzSource from './component/xyz-source'
-// #if IS_STANDALONE
-import * as mixin from './mixin'
-import * as olExt from './ol-ext'
-import * as rxExt from './rx-ext'
-// #endif
+import * as BingMapsSource from './component/bing-maps-source'
+import * as CircleGeom from './component/circle-geom'
+import * as CircleStyle from './component/circle-style'
+import * as ClusterSource from './component/cluster-source'
+import * as DrawInteraction from './component/draw-interaction'
+import * as Feature from './component/feature'
+import * as FillStyle from './component/fill-style'
+import * as Geoloc from './component/geoloc'
+import * as IconStyle from './component/icon-style'
+import * as ImageLayer from './component/image-layer'
+import * as ImageStaticSource from './component/image-static-source'
+import * as LineStringGeom from './component/line-string-geom'
+import * as Map from './component/map'
+import * as MapboxSource from './component/mapbox-source'
+import * as ModifyInteraction from './component/modify-interaction'
+import * as MultiLineStringGeom from './component/multi-line-string-geom'
+import * as MultiPointGeom from './component/multi-point-geom'
+import * as MultiPolygonGeom from './component/multi-polygon-geom'
+import * as OsmSource from './component/osm-source'
+import * as Overlay from './component/overlay'
+import * as PointGeom from './component/point-geom'
+import * as PolygonGeom from './component/polygon-geom'
+import * as RegShapeStyle from './component/reg-shape-style'
+import * as SelectInteraction from './component/select-interaction'
+import * as SnapInteraction from './component/snap-interaction'
+import * as SputnikSource from './component/sputnik-source'
+import * as StrokeStyle from './component/stroke-style'
+import * as StyleBox from './component/style-box'
+import * as StyleFunc from './component/style-func'
+import * as TextStyle from './component/text-style'
+import * as TileLayer from './component/tile-layer'
+import * as VectorLayer from './component/vector-layer'
+import * as VectorSource from './component/vector-source'
+import * as VectorTileLayer from './component/vector-tile-layer'
+import * as VectorTileSource from './component/vector-tile-source'
+import * as WmsSource from './component/wms-source'
+import * as WmtsSource from './component/wmts-source'
+import * as XyzSource from './component/xyz-source'
 import './sass/main.sass'
 
 /**
  * @const {string} VueLayers version.
  */
 const VERSION = 'C_PKG_VERSION'
+
 /**
  * Registers all VueLayers components.
  * @param {Vue|VueConstructor} Vue
  * @param {VueLayersOptions} [options]
  */
 function plugin (Vue, options = {}) {
+  if (plugin.installed) {
+    return
+  }
+  plugin.installed = true
+
   // install components
   Vue.use(BingMapsSource, options)
   Vue.use(CircleGeom, options)
@@ -101,7 +96,7 @@ function plugin (Vue, options = {}) {
 }
 
 export default plugin
-/* eslint-disable indent */
+
 export {
   VERSION,
   plugin as install,
@@ -144,11 +139,6 @@ export {
   WmsSource,
   WmtsSource,
   XyzSource,
-// #if IS_STANDALONE
-  mixin,
-  olExt,
-  rxExt,
-// #endif
 }
 
 /**

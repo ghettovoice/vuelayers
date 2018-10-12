@@ -2,7 +2,7 @@
   /**
    * @module osm-source/source
    */
-  import OSMSource from 'ol/source/osm'
+  import OSMSource from 'ol/source/OSM'
   import xyzSource from '../../mixin/xyz-source'
 
   const OSM_ATTRIBUTIONS = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'

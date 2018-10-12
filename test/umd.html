@@ -26,17 +26,15 @@
     <vl-view :center="[0, 0]" :zoom="3"></vl-view>
 
     <vl-layer-tile>
-      <vl-source-sputnik></vl-source-sputnik>
+      <vl-source-osm cross-origin="anonymous"></vl-source-osm>
     </vl-layer-tile>
   </vl-map>
 </div>
 
-<script src="https://unpkg.com/vue@latest"></script>
-<script src="https://unpkg.com/openlayers@latest"></script>
+<script src="https://unpkg.com/vue@2.5.17/dist/vue.min.js"></script>
+<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
 <script src="../lib/index.umd.js"></script>
 <script>
-  /* global Vue, VueLayers */
-  Vue.use(VueLayers)
   /* eslint-disable no-new */
   new Vue({
     el: '#app',

@@ -1,10 +1,10 @@
 <script>
   /** @module circle-geom/geom */
-  import Circle from 'ol/geom/circle'
+  import Circle from 'ol/geom/Circle'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
-  import { constant } from '../../util/minilo'
   import { hasGeometry } from '../../util/assert'
+  import { constant } from '../../util/minilo'
 
   /**
    * @vueProps
@@ -41,14 +41,14 @@
    */
   const methods = {
     /**
-     * @return {ol.geom.Circle}
+     * @return {Circle}
      * @protected
      */
     createGeometry () {
       return new Circle(this.toViewProj(this.coordinates), this.radius)
     },
     /**
-     * @return {ol.Coordinate}
+     * @return {Coordinate}
      */
     getCoordinates () {
       hasGeometry(this)
@@ -56,7 +56,7 @@
       return this.toDataProj(this.$geometry.getCenter())
     },
     /**
-     * @param {ol.Coordinate} coordinate
+     * @param {Coordinate} coordinate
      */
     setCoordinates (coordinate) {
       hasGeometry(this)

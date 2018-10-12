@@ -1,6 +1,6 @@
 <script>
   /** @module snap-interaction/interaction */
-  import SnapInteraction from 'ol/interaction/snap'
+  import SnapInteraction from 'ol/interaction/Snap'
   import interaction from '../../mixin/interaction'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -47,7 +47,7 @@
    */
   const methods = {
     /**
-     * @return {Promise<ol.interaction.Draw>}
+     * @return {Promise<Snap>}
      * @protected
      */
     async createInteraction () {

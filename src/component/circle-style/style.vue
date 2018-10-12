@@ -1,9 +1,9 @@
 <script>
+  import Circle from 'ol/style/Circle'
   /**
    * @module circle-style/style
    */
   import Vue from 'vue'
-  import Circle from 'ol/style/circle'
   import imageStyle from '../../mixin/image-style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -17,13 +17,12 @@
 
   const methods = {
     /**
-     * @return {ol.style.Circle}
+     * @return {Circle}
      * @protected
      */
     createStyle () {
       return new Circle({
         radius: this.radius,
-        snapToPixel: this.snapToPixel,
         fill: this._fill,
         stroke: this._stroke,
       })
@@ -40,7 +39,7 @@
       })
     },
     /**
-     * @param {ol.style.Fill|Vue|undefined} fill
+     * @param {Fill|Vue|undefined} fill
      * @return {void}
      */
     setFill (fill) {
@@ -52,7 +51,7 @@
       }
     },
     /**
-     * @param {ol.style.Stroke|Vue|undefined} stroke
+     * @param {Stroke|Vue|undefined} stroke
      * @return {void}
      */
     setStroke (stroke) {
