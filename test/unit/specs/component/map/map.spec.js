@@ -1,11 +1,10 @@
-/* global describe, it, expect */
+import { Map } from '@/component/map'
 import olMap from 'ol/Map'
 import olView from 'ol/View'
 import Vue from 'vue'
-import Map from '@/component/map'
 
 describe('vl-map', () => {
-  const Ctor = Vue.extend(Map.Map)
+  const Ctor = Vue.extend(Map)
 
   describe('created hook', () => {
     it('should export $createPromise', done => {
