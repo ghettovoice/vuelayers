@@ -56,7 +56,10 @@
       type: Number,
       default: 20,
     },
-    autoPanAnimation: Object,
+    autoPanAnimation: {
+      type: Object,
+      default: () => ({ duration: 300 }),
+    },
   }
 
   /**
@@ -66,6 +69,11 @@
     positionViewProj () {
       if (this.rev && this.$overlay) {
         return this.$overlay.getPosition()
+      }
+    },
+    positionDataProj () {
+      if (this.rev && this.$overlay) {
+        return this.pointToDataProj(this.$overlay.getPosition())
       }
     },
   }
@@ -127,17 +135,17 @@
 
   const watch = {
     offset (value) {
-      if (this.$overlay && !isEqual(this.$overlay.getOffset(), value)) {
+      if (this.$overlay && !isEqual(value, this.$overlay.getOffset())) {
         this.$overlay.setOffset(value)
       }
     },
     position (value) {
-      if (this.$overlay && !isEqual(this.$overlay.getPosition(), value)) {
+      if (this.$overlay && !isEqual(value, this.positionDataProj)) {
         this.$overlay.setPosition(this.pointToViewProj(value))
       }
     },
     positioning (value) {
-      if (this.$overlay && this.$overlay.getPositioning() !== value) {
+      if (this.$overlay && value !== this.$overlay.getPositioning()) {
         this.$overlay.setPositioning(value)
       }
     },
