@@ -1,15 +1,10 @@
 <template>
-  <div :id="[$options.name, id].join('-')" :class="$options.name" style="display: none">
-    <div>
-      <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
-    </div>
+  <div :id="[$options.name, id].join('-')" :class="$options.name" style="display: none !important;">
+    <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
   </div>
 </template>
 
 <script>
-  /**
-   * @module overlay/overlay
-   */
   import Overlay from 'ol/Overlay'
   import { merge as mergeObs } from 'rxjs/observable'
   import uuid from 'uuid/v4'
@@ -19,6 +14,7 @@
   import { OVERLAY_POSITIONING } from '../../ol-ext/consts'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasOverlay } from '../../util/assert'
+  import { isEqual } from '../../util/minilo'
 
   const props = {
     id: {
@@ -102,8 +98,11 @@
     mount () {
       hasOverlay(this)
 
-      this.$overlay.setElement(this.$el.children[0])
       this.$overlaysContainer && this.$overlaysContainer.addOverlay(this.$overlay)
+      this.$nextTick(() => {
+        this.$overlay.setElement(this.$el.children[0])
+        this.$overlay.setPosition(this.pointToViewProj(this.position))
+      })
       this.subscribeAll()
     },
     /**
@@ -128,17 +127,17 @@
 
   const watch = {
     offset (value) {
-      if (this.$overlay) {
+      if (this.$overlay && !isEqual(this.$overlay.getOffset(), value)) {
         this.$overlay.setOffset(value)
       }
     },
     position (value) {
-      if (this.$overlay) {
+      if (this.$overlay && !isEqual(this.$overlay.getPosition(), value)) {
         this.$overlay.setPosition(this.pointToViewProj(value))
       }
     },
     positioning (value) {
-      if (this.$overlay) {
+      if (this.$overlay && this.$overlay.getPositioning() !== value) {
         this.$overlay.setPositioning(value)
       }
     },

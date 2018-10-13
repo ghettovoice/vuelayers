@@ -5,9 +5,6 @@
 </template>
 
 <script>
-  /**
-   * @module map/view
-   */
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
@@ -15,7 +12,7 @@
   import olCmp from '../../mixin/ol-cmp'
   import projTransforms from '../../mixin/proj-transforms'
   import { EPSG_3857, MAX_ZOOM, MIN_ZOOM, ZOOM_FACTOR } from '../../ol-ext/consts'
-  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
+  import { observableFromOlChangeEvent } from '../../rx-ext'
   import { hasView } from '../../util/assert'
   import { coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
 
@@ -260,23 +257,23 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, this.viewCenter)) {
+      if (this.$view && !this.$view.getAnimating() && !isEqual(value, this.viewCenter)) {
         this.$view.setCenter(this.pointToViewProj(value))
       }
     },
     resolution (value) {
-      if (this.$view && value !== this.viewResolution) {
+      if (this.$view && !this.$view.getAnimating() && value !== this.viewResolution) {
         this.$view.setResolution(value)
       }
     },
     zoom (value) {
       value = Math.round(value)
-      if (this.$view && value !== this.viewZoom) {
+      if (this.$view && !this.$view.getAnimating() && value !== this.viewZoom) {
         this.$view.setZoom(value)
       }
     },
     rotation (value) {
-      if (this.$view && value !== this.viewRotation) {
+      if (this.$view && !this.$view.getAnimating() && value !== this.viewRotation) {
         this.$view.setRotation(value)
       }
     },
@@ -347,7 +344,7 @@
   function subscribeToViewChanges () {
     hasView(this)
 
-    const ft = 0
+    const ft = 1000 / 60
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution.pipe(
       mapObs(() => ({
