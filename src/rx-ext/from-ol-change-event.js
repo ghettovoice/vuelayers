@@ -20,14 +20,17 @@ export default function fromOlChangeEvent (target, prop, distinct, throttle, sel
   selector = selector || ((target, prop) => target.get(prop))
   let event = `change:${prop}`
   let observable = fromOlEvent(target, event, () => selector(target, prop))
+  let operations = []
 
   if (throttle != null) {
-    observable = observable.pipe(throttleTime(throttle))
+    operations.push(throttleTime(throttle))
   }
   if (distinct) {
     isFunction(distinct) || (distinct = isEqual)
-    observable = observable.pipe(distinctUntilChanged(distinct))
+    operations.push(distinctUntilChanged(distinct))
   }
 
-  return observable.pipe(mapObs(value => ({ prop, value })))
+  operations.push(mapObs(value => ({ prop, value })))
+
+  return observable.pipe(...operations)
 }

@@ -4,16 +4,16 @@
 const path = require('path')
 const packageJson = require('../package.json')
 
-const banner = `/*!
-${packageJson.fullname}
-${packageJson.description}
-
-@package ${packageJson.name}
-@author ${packageJson.author}
-@version ${packageJson.version}
-@license ${packageJson.license}
-@copyright (c) 2017-${new Date().getFullYear()}, ${packageJson.author}
-*/`
+const banner = `/**
+ * ${packageJson.fullname}
+ * ${packageJson.description}
+ *
+ * @package ${packageJson.name}
+ * @author ${packageJson.author}
+ * @version ${packageJson.version}
+ * @license ${packageJson.license}
+ * @copyright (c) 2017-${new Date().getFullYear()}, ${packageJson.author}
+ */`
 
 module.exports = {
   banner,

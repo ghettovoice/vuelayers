@@ -6,7 +6,7 @@ import MultiLineString from 'ol/geom/MultiLineString'
 import MultiPoint from 'ol/geom/MultiPoint'
 import MultiPolygon from 'ol/geom/MultiPolygon'
 import Point from 'ol/geom/Point'
-import Polygon from 'ol/geom/Polygon'
+import Polygon, { circular as circularPolygon } from 'ol/geom/Polygon'
 import { GEOMETRY_TYPE } from './consts'
 
 /**
@@ -76,7 +76,7 @@ export function createGeomCollection (geoms) {
  * @return {Polygon}
  */
 export function createCircularPolygon (center, radius) {
-  return Polygon.circular(center, radius)
+  return circularPolygon(center, radius)
 }
 
 /**

@@ -139,8 +139,8 @@
         <!--</vl-layer-vector>-->
 
         <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
-                    :position="pointOnSurface(selectedFeatures[0].geometry)">
-          <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
+                    :position="pointOnSurface(selectedFeatures[0].geometry)" :auto-pan="true" :auto-pan-animation="{ duration: 250 }">
+          <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); width: 200px">
             Popup cluster feature {{ selectedFeatures[0].id }}<br />
             <span v-for="feature in selectedFeatures[0].properties.features">
               feature {{ feature.id }}
