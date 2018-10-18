@@ -2,7 +2,7 @@
 
 > Provides collection of features for vector layers
 
-`vl-source-vector` can be used together with [`vl-layer-vector`](vector-layer.md) to
+`vl-source-vector` can be used together with [`vl-layer-vector`](/docs/component/vector-layer.md) to
 draw any vector data on the map.
 
 # Versions
@@ -12,7 +12,7 @@ draw any vector data on the map.
 
 ## Usage
 
-Static features with the help of [`vl-feature`](feature.md), should be used only for tiny static layers.
+Static features with the help of [`vl-feature`](/docs/component/feature.md), should be used only for tiny static layers.
 
 <vuep template="#static-features-example"></vuep>
 
@@ -61,7 +61,7 @@ Static features with the help of [`vl-feature`](feature.md), should be used only
 </script>
 </script>
 
-Load features simply by providing [`url`](vector-source.md#url) value, default XHR loader will be used in this
+Load features simply by providing [`url`](/docs/component/vector-source.md#url) value, default XHR loader will be used in this
 case.
 
 <vuep template="#default-loader-example"></vuep>
@@ -94,8 +94,8 @@ case.
 </script>
 </script>
 
-Next example loads features from remote WFS service by viewport BBOX. With [`format-factory`](vector-source.md#format-factory) and 
-[`strategy-factory`](vector-source.md#strategy-factory) you can define custom vector source format and loading strategy.
+Next example loads features from remote WFS service by viewport BBOX. With [`format-factory`](/docs/component/vector-source.md#format-factory) and 
+[`strategy-factory`](/docs/component/vector-source.md#strategy-factory) you can define custom vector source format and loading strategy.
 
 <vuep template="#wfs-example"></vuep>
 
@@ -314,7 +314,7 @@ Source attributions.
 - **Default**: `[]`
 
 Array of GeoJSON features with coordinates in map view projection or 
-global [`data-projection`](../quickstart.md#global-data-projection).
+global [`data-projection`](/docs/quickstart.md#global-data-projection).
 
 ### format-factory
 
@@ -322,7 +322,7 @@ global [`data-projection`](../quickstart.md#global-data-projection).
 - **Default**: `function(): ol.format.GeoJSON`
 
 Source format factory that returns prepared instance of [`ol.format.Feature`](http://openlayers.org/en/latest/apidoc/module-ol_format_Feature-FeatureFormat.html).
-This feature format will be used by default XHR loader when [`url`](vector-source.md#url) provided as string.
+This feature format will be used by default XHR loader when [`url`](/docs/component/vector-source.md#url) provided as string.
 
 ### loader-factory
 
