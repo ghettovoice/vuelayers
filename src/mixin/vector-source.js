@@ -93,7 +93,7 @@ const methods = {
    * @protected
    */
   writeFeatureInDataProj (feature) {
-    return Object.freeze(this::projTransforms.methods.writeFeatureInDataProj(feature))
+    return this::projTransforms.methods.writeFeatureInDataProj(feature)
   },
   /**
    * @param feature
@@ -101,7 +101,7 @@ const methods = {
    * @protected
    */
   writeGeometryInViewProj (feature) {
-    return Object.freeze(this::projTransforms.methods.writeFeatureInViewProj(feature))
+    return this::projTransforms.methods.writeFeatureInViewProj(feature)
   },
 }
 
@@ -133,8 +133,9 @@ function subscribeToSourceChanges () {
       this.removeFeature(feature)
     }),
   )
+  const changeFeature = observableFromOlEvent(this.$source, 'changefeature')
 
-  const events = mergeObs(add, remove)
+  const events = mergeObs(add, remove, changeFeature)
 
   this.subscribeTo(events, evt => {
     ++this.rev
