@@ -3,7 +3,7 @@
 > Geographic feature representation
 
 `vl-feature` provides properties similar the **GeoJSON** feature.  It has one 
-**default slot** and acts like geometry container for [`vl-geom-*`](point-geom.md) 
+**default slot** and acts like geometry container for [`vl-geom-*`](/docs/component/point-geom.md) 
 components, without geometry component nothing will be rendered.
 
 `vl-feature` components can be placed inside component that are mixes in 
