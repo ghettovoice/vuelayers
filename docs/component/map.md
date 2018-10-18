@@ -3,7 +3,7 @@
 > The core component of VueLayers
 
 It is a main container for all other VueLayers components and has one `default` 
-slot to place them all. Usually you will use it together with [`vl-view`](view.md) 
+slot to place them all. Usually you will use it together with [`vl-view`](/docs/component/view.md) 
 component to setup `zoom`, `center`, `projection` and other view related propeties for the map.
 
 ## Module system
@@ -16,7 +16,7 @@ component to setup `zoom`, `center`, `projection` and other view related propeti
 ## Usage
 
 Example of simple map.  
-See also documentation of [`vl-view`](view.md) component.
+See also documentation of [`vl-view`](/docs/component/view.md) component.
 
 <vuep template="#usage-example"></vuep>
 
@@ -124,7 +124,7 @@ keyboard events on map.
 - **Default**: `undefined`
 
 Projection of input/output plain coordinates in properties, events and etc.
-See [Global data projection](../quickstart.md#global-data-projection) setup guide.
+See [Global data projection](/docs/quickstart.md#global-data-projection) setup guide.
 
 ## Events
 
