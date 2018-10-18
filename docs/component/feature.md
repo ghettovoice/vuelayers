@@ -7,10 +7,10 @@
 components, without geometry component nothing will be rendered.
 
 `vl-feature` components can be placed inside component that are mixes in 
-[`featuresContainer`](../mixin/features-container.md) mixin, such as [`vl-map`](map.md), 
-[`vl-source-vector`](vector-source.md) and etc.
+[`featuresContainer`](/docs/mixin/features-container.md) mixin, such as [`vl-map`](/docs/component/map.md), 
+[`vl-source-vector`](/docs/component/vector-source.md) and etc.
 
-Custom feature styles can be applied with [`vl-style-*`](circle-style.md) 
+Custom feature styles can be applied with [`vl-style-*`](/docs/component/circle-style.md) 
 components placed inside default slot.
 
 ## Versions
@@ -23,8 +23,8 @@ components placed inside default slot.
 ## Usage
 
 Features with different geometries.  
-See also documentation of [`vl-geom-point`](point-geom.md), [`vl-geom-line-string`](line-string-geom.md) 
-and [`vl-geom-polygon`](polygon-geom.md) components.
+See also documentation of [`vl-geom-point`](/docs/component/point-geom.md), [`vl-geom-line-string`](/docs/component/line-string-geom.md) 
+and [`vl-geom-polygon`](/docs/component/polygon-geom.md) components.
 
 <vuep template="#usage-example"></vuep>
 
