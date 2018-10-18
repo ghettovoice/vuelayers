@@ -257,8 +257,9 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !this.$view.getAnimating() && !isEqual(value, this.viewCenter)) {
-        this.$view.setCenter(this.pointToViewProj(value))
+      value = this.pointToViewProj(value)
+      if (this.$view && !this.$view.getAnimating() && !isEqual(value, this.viewCenterViewProj)) {
+        this.$view.setCenter(value)
       }
     },
     resolution (value) {

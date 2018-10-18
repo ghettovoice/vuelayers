@@ -1,5 +1,5 @@
 <template>
-  <div :id="[$options.name, id].join('-')" :class="$options.name" style="display: none !important;">
+  <div :id="[$options.name, id].join('-')" :class="$options.name">
     <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
   </div>
 </template>
@@ -56,10 +56,7 @@
       type: Number,
       default: 20,
     },
-    autoPanAnimation: {
-      type: Object,
-      default: () => ({ duration: 300 }),
-    },
+    autoPanAnimation: Object,
   }
 
   /**
@@ -106,10 +103,11 @@
     mount () {
       hasOverlay(this)
 
+      this.$overlay.setElement(this.$el)
       this.$overlaysContainer && this.$overlaysContainer.addOverlay(this.$overlay)
+      // reset position to trigger panIntoView
       this.$nextTick(() => {
-        this.$overlay.setElement(this.$el.children[0])
-        this.$overlay.setPosition(this.pointToViewProj(this.position))
+        this.$overlay.setPosition(this.positionViewProj.slice())
       })
       this.subscribeAll()
     },
@@ -140,8 +138,9 @@
       }
     },
     position (value) {
-      if (this.$overlay && !isEqual(value, this.positionDataProj)) {
-        this.$overlay.setPosition(this.pointToViewProj(value))
+      value = this.pointToViewProj(value)
+      if (this.$overlay && !isEqual(value, this.positionViewProj)) {
+        this.$overlay.setPosition(value)
       }
     },
     positioning (value) {
@@ -200,7 +199,7 @@
   function subscribeToOverlayChanges () {
     hasOverlay(this)
 
-    const ft = 100
+    const ft = 1000 / 60
     const changes = mergeObs(
       observableFromOlChangeEvent(this.$overlay, 'position', true, ft,
         () => this.pointToDataProj(this.$overlay.getPosition())),
