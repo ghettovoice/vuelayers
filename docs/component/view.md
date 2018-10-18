@@ -15,7 +15,7 @@ and **rotation** of the map.
 ## Usage
 
 Example of simple map with view in **EPSG:4326** projection.   
-See also documentation of [`vl-map`](map.md) component.
+See also documentation of [`vl-map`](/docs/component/map.md) component.
 
 <vuep template="#usage-example"></vuep>
 
@@ -91,7 +91,7 @@ Resolutions to determine the resolution constraint. If set the `max-resolution`,
 The view internal projection. This is the projection with which OpenLayers component
 will work (`ol.View`, `ol.Feature` and other that works with geographic data). 
 By all VueLayers components accepts coordinates in the view projection.  
-See also how to setup [Global data projection](../quickstart.md#global-data-projection).
+See also how to setup [Global data projection](/docs/quickstart.md#global-data-projection).
 
 ### max-zoom
 
