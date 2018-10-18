@@ -61,7 +61,7 @@ Example below shows how to add custom content on to the map.
 - **Type**: `number[]`
 - **Required**
 
-Coordinate of the overlay position in view [`projection`](view.md#projection) or 
+Coordinate of the overlay position in view [`projection`](/docs/component/view.md#projection) or 
 [data projection](/docs/quickstart.md#global-data-projection).
 
 ### id
