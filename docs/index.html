@@ -120,10 +120,20 @@
       subMaxLevel: 2,
       plugins: [
         EditOnGithubPlugin.create('https://github.com/ghettovoice/vuelayers/blob/master/docs/'),
+        fixDocLinksPath,
       ],
       alias: {
         '/.*/_sidebar.md': '/_sidebar.md',
+        '/docs/(.*)': '/$1',
       },
+    }
+
+    function fixDocLinksPath (hook) {
+      hook.beforeEach(function  (content) {
+        return content.replace(/\[([^\]]*)\]\(([^)]*)\)/g, function (x) {
+          return x.replace('](/docs', '](')
+        })
+      })
     }
   </script>
 
