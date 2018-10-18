@@ -62,7 +62,7 @@ Example below shows how to add custom content on to the map.
 - **Required**
 
 Coordinate of the overlay position in view [`projection`](view.md#projection) or 
-[data projection](../quickstart.md#global-data-projection).
+[data projection](/docs/quickstart.md#global-data-projection).
 
 ### id
 
