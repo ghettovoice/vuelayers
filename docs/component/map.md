@@ -3,7 +3,7 @@
 > The core component of VueLayers
 
 It is a main container for all other VueLayers components and has one `default` 
-slot to place them all. Usually you will use it together with [`vl-view`](component/view.md) 
+slot to place them all. Usually you will use it together with [`vl-view`](/docs/component/view.md) 
 component to setup `zoom`, `center`, `projection` and other view related propeties for the map.
 
 ## Module system
@@ -16,7 +16,7 @@ component to setup `zoom`, `center`, `projection` and other view related propeti
 ## Usage
 
 Example of simple map.  
-See also documentation of [`vl-view`](component/view.md) component.
+See also documentation of [`vl-view`](/docs/component/view.md) component.
 
 <vuep template="#usage-example"></vuep>
 
@@ -124,11 +124,11 @@ keyboard events on map.
 - **Default**: `undefined`
 
 Projection of input/output plain coordinates in properties, events and etc.
-See [Global data projection](quickstart#global-data-projection) setup guide.
+See [Global data projection](/docs/quickstart.md#global-data-projection) setup guide.
 
 ## Events
 
-Pointer events that emits [`ol.MapBrowserEvent`](https://openlayers.org/en/latest/apidoc/ol.MapBrowserEvent.html)
+Pointer events that emits [`ol.MapBrowserEvent`](http://openlayers.org/en/latest/apidoc/module-ol_MapBrowserEvent-MapBrowserEvent.html)
 
 - `click`
 - `dblclick`
@@ -136,7 +136,7 @@ Pointer events that emits [`ol.MapBrowserEvent`](https://openlayers.org/en/lates
 - `pointerdrag`
 - `pointermove` 
 
-Other events that emits [`ol.MapEvent`](https://openlayers.org/en/latest/apidoc/ol.MapEvent.html)
+Other events that emits [`ol.MapEvent`](http://openlayers.org/en/latest/apidoc/module-ol_MapEvent-MapEvent.html)
 
 - `movestart`
 - `moveend`

@@ -3,7 +3,7 @@
 > Renders tiled images organized in grids
 
 `vl-layer-vector-tile` can render tiled vector data in grids organized by zoom levels. It should be used together with 
-[`vl-source-vector-tile`](component/vector-tile-source.md) component.
+[`vl-source-vector-tile`](/docs/component/vector-tile-source.md) component.
 
 ## Versions
 

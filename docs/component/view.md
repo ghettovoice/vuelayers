@@ -15,7 +15,7 @@ and **rotation** of the map.
 ## Usage
 
 Example of simple map with view in **EPSG:4326** projection.   
-See also documentation of [`vl-map`](component/view.md) component.
+See also documentation of [`vl-map`](/docs/component/map.md) component.
 
 <vuep template="#usage-example"></vuep>
 
@@ -91,7 +91,7 @@ Resolutions to determine the resolution constraint. If set the `max-resolution`,
 The view internal projection. This is the projection with which OpenLayers component
 will work (`ol.View`, `ol.Feature` and other that works with geographic data). 
 By all VueLayers components accepts coordinates in the view projection.  
-See also how to setup [Global data projection](quickstart.md#global-data-projection).
+See also how to setup [Global data projection](/docs/quickstart.md#global-data-projection).
 
 ### max-zoom
 
@@ -232,7 +232,7 @@ The zoom factor used to determine the resolution constraint.
 
 Animates the view. To chain together multiple animations, call the method with 
 multiple animation objects.  
-For more info see [OpenLayers documentation](https://openlayers.org/en/latest/apidoc/ol.View.html#animate).
+For more info see [OpenLayers documentation](https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#animate).
 
 ### fit(geometryOrExtent, options = {})
 
@@ -255,4 +255,4 @@ For more info see [OpenLayers documentation](https://openlayers.org/en/latest/ap
 
 Fit the given geometry or extent based on the given map size and border. 
 The size is pixel dimensions of the box to fit the extent into.  
-For more info see [OpenLayers documentation](https://openlayers.org/en/latest/apidoc/ol.View.html#fit).
+For more info see [OpenLayers documentation](https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#fit).
