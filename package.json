@@ -1,7 +1,7 @@
 {
   "name": "vuelayers",
   "fullname": "VueLayers",
-  "version": "0.11.0-beta.3",
+  "version": "0.11.0-rc.1",
   "description": "Web map Vue components with the power of OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "./lib/index.js",
