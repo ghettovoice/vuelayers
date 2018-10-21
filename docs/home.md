@@ -22,10 +22,10 @@ See the [Quick start](quickstart.md "Quick start guide") for more details how to
 ## Versions
 
 **NOTE**: you are reading README for current stable version **v0.11.x** that is based on the **OpenLayers v5**. 
-To use VueLayers with **OpenLayers v4** go to the [**v0.10.x**](https://github.com/ghettovoice/vuelayers/tree/0.10.x) branch.  
+To use VueLayers with **OpenLayers v4** go to the [**v0.10.x**](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) branch.  
 
 - [master](https://github.com/ghettovoice/vuelayers/tree/master) - This is the branch for current release versions **>=v0.11.x (OpenLayers >=5)** 
-- [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/0.10.x) - This is the branch for the **v0.10.x (OpenLayers <5)** versions
+- [stable-0.10.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) - This is the branch for the **v0.10.x (OpenLayers <5)** versions
 
 ## Features
 
