@@ -21,8 +21,8 @@ See the [Quick start](quickstart.md "Quick start guide") for more details how to
 
 ## Versions
 
-- [master](https://github.com/ghettovoice/vuelayers/tree/master) - This is the branch for next versions **>=v0.11.x (OpenLayers >=5)** 
-- [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/0.10.x) - This is the branch for the **v0.10.x (OpenLayers <5)** versions
+- [master](https://github.com/ghettovoice/vuelayers/tree/master) - This is the branch for the next **>=v0.11.x (OpenLayers >=5)** version 
+- [stable-0.10.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) - This is the branch for the **v0.10.x (OpenLayers <5)** version
 
 ## Features
 
@@ -34,7 +34,7 @@ See the [Quick start](quickstart.md "Quick start guide") for more details how to
 ## Requirements
 
 - [Vue](https://vuejs.org/) version **^2.3**.
-- [OpenLayers](https://openlayers.org/) version **^5.0**.
+- [OpenLayers](https://openlayers.org/) version **^4.0**.
 
 ## Live demo
 
