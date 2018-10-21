@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module cluster-source/source
-   */
   import vectorSource from '../../mixin/vector-source'
   import sourceContainer from '../../mixin/source-container'
   import mergeDescriptors from '../../util/multi-merge-descriptors'

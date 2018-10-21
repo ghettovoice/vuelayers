@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module circle-style/style
-   */
   import Vue from 'vue'
   import Circle from 'ol/style/circle'
   import imageStyle from '../../mixin/image-style'

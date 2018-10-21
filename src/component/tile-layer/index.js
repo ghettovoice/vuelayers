@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module tile-layer
- */
 import Layer from './layer.vue'
 
 /**

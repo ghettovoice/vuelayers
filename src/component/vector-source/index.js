@@ -1,4 +1,3 @@
-/** @module vector-source */
 import { pick } from '../../util/minilo'
 import Source from './source.vue'
 

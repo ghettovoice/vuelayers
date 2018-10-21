@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module text-style
- */
 import Style from './style.vue'
 
 /**

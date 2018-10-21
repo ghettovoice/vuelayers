@@ -1,5 +1,5 @@
 <template>
-  <div :id="[$options.name, id].join('-')" :class="$options.name" style="display: none">
+  <div :id="[$options.name, id].join('-')" :class="$options.name">
     <div>
       <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
     </div>
@@ -7,9 +7,6 @@
 </template>
 
 <script>
-  /**
-   * @module overlay/overlay
-   */
   import Overlay from 'ol/overlay'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -20,6 +17,7 @@
   import { OVERLAY_POSITIONING } from '../../ol-ext/consts'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasOverlay } from '../../util/assert'
+  import { isEqual } from '../../util/minilo'
 
   const props = {
     id: {
@@ -73,6 +71,11 @@
         return this.$overlay.getPosition()
       }
     },
+    positionDataProj () {
+      if (this.rev && this.$overlay) {
+        return this.pointToDataProj(this.$overlay.getPosition())
+      }
+    },
   }
 
   /**
@@ -103,8 +106,12 @@
     mount () {
       hasOverlay(this)
 
-      this.$overlay.setElement(this.$el.children[0])
+      this.$overlay.setElement(this.$el)
       this.$overlaysContainer && this.$overlaysContainer.addOverlay(this.$overlay)
+      // reset position to trigger panIntoView
+      this.$nextTick(() => {
+        this.$overlay.setPosition(this.positionViewProj.slice())
+      })
       this.subscribeAll()
     },
     /**
@@ -129,17 +136,18 @@
 
   const watch = {
     offset (value) {
-      if (this.$overlay) {
+      if (this.$overlay && !isEqual(value, this.$overlay.getOffset())) {
         this.$overlay.setOffset(value)
       }
     },
     position (value) {
-      if (this.$overlay) {
-        this.$overlay.setPosition(this.pointToViewProj(value))
+      value = this.pointToViewProj(value)
+      if (this.$overlay && !isEqual(value, this.positionViewProj)) {
+        this.$overlay.setPosition(value)
       }
     },
     positioning (value) {
-      if (this.$overlay) {
+      if (this.$overlay && value !== this.$overlay.getPositioning()) {
         this.$overlay.setPositioning(value)
       }
     },
@@ -194,7 +202,7 @@
   function subscribeToOverlayChanges () {
     hasOverlay(this)
 
-    const ft = 100
+    const ft = 1000 / 60
     const changes = Observable::mergeObs(
       observableFromOlChangeEvent(this.$overlay, 'position', true, ft,
         () => this.pointToDataProj(this.$overlay.getPosition())),

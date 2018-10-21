@@ -1,5 +1,4 @@
 <script>
-  /** @module draw-interaction/interaction */
   import DrawInteraction from 'ol/interaction/draw'
   import condition from 'ol/events/condition'
   import { Observable } from 'rxjs'

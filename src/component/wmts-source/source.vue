@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module wmts-source/source
-   */
   import WMTSSource from 'ol/source/wmts'
   import WMTSTileGrid from 'ol/tilegrid/wmts'
   import { range } from '../../util/minilo'

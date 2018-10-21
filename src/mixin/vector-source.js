@@ -133,8 +133,9 @@ function subscribeToSourceChanges () {
     ::doObs(({ feature }) => {
       this.removeFeature(feature)
     })
+  const changeFeature = observableFromOlEvent(this.$source, 'changefeature')
 
-  const events = Observable::mergeObs(add, remove)
+  const events = Observable::mergeObs(add, remove, changeFeature)
 
   this.subscribeTo(events, evt => {
     ++this.rev

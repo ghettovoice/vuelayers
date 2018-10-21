@@ -4,7 +4,7 @@
 
 `vl-layer-tile` can render images from sources that provide pre-rendered, tiled images in
 grids organized by zoom levels. It should be used together with tiled source components like
-[`vl-source-xyz`](component/xyz-source.md), [`vl-source-wmts`](component/wmts-source.md), [`vl-source-osm`](component/osm-source.md).
+[`vl-source-xyz`](/docs/component/xyz-source.md), [`vl-source-wmts`](/docs/component/wmts-source.md), [`vl-source-osm`](/docs/component/osm-source.md).
 
 ## Versions
 
@@ -15,8 +15,8 @@ grids organized by zoom levels. It should be used together with tiled source com
 
 ## Usage
 
-Example below shows how to use `vl-layer-tile` component together with [`vl-source-wmts`](component/wmts-source.md)
-and with [`vl-source-sputnik`](component/sputnik-source.md).
+Example below shows how to use `vl-layer-tile` component together with [`vl-source-wmts`](/docs/component/wmts-source.md)
+and with [`vl-source-sputnik`](/docs/component/sputnik-source.md).
 
 <vuep template="#usage-example"></vuep>
 

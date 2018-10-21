@@ -118,10 +118,10 @@
           <!--</vl-source-image-static>-->
         <!--</vl-layer-image>-->
 
-        <!-- <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
-        <vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />
-        <vl-interaction-modify source="draw-target" @drawstart="log('modifystart', $event)" @drawend="log('modifyend', $event)" />
-        <vl-interaction-snap source="draw-target" :priority="10" /> -->
+        <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
+        <!--<vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />-->
+        <!--<vl-interaction-modify source="draw-target" @drawstart="log('modifystart', $event)" @drawend="log('modifyend', $event)" />-->
+        <!--<vl-interaction-snap source="draw-target" :priority="10" />-->
 
         <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
           <!--<div style="background: white; padding: 10px">-->
@@ -137,6 +137,16 @@
         <!--<vl-layer-vector id="wfs">-->
         <!--<vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />-->
         <!--</vl-layer-vector>-->
+
+        <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
+                    :position="pointOnSurface(selectedFeatures[0].geometry)" :auto-pan="true" :auto-pan-animation="{ duration: 250 }">
+          <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); width: 200px">
+            Popup cluster feature {{ selectedFeatures[0].id }}<br />
+            <span v-for="feature in selectedFeatures[0].properties.features">
+              feature {{ feature.id }}
+            </span>
+          </div>
+        </vl-overlay>
       </vl-map>
     </div>
     <!--<div style="height: 50%">-->

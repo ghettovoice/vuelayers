@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module vector-source/source
-   */
   import VectorSource from 'ol/source/vector'
   import vectorSource from '../../mixin/vector-source'
   import { getFeatureId } from '../../ol-ext/feature'

@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module polygon-geom
- */
 import Geom from './geom.vue'
 
 /**

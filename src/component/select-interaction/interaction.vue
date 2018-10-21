@@ -5,7 +5,6 @@
 </template>
 
 <script>
-  /** @module select-interaction/interaction */
   import Feature from 'ol/feature'
   import SelectInteraction from 'ol/interaction/select'
   import condition from 'ol/events/condition'

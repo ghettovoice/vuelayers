@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module reg-shape-style/style
-   */
   import Vue from 'vue'
   import RegularShape from 'ol/style/regularshape'
   import imageStyle from '../../mixin/image-style'

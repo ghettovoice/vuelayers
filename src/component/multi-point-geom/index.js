@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module multi-point-geom
- */
 import Geom from './geom.vue'
 
 /**

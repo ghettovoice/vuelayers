@@ -1,6 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/** @module bing-maps-source */
 import Source from './source.vue'
 
 /**

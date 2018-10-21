@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module draw-interaction
- */
 import Interaction from './interaction.vue'
 
 /**

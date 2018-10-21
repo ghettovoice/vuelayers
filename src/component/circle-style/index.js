@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module circle-style
- */
 import Style from './style.vue'
 
 /**

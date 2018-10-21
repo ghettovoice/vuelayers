@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module wms-source/source
-   */
   import TileWMSSource from 'ol/source/tilewms'
   import tileSource from '../../mixin/tile-source'
   import { WMS_VERSION } from '../../ol-ext/consts'

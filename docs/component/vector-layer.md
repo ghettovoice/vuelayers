@@ -3,7 +3,7 @@
 > Renders vector data
 
 `vl-layer-vector` can render vector from verious backend services. It should be
-used with together with [`vl-source-vector`](component/vector-source.md) component.
+used with together with [`vl-source-vector`](/docs/component/vector-source.md) component.
 
 ## Versions
 
@@ -14,7 +14,7 @@ used with together with [`vl-source-vector`](component/vector-source.md) compone
 
 ## Usage
 
-Example below shows how you can use `vl-layer-vector` and [`vl-source-vector`](component/vector-source.md) to render some 
+Example below shows how you can use `vl-layer-vector` and [`vl-source-vector`](/docs/component/vector-source.md) to render some 
 vector vector features from remote backend.
 
 <vuep template="#usage-example"></vuep>

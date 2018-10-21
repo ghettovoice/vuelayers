@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module reg-shape-style
- */
 import Style from './style.vue'
 
 /**

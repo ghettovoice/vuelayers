@@ -1,4 +1,3 @@
-/** @module select-interaction */
 import { pick } from '../../util/minilo'
 import Interaction from './interaction.vue'
 

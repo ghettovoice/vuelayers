@@ -5,9 +5,6 @@
 </template>
 
 <script>
-  /**
-   * @module map/view
-   */
   import View from 'ol/view'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -261,23 +258,24 @@
 
   const watch = {
     center (value) {
-      if (this.$view && !isEqual(value, this.viewCenter)) {
-        this.$view.setCenter(this.pointToViewProj(value))
+      value = this.pointToViewProj(value)
+      if (this.$view && !this.$view.getAnimating() && !isEqual(value, this.viewCenterViewProj)) {
+        this.$view.setCenter(value)
       }
     },
     resolution (value) {
-      if (this.$view && value !== this.viewResolution) {
+      if (this.$view && !this.$view.getAnimating() && value !== this.viewResolution) {
         this.$view.setResolution(value)
       }
     },
     zoom (value) {
       value = Math.round(value)
-      if (this.$view && value !== this.viewZoom) {
+      if (this.$view && !this.$view.getAnimating() && value !== this.viewZoom) {
         this.$view.setZoom(value)
       }
     },
     rotation (value) {
-      if (this.$view && value !== this.viewRotation) {
+      if (this.$view && !this.$view.getAnimating() && value !== this.viewRotation) {
         this.$view.setRotation(value)
       }
     },
@@ -348,7 +346,7 @@
   function subscribeToViewChanges () {
     hasView(this)
 
-    const ft = 0
+    const ft = 1000 / 60
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
     const zoom = resolution::mapObs(() => ({
       prop: 'zoom',

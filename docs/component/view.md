@@ -15,7 +15,7 @@ and **rotation** of the map.
 ## Usage
 
 Example of simple map with view in **EPSG:4326** projection.   
-See also documentation of [`vl-map`](component/view.md) component.
+See also documentation of [`vl-map`](/docs/component/map.md) component.
 
 <vuep template="#usage-example"></vuep>
 
@@ -232,7 +232,7 @@ The zoom factor used to determine the resolution constraint.
 
 Animates the view. To chain together multiple animations, call the method with 
 multiple animation objects.  
-For more info see [OpenLayers documentation](https://openlayers.org/en/latest/apidoc/ol.View.html#animate).
+For more info see [OpenLayers documentation](https://openlayers.org/en/v4.6.5/apidoc/ol.View.html#animate).
 
 ### fit(geometryOrExtent, options = {})
 
@@ -255,4 +255,4 @@ For more info see [OpenLayers documentation](https://openlayers.org/en/latest/ap
 
 Fit the given geometry or extent based on the given map size and border. 
 The size is pixel dimensions of the box to fit the extent into.  
-For more info see [OpenLayers documentation](https://openlayers.org/en/latest/apidoc/ol.View.html#fit).
+For more info see [OpenLayers documentation](https://openlayers.org/en/v4.6.5/apidoc/ol.View.html#fit).

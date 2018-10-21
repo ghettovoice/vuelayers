@@ -1,4 +1,3 @@
-/** @module geoloc */
 import { pick } from '../../util/minilo'
 import Geoloc from './geoloc.vue'
 

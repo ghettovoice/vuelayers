@@ -1,6 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/** @module image-layer */
 import Layer from './layer.vue'
 
 /**

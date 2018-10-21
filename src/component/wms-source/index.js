@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module wms-source
- */
 import Source from './source.vue'
 
 /**

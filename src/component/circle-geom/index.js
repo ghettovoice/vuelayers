@@ -1,6 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/** @module circle-geom */
 import Geom from './geom.vue'
 
 /**

@@ -3,7 +3,7 @@
 > Renders tiled images organized in grids
 
 `vl-layer-vector-tile` can render tiled vector data in grids organized by zoom levels. It should be used together with 
-[`vl-source-vector-tile`](component/vector-tile-source.md) component.
+[`vl-source-vector-tile`](/docs/component/vector-tile-source.md) component.
 
 ## Versions
 
@@ -14,7 +14,7 @@
 
 ## Usage
 
-Below is example taken from [OpenLayers Examples page](http://openlayers.org/en/latest/examples/vector-tile-info.html?q=vectortile)
+Below is example taken from [OpenLayers Examples page](http://openlayers.org/en/v4.6.5/examples/vector-tile-info.html?q=vectortile)
 and implemented in Vue.
 
 <vuep template="#usage-example"></vuep>

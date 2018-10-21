@@ -1,6 +1,3 @@
-/**
- * @module feature
- */
 import { pick } from '../../util/minilo'
 import Feature from './feature.vue'
 

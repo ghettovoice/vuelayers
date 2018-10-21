@@ -1,8 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/**
- * @module sputnik-source
- */
 import Source from './source.vue'
 
 /**

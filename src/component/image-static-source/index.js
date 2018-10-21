@@ -1,6 +1,4 @@
 import { pick } from '../../util/minilo'
-
-/** @module image-static-source */
 import Source from './source.vue'
 
 /**

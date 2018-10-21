@@ -2,7 +2,7 @@
 
 > Provides collection of features for vector layers
 
-`vl-source-vector` can be used together with [`vl-layer-vector`](component/vector-layer.md) to
+`vl-source-vector` can be used together with [`vl-layer-vector`](/docs/component/vector-layer.md) to
 draw any vector data on the map.
 
 # Versions
@@ -12,7 +12,7 @@ draw any vector data on the map.
 
 ## Usage
 
-Static features with the help of [`vl-feature`](component/feature.md), should be used only for tiny static layers.
+Static features with the help of [`vl-feature`](/docs/component/feature.md), should be used only for tiny static layers.
 
 <vuep template="#static-features-example"></vuep>
 
@@ -76,7 +76,7 @@ case.
     </vl-layer-tile>
     
     <vl-layer-vector>
-      <vl-source-vector url="https://openlayers.org/en/latest/examples/data/geojson/countries.geojson"></vl-source-vector>
+      <vl-source-vector url="https://openlayers.org/en/v4.6.5/examples/data/geojson/countries.geojson"></vl-source-vector>
     </vl-layer-vector>
   </vl-map>
 </template>
@@ -321,7 +321,7 @@ global [`data-projection`](quickstart.md#global-data-proejction).
 - **Type**: `function(): ol.format.Feature`
 - **Default**: `function(): ol.format.GeoJSON`
 
-Source format factory that returns prepared instance of [`ol.format.Feature`](http://openlayers.org/en/latest/apidoc/ol.format.Feature.html).
+Source format factory that returns prepared instance of [`ol.format.Feature`](http://openlayers.org/en/v4.6.5/apidoc/ol.format.Feature.html).
 This feature format will be used by default XHR loader when [`url`](component/vector-source.md#url) provided as string.
 
 ### loader-factory
@@ -329,7 +329,7 @@ This feature format will be used by default XHR loader when [`url`](component/ve
 - **Type**: `function(): ol.FeatureLoader`
 - **Default**: `undefined`
 
-Source loader factory that returns [`ol.FeatureLoader`](http://openlayers.org/en/latest/apidoc/ol.html#.FeatureLoader) function.
+Source loader factory that returns [`ol.FeatureLoader`](http://openlayers.org/en/v4.6.5/apidoc/ol.html#.FeatureLoader) function.
 
 ### logo
 
@@ -356,7 +356,7 @@ Projection of the source data.
 - **Type**: `function(): ol.LoadingStrategy`
 - **Default**: `function(): ol.loadingstrategy.all`
 
-Loading strategy factory that returns function of [`ol.LoadingStrategy`](http://openlayers.org/en/latest/apidoc/ol.html#.LoadingStrategy) type.
+Loading strategy factory that returns function of [`ol.LoadingStrategy`](http://openlayers.org/en/v4.6.5/apidoc/ol.html#.LoadingStrategy) type.
 
 ### wrap-x
 
@@ -371,7 +371,7 @@ Wraps the world horizontally.
 - **Default**: `true`
 
 By default, an RTree is used as spatial index. When features are removed and added frequently, and the total number of 
-features is low, setting this to `false` may improve performance. See [OpenLayers docs for more info](http://openlayers.org/en/latest/apidoc/ol.source.Vector.html#Vector).
+features is low, setting this to `false` may improve performance. See [OpenLayers docs for more info](http://openlayers.org/en/v4.6.5/apidoc/ol.source.Vector.html#Vector).
 
 ### url
 
@@ -379,5 +379,5 @@ features is low, setting this to `false` may improve performance. See [OpenLayer
 - **Default**: `undefined`
 
 A string value for a one-off download of all features from the given URL. A function of 
-[`ol.FeatureUrlFunction`](http://openlayers.org/en/latest/apidoc/ol.html#.FeatureUrlFunction) type can be provided 
-to generate url with other loading strategy. See [OpenLayers docs for more info](http://openlayers.org/en/latest/apidoc/ol.source.Vector.html#Vector).
+[`ol.FeatureUrlFunction`](http://openlayers.org/en/v4.6.5/apidoc/ol.html#.FeatureUrlFunction) type can be provided 
+to generate url with other loading strategy. See [OpenLayers docs for more info](http://openlayers.org/en/v4.6.5/apidoc/ol.source.Vector.html#Vector).
