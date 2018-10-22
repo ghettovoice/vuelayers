@@ -125,7 +125,7 @@ Next example loads features from remote WFS service by viewport BBOX. With [`for
       },
       loadingStrategyFactory () {
         // VueLayers.olExt available only in UMD build
-        // in ES/CJS build it should be imported from 'vuelayers/lib/_esm/ol-ext' or 'vuelayers/lib/ol-ext' respectively 
+        // in ES build it should be imported explicitly from 'vuelayers/lib/ol-ext' 
         return VueLayers.olExt.loadingBBox
       },
     },

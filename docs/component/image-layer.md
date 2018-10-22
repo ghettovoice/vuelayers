@@ -40,6 +40,8 @@ Taken from OpenLayers [Static Image Example](http://openlayers.org/en/latest/exa
   let size = [1024, 968]
   let extent = [0, 0, ...size]
   // create custom projection for image 
+  // NOTE: VueLayers.olExt available only in UMD build
+  // in ES build it should be imported explicitly from 'vuelayers/lib/ol-ext'
   let customProj = VueLayers.olExt.createProj({
     code: 'xkcd-image',
     units: 'pixels',
