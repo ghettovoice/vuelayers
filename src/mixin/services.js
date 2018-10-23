@@ -27,12 +27,12 @@ export default {
   beforeCreate () {
     let source = this.$parent
     while (source) {
-      if (source._provided && SERVICES_PROP in source._provided) {
+      if (source._provided && source._provided[SERVICES_PROP] != null) {
         break
       }
       source = source.$parent
     }
-    if (!source || !(SERVICES_PROP in source._provided)) {
+    if (!source || source._provided[SERVICES_PROP] == null) {
       delete this.$options.inject.$services
     }
   },

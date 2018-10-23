@@ -50,7 +50,7 @@
   },
   "homepage": "https://github.com/ghettovoice/vuelayers",
   "dependencies": {
-    "@babel/runtime": "^7.1.2",
+    "@babel/runtime-corejs2": "^7.1.2",
     "@turf/point-on-feature": "^5.1.5",
     "merge-descriptors": "^1.0.1",
     "ol": "^5.2.0",
@@ -185,6 +185,7 @@
   ],
   "browserslist": [
     "> 1%",
-    "last 2 versions"
+    "last 2 versions",
+    "not ie <= 8"
   ]
 }
