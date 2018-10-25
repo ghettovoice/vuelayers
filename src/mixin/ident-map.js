@@ -2,8 +2,9 @@
 import Vue from 'vue'
 import IdentityMap from '../util/identity-map'
 import { identity } from '../util/minilo'
-
-const IDENTITY_MAP_PROP = Symbol('identityMap')
+// todo uncomment when IE 11 will die
+// const IDENTITY_MAP_PROP = Symbol('identityMap')
+const IDENTITY_MAP_PROP = 'identityMap'
 /**
  * @alias module:mixin/ident-map
  * @title identMap

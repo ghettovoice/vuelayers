@@ -84,9 +84,6 @@ module.exports = {
         include: [
           utils.resolve('src'),
           utils.resolve('test'),
-          utils.resolve('node_modules/ol-tilecache'),
-          utils.resolve('node_modules/rxjs/_esm2015'),
-          utils.resolve('node_modules/lodash-es'),
         ],
       },
       {

@@ -1,6 +1,7 @@
 import mergeDescriptors from '../util/multi-merge-descriptors'
-
-const SERVICES_PROP = Symbol('services')
+// todo uncomment when IE 11 will die
+// const SERVICES_PROP = Symbol('services')
+const SERVICES_PROP = 'services'
 /**
  * Service container mixin
  */
@@ -27,12 +28,12 @@ export default {
   beforeCreate () {
     let source = this.$parent
     while (source) {
-      if (source._provided && source._provided[SERVICES_PROP] != null) {
+      if (source._provided != null && source._provided[SERVICES_PROP] != null) {
         break
       }
       source = source.$parent
     }
-    if (!source || source._provided[SERVICES_PROP] == null) {
+    if (source == null || source._provided[SERVICES_PROP] == null) {
       delete this.$options.inject.$services
     }
   },
