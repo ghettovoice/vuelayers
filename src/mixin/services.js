@@ -1,6 +1,7 @@
 import mergeDescriptors from '../util/multi-merge-descriptors'
-
-const SERVICES_PROP = Symbol('services')
+// todo uncomment when IE 11 will die
+// const SERVICES_PROP = Symbol('services')
+const SERVICES_PROP = 'services'
 /**
  * Service container mixin
  */

@@ -1,7 +1,6 @@
 const webpack = require('webpack')
 const WebpackNotifierPlugin = require('webpack-notifier')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
-const NpmInstallPlugin = require('npm-install-webpack-plugin')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -71,9 +70,6 @@ module.exports = {
         include: [
           utils.resolve('src'),
           utils.resolve('test'),
-          utils.resolve('node_modules/ol-tilecache'),
-          utils.resolve('node_modules/rxjs/_esm2015'),
-          utils.resolve('node_modules/lodash-es'),
         ],
       },
     ],
