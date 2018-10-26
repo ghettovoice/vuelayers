@@ -1,14 +1,6 @@
 <template>
   <div id="app">
     <div style="height: 100%">
-      <div class="controls">
-        <button @click="showMap = !showMap">Toggle map</button>
-        <button @click="drawType = 'point'">Point</button>
-        <button @click="drawType = 'line_string'">LineString</button>
-        <button @click="drawType = 'polygon'">Polygon</button>
-        <button @click="drawType = 'circle'">Circle</button>
-        <button @click="drawType = undefined">Reset</button>
-      </div>
 
       <vl-map v-if="showMap" ref="map" @created="log('created', $event)" @mounted="log('mounted', $event)"
               @destroyed="log('destroyed', $event)" @singleclick="clickCoord = $event.coordinate"
@@ -42,13 +34,12 @@
           <vl-source-sputnik/>
         </vl-layer-tile>
 
-        <!--<vl-layer-tile id="bing-maps">-->
-          <!--<vl-source-bing-maps :api-key="bingMapsKey" :imagery-set="bingMapsImagerySet"></vl-source-bing-maps>-->
-        <!--</vl-layer-tile>-->
-
-        <!--<vl-layer-tile>-->
-          <!--<vl-source-mapbox access-token="qwerty" map-id="mapbox.light" tile-format="png"></vl-source-mapbox>-->
-        <!--</vl-layer-tile>-->
+        <vl-layer-tile id="wms">
+          <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>
+        </vl-layer-tile>
+        <vl-layer-image id="wms-image">
+          <vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>
+        </vl-layer-image>
 
         <vl-layer-vector id="points" v-if="pointsLayer">
           <vl-source-cluster>
@@ -57,86 +48,7 @@
           <vl-style-func :factory="clusterStyleFunc"></vl-style-func>
         </vl-layer-vector>
 
-        <!--<vl-layer-vector id="event-sourced">-->
-          <!--<vl-source-cluster :distance="100">-->
-            <!--<vl-source-vector projection="EPSG:4326" :features.sync="eventSourcedFeatures"></vl-source-vector>-->
-          <!--</vl-source-cluster>-->
-
-          <!--<vl-style-func :factory="clusterStyleFunc" />-->
-        <!--</vl-layer-vector>-->
-
-        <!--<vl-layer-tile id="wmts">-->
-          <!--<vl-source-wmts-->
-            <!--url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"-->
-            <!--layer-name="0" matrix-set="EPSG:3857" format="image/png" style-name="default"/>-->
-        <!--</vl-layer-tile>-->
-
-        <!--<vl-layer-vector>-->
-          <!--<vl-source-vector @addfeature="log('addfeature', $event)">-->
-            <!--<vl-feature :id="polyId" ref="poly" :properties="{qwerty: 123}">-->
-              <!--<template slot-scope="feature">-->
-                <!--<vl-geom-polygon v-if="polygonCoords.length" :coordinates="polygonCoords"/>-->
-                <!--<vl-overlay v-if="selected.includes(feature.id)" :position="feature.point">-->
-                  <!--<div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">-->
-                    <!--poly feature {{ polyId }}-->
-                    <!--qwerty: {{ feature.properties.qwerty }}-->
-                  <!--</div>-->
-                <!--</vl-overlay>-->
-              <!--</template>-->
-            <!--</vl-feature>-->
-
-            <!--<vl-feature id="circle">-->
-              <!--<vl-geom-circle :coordinates="circleCoordinates" :radius="5000000"></vl-geom-circle>-->
-            <!--</vl-feature>-->
-          <!--</vl-source-vector>-->
-
-          <!--<vl-style-box>-->
-            <!--<vl-style-fill :color="[45, 156, 201, 0.4]"/>-->
-            <!--<vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>-->
-            <!--<vl-style-circle>-->
-              <!--<vl-style-fill :color="[45, 156, 201, 0.4]"/>-->
-              <!--<vl-style-stroke :color="[55, 55, 55, 0.8]" :width="4"/>-->
-            <!--</vl-style-circle>-->
-          <!--</vl-style-box>-->
-        <!--</vl-layer-vector>-->
-
-        <!--<vl-layer-vector id="draw-layer">-->
-          <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
-        <!--</vl-layer-vector>-->
-
-        <!-- <vl-layer-vector-tile>
-          <vl-source-vector-tile
-            url="https://basemaps.arcgis.com/v1/arcgis/rest/services/World_Basemap/VectorTileServer/tile/{z}/{y}/{x}.pbf"></vl-source-vector-tile>
-        </vl-layer-vector-tile> -->
-
-        <!--<vl-layer-image id="jz">-->
-          <!--<vl-source-image-static-->
-            <!--:url="imageUrl"-->
-            <!--:size="imageSize"-->
-            <!--:extent="imageExtent"-->
-            <!--:projection="imageProj">-->
-          <!--</vl-source-image-static>-->
-        <!--</vl-layer-image>-->
-
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
-        <!--<vl-interaction-draw v-if="drawType" :type="drawType" source="draw-target" @drawstart="log('drawstart', $event)" @drawend="log('drawend', $event)" />-->
-        <!--<vl-interaction-modify source="draw-target" @drawstart="log('modifystart', $event)" @drawend="log('modifyend', $event)" />-->
-        <!--<vl-interaction-snap source="draw-target" :priority="10" />-->
-
-        <!--<vl-overlay v-if="clickCoord" :position="clickCoord">-->
-          <!--<div style="background: white; padding: 10px">-->
-        <!--    {{ clickCoord }}-->
-        <!--    <button @click="clickCoord = undefined">close</button>-->
-          <!--</div>-->
-      <!--  </vl-overlay>-->
-
-        <!--<vl-layer-vector id="countries">-->
-        <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
-        <!--</vl-layer-vector>-->
-
-        <!--<vl-layer-vector id="wfs">-->
-        <!--<vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />-->
-        <!--</vl-layer-vector>-->
 
         <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
                     :position="pointOnSurface(selectedFeatures[0].geometry)" :auto-pan="true" :auto-pan-animation="{ duration: 250 }">
@@ -149,38 +61,6 @@
         </vl-overlay>
       </vl-map>
     </div>
-    <!--<div style="height: 50%">-->
-      <!--<vl-map>-->
-        <!--<vl-view ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"/>-->
-
-        <!--<vl-layer-tile>-->
-          <!--<vl-source-osm/>-->
-        <!--</vl-layer-tile>-->
-
-        <!--<vl-layer-tile id="wms">-->
-          <!--<vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states"-->
-                         <!--:ext-params="{ TILED: true }" server-type="geoserver"/>-->
-        <!--</vl-layer-tile>-->
-
-        <!--<vl-layer-vector id="countries">-->
-          <!--<vl-source-vector :features.sync="countries" url="https://openlayers.org/en/v4.3.2/examples/data/geojson/countries.geojson" />-->
-        <!--</vl-layer-vector>-->
-
-        <!--<vl-layer-vector id="wfs">-->
-          <!--<vl-source-vector :features.sync="wfsFeatures" :url="wfsUrlFunc" :strategy-factory="bboxStrategyFactory" />-->
-        <!--</vl-layer-vector>-->
-
-        <!--<vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"-->
-                    <!--:position="findPointOnSurface(selectedFeatures[0].geometry)">-->
-          <!--<div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">-->
-            <!--Popup cluster feature {{ selectedFeatures[0].id }}<br />-->
-            <!--<span v-for="feature in selectedFeatures[0].properties.features">-->
-              <!--feature {{ feature.id }}-->
-            <!--</span>-->
-          <!--</div>-->
-        <!--</vl-overlay>-->
-      <!--</vl-map>-->
-    <!--</div>-->
   </div>
 </template>
 

@@ -22,6 +22,7 @@
 
     * [vl-source-bing-maps](/docs/component/bing-maps-source.md)
     * [vl-source-image-static](/docs/component/image-static-source.md)
+    * [vl-source-image-wms](/docs/component/image-wms-source.md)
     * [vl-source-osm](/docs/component/osm-source.md)
     * [vl-source-sputnik](/docs/component/sputnik-source.md)
     * [vl-source-vector](/docs/component/vector-source.md)
