@@ -164,7 +164,7 @@ function bundleOptions (format, package, env = 'development') {
         include: [
           'src/component/**/*',
         ],
-        test: /'(?:\.{2}\/){2}((?:mixin|ol-ext|rx-ext|util)\/[^']*)'/ig,
+        test: /'(?:\.{2}\/){2}((?:mixin|ol-ext|rx-ext|util)[^']*)'/ig,
         replace: (m1, m2) => `'../${m2}'`,
       },
     ],
