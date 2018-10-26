@@ -92,6 +92,12 @@ export const OVERLAY_POSITIONING = {
  * @type {string} Default WMS version
  */
 export const WMS_VERSION = '1.3.0'
+export const WMS_SERVER_TYPE = {
+  CARMENTA_SERVER: 'carmentaserver',
+  GEOSERVER: 'geoserver',
+  MAPSERVER: 'mapserver',
+  QGIS: 'qgis',
+}
 
 export const WMTS_VERSION = '1.0.0'
 export const WMTS_REQUEST_ENCODING = 'KVP'

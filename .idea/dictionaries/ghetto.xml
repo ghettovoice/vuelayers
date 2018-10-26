@@ -13,6 +13,8 @@
       <w>bulma</w>
       <w>bundler</w>
       <w>bundlers</w>
+      <w>carmenta</w>
+      <w>carmentaserver</w>
       <w>chunkhash</w>
       <w>columnno</w>
       <w>consts</w>
@@ -62,6 +64,7 @@
       <w>lodash</w>
       <w>logdbg</w>
       <w>mapbox</w>
+      <w>mapserver</w>
       <w>marginless</w>
       <w>memberof</w>
       <w>minified</w>
@@ -99,6 +102,7 @@
       <w>prepatch</w>
       <w>proj</w>
       <w>propertychange</w>
+      <w>qgis</w>
       <w>rearg</w>
       <w>regenerator</w>
       <w>removefeature</w>

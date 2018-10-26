@@ -1,5 +1,4 @@
 <script>
-  /** @module image-static-source/source */
   import ImageStaticSource from 'ol/source/imagestatic'
   import imageSource from '../../mixin/image-source'
   import withUrl from '../../mixin/with-url'

@@ -15,6 +15,7 @@ import Geoloc from './component/geoloc'
 import IconStyle from './component/icon-style'
 import ImageLayer from './component/image-layer'
 import ImageStaticSource from './component/image-static-source'
+import ImageWmsSource from './component/image-wms-source'
 import LineStringGeom from './component/line-string-geom'
 import Map from './component/map'
 import MapboxSource from './component/mapbox-source'
@@ -71,6 +72,7 @@ function plugin (Vue, options = {}) {
   Vue.use(IconStyle, options)
   Vue.use(ImageLayer, options)
   Vue.use(ImageStaticSource, options)
+  Vue.use(ImageWmsSource, options)
   Vue.use(LineStringGeom, options)
   Vue.use(Map, options)
   Vue.use(MapboxSource, options)
@@ -117,6 +119,7 @@ export {
   IconStyle,
   ImageLayer,
   ImageStaticSource,
+  ImageWmsSource,
   LineStringGeom,
   Map,
   MapboxSource,
