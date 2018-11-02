@@ -1,5 +1,5 @@
 import { pick } from '../../util/minilo'
-import Layer from './layer'
+import Layer from './layer.vue'
 
 export default {
   Layer,

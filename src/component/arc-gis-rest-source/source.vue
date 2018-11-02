@@ -1,5 +1,5 @@
 <script>
-  import TileArcGisRestSource from 'ol/source/tilearcgisrest'
+  import TileArcGISRestSource from 'ol/source/tilearcgisrest'
   import { tileSource, arcGisSource } from '../../mixin'
 
   const props = {
@@ -12,7 +12,7 @@
 
   const methods = {
     createSource () {
-      return new TileArcGisRestSource({
+      return new TileArcGISRestSource({
         attributions: this.attributions,
         cacheSize: this.cacheSize,
         crossOrigin: this.crossOrigin,
