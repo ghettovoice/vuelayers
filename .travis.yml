@@ -9,13 +9,13 @@ language: java
 jdk:
   - oraclejdk8
 env:
-  - NODE_VERSION=8 DBUS_SESSION_BUS_ADDRESS=/dev/null
+  - NODE_VERSION=8.12.0 DBUS_SESSION_BUS_ADDRESS=/dev/null
 cache:
   directories:
     - node_modules
 install:
-  - nvm install --lts $NODE_VERSION
-  - nvm use --lts
+  - nvm install $NODE_VERSION
+  - nvm use $NODE_VERSION
   - node --version
   - npm install -g npm@latest
   - npm --version
