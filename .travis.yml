@@ -14,7 +14,7 @@ cache:
   directories:
     - node_modules
 install:
-  - nvm install --lts
+  - nvm install --lts $NODE_VERSION
   - nvm use --lts
   - node --version
   - npm install -g npm@latest
