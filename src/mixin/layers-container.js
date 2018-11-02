@@ -1,4 +1,4 @@
-import Layer from 'ol/layer/layer'
+import BaseLayer from 'ol/layer/base'
 import Vue from 'vue'
 import { instanceOf } from '../util/assert'
 
@@ -16,7 +16,7 @@ const methods = {
    */
   addLayer (layer) {
     layer = layer instanceof Vue ? layer.$layer : layer
-    instanceOf(layer, Layer)
+    instanceOf(layer, BaseLayer)
 
     if (this.getLayersTarget().has(layer) === false) {
       this.getLayersTarget().add(layer)

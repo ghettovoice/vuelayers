@@ -34,19 +34,21 @@
           <vl-source-sputnik/>
         </vl-layer-tile>
 
-        <vl-layer-tile id="wms">
-          <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>
-        </vl-layer-tile>
-        <vl-layer-image id="wms-image">
-          <vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>
-        </vl-layer-image>
+        <vl-layer-group>
+          <vl-layer-tile id="wms">
+            <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>
+          </vl-layer-tile>
+          <vl-layer-image id="wms-image">
+            <vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>
+          </vl-layer-image>
 
-        <vl-layer-vector id="points" v-if="pointsLayer">
-          <vl-source-cluster>
-            <vl-source-vector :features="points"/>
-          </vl-source-cluster>
-          <vl-style-func :factory="clusterStyleFunc"></vl-style-func>
-        </vl-layer-vector>
+          <vl-layer-vector id="points" v-if="pointsLayer">
+            <vl-source-cluster>
+              <vl-source-vector :features="points"/>
+            </vl-source-cluster>
+            <vl-style-func :factory="clusterStyleFunc"></vl-style-func>
+          </vl-layer-vector>
+        </vl-layer-group>
 
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
 

@@ -12,6 +12,7 @@ import DrawInteraction from './component/draw-interaction'
 import Feature from './component/feature'
 import FillStyle from './component/fill-style'
 import Geoloc from './component/geoloc'
+import GroupLayer from './component/group-layer'
 import IconStyle from './component/icon-style'
 import ImageLayer from './component/image-layer'
 import ImageStaticSource from './component/image-static-source'
@@ -69,6 +70,7 @@ function plugin (Vue, options = {}) {
   Vue.use(Feature, options)
   Vue.use(FillStyle, options)
   Vue.use(Geoloc, options)
+  Vue.use(GroupLayer, options)
   Vue.use(IconStyle, options)
   Vue.use(ImageLayer, options)
   Vue.use(ImageStaticSource, options)
@@ -116,6 +118,7 @@ export {
   Feature,
   FillStyle,
   Geoloc,
+  GroupLayer,
   IconStyle,
   ImageLayer,
   ImageStaticSource,
