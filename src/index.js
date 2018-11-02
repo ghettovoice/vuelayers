@@ -32,6 +32,7 @@ import RegShapeStyle from './component/reg-shape-style'
 import SelectInteraction from './component/select-interaction'
 import SnapInteraction from './component/snap-interaction'
 import SputnikSource from './component/sputnik-source'
+import StamenSource from './component/stamen-source'
 import StrokeStyle from './component/stroke-style'
 import StyleBox from './component/style-box'
 import StyleFunc from './component/style-func'
@@ -90,6 +91,7 @@ function plugin (Vue, options = {}) {
   Vue.use(SelectInteraction, options)
   Vue.use(SnapInteraction, options)
   Vue.use(SputnikSource, options)
+  Vue.use(StamenSource, options)
   Vue.use(StrokeStyle, options)
   Vue.use(StyleBox, options)
   Vue.use(StyleFunc, options)
@@ -138,6 +140,7 @@ export {
   SelectInteraction,
   SnapInteraction,
   SputnikSource,
+  StamenSource,
   StrokeStyle,
   StyleBox,
   StyleFunc,

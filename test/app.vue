@@ -31,7 +31,7 @@
         </vl-geoloc>
 
         <vl-layer-tile id="sputnik">
-          <vl-source-sputnik/>
+          <vl-source-stamen layer="toner-lite"/>
         </vl-layer-tile>
 
         <vl-layer-group>
