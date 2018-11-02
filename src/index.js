@@ -4,6 +4,7 @@
  * @author Vladimir Vershinin
  * @license MIT
  */
+import ArcGisRestSource from './component/arc-gis-rest-source'
 import BingMapsSource from './component/bing-maps-source'
 import CircleGeom from './component/circle-geom'
 import CircleStyle from './component/circle-style'
@@ -63,6 +64,7 @@ const VERSION = 'C_PKG_VERSION'
  */
 function plugin (Vue, options = {}) {
   // install components
+  Vue.use(ArcGisRestSource, options)
   Vue.use(BingMapsSource, options)
   Vue.use(CircleGeom, options)
   Vue.use(CircleStyle, options)
@@ -112,6 +114,7 @@ export {
   VERSION,
   plugin as install,
   // components
+  ArcGisRestSource,
   BingMapsSource,
   CircleGeom,
   CircleStyle,

@@ -1,0 +1,38 @@
+<script>
+  import TileArcGisRestSource from 'ol/source/tilearcgisrest'
+  import { tileSource, arcGisSource } from '../../mixin'
+
+  const props = {
+    url: {
+      type: String,
+      required: true,
+      validator: value => !!value.length,
+    },
+  }
+
+  const methods = {
+    createSource () {
+      return new TileArcGisRestSource({
+        attributions: this.attributions,
+        cacheSize: this.cacheSize,
+        crossOrigin: this.crossOrigin,
+        params: this.allParams,
+        logo: this.logo,
+        tileGrid: this._tileGrid,
+        projection: this.projection,
+        reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+        tileLoadFunction: this.tileLoadFunction,
+        url: this.urlTmpl,
+        wrapX: this.wrapX,
+        transition: this.transition,
+      })
+    },
+  }
+
+  export default {
+    name: 'vl-source-arc-gis-rest',
+    mixins: [tileSource, arcGisSource],
+    props,
+    methods,
+  }
+</script>

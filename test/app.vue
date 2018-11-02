@@ -50,6 +50,10 @@
           </vl-layer-vector>
         </vl-layer-group>
 
+        <vl-layer-tile>
+          <vl-source-arc-gis-rest url="https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer"></vl-source-arc-gis-rest>
+        </vl-layer-tile>
+
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
 
         <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
