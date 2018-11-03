@@ -1,6 +1,6 @@
 <script>
   import TileArcGISRestSource from 'ol/source/tilearcgisrest'
-  import { tileSource, arcGisSource } from '../../mixin'
+  import { tileSource, arcgisSource } from '../../mixin'
 
   const props = {
     url: {
@@ -30,8 +30,8 @@
   }
 
   export default {
-    name: 'vl-source-arc-gis-rest',
-    mixins: [tileSource, arcGisSource],
+    name: 'vl-source-arcgis-rest',
+    mixins: [tileSource, arcgisSource],
     props,
     methods,
   }

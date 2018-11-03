@@ -1,7 +1,7 @@
 /**
  * @module mixin
  */
-export arcGisSource from './arc-gis-source'
+export arcgisSource from './arcgis-source'
 export featuresContainer from './features-container'
 export geometry from './geometry'
 export geometryContainer from './geometry-container'
