@@ -5,7 +5,8 @@
  * @license MIT
  */
 import ArcgisRestSource from './component/arcgis-rest-source'
-import BingMapsSource from './component/bing-maps-source'
+import BingMapsSource from './component/bing-maps-source' // todo remove in v0.11.x
+import BingmapsSource from './component/bingmaps-source'
 import CircleGeom from './component/circle-geom'
 import CircleStyle from './component/circle-style'
 import ClusterSource from './component/cluster-source'
@@ -66,6 +67,7 @@ function plugin (Vue, options = {}) {
   // install components
   Vue.use(ArcgisRestSource, options)
   Vue.use(BingMapsSource, options)
+  Vue.use(BingmapsSource, options)
   Vue.use(CircleGeom, options)
   Vue.use(CircleStyle, options)
   Vue.use(ClusterSource, options)
@@ -116,6 +118,7 @@ export {
   // components
   ArcgisRestSource,
   BingMapsSource,
+  BingmapsSource,
   CircleGeom,
   CircleStyle,
   ClusterSource,

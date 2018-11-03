@@ -54,6 +54,13 @@
           <vl-source-arcgis-rest url="https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer"></vl-source-arcgis-rest>
         </vl-layer-tile>
 
+        <vl-layer-tile>
+          <vl-source-bing-maps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bing-maps>
+        </vl-layer-tile>
+        <vl-layer-tile>
+          <vl-source-bingmaps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bingmaps>
+        </vl-layer-tile>
+
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
 
         <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"

@@ -1,5 +1,4 @@
 <script>
-  /** @module bing-maps-source/source */
   import BingMapsSource from 'ol/source/bingmaps'
   import tileSource from '../../mixin/tile-source'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -77,12 +76,8 @@
     this.recreate()
   })
 
-  /**
-   * @vueProto
-   * @alias module:bing-maps-source/source
-   */
   export default {
-    name: 'vl-source-bing-maps',
+    name: 'vl-source-bingmaps',
     mixins: [tileSource],
     props,
     methods,

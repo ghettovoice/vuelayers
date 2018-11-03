@@ -1,20 +1,23 @@
-# vl-source-bing-maps
+# vl-source-bingmaps
 
-> Layer source for [Bing Maps API](https://www.bing.com/maps)
+> Layer source for [BingMaps API](https://www.bing.com/maps)
 
-`vl-source-bing-maps` adds ability to display tile data from Bing Maps. To use
+`vl-source-bingmaps` adds ability to display tile data from BingMaps service. To use
 this source you should get **API key** at https://www.bingmapsportal.com.
 
 ## Versions
 
-`vl-source-bing-maps` is a part of **BingMapsSource** module:
+`vl-source-bingmaps` is a part of **BingmapsSource** module:
 
-- **ES6**: https://unpkg.com/vuelayers/lib/_esm/bing-maps-source/
-- **CommonJS**: https://unpkg.com/vuelayers/lib/bing-maps-source/
+- **ES6**: https://unpkg.com/vuelayers/lib/_esm/bingmaps-source/
+- **CommonJS**: https://unpkg.com/vuelayers/lib/bingmaps-source/
+
+!> **NOTE** The old name `vl-source-bing-maps` is deprecated and currently is an alias to the new name `vl-source-bingmaps`.  
+The old  name will be removed later with the next major release.
 
 ## Usage
 
-Example of `vl-source-bing-maps` usage
+Example of `vl-source-bingmaps` usage
 
 <vuep template="#usage-example"></vuep>
 
@@ -23,8 +26,8 @@ Example of `vl-source-bing-maps` usage
   <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" style="height: 400px">
       <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
 
-      <vl-layer-tile id="bing-maps">
-          <vl-source-bing-maps :api-key="apiKey" :imagery-set="imagerySet"></vl-source-bing-maps>
+      <vl-layer-tile id="bingmaps">
+          <vl-source-bingmaps :api-key="apiKey" :imagery-set="imagerySet"></vl-source-bingmaps>
       </vl-layer-tile>
   </vl-map>
 </template>

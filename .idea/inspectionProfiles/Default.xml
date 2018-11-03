@@ -50,7 +50,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="10">
+          <list size="11">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -61,6 +61,7 @@
             <item index="7" class="java.lang.String" itemvalue="component" />
             <item index="8" class="java.lang.String" itemvalue="vld-github-btn" />
             <item index="9" class="java.lang.String" itemvalue="vl-layer-image" />
+            <item index="10" class="java.lang.String" itemvalue="vl-source-bing-maps" />
           </list>
         </value>
       </option>
@@ -68,7 +69,7 @@
     </inspection_tool>
     <inspection_tool class="JSClosureCompilerSyntax" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="RequiredAttributes" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="myAdditionalRequiredHtmlAttributes" value="url" />
+      <option name="myAdditionalRequiredHtmlAttributes" value="url,imagery-set" />
     </inspection_tool>
     <inspection_tool class="ReservedWordUsedAsNameJS" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ThisExpressionReferencesGlobalObjectJS" enabled="false" level="WARNING" enabled_by_default="false" />

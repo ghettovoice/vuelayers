@@ -1,18 +1,21 @@
 import { pick } from '../../util/minilo'
-import Source from './source.vue'
+import BingmapsSource from '../bingmaps-source'
 
-/**
- * @alias module:bing-maps-source
- */
+const Source = {
+  ...BingmapsSource.Source,
+  name: 'vl-source-bing-maps',
+  created () {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        '[VueLayers] Component vl-source-bing-maps was deprecated and will be removed later. ' +
+        'Please use the new vl-source-bingmaps component.'
+      )
+    }
+  },
+}
+
 export default {
-  /**
-   * @alias module:bing-maps-source/source
-   */
   Source,
-  /**
-   * @param {Vue} Vue
-   * @param {VueLayersOptions} [options]
-   */
   install (Vue, options = {}) {
     options = pick(options, 'dataProjection')
     Object.assign(Source, options)
