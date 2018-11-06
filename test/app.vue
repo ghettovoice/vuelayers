@@ -3,7 +3,7 @@
     <div style="height: 100%">
 
       <vl-map v-if="showMap" ref="map" @created="log('created', $event)" @mounted="log('mounted', $event)"
-              @destroyed="log('destroyed', $event)" @singleclick="clickCoord = $event.coordinate"
+              @destroyed="log('destroyed', $event)" @singleclick="clickCoord = $event.coordinate" @click="onMapClick"
               data-projection="EPSG:4326">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
           <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
@@ -36,7 +36,7 @@
 
         <vl-layer-group>
           <vl-layer-tile id="wms">
-            <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>
+            <vl-source-wms ref="wmsSource" url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>
           </vl-layer-tile>
           <vl-layer-image id="wms-image">
             <vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>
@@ -50,16 +50,16 @@
           </vl-layer-vector>
         </vl-layer-group>
 
-        <vl-layer-tile>
-          <vl-source-arcgis-rest url="https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer"></vl-source-arcgis-rest>
-        </vl-layer-tile>
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-arcgis-rest url="https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer"></vl-source-arcgis-rest>-->
+        <!--</vl-layer-tile>-->
 
-        <vl-layer-tile>
-          <vl-source-bing-maps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bing-maps>
-        </vl-layer-tile>
-        <vl-layer-tile>
-          <vl-source-bingmaps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bingmaps>
-        </vl-layer-tile>
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-bing-maps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bing-maps>-->
+        <!--</vl-layer-tile>-->
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-bingmaps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bingmaps>-->
+        <!--</vl-layer-tile>-->
 
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
 
@@ -80,7 +80,7 @@
 <script>
   import { findPointOnSurface } from '@/ol-ext/geom'
   import { loadingBBox } from '@/ol-ext/load-strategy'
-  import { addProj, createProj } from '@/ol-ext/proj'
+  import { addProj, createProj, pointFromLonLat } from '@/ol-ext/proj'
   import { createStyle } from '@/ol-ext/style'
   import { random, range } from 'lodash/fp'
   import ScaleLine from 'ol/control/scaleline'
@@ -204,6 +204,10 @@
         }
         return [style]
       }
+    },
+    onMapClick (evt) {
+      let coordinate = pointFromLonLat(evt.coordinate, 'EPSG:3857')
+      console.log(coordinate, this.$refs.wmsSource.getFeatureInfoUrl(coordinate))
     },
   }
 

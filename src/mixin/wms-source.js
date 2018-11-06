@@ -88,12 +88,13 @@ const methods = {
 
     resolution || (resolution = this.$view.getResolution())
     projection || (projection = this.projection)
+    params = { ...this.allParams, ...params }
 
-    return this.$source.getFeatureInfoUrl(
+    return this.$source.getGetFeatureInfoUrl(
       coordinate,
       resolution,
       projection,
-      { ...this.cleanExtParams, ...params },
+      params,
     )
   },
 }
