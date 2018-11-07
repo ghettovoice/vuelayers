@@ -57,6 +57,8 @@ app.use(devMiddleware)
 // compilation error display
 app.use(hotMiddleware)
 
+app.use(express.static('test'))
+
 const uri = 'http://' + config.host + ':' + port
 
 console.log('> Starting dev server...')

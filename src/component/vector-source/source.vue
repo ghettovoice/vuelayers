@@ -1,11 +1,9 @@
 <script>
+  import { fetch } from 'whatwg-fetch'
   import VectorSource from 'ol/source/vector'
   import vectorSource from '../../mixin/vector-source'
-  import { getFeatureId } from '../../ol-ext/feature'
-  import { createGeoJsonFmt } from '../../ol-ext/format'
-  import { loadingAll } from '../../ol-ext/load-strategy'
-  import { transform } from '../../ol-ext/proj'
-  import { constant, stubArray, isFinite, isFunction, difference } from '../../util/minilo'
+  import { getFeatureId, createGeoJsonFmt, loadingAll, transform } from '../../ol-ext'
+  import { constant, stubArray, isFinite, isFunction, difference, isEmpty } from '../../util/minilo'
 
   const props = {
     /**
@@ -21,7 +19,10 @@
      * Source loader should load features from some remote service, decode them and pas to `features` prop to render.
      * @type {(function(): ol.FeatureLoader|undefined)} loaderFactory
      */
-    loaderFactory: Function,
+    loaderFactory: {
+      type: Function,
+      default: defaultLoaderFactory,
+    },
     /**
      * Source format factory
      * @type {(function(): ol.format.Feature|undefined)} formatFactory
@@ -69,8 +70,8 @@
         useSpatialIndex: this.useSpatialIndex,
         wrapX: this.wrapX,
         logo: this.logo,
-        strategy: this.strategyFactory(),
-        format: this.formatFactory(),
+        strategy: this.strategyFactory.call(undefined, this),
+        format: this.formatFactory.call(undefined, this),
         url: this.createUrlFunc(),
         overlaps: this.overlaps,
       })
@@ -82,6 +83,7 @@
       if (!this.url) {
         return
       }
+
       let url = this.url
       if (!isFunction(url)) {
         url = constant(this.url)
@@ -97,16 +99,23 @@
      * @protected
      */
     createLoader () {
-      if (!this.loaderFactory) {
+      if (!this.url) {
         return
       }
-      const loader = this.loaderFactory()
+
+      const loader = this.loaderFactory.call(undefined, this)
       // wrap strategy function to transform map view projection to source projection
-      return (extent, resolution, projection) => loader(
-        transformExtent(extent, projection, this.resolvedDataProjection),
-        resolution,
-        this.resolvedDataProjection,
-      )
+      return async (extent, resolution, projection) => {
+        const features = await loader(
+          transformExtent(extent, projection, this.resolvedDataProjection),
+          resolution,
+          this.resolvedDataProjection,
+        )
+
+        if (Array.isArray(features)) {
+          this.$source.addFeatures(features)
+        }
+      }
     },
     /**
      * @return {void}
@@ -160,6 +169,33 @@
    */
   function defaultFormatFactory () {
     return createGeoJsonFmt()
+  }
+
+  /**
+   * Default loader for provided URL.
+   *
+   * @param vm
+   * @return {Function}
+   */
+  function defaultLoaderFactory (vm) {
+    return (extent, resolution, projection) => {
+      let url = vm.$source.getUrl()
+      if (isFunction(url)) {
+        url = url(extent, resolution, projection)
+      }
+
+      if (isEmpty(url)) {
+        return []
+      }
+
+      return fetch(url, {
+        credentials: 'include',
+      }).then(response => response.text())
+        .then(text => vm.$source.getFormat().readFeatures(text, {
+          featureProjection: vm.viewProjection,
+          dataProjection: vm.resolvedDataProjection,
+        }))
+    }
   }
 
   function transformExtent (extent, sourceProj, destProj) {
