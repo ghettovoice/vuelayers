@@ -31,22 +31,39 @@
         </vl-geoloc>
 
         <vl-layer-tile id="sputnik">
-          <vl-source-sputnik/>
+          <vl-source-stamen layer="toner-lite"/>
         </vl-layer-tile>
 
-        <vl-layer-tile id="wms">
-          <vl-source-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>
-        </vl-layer-tile>
-        <vl-layer-image id="wms-image">
-          <vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>
-        </vl-layer-image>
-
-        <vl-layer-vector id="points" v-if="pointsLayer">
-          <vl-source-cluster>
-            <vl-source-vector :features="points"/>
-          </vl-source-cluster>
-          <vl-style-func :factory="clusterStyleFunc"></vl-style-func>
+        <vl-layer-vector>
+          <vl-source-vector url="./test.gml" :features.sync="gmlFeatures" :format-factory="formatFactory" projection="EPSG:4326"></vl-source-vector>
         </vl-layer-vector>
+
+        <vl-layer-group :opacity="0.5">
+          <vl-layer-tile id="wms">
+            <vl-source-wms ref="wmsSource" url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>
+          </vl-layer-tile>
+          <vl-layer-image id="wms-image">
+            <vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>
+          </vl-layer-image>
+
+          <vl-layer-vector id="points" v-if="pointsLayer">
+            <vl-source-cluster>
+              <vl-source-vector :features="points"/>
+            </vl-source-cluster>
+            <vl-style-func :factory="clusterStyleFunc"></vl-style-func>
+          </vl-layer-vector>
+        </vl-layer-group>
+
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-arcgis-rest url="https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer"></vl-source-arcgis-rest>-->
+        <!--</vl-layer-tile>-->
+
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-bing-maps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bing-maps>-->
+        <!--</vl-layer-tile>-->
+        <!--<vl-layer-tile>-->
+          <!--<vl-source-bingmaps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bingmaps>-->
+        <!--</vl-layer-tile>-->
 
         <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
 
@@ -71,6 +88,8 @@
   import { createStyle } from '@/ol-ext/style'
   import { random, range } from 'lodash/fp'
   import ScaleLine from 'ol/control/ScaleLine'
+  import GML from 'ol/format/GML2'
+  import WFS from 'ol/format/WFS'
 
   let fakerator = Fakerator()
 
@@ -84,6 +103,11 @@
   }
 
   const methods = {
+    formatFactory () {
+      return new WFS({
+        gmlFormat: new GML(),
+      })
+    },
     log: ::console.log,
     loadData () {
       const points = []
@@ -233,6 +257,7 @@
         bingMapsImagerySet: 'Aerial',
         eventSourcedFeatures: [],
         layerExtent: [-10000000, -10000000, 10000000, 10000000],
+        gmlFeatures: [],
       }
     },
     mounted () {

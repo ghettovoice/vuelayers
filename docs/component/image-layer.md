@@ -9,8 +9,7 @@ raster source, like [`vl-source-image-static`](/docs/component/image-static-sour
 
 `vl-layer-image` component is a part of **ImageLayer** module:
 
-- **ES6**: https://unpkg.com/vuelayers/lib/_esm/image-layer/
-- **CommonJS**: https://unpkg.com/vuelayers/lib/image-layer/
+- **ES6**: https://unpkg.com/vuelayers/lib/image-layer/
 
 ## Usage
 

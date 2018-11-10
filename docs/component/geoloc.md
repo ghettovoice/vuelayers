@@ -10,8 +10,7 @@ a user's position. You can place it to the **default slot** of [`vl-map`](/docs/
 
 `vl-geoloc` is a part of **Geoloc** module:
 
-- **ES6**: https://unpkg.com/vuelayers/lib/_esm/geoloc/
-- **CommonJS**: https://unpkg.com/vuelayers/lib/geoloc/
+- **ES6**: https://unpkg.com/vuelayers/lib/geoloc/
 
 ## Usage
 

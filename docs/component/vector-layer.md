@@ -9,8 +9,7 @@ used with together with [`vl-source-vector`](/docs/component/vector-source.md) c
 
 `vl-layer-vector` is a part of **VectorLayer** module:
 
-- **ES6**: https://unpkg.com/vuelayers/lib/_esm/vector-layer/
-- **CommonJS**: https://unpkg.com/vuelayers/lib/vector-layer/
+- **ES6**: https://unpkg.com/vuelayers/lib/vector-layer/
 
 ## Usage
 

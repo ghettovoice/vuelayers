@@ -57,7 +57,8 @@
     "ol-tilecache": "^3.0.1",
     "parse-color": "^1.0.0",
     "rxjs": "^6.3.3",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "whatwg-fetch": "^3.0.0"
   },
   "peerDependencies": {
     "vue": "^2.3.0"

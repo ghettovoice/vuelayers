@@ -9,8 +9,7 @@
 
 `vl-layer-vector-tile` component is a part of **VectorTileLayer** module:
 
-- **ES6**: https://unpkg.com/vuelayers/lib/_esm/vector-tile-layer/
-- **CommonJS**: https://unpkg.com/vuelayers/lib/vector-tile-layer/
+- **ES6**: https://unpkg.com/vuelayers/lib/vector-tile-layer/
 
 ## Usage
 

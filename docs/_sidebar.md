@@ -20,7 +20,7 @@
 
   * Source
 
-    * [vl-source-bing-maps](/docs/component/bing-maps-source.md)
+    * [vl-source-bingmaps](/docs/component/bingmaps-source.md)
     * [vl-source-image-static](/docs/component/image-static-source.md)
     * [vl-source-image-wms](/docs/component/image-wms-source.md)
     * [vl-source-osm](/docs/component/osm-source.md)

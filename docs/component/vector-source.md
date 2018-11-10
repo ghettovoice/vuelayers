@@ -7,8 +7,7 @@ draw any vector data on the map.
 
 # Versions
 
-- **ES6**: https://unpkg.com/vuelayers/lib/_esm/vector-source/
-- **CommonJS**: https://unpkg.com/vuelayers/lib/vector-source/   
+- **ES6**: https://unpkg.com/vuelayers/lib/vector-source/
 
 ## Usage
 

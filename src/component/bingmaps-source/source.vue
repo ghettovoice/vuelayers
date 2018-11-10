@@ -1,14 +1,11 @@
 <script>
-  /** @module bing-maps-source/source */
   import BingMapsSource from 'ol/source/BingMaps'
   import tileSource from '../../mixin/tile-source'
   import { makeWatchers } from '../../util/vue-helpers'
 
   const BINGMAPS_MAX_ZOOM = 21
   const BINGMAPS_CULTURE = 'en-us'
-  /**
-   * @vueProps
-   */
+
   const props = {
     /**
      * Enables hidpi tiles.
@@ -49,9 +46,6 @@
     url: String,
   }
 
-  /**
-   * @vueMethods
-   */
   const methods = {
     /**
      * @return {BingMaps}
@@ -77,12 +71,8 @@
     this.recreate()
   })
 
-  /**
-   * @vueProto
-   * @alias module:bing-maps-source/source
-   */
   export default {
-    name: 'vl-source-bing-maps',
+    name: 'vl-source-bingmaps',
     mixins: [tileSource],
     props,
     methods,

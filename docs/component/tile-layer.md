@@ -10,8 +10,7 @@ grids organized by zoom levels. It should be used together with tiled source com
 
 `vl-layer-tile` component is a part of **TileLayer** module:
 
-- **ES6**: https://unpkg.com/vuelayers/lib/_esm/tile-layer/
-- **CommonJS**: https://unpkg.com/vuelayers/lib/tile-layer/
+- **ES6**: https://unpkg.com/vuelayers/lib/tile-layer/
 
 ## Usage
 

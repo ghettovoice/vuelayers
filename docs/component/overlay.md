@@ -11,8 +11,7 @@ it to some coordinate (for example: inside `vl-feature` or `vl-view`).
 
 `vl-overlay` component is a part of **Overlay** module:
 
-- **ES6**: https://unpkg.com/vuelayers/lib/_esm/overlay/
-- **CommonJS**: https://unpkg.com/vuelayers/lib/overlay/
+- **ES6**: https://unpkg.com/vuelayers/lib/overlay/
 
 ## Usage
 
