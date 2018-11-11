@@ -35,24 +35,24 @@
         </vl-layer-tile>
 
         <vl-layer-vector>
-          <vl-source-vector url="./test.gml" :features.sync="gmlFeatures" :format-factory="formatFactory" projection="EPSG:4326"></vl-source-vector>
+          <vl-source-vector url="https://rsg.pml.ac.uk/geoserver/ows?service=WFS&version=1.1.0&request=GetFeature&typename=rsg:50m_coastline&outputFormat=application/json&srsname=EPSG:3857" :features.sync="gmlFeatures"></vl-source-vector>
         </vl-layer-vector>
 
-        <vl-layer-group :opacity="0.5">
-          <vl-layer-tile id="wms">
-            <vl-source-wms ref="wmsSource" url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>
-          </vl-layer-tile>
-          <vl-layer-image id="wms-image">
-            <vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>
-          </vl-layer-image>
+        <!--<vl-layer-group :opacity="0.5">-->
+          <!--<vl-layer-tile id="wms">-->
+            <!--<vl-source-wms ref="wmsSource" url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>-->
+          <!--</vl-layer-tile>-->
+          <!--<vl-layer-image id="wms-image">-->
+            <!--<vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>-->
+          <!--</vl-layer-image>-->
 
-          <vl-layer-vector id="points" v-if="pointsLayer">
-            <vl-source-cluster>
-              <vl-source-vector :features="points"/>
-            </vl-source-cluster>
-            <vl-style-func :factory="clusterStyleFunc"></vl-style-func>
-          </vl-layer-vector>
-        </vl-layer-group>
+          <!--<vl-layer-vector id="points" v-if="pointsLayer">-->
+            <!--<vl-source-cluster>-->
+              <!--<vl-source-vector :features="points"/>-->
+            <!--</vl-source-cluster>-->
+            <!--<vl-style-func :factory="clusterStyleFunc"></vl-style-func>-->
+          <!--</vl-layer-vector>-->
+        <!--</vl-layer-group>-->
 
         <!--<vl-layer-tile>-->
           <!--<vl-source-arcgis-rest url="https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer"></vl-source-arcgis-rest>-->
@@ -235,8 +235,8 @@
     data () {
       return {
         showMap: true,
-        zoom: 3,
-        center: [-80.0307892780456, 43.456341754866685],
+        zoom: 5,
+        center:  [-79.27368887216703, 43.64267516128234],
         rotation: 0,
         points: [],
         pointsLayer: true,
