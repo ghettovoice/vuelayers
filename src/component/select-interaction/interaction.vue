@@ -6,7 +6,6 @@
 
 <script>
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
-  /** @module select-interaction/interaction */
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
   import Vue from 'vue'

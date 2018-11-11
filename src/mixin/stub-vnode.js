@@ -1,6 +1,8 @@
 /**
  * Renders stub VNode for component.
  */
+import { extractChildren } from '../util/vue-helpers'
+
 export default {
   /**
    * @param {function} h
@@ -40,14 +42,4 @@ export default {
 
     return h(options.tag || 'i', data, children)
   },
-}
-
-function extractChildren (slots, slotNames = []) {
-  return Object.keys(slots).reduce((all, name) => {
-    if (!slotNames.length || slotNames.includes(name)) {
-      all = all.concat(slots[name])
-    }
-
-    return all
-  }, [])
 }

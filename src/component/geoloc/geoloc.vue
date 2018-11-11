@@ -10,10 +10,8 @@
   /** @module geoloc/geoloc */
   import Geolocation from 'ol/Geolocation'
   import { merge } from 'rxjs/observable'
-  import olCmp from '../../mixin/ol-cmp'
-  import projTransforms from '../../mixin/proj-transforms'
-  import useMapCmp from '../../mixin/use-map-cmp'
-  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
+  import { olCmp, useMapCmp, projTransforms } from '../../mixin'
+  import { observableFromOlChangeEvent } from '../../rx-ext'
   import { hasGeolocation } from '../../util/assert'
 
   const props = {

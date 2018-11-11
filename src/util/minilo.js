@@ -236,6 +236,18 @@ export function mapKeys (object, iteratee = identity) {
   })
 }
 
+export function firstEl (object) {
+  if (!isArrayLike(object)) return
+
+  return object[0]
+}
+
+export function lastEl (object) {
+  if (!isArrayLike(object)) return
+
+  return object[object.length - 1]
+}
+
 export function pick (object, key, ...keys) {
   if (Array.isArray(key)) {
     keys = key

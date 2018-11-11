@@ -1,6 +1,5 @@
 <script>
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
-  /** @module draw-interaction/interaction */
   import DrawInteraction from 'ol/interaction/Draw'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operators'

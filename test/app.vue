@@ -16,6 +16,16 @@
           </vl-overlay>
         </vl-view>
 
+        <vl-graticule :show-labels="true">
+          <vl-style-stroke slot="stroke" color="green"></vl-style-stroke>
+          <vl-style-text slot="lon">
+            <vl-style-stroke color="blue"></vl-style-stroke>
+          </vl-style-text>
+          <vl-style-text slot="lat" text-align="end">
+            <vl-style-stroke color="black"></vl-style-stroke>
+          </vl-style-text>
+        </vl-graticule>
+
         <vl-geoloc @update:position="log($event)">
           <template slot-scope="ctx">
             <vl-feature v-if="ctx.position" id="my-geoloc">

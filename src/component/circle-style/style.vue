@@ -1,8 +1,5 @@
 <script>
   import Circle from 'ol/style/Circle'
-  /**
-   * @module circle-style/style
-   */
   import Vue from 'vue'
   import imageStyle from '../../mixin/image-style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
