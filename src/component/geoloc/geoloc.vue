@@ -7,7 +7,6 @@
 </template>
 
 <script>
-  /** @module geoloc/geoloc */
   import Geolocation from 'ol/geolocation'
   import { Observable } from 'rxjs'
   import { merge } from 'rxjs/observable'

@@ -189,7 +189,8 @@
       }
 
       return fetch(url, {
-        credentials: 'include',
+        credentials: 'same-origin',
+        mode: 'cors',
       }).then(response => response.text())
         .then(text => vm.$source.getFormat().readFeatures(text, {
           featureProjection: vm.viewProjection,

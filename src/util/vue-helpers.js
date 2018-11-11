@@ -9,3 +9,13 @@ export function makeWatchers (props, watcher) {
     return hash
   }, {})
 }
+
+export function extractChildren (slots, slotNames = []) {
+  return Object.keys(slots).reduce((all, name) => {
+    if (!slotNames.length || slotNames.includes(name)) {
+      all = all.concat(slots[name])
+    }
+
+    return all
+  }, [])
+}

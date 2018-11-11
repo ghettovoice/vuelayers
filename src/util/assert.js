@@ -49,6 +49,10 @@ export function instanceOf (value, Ctor) {
   assert(value instanceof Ctor, `value is an instance of ${Ctor.name}`)
 }
 
+export function hasOlObject (vm) {
+  assert(vm.$olObject, 'component has "$olObject" property')
+}
+
 /**
  * @param {Object} vm
  * @return {void}
@@ -137,4 +141,8 @@ export function hasStyle (vm) {
  */
 export function hasOverlay (vm) {
   assert(vm.$overlay, 'component has "$overlay" property')
+}
+
+export function hasGraticule (vm) {
+  assert(vm.$graticule, 'component has "$graticule" property')
 }
