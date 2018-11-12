@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div style="height: 100%">
+      <button @click="graticule = !graticule">Graticule</button>
 
       <vl-map v-if="showMap" ref="map" @created="log('created', $event)" @mounted="log('mounted', $event)"
               @destroyed="log('destroyed', $event)" @singleclick="clickCoord = $event.coordinate" @click="onMapClick"
@@ -16,14 +17,14 @@
           </vl-overlay>
         </vl-view>
 
-        <vl-graticule :show-labels="true">
-          <vl-style-stroke slot="stroke" color="green"></vl-style-stroke>
-          <vl-style-text slot="lon">
-            <vl-style-stroke color="blue"></vl-style-stroke>
-          </vl-style-text>
-          <vl-style-text slot="lat" text-align="end">
-            <vl-style-stroke color="black"></vl-style-stroke>
-          </vl-style-text>
+        <vl-graticule :show-labels="true" v-if="graticule">
+          <!--<vl-style-stroke slot="stroke" color="green" :line-dash="[5, 10]"></vl-style-stroke>-->
+          <!--<vl-style-text slot="lon">-->
+            <!--<vl-style-stroke color="blue"></vl-style-stroke>-->
+          <!--</vl-style-text>-->
+          <!--<vl-style-text slot="lat" text-align="end">-->
+            <!--<vl-style-stroke color="black"></vl-style-stroke>-->
+          <!--</vl-style-text>-->
         </vl-graticule>
 
         <vl-geoloc @update:position="log($event)">
@@ -227,8 +228,8 @@
       }
     },
     onMapClick (evt) {
-      let coordinate = pointFromLonLat(evt.coordinate, 'EPSG:3857')
-      console.log(coordinate, this.$refs.wmsSource.getFeatureInfoUrl(coordinate))
+      // let coordinate = pointFromLonLat(evt.coordinate, 'EPSG:3857')
+      // console.log(coordinate, this.$refs.wmsSource.getFeatureInfoUrl(coordinate))
     },
   }
 
@@ -272,6 +273,7 @@
         eventSourcedFeatures: [],
         layerExtent: [-10000000, -10000000, 10000000, 10000000],
         gmlFeatures: [],
+        graticule: false,
       }
     },
     mounted () {

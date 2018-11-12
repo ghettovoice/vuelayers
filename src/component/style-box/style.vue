@@ -1,15 +1,16 @@
 <script>
-  /**
-   * Style box component.
-   * Wrapper for ol.style.Style class. Can be inserted into component with setStyle/getStyle methods (vl-layer-vector, vl-feature & etc.)
-   * and acts as a box for inner style components (vl-style-fill, vl-style-stroke, icon ...)
-   * @module style-box/style
-   */
   import Vue from 'vue'
   import Style from 'ol/style/style'
   import style from '../../mixin/style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { isEqual } from '../../util/minilo'
+
+  /**
+   * Style box component.
+   * Wrapper for ol.style.Style class. Can be inserted into component with setStyle/getStyle methods (vl-layer-vector, vl-feature & etc.)
+   * and acts as a box for inner style components (vl-style-fill, vl-style-stroke, icon ...)
+   */
 
   const props = {
     zIndex: {
@@ -74,7 +75,7 @@
       }
       if (this.$style && image !== this.$style.getImage()) {
         this.$style.setImage(image)
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
     /**
@@ -89,7 +90,7 @@
       }
       if (this.$style && geom !== this.$style.getGeometry()) {
         this.$style.setGeometry(geom)
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
     /**
@@ -104,17 +105,17 @@
       }
       if (this.$style && text !== this.$style.getText()) {
         this.$style.setText(text)
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
   }
 
   const watch = {
     zIndex (value) {
-      if (!this.$style) return
-
-      this.$style.setZIndex(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getZIndex())) {
+        this.$style.setZIndex(value)
+        this.scheduleRefresh()
+      }
     },
   }
 

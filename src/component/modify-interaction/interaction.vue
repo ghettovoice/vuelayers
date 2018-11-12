@@ -150,7 +150,7 @@
     setStyle (styles) {
       if (styles !== this._styles) {
         this._styles = styles
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
     /**
@@ -162,9 +162,7 @@
     },
   }
 
-  const watch = makeWatchers(['source'], function () {
-    this.recreate()
-  })
+  const watch = makeWatchers(['source'], () => function () { this.recreate() })
 
   /**
    * @vueProto

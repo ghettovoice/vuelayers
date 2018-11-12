@@ -221,7 +221,7 @@
     setStyle (styles) {
       if (styles !== this._styles) {
         this._styles = styles
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
     /**
@@ -233,9 +233,7 @@
     },
   }
   // todo other props?
-  const watch = makeWatchers(['source', 'type'], function () {
-    this.recreate()
-  })
+  const watch = makeWatchers(['source', 'type'], () => function () { this.recreate() })
 
   /**
    * @alias module:draw-interaction/interaction

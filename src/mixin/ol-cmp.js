@@ -1,6 +1,7 @@
 /**
  * @module mixin/ol-cmp
  */
+import debounce from 'lodash/debounce'
 import { Observable } from 'rxjs'
 import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
@@ -102,12 +103,14 @@ const methods = {
    * @return {Promise<void>}
    */
   refresh () {
+    if (this.$olObject == null) return Promise.resolve()
+
     return new Promise(resolve => {
       let done = () => {
         ++this.rev
         resolve()
       }
-      if (this.$olObject && isFunction(this.$olObject.changed)) {
+      if (isFunction(this.$olObject.changed)) {
         this.$olObject.once('change', done)
         this.$olObject.changed()
       } else {
@@ -115,14 +118,19 @@ const methods = {
       }
     })
   },
+  scheduleRefresh: debounce(function () {
+    return this.refresh()
+  }, 10),
   /**
    * Internal usage only in components that doesn't support refreshing.
    * @return {Promise<void>}
    * @protected
    */
-  async remount () {
-    await this.unmount()
-    await this.mount()
+  remount () {
+    if (this.$olObject == null) return Promise.resolve()
+
+    return Promise.resolve(this.unmount())
+      .then(() => this.mount())
   },
   /**
    * Only for internal purpose to support watching for properties
@@ -130,10 +138,13 @@ const methods = {
    * @return {Promise}
    * @protected
    */
-  async recreate () {
-    await this.unmount()
-    await this.init()
-    await this.mount()
+  recreate () {
+    if (this.$olObject == null) return Promise.resolve()
+
+    return Promise.resolve(this.unmount())
+      .then(() => this.deinit())
+      .then(() => this.init())
+      .then(() => this.mount())
   },
 }
 

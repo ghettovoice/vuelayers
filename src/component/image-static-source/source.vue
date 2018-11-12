@@ -63,9 +63,7 @@
     },
   }
 
-  const watch = makeWatchers(Object.keys(props), function () {
-    this.recreate()
-  })
+  const watch = makeWatchers(Object.keys(props), () => function () { this.recreate() })
 
   /**
    * A layer source for displaying a single, static image.

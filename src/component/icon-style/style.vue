@@ -1,10 +1,7 @@
 <script>
-  /**
-   * @module icon-style/style
-   */
   import Icon from 'ol/style/icon'
   import imageStyle from '../../mixin/image-style'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { isEqual } from '../../util/minilo'
 
   const props = {
     src: {
@@ -87,9 +84,28 @@
     },
   }
   // todo other watchers
-  const watch = makeWatchers(['src', 'size', 'anchor', 'scale'], function () {
-    this.refresh()
-  })
+  const watch = {
+    src (value) {
+      if (this.$style && !isEqual(value, this.$style.getSrc())) {
+        this.scheduleRefresh()
+      }
+    },
+    size (value) {
+      if (this.$style && !isEqual(value, this.$style.getSize())) {
+        this.scheduleRefresh()
+      }
+    },
+    anchor (value) {
+      if (this.$style && !isEqual(value, this.$style.getAnchor())) {
+        this.scheduleRefresh()
+      }
+    },
+    scale (value) {
+      if (this.$style && !isEqual(value, this.$style.getScale())) {
+        this.scheduleRefresh()
+      }
+    },
+  }
 
   export default {
     name: 'vl-style-icon',

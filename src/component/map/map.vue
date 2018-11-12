@@ -359,7 +359,7 @@
     dataProjection (value) {
       if (this.$map) {
         this.$map.set('dataProjection', value)
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
   }

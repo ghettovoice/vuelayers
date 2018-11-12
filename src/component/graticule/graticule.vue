@@ -7,10 +7,12 @@
 </template>
 
 <script>
-  import Vue from 'vue'
   import Graticule from 'ol/graticule'
-  import { olCmp, useMapCmp, projTransforms } from '../../mixin'
-  import { hasGraticule } from '../../util/assert'
+  import Vue from 'vue'
+  import { throttleTime } from 'rxjs/operator'
+  import { observableFromOlEvent } from '../../rx-ext'
+  import { olCmp, projTransforms, useMapCmp } from '../../mixin'
+  import { hasGraticule, hasMap } from '../../util/assert'
   import { firstEl, map } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -46,14 +48,20 @@
 
   const computed = {
     meridians () {
-      if (!this.$graticule) return
+      if (this.$graticule && this.rev) {
+        // return map(this.getMeridians(), meridian => this.lineToDataProj(meridian.getCoordinates()))
+        return map(this.getMeridians(), meridian => meridian.getCoordinates())
+      }
 
-      return map(this.getMeridians(), meridian => this.lineToDataProj(meridian.getCoordinates()))
+      return []
     },
     parallels () {
-      if (!this.$graticule) return
+      if (this.$graticule && this.rev) {
+        // return map(this.getParallels(), parallel => this.lineToDataProj(parallel.getCoordinates()))
+        return map(this.getParallels(), parallel => parallel.getCoordinates())
+      }
 
-      return map(this.getParallels(), parallel => this.lineToDataProj(parallel.getCoordinates()))
+      return []
     },
   }
 
@@ -88,21 +96,22 @@
       return this::olCmp.methods.deinit()
     },
     /**
-     * @return {void}
+     * @return {Promise}
      * @protected
      */
     mount () {
-      console.log(this.$graticule)
       this.$map && this.$graticule.setMap(this.$map)
       this.subscribeAll()
+      console.log('mount', this.$graticule)
     },
     /**
-     * @return {void}
+     * @return {Promise}
      * @protected
      */
     unmount () {
       this.unsubscribeAll()
       this.$graticule.setMap(undefined)
+      console.log('unmount', this.$graticule)
     },
     getMeridians () {
       hasGraticule(this)
@@ -116,35 +125,38 @@
     },
     setStroke (stroke) {
       stroke = stroke instanceof Vue ? stroke.$style : stroke
-
+      console.log('setStroke', stroke)
       if (stroke !== this._strokeStyle) {
         this._strokeStyle = stroke
-        this.recreate()
+        this.scheduleRefresh()
       }
     },
     setText (text) {
       text = text instanceof Vue ? text.$style : text
-
+      console.log('setText', text)
       let vm
-      const vmMatcher = vnode => vnode.componentInstance && vnode.componentInstance === vm
-
       if (text) {
         vm = firstEl(text[this.$options.VM_PROP])
       }
 
-      switch (true) {
-        case Array.isArray(this.$slots.lon) && this.$slots.lon.some(vmMatcher):
-          if (text !== this._lonLabelStyle) {
-            this._lonLabelStyle = text
-            this.recreate()
-          }
-          break
-        case Array.isArray(this.$slots.lat) && this.$slots.lat.some(vmMatcher):
-          if (text !== this._latLabelStyle) {
-            this._latLabelStyle = text
-            this.recreate()
-          }
-          break
+      const vmMatcher = vnode => vnode.componentInstance && vnode.componentInstance === vm
+
+      if (
+        (text == null && this.$slots.lon == null) ||
+        (Array.isArray(this.$slots.lon) && this.$slots.lon.some(vmMatcher))
+      ) {
+        if (text !== this._lonLabelStyle) {
+          this._lonLabelStyle = text
+          this.scheduleRefresh()
+        }
+      } else if (
+        (text == null && this.$slots.lat == null) ||
+        (Array.isArray(this.$slots.lat) && this.$slots.lat.some(vmMatcher))
+      ) {
+        if (text !== this._latLabelStyle) {
+          this._latLabelStyle = text
+          this.scheduleRefresh()
+        }
       }
     },
     getServices () {
@@ -154,11 +166,26 @@
         get stylesContainer () { return vm },
       })
     },
+    /**
+     * @return {Promise}
+     */
+    refresh () {
+      return this.recreate()
+    },
+    subscribeAll () {
+      hasMap(this)
+
+      const ft = 1000 / 60
+      const postcompose = observableFromOlEvent(this.$map, 'postcompose')
+        ::throttleTime(ft)
+
+      this.subscribeTo(postcompose, () => {
+        ++this.rev
+      })
+    },
   }
 
-  const watch = makeWatchers(Object.keys(props), function () {
-    this.recreate()
-  })
+  const watch = makeWatchers(Object.keys(props), () => function () { this.scheduleRefresh() })
 
   export default {
     name: 'vl-graticule',

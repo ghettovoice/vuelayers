@@ -5,6 +5,8 @@
    * and style target for inner style containers (vl-style-box) as fallback style.
    * @module style-func/style
    */
+  import { first as firstObs, toPromise as obsToPromise } from 'rxjs/operator'
+  import { observableFromOlEvent } from '../../rx-ext'
   import style from '../../mixin/style'
   import stylesContainer from '../../mixin/styles-container'
   import { hasMap } from '../../util/assert'
@@ -95,24 +97,33 @@
         // simply save all inner styles and
         // use them later in style function as fallback
         this._styles = styles
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
     /**
      * @return {Promise}
      */
     refresh () {
+      if (this.$olObject == null) return Promise.resolve()
       // recreate style
-      return Promise.resolve(this.unmount())
-        .then(this.deinit)
-        .then(this.init)
-        .then(this.mount)
+      return this.recreate()
+        .then(() => {
+          if (!this.$map) {
+            return
+          }
+
+          this.$map.render()
+
+          return observableFromOlEvent(this.$map, 'postcompose')
+            ::firstObs()
+            ::obsToPromise()
+        })
     },
   }
 
   const watch = {
     factory () {
-      this.refresh()
+      this.scheduleRefresh()
     },
   }
 

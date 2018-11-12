@@ -1,11 +1,11 @@
 /**
  * Constructs watch hash for multiple properties.
  * @param {string[]} props
- * @param {function|Object} watcher
+ * @param {function|Object} watcherFactory
  */
-export function makeWatchers (props, watcher) {
+export function makeWatchers (props, watcherFactory) {
   return props.reduce((hash, prop) => {
-    hash[prop] = watcher
+    hash[prop] = watcherFactory(prop)
     return hash
   }, {})
 }

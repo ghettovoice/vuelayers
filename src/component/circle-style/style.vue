@@ -3,6 +3,7 @@
   import Circle from 'ol/style/circle'
   import imageStyle from '../../mixin/image-style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
+  import { isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
@@ -45,7 +46,7 @@
 
       if (fill !== this._fill) {
         this._fill = fill
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
     /**
@@ -57,14 +58,16 @@
 
       if (stroke !== this._stroke) {
         this._stroke = stroke
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
   }
 
   const watch = {
-    radius () {
-      this.refresh()
+    radius (value) {
+      if (this.$style && !isEqual(value, this.$style.getRadius())) {
+        this.scheduleRefresh()
+      }
     },
   }
 
