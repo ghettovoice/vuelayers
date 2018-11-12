@@ -1,11 +1,7 @@
-/**
- * @module mixin/ol-cmp
- */
-import debounce from 'lodash/debounce'
 import { Observable } from 'rxjs'
 import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
-import { isFunction } from '../util/minilo'
+import { isFunction, debounce } from '../util/minilo'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
 import services from './services'

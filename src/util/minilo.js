@@ -285,7 +285,7 @@ export function lowerFirst (string) {
   return string[0].toLowerCase() + string.slice(1)
 }
 
-export function* range (start, end, step = 1) {
+export function * range (start, end, step = 1) {
   for (let i = start; i < end; i += step) {
     yield i
   }
@@ -314,4 +314,21 @@ export function camelCase (str) {
   let regExp = /([-_]\w)/g
 
   return str.replace(regExp, matches => matches[1].toUpperCase())
+}
+
+export function debounce (func, ms) {
+  let timer = null
+
+  return function (...args) {
+    const onComplete = () => {
+      func.apply(this, args)
+      timer = null
+    }
+
+    if (timer) {
+      clearTimeout(timer)
+    }
+
+    timer = setTimeout(onComplete, ms)
+  }
 }
