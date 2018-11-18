@@ -1,9 +1,7 @@
 <script>
-  /**
-   * @module stroke-style/style
-   */
   import Stroke from 'ol/style/Stroke'
   import style from '../../mixin/style'
+  import { isEqual } from '../../util/minilo'
 
   const props = {
     color: [Array, String],
@@ -64,34 +62,34 @@
 
   const watch = {
     color (value) {
-      if (!this.$style) return
-
-      this.$style.setColor(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getColor())) {
+        this.$style.setColor(value)
+        this.scheduleRefresh()
+      }
     },
     lineCap (value) {
-      if (!this.$style) return
-
-      this.$style.setLineCap(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getLineCap())) {
+        this.$style.setLineCap(value)
+        this.scheduleRefresh()
+      }
     },
     lineDash (value) {
-      if (!this.$style) return
-
-      this.$style.setLineDash(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getLineDash())) {
+        this.$style.setLineDash(value)
+        this.scheduleRefresh()
+      }
     },
     lineJoin (value) {
-      if (!this.$style) return
-
-      this.$style.setLineJoin(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getLineJoin())) {
+        this.$style.setLineJoin(value)
+        this.scheduleRefresh()
+      }
     },
     width (value) {
-      if (!this.$style) return
-
-      this.$style.setWidth(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getWidth())) {
+        this.$style.setWidth(value)
+        this.scheduleRefresh()
+      }
     },
   }
 

@@ -5,9 +5,6 @@
 </template>
 
 <script>
-  /**
-   * @module map/map
-   */
   import { defaults as defaultsControl } from 'ol/control'
   import VectorLayer from 'ol/layer/Vector'
   import Map from 'ol/Map'
@@ -203,8 +200,7 @@
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */
-          this._defaultLayer.getSource())
+        this._featuresTarget = new SourceCollectionAdapter(this._defaultLayer.getSource())
       }
 
       return this._featuresTarget
@@ -358,7 +354,7 @@
     dataProjection (value) {
       if (this.$map) {
         this.$map.set('dataProjection', value)
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
   }

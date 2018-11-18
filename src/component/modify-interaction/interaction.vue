@@ -1,6 +1,5 @@
 <script>
   import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
-  /** @module modify-interaction/interaction */
   import ModifyInteraction from 'ol/interaction/Modify'
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
@@ -162,8 +161,8 @@
     },
   }
 
-  const watch = makeWatchers(['source'], function () {
-    this.recreate()
+  const watch = makeWatchers(['source'], () => function () {
+    this.scheduleRecreate()
   })
 
   /**

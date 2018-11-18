@@ -1,8 +1,9 @@
 <script>
-  import Circle from 'ol/style/Circle'
   import Vue from 'vue'
+  import Circle from 'ol/style/Circle'
   import imageStyle from '../../mixin/image-style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
+  import { isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
@@ -14,7 +15,7 @@
 
   const methods = {
     /**
-     * @return {Circle}
+     * @return {ol.style.Circle}
      * @protected
      */
     createStyle () {
@@ -36,7 +37,7 @@
       })
     },
     /**
-     * @param {Fill|Vue|undefined} fill
+     * @param {ol.style.Fill|Vue|undefined} fill
      * @return {void}
      */
     setFill (fill) {
@@ -44,11 +45,11 @@
 
       if (fill !== this._fill) {
         this._fill = fill
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
     /**
-     * @param {Stroke|Vue|undefined} stroke
+     * @param {ol.style.Stroke|Vue|undefined} stroke
      * @return {void}
      */
     setStroke (stroke) {
@@ -56,14 +57,16 @@
 
       if (stroke !== this._stroke) {
         this._stroke = stroke
-        this.refresh()
+        this.scheduleRefresh()
       }
     },
   }
 
   const watch = {
-    radius () {
-      this.refresh()
+    radius (value) {
+      if (this.$style && !isEqual(value, this.$style.getRadius())) {
+        this.scheduleRefresh()
+      }
     },
   }
 

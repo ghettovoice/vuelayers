@@ -1,7 +1,9 @@
 /**
  * Basic style mixin.
  */
+import { first as firstObs } from 'rxjs/operators'
 import mergeDescriptors from '../util/multi-merge-descriptors'
+import { observableFromOlEvent } from '../rx-ext'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
 
@@ -50,7 +52,20 @@ const methods = {
    * @return {Promise}
    */
   refresh () {
+    if (this.$olObject == null) return Promise.resolve()
+
     return this.remount()
+      .then(() => {
+        if (!this.$map) {
+          return
+        }
+
+        this.$map.render()
+
+        return observableFromOlEvent(this.$map, 'postcompose')
+          .pipe(firstObs())
+          .toPromise()
+      })
   },
 }
 

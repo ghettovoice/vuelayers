@@ -1,9 +1,7 @@
 <script>
-  /**
-   * @module fill-style/style
-   */
   import Fill from 'ol/style/Fill'
   import style from '../../mixin/style'
+  import { isEqual } from '../../util/minilo'
 
   const props = {
     color: [String, Array],
@@ -37,10 +35,10 @@
 
   const watch = {
     color (value) {
-      if (!this.$style) return
-
-      this.$style.setColor(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getColor())) {
+        this.$style.setColor(value)
+        this.scheduleRefresh()
+      }
     },
   }
 

@@ -1,4 +1,6 @@
 import style from './style'
+import { first as firstObs } from 'rxjs/operators'
+import { observableFromOlEvent } from '../rx-ext'
 
 const props = {
 }
@@ -43,15 +45,24 @@ const methods = {
    * @return {Promise}
    */
   refresh () {
+    if (this.$olObject == null) return Promise.resolve()
     // recreate style
     return this.recreate()
+      .then(() => {
+        if (!this.$map) {
+          return
+        }
+
+        this.$map.render()
+
+        return observableFromOlEvent(this.$map, 'postcompose')
+          .pipe(firstObs())
+          .toPromise()
+      })
   },
 }
 
 const watch = {
-  snapToPixel () {
-    this.refresh()
-  },
 }
 
 export default {

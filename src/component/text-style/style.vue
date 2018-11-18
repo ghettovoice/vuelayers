@@ -1,9 +1,7 @@
 <script>
-  /**
-   * @module text-style/style
-   */
   import Text from 'ol/style/Text'
   import style from '../../mixin/style'
+  import { isEqual } from '../../util/minilo'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
@@ -92,52 +90,52 @@
 
   const watch = {
     font (value) {
-      if (!this.$style) return
-
-      this.$style.setFont(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getFont())) {
+        this.$style.setFont(value)
+        this.scheduleRefresh()
+      }
     },
     offsetX (value) {
-      if (!this.$style) return
-
-      this.$style.setOffsetX(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getOffsetX())) {
+        this.$style.setOffsetX(value)
+        this.scheduleRefresh()
+      }
     },
     offsetY (value) {
-      if (!this.$style) return
-
-      this.$style.setOffsetY(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getOffsetY())) {
+        this.$style.setOffsetY(value)
+        this.scheduleRefresh()
+      }
     },
     rotation (value) {
-      if (!this.$style) return
-
-      this.$style.setRotation(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getRotation())) {
+        this.$style.setRotation(value)
+        this.scheduleRefresh()
+      }
     },
     scale (value) {
-      if (!this.$style) return
-
-      this.$style.setScale(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getScale())) {
+        this.$style.setScale(value)
+        this.scheduleRefresh()
+      }
     },
     text (value) {
-      if (!this.$style) return
-
-      this.$style.setText(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getText())) {
+        this.$style.setText(value)
+        this.scheduleRefresh()
+      }
     },
     textAlign (value) {
-      if (!this.$style) return
-
-      this.$style.setTextAlign(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getTextAlign())) {
+        this.$style.setTextAlign(value)
+        this.scheduleRefresh()
+      }
     },
     textBaseline (value) {
-      if (!this.$style) return
-
-      this.$style.setTextBaseline(value)
-      this.refresh()
+      if (this.$style && !isEqual(value, this.$style.getTextBaseline())) {
+        this.$style.setTextBaseline(value)
+        this.scheduleRefresh()
+      }
     },
   }
 

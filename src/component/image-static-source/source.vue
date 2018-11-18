@@ -63,8 +63,8 @@
     },
   }
 
-  const watch = makeWatchers(Object.keys(props), function () {
-    this.recreate()
+  const watch = makeWatchers(Object.keys(props), () => function () {
+    this.scheduleRefresh()
   })
 
   /**

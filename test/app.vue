@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div style="height: 100%">
+      <button @click="graticule = !graticule">Graticule</button>
 
       <vl-map v-if="showMap" ref="map" @created="log('created', $event)" @mounted="log('mounted', $event)"
               @destroyed="log('destroyed', $event)" @singleclick="clickCoord = $event.coordinate"
@@ -16,14 +17,14 @@
           </vl-overlay>
         </vl-view>
 
-        <vl-graticule :show-labels="true">
-          <vl-style-stroke slot="stroke" color="green"></vl-style-stroke>
-          <vl-style-text slot="lon">
-            <vl-style-stroke color="blue"></vl-style-stroke>
-          </vl-style-text>
-          <vl-style-text slot="lat" text-align="end">
-            <vl-style-stroke color="black"></vl-style-stroke>
-          </vl-style-text>
+        <vl-graticule :show-labels="true" v-if="graticule">
+          <!--<vl-style-stroke slot="stroke" color="green"></vl-style-stroke>-->
+          <!--<vl-style-text slot="lon">-->
+            <!--<vl-style-stroke color="blue"></vl-style-stroke>-->
+          <!--</vl-style-text>-->
+          <!--<vl-style-text slot="lat" text-align="end">-->
+            <!--<vl-style-stroke color="black"></vl-style-stroke>-->
+          <!--</vl-style-text>-->
         </vl-graticule>
 
         <vl-geoloc @update:position="log($event)">
@@ -268,6 +269,7 @@
         eventSourcedFeatures: [],
         layerExtent: [-10000000, -10000000, 10000000, 10000000],
         gmlFeatures: [],
+        graticule: false,
       }
     },
     mounted () {
