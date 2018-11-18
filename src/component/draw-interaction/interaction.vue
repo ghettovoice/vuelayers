@@ -233,7 +233,7 @@
     },
   }
   // todo other props?
-  const watch = makeWatchers(['source', 'type'], () => function () { this.recreate() })
+  const watch = makeWatchers(['source', 'type'], () => function () { this.scheduleRecreate() })
 
   /**
    * @alias module:draw-interaction/interaction

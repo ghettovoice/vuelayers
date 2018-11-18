@@ -1,5 +1,4 @@
 <script>
-  /** @module snap-interaction/interaction */
   import SnapInteraction from 'ol/interaction/snap'
   import interaction from '../../mixin/interaction'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -80,7 +79,7 @@
     },
   }
 
-  const watch = makeWatchers(['source'], () => function () { this.recreate() })
+  const watch = makeWatchers(['source'], () => function () { this.scheduleRecreate() })
 
   /**
    * @alias module:snap-interaction/interaction

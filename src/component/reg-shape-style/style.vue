@@ -3,6 +3,7 @@
   import RegularShape from 'ol/style/regularshape'
   import imageStyle from '../../mixin/image-style'
   import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
+  import { isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
@@ -83,10 +84,49 @@
     },
   }
 
+  const watch = {
+    points (value) {
+      if (this.$style && !isEqual(value, this.$style.getPoints())) {
+        this.scheduleRefresh()
+      }
+    },
+    radius (value) {
+      if (this.$style && !isEqual(value, this.$style.getRadius())) {
+        this.scheduleRefresh()
+      }
+    },
+    radius1 (value) {
+      if (this.$style && !isEqual(value, this.$style.getRadius())) {
+        this.scheduleRefresh()
+      }
+    },
+    radius2 (value) {
+      if (this.$style && !isEqual(value, this.$style.getRadius2())) {
+        this.scheduleRefresh()
+      }
+    },
+    angle (value) {
+      if (this.$style && !isEqual(value, this.$style.getAngle())) {
+        this.scheduleRefresh()
+      }
+    },
+    rotation (value) {
+      if (this.$style && !isEqual(value, this.$style.getRotation())) {
+        this.scheduleRefresh()
+      }
+    },
+    rotateWithView (value) {
+      if (this.$style && !isEqual(value, this.$style.getRotateWithView())) {
+        this.scheduleRefresh()
+      }
+    },
+  }
+
   export default {
     name: 'vl-style-reg-shape',
     mixins: [imageStyle, withFillStrokeStyle],
     props,
     methods,
+    watch,
   }
 </script>

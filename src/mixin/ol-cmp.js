@@ -1,7 +1,8 @@
 import { Observable } from 'rxjs'
 import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, map as mapObs, skipWhile, toPromise } from 'rxjs/operator'
-import { isFunction, debounce } from '../util/minilo'
+import debounce from 'debounce-promise'
+import { isFunction } from '../util/minilo'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
 import services from './services'
@@ -128,6 +129,9 @@ const methods = {
     return Promise.resolve(this.unmount())
       .then(() => this.mount())
   },
+  scheduleRemount: debounce(function () {
+    return this.remount()
+  }, 10),
   /**
    * Only for internal purpose to support watching for properties
    * for which OpenLayers doesn't provide setters.
@@ -142,6 +146,9 @@ const methods = {
       .then(() => this.init())
       .then(() => this.mount())
   },
+  scheduleRecreate: debounce(function () {
+    return this.recreate()
+  }, 10),
 }
 
 /**

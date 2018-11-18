@@ -72,7 +72,7 @@
     },
   }
 
-  const watch = makeWatchers(['apiKey', 'imagerySet'], () => function () { this.recreate() })
+  const watch = makeWatchers(['apiKey', 'imagerySet'], () => function () { this.scheduleRecreate() })
 
   export default {
     name: 'vl-source-bingmaps',

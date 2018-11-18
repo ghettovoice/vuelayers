@@ -205,7 +205,7 @@
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new SourceCollectionAdapter(/** @type {ol.source.Vector} */this._defaultLayer.getSource())
+        this._featuresTarget = new SourceCollectionAdapter(this._defaultLayer.getSource())
       }
 
       return this._featuresTarget
