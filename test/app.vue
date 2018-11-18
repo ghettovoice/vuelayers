@@ -1,92 +1,27 @@
 <template>
   <div id="app">
     <div style="height: 100%">
-      <button @click="graticule = !graticule">Graticule</button>
+      <div style="position: absolute; text-align: center; top: 0; left: 0; right: 0; z-index: 100">
+        <button @click="graticule = !graticule">Graticule</button>
+      </div>
 
-      <vl-map v-if="showMap" ref="map" @created="log('created', $event)" @mounted="log('mounted', $event)"
-              @destroyed="log('destroyed', $event)" @singleclick="clickCoord = $event.coordinate"
-              data-projection="EPSG:4326">
+      <vl-map v-if="showMap" ref="map" data-projection="EPSG:4326">
         <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
-          <vl-overlay slot-scope="view" v-if="view.center" :position="view.center">
-            <div style="background: #eee; padding: 1rem">
-              Center: {{ view.center }}<br>
-              Zoom: {{ view.zoom }}<br>
-              Resolution: {{ view.resolution }}<br>
-              Rotation: {{ view.rotation }}<br>
-            </div>
-          </vl-overlay>
         </vl-view>
 
         <vl-graticule :show-labels="true" v-if="graticule">
-          <!--<vl-style-stroke slot="stroke" color="green"></vl-style-stroke>-->
-          <!--<vl-style-text slot="lon">-->
-            <!--<vl-style-stroke color="blue"></vl-style-stroke>-->
-          <!--</vl-style-text>-->
-          <!--<vl-style-text slot="lat" text-align="end">-->
-            <!--<vl-style-stroke color="black"></vl-style-stroke>-->
-          <!--</vl-style-text>-->
+          <vl-style-stroke slot="stroke" color="green" :line-dash="[5, 10]"></vl-style-stroke>
+          <vl-style-text slot="lon" text-baseline="bottom">
+            <vl-style-stroke color="blue"></vl-style-stroke>
+          </vl-style-text>
+          <vl-style-text slot="lat" text-align="end">
+            <vl-style-stroke color="black"></vl-style-stroke>
+          </vl-style-text>
         </vl-graticule>
-
-        <vl-geoloc @update:position="log($event)">
-          <template slot-scope="ctx">
-            <vl-feature v-if="ctx.position" id="my-geoloc">
-              <vl-geom-point :coordinates="ctx.position" />
-              <vl-style-box>
-                <vl-style-circle :radius="7">
-                  <vl-style-fill color="#abcabc" />
-                  <vl-style-stroke color="#ff22ff" :width="5" />
-                </vl-style-circle>
-              </vl-style-box>
-            </vl-feature>
-          </template>
-        </vl-geoloc>
 
         <vl-layer-tile id="sputnik">
           <vl-source-stamen layer="toner-lite"/>
         </vl-layer-tile>
-
-        <vl-layer-vector>
-          <vl-source-vector url="https://rsg.pml.ac.uk/geoserver/ows?service=WFS&version=1.1.0&request=GetFeature&typename=rsg:50m_coastline&outputFormat=application/json&srsname=EPSG:3857" :features.sync="gmlFeatures"></vl-source-vector>
-        </vl-layer-vector>
-
-        <!--<vl-layer-group :opacity="0.5">-->
-          <!--<vl-layer-tile id="wms">-->
-            <!--<vl-source-wms ref="wmsSource" url="https://ahocevar.com/geoserver/wms" layers="topp:states" :ext-params="{ TILED: true }" server-type="geoserver"/>-->
-          <!--</vl-layer-tile>-->
-          <!--<vl-layer-image id="wms-image">-->
-            <!--<vl-source-image-wms url="https://ahocevar.com/geoserver/wms" layers="topp:states" server-type="geoserver"/>-->
-          <!--</vl-layer-image>-->
-
-          <!--<vl-layer-vector id="points" v-if="pointsLayer">-->
-            <!--<vl-source-cluster>-->
-              <!--<vl-source-vector :features="points"/>-->
-            <!--</vl-source-cluster>-->
-            <!--<vl-style-func :factory="clusterStyleFunc"></vl-style-func>-->
-          <!--</vl-layer-vector>-->
-        <!--</vl-layer-group>-->
-
-        <!--<vl-layer-tile>-->
-          <!--<vl-source-arcgis-rest url="https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer"></vl-source-arcgis-rest>-->
-        <!--</vl-layer-tile>-->
-
-        <!--<vl-layer-tile>-->
-          <!--<vl-source-bing-maps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bing-maps>-->
-        <!--</vl-layer-tile>-->
-        <!--<vl-layer-tile>-->
-          <!--<vl-source-bingmaps api-key="qwerty" imagery-set="RoadOnDemand"></vl-source-bingmaps>-->
-        <!--</vl-layer-tile>-->
-
-        <vl-interaction-select ident="select" @select="log('select', $event)" @unselect="log('unselect', $event)" :features.sync="selectedFeatures"/>
-
-        <vl-overlay v-if="selectedFeatures.length && selectedFeatures[0].properties && selectedFeatures[0].properties.features"
-                    :position="pointOnSurface(selectedFeatures[0].geometry)" :auto-pan="true" :auto-pan-animation="{ duration: 250 }">
-          <div style="background: #eee; padding: 10px 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); width: 200px">
-            Popup cluster feature {{ selectedFeatures[0].id }}<br />
-            <span v-for="feature in selectedFeatures[0].properties.features">
-              feature {{ feature.id }}
-            </span>
-          </div>
-        </vl-overlay>
       </vl-map>
     </div>
   </div>
