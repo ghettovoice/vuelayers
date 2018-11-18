@@ -64,7 +64,7 @@
   }
 
   const watch = makeWatchers(Object.keys(props), () => function () {
-    this.scheduleRefresh()
+    this.scheduleRecreate()
   })
 
   /**
