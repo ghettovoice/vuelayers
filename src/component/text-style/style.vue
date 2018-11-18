@@ -10,6 +10,7 @@
       type: String,
       default: '10px sans-serif', // css font format https://developer.mozilla.org/en-US/docs/Web/CSS/font?v=control
     },
+    placement: String,
     offsetX: {
       type: Number,
       default: 0,
@@ -31,14 +32,8 @@
       default: 1,
     },
     text: String,
-    textAlign: {
-      type: String,
-      default: 'start', // left, right, center, end, start
-    },
-    textBaseline: {
-      type: String,
-      default: 'alphabetic', // bottom, top, middle, alphabetic, hanging, ideographic
-    },
+    textAlign: String, // left, right, center, end, start
+    textBaseline: String, // bottom, top, middle, alphabetic, hanging, ideographic
   }
 
   const methods = {
@@ -49,6 +44,7 @@
     createStyle () {
       return new Text({
         font: this.font,
+        placement: this.placement,
         offsetX: this.offsetX,
         offsetY: this.offsetY,
         rotateWithView: this.rotateWithView,

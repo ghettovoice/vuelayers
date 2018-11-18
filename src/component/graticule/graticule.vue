@@ -8,10 +8,10 @@
 
 <script>
   import Graticule from 'ol/graticule'
-  import Vue from 'vue'
   import { throttleTime } from 'rxjs/operator'
-  import { observableFromOlEvent } from '../../rx-ext'
+  import Vue from 'vue'
   import { olCmp, projTransforms, useMapCmp } from '../../mixin'
+  import { observableFromOlEvent } from '../../rx-ext'
   import { hasGraticule, hasMap } from '../../util/assert'
   import { firstEl, map } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -49,16 +49,14 @@
   const computed = {
     meridians () {
       if (this.$graticule && this.rev) {
-        // return map(this.getMeridians(), meridian => this.lineToDataProj(meridian.getCoordinates()))
-        return map(this.getMeridians(), meridian => meridian.getCoordinates())
+        return map(this.getMeridians(), meridian => this.lineToDataProj(meridian.getCoordinates()))
       }
 
       return []
     },
     parallels () {
       if (this.$graticule && this.rev) {
-        // return map(this.getParallels(), parallel => this.lineToDataProj(parallel.getCoordinates()))
-        return map(this.getParallels(), parallel => parallel.getCoordinates())
+        return map(this.getParallels(), parallel => this.lineToDataProj(parallel.getCoordinates()))
       }
 
       return []
@@ -102,7 +100,6 @@
     mount () {
       this.$map && this.$graticule.setMap(this.$map)
       this.subscribeAll()
-      console.log('mount', this.$graticule)
     },
     /**
      * @return {Promise}
@@ -111,7 +108,6 @@
     unmount () {
       this.unsubscribeAll()
       this.$graticule.setMap(undefined)
-      console.log('unmount', this.$graticule)
     },
     getMeridians () {
       hasGraticule(this)
@@ -125,7 +121,7 @@
     },
     setStroke (stroke) {
       stroke = stroke instanceof Vue ? stroke.$style : stroke
-      console.log('setStroke', stroke)
+
       if (stroke !== this._strokeStyle) {
         this._strokeStyle = stroke
         this.scheduleRefresh()
@@ -133,7 +129,7 @@
     },
     setText (text) {
       text = text instanceof Vue ? text.$style : text
-      console.log('setText', text)
+
       let vm
       if (text) {
         vm = firstEl(text[this.$options.VM_PROP])
