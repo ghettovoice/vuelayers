@@ -146,6 +146,9 @@ const methods = {
       .then(() => this.init())
       .then(() => this.mount())
   },
+  scheduleRecreate: debounce(function () {
+    return this.recreate()
+  }, 10),
 }
 
 /**
