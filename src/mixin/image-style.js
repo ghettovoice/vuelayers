@@ -1,5 +1,3 @@
-import { first as firstObs, toPromise as obsToPromise } from 'rxjs/operator'
-import { observableFromOlEvent } from '../rx-ext'
 import { isEqual } from '../util/minilo'
 import style from './style'
 
@@ -50,20 +48,8 @@ const methods = {
    * @return {Promise}
    */
   refresh () {
-    if (this.$olObject == null) return Promise.resolve()
     // recreate style
     return this.recreate()
-      .then(() => {
-        if (!this.$map) {
-          return
-        }
-
-        this.$map.render()
-
-        return observableFromOlEvent(this.$map, 'postcompose')
-          ::firstObs()
-          ::obsToPromise()
-      })
   },
 }
 
