@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module point-geom/geom
-   */
   import Point from 'ol/geom/Point'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'

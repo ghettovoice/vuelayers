@@ -1,5 +1,4 @@
 <script>
-  /** @module vector-layer/layer */
   import VectorLayer from 'ol/layer/Vector'
   import vectorLayer from '../../mixin/vector-layer'
 

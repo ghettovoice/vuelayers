@@ -1,6 +1,3 @@
-/**
- * @module mixin/layer
- */
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 import { hasLayer, hasMap } from '../util/assert'
@@ -10,10 +7,7 @@ import cmp from './ol-virt-cmp'
 import sourceContainer from './source-container'
 import useMapCmp from './use-map-cmp'
 
-/**
- * @vueProps
- */
-const props = /** @lends module:mixin/layer# */{
+const props = {
   id: {
     type: [String, Number],
     default: () => uuid(),

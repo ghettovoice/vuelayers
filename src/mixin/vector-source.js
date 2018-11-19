@@ -36,8 +36,8 @@ const methods = {
    * @protected
    */
   getFeaturesTarget () {
-    if (this._featuresTarget == null) {
-      this._featuresTarget = new SourceCollectionAdapter(/** @type {Vector} */this.$source)
+    if (this._featuresTarget == null && this.$source) {
+      this._featuresTarget = new SourceCollectionAdapter(this.$source)
     }
 
     return this._featuresTarget
@@ -78,6 +78,7 @@ const methods = {
    * @protected
    */
   unmount () {
+    this.clear()
     this::source.methods.unmount()
   },
   /**

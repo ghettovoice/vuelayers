@@ -105,7 +105,4 @@ const methods = {
 export default {
   mixins: [projTransforms],
   methods,
-  destroyed () {
-    this.clearFeatures()
-  },
 }

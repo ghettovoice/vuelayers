@@ -114,9 +114,6 @@ const methods = {
       }
     })
   },
-  scheduleRefresh: debounce(function () {
-    return this.refresh()
-  }, 10),
   /**
    * Internal usage only in components that doesn't support refreshing.
    * @return {Promise<void>}
@@ -128,9 +125,6 @@ const methods = {
     return Promise.resolve(this.unmount())
       .then(() => this.mount())
   },
-  scheduleRemount: debounce(function () {
-    return this.remount()
-  }, 10),
   /**
    * Only for internal purpose to support watching for properties
    * for which OpenLayers doesn't provide setters.
@@ -145,9 +139,6 @@ const methods = {
       .then(() => this.init())
       .then(() => this.mount())
   },
-  scheduleRecreate: debounce(function () {
-    return this.recreate()
-  }, 10),
 }
 
 /**
@@ -216,6 +207,19 @@ export default {
         get: () => this._mountPromise,
       },
     })
+
+    // bind debounced functions at runtime
+    // for each instance to avoid interfering between
+    // different instances
+    this.scheduleRefresh = debounce(function () {
+      return this.refresh()
+    }, 10)
+    this.scheduleRemount = debounce(function () {
+      return this.remount()
+    }, 10)
+    this.scheduleRecreate = debounce(function () {
+      return this.recreate()
+    }, 10)
   },
   mounted () {
     this.$createPromise.then(this.mount)

@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module tile-layer/layer
-   */
   import TileLayer from 'ol/layer/Tile'
   import layer from '../../mixin/layer'
 

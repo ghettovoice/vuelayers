@@ -1,7 +1,3 @@
-/**
- * Mixin with helpers for projection transforms between current view projection and global defined projection.
- * @module mixin/proj-transforms
- */
 import { EPSG_3857 } from '../ol-ext/consts'
 import { readGeoJsonFeature, readGeoJsonGeometry, writeGeoJsonFeature, writeGeoJsonGeometry } from '../ol-ext/geojson'
 import {
@@ -16,9 +12,9 @@ import {
 import { coalesce } from '../util/minilo'
 
 /**
- * @alias module:mixin/proj-transforms
- * @vueProto
+ * Mixin with helpers for projection transforms between current view projection and global defined projection.
  */
+
 export default {
   computed: {
     /**

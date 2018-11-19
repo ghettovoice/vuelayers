@@ -1,12 +1,12 @@
 <script>
-  import { fetch } from 'whatwg-fetch'
   import VectorSource from 'ol/source/Vector'
+  import { fetch } from 'whatwg-fetch'
   import vectorSource from '../../mixin/vector-source'
   import { getFeatureId } from '../../ol-ext/feature'
   import { createGeoJsonFmt } from '../../ol-ext/format'
   import { loadingAll } from '../../ol-ext/load-strategy'
   import { transform } from '../../ol-ext/proj'
-  import { constant, difference, isFinite, isFunction, stubArray, isEmpty } from '../../util/minilo'
+  import { constant, difference, isEmpty, isFinite, isFunction, stubArray } from '../../util/minilo'
 
   const props = {
     /**
@@ -195,10 +195,16 @@
         credentials: 'same-origin',
         mode: 'cors',
       }).then(response => response.text())
-        .then(text => vm.$source.getFormat().readFeatures(text, {
-          featureProjection: vm.viewProjection,
-          dataProjection: vm.resolvedDataProjection,
-        }))
+        .then(text => {
+          if (!vm.$source) {
+            return []
+          }
+
+          return vm.$source.getFormat().readFeatures(text, {
+            featureProjection: vm.viewProjection,
+            dataProjection: vm.resolvedDataProjection,
+          })
+        })
     }
   }
 

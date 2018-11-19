@@ -7,7 +7,6 @@
 </template>
 
 <script>
-  /** @module geoloc/geoloc */
   import Geolocation from 'ol/Geolocation'
   import { merge } from 'rxjs/observable'
   import { olCmp, useMapCmp, projTransforms } from '../../mixin'

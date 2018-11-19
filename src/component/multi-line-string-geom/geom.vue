@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module multi-line-string-geom/geom
-   */
   import MultiLineString from 'ol/geom/MultiLineString'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'

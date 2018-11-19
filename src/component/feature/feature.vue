@@ -5,9 +5,6 @@
 </template>
 
 <script>
-  /**
-   * @module feature/feature
-   */
   import Feature from 'ol/Feature'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'

@@ -1,8 +1,5 @@
 <script>
   import sourceContainer from '../../mixin/source-container'
-  /**
-   * @module cluster-source/source
-   */
   import vectorSource from '../../mixin/vector-source'
   import { createPointGeom, findPointOnSurface } from '../../ol-ext/geom'
   import mergeDescriptors from '../../util/multi-merge-descriptors'

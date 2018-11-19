@@ -1,18 +1,16 @@
 <script>
-  /**
-   * Style function component for advanced styling.
-   * Plays the role of both a style that mounts itself to style target component (vl-layer-vector, vl-feature & etc.)
-   * and style target for inner style containers (vl-style-box) as fallback style.
-   * @module style-func/style
-   */
-  import { first as firstObs } from 'rxjs/operators'
-  import { observableFromOlEvent } from '../../rx-ext'
   import style from '../../mixin/style'
   import stylesContainer from '../../mixin/styles-container'
   import { hasMap } from '../../util/assert'
   import { warn } from '../../util/log'
   import { isFunction, noop } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
+
+  /**
+   * Style function component for advanced styling.
+   * Plays the role of both a style that mounts itself to style target component (vl-layer-vector, vl-feature & etc.)
+   * and style target for inner style containers (vl-style-box) as fallback style.
+   */
 
   const props = {
     /**
@@ -104,20 +102,8 @@
      * @return {Promise}
      */
     refresh () {
-      if (this.$olObject == null) return Promise.resolve()
       // recreate style
       return this.recreate()
-        .then(() => {
-          if (!this.$map) {
-            return
-          }
-
-          this.$map.render()
-
-          return observableFromOlEvent(this.$map, 'postcompose')
-            .pipe(firstObs())
-            .toPromise()
-        })
     },
   }
 

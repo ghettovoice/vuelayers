@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module mapbox-source/source
-   */
   import xyzSource from '../../mixin/xyz-source'
   import { EPSG_3857, TILE_FORMAT } from '../../ol-ext/consts'
   import { coalesce } from '../../util/minilo'

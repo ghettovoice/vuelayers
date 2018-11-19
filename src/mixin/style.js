@@ -1,12 +1,12 @@
-/**
- * Basic style mixin.
- */
 import { first as firstObs } from 'rxjs/operators'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { observableFromOlEvent } from '../rx-ext'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
 
+/**
+ * Basic style mixin.
+ */
 const methods = {
   /**
    * @return {OlStyle|Promise<OlStyle>}

@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module multi-point-geom/geom
-   */
   import MultiPoint from 'ol/geom/MultiPoint'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'

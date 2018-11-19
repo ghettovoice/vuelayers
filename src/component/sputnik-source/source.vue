@@ -1,9 +1,9 @@
 <script>
+  import xyzSource from '../../mixin/xyz-source'
+
   /**
    * Layer source to work with Sputnik.ru tile server.
-   * @module sputnik-source/source
    */
-  import xyzSource from '../../mixin/xyz-source'
 
   const SPUTNIK_URL_TEMPLATE = 'http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png?apikey={apikey}'
   const SPUTNIK_ATTRIBUTIONS = '<a href="http://maps.sputnik.ru/" target="_blank">Спутник</a> ' +

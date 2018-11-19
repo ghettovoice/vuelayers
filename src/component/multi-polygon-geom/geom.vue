@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module multi-polygon-geom/geom
-   */
   import MultiPolygon from 'ol/geom/MultiPolygon'
   import geometry from '../../mixin/geometry'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'

@@ -85,7 +85,4 @@ const methods = {
 
 export default {
   methods,
-  destroyed () {
-    this.clearInteractions()
-  },
 }

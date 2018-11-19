@@ -3,6 +3,8 @@
     <div style="height: 100%">
       <div style="position: absolute; text-align: center; top: 0; left: 0; right: 0; z-index: 100">
         <button @click="graticule = !graticule">Graticule</button>
+        <button @click="drawType = 'Polygon'">Draw polygon</button>
+        <button @click="drawType = undefined">Stop draw</button>
       </div>
 
       <vl-map v-if="showMap" ref="map" data-projection="EPSG:4326">
@@ -22,6 +24,38 @@
         <vl-layer-tile id="sputnik">
           <vl-source-stamen layer="toner-lite"/>
         </vl-layer-tile>
+
+        <vl-interaction-select :features.sync="selectedFeatures">
+          <vl-style-box>
+            <vl-style-stroke color="#423e9e" :width="7"></vl-style-stroke>
+            <vl-style-fill :color="[254, 178, 76, 0.7]"></vl-style-fill>
+            <vl-style-circle :radius="5">
+              <vl-style-stroke color="#423e9e" :width="7"></vl-style-stroke>
+              <vl-style-fill :color="[254, 178, 76, 0.7]"></vl-style-fill>
+            </vl-style-circle>
+          </vl-style-box>
+          <vl-style-box :z-index="1">
+            <vl-style-stroke color="#d43f45" :width="2"></vl-style-stroke>
+            <vl-style-circle :radius="5">
+              <vl-style-stroke color="#d43f45" :width="2"></vl-style-stroke>
+            </vl-style-circle>
+          </vl-style-box>
+        </vl-interaction-select>
+
+        <vl-layer-vector id="countries">
+          <vl-source-vector url="https://openlayers.org/en/latest/examples/data/geojson/countries.geojson"></vl-source-vector>
+
+          <vl-style-box>
+            <vl-style-fill :color="[255, 255, 255, 0.5]"></vl-style-fill>
+            <vl-style-stroke color="#219e46" :width="2"></vl-style-stroke>
+          </vl-style-box>
+        </vl-layer-vector>
+
+        <vl-layer-vector id="draw-pane" v-if="drawType != null">
+          <vl-source-vector ident="draw-target" :features.sync="drawnFeatures"></vl-source-vector>
+        </vl-layer-vector>
+
+        <vl-interaction-draw v-if="drawType != null" source="draw-target" :type="drawType"></vl-interaction-draw>
       </vl-map>
     </div>
   </div>

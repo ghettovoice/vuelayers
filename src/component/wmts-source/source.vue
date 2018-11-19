@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module wmts-source/source
-   */
   import WMTSSource from 'ol/source/WMTS'
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
   import tileSource from '../../mixin/tile-source'

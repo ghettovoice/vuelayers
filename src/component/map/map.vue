@@ -310,6 +310,11 @@
      */
     unmount () {
       hasMap(this)
+
+      this.clearLayers()
+      this.clearInteractions()
+      this.clearOverlays()
+
       this.unsubscribeAll()
       this.$map.setTarget(undefined)
     },

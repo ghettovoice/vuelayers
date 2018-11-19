@@ -1,7 +1,4 @@
 <script>
-  /**
-   * @module osm-source/source
-   */
   import OSMSource from 'ol/source/OSM'
   import xyzSource from '../../mixin/xyz-source'
 

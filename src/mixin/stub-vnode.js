@@ -1,8 +1,8 @@
+import { extractChildren } from '../util/vue-helpers'
+
 /**
  * Renders stub VNode for component.
  */
-import { extractChildren } from '../util/vue-helpers'
-
 export default {
   /**
    * @param {function} h
