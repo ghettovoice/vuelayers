@@ -23,11 +23,13 @@ It can display maps with tiled, raster or vector layers loaded from different so
 
 ## Versions
 
-**NOTE**: you are reading README for latest version **v0.11.x** that is based on the **OpenLayers v5**. 
-To use VueLayers with **OpenLayers v4** go to the [**v0.10.x**](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) branch.  
+**NOTE**: you are reading README for the next version **v0.12.x**.  
 
-- [master](https://github.com/ghettovoice/vuelayers/tree/master) - This is the branch for the current **>=v0.11.x (OpenLayers >=5)** version 
-- [stable-0.10.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) - This is the branch for the previous **v0.10.x (OpenLayers <5)** version
+| Vuelayers           | Branch                                                                       | Vue     | OpenLayers |
+| :------------------ | :--------------------------------------------------------------------------- | :------ | :--------- |
+| Current **0.11.x**  | [stable-0.11.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.11.x) | **2.3** | **5.x**    |
+| Next **0.12.x**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)               | **2.3** | **5.x**    |
+| Previous **0.10.x** | [stable-0.10.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) | **2.3** | **4.x**    |
 
 ## Links
 
@@ -37,14 +39,20 @@ To use VueLayers with **OpenLayers v4** go to the [**v0.10.x**](https://github.c
 
 ## Requirements
 
-- [Vue](https://vuejs.org/) version **^2.3**.
-- [OpenLayers](https://openlayers.org/) version **^5.0**.
+- [Vue](https://vuejs.org/) version **^2.3**
+- [OpenLayers](https://openlayers.org/) version **^5.0**
 
 ## Install
 
 ```bash
-# install Vue and VueLayers
-npm install -S vue vuelayers
+# install Vue
+npm install vue
+
+# install current VueLayers version 
+npm install vuelayers
+
+# install next VueLayers version
+npm install vuelayers@next
 ```
 
 ## Build Setup

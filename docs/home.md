@@ -21,23 +21,23 @@ See the [Quick start](quickstart.md "Quick start guide") for more details how to
 
 ## Versions
 
-**NOTE**: you are reading README for latest version **v0.11.x** that is based on the **OpenLayers v5**. 
-To use VueLayers with **OpenLayers v4** go to the [**v0.10.x**](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) branch.  
-
-- [master](https://github.com/ghettovoice/vuelayers/tree/master) - This is the branch for the current **>=v0.11.x (OpenLayers >=5)** version 
-- [stable-0.10.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) - This is the branch for the previous **v0.10.x (OpenLayers <5)** version
+| Vuelayers           | Branch                                                                       | Vue     | OpenLayers |
+| :------------------ | :--------------------------------------------------------------------------- | :------ | :--------- |
+| Current **0.11.x**  | [stable-0.11.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.11.x) | **2.3** | **5.x**    |
+| Next **0.12.x**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)               | **2.3** | **5.x**    |
+| Previous **0.10.x** | [stable-0.10.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) | **2.3** | **4.x**    |
 
 ## Features
 
 * Display raster, vector, tiled layers
 * Draw and modify vector features
 * Easy to extend with the help of multiple mixins
-* UMD / CommonJS / ES6 build versions
+* UMD / ES6 build versions
 
 ## Requirements
 
-- [Vue](https://vuejs.org/) version **^2.3**.
-- [OpenLayers](https://openlayers.org/) version **^5.0**.
+- [Vue](https://vuejs.org/) version **^2.3**
+- [OpenLayers](https://openlayers.org/) version **^5.0**
 
 ## Live demo
 

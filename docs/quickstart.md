@@ -1,11 +1,11 @@
 # Quick start
 
-VueLayers distributed as a set of separated components and mixins built as **CommonJS** and **ES2015** modules.
+VueLayers distributed as a set of separated components and mixins built as **ES2015** modules.
 For in browser usage there is full standalone **UMD** bundle provided.
 
 ## Installation
 
-!> VueLayers works with Vue.js **2.3+** and OpenLayers **3.14+**
+!> VueLayers works with Vue.js **2.3+** and OpenLayers **5.0+**
 
 ### NPM
 
@@ -42,15 +42,6 @@ You can browse the source of the npm package at [unpkg.com/vuelayers/](https://u
 </script>
 ```
 
-**Compressed files** are also available
-
-```html
-<!-- include optimized UMD VueLayers build -->
-<link rel="stylesheet" href="https://unpkg.com/vuelayers/lib/style.min.css">
-<script src="https://unpkg.com/vuelayers/lib/index.umd.min.js"></script>
-```
-
-
 ### Build from source
 
 !> Node **v6+** is required
@@ -65,9 +56,6 @@ npm install
 
 # build all targets
 npm run build
-# or only what you need, --format argument accepts list of target formats
-# separated by comma (es, cjs, umd)
-npm run rollup -- --format es,cjs
 
 # check lib dir, there are all ready to use components
 ls -l lib
