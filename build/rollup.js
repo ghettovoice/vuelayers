@@ -7,7 +7,7 @@ const cjs = require('rollup-plugin-commonjs')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const replace = require('rollup-plugin-re')
 const vue = require('rollup-plugin-vue').default
-const uglify = require('rollup-plugin-uglify').uglify
+const uglify = require('rollup-plugin-uglify')
 const sass = require('./rollup/sass')
 const notifier = require('node-notifier')
 const argv = require('yargs').argv
@@ -267,7 +267,7 @@ function makeBundle (options = {}) {
     plugins.push(
       uglify({
         mangle: true,
-        sourcemap: true,
+        sourceMap: true,
         compress: {
           warnings: false,
         },
