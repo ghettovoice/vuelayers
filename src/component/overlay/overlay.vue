@@ -1,5 +1,5 @@
 <template>
-  <div :id="[$options.name, id].join('-')" :class="$options.name">
+  <div :id="[$options.name, id].join('-')" :class="classes">
     <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
   </div>
 </template>
@@ -14,7 +14,7 @@
   import { OVERLAY_POSITIONING } from '../../ol-ext/consts'
   import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
   import { hasOverlay } from '../../util/assert'
-  import { isEqual } from '../../util/minilo'
+  import { isEqual, identity } from '../../util/minilo'
 
   const props = {
     id: {
@@ -73,6 +73,12 @@
         return this.pointToDataProj(this.$overlay.getPosition())
       }
     },
+    classes () {
+      return [
+        this.$options.name,
+        this.visible ? 'visible' : undefined,
+      ].filter(identity)
+    },
   }
 
   /**
@@ -108,6 +114,7 @@
       // reset position to trigger panIntoView
       this.$nextTick(() => {
         this.$overlay.setPosition(this.positionViewProj.slice())
+        this.visible = true
       })
       this.subscribeAll()
     },
@@ -121,6 +128,7 @@
       this.unsubscribeAll()
       this.$overlay.setElement(undefined)
       this.$overlaysContainer && this.$overlaysContainer.removeOverlay(this.$overlay)
+      this.visible = false
     },
     /**
      * @return {void}
@@ -189,6 +197,11 @@
           get: () => this.$services && this.$services.overlaysContainer,
         },
       })
+    },
+    data () {
+      return {
+        visible: false,
+      }
     },
   }
 
