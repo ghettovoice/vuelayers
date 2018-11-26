@@ -109,6 +109,10 @@
      * @type {string}
      */
     dataProjection: String,
+    wrapX: {
+      type: Boolean,
+      default: true,
+    },
   }
 
   /**
@@ -403,7 +407,9 @@
        * @private
        */
       this._defaultLayer = new VectorLayer({
-        source: new VectorSource(),
+        source: new VectorSource({
+          wrapX: this.wrapX,
+        }),
       })
 
       Object.defineProperties(this, /** @lends module:map/map# */{

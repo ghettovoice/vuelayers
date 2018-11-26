@@ -23,16 +23,16 @@
 <body>
 <div id="app">
   <vl-map>
-    <vl-view :center="[0, 0]" :zoom="3"></vl-view>
+    <vl-view :center="[0, 0]" :zoom="2"></vl-view>
 
     <vl-layer-tile>
-      <vl-source-osm cross-origin="anonymous"></vl-source-osm>
+      <vl-source-osm></vl-source-osm>
     </vl-layer-tile>
   </vl-map>
 </div>
 
 <script src="https://unpkg.com/vue@2.5.17/dist/vue.min.js"></script>
-<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.2.0/build/ol.js"></script>
+<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
 <script src="../lib/index.umd.js"></script>
 <script>
   /* eslint-disable no-new */

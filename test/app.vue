@@ -7,9 +7,8 @@
         <button @click="drawType = undefined">Stop draw</button>
       </div>
 
-      <vl-map v-if="showMap" ref="map" data-projection="EPSG:4326">
-        <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation">
-        </vl-view>
+      <vl-map v-if="showMap" ref="map" data-projection="EPSG:4326" :wrap-x="false">
+        <vl-view ref="view" ident="view" :center.sync="center" :zoom.sync="zoom" :rotation.sync="rotation"></vl-view>
 
         <vl-graticule :show-labels="true" v-if="graticule">
           <vl-style-stroke slot="stroke" color="green" :line-dash="[5, 10]"></vl-style-stroke>
@@ -21,35 +20,30 @@
           </vl-style-text>
         </vl-graticule>
 
-        <vl-layer-tile id="sputnik">
-          <vl-source-stamen layer="toner-lite"/>
+        <vl-layer-tile>
+          <vl-source-osm/>
         </vl-layer-tile>
 
-        <vl-interaction-select :features.sync="selectedFeatures">
-          <vl-style-box>
-            <vl-style-stroke color="#423e9e" :width="7"></vl-style-stroke>
-            <vl-style-fill :color="[254, 178, 76, 0.7]"></vl-style-fill>
-            <vl-style-circle :radius="5">
-              <vl-style-stroke color="#423e9e" :width="7"></vl-style-stroke>
-              <vl-style-fill :color="[254, 178, 76, 0.7]"></vl-style-fill>
-            </vl-style-circle>
-          </vl-style-box>
-          <vl-style-box :z-index="1">
-            <vl-style-stroke color="#d43f45" :width="2"></vl-style-stroke>
-            <vl-style-circle :radius="5">
-              <vl-style-stroke color="#d43f45" :width="2"></vl-style-stroke>
-            </vl-style-circle>
-          </vl-style-box>
-        </vl-interaction-select>
+        <!--<vl-overlay v-if="selectedFeatures" v-for="feature in selectedFeatures" :key="feature.id" :position="feature.geometry.coordinates">-->
+          <!--<div style="background: #fff">-->
+            <!--{{ feature }}-->
+          <!--</div>-->
+        <!--</vl-overlay>-->
 
-        <vl-layer-vector id="countries">
-          <vl-source-vector url="https://openlayers.org/en/latest/examples/data/geojson/countries.geojson"></vl-source-vector>
+        <vl-interaction-select :features.sync="selectedFeatures" :condition="eventCondition.pointerMove"></vl-interaction-select>
 
-          <vl-style-box>
-            <vl-style-fill :color="[255, 255, 255, 0.5]"></vl-style-fill>
-            <vl-style-stroke color="#219e46" :width="2"></vl-style-stroke>
-          </vl-style-box>
-        </vl-layer-vector>
+        <vl-feature id="point">
+          <vl-geom-point :coordinates="[50, 50]"></vl-geom-point>
+        </vl-feature>
+
+        <!--<vl-layer-vector id="countries">-->
+          <!--<vl-source-vector url="https://openlayers.org/en/latest/examples/data/geojson/countries.geojson"></vl-source-vector>-->
+
+          <!--<vl-style-box>-->
+            <!--<vl-style-fill :color="[255, 255, 255, 0.5]"></vl-style-fill>-->
+            <!--<vl-style-stroke color="#219e46" :width="2"></vl-style-stroke>-->
+          <!--</vl-style-box>-->
+        <!--</vl-layer-vector>-->
 
         <vl-layer-vector id="draw-pane" v-if="drawType != null">
           <vl-source-vector ident="draw-target" :features.sync="drawnFeatures"></vl-source-vector>
@@ -70,6 +64,7 @@
   import ScaleLine from 'ol/control/ScaleLine'
   import GML from 'ol/format/GML2'
   import WFS from 'ol/format/WFS'
+  import * as eventCondition from 'ol/events/condition'
 
   let fakerator = Fakerator()
 
@@ -79,6 +74,9 @@
     },
     eventSourcedFeatureIds () {
       return this.eventSourcedFeatures.map(feature => feature.id)
+    },
+    eventCondition () {
+      return eventCondition
     },
   }
 
@@ -215,8 +213,8 @@
     data () {
       return {
         showMap: true,
-        zoom: 5,
-        center:  [-79.27368887216703, 43.64267516128234],
+        zoom: 2,
+        center:  [0, 0],
         rotation: 0,
         points: [],
         pointsLayer: true,
