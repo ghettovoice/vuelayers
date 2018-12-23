@@ -18,6 +18,7 @@
   import { hasInteraction, hasMap } from '../../util/assert'
   import { constant, difference, forEach, isFunction, mapValues, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   /**
    * @vueProps
@@ -289,6 +290,16 @@
   }
 
   const watch = {
+    ...makeWatchers([
+      'filter',
+      'hitTolerance',
+      'multi',
+      'wrapX',
+      'addCondition',
+      'condition',
+      'removeCondition',
+      'toggleCondition',
+    ], () => function () { this.scheduleRecreate() }),
     features (value) {
       if (!this.$interaction) return
 
