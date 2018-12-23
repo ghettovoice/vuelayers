@@ -2,6 +2,7 @@
   <div id="app">
     <div style="height: 100%">
       <div class="panel">
+        <button @click="selectByHover = !selectByHover">Select by {{ !selectByHover ? 'hover' : 'click' }}</button>
         <button @click="graticule = !graticule">Graticule</button>
         <button @click="drawType = 'Polygon'">Draw polygon</button>
         <button @click="drawType = undefined">Stop draw</button>
@@ -11,34 +12,33 @@
       </div>
 
       <vl-map :wrap-x="false" data-projection="EPSG:4326" ref="map" v-if="showMap">
-        <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom" ident="view" ref="view"></vl-view>
+        <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom" ident="view" ref="view" />
 
         <vl-graticule :show-labels="true" v-if="graticule">
           <vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>
           <vl-style-text slot="lon" text-baseline="bottom">
-            <vl-style-stroke color="blue"></vl-style-stroke>
+            <vl-style-stroke color="blue" />
           </vl-style-text>
           <vl-style-text slot="lat" text-align="end">
-            <vl-style-stroke color="black"></vl-style-stroke>
+            <vl-style-stroke color="black" />
           </vl-style-text>
         </vl-graticule>
 
-        <vl-interaction-select :condition="eventCondition.pointerMove"
-                               :features.sync="selectedFeatures"></vl-interaction-select>
+        <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures" />
 
         <vl-layer-tile>
-          <vl-source-osm/>
+          <vl-source-osm />
         </vl-layer-tile>
 
-        <vl-feature id="point">
-          <vl-geom-point :coordinates="[50, 50]"></vl-geom-point>
-        </vl-feature>
-
-        <vl-layer-vector id="draw-pane" v-if="drawType != null">
-          <vl-source-vector :features.sync="drawnFeatures" ident="draw-target"></vl-source-vector>
+        <vl-layer-vector id="features">
+          <vl-source-vector :features.sync="features" />
         </vl-layer-vector>
 
-        <vl-interaction-draw :type="drawType" source="draw-target" v-if="drawType != null"></vl-interaction-draw>
+        <vl-layer-vector id="draw-pane" v-if="drawType != null">
+          <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />
+        </vl-layer-vector>
+
+        <vl-interaction-draw :type="drawType" source="draw-target" v-if="drawType != null" />
       </vl-map>
     </div>
   </div>
@@ -47,9 +47,21 @@
 <script>
   import * as eventCondition from 'ol/events/condition'
 
+  const features = [
+    {
+      type: 'Feature',
+      id: 'feature-1',
+      properties: {},
+      geometry: {
+        type: 'Point',
+        coordinates: [10, 10],
+      },
+    },
+  ]
+
   const computed = {
-    eventCondition () {
-      return eventCondition
+    selectCondition () {
+      return this.selectByHover ? eventCondition.pointerMove : eventCondition.singleClick
     },
   }
 
@@ -64,11 +76,13 @@
         zoom: 2,
         center: [0, 0],
         rotation: 0,
+        features,
         selectedFeatures: [],
         graticule: false,
         showMap: true,
         drawType: undefined,
         drawnFeatures: [],
+        selectByHover: false,
       }
     },
   }
