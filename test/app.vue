@@ -11,7 +11,7 @@
         </div>
       </div>
 
-      <vl-map :wrap-x="false" data-projection="EPSG:4326" ref="map" v-if="showMap">
+      <vl-map data-projection="EPSG:4326" ref="map" v-if="showMap">
         <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom" ident="view" ref="view" />
 
         <vl-graticule :show-labels="true" v-if="graticule">
@@ -29,6 +29,10 @@
         <vl-layer-tile>
           <vl-source-osm />
         </vl-layer-tile>
+
+        <vl-feature id="marker">
+          <vl-geom-point :coordinates="[0, 0]" />
+        </vl-feature>
 
         <vl-layer-vector id="features">
           <vl-source-vector :features.sync="features" />

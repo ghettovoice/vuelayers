@@ -5,31 +5,26 @@
 </template>
 
 <script>
-  import { defaults as defaultsControl } from 'ol/control'
+  import { defaults as createDefaultControls } from 'ol/control'
+  import { defaults as createDefaultInteractions } from 'ol/interaction'
   import VectorLayer from 'ol/layer/Vector'
+  import Collection from 'ol/Collection'
   import Map from 'ol/Map'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
-  import featuresContainer from '../../mixin/features-container'
-  import interactionsContainer from '../../mixin/interactions-container'
-  import layersContainer from '../../mixin/layers-container'
-  import olCmp from '../../mixin/ol-cmp'
-  import overlaysContainer from '../../mixin/overlays-container'
+  import { olCmp, overlaysContainer, layersContainer, interactionsContainer, featuresContainer } from '../../mixin'
   import projTransforms from '../../mixin/proj-transforms'
-  import { IndexedCollectionAdapter, SourceCollectionAdapter } from '../../ol-ext/collection'
-  import { RENDERER_TYPE } from '../../ol-ext/consts'
-  import observableFromOlEvent from '../../rx-ext/from-ol-event'
+  import { RENDERER_TYPE, getFeatureId, IndexedCollectionAdapter } from '../../ol-ext'
+  import { observableFromOlEvent } from '../../rx-ext'
   import { hasMap, hasView } from '../../util/assert'
   import { isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { makeWatchers } from '../../util/vue-helpers'
 
-  /**
-   * @vueProps
-   */
-  const props = /** @lends module:map/map# */{
+  const props = {
     /**
      * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
      * value is used to configure controls.
@@ -63,14 +58,6 @@
       type: Boolean,
       default: false,
     },
-    /**
-     * The map logo. If a **string** is provided, it will be set as the image source of the logo. If an **object** is provided,
-     * the `src` property should be the **URL** for an image and the `href` property should be a **URL** for creating a link.
-     * If an **element** is provided, the **element** will be used. To disable the map logo, set the option to `false`.
-     * By default, the **OpenLayers** logo is shown.
-     * @type {boolean|string|Object|Element}
-     */
-    logo: [String, Object, Element, Boolean],
     /**
      * The minimum distance in pixels the cursor must move to be detected as a map move event instead of a click.
      * Increasing this value can make it easier to click on the map.
@@ -115,47 +102,36 @@
     },
   }
 
-  /**
-   * @vueComputed
-   */
-  const computed = {}
+  const computed = {
+  }
 
-  /**
-   * @vueMethods
-   */
-  const methods = /** @lends module:map/map# */{
+  const methods = {
     /**
      * @return {Map}
      * @protected
      */
     createOlObject () {
       const map = new Map({
-        controls: [],
         loadTilesWhileAnimating: this.loadTilesWhileAnimating,
         loadTilesWhileInteracting: this.loadTilesWhileInteracting,
         pixelRatio: this.pixelRatio,
-        renderer: this.renderer,
-        logo: this.logo,
+        moveTolerance: this.moveTolerance,
         keyboardEventTarget: this.keyboardEventTarget,
+        controls: this._controls,
+        interactions: this._interactions,
+        layers: this._layers,
+        overlays: this._overlays,
         view: this._view,
       })
-      // ol.Map constructor can create default view if no provided with options
-      this._view = map.getView()
-      // add default overlay to map
-      this._defaultLayer.setMap(map)
-
-      if (this.controls) {
-        let opts = typeof this.controls === 'object' ? this.controls : undefined
-        map.getControls().extend(defaultsControl(opts).getArray())
-      }
-
       map.set('dataProjection', this.dataProjection)
+
+      this._defaultOverlay.setMap(map)
 
       return map
     },
     /**
      * @return {IndexedCollectionAdapter}
-     *  @protected
+     * @protected
      */
     getLayersTarget () {
       hasMap(this)
@@ -204,7 +180,10 @@
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new SourceCollectionAdapter(this._defaultLayer.getSource())
+        this._featuresTarget = new IndexedCollectionAdapter(
+          this._defaultOverlayFeatures,
+          feature => getFeatureId(feature)
+        )
       }
 
       return this._featuresTarget
@@ -360,6 +339,32 @@
   }
 
   const watch = {
+    ...makeWatchers([
+      'keyboardEventTarget',
+      'loadTilesWhileAnimating',
+      'loadTilesWhileInteracting',
+      'moveTolerance',
+      'pixelRatio',
+    ], () => olCmp.methods.scheduleRecreate),
+    controls (value) {
+      if (value === false) {
+        this._controls.clear()
+        return
+      }
+
+      value = typeof value === 'object' ? value : undefined
+      this._controls.clear()
+      this._controls.extend(createDefaultControls(value).getArray())
+    },
+    wrapX (value) {
+      if (this._defaultOverlay != null) {
+        let source = new VectorSource({
+          features: this._defaultOverlayFeatures,
+          wrapX: value,
+        })
+        this._defaultOverlay.setSource(source)
+      }
+    },
     dataProjection (value) {
       if (this.$map) {
         this.$map.set('dataProjection', value)
@@ -391,23 +396,31 @@
    */
   export default {
     name: 'vl-map',
-    mixins: [olCmp, layersContainer, interactionsContainer, overlaysContainer, featuresContainer, projTransforms],
+    mixins: [
+      olCmp,
+      layersContainer,
+      interactionsContainer,
+      overlaysContainer,
+      featuresContainer,
+      projTransforms,
+    ],
     props,
     computed,
     methods,
     watch,
     created () {
-      /**
-       * @type {View|undefined}
-       * @private
-       */
-      this._view = undefined
-      /**
-       * @type {Vector}
-       * @private
-       */
-      this._defaultLayer = new VectorLayer({
+      this._view = new View()
+      this._controls = this.controls !== false
+        ? createDefaultControls(typeof this.controls === 'object' ? this.controls : undefined)
+        : new Collection()
+      this._interactions = createDefaultInteractions()
+      this._layers = new Collection()
+      this._overlays = new Collection()
+      // prepare default overlay
+      this._defaultOverlayFeatures = new Collection()
+      this._defaultOverlay = new VectorLayer({
         source: new VectorSource({
+          features: this._defaultOverlayFeatures,
           wrapX: this.wrapX,
         }),
       })
