@@ -10,6 +10,7 @@
   import VectorLayer from 'ol/layer/Vector'
   import Collection from 'ol/Collection'
   import Map from 'ol/Map'
+  import WebGLMap from 'ol/WebGLMap'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -83,8 +84,9 @@
      * @default ['canvas', 'webgl']
      */
     renderer: {
-      type: [String, Array],
-      default: () => [RENDERER_TYPE.CANVAS, RENDERER_TYPE.WEBGL],
+      type: String,
+      default: RENDERER_TYPE.CANVAS,
+      validator: value => Object.values(RENDERER_TYPE).includes(value),
     },
     /**
      * Root element `tabindex` attribute value. Value should be provided to allow keyboard events on map.
@@ -103,6 +105,15 @@
   }
 
   const computed = {
+    mapCtor () {
+      switch (this.renderer) {
+        case RENDERER_TYPE.WEBGL:
+          return WebGLMap
+        case RENDERER_TYPE.CANVAS:
+        default:
+          return Map
+      }
+    },
   }
 
   const methods = {
@@ -111,7 +122,8 @@
      * @protected
      */
     createOlObject () {
-      const map = new Map({
+      /* eslint-disable-next-line new-cap */
+      const map = new this.mapCtor({
         loadTilesWhileAnimating: this.loadTilesWhileAnimating,
         loadTilesWhileInteracting: this.loadTilesWhileInteracting,
         pixelRatio: this.pixelRatio,
@@ -124,9 +136,8 @@
         view: this._view,
       })
       map.set('dataProjection', this.dataProjection)
-
       this._defaultOverlay.setMap(map)
-
+      console.log(map)
       return map
     },
     /**
@@ -345,6 +356,7 @@
       'loadTilesWhileInteracting',
       'moveTolerance',
       'pixelRatio',
+      'renderer',
     ], () => olCmp.methods.scheduleRecreate),
     controls (value) {
       if (value === false) {

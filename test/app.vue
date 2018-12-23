@@ -11,7 +11,7 @@
         </div>
       </div>
 
-      <vl-map data-projection="EPSG:4326" ref="map" v-if="showMap">
+      <vl-map ref="map" v-if="showMap" data-projection="EPSG:4326" renderer="webgl">
         <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom" ident="view" ref="view" />
 
         <vl-graticule :show-labels="true" v-if="graticule">
