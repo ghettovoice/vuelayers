@@ -137,7 +137,7 @@
       })
       map.set('dataProjection', this.dataProjection)
       this._defaultOverlay.setMap(map)
-      console.log(map)
+
       return map
     },
     /**
