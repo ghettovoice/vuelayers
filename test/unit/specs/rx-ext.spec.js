@@ -1,9 +1,10 @@
 /* global describe, it, beforeEach, afterEach */
 import sinon from 'sinon'
 import OlObject from 'ol/Object'
-import { identity } from 'lodash/fp'
 import { Observable } from 'rxjs'
 import observableFromOlEvent from '@/rx-ext/from-ol-event'
+
+const identity = val => val
 
 describe('RxJS extensions', () => {
   describe('fromOlEvent', () => {
