@@ -24,7 +24,18 @@
           </vl-style-text>
         </vl-graticule>
 
-        <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures" />
+        <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">
+          <template slot-scope="select">
+            <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
+                        :position="pointOnSurface(feature.geometry)" :auto-pan="true"
+                        :auto-pan-animation="{ duration: 300 }"
+                        positioning="bottom-right">
+              <div style="background: #fff; padding: 10px; width: 200px">
+                {{ feature }}
+              </div>
+            </vl-overlay>
+          </template>
+        </vl-interaction-select>
 
         <vl-layer-tile>
           <vl-source-osm />
@@ -50,6 +61,7 @@
 
 <script>
   import * as eventCondition from 'ol/events/condition'
+  import { findPointOnSurface } from '../src/ol-ext'
 
   const features = [
     {
@@ -69,7 +81,9 @@
     },
   }
 
-  const methods = {}
+  const methods = {
+    pointOnSurface: findPointOnSurface,
+  }
 
   export default {
     name: 'app',
