@@ -3,7 +3,9 @@ import { debounceTime, tap } from 'rxjs/operators'
 import { SourceCollectionAdapter } from '../ol-ext/collection'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../util/assert'
+import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
+import { makeWatchers } from '../util/vue-helpers'
 import featuresContainer from './features-container'
 import projTransforms from './proj-transforms'
 import source from './source'
@@ -106,11 +108,22 @@ const methods = {
   },
 }
 
+const watch = {
+  ...makeWatchers([
+    'useSpatialIndex',
+  ], () => function (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
+    this.scheduleRecreate()
+  }),
+}
+
 export default {
   mixins: [source, featuresContainer, projTransforms],
   props,
   computed,
   methods,
+  watch,
   stubVNode: {
     empty: false,
     attrs () {

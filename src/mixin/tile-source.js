@@ -11,7 +11,8 @@ import {
 import { createExtentFromProjection } from '../ol-ext/extent'
 import { createXyzGrid } from '../ol-ext/tile-grid'
 import { hasView } from '../util/assert'
-import { isFunction, isString, pick, replaceTokens } from '../util/minilo'
+import { isEqual, isFunction, isString, pick, replaceTokens } from '../util/minilo'
+import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
 import withUrl from './with-url'
 
@@ -142,11 +143,25 @@ const methods = {
 }
 
 const watch = {
+  ...makeWatchers([
+    'cacheSize',
+    'crossOrigin',
+    'maxZoom',
+    'minZoom',
+    'opaque',
+    'reprojectionErrorThreshold',
+    'tilePixelRatio',
+    'tileSize',
+    'tileLoadFunction',
+    'transition',
+  ], () => function (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
+    this.scheduleRefresh()
+  }),
   url () {
-    if (this.$source) {
-      this.$source.setTileUrlFunction(this.createUrlFunc())
-      this.scheduleRefresh()
-    }
+    this.$source && this.$source.setTileUrlFunction(this.createUrlFunc())
+    this.scheduleRefresh()
   },
 }
 

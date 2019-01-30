@@ -1,9 +1,8 @@
 import { EPSG_3857 } from '../ol-ext/consts'
+import { isEqual } from '../util/minilo'
+import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
 
-/**
- * @vueProps
- */
 const props = {
   crossOrigin: String,
   projection: {
@@ -12,9 +11,6 @@ const props = {
   },
 }
 
-/**
- * @vueMethods
- */
 const methods = {
   /**
    * @return {Promise}
@@ -46,12 +42,19 @@ const methods = {
   },
 }
 
-/**
- * @vueProto
- * @alias module:mixin/image-source
- */
+const watch = {
+  ...makeWatchers([
+    'crossOrigin',
+  ], () => function (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
+    this.scheduleRecreate()
+  }),
+}
+
 export default {
   mixins: [source],
   props,
   methods,
+  watch,
 }

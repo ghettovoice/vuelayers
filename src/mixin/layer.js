@@ -3,6 +3,7 @@ import Vue from 'vue'
 import { hasLayer, hasMap } from '../util/assert'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
+import { makeWatchers } from '../util/vue-helpers'
 import cmp from './ol-virt-cmp'
 import sourceContainer from './source-container'
 import useMapCmp from './use-map-cmp'
@@ -186,6 +187,13 @@ const watch = {
       this.$layer.setExtent(value)
     }
   },
+  ...makeWatchers([
+    'overlay',
+  ], () => function (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
+    this.scheduleRecreate()
+  }),
 }
 
 export default {

@@ -1,4 +1,6 @@
+import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
+import { makeWatchers } from '../util/vue-helpers'
 import layer from './layer'
 import stylesContainer from './styles-container'
 
@@ -80,8 +82,23 @@ const methods = {
   },
 }
 
+const watch = {
+  ...makeWatchers([
+    'updateWhileAnimating',
+    'updateWhileInteracting',
+    'renderBuffer',
+    'renderOrder',
+    'declutter',
+  ], () => function (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
+    this.scheduleRecreate()
+  }),
+}
+
 export default {
   mixins: [layer, stylesContainer],
   props,
   methods,
+  watch,
 }

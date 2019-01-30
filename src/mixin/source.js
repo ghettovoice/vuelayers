@@ -1,5 +1,6 @@
-import { isFunction } from '../util/minilo'
+import { isEqual, isFunction } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
+import { makeWatchers } from '../util/vue-helpers'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
 
@@ -97,6 +98,15 @@ const watch = {
   attributions (value) {
     this.$source && this.$source.setAttributions(value)
   },
+  ...makeWatchers([
+    'logo',
+    'projection',
+    'wrapX',
+  ], () => function (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
+    this.scheduleRecreate()
+  }),
 }
 
 export default {

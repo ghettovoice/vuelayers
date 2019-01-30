@@ -1,4 +1,5 @@
-import { reduce } from '../util/minilo'
+import { isEqual, reduce } from '../util/minilo'
+import { makeWatchers } from '../util/vue-helpers'
 
 const cleanExtParams = params => reduce(params, (params, value, key) => {
   let filterKeys = [
@@ -96,55 +97,39 @@ const computed = {
 const methods = {}
 
 const watch = {
-  layers (LAYERS) {
-    this.$source && this.$source.updateParams({ LAYERS })
-  },
-  format (FORMAT) {
-    this.$source && this.$source.updateParams({ FORMAT })
-  },
-  layerDefs (LAYERDEFS) {
-    this.$source && this.$source.updateParams({ LAYERDEFS: serialize(LAYERDEFS) })
-  },
-  dynamicLayers (DYNAMICLAYERS) {
-    this.$source && this.$source.updateParams({ DYNAMICLAYERS: serialize(DYNAMICLAYERS) })
-  },
-  dpi (DPI) {
-    this.$source && this.$source.updateParams({ DPI })
-  },
-  transparent (TRANSPARENT) {
-    this.$source && this.$source.updateParams({ TRANSPARENT })
-  },
-  time (TIME) {
-    this.$source && this.$source.updateParams({ TIME: serialize(TIME) })
-  },
-  layerTimeOptions (LAYERTIMEOPTIONS) {
-    this.$source && this.$source.updateParams({ LAYERTIMEOPTIONS: serialize(LAYERTIMEOPTIONS) })
-  },
-  gdbVersion (GDBVERSION) {
-    this.$source && this.$source.updateParams({ GDBVERSION })
-  },
-  mapScale (MAPSCALE) {
-    this.$source && this.$source.updateParams({ MAPSCALE })
-  },
-  rotation (ROTATION) {
-    this.$source && this.$source.updateParams({ ROTATION })
-  },
-  datumTransformations (DATUMTRANSFORMATIONS) {
-    this.$source && this.$source.updateParams({ DATUMTRANSFORMATIONS: serialize(DATUMTRANSFORMATIONS) })
-  },
-  mapRangeValues (MAPRANGEVALUES) {
-    this.$source && this.$source.updateParams({ MAPRANGEVALUES: serialize(MAPRANGEVALUES) })
-  },
-  layerRangeValues (LAYERRANGEVALUES) {
-    this.$source && this.$source.updateParams({ LAYERRANGEVALUES: serialize(LAYERRANGEVALUES) })
-  },
-  layerParameterValues (LAYERPARAMETERVALUES) {
-    this.$source && this.$source.updateParams({ LAYERPARAMETERVALUES: serialize(LAYERPARAMETERVALUES) })
-  },
-  historicMoment (HISTORICMOMENT) {
-    this.$source && this.$source.updateParams({ HISTORICMOMENT })
-  },
-  extParams (value) {
+  ...makeWatchers([
+    'layers',
+    'format',
+    'dpi',
+    'transparent',
+    'gdbVersion',
+    'mapScale',
+    'rotation',
+    'historicMoment',
+  ], prop => function (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
+    prop = prop.toUpperCase()
+    this.$source && this.$source.updateParams({ [prop]: value })
+  }),
+  ...makeWatchers([
+    'layerDefs',
+    'dynamicLayers',
+    'time',
+    'layerTimeOptions',
+    'datumTransformations',
+    'mapRangeValues',
+    'layerRangeValues',
+    'layerParameterValues',
+  ], prop => function (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
+    prop = prop.toUpperCase()
+    this.$source && this.$source.updateParams({ [prop]: serialize(value) })
+  }),
+  extParams (value, prevValue) {
+    if (isEqual(value, prevValue)) return
+
     this.$source && this.$source.updateParams(value ? cleanExtParams(value) : undefined)
   },
 }
