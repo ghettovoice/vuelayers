@@ -1,8 +1,6 @@
 import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
-import { boundingExtent } from '../ol-ext/extent'
-import { findPointOnSurface } from '../ol-ext/geom'
-import { transforms } from '../ol-ext/proj'
-import observableFromOlEvent from '../rx-ext/from-ol-event'
+import { boundingExtent, findPointOnSurface, transforms } from '../ol-ext'
+import { observableFromOlEvent } from '../rx-ext'
 import { hasGeometry } from '../util/assert'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
@@ -13,7 +11,7 @@ import useMapCmp from './use-map-cmp'
 const props = {
   /**
    * Coordinates in the map view projection.
-   * @type {number[]|Coordinate}
+   * @type {number[]}
    */
   coordinates: {
     type: Array,
@@ -32,7 +30,7 @@ const computed = {
     throw new Error('Not implemented computed property')
   },
   /**
-   * @type {number[]|Extent|undefined}
+   * @type {number[]|undefined}
    */
   extent () {
     if (this.extentViewProj && this.resolvedDataProjection) {
@@ -40,7 +38,7 @@ const computed = {
     }
   },
   /**
-   * @type {number[]|Extent|undefined}
+   * @type {number[]|undefined}
    */
   extentViewProj () {
     if (this.rev && this.$geometry) {
@@ -48,7 +46,7 @@ const computed = {
     }
   },
   /**
-   * @type {number[]|Coordinate|undefined}
+   * @type {number[]|undefined}
    */
   point () {
     if (this.pointViewProj && this.resolvedDataProjection) {
@@ -56,7 +54,7 @@ const computed = {
     }
   },
   /**
-   * @type {Array<number>}
+   * @type {number[]}
    */
   pointViewProj () {
     if (this.rev && this.$geometry) {
@@ -64,7 +62,7 @@ const computed = {
     }
   },
   /**
-   * @type {Array|undefined}
+   * @type {number[]|undefined}
    */
   coordinatesViewProj () {
     if (this.rev && this.$geometry) {
@@ -75,14 +73,14 @@ const computed = {
 
 const methods = {
   /**
-   * @return {Geometry|Promise<Geometry>}
+   * @return {module:ol/geom/Geometry~Geometry|Promise<module:ol/geom/Geometry~Geometry>}
    * @protected
    */
   createOlObject () {
     return this.createGeometry()
   },
   /**
-   * @return {Geometry|Promise<Geometry>}
+   * @return {module:ol/geom/Geometry~Geometry|Promise<module:ol/geom/Geometry~Geometry>}
    * @protected
    * @abstract
    */
@@ -90,17 +88,19 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {Coordinate}
+   * @return {number[]}
    */
   getCoordinates () {
     hasGeometry(this)
+
     return this.toDataProj(this.$geometry.getCoordinates())
   },
   /**
-   * @param {Coordinate} coordinates
+   * @param {number[]} coordinates
    */
   setCoordinates (coordinates) {
     hasGeometry(this)
+
     this.$geometry.setCoordinates(this.toViewProj(coordinates))
   },
   /**
@@ -121,21 +121,21 @@ const methods = {
     const { transform } = transforms[this.type]
     /**
      * @method
-     * @param {Array} coordinates
+     * @param {number[]} coordinates
      * @return {number[]}
      * @protected
      */
     this.toDataProj = coordinates => transform(coordinates, this.viewProjection, this.resolvedDataProjection)
     /**
      * @method
-     * @param {Array} coordinates
+     * @param {number[]} coordinates
      * @return {number[]}
      * @protected
      */
     this.toViewProj = coordinates => transform(coordinates, this.resolvedDataProjection, this.viewProjection)
   },
   /**
-   * @return {void|Promise<void>}
+   * @return {void|Promise}
    * @protected
    */
   deinit () {
@@ -222,20 +222,29 @@ export default {
   created () {
     Object.defineProperties(this, {
       /**
-       * @type {Geometry|undefined}
+       * @type {module:ol/geom/Geometry~Geometry|undefined}
        */
       $geometry: {
         enumerable: true,
         get: () => this.$olObject,
       },
+      /**
+       * @type {module:ol/PluggableMap~PluggableMap|undefined}
+       */
       $map: {
         enumerable: true,
         get: () => this.$services && this.$services.map,
       },
+      /**
+       * @type {module:ol/View~View|undefined}
+       */
       $view: {
         enumerable: true,
         get: () => this.$services && this.$services.view,
       },
+      /**
+       * @type {Object|undefined}
+       */
       $geometryContainer: {
         enumerable: true,
         get: () => this.$services && this.$services.geometryContainer,

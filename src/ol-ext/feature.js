@@ -1,23 +1,30 @@
 import Feature from 'ol/Feature'
-/** @module ol-ext/feature */
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 import { isNumber, isPlainObject, isString } from '../util/minilo'
 
 /**
  * Basic feature initialization
- * @param feature
+ * @param {Object|Vue|module:ol/Feature~Feature} feature
  */
-export function initFeature (feature) {
-  if (feature.getId() == null) {
-    feature.setId(uuid())
+export function identifyFeature (feature) {
+  if (isPlainObject(feature) || feature instanceof Vue) {
+    if (feature.id == null) {
+      feature.id = uuid()
+    }
+  } else if (feature instanceof Feature) {
+    if (feature.getId() == null) {
+      feature.setId(uuid())
+    }
+  } else {
+    throw new Error('Illegal feature format')
   }
 
   return feature
 }
 
 /**
- * @param {Object|Vue|Feature|string|number} feature
+ * @param {Object|Vue|module:ol/Feature~Feature|string|number} feature
  * @return {string|number}
  * @throws {Error}
  */

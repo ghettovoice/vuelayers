@@ -6,7 +6,7 @@
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
-  import { initFeature } from '../../ol-ext/feature'
+  import { identifyFeature } from '../../ol-ext/feature'
   import { createStyle, defaultEditStyle } from '../../ol-ext/style'
   import { isCollection, isVectorSource } from '../../ol-ext/util'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
@@ -268,7 +268,7 @@
       observableFromOlEvent(this.$interaction, 'drawstart')
         .pipe(
           mapObs(evt => {
-            initFeature(evt.feature)
+            identifyFeature(evt.feature)
             return evt
           }),
         ),

@@ -18,7 +18,7 @@
   import Vue from 'vue'
   import { olCmp, overlaysContainer, layersContainer, interactionsContainer, featuresContainer } from '../../mixin'
   import projTransforms from '../../mixin/proj-transforms'
-  import { RENDERER_TYPE, getFeatureId, IndexedCollectionAdapter } from '../../ol-ext'
+  import { RENDERER_TYPE } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasMap, hasView } from '../../util/assert'
   import { isEqual } from '../../util/minilo'
@@ -77,6 +77,14 @@
       default: () => window.devicePixelRatio || 1,
     },
     /**
+     * Maximum number tiles to load simultaneously.
+     * @type {number}
+     */
+    maxTilesLoading: {
+      type: Number,
+      default: 16,
+    },
+    /**
      * Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,
      * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,
      * but **WebGL** can only render **Point** geometries.
@@ -98,6 +106,9 @@
      * @type {string}
      */
     dataProjection: String,
+    /**
+     * @type {boolean}
+     */
     wrapX: {
       type: Boolean,
       default: true,
@@ -118,7 +129,7 @@
 
   const methods = {
     /**
-     * @return {Map}
+     * @return {module:ol/PluggableMap~PluggableMap}
      * @protected
      */
     createOlObject () {
@@ -129,6 +140,7 @@
         pixelRatio: this.pixelRatio,
         moveTolerance: this.moveTolerance,
         keyboardEventTarget: this.keyboardEventTarget,
+        maxTilesLoading: this.maxTilesLoading,
         controls: this._controls,
         interactions: this._interactions,
         layers: this._layers,
@@ -136,42 +148,129 @@
         view: this._view,
       })
       map.set('dataProjection', this.dataProjection)
-      this._defaultOverlay.setMap(map)
+
+      this._featuresOverlay.setMap(map)
 
       return map
     },
     /**
-     * @return {IndexedCollectionAdapter}
-     * @protected
+     * @param {number[]} pixel
+     * @return {number[]} Coordinates in the map view projection.
      */
-    getLayersTarget () {
+    getCoordinateFromPixel (pixel) {
       hasMap(this)
 
-      if (this._layersTarget == null) {
-        this._layersTarget = new IndexedCollectionAdapter(
-          this.$map.getLayers(),
-          layer => layer.get('id'),
-        )
-      }
+      let coordinate = this.$map.getCoordinateFromPixel(pixel)
 
-      return this._layersTarget
+      return this.pointToDataProj(coordinate)
     },
     /**
-     * @return {IndexedCollectionAdapter}
-     * @protected
+     * Triggers focus on map container.
+     * @return {void}
      */
-    getInteractionsTarget () {
+    focus () {
+      this.$el.focus()
+    },
+    /**
+     * @param {number[]} pixel
+     * @param {function} callback
+     * @param {Object} [opts]
+     * @return {*|undefined}
+     */
+    forEachFeatureAtPixel (pixel, callback, opts = {}) {
+      hasMap(this)
+      return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
+    },
+    /**
+     * @param {number[]} pixel
+     * @param {function} callback
+     * @param {function} [layerFilter]
+     * @return {*|undefined}
+     */
+    forEachLayerAtPixel (pixel, callback, layerFilter) {
+      hasMap(this)
+      return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
+    },
+    /**
+     * Updates map size and re-renders map.
+     * @return {Promise}
+     */
+    refresh () {
+      this.updateSize()
+
+      return this.render().then(() => this::olCmp.methods.refresh())
+    },
+    /**
+     * @return {Promise}
+     */
+    render () {
+      return new Promise(resolve => {
+        hasMap(this)
+
+        this.$map.once('postrender', () => resolve())
+        this.$map.render()
+      })
+    },
+    /**
+     * Updates map size.
+     * @return {void}
+     */
+    updateSize () {
       hasMap(this)
 
-      if (this._interactionsTarget == null) {
-        this._interactionsTarget = new IndexedCollectionAdapter(
-          this.$map.getInteractions(),
-          interaction => interaction.get('id'),
-        )
-      }
-
-      return this._interactionsTarget
+      this.$map.updateSize()
     },
+    /**
+     * @param {module:ol/View~View|Vue|undefined} view
+     * @return {void}
+     * @protected
+     */
+    setView (view) {
+      view = view instanceof Vue ? view.$view : view
+      view || (view = new View())
+
+      if (view !== this._view) {
+        this._view = view
+      }
+      if (this.$map && view !== this.$map.getView()) {
+        this.$map.setView(view)
+      }
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      hasMap(this)
+
+      this.$map.setTarget(this.$el)
+      this.$nextTick(::this.updateSize)
+
+      this.subscribeAll()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      hasMap(this)
+
+      this.clearFeatures()
+      this.clearLayers()
+      this.clearInteractions()
+      this.clearOverlays()
+
+      this.unsubscribeAll()
+      this.$map.setTarget(undefined)
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToMapEvents()
+    },
+
     /**
      * @return {function}
      * @protected
@@ -184,43 +283,6 @@
         let bp = b.get('priority') || 0
         return ap === bp ? 0 : ap - bp
       }
-    },
-    /**
-     * @return {SourceCollectionAdapter}
-     * @protected
-     */
-    getFeaturesTarget () {
-      if (this._featuresTarget == null) {
-        this._featuresTarget = new IndexedCollectionAdapter(this._defaultOverlayFeatures, getFeatureId)
-      }
-
-      return this._featuresTarget
-    },
-    /**
-     * @return {IndexedCollectionAdapter}
-     * @protected
-     */
-    getOverlaysTarget () {
-      hasMap(this)
-
-      if (this._overlaysTarget == null) {
-        this._overlaysTarget = new IndexedCollectionAdapter(
-          this.$map.getOverlays(),
-          overlay => overlay.getId(),
-        )
-      }
-
-      return this._overlaysTarget
-    },
-    /**
-     * @param {number[]} pixel
-     * @return {number[]} Coordinates in the map view projection.
-     */
-    getCoordinateFromPixel (pixel) {
-      hasMap(this)
-
-      let coordinate = this.$map.getCoordinateFromPixel(pixel)
-      return this.pointToDataProj(coordinate)
     },
     /**
      * @returns {Object}
@@ -242,108 +304,6 @@
         },
       )
     },
-    /**
-     * Triggers focus on map container.
-     * @return {void}
-     */
-    focus () {
-      this.$el.focus()
-    },
-    /**
-     * @param {number[]} pixel
-     * @param {function((Feature), ?Layer): *} callback
-     * @param {Object} [opts]
-     * @return {*|undefined}
-     */
-    forEachFeatureAtPixel (pixel, callback, opts = {}) {
-      hasMap(this)
-      return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
-    },
-    /**
-     * @param {number[]} pixel
-     * @param {function(Layer, ?(number[]|Uint8Array)): *} callback
-     * @param {function(Layer): boolean} [layerFilter]
-     * @return {*|undefined}
-     */
-    forEachLayerAtPixel (pixel, callback, layerFilter) {
-      hasMap(this)
-      return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
-    },
-    /**
-     * @param {View|Vue|undefined} view
-     * @return {void}
-     * @protected
-     */
-    setView (view) {
-      view = view instanceof Vue ? view.$view : view
-      view || (view = new View())
-
-      if (view !== this._view) {
-        this._view = view
-      }
-      if (this.$map && view !== this.$map.getView()) {
-        this.$map.setView(view)
-      }
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    mount () {
-      hasMap(this)
-      this.$map.setTarget(this.$el)
-      this.subscribeAll()
-      this.updateSize()
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    unmount () {
-      hasMap(this)
-
-      this.clearLayers()
-      this.clearInteractions()
-      this.clearOverlays()
-
-      this.unsubscribeAll()
-      this.$map.setTarget(undefined)
-    },
-    /**
-     * Updates map size and re-renders map.
-     * @return {Promise}
-     */
-    refresh () {
-      this.updateSize()
-
-      return this.render()
-        .then(() => this::olCmp.methods.refresh())
-    },
-    /**
-     * @return {Promise}
-     */
-    render () {
-      return new Promise(resolve => {
-        hasMap(this)
-        this.$map.once('postrender', () => resolve())
-        this.$map.render()
-      })
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    subscribeAll () {
-      this::subscribeToMapEvents()
-    },
-    /**
-     * Updates map size.
-     * @return {void}
-     */
-    updateSize () {
-      hasMap(this)
-      this.$map.updateSize()
-    },
   }
 
   const watch = {
@@ -354,6 +314,7 @@
       'moveTolerance',
       'pixelRatio',
       'renderer',
+      'maxTilesLoading',
     ], () => function (value, prevValue) {
       if (isEqual(value, prevValue)) return
 
@@ -370,42 +331,22 @@
       this._controls.extend(createDefaultControls(value).getArray())
     },
     wrapX (value) {
-      if (this._defaultOverlay != null) {
-        let source = new VectorSource({
-          features: this._defaultOverlayFeatures,
-          wrapX: value,
-        })
-        this._defaultOverlay.setSource(source)
-      }
+      if (this._featuresOverlay == null) return
+
+      this._featuresOverlay.setSource(new VectorSource({
+        features: this._featureCollection,
+        wrapX: value,
+      }))
     },
     dataProjection (value) {
-      if (this.$map) {
-        this.$map.set('dataProjection', value)
-        this.scheduleRefresh()
-      }
+      this.$map && this.$map.set('dataProjection', value)
+      this.scheduleRefresh()
     },
   }
 
   /**
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.
-   *
-   * @title vl-map
-   * @alias module:map/map
-   * @vueProto
-   *
-   * @fires module:map/map#click
-   * @fires module:map/map#dblclick
-   * @fires module:map/map#singleclick
-   * @fires module:map/map#pointerdrag
-   * @fires module:map/map#pointermove
-   * @fires module:map/map#movestart
-   * @fires module:map/map#moveend
-   * @fires module:map/map#postrender
-   * @fires module:map/map#precompose
-   * @fires module:map/map#postcompose
-   *
-   * @vueSlot default Default slot for all child components.
    */
   export default {
     name: 'vl-map',
@@ -430,18 +371,17 @@
       this._layers = new Collection()
       this._overlays = new Collection()
       // prepare default overlay
-      this._defaultOverlayFeatures = new Collection()
-      this._defaultOverlay = new VectorLayer({
+      this._featuresOverlay = new VectorLayer({
         source: new VectorSource({
-          features: this._defaultOverlayFeatures,
+          features: this._featureCollection,
           wrapX: this.wrapX,
         }),
       })
 
-      Object.defineProperties(this, /** @lends module:map/map# */{
+      Object.defineProperties(this, {
         /**
          * OpenLayers map instance.
-         * @type {Map|undefined}
+         * @type {module:ol/PluggableMap~PluggableMap|undefined}
          */
         $map: {
           enumerable: true,
@@ -449,7 +389,7 @@
         },
         /**
          * OpenLayers view instance.
-         * @type {View|undefined}
+         * @type {module:ol/View~View}
          */
         $view: {
           enumerable: true,
@@ -503,15 +443,4 @@
 
     this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
-
-  /**
-   * A click with no dragging. A double click will fire two of this.
-   * @event module:map/map#click
-   * @type {MapBrowserEvent}
-   */
-  /**
-   * A true double click, with no dragging.
-   * @event module:map/map#dblclick
-   * @type {MapBrowserEvent}
-   */
 </script>

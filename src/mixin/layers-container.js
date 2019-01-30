@@ -4,7 +4,7 @@ import { instanceOf } from '../util/assert'
 
 const methods = {
   /**
-   * @return {IndexedCollectionAdapter}
+   * @return {IndexedCollection}
    * @protected
    */
   getLayersTarget () {

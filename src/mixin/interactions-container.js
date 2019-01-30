@@ -1,61 +1,57 @@
+import Collection from 'ol/Collection'
 import Interaction from 'ol/interaction/Interaction'
 import Vue from 'vue'
+import { getInteractionId, identifyInteraction } from '../ol-ext/interaction'
 import { instanceOf } from '../util/assert'
 
 const methods = {
   /**
-   * @return {IndexedCollectionAdapter}
-   * @protected
-   */
-  getInteractionsTarget () {
-    throw new Error('Not implemented method')
-  },
-  /**
-   * @param {Interaction|Vue} interaction
+   * @param {module:ol/interaction/Interaction~Interaction|Vue} interaction
    * @return {void}
    */
   addInteraction (interaction) {
     interaction = interaction instanceof Vue ? interaction.$interaction : interaction
     instanceOf(interaction, Interaction)
 
-    if (this.getInteractionsTarget().has(interaction) === false) {
-      this.getInteractionsTarget().add(interaction)
+    if (this.getInteractionById(getInteractionId(interaction)) == null) {
+      identifyInteraction(interaction)
+      this._interactionCollection.push(interaction)
       this.sortInteractions()
     }
   },
   /**
-   * @param {Interaction|Vue} interaction
+   * @param {module:ol/interaction/Interaction~Interaction|Vue} interaction
    * @return {void}
    */
   removeInteraction (interaction) {
-    interaction = interaction instanceof Vue ? interaction.$interaction : interaction
-
+    interaction = this.getInteractionById(getInteractionId(interaction))
     if (!interaction) return
 
-    if (this.getInteractionsTarget().has(interaction)) {
-      this.getInteractionsTarget().remove(interaction)
-      this.sortInteractions()
-    }
+    this._interactionCollection.remove(interaction)
+    this.sortInteractions()
   },
   /**
-   * @return {Interaction[]}
+   * @return {module:ol/interaction/Interaction~Interaction[]}
    */
   getInteractions () {
-    return this.getInteractionsTarget().elements
+    return this._interactionCollection.toArray()
   },
   /**
    * @param {string|number} id
-   * @return {Interaction|undefined}
+   * @return {module:ol/interaction/Interaction~Interaction|undefined}
    */
   getInteractionById (id) {
-    return this.getInteractionsTarget().findByKey(id)
+    return this._interactionCollection.getArray().find(interaction => {
+      return getInteractionId(interaction) === id
+    })
   },
   /**
    * @return {void}
    */
   sortInteractions (sorter) {
     sorter || (sorter = this.getDefaultInteractionsSorter())
-    this.getInteractionsTarget().sort(sorter)
+
+    this._interactionCollection.getArray().sort(sorter)
   },
   /**
    * @return {function}
@@ -68,7 +64,7 @@ const methods = {
    * @return {void}
    */
   clearInteractions () {
-    this.getInteractionsTarget().clear()
+    this._interactionCollection.clear()
   },
   /**
    * @returns {Object}
@@ -85,4 +81,12 @@ const methods = {
 
 export default {
   methods,
+  created () {
+    /**
+     * @type {module:ol/Collection~Collection}
+     * @private
+     */
+    this._interactionCollection = new Collection()
+    // todo subscribe to collection
+  },
 }

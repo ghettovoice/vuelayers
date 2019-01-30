@@ -45,15 +45,15 @@
           <vl-geom-point :coordinates="[0, 0]" />
         </vl-feature>
 
-        <vl-layer-vector id="features">
-          <vl-source-vector :features.sync="features" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="features">-->
+          <!--<vl-source-vector :features.sync="features" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-layer-vector id="draw-pane" v-if="drawType != null">
-          <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="draw-pane" v-if="drawType != null">-->
+          <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-interaction-draw :type="drawType" source="draw-target" v-if="drawType != null" />
+        <!--<vl-interaction-draw :type="drawType" source="draw-target" v-if="drawType != null" />-->
       </vl-map>
     </div>
   </div>

@@ -1,6 +1,5 @@
 /**
  * Mini Lodash.
- * @module util/minilo
  */
 const glob = typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : {}
 const globIsFinite = glob.isFinite || noop

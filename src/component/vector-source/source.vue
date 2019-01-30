@@ -66,7 +66,7 @@
     createSource () {
       return new VectorSource({
         attributions: this.attributions,
-        features: this._featuresCollection,
+        features: this._featureCollection,
         projection: this.resolvedDataProjection,
         loader: this.createLoader(),
         useSpatialIndex: this.useSpatialIndex,

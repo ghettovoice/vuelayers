@@ -1,6 +1,3 @@
-/**
- * @module ol-ext
- */
 export * from './collection'
 export * from './consts'
 export * from './extent'

@@ -1,7 +1,7 @@
 <script>
   import GroupLayer from 'ol/layer/Group'
   import { layer, layersContainer } from '../../mixin'
-  import { IndexedCollectionAdapter } from '../../ol-ext'
+  import { IndexedCollection } from '../../ol-ext'
   import { hasLayer } from '../../util/assert'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
@@ -21,7 +21,7 @@
       hasLayer(this)
 
       if (this._layersTarget == null) {
-        this._layersTarget = new IndexedCollectionAdapter(
+        this._layersTarget = new IndexedCollection(
           this.$layer.getLayers(),
           layer => layer.get('id'),
         )

@@ -1,7 +1,7 @@
 import Collection from 'ol/Collection'
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime, tap } from 'rxjs/operators'
-import { getFeatureId, IndexedCollectionAdapter } from '../ol-ext'
+import { getFeatureId, IndexedCollection } from '../ol-ext'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../util/assert'
 import { isEqual } from '../util/minilo'
@@ -40,7 +40,7 @@ const methods = {
    */
   getFeaturesTarget () {
     if (this._featuresTarget == null && this.$source) {
-      this._featuresTarget = new IndexedCollectionAdapter(this._featuresCollection, getFeatureId)
+      this._featuresTarget = new IndexedCollection(this._featureCollection, getFeatureId)
     }
 
     return this._featuresTarget

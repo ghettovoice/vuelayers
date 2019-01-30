@@ -1,27 +1,21 @@
+import Collection from 'ol/Collection'
 import Feature from 'ol/Feature'
 import Vue from 'vue'
-import { initFeature } from '../ol-ext/feature'
+import { getFeatureId, identifyFeature } from '../ol-ext'
 import { instanceOf } from '../util/assert'
-import { isPlainObject } from '../util/minilo'
+import { isPlainObject, forEach } from '../util/minilo'
 import projTransforms from './proj-transforms'
 
 const methods = {
   /**
-   * @return {IndexedCollectionAdapter|SourceCollectionAdapter}
-   * @protected
-   */
-  getFeaturesTarget () {
-    throw new Error('Not implemented method')
-  },
-  /**
-   * @param {Array<(Feature|Vue|Object)>} features
+   * @param {Array<(module:ol/Feature~Feature|Vue|Object)>} features
    * @return {void}
    */
   addFeatures (features) {
-    features.forEach(::this.addFeature)
+    forEach(features, ::this.addFeature)
   },
   /**
-   * @param {Feature|Vue|Object} feature
+   * @param {module:ol/Feature~Feature|Vue|Object} feature
    * @return {void}
    */
   addFeature (feature) {
@@ -32,54 +26,48 @@ const methods = {
     }
     instanceOf(feature, Feature)
 
-    this.prepareFeature(feature)
-
-    if (!this.getFeaturesTarget().has(feature)) {
-      this.getFeaturesTarget().add(feature)
+    if (this.getFeatureById(getFeatureId(feature)) == null) {
+      identifyFeature(feature)
+      this._featureCollection.push(feature)
     }
   },
   /**
-   * @param {Array<(Feature|Vue|Object)>} features
+   * @param {Array<(module:ol/Feature~Feature|Vue|Object)>} features
    * @return {void}
    */
   removeFeatures (features) {
-    features.forEach(::this.removeFeature)
+    forEach(features, ::this.removeFeature)
   },
   /**
-   * @param {Feature|Vue|Object} feature
+   * @param {module:ol/Feature~Feature|Vue|Object} feature
    * @return {void}
    */
   removeFeature (feature) {
-    if (feature instanceof Vue) {
-      feature = feature.$feature
-    } else if (isPlainObject(feature)) {
-      // feature = this._features[feature.id]
-      feature = this.getFeatureById(feature.id)
-    }
+    feature = this.getFeatureById(getFeatureId(feature))
     if (!feature) return
 
-    if (this.getFeaturesTarget().has(feature)) {
-      this.getFeaturesTarget().remove(feature)
-    }
+    this._featureCollection.remove(feature)
   },
   /**
    * @return {void}
    */
   clearFeatures () {
-    this.getFeaturesTarget().clear()
+    this._featureCollection.clear()
   },
   /**
    * @param {string|number} id
-   * @return {Feature|undefined}
+   * @return {module:ol/Feature~Feature|undefined}
    */
   getFeatureById (id) {
-    return this.getFeaturesTarget().findByKey(id)
+    return this._featureCollection.getArray().find(feature => {
+      return getFeatureId(feature) === id
+    })
   },
   /**
-   * @return {Feature[]}
+   * @return {module:ol/Feature~Feature[]}
    */
   getFeatures () {
-    return this.getFeaturesTarget().elements
+    return this._featureCollection.toArray()
   },
   /**
    * @returns {Object}
@@ -92,17 +80,17 @@ const methods = {
       get featuresContainer () { return vm },
     }
   },
-  /**
-   * @param {Feature} feature
-   * @return {Feature}
-   * @protected
-   */
-  prepareFeature (feature) {
-    return initFeature(feature)
-  },
 }
 
 export default {
   mixins: [projTransforms],
   methods,
+  created () {
+    /**
+     * @type {module:ol/Collection~Collection}
+     * @private
+     */
+    this._featureCollection = new Collection()
+    // todo subscribe to collection
+  },
 }
