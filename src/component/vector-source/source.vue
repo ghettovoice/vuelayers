@@ -1,12 +1,10 @@
 <script>
   import VectorSource from 'ol/source/Vector'
   import { fetch } from 'whatwg-fetch'
-  import vectorSource from '../../mixin/vector-source'
-  import { getFeatureId } from '../../ol-ext/feature'
-  import { createGeoJsonFmt } from '../../ol-ext/format'
-  import { loadingAll } from '../../ol-ext/load-strategy'
-  import { transform } from '../../ol-ext/proj'
-  import { constant, difference, isEmpty, isFinite, isFunction, stubArray } from '../../util/minilo'
+  import { vectorSource } from '../../mixin'
+  import { getFeatureId, createGeoJsonFmt, loadingAll, transform } from '../../ol-ext'
+  import { constant, difference, isEmpty, isFinite, isFunction, stubArray, isEqual } from '../../util/minilo'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   const props = {
     /**
@@ -68,6 +66,7 @@
     createSource () {
       return new VectorSource({
         attributions: this.attributions,
+        features: this._featuresCollection,
         projection: this.resolvedDataProjection,
         loader: this.createLoader(),
         useSpatialIndex: this.useSpatialIndex,
@@ -149,6 +148,16 @@
       this.addFeatures(forAdd)
       this.removeFeatures(forRemove)
     },
+    ...makeWatchers([
+      'loaderFactory',
+      'formatFactory',
+      'strategyFactory',
+      'overlaps',
+    ], () => function (value, prevValue) {
+      if (isEqual(value, prevValue)) return
+
+      this.scheduleRecreate()
+    }),
   }
 
   export default {

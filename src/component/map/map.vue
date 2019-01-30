@@ -191,10 +191,7 @@
      */
     getFeaturesTarget () {
       if (this._featuresTarget == null) {
-        this._featuresTarget = new IndexedCollectionAdapter(
-          this._defaultOverlayFeatures,
-          feature => getFeatureId(feature)
-        )
+        this._featuresTarget = new IndexedCollectionAdapter(this._defaultOverlayFeatures, getFeatureId)
       }
 
       return this._featuresTarget
@@ -357,7 +354,11 @@
       'moveTolerance',
       'pixelRatio',
       'renderer',
-    ], () => olCmp.methods.scheduleRecreate),
+    ], () => function (value, prevValue) {
+      if (isEqual(value, prevValue)) return
+
+      this.scheduleRecreate()
+    }),
     controls (value) {
       if (value === false) {
         this._controls.clear()
