@@ -1,0 +1,5 @@
+@import "../utils/mixins";
+
+.vl-map {
+  @include vl-wh(100%, 100%);
+}

@@ -41,7 +41,7 @@ import * as VectorTileSource from './component/vector-tile-source'
 import * as WmsSource from './component/wms-source'
 import * as WmtsSource from './component/wmts-source'
 import * as XyzSource from './component/xyz-source'
-import './sass/main.sass'
+import './styles/main.scss'
 
 /**
  * @const {string} VueLayers version.

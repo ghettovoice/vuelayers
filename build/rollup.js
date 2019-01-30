@@ -231,7 +231,7 @@ function makeBundle (options = {}) {
         indentedSyntax: true,
         includePaths: [
           utils.resolve('src'),
-          utils.resolve('src/sass'),
+          utils.resolve('src/styles'),
           utils.resolve('node_modules'),
         ],
       },
