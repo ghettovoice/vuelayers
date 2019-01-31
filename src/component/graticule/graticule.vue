@@ -8,7 +8,7 @@
 
 <script>
   import Vue from 'vue'
-  import Graticule from 'ol/Graticule'
+  import Graticule from 'ol/layer/Graticule'
   import { throttleTime } from 'rxjs/operators'
   import { observableFromOlEvent } from '../../rx-ext'
   import { olCmp, useMapCmp, projTransforms } from '../../mixin'
