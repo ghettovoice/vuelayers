@@ -5,3 +5,4 @@ test/unit/coverage/*
 build/*
 test/*
 docs/*
+babel.config.js

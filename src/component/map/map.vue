@@ -10,7 +10,7 @@
   import VectorLayer from 'ol/layer/Vector'
   import Collection from 'ol/Collection'
   import Map from 'ol/Map'
-  import WebGLMap from 'ol/WebGLMap'
+  // import WebGLMap from 'ol/WebGLMap'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -107,8 +107,8 @@
   const computed = {
     mapCtor () {
       switch (this.renderer) {
-        case RENDERER_TYPE.WEBGL:
-          return WebGLMap
+        // case RENDERER_TYPE.WEBGL:
+        //   return WebGLMap
         case RENDERER_TYPE.CANVAS:
         default:
           return Map

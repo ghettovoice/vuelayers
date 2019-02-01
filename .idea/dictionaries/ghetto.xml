@@ -39,6 +39,7 @@
       <w>drawend</w>
       <w>drawstart</w>
       <w>dropdown</w>
+      <w>entrypoint</w>
       <w>epsg</w>
       <w>errordbg</w>
       <w>eslint</w>

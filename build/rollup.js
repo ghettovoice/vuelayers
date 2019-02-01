@@ -121,6 +121,13 @@ function bundleOptions (format, package, env = 'development') {
     // defines: {
     //   IS_STANDALONE: false,
     // },
+    paths: id => {
+      if (/^ol\/.+/.test(id)) {
+        return utils.resolve('node_modules/ol/src', id)
+      }
+
+      return id
+    },
   })
 
   // es/cjs external resolver

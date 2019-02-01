@@ -34,11 +34,11 @@ module.exports = {
     ],
     alias: {
       '@': utils.resolve('src'),
+      'ol': utils.resolve('node_modules/ol/src/ol'),
     },
   },
   resolveLoader: {
     modules: [
-      utils.resolve('build/webpack'),
       utils.resolve('node_modules'),
     ],
   },
@@ -84,6 +84,11 @@ module.exports = {
         include: [
           utils.resolve('src'),
           utils.resolve('test'),
+          utils.resolve('node_modules/ol-tilecache'),
+          utils.resolve('node_modules/rxjs/_esm2015'),
+          utils.resolve('node_modules/lodash-es'),
+          utils.resolve('node_modules/webpack-dev-server/client'),
+          utils.resolve('node_modules/ol/src/ol'),
         ],
       },
       {
@@ -95,7 +100,6 @@ module.exports = {
         sourceMap: isProduction,
       }),
     ],
-    noParse: [/openlayers/],
   },
   plugins: [
     new VueLoaderPlugin(),
