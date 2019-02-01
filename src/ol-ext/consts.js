@@ -43,7 +43,6 @@ export const EARTH_RADIUS = 6378137
 
 export const RENDERER_TYPE = {
   CANVAS: 'canvas',
-  WEBGL: 'webgl',
 }
 
 export const GEOMETRY_TYPE = {

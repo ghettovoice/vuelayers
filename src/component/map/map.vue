@@ -10,7 +10,6 @@
   import VectorLayer from 'ol/layer/Vector'
   import Collection from 'ol/Collection'
   import Map from 'ol/Map'
-  import WebGLMap from 'ol/WebGLMap'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -77,11 +76,9 @@
       default: () => window.devicePixelRatio || 1,
     },
     /**
-     * Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,
-     * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,
-     * but **WebGL** can only render **Point** geometries.
+     * Renderer. Only **Canvas** renderer is available, since **WebGL** renderer was removed in OpenLayers >5.3.0.
      * @type {string|string[]}
-     * @default ['canvas', 'webgl']
+     * @default ['canvas']
      */
     renderer: {
       type: String,
@@ -107,8 +104,6 @@
   const computed = {
     mapCtor () {
       switch (this.renderer) {
-        case RENDERER_TYPE.WEBGL:
-          return WebGLMap
         case RENDERER_TYPE.CANVAS:
         default:
           return Map
