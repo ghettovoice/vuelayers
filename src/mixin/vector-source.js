@@ -1,6 +1,6 @@
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime, tap } from 'rxjs/operators'
-import observableFromOlEvent from '../rx-ext/from-ol-event'
+import { observableFromOlEvent } from '../rx-ext'
 import * as assert from '../util/assert'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
@@ -124,7 +124,7 @@ export default {
 
 function subscribeToSourceChanges () {
   assert.hasSource(this)
-
+  // todo most likely it is no longer necessary cause this.$source will use this._featuresCollection
   const add = observableFromOlEvent(this.$source, 'addfeature').pipe(
     tap(({ feature }) => {
       this.addFeature(feature)

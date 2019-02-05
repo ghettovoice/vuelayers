@@ -1,6 +1,5 @@
 import { error as logError } from '../util/log'
-
-const noop = () => {}
+import { noop } from '../util/minilo'
 
 /**
  * RxJS subscriptions manager.

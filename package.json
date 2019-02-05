@@ -54,7 +54,7 @@
     "@turf/point-on-feature": "^5.1.5",
     "debounce-promise": "^3.1.0",
     "merge-descriptors": "^1.0.1",
-    "ol": "^5.2.0",
+    "ol": "^5.3.0",
     "ol-tilecache": "^3.0.1",
     "parse-color": "^1.0.0",
     "rxjs": "^6.3.3",

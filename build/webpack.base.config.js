@@ -79,6 +79,15 @@ module.exports = {
         },
       },
       {
+        test: /\.(js|vue|s?[ca]ss)$/,
+        loader: utils.compileVarsReplaceLoader(),
+        enforce: 'pre',
+        include: [
+          utils.resolve('src'),
+          utils.resolve('test'),
+        ],
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [
