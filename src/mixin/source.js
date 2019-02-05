@@ -106,29 +106,6 @@ export default {
         }
       })
     },
-    defineServices () {
-      Object.defineProperties(this, {
-        /**
-         * @type {module:ol/source/Source~Source|undefined}
-         */
-        $source: {
-          enumerable: true,
-          get: () => this.$olObject,
-        },
-        $map: {
-          enumerable: true,
-          get: () => this.$services && this.$services.map,
-        },
-        $view: {
-          enumerable: true,
-          get: () => this.$services && this.$services.view,
-        },
-        $sourceContainer: {
-          enumerable: true,
-          get: () => this.$services && this.$services.sourceContainer,
-        },
-      })
-    },
   },
   watch: {
     attributions (value) {
@@ -152,6 +129,30 @@ export default {
     },
   },
   created () {
-    this.defineServices()
+    this::defineServices()
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    /**
+     * @type {module:ol/source/Source~Source|undefined}
+     */
+    $source: {
+      enumerable: true,
+      get: () => this.$olObject,
+    },
+    $map: {
+      enumerable: true,
+      get: () => this.$services && this.$services.map,
+    },
+    $view: {
+      enumerable: true,
+      get: () => this.$services && this.$services.view,
+    },
+    $sourceContainer: {
+      enumerable: true,
+      get: () => this.$services && this.$services.sourceContainer,
+    },
+  })
 }
