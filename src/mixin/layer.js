@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4'
 import Vue from 'vue'
+import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
 import { hasLayer, hasMap } from '../util/assert'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
@@ -17,7 +18,7 @@ const props = {
    * The bounding extent for layer rendering defined in the map view projection.
    * The layer will not be rendered outside of this extent.
    * @default undefined
-   * @type {Extent|number[]|undefined}
+   * @type {number[]|undefined}
    */
   extent: {
     type: Array,
@@ -42,17 +43,18 @@ const props = {
 
 const methods = {
   /**
-   * @return {Promise<Layer>}
+   * @return {Promise<module:ol/layer/BaseLayer>}
    * @protected
    */
   async createOlObject () {
     let layer = await this.createLayer()
-    layer.set('id', this.id)
+
+    initializeLayer(layer, this.id)
 
     return layer
   },
   /**
-   * @return {Layer|Promise<Layer>}
+   * @return {module:ol/layer/BaseLayer|Promise<module:ol/layer/BaseLayer>}
    * @protected
    * @abstract
    */
@@ -60,7 +62,7 @@ const methods = {
     throw new Error('Not implemented method')
   },
   /**
-   * @return {Promise<Vue<Layer>>}
+   * @return {Promise<Vue<module:ol/layer/BaseLayer>>}
    * @protected
    */
   init () {
@@ -153,8 +155,8 @@ const methods = {
 
 const watch = {
   id (value) {
-    if (this.$layer && value !== this.$layer.get('id')) {
-      this.$layer.set('id', value)
+    if (this.$layer && value !== getLayerId(this.$layer)) {
+      setLayerId(this.$layer, value)
     }
   },
   maxResolution (value) {

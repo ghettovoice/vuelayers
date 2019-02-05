@@ -1,4 +1,5 @@
 import uuid from 'uuid/v4'
+import { initializeInteraction, setInteractionId, setInteractionPriority } from '../ol-ext'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
@@ -25,21 +26,19 @@ const props = {
 
 const methods = {
   /**
-   * @return {Promise<Interaction>}
+   * @return {Promise<module:ol/interaction/Interaction~Interaction>}
    * @protected
    */
   async createOlObject () {
     const interaction = await this.createInteraction()
+
+    initializeInteraction(interaction, this.id, this.priority)
     interaction.setActive(this.active)
-    interaction.setProperties({
-      id: this.id,
-      priority: this.priority,
-    })
 
     return interaction
   },
   /**
-   * @return {Interaction|Promise<Interaction>}
+   * @return {module:ol/interaction/Interaction~Interaction|Promise<module:ol/interaction/Interaction~Interaction>}
    * @protected
    * @abstract
    */
@@ -96,6 +95,11 @@ const methods = {
 }
 
 const watch = {
+  id (value) {
+    if (!this.$interaction) return
+
+    setInteractionId(this.$interaction, value)
+  },
   active (value) {
     if (this.$interaction && value !== this.$interaction.getActive()) {
       this.$interaction.setActive(value)
@@ -104,7 +108,7 @@ const watch = {
   priority (value) {
     if (!this.$interactionsContainer) return
 
-    this.$interaction.set('priority', value)
+    setInteractionPriority(this.$interaction, value)
     this.$interactionsContainer.sortInteractions()
   },
 }
@@ -122,7 +126,7 @@ export default {
   created () {
     Object.defineProperties(this, {
       /**
-       * @type {Interaction|undefined}
+       * @type {module:ol/interaction/Interaction~Interaction|undefined}
        */
       $interaction: {
         enumerable: true,

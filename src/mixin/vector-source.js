@@ -1,7 +1,5 @@
-import Collection from 'ol/Collection'
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime, tap } from 'rxjs/operators'
-import { getFeatureId, IndexedCollection } from '../ol-ext'
 import observableFromOlEvent from '../rx-ext/from-ol-event'
 import * as assert from '../util/assert'
 import { isEqual } from '../util/minilo'
@@ -33,17 +31,6 @@ const methods = {
    */
   clear () {
     this::featuresContainer.methods.clearFeatures()
-  },
-  /**
-   * @return {SourceCollectionAdapter}
-   * @protected
-   */
-  getFeaturesTarget () {
-    if (this._featuresTarget == null && this.$source) {
-      this._featuresTarget = new IndexedCollection(this._featureCollection, getFeatureId)
-    }
-
-    return this._featuresTarget
   },
   /**
    * @return {Object}
@@ -132,9 +119,6 @@ export default {
         class: this.$options.name,
       }
     },
-  },
-  created () {
-    this._featuresCollection = new Collection()
   },
 }
 

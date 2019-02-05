@@ -8,11 +8,9 @@
   import Overlay from 'ol/Overlay'
   import { merge as mergeObs } from 'rxjs/observable'
   import uuid from 'uuid/v4'
-  import olCmp from '../../mixin/ol-cmp'
-  import projTransforms from '../../mixin/proj-transforms'
-  import useMapCmp from '../../mixin/use-map-cmp'
-  import { OVERLAY_POSITIONING } from '../../ol-ext/consts'
-  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
+  import { olCmp, projTransforms, useMapCmp } from '../../mixin'
+  import { initializeOverlay, OVERLAY_POSITIONING, setOverlayId } from '../../ol-ext'
+  import { observableFromOlChangeEvent } from '../../rx-ext'
   import { hasOverlay } from '../../util/assert'
   import { isEqual, identity } from '../../util/minilo'
 
@@ -59,9 +57,6 @@
     autoPanAnimation: Object,
   }
 
-  /**
-   * @vueComputed
-   */
   const computed = {
     positionViewProj () {
       if (this.rev && this.$overlay) {
@@ -81,16 +76,13 @@
     },
   }
 
-  /**
-   * @vueMethods
-   */
-  const methods = /** @lends module:overlay/overlay# */{
+  const methods = {
     /**
-     * @return {Overlay}
+     * @return {module:ol/Overlay~Overlay}
      * @protected
      */
     createOlObject () {
-      return new Overlay({
+      const overlay = new Overlay({
         id: this.id,
         offset: this.offset,
         position: this.pointToViewProj(this.position),
@@ -101,6 +93,10 @@
         autoPanMargin: this.autoPanMargin,
         autoPanAnimation: this.autoPanAnimation,
       })
+
+      initializeOverlay(overlay, this.id)
+
+      return overlay
     },
     /**
      * @return {void}
@@ -128,6 +124,7 @@
       this.unsubscribeAll()
       this.$overlay.setElement(undefined)
       this.$overlaysContainer && this.$overlaysContainer.removeOverlay(this.$overlay)
+
       this.visible = false
     },
     /**
@@ -140,6 +137,11 @@
   }
 
   const watch = {
+    id (value) {
+      if (!this.$overlay) return
+
+      setOverlayId(this.$overlay, value)
+    },
     offset (value) {
       if (this.$overlay && !isEqual(value, this.$overlay.getOffset())) {
         this.$overlay.setOffset(value)
@@ -163,11 +165,6 @@
     },
   }
 
-  /**
-   * @alias module:overlay/overlay
-   * @title vl-overlay
-   * @vueProto
-   */
   export default {
     name: 'vl-overlay',
     mixins: [olCmp, useMapCmp, projTransforms],
@@ -176,9 +173,9 @@
     methods,
     watch,
     created () {
-      Object.defineProperties(this, /** @lends module:overlay/overlay# */{
+      Object.defineProperties(this, {
         /**
-         * @type {Overlay|undefined}
+         * @type {module:ol/Overlay~Overlay|undefined}
          */
         $overlay: {
           enumerable: true,

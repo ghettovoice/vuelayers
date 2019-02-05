@@ -6,30 +6,22 @@
 
 <script>
   import Feature from 'ol/Feature'
+  import uuid from 'uuid/v4'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, mergeAll, throttleTime } from 'rxjs/operators'
-  import uuid from 'uuid/v4'
-  import geometryContainer from '../../mixin/geometry-container'
-  import olCmp from '../../mixin/ol-cmp'
-  import projTransforms from '../../mixin/proj-transforms'
-  import stylesContainer from '../../mixin/styles-container'
-  import useMapCmp from '../../mixin/use-map-cmp'
-  import { findPointOnSurface } from '../../ol-ext/geom'
-  import observableFromOlEvent from '../../rx-ext/from-ol-event'
+  import { geometryContainer, olCmp, projTransforms, stylesContainer, useMapCmp } from '../../mixin'
+  import { findPointOnSurface, initializeFeature } from '../../ol-ext'
+  import { observableFromOlEvent } from '../../rx-ext'
   import { hasFeature, hasMap } from '../../util/assert'
   import { isEqual, plainProps } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
-  /**
-   * @vueProps
-   */
-  const props = /** @lends module:feature/feature# */{
+  const props = {
     /**
      * Feature identifier.
      * @type {string|number}
      * @default UUID
-     * @vueSync
      */
     id: {
       type: [String, Number],
@@ -39,7 +31,6 @@
      * All feature properties.
      * @type {Object}
      * @default {}
-     * @vueSync
      */
     properties: {
       type: Object,
@@ -47,10 +38,7 @@
     },
   }
 
-  /**
-   * @vueComputed
-   */
-  const computed = /** @lends module:feature/feature# */{
+  const computed = {
     /**
      * **GeoJSON** encoded geometry.
      * @type {Object|undefined}
@@ -80,27 +68,25 @@
     },
   }
 
-  /**
-   * @vueMethods
-   */
-  const methods = /** @lends module:feature/feature# */{
+  const methods = {
     /**
      * Create feature without inner style applying, feature level style
      * will be applied in the layer level style function.
-     * @return {Feature}
+     * @return {module:ol/Feature~Feature}
      * @protected
      */
     createOlObject () {
       let feature = new Feature(this.properties)
-      feature.setId(this.id)
+
+      initializeFeature(feature, this.id)
       feature.setGeometry(this.$geometry)
 
       return feature
     },
     /**
      * @return {{
-     *     getGeometry: function(): (Geometry|undefined),
-     *     setGeometry: function((Geometry|undefined)): void
+     *     getGeometry: function(): (module:ol/geom/Geometry~Geometry|undefined),
+     *     setGeometry: function((module:ol/geom/Geometry~Geometry|undefined)): void
      *   }|Feature|undefined}
      * @protected
      */
@@ -124,7 +110,7 @@
       )
     },
     /**
-     * @return {Feature|undefined}
+     * @return {module:ol/Feature~Feature|undefined}
      * @protected
      */
     getStyleTarget () {
@@ -192,12 +178,6 @@
   /**
    * A vector object for geographic features with a geometry and other attribute properties,
    * similar to the features in vector file formats like **GeoJSON**.
-   *
-   * @title vl-feature
-   * @alias module:feature/feature
-   * @vueProto
-   *
-   * @vueSlot default [scoped] Default **scoped** slot with current feature state: `id`, `properties`, GeoJSON `geometry`.
    */
   export default {
     name: 'vl-feature',
@@ -207,10 +187,10 @@
     methods,
     watch,
     created () {
-      Object.defineProperties(this, /** @lends module:feature/feature# */{
+      Object.defineProperties(this, {
         /**
          * Reference to `ol.Feature` instance.
-         * @type {Feature|undefined}
+         * @type {module:ol/Feature~Feature|undefined}
          */
         $feature: {
           enumerable: true,
@@ -218,7 +198,7 @@
         },
         /**
          * Reference to parent `Layer` instance.
-         * @type {Layer|undefined}
+         * @type {module:ol/layer/Layer|undefined}
          */
         $layer: {
           enumerable: true,
@@ -226,7 +206,7 @@
         },
         /**
          * Reference to `ol.Map` instance.
-         * @type {Map|undefined}
+         * @type {module:ol/Map|undefined}
          */
         $map: {
           enumerable: true,
@@ -234,7 +214,7 @@
         },
         /**
          * Reference to `ol.View` instance.
-         * @type {View|undefined}
+         * @type {module:ol/View|undefined}
          */
         $view: {
           enumerable: true,

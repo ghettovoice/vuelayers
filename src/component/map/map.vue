@@ -16,9 +16,8 @@
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
-  import { olCmp, overlaysContainer, layersContainer, interactionsContainer, featuresContainer } from '../../mixin'
-  import projTransforms from '../../mixin/proj-transforms'
-  import { RENDERER_TYPE } from '../../ol-ext'
+  import { olCmp, overlaysContainer, layersContainer, interactionsContainer, featuresContainer, projTransforms } from '../../mixin'
+  import { RENDERER_TYPE, setMapDataProjection } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasMap, hasView } from '../../util/assert'
   import { isEqual } from '../../util/minilo'
@@ -90,6 +89,7 @@
      * but **WebGL** can only render **Point** geometries.
      * @type {string|string[]}
      * @default ['canvas', 'webgl']
+     * @todo remove in the next version
      */
     renderer: {
       type: String,
@@ -141,21 +141,21 @@
         moveTolerance: this.moveTolerance,
         keyboardEventTarget: this.keyboardEventTarget,
         maxTilesLoading: this.maxTilesLoading,
-        controls: this._controls,
-        interactions: this._interactions,
-        layers: this._layers,
-        overlays: this._overlays,
+        controls: this._controlsCollection,
+        interactions: this._interactionsCollection,
+        layers: this._layersCollection,
+        overlays: this._overlaysCollection,
         view: this._view,
       })
-      map.set('dataProjection', this.dataProjection)
 
+      setMapDataProjection(map, this.dataProjection)
       this._featuresOverlay.setMap(map)
 
       return map
     },
     /**
      * @param {number[]} pixel
-     * @return {number[]} Coordinates in the map view projection.
+     * @return {number[]} Coordinates in the map data projection.
      */
     getCoordinateFromPixel (pixel) {
       hasMap(this)
@@ -163,6 +163,15 @@
       let coordinate = this.$map.getCoordinateFromPixel(pixel)
 
       return this.pointToDataProj(coordinate)
+    },
+    /**
+     * @param {number[]} coordinate Coordinates in map data projection
+     * @return {number[]}
+     */
+    getPixelFromCoordinate (coordinate) {
+      hasMap(this)
+
+      return this.$map.getPixelFromCoordinate(this.pointToViewProj(coordinate))
     },
     /**
      * Triggers focus on map container.
@@ -179,6 +188,7 @@
      */
     forEachFeatureAtPixel (pixel, callback, opts = {}) {
       hasMap(this)
+
       return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
     },
     /**
@@ -189,6 +199,7 @@
      */
     forEachLayerAtPixel (pixel, callback, layerFilter) {
       hasMap(this)
+
       return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
     },
     /**
@@ -261,7 +272,7 @@
       this.clearOverlays()
 
       this.unsubscribeAll()
-      this.$map.setTarget(undefined)
+      this.$map.setTarget(null)
     },
     /**
      * @return {void}
@@ -269,20 +280,6 @@
      */
     subscribeAll () {
       this::subscribeToMapEvents()
-    },
-
-    /**
-     * @return {function}
-     * @protected
-     */
-    getDefaultInteractionsSorter () {
-      // sort interactions by priority in asc order
-      // the higher the priority, the earlier the interaction handles the event
-      return (a, b) => {
-        let ap = a.get('priority') || 0
-        let bp = b.get('priority') || 0
-        return ap === bp ? 0 : ap - bp
-      }
     },
     /**
      * @returns {Object}
@@ -322,24 +319,26 @@
     }),
     controls (value) {
       if (value === false) {
-        this._controls.clear()
+        this._controlsCollection.clear()
         return
       }
 
       value = typeof value === 'object' ? value : undefined
-      this._controls.clear()
-      this._controls.extend(createDefaultControls(value).getArray())
+      this._controlsCollection.clear()
+      this._controlsCollection.extend(createDefaultControls(value).getArray())
     },
     wrapX (value) {
       if (this._featuresOverlay == null) return
 
       this._featuresOverlay.setSource(new VectorSource({
-        features: this._featureCollection,
+        features: this._featuresCollection,
         wrapX: value,
       }))
     },
     dataProjection (value) {
-      this.$map && this.$map.set('dataProjection', value)
+      if (!this.$map) return
+
+      setMapDataProjection(this.$map, value)
       this.scheduleRefresh()
     },
   }
@@ -364,16 +363,14 @@
     watch,
     created () {
       this._view = new View()
-      this._controls = this.controls !== false
+      this._controlsCollection = this.controls !== false
         ? createDefaultControls(typeof this.controls === 'object' ? this.controls : undefined)
         : new Collection()
-      this._interactions = createDefaultInteractions()
-      this._layers = new Collection()
-      this._overlays = new Collection()
+      this._interactionsCollection = createDefaultInteractions()
       // prepare default overlay
       this._featuresOverlay = new VectorLayer({
         source: new VectorSource({
-          features: this._featureCollection,
+          features: this._featuresCollection,
           wrapX: this.wrapX,
         }),
       })

@@ -1,28 +1,61 @@
 import Interaction from 'ol/interaction/Interaction'
-import Vue from 'vue'
 import uuid from 'uuid/v4'
+import Vue from 'vue'
 
 export function getInteractionId (interaction) {
   if (interaction instanceof Vue) {
     return interaction.id
   } else if (interaction instanceof Interaction) {
     return interaction.get('id')
-  } else {
-    throw new Error('Illegal argument')
   }
+
+  throw new Error('Illegal interaction argument')
 }
 
-export function identifyInteraction (interaction) {
+export function setInteractionId (interaction, interactionId) {
   if (interaction instanceof Vue) {
-    if (interaction.id == null) {
-      interaction.id = uuid()
-    }
+    interaction.id = interactionId
+
+    return interaction
   } else if (interaction instanceof Interaction) {
-    if (interaction.get('id') == null) {
-      interaction.set('id', uuid())
-    }
-  } else {
-    throw new Error('Illegal argument')
+    interaction.set('id', interactionId)
+
+    return interaction
+  }
+
+  throw new Error('Illegal interaction argument')
+}
+
+export function getInteractionPriority (interaction) {
+  if (interaction instanceof Vue) {
+    return interaction.priority
+  } else if (interaction instanceof Interaction) {
+    return interaction.get('priority')
+  }
+
+  throw new Error('Illegal interaction argument')
+}
+
+export function setInteractionPriority (interaction, interactionId) {
+  if (interaction instanceof Vue) {
+    interaction.id = interactionId
+
+    return interaction
+  } else if (interaction instanceof Interaction) {
+    interaction.set('id', interactionId)
+
+    return interaction
+  }
+
+  throw new Error('Illegal interaction argument')
+}
+
+export function initializeInteraction (interaction, defaultInteractionId, defaultPriority) {
+  if (getInteractionId(interaction) == null) {
+    setInteractionId(interaction, defaultInteractionId || uuid())
+  }
+  if (getInteractionPriority(interaction) == null) {
+    setInteractionPriority(interaction, defaultPriority || 0)
   }
 
   return interaction
