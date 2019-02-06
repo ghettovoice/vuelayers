@@ -1,8 +1,10 @@
 import debounce from 'debounce-promise'
 import { interval as intervalObs } from 'rxjs/observable'
-import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
+import { first as firstObs, skipWhile, skipUntil } from 'rxjs/operators'
+import { observableFromOlEvent } from '../rx-ext'
+import { hasOlObject } from '../util/assert'
 import { log } from '../util/log'
-import { isFunction } from '../util/minilo'
+import { identity, isFunction } from '../util/minilo'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
 import services from './services'
@@ -23,6 +25,11 @@ export default {
       rev: 0,
     }
   },
+  computed: {
+    name () {
+      return [this.$options.name, this.id].filter(identity).join(' ')
+    },
+  },
   methods: {
     /**
      * @return {Promise<void>}
@@ -40,7 +47,7 @@ export default {
       if (ident && this.$identityMap.has(ident, INSTANCE_PROMISE_POOL)) {
         createPromise = this.$identityMap.get(ident, INSTANCE_PROMISE_POOL)
       } else {
-        createPromise = Promise.resolve(this.createOlObject())
+        createPromise = this.createOlObject()
 
         if (ident) {
           this.$identityMap.set(ident, createPromise, INSTANCE_PROMISE_POOL)
@@ -89,18 +96,16 @@ export default {
     /**
      * @return {void|Promise<void>}
      * @protected
-     * @abstract
      */
     mount () {
-      throw new Error('Not implemented method')
+      this.subscribeAll()
     },
     /**
      * @return {void|Promise<void>}
      * @protected
-     * @abstract
      */
     unmount () {
-      throw new Error('Not implemented method')
+      this.unsubscribeAll()
     },
     /**
      * Refresh internal ol objects
@@ -110,15 +115,11 @@ export default {
       if (this.$olObject == null) return Promise.resolve()
 
       return new Promise(resolve => {
-        let done = () => {
-          ++this.rev
-          resolve()
-        }
         if (this.$olObject && isFunction(this.$olObject.changed)) {
-          this.$olObject.once('change', done)
+          this.$olObject.once('change', () => resolve())
           this.$olObject.changed()
         } else {
-          done()
+          resolve()
         }
       })
     },
@@ -127,11 +128,11 @@ export default {
      * @return {Promise<void>}
      * @protected
      */
-    remount () {
-      if (this.$olObject == null) return Promise.resolve()
+    async remount () {
+      if (this.$olObject == null) return
 
-      return Promise.resolve(this.unmount())
-        .then(() => this.mount())
+      await this.unmount()
+      await this.mount()
     },
     /**
      * Only for internal purpose to support watching for properties
@@ -139,13 +140,23 @@ export default {
      * @return {Promise}
      * @protected
      */
-    recreate () {
-      if (this.$olObject == null) return Promise.resolve()
+    async recreate () {
+      if (this.$olObject == null) return
 
-      return Promise.resolve(this.unmount())
-        .then(() => this.deinit())
-        .then(() => this.init())
-        .then(() => this.mount())
+      await this.unmount()
+      await this.deinit()
+      await this.init()
+      await this.mount()
+    },
+    subscribeAll () {
+      hasOlObject(this)
+
+      this.subscribeTo(observableFromOlEvent(this.$olObject, 'change'), () => {
+        ++this.rev
+        if (process.env.NODE_ENV !== 'production') {
+          log('changed', this.name, this.rev)
+        }
+      })
     },
   },
   created () {
@@ -164,38 +175,27 @@ export default {
     this::defineLifeCyclePromises()
     this::defineDebouncedHelpers()
   },
-  mounted () {
-    this.$createPromise.then(this.mount)
-      .then(() => {
-        this._mounted = true
-        this.$emit('mounted', this)
+  async mounted () {
+    await this.$createPromise
 
-        if (process.env.NODE_ENV !== 'production') {
-          log('mounted', this.$options.name)
-        }
-      })
+    this._mounted = true
   },
-  destroyed () {
-    this.$mountPromise.then(this.unmount)
-      .then(this.deinit)
-      .then(() => {
-        this._mounted = false
-        this.$emit('destroyed', this)
+  async beforeDestroy () {
+    await this.$mountPromise
 
-        if (process.env.NODE_ENV !== 'production') {
-          log('destroyed', this.$options.name)
-        }
-      })
+    this._mounted = false
+  },
+  async destroyed () {
+    await this.$unmountPromise
+
+    this._destroyed = true
   },
 }
 
 function defineLifeCyclePromises () {
-  /**
-   * @type {Promise<Vue<T>>}
-   * @private
-   */
+  // create
   this._createPromise = Promise.resolve(this.beforeInit())
-    .then(this.init)
+    .then(() => this.init())
     .then(() => {
       this.$emit('created', this)
 
@@ -205,15 +205,61 @@ function defineLifeCyclePromises () {
 
       return this
     })
-  /**
-   * @type {Promise<Vue<T>>}
-   * @private
-   */
-  this._mountPromise = intervalObs(100).pipe(
-    skipWhile(() => !this._mounted),
-    firstObs(),
-    mapObs(() => this),
-  ).toPromise(Promise)
+
+  // mount
+  const mountObs = intervalObs(1000 / 60)
+    .pipe(
+      skipWhile(() => !this._mounted),
+      firstObs(),
+    )
+  this._mountPromise = mountObs.toPromise(Promise)
+    .then(() => this.mount())
+    .then(() => {
+      this.$emit('mounted', this)
+
+      if (process.env.NODE_ENV !== 'production') {
+        log('mounted', this.$options.name)
+      }
+
+      return this
+    })
+
+  // unmount
+  const unmountObs = intervalObs(1000 / 60)
+    .pipe(
+      skipUntil(mountObs),
+      skipWhile(() => this._mounted),
+      firstObs(),
+    )
+  this._unmountPromise = unmountObs.toPromise(Promise)
+    .then(() => this.unmount())
+    .then(() => {
+      this.$emit('unmounted', this)
+
+      if (process.env.NODE_ENV !== 'production') {
+        log('unmounted', this.$options.name)
+      }
+
+      return this
+    })
+
+  // destroy
+  const destroyObs = intervalObs(1000 / 60)
+    .pipe(
+      skipWhile(() => !this._destroyed),
+      firstObs(),
+    )
+  this._destroyPromise = destroyObs.toPromise(Promise)
+    .then(() => this.deinit())
+    .then(() => {
+      this.$emit('destroyed', this)
+
+      if (process.env.NODE_ENV !== 'production') {
+        log('destroyed', this.$options.name)
+      }
+
+      return this
+    })
 
   Object.defineProperties(this, {
     $createPromise: {
@@ -223,6 +269,14 @@ function defineLifeCyclePromises () {
     $mountPromise: {
       enumerable: true,
       get: () => this._mountPromise,
+    },
+    $unmountPromise: {
+      enumerable: true,
+      get: () => this._unmountPromise,
+    },
+    $destroyPromise: {
+      enumerable: true,
+      get: () => this._destroyPromise,
     },
   })
 }

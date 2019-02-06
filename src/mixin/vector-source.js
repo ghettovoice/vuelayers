@@ -9,109 +9,103 @@ import featuresContainer from './features-container'
 import projTransforms from './proj-transforms'
 import source from './source'
 
-const props = {
-  useSpatialIndex: {
-    type: Boolean,
-    default: true,
-  },
-}
-
-const computed = {
-  featuresViewProj () {
-    if (this.rev && this.resolvedDataProjection && this.$source) {
-      return this.getFeatures().map(::this.writeFeatureInViewProj)
-    }
-    return []
-  },
-}
-
-const methods = {
-  /**
-   * @return {void}
-   */
-  clear () {
-    this::featuresContainer.methods.clearFeatures()
-  },
-  /**
-   * @return {Object}
-   * @protected
-   */
-  getServices () {
-    return mergeDescriptors(
-      this::source.methods.getServices(),
-      this::featuresContainer.methods.getServices(),
-    )
-  },
-  /**
-   * @return {Promise}
-   * @protected
-   */
-  init () {
-    return this::source.methods.init()
-  },
-  /**
-   * @return {void|Promise<void>}
-   * @protected
-   */
-  deinit () {
-    return this::source.methods.deinit()
-  },
-  /**
-   * @return {void}
-   * @protected
-   */
-  mount () {
-    this::source.methods.mount()
-  },
-  /**
-   * @return {void}
-   * @protected
-   */
-  unmount () {
-    this.clear()
-    this::source.methods.unmount()
-  },
-  /**
-   * @return {void}
-   * @protected
-   */
-  subscribeAll () {
-    this::subscribeToSourceChanges()
-  },
-  /**
-   * @param feature
-   * @return {ReadonlyArray<any>}
-   * @protected
-   */
-  writeFeatureInDataProj (feature) {
-    return this::projTransforms.methods.writeFeatureInDataProj(feature)
-  },
-  /**
-   * @param feature
-   * @return {ReadonlyArray<any>}
-   * @protected
-   */
-  writeGeometryInViewProj (feature) {
-    return this::projTransforms.methods.writeFeatureInViewProj(feature)
-  },
-}
-
-const watch = {
-  ...makeWatchers([
-    'useSpatialIndex',
-  ], () => function (value, prevValue) {
-    if (isEqual(value, prevValue)) return
-
-    this.scheduleRecreate()
-  }),
-}
-
 export default {
   mixins: [source, featuresContainer, projTransforms],
-  props,
-  computed,
-  methods,
-  watch,
+  props: {
+    useSpatialIndex: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  computed: {
+    featuresViewProj () {
+      if (!this.rev || !this.resolvedDataProjection || !this.$source) {
+        return []
+      }
+
+      return this.getFeatures().map(::this.writeFeatureInViewProj)
+    },
+  },
+  methods: {
+    /**
+     * @return {void}
+     */
+    clear () {
+      this::featuresContainer.methods.clearFeatures()
+    },
+    /**
+     * @return {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(
+        this::source.methods.getServices(),
+        this::featuresContainer.methods.getServices(),
+      )
+    },
+    /**
+     * @return {Promise}
+     * @protected
+     */
+    init () {
+      return this::source.methods.init()
+    },
+    /**
+     * @return {void|Promise<void>}
+     * @protected
+     */
+    deinit () {
+      return this::source.methods.deinit()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    mount () {
+      return this::source.methods.mount()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    unmount () {
+      this.clear()
+      return this::source.methods.unmount()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::source.methods.subscribeAll()
+      this::subscribeToEvents()
+    },
+    /**
+     * @param feature
+     * @return {ReadonlyArray<any>}
+     * @protected
+     */
+    writeFeatureInDataProj (feature) {
+      return this::projTransforms.methods.writeFeatureInDataProj(feature)
+    },
+    /**
+     * @param feature
+     * @return {ReadonlyArray<any>}
+     * @protected
+     */
+    writeGeometryInViewProj (feature) {
+      return this::projTransforms.methods.writeFeatureInViewProj(feature)
+    },
+  },
+  watch: {
+    ...makeWatchers([
+      'useSpatialIndex',
+    ], () => function (value, prevValue) {
+      if (isEqual(value, prevValue)) return
+
+      this.scheduleRecreate()
+    }),
+  },
   stubVNode: {
     empty: false,
     attrs () {
@@ -122,7 +116,7 @@ export default {
   },
 }
 
-function subscribeToSourceChanges () {
+function subscribeToEvents () {
   assert.hasSource(this)
   // todo most likely it is no longer necessary cause this.$source will use this._featuresCollection
   const add = observableFromOlEvent(this.$source, 'addfeature').pipe(

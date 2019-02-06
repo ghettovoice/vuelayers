@@ -195,15 +195,15 @@ export default {
         extent: this.extent,
       })
 
-      if (!isEq) {
-        this.setCoordinates(value)
-      }
+      if (isEq) return
+
+      this.setCoordinates(value)
     },
     resolvedDataProjection () {
-      if (this.$geometry) {
-        this.setupTransformFunctions()
-        this.setCoordinates(this.coordinates)
-      }
+      if (!this.$geometry) return
+
+      this.setupTransformFunctions()
+      this.setCoordinates(this.coordinates)
     },
   },
   stubVNode: {

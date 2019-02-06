@@ -1,6 +1,3 @@
-/**
- * Style helpers
- */
 import Circle from 'ol/style/Circle'
 import Fill from 'ol/style/Fill'
 import Icon from 'ol/style/Icon'
@@ -81,8 +78,7 @@ const isEmpty = x => {
   if (x == null) return true
   if (typeof x === 'number') return false
 
-  return ((typeof x === 'string' || Array.isArray(x)) && !x.length) ||
-    !Object.keys(x).length
+  return ((typeof x === 'string' || Array.isArray(x)) && !x.length) || !Object.keys(x).length
 }
 
 /**

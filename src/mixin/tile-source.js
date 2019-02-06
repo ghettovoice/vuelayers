@@ -148,33 +148,29 @@ export default {
     },
   },
   watch: {
-    ...makeWatchers([
-      'cacheSize',
-      'crossOrigin',
-      'opaque',
-      'reprojectionErrorThreshold',
-      'tilePixelRatio',
-      'tileLoadFunction',
-      'transition',
-    ], () => function (value, prevValue) {
-      if (isEqual(value, prevValue)) return
+    opaque (value) {
+      if (!this.$source || value === this.$source.getOpaque()) {
+        return
+      }
 
-      this.scheduleRefresh()
-    }),
-    ...makeWatchers([
-      'maxZoom',
-      'minZoom',
-      'tileSize',
-    ], () => function (value, prevValue) {
-      if (isEqual(value, prevValue) || !this.$source) return
+      this.scheduleRecreate()
+    },
+    tilePixelRatio (value) {
+      if (!this.$source || value === this.$source.getOpaque()) {
+        return
+      }
 
-      this._tileGrid = this.createTileGrid()
-      this.$source.setTileGridForProjection(this.projection, this._tileGrid)
-      this.$source.setTileUrlFunction(this.createUrlFunc())
-      this.scheduleRefresh()
-    }),
+      this.scheduleRecreate()
+    },
+    tileKey (value) {
+      if (!this.$source || value === this.$source.getKey()) {
+        return
+      }
+
+      this.$source.setKey(value)
+    },
     tileLoadFunction (value, prevValue) {
-      if (isEqual(value, prevValue) || !this.$source) return
+      if (!this.$source || isEqual(value, prevValue)) return
 
       this.$source.setTileLoadFunction(value)
     },
@@ -184,5 +180,27 @@ export default {
       this.$source.setTileUrlFunction(this.createUrlFunc())
       this.scheduleRefresh()
     },
+    ...makeWatchers([
+      'cacheSize',
+      'crossOrigin',
+      'reprojectionErrorThreshold',
+      'transition',
+    ], () => function (value, prevValue) {
+      if (isEqual(value, prevValue)) return
+
+      this.scheduleRecreate()
+    }),
+    ...makeWatchers([
+      'maxZoom',
+      'minZoom',
+      'tileSize',
+    ], () => function (value, prevValue) {
+      if (!this.$source || isEqual(value, prevValue)) return
+
+      this._tileGrid = this.createTileGrid()
+      this.$source.setTileGridForProjection(this.projection, this._tileGrid)
+      this.$source.setTileUrlFunction(this.createUrlFunc())
+      this.scheduleRefresh()
+    }),
   },
 }

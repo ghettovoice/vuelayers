@@ -1,5 +1,5 @@
 import { cleanSourceExtraParams, ARCGIS_EXTRA_PARAMS } from '../ol-ext'
-import { isEqual } from '../util/minilo'
+import { isEqual, pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 
 const serialize = value => {
@@ -77,10 +77,14 @@ export default {
       'mapScale',
       'rotation',
       'historicMoment',
-    ], prop => function (value, prevValue) {
-      if (isEqual(value, prevValue) || !this.$source) return
+    ], prop => function (value) {
+      if (!this.$source) return
 
       prop = prop.toUpperCase()
+      const params = this.$source.getParams() || {}
+
+      if (isEqual(value, params[value])) return
+
       this.$source.updateParams({ [prop]: value })
     }),
     ...makeWatchers([
@@ -92,14 +96,22 @@ export default {
       'mapRangeValues',
       'layerRangeValues',
       'layerParameterValues',
-    ], prop => function (value, prevValue) {
-      if (isEqual(value, prevValue) || !this.$source) return
+    ], prop => function (value) {
+      if (!this.$source) return
 
       prop = prop.toUpperCase()
-      this.$source.updateParams({ [prop]: serialize(value) })
+      value = serialize(value)
+      const params = this.$source.getParams() || {}
+
+      if (isEqual(value, params[value])) return
+
+      this.$source.updateParams({ [prop]: value })
     }),
-    extParams (value, prevValue) {
-      if (isEqual(value, prevValue) || !this.$source) return
+    extParams (value) {
+      if (!this.$source) return
+
+      const params = pick(this.$source.getParams() || {}, Object.keys(value))
+      if (isEqual(value, params)) return
 
       this.$source.updateParams(value ? cleanSourceExtraParams(value) : undefined)
     },

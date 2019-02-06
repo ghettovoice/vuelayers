@@ -21,6 +21,7 @@
       <w>contenthash</w>
       <w>corejs</w>
       <w>datasets</w>
+      <w>datumtransformations</w>
       <w>dblclick</w>
       <w>debounce</w>
       <w>debounced</w>
@@ -40,6 +41,7 @@
       <w>drawend</w>
       <w>drawstart</w>
       <w>dropdown</w>
+      <w>dynamiclayers</w>
       <w>epsg</w>
       <w>errordbg</w>
       <w>eslint</w>
@@ -47,6 +49,7 @@
       <w>fullheight</w>
       <w>fullwidth</w>
       <w>gapless</w>
+      <w>gdbversion</w>
       <w>geoloc</w>
       <w>geolocation</w>
       <w>geolocchanged</w>
@@ -54,17 +57,24 @@
       <w>ghettovoice</w>
       <w>hashmap</w>
       <w>hidpi</w>
+      <w>historicmoment</w>
       <w>hljs</w>
       <w>hoverable</w>
       <w>ident</w>
       <w>ifdef</w>
       <w>importee</w>
       <w>jsnext</w>
+      <w>layerdefs</w>
+      <w>layerparametervalues</w>
+      <w>layerrangevalues</w>
+      <w>layertimeoptions</w>
       <w>linkify</w>
       <w>loadingstrategy</w>
       <w>lodash</w>
       <w>logdbg</w>
       <w>mapbox</w>
+      <w>maprangevalues</w>
+      <w>mapscale</w>
       <w>marginless</w>
       <w>memberof</w>
       <w>minified</w>
@@ -106,6 +116,7 @@
       <w>rearg</w>
       <w>regenerator</w>
       <w>removefeature</w>
+      <w>rendercomplete</w>
       <w>replacers</w>
       <w>reproj</w>
       <w>reprojection</w>

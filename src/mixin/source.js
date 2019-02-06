@@ -1,6 +1,5 @@
-import { isEqual, isFunction, isString, isArray } from '../util/minilo'
+import { isArray, isEqual, isFunction, isString } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import { makeWatchers } from '../util/vue-helpers'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
 
@@ -23,9 +22,11 @@ export default {
   },
   computed: {
     state () {
-      if (this.rev && this.$source) {
-        return this.$source.getState()
+      if (!this.rev || !this.$source) {
+        return
       }
+
+      return this.$source.getState()
     },
   },
   methods: {
@@ -75,14 +76,16 @@ export default {
      */
     mount () {
       this.$sourceContainer && this.$sourceContainer.setSource(this)
-      this.subscribeAll()
+
+      return this::cmp.methods.mount()
     },
     /**
      * @return {void}
      * @protected
      */
-    unmount () {
-      this.unsubscribeAll()
+    async unmount () {
+      await this::cmp.methods.unmount()
+
       this.$sourceContainer && this.$sourceContainer.setSource(undefined)
     },
     /**
@@ -106,22 +109,61 @@ export default {
         }
       })
     },
+    /**
+     * Internal usage only in components that doesn't support refreshing.
+     * @return {Promise<void>}
+     * @protected
+     */
+    remount () {
+      return this::cmp.methods.remount()
+    },
+    /**
+     * Internal usage only in components that doesn't support refreshing.
+     * @return {Promise<void>}
+     * @protected
+     */
+    recreate () {
+      return this::cmp.methods.remount()
+    },
+    /**
+     * @protected
+     */
+    subscribeAll () {
+      this::cmp.methods.subscribeAll()
+    },
   },
   watch: {
     attributions (value) {
-      if (!this.$source) return
+      if (!this.$source || isEqual(value, this.$source.getAttributions())) {
+        return
+      }
 
       this.$source.setAttributions(value)
     },
-    ...makeWatchers([
-      'attributionsCollapsible',
-      'projection',
-      'wrapX',
-    ], () => function (value, prevValue) {
-      if (isEqual(value, prevValue)) return
+    attributionsCollapsible (value) {
+      if (!this.$source || value === this.$source.getAttributionsCollapsible()) {
+        return
+      }
 
       this.scheduleRecreate()
-    }),
+    },
+    projection (value) {
+      if (
+        !this.$source ||
+        (this.$source.getProjection() && value === this.$source.getProjection().getCode())
+      ) {
+        return
+      }
+
+      this.scheduleRecreate()
+    },
+    wrapX (value) {
+      if (!this.$source || value === this.$source.getWrapX()) {
+        return
+      }
+
+      this.scheduleRecreate()
+    },
   },
   stubVNode: {
     empty () {
