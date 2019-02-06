@@ -14,28 +14,28 @@
       <vl-map ref="map" v-if="showMap" data-projection="EPSG:4326" renderer="webgl">
         <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom" ident="view" ref="view" />
 
-        <vl-graticule :show-labels="true" v-if="graticule">
-          <vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>
-          <vl-style-text slot="lon" text-baseline="bottom">
-            <vl-style-stroke color="blue" />
-          </vl-style-text>
-          <vl-style-text slot="lat" text-align="end">
-            <vl-style-stroke color="black" />
-          </vl-style-text>
-        </vl-graticule>
+        <!--<vl-graticule :show-labels="true" v-if="graticule">-->
+          <!--<vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>-->
+          <!--<vl-style-text slot="lon" text-baseline="bottom">-->
+            <!--<vl-style-stroke color="blue" />-->
+          <!--</vl-style-text>-->
+          <!--<vl-style-text slot="lat" text-align="end">-->
+            <!--<vl-style-stroke color="black" />-->
+          <!--</vl-style-text>-->
+        <!--</vl-graticule>-->
 
-        <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">
-          <template slot-scope="select">
-            <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
-                        :position="pointOnSurface(feature.geometry)" :auto-pan="true"
-                        :auto-pan-animation="{ duration: 300 }"
-                        positioning="bottom-right">
-              <div style="background: #fff; padding: 10px; width: 200px">
-                {{ feature }}
-              </div>
-            </vl-overlay>
-          </template>
-        </vl-interaction-select>
+        <!--<vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">-->
+          <!--<template slot-scope="select">-->
+            <!--<vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"-->
+                        <!--:position="pointOnSurface(feature.geometry)" :auto-pan="true"-->
+                        <!--:auto-pan-animation="{ duration: 300 }"-->
+                        <!--positioning="bottom-right">-->
+              <!--<div style="background: #fff; padding: 10px; width: 200px">-->
+                <!--{{ feature }}-->
+              <!--</div>-->
+            <!--</vl-overlay>-->
+          <!--</template>-->
+        <!--</vl-interaction-select>-->
 
         <vl-layer-tile>
           <vl-source-osm />

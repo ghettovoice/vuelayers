@@ -1,6 +1,6 @@
 import debounce from 'debounce-promise'
 import { interval as intervalObs } from 'rxjs/observable'
-import { first as firstObs, skipWhile, skipUntil } from 'rxjs/operators'
+import { first as firstObs, skipUntil, skipWhile } from 'rxjs/operators'
 import { observableFromOlEvent } from '../rx-ext'
 import { hasOlObject } from '../util/assert'
 import { log } from '../util/log'
@@ -193,18 +193,19 @@ export default {
 }
 
 function defineLifeCyclePromises () {
+  const makeEventEmitter = event => () => {
+    this.$emit(event, this)
+
+    if (process.env.NODE_ENV !== 'production') {
+      log(event, this.name)
+    }
+
+    return this
+  }
   // create
   this._createPromise = Promise.resolve(this.beforeInit())
     .then(() => this.init())
-    .then(() => {
-      this.$emit('created', this)
-
-      if (process.env.NODE_ENV !== 'production') {
-        log('create', this.$options.name)
-      }
-
-      return this
-    })
+    .then(makeEventEmitter('created'))
 
   // mount
   const mountObs = intervalObs(1000 / 60)
@@ -214,15 +215,7 @@ function defineLifeCyclePromises () {
     )
   this._mountPromise = mountObs.toPromise(Promise)
     .then(() => this.mount())
-    .then(() => {
-      this.$emit('mounted', this)
-
-      if (process.env.NODE_ENV !== 'production') {
-        log('mounted', this.$options.name)
-      }
-
-      return this
-    })
+    .then(makeEventEmitter('mounted'))
 
   // unmount
   const unmountObs = intervalObs(1000 / 60)
@@ -233,15 +226,7 @@ function defineLifeCyclePromises () {
     )
   this._unmountPromise = unmountObs.toPromise(Promise)
     .then(() => this.unmount())
-    .then(() => {
-      this.$emit('unmounted', this)
-
-      if (process.env.NODE_ENV !== 'production') {
-        log('unmounted', this.$options.name)
-      }
-
-      return this
-    })
+    .then(makeEventEmitter('unmounted'))
 
   // destroy
   const destroyObs = intervalObs(1000 / 60)
@@ -251,15 +236,7 @@ function defineLifeCyclePromises () {
     )
   this._destroyPromise = destroyObs.toPromise(Promise)
     .then(() => this.deinit())
-    .then(() => {
-      this.$emit('destroyed', this)
-
-      if (process.env.NODE_ENV !== 'production') {
-        log('destroyed', this.$options.name)
-      }
-
-      return this
-    })
+    .then(makeEventEmitter('destroyed'))
 
   Object.defineProperties(this, {
     $createPromise: {

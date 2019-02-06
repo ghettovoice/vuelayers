@@ -139,5 +139,13 @@ module.exports = {
     open: true,
     hot: true,
     contentBase: config.outputPath,
+    clientLogLevel: 'info',
+    compress: true,
+    overlay: config.dev.errorOverlay
+      ? { warnings: false, errors: true }
+      : false,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
 }

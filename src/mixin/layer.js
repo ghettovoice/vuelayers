@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     /**
-     * @return {Promise<module:ol/layer/BaseLayer>}
+     * @return {Promise<module:ol/layer/BaseLayer~BaseLayer>}
      * @protected
      */
     async createOlObject () {
@@ -55,7 +55,7 @@ export default {
       return layer
     },
     /**
-     * @return {module:ol/layer/BaseLayer|Promise<module:ol/layer/BaseLayer>}
+     * @return {module:ol/layer/BaseLayer~BaseLayer|Promise<module:ol/layer/BaseLayer~BaseLayer>}
      * @protected
      * @abstract
      */
@@ -63,14 +63,14 @@ export default {
       throw new Error('Not implemented method')
     },
     /**
-     * @return {Promise<Vue<module:ol/layer/BaseLayer>>}
+     * @return {Promise<Vue<module:ol/layer/BaseLayer~BaseLayer>>}
      * @protected
      */
     init () {
       return this::cmp.methods.init()
     },
     /**
-     * @return {void|Promise<void>}
+     * @return {void|Promise}
      * @protected
      */
     deinit () {
@@ -111,7 +111,7 @@ export default {
       return this.$layer
     },
     /**
-     * @return {void}
+     * @return {Promise}
      * @protected
      */
     mount () {
@@ -121,20 +121,20 @@ export default {
         this.$layersContainer.addLayer(this)
       }
 
-      this.subscribeAll()
+      return this::cmp.methods.mount()
     },
     /**
-     * @return {void}
+     * @return {Promise}
      * @protected
      */
     unmount () {
-      this.unsubscribeAll()
-
       if (this.overlay) {
         this.setMap(undefined)
       } else if (this.$layersContainer) {
         this.$layersContainer.removeLayer(this)
       }
+
+      return this::cmp.methods.unmount()
     },
     /**
      * Updates layer state
@@ -142,6 +142,28 @@ export default {
      */
     refresh () {
       return this::cmp.methods.refresh()
+    },
+    /**
+     * Internal usage only in components that doesn't support refreshing.
+     * @return {Promise}
+     * @protected
+     */
+    remount () {
+      return this::cmp.methods.remount()
+    },
+    /**
+     * Internal usage only in components that doesn't support refreshing.
+     * @return {Promise}
+     * @protected
+     */
+    recreate () {
+      return this::cmp.methods.remount()
+    },
+    /**
+     * @protected
+     */
+    subscribeAll () {
+      this::cmp.methods.subscribeAll()
     },
     /**
      * @param {module:ol/Map~Map|Vue|undefined} map
@@ -227,9 +249,6 @@ export default {
 
 function defineServices () {
   Object.defineProperties(this, {
-    /**
-     * @type {module:ol/layer/Layer~Layer|undefined}
-     */
     $layer: {
       enumerable: true,
       get: () => this.$olObject,

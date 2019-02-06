@@ -46,14 +46,14 @@ export default {
       throw new Error('Not implemented method')
     },
     /**
-     * @return {Promise}
+     * @return {Promise|void}
      * @protected
      */
     init () {
       return this::cmp.methods.init()
     },
     /**
-     * @return {void|Promise<void>}
+     * @return {Promise|void}
      * @protected
      */
     deinit () {
@@ -71,7 +71,7 @@ export default {
       })
     },
     /**
-     * @return {void}
+     * @return {Promise|void}
      * @protected
      */
     mount () {
@@ -80,16 +80,16 @@ export default {
       return this::cmp.methods.mount()
     },
     /**
-     * @return {void}
+     * @return {Promise|void}
      * @protected
      */
-    async unmount () {
-      await this::cmp.methods.unmount()
-
+    unmount () {
       this.$sourceContainer && this.$sourceContainer.setSource(undefined)
+
+      return this::cmp.methods.unmount()
     },
     /**
-     * @return {Promise<void>}
+     * @return {Promise}
      */
     refresh () {
       if (this.$source && !isFunction(this.$source.clear)) {
@@ -111,7 +111,7 @@ export default {
     },
     /**
      * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise<void>}
+     * @return {Promise}
      * @protected
      */
     remount () {
@@ -119,7 +119,7 @@ export default {
     },
     /**
      * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise<void>}
+     * @return {Promise}
      * @protected
      */
     recreate () {

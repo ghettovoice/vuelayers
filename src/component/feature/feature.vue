@@ -185,42 +185,22 @@
 
   function defineServices () {
     Object.defineProperties(this, {
-      /**
-       * Reference to `ol.Feature` instance.
-       * @type {module:ol/Feature~Feature|undefined}
-       */
       $feature: {
         enumerable: true,
         get: () => this.$olObject,
       },
-      /**
-       * Reference to parent `Layer` instance.
-       * @type {module:ol/layer/Layer|undefined}
-       */
       $layer: {
         enumerable: true,
         get: () => this.$services && this.$services.layer,
       },
-      /**
-       * Reference to `ol.Map` instance.
-       * @type {module:ol/Map|undefined}
-       */
       $map: {
         enumerable: true,
         get: () => this.$services && this.$services.map,
       },
-      /**
-       * Reference to `ol.View` instance.
-       * @type {module:ol/View|undefined}
-       */
       $view: {
         enumerable: true,
         get: () => this.$services && this.$services.view,
       },
-      /**
-       * Reference to `featuresContainer`.
-       * @type {Object|undefined}
-       */
       $featuresContainer: {
         enumerable: true,
         get: () => this.$services && this.$services.featuresContainer,
