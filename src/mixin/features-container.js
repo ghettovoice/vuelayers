@@ -1,7 +1,7 @@
 import Collection from 'ol/Collection'
 import Feature from 'ol/Feature'
 import Vue from 'vue'
-import { getFeatureId, initializeFeature } from '../ol-ext'
+import { getFeatureId, initializeFeature, mergeFeatures } from '../ol-ext'
 import { instanceOf } from '../util/assert'
 import { forEach, isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
@@ -28,9 +28,12 @@ export default {
       }
       instanceOf(feature, Feature)
 
-      if (this.getFeatureById(getFeatureId(feature)) == null) {
+      const foundFeature = this.getFeatureById(getFeatureId(feature))
+      if (foundFeature == null) {
         initializeFeature(feature)
         this._featuresCollection.push(feature)
+      } else {
+        mergeFeatures(foundFeature, feature)
       }
     },
     /**
@@ -69,7 +72,7 @@ export default {
      * @return {module:ol/Feature~Feature[]}
      */
     getFeatures () {
-      return this._featuresCollection.toArray()
+      return this._featuresCollection.getArray()
     },
     /**
      * @return {module:ol/Collection~Collection<module:ol/Feature~Feature>>}

@@ -1,7 +1,6 @@
 const webpack = require('webpack')
-const WebpackNotifierPlugin = require('webpack-notifier')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
-const {VueLoaderPlugin} = require('vue-loader')
+const { VueLoaderPlugin } = require('vue-loader')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const utils = require('./utils')
@@ -119,10 +118,6 @@ module.exports = {
       raw: true,
       entryOnly: true,
     }),
-    new WebpackNotifierPlugin({
-      title: config.fullname,
-      alwaysNotify: false,
-    }),
   ],
   performance: {
     maxEntrypointSize: 1024 * 1024, // 1Mb
@@ -141,9 +136,7 @@ module.exports = {
     contentBase: config.outputPath,
     clientLogLevel: 'info',
     compress: true,
-    overlay: config.dev.errorOverlay
-      ? { warnings: false, errors: true }
-      : false,
+    overlay: { warnings: false, errors: true },
     headers: {
       'Access-Control-Allow-Origin': '*',
     },

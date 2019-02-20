@@ -41,9 +41,9 @@
           <vl-source-osm />
         </vl-layer-tile>
 
-        <vl-feature id="marker">
-          <vl-geom-point :coordinates="[0, 0]" />
-        </vl-feature>
+        <!--<vl-feature id="marker">-->
+          <!--<vl-geom-point :coordinates="[0, 0]" />-->
+        <!--</vl-feature>-->
 
         <vl-layer-vector id="features">
           <vl-source-vector :features.sync="features" />
@@ -66,7 +66,6 @@
   const features = [
     {
       type: 'Feature',
-      id: 'feature-1',
       properties: {},
       geometry: {
         type: 'Point',
@@ -103,6 +102,14 @@
         selectByHover: false,
       }
     },
+    mounted () {
+      // setInterval(() => {
+      //   this.features[0].geometry.coordinates = [
+      //     this.features[0].geometry.coordinates[0] + 0.1,
+      //     this.features[0].geometry.coordinates[1] + 0.1,
+      //   ];
+      // }, 100)
+    }
   }
 </script>
 

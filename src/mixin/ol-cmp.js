@@ -151,12 +151,12 @@ export default {
     subscribeAll () {
       hasOlObject(this)
 
-      this.subscribeTo(observableFromOlEvent(this.$olObject, 'change'), () => {
-        ++this.rev
-        if (process.env.NODE_ENV !== 'production') {
-          log('changed', this.name, this.rev)
+      this.subscribeTo(
+        observableFromOlEvent(this.$olObject, 'change'),
+        () => {
+          ++this.rev
         }
-      })
+      )
     },
   },
   created () {
@@ -259,16 +259,17 @@ function defineLifeCyclePromises () {
 }
 
 function defineDebouncedHelpers () {
+  const t = 1000 / 60
   // bind debounced functions at runtime
   // for each instance to avoid interfering between
   // different instances
   this.scheduleRefresh = debounce(function () {
     return this.refresh()
-  }, 10)
+  }, t)
   this.scheduleRemount = debounce(function () {
     return this.remount()
-  }, 10)
+  }, t)
   this.scheduleRecreate = debounce(function () {
     return this.recreate()
-  }, 10)
+  }, t)
 }

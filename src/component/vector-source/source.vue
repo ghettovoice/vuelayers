@@ -1,12 +1,11 @@
 <script>
+  import debounce from 'debounce-promise'
   import VectorSource from 'ol/source/Vector'
   import { fetch } from 'whatwg-fetch'
   import { vectorSource } from '../../mixin'
-  import { getFeatureId, createGeoJsonFmt, loadingAll, transform } from '../../ol-ext'
+  import { createGeoJsonFmt, loadingAll, transform } from '../../ol-ext'
   import { constant, difference, isEmpty, isFinite, isFunction, stubArray, isEqual } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
-
-  const diffById = (a, b) => a.id === b.id
 
   export default {
     name: 'vl-source-vector',
@@ -54,11 +53,6 @@
       overlaps: {
         type: Boolean,
         default: true,
-      },
-    },
-    computed: {
-      featureIds () {
-        return this.features.map(getFeatureId)
       },
     },
     methods: {
@@ -140,25 +134,27 @@
       },
     },
     watch: {
-      features (value, oldValue) {
-        if (!this.$source) return
+      features: {
+        deep: true,
+        handler: debounce(function (value, oldValue) {
+          if (!this.$source) return
 
-        let forAdd = difference(value, oldValue, diffById)
-        let forRemove = difference(oldValue, value, diffById)
+          this.addFeatures(value)
 
-        this.addFeatures(forAdd)
-        this.removeFeatures(forRemove)
+          const forRemove = difference(oldValue, value, (a, b) => a.id === b.id)
+          this.removeFeatures(forRemove)
+        }, 1000 / 60),
       },
       ...makeWatchers([
         'loaderFactory',
         'formatFactory',
         'strategyFactory',
         'overlaps',
-      ], () => function (value, prevValue) {
+      ], () => debounce(function (value, prevValue) {
         if (isEqual(value, prevValue)) return
 
-        this.scheduleRecreate()
-      }),
+        this.recreate()
+      }, 1000 / 60)),
     },
   }
 

@@ -41,3 +41,15 @@ export function initializeFeature (feature, defaultFeatureId) {
 
   return feature
 }
+
+export function mergeFeatures (destFeature, srcFeature) {
+  destFeature.setProperties({ ...srcFeature.getProperties() })
+  destFeature.setGeometry(srcFeature.getGeometry().clone())
+
+  const srcStyle = srcFeature.getStyle()
+  if (srcStyle) {
+    destFeature.setStyle(srcStyle.clone())
+  }
+
+  return destFeature
+}

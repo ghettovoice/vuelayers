@@ -1,4 +1,4 @@
-import { isArray, isEqual, isFunction, isString } from '../util/minilo'
+import { isArray, isEqual, isString } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
@@ -92,20 +92,14 @@ export default {
      * @return {Promise}
      */
     refresh () {
-      if (this.$source && !isFunction(this.$source.clear)) {
-        return this::cmp.methods.refresh()
-      }
+      if (!this.$source) return Promise.resolve()
 
       return new Promise(resolve => {
-        let done = () => {
-          ++this.rev
-          resolve()
-        }
         if (this.$source) {
-          this.$source.once('change', done)
-          this.$source.clear()
+          this.$source.once('change', () => resolve)
+          this.$source.refresh()
         } else {
-          done()
+          resolve()
         }
       })
     },
@@ -123,7 +117,7 @@ export default {
      * @protected
      */
     recreate () {
-      return this::cmp.methods.remount()
+      return this::cmp.methods.recreate()
     },
     /**
      * @protected

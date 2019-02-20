@@ -1,5 +1,6 @@
 import { merge as mergeObs } from 'rxjs/observable'
-import { debounceTime, tap } from 'rxjs/operators'
+import { tap, throttleTime } from 'rxjs/operators'
+import { getFeatureId } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
 import * as assert from '../util/assert'
 import { isEqual } from '../util/minilo'
@@ -18,10 +19,13 @@ export default {
     },
   },
   computed: {
+    featureIds () {
+      if (!this.rev) return []
+
+      return this.getFeatures().map(getFeatureId)
+    },
     featuresViewProj () {
-      if (!this.rev || !this.resolvedDataProjection || !this.$source) {
-        return []
-      }
+      if (!(this.rev && this.$source)) return []
 
       return this.getFeatures().map(::this.writeFeatureInViewProj)
     },
@@ -118,7 +122,7 @@ export default {
 
 function subscribeToEvents () {
   assert.hasSource(this)
-  // todo most likely it is no longer necessary cause this.$source will use this._featuresCollection
+
   const add = observableFromOlEvent(this.$source, 'addfeature').pipe(
     tap(({ feature }) => {
       this.addFeature(feature)
@@ -134,11 +138,10 @@ function subscribeToEvents () {
   const events = mergeObs(add, remove, changeFeature)
 
   this.subscribeTo(events, evt => {
-    ++this.rev
     this.$emit(evt.type, evt)
   })
   // emit event to allow `sync` modifier
-  this.subscribeTo(events.pipe(debounceTime(100)), () => {
+  this.subscribeTo(events.pipe(throttleTime(1000 / 60)), () => {
     this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInDataProj))
   })
 }

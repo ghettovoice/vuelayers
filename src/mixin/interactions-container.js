@@ -35,7 +35,7 @@ export default {
      * @return {module:ol/interaction/Interaction~Interaction[]}
      */
     getInteractions () {
-      return this._interactionsCollection.toArray()
+      return this._interactionsCollection.getArray()
     },
     /**
      * @return {module:ol/Collection~Collection<module:ol/interaction/Interaction~Interaction>>}
