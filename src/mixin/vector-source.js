@@ -1,6 +1,6 @@
+import debounce from 'debounce-promise'
 import { merge as mergeObs } from 'rxjs/observable'
-import { tap, throttleTime } from 'rxjs/operators'
-import { getFeatureId } from '../ol-ext'
+import { throttleTime } from 'rxjs/operators'
 import { observableFromOlEvent } from '../rx-ext'
 import * as assert from '../util/assert'
 import { isEqual } from '../util/minilo'
@@ -16,18 +16,6 @@ export default {
     useSpatialIndex: {
       type: Boolean,
       default: true,
-    },
-  },
-  computed: {
-    featureIds () {
-      if (!this.rev) return []
-
-      return this.getFeatures().map(getFeatureId)
-    },
-    featuresViewProj () {
-      if (!(this.rev && this.$source)) return []
-
-      return this.getFeatures().map(::this.writeFeatureInViewProj)
     },
   },
   methods: {
@@ -104,11 +92,11 @@ export default {
   watch: {
     ...makeWatchers([
       'useSpatialIndex',
-    ], () => function (value, prevValue) {
+    ], () => debounce(function (value, prevValue) {
       if (isEqual(value, prevValue)) return
 
-      this.scheduleRecreate()
-    }),
+      return this.recreate()
+    }, 1000 / 60)),
   },
   stubVNode: {
     empty: false,
@@ -123,25 +111,18 @@ export default {
 function subscribeToEvents () {
   assert.hasSource(this)
 
-  const add = observableFromOlEvent(this.$source, 'addfeature').pipe(
-    tap(({ feature }) => {
-      this.addFeature(feature)
-    }),
-  )
-  const remove = observableFromOlEvent(this.$source, 'removefeature').pipe(
-    tap(({ feature }) => {
-      this.removeFeature(feature)
-    }),
-  )
-  const changeFeature = observableFromOlEvent(this.$source, 'changefeature')
-
-  const events = mergeObs(add, remove, changeFeature)
+  const add = observableFromOlEvent(this.$source, 'addfeature')
+  const remove = observableFromOlEvent(this.$source, 'removefeature')
+  const events = mergeObs(add, remove)
 
   this.subscribeTo(events, evt => {
     this.$emit(evt.type, evt)
   })
   // emit event to allow `sync` modifier
-  this.subscribeTo(events.pipe(throttleTime(1000 / 60)), () => {
-    this.$emit('update:features', this.getFeatures().map(::this.writeFeatureInDataProj))
-  })
+  this.subscribeTo(
+    events.pipe(throttleTime(1000 / 60)),
+    () => {
+      this.$emit('update:features', this.featuresDataProj)
+    }
+  )
 }

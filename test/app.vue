@@ -11,7 +11,7 @@
         </div>
       </div>
 
-      <vl-map ref="map" v-if="showMap" data-projection="EPSG:4326" renderer="webgl">
+      <vl-map ref="map" v-if="showMap" data-projection="EPSG:4326">
         <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom" ident="view" ref="view" />
 
         <!--<vl-graticule :show-labels="true" v-if="graticule">-->
@@ -24,21 +24,21 @@
           <!--</vl-style-text>-->
         <!--</vl-graticule>-->
 
-        <!--<vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">-->
-          <!--<template slot-scope="select">-->
-            <!--<vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"-->
-                        <!--:position="pointOnSurface(feature.geometry)" :auto-pan="true"-->
-                        <!--:auto-pan-animation="{ duration: 300 }"-->
-                        <!--positioning="bottom-right">-->
-              <!--<div style="background: #fff; padding: 10px; width: 200px">-->
-                <!--{{ feature }}-->
-              <!--</div>-->
-            <!--</vl-overlay>-->
-          <!--</template>-->
-        <!--</vl-interaction-select>-->
+        <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">
+          <template slot-scope="select">
+            <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
+                        :position="pointOnSurface(feature.geometry)" :auto-pan="true"
+                        :auto-pan-animation="{ duration: 300 }"
+                        positioning="bottom-right">
+              <div style="background: #fff; padding: 10px; width: 200px">
+                {{ feature }}
+              </div>
+            </vl-overlay>
+          </template>
+        </vl-interaction-select>
 
         <vl-layer-tile>
-          <vl-source-osm />
+          <vl-source-sputnik />
         </vl-layer-tile>
 
         <!--<vl-feature id="marker">-->
@@ -103,12 +103,12 @@
       }
     },
     mounted () {
-      // setInterval(() => {
-      //   this.features[0].geometry.coordinates = [
-      //     this.features[0].geometry.coordinates[0] + 0.1,
-      //     this.features[0].geometry.coordinates[1] + 0.1,
-      //   ];
-      // }, 100)
+      setInterval(() => {
+        this.features[0].geometry.coordinates = [
+          this.features[0].geometry.coordinates[0] + 0.1,
+          this.features[0].geometry.coordinates[1] + 0.1,
+        ];
+      }, 3000)
     }
   }
 </script>

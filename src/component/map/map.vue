@@ -10,14 +10,13 @@
   import VectorLayer from 'ol/layer/Vector'
   import Collection from 'ol/Collection'
   import Map from 'ol/Map'
-  import WebGLMap from 'ol/WebGLMap'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
   import { olCmp, overlaysContainer, layersContainer, interactionsContainer, featuresContainer, projTransforms } from '../../mixin'
-  import { RENDERER_TYPE, setMapDataProjection } from '../../ol-ext'
+  import { initializeInteraction, setMapDataProjection } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasMap, hasView } from '../../util/assert'
   import { isEqual } from '../../util/minilo'
@@ -98,19 +97,6 @@
         default: 16,
       },
       /**
-       * Renderer. By default, **Canvas** and **WebGL** renderers are tested for support in that order,
-       * and the first supported used. **Note** that the **Canvas** renderer fully supports vector data,
-       * but **WebGL** can only render **Point** geometries.
-       * @type {string|string[]}
-       * @default ['canvas', 'webgl']
-       * @todo remove in the next version
-       */
-      renderer: {
-        type: String,
-        default: RENDERER_TYPE.CANVAS,
-        validator: value => Object.values(RENDERER_TYPE).includes(value),
-      },
-      /**
        * Root element `tabindex` attribute value. Value should be provided to allow keyboard events on map.
        * @type {number|string}
        */
@@ -128,25 +114,13 @@
         default: true,
       },
     },
-    computed: {
-      mapCtor () {
-        switch (this.renderer) {
-          case RENDERER_TYPE.WEBGL:
-            return WebGLMap
-          case RENDERER_TYPE.CANVAS:
-          default:
-            return Map
-        }
-      },
-    },
     methods: {
       /**
        * @return {module:ol/PluggableMap~PluggableMap}
        * @protected
        */
       createOlObject () {
-        /* eslint-disable-next-line new-cap */
-        const map = new this.mapCtor({
+        const map = new Map({
           loadTilesWhileAnimating: this.loadTilesWhileAnimating,
           loadTilesWhileInteracting: this.loadTilesWhileInteracting,
           pixelRatio: this.pixelRatio,
@@ -355,10 +329,15 @@
     },
     created () {
       this._view = new View()
+      // todo make controls handling like with interactions
       this._controlsCollection = this.controls !== false
         ? createDefaultControls(typeof this.controls === 'object' ? this.controls : undefined)
         : new Collection()
-      this._interactionsCollection = createDefaultInteractions()
+      // initialize default set of interactions
+      // todo initialize without interactions and provide vl-interaction-default component
+      const interactions = createDefaultInteractions()
+      interactions.forEach(interaction => initializeInteraction(interaction))
+      this._interactionsCollection = interactions
       // prepare default overlay
       this._featuresOverlay = new VectorLayer({
         source: new VectorSource({
@@ -435,6 +414,8 @@
 
     const events = mergeObs(pointerEvents, otherEvents)
 
-    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
+    this.subscribeTo(events, evt => {
+      this.$emit(evt.type, evt)
+    })
   }
 </script>

@@ -274,6 +274,7 @@ function subscribeToGeomChanges () {
   )
 
   this.subscribeTo(changes, ({ prop, value }) => {
+    ++this.rev
     this.$emit(`update:${prop}`, value)
   })
 }

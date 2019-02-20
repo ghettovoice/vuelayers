@@ -1,13 +1,34 @@
 import Collection from 'ol/Collection'
 import Feature from 'ol/Feature'
 import Vue from 'vue'
-import { getFeatureId, initializeFeature, mergeFeatures } from '../ol-ext'
+import { merge as mergeObs } from 'rxjs/observable'
+import { tap } from 'rxjs/operators'
+import { getFeatureId, getObjectUid, initializeFeature, mergeFeatures } from '../ol-ext'
 import { instanceOf } from '../util/assert'
 import { forEach, isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
+import rxSubs from './rx-subs'
+import { observableFromOlEvent } from '../rx-ext'
 
 export default {
-  mixins: [projTransforms],
+  mixins: [rxSubs, projTransforms],
+  computed: {
+    featureIds () {
+      if (!this.rev) return []
+
+      return this.getFeatures().map(getFeatureId)
+    },
+    featuresViewProj () {
+      if (!this.rev) return []
+
+      return this.getFeatures().map(::this.writeFeatureInViewProj)
+    },
+    featuresDataProj () {
+      if (!this.rev) return []
+
+      return this.getFeatures().map(::this.writeFeatureInDataProj)
+    },
+  },
   methods: {
     /**
      * @param {Array<(module:ol/Feature~Feature|Vue|Object)>} features
@@ -98,6 +119,37 @@ export default {
      * @private
      */
     this._featuresCollection = new Collection()
-    // todo subscribe to collection
+    this._featureSubs = {}
+
+    const add = observableFromOlEvent(this._featuresCollection, 'add')
+      .pipe(
+        tap(({ element }) => {
+          const elementUid = getObjectUid(element)
+          const propChanges = observableFromOlEvent(element, 'propertychange')
+          const otherChanges = observableFromOlEvent(element, 'change')
+          const featureChanges = mergeObs(propChanges, otherChanges)
+
+          this._featureSubs[elementUid] = this.subscribeTo(featureChanges, () => {
+            ++this.rev
+          })
+        })
+      )
+    const remove = observableFromOlEvent(this._featuresCollection, 'remove')
+      .pipe(
+        tap(({ element }) => {
+          const elementUid = getObjectUid(element)
+          if (!this._featureSubs[elementUid]) {
+            return
+          }
+
+          this.unsubscribe(this._featureSubs[elementUid])
+          delete this._featureSubs[elementUid]
+        })
+      )
+    const events = mergeObs(add, remove)
+
+    this.subscribeTo(events, () => {
+      ++this.rev
+    })
   },
 }

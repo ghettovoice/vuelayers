@@ -40,6 +40,13 @@ export default {
 
       return subs
     },
+    unsubscribe (subs) {
+      const idx = this._rxSubs.indexOf(subs)
+      if (idx === -1) return
+
+      subs.unsubscribe()
+      this._rxSubs.splice(idx, 1)
+    },
   },
   beforeCreate () {
     /**

@@ -1,4 +1,9 @@
+import { getUid } from 'ol'
 import { isFunction, reduce } from '../util/minilo'
+
+export function getObjectUid (object) {
+  return getUid(object)
+}
 
 /**
  * heuristic check that value is ol collection

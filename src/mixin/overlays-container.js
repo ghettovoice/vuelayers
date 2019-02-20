@@ -5,6 +5,13 @@ import { getOverlayId, initializeOverlay } from '../ol-ext'
 import { instanceOf } from '../util/assert'
 
 export default {
+  computed: {
+    overlayIds () {
+      if (!this.rev) return []
+
+      return this.getOverlays().map(getOverlayId)
+    },
+  },
   methods: {
     /**
      * @param {module:ol/Overlay~Overlay|Vue} overlay

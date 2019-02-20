@@ -1,4 +1,5 @@
 <script>
+  import debounce from 'debounce-promise'
   import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
   import ModifyInteraction from 'ol/interaction/Modify'
   import interaction from '../../mixin/interaction'
@@ -157,13 +158,18 @@
      * @protected
      */
     subscribeAll () {
+      this::interaction.methods.subscribeAll()
       this::subscribeToInteractionChanges()
     },
   }
 
-  const watch = makeWatchers(['source'], () => function () {
-    this.scheduleRecreate()
-  })
+  const watch = {
+    ...makeWatchers([
+      'source',
+    ], () => debounce(function () {
+      return this.recreate()
+    }, 1000 / 60)),
+  }
 
   /**
    * @vueProto

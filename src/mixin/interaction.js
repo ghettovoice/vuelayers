@@ -100,6 +100,24 @@ export default {
     refresh () {
       return this::cmp.methods.refresh()
     },
+    /**
+     * @return {Promise}
+     */
+    recreate () {
+      return this::cmp.methods.recreate()
+    },
+    /**
+     * @return {Promise}
+     */
+    remount () {
+      return this::cmp.methods.remount()
+    },
+    /**
+     * @protected
+     */
+    subscribeAll () {
+
+    },
   },
   watch: {
     id (value) {

@@ -36,13 +36,13 @@ export function getInteractionPriority (interaction) {
   throw new Error('Illegal interaction argument')
 }
 
-export function setInteractionPriority (interaction, interactionId) {
+export function setInteractionPriority (interaction, priority) {
   if (interaction instanceof Vue) {
-    interaction.id = interactionId
+    interaction.id = priority
 
     return interaction
   } else if (interaction instanceof Interaction) {
-    interaction.set('id', interactionId)
+    interaction.set('priority', priority)
 
     return interaction
   }

@@ -1,4 +1,5 @@
 <script>
+  import debounce from 'debounce-promise'
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import DrawInteraction from 'ol/interaction/Draw'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -228,13 +229,19 @@
      * @protected
      */
     subscribeAll () {
+      this::interaction.methods.subscribeAll()
       this::subscribeToInteractionChanges()
     },
   }
   // todo other props?
-  const watch = makeWatchers(['source', 'type'], () => function () {
-    this.scheduleRecreate()
-  })
+  const watch = {
+    ...makeWatchers([
+      'source',
+      'type',
+    ], () => debounce(function () {
+      return this.recreate()
+    }, 1000 / 60)),
+  }
 
   /**
    * @alias module:draw-interaction/interaction

@@ -1,8 +1,6 @@
 import debounce from 'debounce-promise'
 import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, skipUntil, skipWhile } from 'rxjs/operators'
-import { observableFromOlEvent } from '../rx-ext'
-import { hasOlObject } from '../util/assert'
 import { log } from '../util/log'
 import { identity, isFunction } from '../util/minilo'
 import identMap from './ident-map'
@@ -148,16 +146,7 @@ export default {
       await this.init()
       await this.mount()
     },
-    subscribeAll () {
-      hasOlObject(this)
-
-      this.subscribeTo(
-        observableFromOlEvent(this.$olObject, 'change'),
-        () => {
-          ++this.rev
-        }
-      )
-    },
+    subscribeAll () {},
   },
   created () {
     /**

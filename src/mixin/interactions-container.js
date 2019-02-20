@@ -5,6 +5,13 @@ import { getInteractionId, initializeInteraction } from '../ol-ext'
 import { instanceOf } from '../util/assert'
 
 export default {
+  computed: {
+    interactionIds () {
+      if (!this.rev) return []
+
+      return this.getInteractions().map(getInteractionId)
+    },
+  },
   methods: {
     /**
      * @param {module:ol/interaction/Interaction~Interaction|Vue} interaction

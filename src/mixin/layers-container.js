@@ -5,6 +5,13 @@ import { getLayerId, initializeLayer } from '../ol-ext'
 import { instanceOf } from '../util/assert'
 
 export default {
+  computed: {
+    layerIds () {
+      if (!this.rev) return []
+
+      return this.getLayers().map(getLayerId)
+    },
+  },
   methods: {
     /**
      * @param {module:ol/layer/BaseLayer~BaseLayer|Vue} layer

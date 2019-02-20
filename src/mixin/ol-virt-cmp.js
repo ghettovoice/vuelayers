@@ -72,7 +72,7 @@ export default {
      * @protected
      */
     recreate () {
-      return this::cmp.methods.remount()
+      return this::cmp.methods.recreate()
     },
     /**
      * @protected
