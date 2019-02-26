@@ -2,8 +2,8 @@
   import WMTSSource from 'ol/source/WMTS'
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
   import tileSource from '../../mixin/tile-source'
-  import { WMTS_FORMAT, WMTS_REQUEST_ENCODING, WMTS_VERSION } from '../../ol-ext/consts'
-  import { createExtentFromProjection } from '../../ol-ext/extent'
+  import { EXTENT_CORNER, WMTS_FORMAT, WMTS_REQUEST_ENCODING, WMTS_VERSION } from '../../ol-ext/consts'
+  import { createExtentFromProjection, getExtentCorner } from '../../ol-ext/extent'
   import { resolutionsFromExtent } from '../../ol-ext/tile-grid'
   import { hasView } from '../../util/assert'
   import { range } from '../../util/minilo'
@@ -38,6 +38,12 @@
       type: String,
       required: true,
     },
+    origin: {
+      type: Array,
+    },
+    resolutions: {
+      type: Array,
+    },
   }
 
   const methods = {
@@ -55,9 +61,11 @@
         layer: this.layerName,
         logo: this.logo,
         matrixSet: this.matrixSet,
+        origin: this.origin,
         projection: this.projection,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         requestEncoding: this.requestEncoding,
+        resolutions: this.resolutions,
         tileGrid: this._tileGrid,
         tilePixelRatio: this.tilePixelRatio,
         style: this.styleName,
@@ -75,16 +83,14 @@
     createTileGrid () {
       hasView(this)
 
-      const extent = createExtentFromProjection(this.$view.getProjection())
-      const resolutions = resolutionsFromExtent(
-        extent,
-        this.maxZoom,
-        this.tileSize,
-      )
+      var extent = createExtentFromProjection(this.$view.getProjection())
+      var resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
+      var origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
 
       return new WMTSTileGrid({
-        extent,
-        resolutions,
+        extent: extent,
+        origin: origin,
+        resolutions: resolutions,
         tileSize: this.tileSize,
         minZoom: this.minZoom,
         matrixIds: Array.from(range(this.minZoom, resolutions.length)),
