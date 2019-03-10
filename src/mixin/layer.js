@@ -3,6 +3,7 @@ import Vue from 'vue'
 import { hasLayer, hasMap } from '../util/assert'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
+import { observableFromOlEvent } from '../rx-ext'
 import cmp from './ol-virt-cmp'
 import sourceContainer from './source-container'
 import useMapCmp from './use-map-cmp'
@@ -148,6 +149,9 @@ const methods = {
     map = map instanceof Vue ? map.$map : map
     this.$layer.setMap(map)
   },
+  subscribeAll () {
+    this::subscribeToLayerEvents()
+  },
 }
 
 const watch = {
@@ -224,4 +228,17 @@ export default {
       },
     })
   },
+}
+
+function subscribeToLayerEvents () {
+  hasLayer(this)
+
+  const events = observableFromOlEvent(this.$layer, [
+    'postcompose',
+    'precompose',
+    'render',
+    'rendercomplete',
+  ])
+
+  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }
