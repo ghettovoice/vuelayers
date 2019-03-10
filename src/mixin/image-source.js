@@ -1,4 +1,6 @@
+import { observableFromOlEvent } from '../rx-ext'
 import { EPSG_3857 } from '../ol-ext/consts'
+import { hasSource } from '../util/assert'
 import source from './source'
 
 /**
@@ -44,6 +46,9 @@ const methods = {
   unmount () {
     this::source.methods.unmount()
   },
+  subscribeAll () {
+    this::subscribeToSourceEvents()
+  },
 }
 
 /**
@@ -54,4 +59,16 @@ export default {
   mixins: [source],
   props,
   methods,
+}
+
+function subscribeToSourceEvents () {
+  hasSource(this)
+
+  const events = observableFromOlEvent(this.$source, [
+    'imageloadend',
+    'imageloaderror',
+    'imageloadstart',
+  ])
+
+  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }
