@@ -63,6 +63,9 @@
       <w>hoverable</w>
       <w>ident</w>
       <w>ifdef</w>
+      <w>imageloadend</w>
+      <w>imageloaderror</w>
+      <w>imageloadstart</w>
       <w>importee</w>
       <w>jsnext</w>
       <w>layerdefs</w>
@@ -131,6 +134,9 @@
       <w>subitem</w>
       <w>tabindex</w>
       <w>tilegrid</w>
+      <w>tileloadend</w>
+      <w>tileloaderror</w>
+      <w>tileloadstart</w>
       <w>tmpl</w>
       <w>topo</w>
       <w>topp</w>

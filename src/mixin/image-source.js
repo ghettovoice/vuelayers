@@ -1,4 +1,6 @@
+import { observableFromOlEvent } from '../rx-ext'
 import { EPSG_3857 } from '../ol-ext/consts'
+import { hasSource } from '../util/assert'
 import { isEqual } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
@@ -41,6 +43,9 @@ export default {
     unmount () {
       this::source.methods.unmount()
     },
+    subscribeAll () {
+      this::subscribeToSourceEvents()
+    },
   },
   watch: {
     ...makeWatchers([
@@ -51,4 +56,16 @@ export default {
       this.scheduleRecreate()
     }),
   },
+}
+
+function subscribeToSourceEvents () {
+  hasSource(this)
+
+  const events = observableFromOlEvent(this.$source, [
+    'imageloadend',
+    'imageloaderror',
+    'imageloadstart',
+  ])
+
+  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

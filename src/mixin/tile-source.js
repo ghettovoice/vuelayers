@@ -1,4 +1,5 @@
 import { createTileUrlFunction } from 'ol-tilecache'
+import { observableFromOlEvent } from '../rx-ext'
 import {
   CACHE_SIZE,
   EPSG_3857,
@@ -10,6 +11,7 @@ import {
 } from '../ol-ext/consts'
 import { createExtentFromProjection } from '../ol-ext/extent'
 import { createXyzGrid } from '../ol-ext/tile-grid'
+import { hasSource, hasView } from '../util/assert'
 import { isEqual, isFunction, isString, pick, replaceTokens } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
@@ -146,6 +148,9 @@ export default {
     unmount () {
       this::source.methods.mount()
     },
+    subscribeAll () {
+      this::subscribeToSourceEvents()
+    },
   },
   watch: {
     opaque (value) {
@@ -203,4 +208,16 @@ export default {
       this.scheduleRefresh()
     }),
   },
+}
+
+function subscribeToSourceEvents () {
+  hasSource(this)
+
+  const events = observableFromOlEvent(this.$source, [
+    'tileloadstart',
+    'tileloadend',
+    'tileloaderror',
+  ])
+
+  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

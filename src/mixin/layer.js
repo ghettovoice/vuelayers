@@ -4,6 +4,7 @@ import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
 import { hasLayer, hasMap } from '../util/assert'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
+import { observableFromOlEvent } from '../rx-ext'
 import { makeWatchers } from '../util/vue-helpers'
 import cmp from './ol-virt-cmp'
 import sourceContainer from './source-container'
@@ -164,6 +165,7 @@ export default {
      */
     subscribeAll () {
       this::cmp.methods.subscribeAll()
+      this::subscribeToLayerEvents()
     },
     /**
      * @param {module:ol/Map~Map|Vue|undefined} map
@@ -266,4 +268,17 @@ function defineServices () {
       get: () => this.$services && this.$services.layersContainer,
     },
   })
+}
+
+function subscribeToLayerEvents () {
+  hasLayer(this)
+
+  const events = observableFromOlEvent(this.$layer, [
+    'postcompose',
+    'precompose',
+    'render',
+    'rendercomplete',
+  ])
+
+  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

@@ -30,7 +30,7 @@ and with [`vl-source-sputnik`](/docs/component/sputnik-source.md).
     
     <vl-layer-tile id="wmts">
       <vl-source-wmts :attributions="attribution" :url="url" :layer-name="layerName" :matrix-set="matrixSet" :format="format" 
-                      :style-name="styleName"></vl-source-image-static>
+                      :style-name="styleName"></vl-source-wmts>
     </vl-layer-tile>
   </vl-map>
 </template>

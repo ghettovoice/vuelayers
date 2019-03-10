@@ -25,11 +25,11 @@ It can display maps with tiled, raster or vector layers loaded from different so
 
 **NOTE**: you are reading README for the next version **v0.12.x**.  
 
-| Vuelayers           | Branch                                                                       | Vue     | OpenLayers |
-| :------------------ | :--------------------------------------------------------------------------- | :------ | :--------- |
-| Current **0.11.x**  | [stable-0.11.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.11.x) | **2.3** | **5.x**    |
-| Next **0.12.x**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)               | **2.3** | **5.x**    |
-| Previous **0.10.x** | [stable-0.10.x](https://github.com/ghettovoice/vuelayers/tree/stable-0.10.x) | **2.3** | **4.x**    |
+| Vuelayers           | Branch                                                           | Vue     | OpenLayers |
+| :------------------ | :--------------------------------------------------------------- | :------ | :--------- |
+| Current **0.11.x**  | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **2.3** | **5.x**    |
+| Next **0.12.x**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)   | **2.3** | **5.x**    |
+| Previous **0.10.x** | [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/v0.10.x) | **2.3** | **4.x**    |
 
 ## Links
 

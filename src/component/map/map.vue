@@ -407,6 +407,7 @@
       'movestart',
       'moveend',
       'postrender',
+      'rendercomplete',
       'precompose',
       'postcompose',
       'rendercomplete',
