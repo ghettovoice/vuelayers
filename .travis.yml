@@ -5,13 +5,6 @@ addons:
       - google-chrome
     packages:
       - google-chrome-stable
-branches:
-  only:
-    - master
-    - develop
-    - /stable/
-    - /feature/
-    - /issue/
 language: java
 jdk:
   - oraclejdk8
