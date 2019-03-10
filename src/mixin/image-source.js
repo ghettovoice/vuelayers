@@ -44,6 +44,7 @@ export default {
       this::source.methods.unmount()
     },
     subscribeAll () {
+      this::source.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
   },

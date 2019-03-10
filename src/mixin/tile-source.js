@@ -11,7 +11,7 @@ import {
 } from '../ol-ext/consts'
 import { createExtentFromProjection } from '../ol-ext/extent'
 import { createXyzGrid } from '../ol-ext/tile-grid'
-import { hasSource, hasView } from '../util/assert'
+import { hasSource } from '../util/assert'
 import { isEqual, isFunction, isString, pick, replaceTokens } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
@@ -149,6 +149,7 @@ export default {
       this::source.methods.mount()
     },
     subscribeAll () {
+      this::source.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
   },
