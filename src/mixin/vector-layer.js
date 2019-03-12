@@ -78,6 +78,9 @@ const methods = {
   unmount () {
     this::layer.methods.unmount()
   },
+  subscribeAll () {
+    this::layer.methods.subscribeAll()
+  },
 }
 
 export default {
