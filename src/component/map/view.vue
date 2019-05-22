@@ -308,9 +308,7 @@
         'projection',
         'resolutions',
         'zoomFactor',
-      ], () => function (value, prevValue) {
-        if (isEqual(value, prevValue)) return
-
+      ], () => function () {
         this.scheduleRecreate()
       }),
     },

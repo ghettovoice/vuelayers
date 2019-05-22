@@ -61,6 +61,7 @@
 
 <script>
   import * as eventCondition from 'ol/events/condition'
+  import faker from 'faker'
   import { findPointOnSurface } from '../src/ol-ext'
 
   const features = [
@@ -104,10 +105,10 @@
     },
     mounted () {
       setInterval(() => {
-        this.features[0].geometry.coordinates = [
-          this.features[0].geometry.coordinates[0] + 0.1,
-          this.features[0].geometry.coordinates[1] + 0.1,
-        ];
+        let lon = faker.random.number({ min: -30, max: 30 })
+        let lat = faker.random.number({ min: -30, max: 30 })
+
+        this.features[0].geometry.coordinates = [lon, lat]
       }, 3000)
     }
   }

@@ -11,7 +11,7 @@ const geoJsonFmt = createGeoJsonFmt()
  * @return {Object}
  */
 export function writeGeoJsonFeature (feature, featureProjection, dataProjection) {
-  const geoJsonFeature = geoJsonFmt.writeFeatureObject(feature, { featureProjection, dataProjection: dataProjection })
+  const geoJsonFeature = geoJsonFmt.writeFeatureObject(feature, { featureProjection, dataProjection })
 
   if (Array.isArray(get(geoJsonFeature, 'properties.features'))) {
     geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(feature => {
@@ -32,7 +32,7 @@ export function writeGeoJsonFeature (feature, featureProjection, dataProjection)
  * @return {Feature}
  */
 export function readGeoJsonFeature (geoJsonFeature, featureProjection, dataProjection) {
-  let feature = geoJsonFmt.readFeature(geoJsonFeature, { featureProjection, dataProjection: dataProjection })
+  let feature = geoJsonFmt.readFeature(geoJsonFeature, { featureProjection, dataProjection })
 
   if (Array.isArray(feature.get('features'))) {
     feature.set('features', feature.get('features').map(feature => {

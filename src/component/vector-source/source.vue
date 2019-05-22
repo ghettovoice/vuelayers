@@ -1,10 +1,9 @@
 <script>
-  import debounce from 'debounce-promise'
   import VectorSource from 'ol/source/Vector'
   import { fetch } from 'whatwg-fetch'
   import { vectorSource } from '../../mixin'
   import { createGeoJsonFmt, getFeatureId, loadingAll, transform } from '../../ol-ext'
-  import { constant, difference, isEmpty, isFinite, isFunction, stubArray, isEqual } from '../../util/minilo'
+  import { constant, difference, isEmpty, isFinite, isFunction, stubArray } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
@@ -108,7 +107,7 @@
           )
 
           if (Array.isArray(features)) {
-            this.$source.addFeatures(features)
+            this.addFeatures(features)
           }
         }
       },
@@ -132,25 +131,23 @@
     watch: {
       features: {
         deep: true,
-        handler: debounce(function (value, oldValue) {
+        handler (value) {
           if (!this.$source) return
 
           this.addFeatures(value)
 
-          const forRemove = difference(oldValue, value, (a, b) => getFeatureId(a) === getFeatureId(b))
+          const forRemove = difference(this.featuresViewProj, value, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forRemove)
-        }, 1000 / 60),
+        },
       },
       ...makeWatchers([
         'loaderFactory',
         'formatFactory',
         'strategyFactory',
         'overlaps',
-      ], () => debounce(function (value, prevValue) {
-        if (isEqual(value, prevValue)) return
-
-        return this.recreate()
-      }, 1000 / 60)),
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
     },
   }
 

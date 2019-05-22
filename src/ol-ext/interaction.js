@@ -2,6 +2,10 @@ import Interaction from 'ol/interaction/Interaction'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 
+/**
+ * @param {Interaction|Vue} interaction
+ * @returns {string|null}
+ */
 export function getInteractionId (interaction) {
   if (interaction instanceof Vue) {
     return interaction.id
@@ -12,6 +16,11 @@ export function getInteractionId (interaction) {
   throw new Error('Illegal interaction argument')
 }
 
+/**
+ * @param {Interaction|Vue} interaction
+ * @param {string} interactionId
+ * @returns {Vue|Interaction}
+ */
 export function setInteractionId (interaction, interactionId) {
   if (interaction instanceof Vue) {
     interaction.id = interactionId

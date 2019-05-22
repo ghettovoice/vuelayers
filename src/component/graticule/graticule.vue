@@ -13,7 +13,7 @@
   import { observableFromOlEvent } from '../../rx-ext'
   import { olCmp, useMapCmp, projTransforms } from '../../mixin'
   import { hasGraticule, hasMap } from '../../util/assert'
-  import { firstEl, isEqual, map } from '../../util/minilo'
+  import { firstEl, map } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -183,9 +183,7 @@
         'lonLabelPosition',
         'latLabelPosition',
         'intervals',
-      ], () => function (value, prevValue) {
-        if (isEqual(value, prevValue)) return
-
+      ], () => function () {
         this.scheduleRefresh()
       }),
     },

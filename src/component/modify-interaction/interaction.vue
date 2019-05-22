@@ -1,5 +1,4 @@
 <script>
-  import debounce from 'debounce-promise'
   import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
   import ModifyInteraction from 'ol/interaction/Modify'
   import interaction from '../../mixin/interaction'
@@ -166,9 +165,9 @@
   const watch = {
     ...makeWatchers([
       'source',
-    ], () => debounce(function () {
-      return this.recreate()
-    }, 1000 / 60)),
+    ], () => function () {
+      this.scheduleRecreate()
+    }),
   }
 
   /**

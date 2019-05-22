@@ -1,5 +1,4 @@
 <script>
-  import debounce from 'debounce-promise'
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import DrawInteraction from 'ol/interaction/Draw'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -238,9 +237,9 @@
     ...makeWatchers([
       'source',
       'type',
-    ], () => debounce(function () {
-      return this.recreate()
-    }, 1000 / 60)),
+    ], () => function () {
+      this.scheduleRecreate()
+    }),
   }
 
   /**

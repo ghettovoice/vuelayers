@@ -1,4 +1,3 @@
-export * from './collection'
 export * from './consts'
 export * from './extent'
 export * from './feature'

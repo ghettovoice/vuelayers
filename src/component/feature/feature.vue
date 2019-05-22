@@ -9,7 +9,7 @@
   import uuid from 'uuid/v4'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { distinctUntilChanged, map as mapObs, mergeAll, throttleTime } from 'rxjs/operators'
+  import { distinctUntilChanged, map as mapObs, mergeAll } from 'rxjs/operators'
   import { geometryContainer, olCmp, projTransforms, stylesContainer, useMapCmp } from '../../mixin'
   import { findPointOnSurface, initializeFeature } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
@@ -174,7 +174,7 @@
       properties (value) {
         value = plainProps(value)
         if (this.$feature && !isEqual(value, plainProps(this.$feature.getProperties()))) {
-          this.$feature.setProperties(plainProps(value))
+          this.$feature.setProperties(value)
         }
       },
     },
@@ -216,15 +216,11 @@
     hasFeature(this)
 
     const getPropValue = prop => this.$feature.get(prop)
-    const ft = 100
-    // all plain properties
+    // all plain properties + geometry
     const propChanges = observableFromOlEvent(
       this.$feature,
       'propertychange',
       ({ key }) => ({ prop: key, value: getPropValue(key) }),
-    ).pipe(
-      throttleTime(ft),
-      distinctUntilChanged(isEqual),
     )
     // id, style and other generic changes
     const changes = observableFromOlEvent(
@@ -238,11 +234,11 @@
         // todo style?
       })),
       mergeAll(),
-      throttleTime(ft),
-      distinctUntilChanged(isEqual),
     )
     // all changes
-    const allChanges = mergeObs(propChanges, changes)
+    const allChanges = mergeObs(propChanges, changes).pipe(
+      distinctUntilChanged(isEqual),
+    )
 
     this.subscribeTo(allChanges, ({ prop, value }) => {
       ++this.rev
@@ -250,7 +246,7 @@
       if (prop === 'id') {
         this.$emit(`update:${prop}`, value)
       } else if (prop !== this.$feature.getGeometryName()) {
-        this.$emit('update:properties', Object.assign({}, this.properties, { [prop]: value }))
+        this.$emit('update:properties', { ...this.properties, [prop]: value })
       }
     })
   }

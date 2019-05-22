@@ -1,10 +1,14 @@
 import Collection from 'ol/Collection'
 import BaseLayer from 'ol/layer/Base'
 import Vue from 'vue'
+import { merge as mergeObs } from 'rxjs/observable'
 import { getLayerId, initializeLayer } from '../ol-ext'
+import { observableFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
+import rxSubs from './rx-subs'
 
 export default {
+  mixins: [rxSubs],
   computed: {
     layerIds () {
       if (!this.rev) return []
@@ -14,7 +18,7 @@ export default {
   },
   methods: {
     /**
-     * @param {module:ol/layer/BaseLayer~BaseLayer|Vue} layer
+     * @param {BaseLayer|Vue} layer
      * @return {void}
      */
     addLayer (layer) {
@@ -27,7 +31,7 @@ export default {
       }
     },
     /**
-     * @param {module:ol/layer/BaseLayer~BaseLayer|Vue} layer
+     * @param {BaseLayer|Vue} layer
      * @return {void}
      */
     removeLayer (layer) {
@@ -37,20 +41,20 @@ export default {
       this._layersCollection.remove(layer)
     },
     /**
-     * @return {module:ol/layer/BaseLayer~BaseLayer[]}
+     * @return {BaseLayer[]}
      */
     getLayers () {
       return this._layersCollection.getArray()
     },
     /**
-     * @return {module:ol/Collection~Collection<module:ol/layer/BaseLayer~BaseLayer>}
+     * @return {module:ol/Collection~Collection<BaseLayer>}
      */
     getLayersCollection () {
       return this._layersCollection
     },
     /**
      * @param {string|number} layerId
-     * @return {module:ol/layer/BaseLayer~BaseLayer|undefined}
+     * @return {BaseLayer|undefined}
      */
     getLayerById (layerId) {
       return this._layersCollection.getArray().find(layer => {
@@ -77,9 +81,17 @@ export default {
   },
   created () {
     /**
-     * @type {module:ol/Collection~Collection<module:ol/layer/BaseLayer>}
+     * @type {Collection<BaseLayer>}
      * @private
      */
     this._layersCollection = new Collection()
+
+    const add = observableFromOlEvent(this._layersCollection, 'add')
+    const remove = observableFromOlEvent(this._layersCollection, 'remove')
+    const events = mergeObs(add, remove)
+
+    this.subscribeTo(events, () => {
+      ++this.rev
+    })
   },
 }

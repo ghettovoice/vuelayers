@@ -1,10 +1,14 @@
 import Collection from 'ol/Collection'
 import Interaction from 'ol/interaction/Interaction'
 import Vue from 'vue'
-import { getInteractionId, initializeInteraction } from '../ol-ext'
+import { merge as mergeObs } from 'rxjs/observable'
+import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
 import { instanceOf } from '../util/assert'
+import rxSubs from './rx-subs'
+import { observableFromOlEvent } from '../rx-ext'
 
 export default {
+  mixins: [rxSubs],
   computed: {
     interactionIds () {
       if (!this.rev) return []
@@ -14,7 +18,7 @@ export default {
   },
   methods: {
     /**
-     * @param {module:ol/interaction/Interaction~Interaction|Vue} interaction
+     * @param {Interaction|Vue} interaction
      * @return {void}
      */
     addInteraction (interaction) {
@@ -28,7 +32,7 @@ export default {
       }
     },
     /**
-     * @param {module:ol/interaction/Interaction~Interaction|Vue} interaction
+     * @param {Interaction|Vue} interaction
      * @return {void}
      */
     removeInteraction (interaction) {
@@ -39,20 +43,20 @@ export default {
       this.sortInteractions()
     },
     /**
-     * @return {module:ol/interaction/Interaction~Interaction[]}
+     * @return {Interaction[]}
      */
     getInteractions () {
       return this._interactionsCollection.getArray()
     },
     /**
-     * @return {module:ol/Collection~Collection<module:ol/interaction/Interaction~Interaction>>}
+     * @return {Collection<Interaction>>}
      */
     getInteractionsCollection () {
       return this._interactionsCollection
     },
     /**
      * @param {string|number} interactionId
-     * @return {module:ol/interaction/Interaction~Interaction|undefined}
+     * @return {Interaction|undefined}
      */
     getInteractionById (interactionId) {
       return this._interactionsCollection.getArray().find(interaction => {
@@ -75,8 +79,8 @@ export default {
       // sort interactions by priority in asc order
       // the higher the priority, the earlier the interaction handles the event
       return (a, b) => {
-        let ap = a.get('priority') || 0
-        let bp = b.get('priority') || 0
+        let ap = getInteractionPriority(a) || 0
+        let bp = getInteractionPriority(b) || 0
         return ap === bp ? 0 : ap - bp
       }
     },
@@ -100,10 +104,17 @@ export default {
   },
   created () {
     /**
-     * @type {module:ol/Collection~Collection<module:ol/interaction/Interaction~Interaction>>}
+     * @type {Collection<Interaction>>}
      * @private
      */
     this._interactionsCollection = new Collection()
-    // todo subscribe to collection
+
+    const add = observableFromOlEvent(this._interactionsCollection, 'add')
+    const remove = observableFromOlEvent(this._interactionsCollection, 'remove')
+    const events = mergeObs(add, remove)
+
+    this.subscribeTo(events, () => {
+      ++this.rev
+    })
   },
 }

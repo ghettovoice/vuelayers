@@ -180,13 +180,22 @@
       /**
        * @param {number[]} pixel
        * @param {function} callback
-       * @param {function} [layerFilter]
+       * @param {Object} [opts]
        * @return {*|undefined}
        */
-      forEachLayerAtPixel (pixel, callback, layerFilter) {
+      forEachLayerAtPixel (pixel, callback, opts = {}) {
         hasMap(this)
 
-        return this.$map.forEachLayerAtPixel(pixel, callback, undefined, layerFilter)
+        return this.$map.forEachLayerAtPixel(pixel, callback, opts)
+      },
+      /**
+       * @param {number[]} pixel
+       * @param {Object} [opts]
+       */
+      getFeaturesAtPixel (pixel, opts = {}) {
+        hasMap(this)
+
+        return this.$map.getFeaturesAtPixel(pixel, opts)
       },
       /**
        * Updates map size and re-renders map.
@@ -297,9 +306,7 @@
         'pixelRatio',
         'renderer',
         'maxTilesLoading',
-      ], () => function (value, prevValue) {
-        if (isEqual(value, prevValue)) return
-
+      ], () => function () {
         this.scheduleRecreate()
       }),
       controls (value) {
@@ -381,7 +388,7 @@
     hasMap(this)
     hasView(this)
 
-    const ft = 100
+    const ft = 1000 / 60
     // pointer
     const pointerEvents = mergeObs(
       observableFromOlEvent(this.$map, [

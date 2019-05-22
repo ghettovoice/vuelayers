@@ -2,7 +2,7 @@ import Collection from 'ol/Collection'
 import Feature from 'ol/Feature'
 import Vue from 'vue'
 import { merge as mergeObs } from 'rxjs/observable'
-import { tap } from 'rxjs/operators'
+import { tap, debounceTime } from 'rxjs/operators'
 import { getFeatureId, getObjectUid, initializeFeature, mergeFeatures } from '../ol-ext'
 import { instanceOf } from '../util/assert'
 import { forEach, isPlainObject } from '../util/minilo'
@@ -31,14 +31,14 @@ export default {
   },
   methods: {
     /**
-     * @param {Array<(module:ol/Feature~Feature|Vue|Object)>} features
+     * @param {Array<(Feature|Vue|Object)>} features
      * @return {void}
      */
     addFeatures (features) {
       forEach(features, ::this.addFeature)
     },
     /**
-     * @param {module:ol/Feature~Feature|Vue|Object} feature
+     * @param {Feature|Vue|Object} feature
      * @return {void}
      */
     addFeature (feature) {
@@ -58,14 +58,14 @@ export default {
       }
     },
     /**
-     * @param {Array<(module:ol/Feature~Feature|Vue|Object)>} features
+     * @param {Array<(Feature|Vue|Object)>} features
      * @return {void}
      */
     removeFeatures (features) {
       forEach(features, ::this.removeFeature)
     },
     /**
-     * @param {module:ol/Feature~Feature|Vue|Object} feature
+     * @param {Feature|Vue|Object} feature
      * @return {void}
      */
     removeFeature (feature) {
@@ -82,7 +82,7 @@ export default {
     },
     /**
      * @param {string|number} featureId
-     * @return {module:ol/Feature~Feature|undefined}
+     * @return {Feature|undefined}
      */
     getFeatureById (featureId) {
       return this._featuresCollection.getArray().find(feature => {
@@ -90,13 +90,13 @@ export default {
       })
     },
     /**
-     * @return {module:ol/Feature~Feature[]}
+     * @return {Feature[]}
      */
     getFeatures () {
       return this._featuresCollection.getArray()
     },
     /**
-     * @return {module:ol/Collection~Collection<module:ol/Feature~Feature>>}
+     * @return {Collection<Feature>>}
      */
     getFeaturesCollection () {
       return this._featuresCollection
@@ -115,7 +115,7 @@ export default {
   },
   created () {
     /**
-     * @type {module:ol/Collection~Collection<module:ol/Feature~Feature>>}
+     * @type {Collection<Feature>>}
      * @private
      */
     this._featuresCollection = new Collection()
@@ -127,7 +127,9 @@ export default {
           const elementUid = getObjectUid(element)
           const propChanges = observableFromOlEvent(element, 'propertychange')
           const otherChanges = observableFromOlEvent(element, 'change')
-          const featureChanges = mergeObs(propChanges, otherChanges)
+          const featureChanges = mergeObs(propChanges, otherChanges).pipe(
+            debounceTime(1000 / 60)
+          )
 
           this._featureSubs[elementUid] = this.subscribeTo(featureChanges, () => {
             ++this.rev

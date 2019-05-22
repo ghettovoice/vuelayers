@@ -1,9 +1,7 @@
-import debounce from 'debounce-promise'
 import { merge as mergeObs } from 'rxjs/observable'
 import { throttleTime } from 'rxjs/operators'
 import { observableFromOlEvent } from '../rx-ext'
 import * as assert from '../util/assert'
-import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import featuresContainer from './features-container'
@@ -92,11 +90,9 @@ export default {
   watch: {
     ...makeWatchers([
       'useSpatialIndex',
-    ], () => debounce(function (value, prevValue) {
-      if (isEqual(value, prevValue)) return
-
-      return this.recreate()
-    }, 1000 / 60)),
+    ], () => function () {
+      return this.scheduleRecreate()
+    }),
   },
   stubVNode: {
     empty: false,

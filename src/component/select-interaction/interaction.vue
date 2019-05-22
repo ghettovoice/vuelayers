@@ -5,7 +5,6 @@
 </template>
 
 <script>
-  import debounce from 'debounce-promise'
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
@@ -261,20 +260,20 @@
     watch: {
       features: {
         deep: true,
-        handler: debounce(function (value, prevValue) {
+        handler (value) {
           if (!this.$interaction) return
 
           this.addFeatures(value)
 
-          let forUnselect = difference(prevValue, value, (a, b) => getFeatureId(a) === getFeatureId(b))
+          let forUnselect = difference(this.featuresViewProj, value, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forUnselect)
-        }, 1000 / 60),
+        },
       },
       featuresDataProj: {
         deep: true,
-        handler: debounce(function (value) {
+        handler (value) {
           this.$emit('update:features', value)
-        }, 1000 / 60),
+        },
       },
       ...makeWatchers([
         'filter',
@@ -285,9 +284,9 @@
         'condition',
         'removeCondition',
         'toggleCondition',
-      ], () => debounce(function () {
-        return this.recreate()
-      }, 1000 / 60)),
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
     },
     stubVNode: {
       empty: false,
@@ -305,7 +304,7 @@
    */
   function subscribeToInteractionChanges () {
     hasInteraction(this)
-
+    // todo switch to add/remove events
     const events = observableFromOlEvent(this.$interaction, 'select')
 
     this.subscribeTo(

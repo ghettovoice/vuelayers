@@ -1,10 +1,14 @@
 import Collection from 'ol/Collection'
 import Overlay from 'ol/Overlay'
 import Vue from 'vue'
+import { merge as mergeObs } from 'rxjs/observable'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
+import { observableFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
+import rxSubs from './rx-subs'
 
 export default {
+  mixins: [rxSubs],
   computed: {
     overlayIds () {
       if (!this.rev) return []
@@ -14,7 +18,7 @@ export default {
   },
   methods: {
     /**
-     * @param {module:ol/Overlay~Overlay|Vue} overlay
+     * @param {Overlay|Vue} overlay
      * @return {void}
      */
     addOverlay (overlay) {
@@ -27,7 +31,7 @@ export default {
       }
     },
     /**
-     * @param {module:ol/Overlay~Overlay|Vue} overlay
+     * @param {Overlay|Vue} overlay
      * @return {void}
      */
     removeOverlay (overlay) {
@@ -37,20 +41,20 @@ export default {
       this._overlaysCollection.remove(overlay)
     },
     /**
-     * @return {module:ol/Overlay~Overlay[]}
+     * @return {Overlay[]}
      */
     getOverlays () {
       return this._overlaysCollection.getArray()
     },
     /**
-     * @return {module:ol/Collection~Collection<module:ol/Overlay~Overlay>}
+     * @return {Collection<Overlay>}
      */
     getOverlaysCollection () {
       return this._overlaysCollection
     },
     /**
      * @param {string|number} overlayId
-     * @return {module:ol/Overlay~Overlay|undefined}
+     * @return {Overlay|undefined}
      */
     getOverlayById (overlayId) {
       return this._overlaysCollection.getArray().find(overlay => {
@@ -77,9 +81,17 @@ export default {
   },
   created () {
     /**
-     * @type {module:ol/Collection~Collection<module:ol/Overlay~Overlay>}
+     * @type {Collection<Overlay>}
      * @private
      */
     this._overlaysCollection = new Collection()
+
+    const add = observableFromOlEvent(this._overlaysCollection, 'add')
+    const remove = observableFromOlEvent(this._overlaysCollection, 'remove')
+    const events = mergeObs(add, remove)
+
+    this.subscribeTo(events, () => {
+      ++this.rev
+    })
   },
 }

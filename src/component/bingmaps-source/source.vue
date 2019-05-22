@@ -1,7 +1,6 @@
 <script>
   import BingMapsSource from 'ol/source/BingMaps'
   import { tileSource } from '../../mixin'
-  import { isEqual } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   const BINGMAPS_MAX_ZOOM = 21
@@ -73,9 +72,7 @@
       ...makeWatchers([
         'apiKey',
         'imagerySet',
-      ], () => function (value, prevValue) {
-        if (isEqual(value, prevValue)) return
-
+      ], () => function () {
         this.scheduleRecreate()
       }),
     },
