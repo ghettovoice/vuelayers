@@ -277,7 +277,6 @@ function subscribeToLayerEvents () {
     'postcompose',
     'precompose',
     'render',
-    'rendercomplete',
   ])
 
   this.subscribeTo(events, evt => this.$emit(evt.type, evt))
