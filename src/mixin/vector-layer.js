@@ -112,18 +112,12 @@ export default {
       this::layer.methods.subscribeAll()
     },
   },
-  subscribeAll () {
-    this::layer.methods.subscribeAll()
-  },
-}
-watch: {
-  updateWhileAnimating (value) {
-    if (!this.$layer || value === this.$layer.getUpdateWhileAnimating()) {
-      return
-    }
+  watch: {
+    updateWhileAnimating (value) {
+      if (!this.$layer || value === this.$layer.getUpdateWhileAnimating()) {
+        return
+      }
 
-    this.scheduleRecreate()
-  },
       this.scheduleRecreate()
     },
     updateWhileInteracting (value) {
