@@ -1,5 +1,5 @@
 import { merge as mergeObs } from 'rxjs/observable'
-import { throttleTime } from 'rxjs/operators'
+import { debounceTime } from 'rxjs/operators'
 import { observableFromOlEvent } from '../rx-ext'
 import * as assert from '../util/assert'
 import mergeDescriptors from '../util/multi-merge-descriptors'
@@ -107,18 +107,20 @@ export default {
 function subscribeToEvents () {
   assert.hasSource(this)
 
-  const add = observableFromOlEvent(this.$source, 'addfeature')
-  const remove = observableFromOlEvent(this.$source, 'removefeature')
-  const events = mergeObs(add, remove)
+  const add = observableFromOlEvent(this.getFeaturesCollection(), 'add')
+  const remove = observableFromOlEvent(this.getFeaturesCollection(), 'remove')
+  const events = mergeObs(add, remove).pipe(debounceTime(1000 / 60))
+  // emit event to allow `sync` modifier
+  this.subscribeTo(events, () => {
+    this.$emit('update:features', this.featuresDataProj)
+  })
 
-  this.subscribeTo(events, evt => {
+  // todo only for backward compatibility, remove later
+  this.subscribeTo(mergeObs(
+    observableFromOlEvent(this.$source, 'addfeature'),
+    observableFromOlEvent(this.$source, 'removefeature'),
+    observableFromOlEvent(this.$source, 'changefeature')
+  ), evt => {
     this.$emit(evt.type, evt)
   })
-  // emit event to allow `sync` modifier
-  this.subscribeTo(
-    events.pipe(throttleTime(1000 / 60)),
-    () => {
-      this.$emit('update:features', this.featuresDataProj)
-    }
-  )
 }

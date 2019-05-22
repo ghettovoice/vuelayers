@@ -113,8 +113,10 @@ export default {
     const remove = observableFromOlEvent(this._interactionsCollection, 'remove')
     const events = mergeObs(add, remove)
 
-    this.subscribeTo(events, () => {
+    this.subscribeTo(events, ({ type, element }) => {
       ++this.rev
+
+      this.$emit(type + ':interaction', getInteractionId(element))
     })
   },
 }

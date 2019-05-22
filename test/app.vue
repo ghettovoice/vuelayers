@@ -45,8 +45,9 @@
           <!--<vl-geom-point :coordinates="[0, 0]" />-->
         <!--</vl-feature>-->
 
-        <vl-layer-vector id="features">
-          <vl-source-vector :features.sync="features" />
+        <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">
+          <vl-source-vector :features.sync="features" ref="featuresSource" />
+          <vl-style-func :factory="styleFuncFactory" />
         </vl-layer-vector>
 
         <!--<vl-layer-vector id="draw-pane" v-if="drawType != null">-->
@@ -60,22 +61,27 @@
 </template>
 
 <script>
+  import { isFunction, range, random, forEach } from 'lodash'
   import * as eventCondition from 'ol/events/condition'
   import { inAndOut } from 'ol/easing'
-  import faker from 'faker'
-  import { findPointOnSurface } from '../src/ol-ext'
-  import { isFunction } from '../src/util/minilo'
+  import Feature from 'ol/Feature'
+  import Point from 'ol/geom/Point'
+  import { findPointOnSurface, defaultStyle, createStyle, pointFromLonLat } from '../src/ol-ext'
 
-  const features = [
-    {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Point',
-        coordinates: [10, 10],
-      },
-    },
-  ]
+  const features = range(0, 1000).map(i => {
+      let coordinate = [
+        random(-50, 50),
+        random(-50, 50),
+      ]
+      return {
+        type: 'Feature',
+        id: 'random-' + i,
+        geometry: {
+          type: 'Point',
+          coordinates: coordinate,
+        },
+      }
+    })
 
   export default {
     name: 'app',
@@ -84,7 +90,8 @@
         zoom: 2,
         center: [0, 0],
         rotation: 0,
-        features,
+        features: [],
+        featureAnimations: {},
         selectedFeatures: [],
         graticule: false,
         showMap: true,
@@ -100,54 +107,107 @@
     },
     methods: {
       pointOnSurface: findPointOnSurface,
-      animateCoordinate (sourceCoord, destCoord, predicate, done) {
-        let duration = 1000
+      styleFuncFactory () {
+        const style = createStyle(defaultStyle()[0])
+
+        return feature => {
+          if (feature.get('animating') === true) {
+            return null
+          }
+
+          return [style]
+        }
+      },
+      animateFeature (feature, destCoord, step, done) {
+        if (this.featureAnimations[feature.id]) {
+          this.featureAnimations[feature.id]()
+        }
+
+        this.$refs.featuresSource.getFeatureById(feature.id).set('animating', true)
+
+        let duration = 2000
         let now = Date.now()
         let start = Date.now()
         let elapsed = 0
         let complete = false
+        let progress = 0
+        let x, y
 
-        const animate = () => {
+        const animate = evt => {
+          const vectorContext = evt.vectorContext
+
           now = Date.now()
           elapsed = now - start
+
           let fraction = elapsed / duration
           if (fraction >= 1) {
             fraction = 1
             complete = true
           }
-          let progress = inAndOut(fraction)
+          if (complete) {
+            this.featureAnimations[feature.id]()
 
-          let x0 = sourceCoord[0]
-          let y0 = sourceCoord[1]
+            return
+          }
+
+          progress = inAndOut(fraction)
+
+          let x0 = feature.geometry.coordinates[0]
+          let y0 = feature.geometry.coordinates[1]
           let x1 = destCoord[0]
           let y1 = destCoord[1]
-          let x = x0 + progress * (x1 - x0)
-          let y = y0 + progress * (y1 - y0)
+          x = x0 + progress * (x1 - x0)
+          y = y0 + progress * (y1 - y0)
 
-          predicate(x, y)
-
-          if (complete) {
-            if (isFunction(done)) {
-              done(x, y)
-            }
-          } else {
-            requestAnimationFrame(animate)
+          if (isFunction(step)) {
+            step(x, y, progress)
           }
+
+          let currentPoint = new Point(pointFromLonLat([x, y]))
+          let animFeature = new Feature(currentPoint)
+          vectorContext.drawFeature(animFeature, createStyle(defaultStyle()[0]))
+
+          this.$refs.map.$map.render()
         }
 
-        requestAnimationFrame(animate)
+        this.featureAnimations[feature.id] = () => {
+          this.$refs.map.$map.un('postcompose', animate)
+
+          delete this.featureAnimations[feature.id]
+
+          if (isFunction(done)) {
+            done(x, y, progress)
+          }
+
+          this.$refs.featuresSource.getFeatureById(feature.id).set('animating', false)
+        }
+
+        this.$refs.map.$map.on('postcompose', animate)
+        this.$refs.map.$map.render()
       },
     },
     mounted () {
+      setTimeout(() => {
+        this.features = features.slice()
+      }, 1000)
+
       setInterval(() => {
-        this.animateCoordinate(
-          this.features[0].geometry.coordinates,
-          [faker.random.number({ min: -30, max: 30 }), faker.random.number({ min: -30, max: 30 })],
-          (lon, lat) => {
-            this.features[0].geometry.coordinates = [lon, lat]
-          }
-        )
+        let start = random(0, this.features.length - 1)
+        let end = random(start + 1, this.features.length / 2 - 1)
+        this.features.slice(start, end).forEach(feature => {
+          this.animateFeature(
+            feature,
+            [random(-50, 50), random(-50, 50)],
+            undefined,
+            (lon, lat) => {
+              feature.geometry.coordinates = [lon, lat]
+            }
+          )
+        })
       }, 3000)
+    },
+    beforeDestroy () {
+      forEach(this.featureAnimations, cancel => cancel())
     }
   }
 </script>

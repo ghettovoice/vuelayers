@@ -85,6 +85,7 @@ export default {
      * @return {Feature|undefined}
      */
     getFeatureById (featureId) {
+      // todo add hash {featureId => featureIdx, ....}
       return this._featuresCollection.getArray().find(feature => {
         return getFeatureId(feature) === featureId
       })
@@ -150,8 +151,10 @@ export default {
       )
     const events = mergeObs(add, remove)
 
-    this.subscribeTo(events, () => {
+    this.subscribeTo(events, ({ type, element }) => {
       ++this.rev
+
+      this.$emit(type + ':feature', this.writeFeatureInDataProj(element))
     })
   },
 }

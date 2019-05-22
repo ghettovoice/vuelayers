@@ -265,7 +265,7 @@
 
           this.addFeatures(value)
 
-          let forUnselect = difference(this.featuresViewProj, value, (a, b) => getFeatureId(a) === getFeatureId(b))
+          let forUnselect = difference(this.getFeatures(), value, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forUnselect)
         },
       },

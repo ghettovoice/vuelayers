@@ -136,7 +136,7 @@
 
           this.addFeatures(value)
 
-          const forRemove = difference(this.featuresViewProj, value, (a, b) => getFeatureId(a) === getFeatureId(b))
+          const forRemove = difference(this.getFeatures(), value, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forRemove)
         },
       },
