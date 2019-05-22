@@ -61,8 +61,10 @@
 
 <script>
   import * as eventCondition from 'ol/events/condition'
+  import { inAndOut } from 'ol/easing'
   import faker from 'faker'
   import { findPointOnSurface } from '../src/ol-ext'
+  import { isFunction } from '../src/util/minilo'
 
   const features = [
     {
@@ -75,20 +77,8 @@
     },
   ]
 
-  const computed = {
-    selectCondition () {
-      return this.selectByHover ? eventCondition.pointerMove : eventCondition.singleClick
-    },
-  }
-
-  const methods = {
-    pointOnSurface: findPointOnSurface,
-  }
-
   export default {
     name: 'app',
-    computed,
-    methods,
     data () {
       return {
         zoom: 2,
@@ -103,12 +93,60 @@
         selectByHover: false,
       }
     },
+    computed: {
+      selectCondition () {
+        return this.selectByHover ? eventCondition.pointerMove : eventCondition.singleClick
+      },
+    },
+    methods: {
+      pointOnSurface: findPointOnSurface,
+      animateCoordinate (sourceCoord, destCoord, predicate, done) {
+        let duration = 1000
+        let now = Date.now()
+        let start = Date.now()
+        let elapsed = 0
+        let complete = false
+
+        const animate = () => {
+          now = Date.now()
+          elapsed = now - start
+          let fraction = elapsed / duration
+          if (fraction >= 1) {
+            fraction = 1
+            complete = true
+          }
+          let progress = inAndOut(fraction)
+
+          let x0 = sourceCoord[0]
+          let y0 = sourceCoord[1]
+          let x1 = destCoord[0]
+          let y1 = destCoord[1]
+          let x = x0 + progress * (x1 - x0)
+          let y = y0 + progress * (y1 - y0)
+
+          predicate(x, y)
+
+          if (complete) {
+            if (isFunction(done)) {
+              done(x, y)
+            }
+          } else {
+            requestAnimationFrame(animate)
+          }
+        }
+
+        requestAnimationFrame(animate)
+      },
+    },
     mounted () {
       setInterval(() => {
-        let lon = faker.random.number({ min: -30, max: 30 })
-        let lat = faker.random.number({ min: -30, max: 30 })
-
-        this.features[0].geometry.coordinates = [lon, lat]
+        this.animateCoordinate(
+          this.features[0].geometry.coordinates,
+          [faker.random.number({ min: -30, max: 30 }), faker.random.number({ min: -30, max: 30 })],
+          (lon, lat) => {
+            this.features[0].geometry.coordinates = [lon, lat]
+          }
+        )
       }, 3000)
     }
   }
