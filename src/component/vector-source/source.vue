@@ -98,10 +98,6 @@
        * @protected
        */
       createLoader () {
-        if (!this.url) {
-          return
-        }
-
         const loader = this.loaderFactory.call(undefined, this)
         // wrap strategy function to transform map view projection to source projection
         return async (extent, resolution, projection) => {
