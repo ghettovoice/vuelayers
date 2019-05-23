@@ -6,6 +6,8 @@ import { EPSG_4326 } from './consts'
 import { createCircularPolygon } from './geom'
 import { transformPoint } from './proj'
 import { isCircle } from './util'
+import LineString from 'ol/geom/LineString'
+import { getLength } from 'ol/sphere'
 
 /**
  * @param {Object} [options]
@@ -34,13 +36,16 @@ export function createMvtFmt (options) {
 class GeoJSON extends BaseGeoJSON {
   writeGeometryObject (geometry, options) {
     if (isCircle(geometry)) {
+      const start = geometry.getCenter()
+      const end = [start[0] + geometry.getRadius(), start[1]]
+      const radius = getLength(new LineString([start, end]), options.featureProjection || this.defaultFeatureProjection)
       geometry = createCircularPolygon(
         transformPoint(
           geometry.getCenter(),
           options.featureProjection || this.defaultFeatureProjection,
           EPSG_4326,
         ),
-        geometry.getRadius(),
+        radius
       )
       options.featureProjection = EPSG_4326
     }
