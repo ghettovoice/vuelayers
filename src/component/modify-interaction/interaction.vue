@@ -157,13 +157,18 @@
      * @protected
      */
     subscribeAll () {
+      this::interaction.methods.subscribeAll()
       this::subscribeToInteractionChanges()
     },
   }
 
-  const watch = makeWatchers(['source'], () => function () {
-    this.scheduleRecreate()
-  })
+  const watch = {
+    ...makeWatchers([
+      'source',
+    ], () => function () {
+      this.scheduleRecreate()
+    }),
+  }
 
   /**
    * @vueProto

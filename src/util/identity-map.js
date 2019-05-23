@@ -14,7 +14,7 @@ export default class IdentityMap {
 
   /**
    * @param {string} id
-   * @param {mixed} value
+   * @param {*} value
    * @param {string} pool
    */
   set (id, value, pool = 'default') {

@@ -6,7 +6,7 @@
   import interaction from '../../mixin/interaction'
   import stylesContainer from '../../mixin/styles-container'
   import { GEOMETRY_TYPE } from '../../ol-ext/consts'
-  import { initFeature } from '../../ol-ext/feature'
+  import { initializeFeature } from '../../ol-ext/feature'
   import { createStyle, defaultEditStyle } from '../../ol-ext/style'
   import { isCollection, isVectorSource } from '../../ol-ext/util'
   import observableFromOlEvent from '../../rx-ext/from-ol-event'
@@ -228,13 +228,19 @@
      * @protected
      */
     subscribeAll () {
+      this::interaction.methods.subscribeAll()
       this::subscribeToInteractionChanges()
     },
   }
   // todo other props?
-  const watch = makeWatchers(['source', 'type'], () => function () {
-    this.scheduleRecreate()
-  })
+  const watch = {
+    ...makeWatchers([
+      'source',
+      'type',
+    ], () => function () {
+      this.scheduleRecreate()
+    }),
+  }
 
   /**
    * @alias module:draw-interaction/interaction
@@ -268,7 +274,7 @@
       observableFromOlEvent(this.$interaction, 'drawstart')
         .pipe(
           mapObs(evt => {
-            initFeature(evt.feature)
+            initializeFeature(evt.feature)
             return evt
           }),
         ),

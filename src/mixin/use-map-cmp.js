@@ -11,6 +11,7 @@ export default {
      * @protected
      */
     beforeInit () {
+      // waits while $map service will be injected
       return intervalObs(100).pipe(
         skipWhile(() => !this.$map),
         firstObs(),

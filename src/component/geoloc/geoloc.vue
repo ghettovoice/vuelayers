@@ -12,150 +12,151 @@
   import { olCmp, useMapCmp, projTransforms } from '../../mixin'
   import { observableFromOlChangeEvent } from '../../rx-ext'
   import { hasGeolocation } from '../../util/assert'
-
-  const props = {
-    tracking: {
-      type: Boolean,
-      default: true,
-    },
-    trackingOptions: Object,
-    /**
-     * @type {string}
-     */
-    projection: String,
-    // todo add autoCenter, bindToPosition
-  }
-
-  const computed = {
-    accuracy () {
-      if (this.rev && this.$geolocation) {
-        return this.$geolocation.getAccuracy()
-      }
-    },
-    altitude () {
-      if (this.rev && this.$geolocation) {
-        return this.$geolocation.getAltitude()
-      }
-    },
-    altitudeAccuracy () {
-      if (this.rev && this.$geolocation) {
-        return this.$geolocation.getAltitudeAccuracy()
-      }
-    },
-    heading () {
-      if (this.rev && this.$geolocation) {
-        return this.$geolocation.getHeading()
-      }
-    },
-    speed () {
-      if (this.rev && this.$geolocation) {
-        return this.$geolocation.getSpeed()
-      }
-    },
-    position () {
-      if (this.rev && this.$geolocation) {
-        return this.$geolocation.getPosition()
-      }
-    },
-    positionViewProj () {
-      if (this.position && this.resolvedDataProjection) {
-        return this.pointToViewProj(this.position)
-      }
-    },
-  }
-
-  const methods = {
-    /**
-     * @return {Geolocation}
-     * @private
-     */
-    createOlObject () {
-      return new Geolocation({
-        tracking: this.tracking,
-        trackingOptions: this.trackingOptions,
-        projection: this.resolvedDataProjection,
-      })
-    },
-    /**
-     * @return {void}
-     * @private
-     */
-    mount () {
-      this.subscribeAll()
-    },
-    /**
-     * @return {void}
-     * @private
-     */
-    unmount () {
-      hasGeolocation(this)
-
-      this.unsubscribeAll()
-      this.$geolocation.setTracking(false)
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    subscribeAll () {
-      this::subscribeToGeolocation()
-    },
-  }
-
-  const watch = {
-    /**
-     * @param {boolean} value
-     */
-    tracking (value) {
-      if (this.$geolocation && value !== this.$geolocation.getTracking()) {
-        this.$geolocation.setTracking(value)
-      }
-    },
-    tracingOptions (value) {
-      this.$geolocation && this.$geolocation.setTrackingOptions(value)
-    },
-    resolvedDataProjection (value) {
-      if (this.$geolocation) {
-        this.$geolocation.setProjection(value)
-      }
-    },
-  }
+  import { isEqual } from '../../util/minilo'
 
   export default {
     name: 'vl-geoloc',
     mixins: [olCmp, useMapCmp, projTransforms],
-    props,
-    computed,
-    methods,
-    watch,
+    props: {
+      tracking: {
+        type: Boolean,
+        default: true,
+      },
+      trackingOptions: Object,
+      /**
+       * @type {string}
+       */
+      projection: String,
+      // todo add autoCenter, bindToPosition
+    },
+    computed: {
+      accuracy () {
+        if (this.rev && this.$geolocation) {
+          return this.$geolocation.getAccuracy()
+        }
+      },
+      altitude () {
+        if (this.rev && this.$geolocation) {
+          return this.$geolocation.getAltitude()
+        }
+      },
+      altitudeAccuracy () {
+        if (this.rev && this.$geolocation) {
+          return this.$geolocation.getAltitudeAccuracy()
+        }
+      },
+      heading () {
+        if (this.rev && this.$geolocation) {
+          return this.$geolocation.getHeading()
+        }
+      },
+      speed () {
+        if (this.rev && this.$geolocation) {
+          return this.$geolocation.getSpeed()
+        }
+      },
+      position () {
+        if (this.rev && this.$geolocation) {
+          return this.$geolocation.getPosition()
+        }
+      },
+      positionViewProj () {
+        if (this.position && this.resolvedDataProjection) {
+          return this.pointToViewProj(this.position)
+        }
+      },
+    },
+    methods: {
+      /**
+       * @return {ol/Geolocation~Geolocation}
+       * @private
+       */
+      createOlObject () {
+        return new Geolocation({
+          tracking: this.tracking,
+          trackingOptions: this.trackingOptions,
+          projection: this.resolvedDataProjection,
+        })
+      },
+      /**
+       * @return {void}
+       * @private
+       */
+      mount () {
+        this.subscribeAll()
+      },
+      /**
+       * @return {void}
+       * @private
+       */
+      unmount () {
+        hasGeolocation(this)
+
+        this.unsubscribeAll()
+        this.$geolocation.setTracking(false)
+      },
+      /**
+       * @return {void}
+       * @protected
+       */
+      subscribeAll () {
+        this::subscribeToGeolocation()
+      },
+    },
+    watch: {
+      /**
+       * @param {boolean} value
+       */
+      tracking (value) {
+        if (!this.$geolocation && value === this.$geolocation.getTracking()) {
+          return
+        }
+
+        this.$geolocation.setTracking(value)
+      },
+      tracingOptions (value, prevValue) {
+        if (isEqual(value, prevValue) || !this.$geolocation) return
+
+        this.$geolocation.setTrackingOptions(value)
+      },
+      resolvedDataProjection (value) {
+        if (!this.$geolocation) return
+
+        this.$geolocation.setProjection(value)
+      },
+    },
     stubVNode: {
       empty () {
         return this.$options.name
       },
     },
     created () {
-      Object.defineProperties(this, {
-        /**
-         * @type {Geolocation|undefined}
-         */
-        $geolocation: {
-          enumerable: true,
-          get: () => this.$olObject,
-        },
-        $map: {
-          enumerable: true,
-          get: () => this.$services && this.$services.map,
-        },
-        /**
-         * Reference to `ol.View` instance.
-         * @type {View|undefined}
-         */
-        $view: {
-          enumerable: true,
-          get: () => this.$services && this.$services.view,
-        },
-      })
+      this::defineServices()
     },
+  }
+
+  function defineServices () {
+    Object.defineProperties(this, {
+      /**
+       * @type {ol/Geolocation~Geolocation|undefined}
+       */
+      $geolocation: {
+        enumerable: true,
+        get: () => this.$olObject,
+      },
+      $map: {
+        enumerable: true,
+        get: () => this.$services && this.$services.map,
+      },
+      /**
+       * Reference to `ol.View` instance.
+       * @type {module:ol/View~View|undefined}
+       */
+      $view: {
+        enumerable: true,
+        get: () => this.$services && this.$services.view,
+      },
+    })
   }
 
   /**

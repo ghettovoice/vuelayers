@@ -1,6 +1,5 @@
 import { error as logError } from '../util/log'
-
-const noop = () => {}
+import { noop } from '../util/minilo'
 
 /**
  * RxJS subscriptions manager.
@@ -40,6 +39,13 @@ export default {
       this._rxSubs.push(subs)
 
       return subs
+    },
+    unsubscribe (subs) {
+      const idx = this._rxSubs.indexOf(subs)
+      if (idx === -1) return
+
+      subs.unsubscribe()
+      this._rxSubs.splice(idx, 1)
     },
   },
   beforeCreate () {

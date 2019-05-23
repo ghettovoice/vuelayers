@@ -62,7 +62,7 @@ function cssLoaders (options) {
     sass: generateLoaders('sass', {
       includePaths: [
         resolve('src'),
-        resolve('src/sass'),
+        resolve('src/styles'),
         resolve('node_modules'),
       ],
       indentedSyntax: true,
@@ -70,7 +70,7 @@ function cssLoaders (options) {
     scss: generateLoaders('sass', {
       includePaths: [
         resolve('src'),
-        resolve('src/sass'),
+        resolve('src/styles'),
         resolve('node_modules'),
       ],
     }),

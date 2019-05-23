@@ -1,6 +1,3 @@
-/**
- * Style helpers
- */
 import Circle from 'ol/style/Circle'
 import Fill from 'ol/style/Fill'
 import Icon from 'ol/style/Icon'
@@ -47,21 +44,16 @@ export function defaultEditStyle () {
       strokeWidth: width,
     },
   ]
-  styles[GEOMETRY_TYPE.MULTI_LINE_STRING] =
-    styles[GEOMETRY_TYPE.LINE_STRING]
+  styles[GEOMETRY_TYPE.MULTI_LINE_STRING] = styles[GEOMETRY_TYPE.LINE_STRING]
 
   styles[GEOMETRY_TYPE.POLYGON] = [
     {
       fillColor: [255, 255, 255, 0.5],
     },
   ].concat(styles[GEOMETRY_TYPE.LINE_STRING])
-  styles[GEOMETRY_TYPE.MULTI_POLYGON] =
-    styles[GEOMETRY_TYPE.POLYGON]
+  styles[GEOMETRY_TYPE.MULTI_POLYGON] = styles[GEOMETRY_TYPE.POLYGON]
 
-  styles[GEOMETRY_TYPE.CIRCLE] =
-    styles[GEOMETRY_TYPE.POLYGON].concat(
-      styles[GEOMETRY_TYPE.LINE_STRING],
-    )
+  styles[GEOMETRY_TYPE.CIRCLE] = styles[GEOMETRY_TYPE.POLYGON].concat(styles[GEOMETRY_TYPE.LINE_STRING])
 
   styles[GEOMETRY_TYPE.POINT] = [
     {
@@ -72,14 +64,12 @@ export function defaultEditStyle () {
       zIndex: Infinity,
     },
   ]
-  styles[GEOMETRY_TYPE.MULTI_POINT] =
-    styles[GEOMETRY_TYPE.POINT]
+  styles[GEOMETRY_TYPE.MULTI_POINT] = styles[GEOMETRY_TYPE.POINT]
 
-  styles[GEOMETRY_TYPE.GEOMETRY_COLLECTION] =
-    styles[GEOMETRY_TYPE.POLYGON].concat(
-      styles[GEOMETRY_TYPE.LINE_STRING],
-      styles[GEOMETRY_TYPE.POINT],
-    )
+  styles[GEOMETRY_TYPE.GEOMETRY_COLLECTION] = styles[GEOMETRY_TYPE.POLYGON].concat(
+    styles[GEOMETRY_TYPE.LINE_STRING],
+    styles[GEOMETRY_TYPE.POINT],
+  )
 
   return styles
 }
@@ -88,8 +78,7 @@ const isEmpty = x => {
   if (x == null) return true
   if (typeof x === 'number') return false
 
-  return ((typeof x === 'string' || Array.isArray(x)) && !x.length) ||
-    !Object.keys(x).length
+  return ((typeof x === 'string' || Array.isArray(x)) && !x.length) || !Object.keys(x).length
 }
 
 /**

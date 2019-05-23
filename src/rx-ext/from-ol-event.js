@@ -9,7 +9,7 @@ import { fromEventPattern, merge as mergeObs } from 'rxjs/observable'
  *
  * changes.subscribe(({ coordinate }) => console.log(coordinate))
  *
- * @param {ol.Object} target OpenLayers event target.
+ * @param {module:ol/Observable~Observable} target OpenLayers event target.
  * @param {string|Object[]} eventName The event name of interest, being emitted by the `target`
  *                          or an array of events/selectors like `[{ event: 'event1', selector?: x => x }, ...]`.
  * @param {function(...*): *} [selector] An optional function to post-process results. It takes the arguments

@@ -1,5 +1,9 @@
-/** @module ol-ext/util */
-import { isFunction } from '../util/minilo'
+import { getUid } from 'ol'
+import { isFunction, reduce } from '../util/minilo'
+
+export function getObjectUid (object) {
+  return getUid(object)
+}
 
 /**
  * heuristic check that value is ol collection
@@ -25,4 +29,17 @@ export function isVectorSource (value) {
  */
 export function isCircle (value) {
   return isFunction(value.getCenter) && isFunction(value.getRadius)
+}
+
+export function cleanSourceExtraParams (params, filterKeys) {
+  return reduce(params, (params, value, key) => {
+    key = key.toUpperCase()
+    if (filterKeys.includes(key)) {
+      return params
+    }
+
+    params[key] = value
+
+    return params
+  }, {})
 }
