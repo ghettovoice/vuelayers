@@ -2,6 +2,7 @@
   <div id="app">
     <div style="height: 100%">
       <div class="panel">
+        <button @click="animate">Move animate</button>
         <button @click="selectByHover = !selectByHover">Select by {{ !selectByHover ? 'hover' : 'click' }}</button>
         <button @click="graticule = !graticule">Graticule</button>
         <button @click="drawType = 'Polygon'">Draw polygon</button>
@@ -29,6 +30,7 @@
             <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
                         :position="pointOnSurface(feature.geometry)" :auto-pan="true"
                         :auto-pan-animation="{ duration: 300 }"
+                        class-name="ol-overlay-container ol-selectable smooth-transition"
                         positioning="bottom-right">
               <div style="background: #fff; padding: 10px; width: 200px">
                 {{ feature }}
@@ -61,14 +63,14 @@
 </template>
 
 <script>
-  import { isFunction, range, random, forEach } from 'lodash'
+  import { isFunction, range, random, forEach, throttle } from 'lodash'
   import * as eventCondition from 'ol/events/condition'
   import { inAndOut } from 'ol/easing'
   import Feature from 'ol/Feature'
   import Point from 'ol/geom/Point'
   import { findPointOnSurface, defaultStyle, createStyle, pointFromLonLat } from '../src/ol-ext'
 
-  const features = range(0, 1000).map(i => {
+  const features = range(0, 100).map(i => {
       let coordinate = [
         random(-50, 50),
         random(-50, 50),
@@ -117,6 +119,23 @@
 
           return [style]
         }
+      },
+      animate () {
+        requestAnimationFrame(() => {
+          this.features.forEach(feature => {
+            this.animateFeature(
+              feature,
+              [random(-50, 50), random(-50, 50)],
+              throttle((lon, lat) => {
+                feature.geometry.coordinates = [lon, lat]
+              }, 10),
+              undefined,
+              (lon, lat) => {
+                feature.geometry.coordinates = [lon, lat]
+              }
+            )
+          })
+        })
       },
       animateFeature (feature, destCoord, step, done) {
         if (this.featureAnimations[feature.id]) {
@@ -190,21 +209,6 @@
       setTimeout(() => {
         this.features = features.slice()
       }, 1000)
-
-      setInterval(() => {
-        let start = random(0, this.features.length - 1)
-        let end = random(start + 1, this.features.length / 2 - 1)
-        this.features.slice(start, end).forEach(feature => {
-          this.animateFeature(
-            feature,
-            [random(-50, 50), random(-50, 50)],
-            undefined,
-            (lon, lat) => {
-              feature.geometry.coordinates = [lon, lat]
-            }
-          )
-        })
-      }, 3000)
     },
     beforeDestroy () {
       forEach(this.featureAnimations, cancel => cancel())
@@ -245,5 +249,9 @@
       padding: 5px 10px;
       text-transform: uppercase;
     }
+  }
+
+  .smooth-transition {
+    transition: all 0.3s ease-in-out;
   }
 </style>

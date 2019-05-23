@@ -55,6 +55,7 @@
       default: 20,
     },
     autoPanAnimation: Object,
+    className: String,
   }
 
   const computed = {
@@ -92,6 +93,7 @@
         autoPan: this.autoPan,
         autoPanMargin: this.autoPanMargin,
         autoPanAnimation: this.autoPanAnimation,
+        className: this.className,
       })
 
       initializeOverlay(overlay, this.id)
@@ -149,7 +151,7 @@
     },
     position (value) {
       value = this.pointToViewProj(value)
-      if (this.$overlay && !isEqual(value, this.positionViewProj)) {
+      if (this.$overlay && !isEqual(value, this.$overlay.getPosition())) {
         this.$overlay.setPosition(value)
       }
     },
@@ -209,14 +211,12 @@
   function subscribeToOverlayChanges () {
     hasOverlay(this)
 
-    const ft = 1000 / 60
     const changes = mergeObs(
-      observableFromOlChangeEvent(this.$overlay, 'position', true, ft,
-        () => this.pointToDataProj(this.$overlay.getPosition())),
+      observableFromOlChangeEvent(this.$overlay, 'position', true, undefined, () => this.pointToDataProj(this.$overlay.getPosition())),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
-      ], true, ft),
+      ], true),
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {

@@ -1,6 +1,6 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
-    <slot :features="features"/>
+    <slot :features="featuresDataProj"/>
   </i>
 </template>
 
@@ -9,11 +9,13 @@
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
   import Vue from 'vue'
+  import { merge as mergeObs } from 'rxjs/observable'
+  import { map as mapOp, debounceTime } from 'rxjs/operators'
   import { interaction, projTransforms, stylesContainer, featuresContainer } from '../../mixin'
   import { getFeatureId, createStyle, defaultEditStyle, getLayerId } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasInteraction, hasMap } from '../../util/assert'
-  import { constant, difference, forEach, isFunction, mapValues, stubArray } from '../../util/minilo'
+  import { constant, difference, forEach, isEqual, isFunction, mapValues, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -271,8 +273,10 @@
       },
       featuresDataProj: {
         deep: true,
-        handler (value) {
-          this.$emit('update:features', value)
+        handler (value, prev) {
+          if (!isEqual(value, prev)) {
+            this.$emit('update:features', value)
+          }
         },
       },
       ...makeWatchers([
@@ -304,22 +308,21 @@
    */
   function subscribeToInteractionChanges () {
     hasInteraction(this)
-    // todo switch to add/remove events
-    const events = observableFromOlEvent(this.$interaction, 'select')
 
-    this.subscribeTo(
-      events,
-      ({ selected, deselected, mapBrowserEvent }) => {
-        deselected.forEach(feature => this.$emit('unselect', { feature, mapBrowserEvent }))
-        selected.forEach(feature => this.$emit('select', { feature, mapBrowserEvent }))
-      },
-    )
+    const select = observableFromOlEvent(this._featuresCollection, 'add')
+      .pipe(
+        mapOp(({ element }) => ({ type: 'select', feature: element }))
+      )
+    const unselect = observableFromOlEvent(this._featuresCollection, 'remove')
+      .pipe(
+        mapOp(({ element }) => ({ type: 'unselect', feature: element }))
+      )
+    const events = mergeObs(select, unselect)
+
+    this.subscribeTo(events, evt => this.$emit(evt.type, evt.feature))
     // emit event to allow `sync` modifier
-    // this.subscribeTo(
-    //   events.pipe(throttleTime(1000 / 60)),
-    //   () => {
-    //     this.$emit('update:features', this.featuresDataProj)
-    //   }
-    // )
+    this.subscribeTo(events.pipe(debounceTime(1000 / 60)), () => {
+      this.$emit('update:features', this.featuresDataProj)
+    })
   }
 </script>
