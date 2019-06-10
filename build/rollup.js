@@ -128,7 +128,7 @@ function bundleOptions (format, package, env = 'development') {
     if (!parentId) {
       return false
     }
-    if (/\.(sass|vue)$/i.test(id)) {
+    if (/\.(sass|s?css|vue)$/i.test(id)) {
       return false
     }
     // embeddable
