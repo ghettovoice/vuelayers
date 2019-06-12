@@ -47,18 +47,4 @@ export default {
       }
     },
   },
-  created () {
-    /**
-     * @type {module:ol/source/Source~Source|undefined}
-     * @private
-     */
-    this._source = undefined
-
-    Object.defineProperties(this, {
-      $source: {
-        enumerable: true,
-        get: this.getSource,
-      },
-    })
-  },
 }

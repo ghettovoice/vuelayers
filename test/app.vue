@@ -7,6 +7,7 @@
         <button @click="graticule = !graticule">Graticule</button>
         <button @click="drawType = 'Polygon'">Draw polygon</button>
         <button @click="drawType = undefined">Stop draw</button>
+        <button @click="loadClusterFeatures">Load cluster features</button>
         <div>
           {{ selectedFeatures }}
         </div>
@@ -47,9 +48,17 @@
           <!--<vl-geom-point :coordinates="[0, 0]" />-->
         <!--</vl-feature>-->
 
-        <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">
-          <vl-source-vector :features.sync="features" ref="featuresSource" />
-          <vl-style-func :factory="styleFuncFactory" />
+<!--        <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">-->
+<!--          <vl-source-vector :features.sync="features" ref="featuresSource" />-->
+<!--          <vl-style-func :factory="styleFuncFactory" />-->
+<!--        </vl-layer-vector>-->
+
+        <vl-layer-vector id="clusters" render-mode="image">
+          <vl-source-cluster :distance="50">
+            <vl-source-vector :features="clusterFeatures"></vl-source-vector>
+          </vl-source-cluster>
+
+          <vl-style-func :factory="makeClusterStyleFunc"></vl-style-func>
         </vl-layer-vector>
 
         <!--<vl-layer-vector id="draw-pane" v-if="drawType != null">-->
@@ -100,6 +109,7 @@
         drawType: undefined,
         drawnFeatures: [],
         selectByHover: false,
+        clusterFeatures: []
       }
     },
     computed: {
@@ -203,6 +213,44 @@
 
         this.$refs.map.$map.on('postcompose', animate)
         this.$refs.map.$map.render()
+      },
+      loadClusterFeatures () {
+        this.clusterFeatures = _.range(0, 10000).map(i => {
+          let coordinate = [
+            _.random(-50, 50),
+            _.random(-50, 50),
+          ]
+          return {
+            type: 'Feature',
+            id: 'random-' + i,
+            geometry: {
+              type: 'Point',
+              coordinates: coordinate,
+            },
+          }
+        })
+      },
+      makeClusterStyleFunc () {
+        const cache = {}
+
+        return function __clusterStyleFunc (feature) {
+          const size = feature.get('features').length
+          let style = cache[size]
+
+          if (!style) {
+            style = createStyle({
+              imageRadius: 10,
+              strokeColor: '#fff',
+              fillColor: '#3399cc',
+              text: size.toString(),
+              textFillColor: '#fff',
+            })
+
+            cache[size] = style
+          }
+
+          return [style]
+        }
       },
     },
     mounted () {
