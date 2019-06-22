@@ -6,11 +6,11 @@
 grids organized by zoom levels. It should be used together with tiled source components like
 [`vl-source-xyz`](/docs/component/xyz-source.md), [`vl-source-wmts`](/docs/component/wmts-source.md), [`vl-source-osm`](/docs/component/osm-source.md).
 
-## Versions
+## ES6 Module
 
-`vl-layer-tile` component is a part of **TileLayer** module:
-
-- **ES6**: https://unpkg.com/vuelayers/lib/tile-layer/
+```javascript
+import { TileLayer } from 'vuelayers'
+```
 
 ## Usage
 

@@ -13,11 +13,11 @@ components, without geometry component nothing will be rendered.
 Custom feature styles can be applied with [`vl-style-*`](/docs/component/circle-style.md) 
 components placed inside default slot.
 
-## Versions
+## ES6 Module
 
-`vl-feature` component is a part of **Feature** module:
-
-- **ES6**: https://unpkg.com/vuelayers/lib/feature/
+```javascript
+import { Feature } from 'vuelayers'
+```
 
 ## Usage
 

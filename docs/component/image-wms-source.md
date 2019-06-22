@@ -1,3 +1,7 @@
 # vl-image-wms-source
 
-// TODO
+## ES6 Module
+
+```javascript
+import { ImageWmsSource } from 'vuelayers'
+```

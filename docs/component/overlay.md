@@ -7,11 +7,11 @@ the map. It has **default** scoped slot to render your custom content. You can
 place it any component with slot inside the map components tree to easily bind
 it to some coordinate (for example: inside `vl-feature` or `vl-view`).
 
-## Versions
+## ES6 Module
 
-`vl-overlay` component is a part of **Overlay** module:
-
-- **ES6**: https://unpkg.com/vuelayers/lib/overlay/
+```javascript
+import { Overlay } from 'vuelayers'
+```
 
 ## Usage
 

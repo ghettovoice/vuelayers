@@ -5,11 +5,11 @@
 `vl-source-bingmaps` adds ability to display tile data from Bing Maps. To use
 this source you should get **API key** at https://www.bingmapsportal.com.
 
-## Versions
+## ES6 Module
 
-`vl-source-bingmaps` is a part of **BingmapsSource** module:
-
-- **ES6**: https://unpkg.com/vuelayers/lib/bingmaps-source/
+```javascript
+import { BingmapsSource } from 'vuelayers'
+```
 
 ## Usage
 
