@@ -10,6 +10,8 @@ a user's position. You can place it to the **default slot** of [`vl-map`](/docs/
 
 ```javascript
 import { Geoloc } from 'vuelayers'
+
+Vue.use(Geoloc)
 ```
 
 ## Usage

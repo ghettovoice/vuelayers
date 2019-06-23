@@ -10,6 +10,8 @@ component to setup `zoom`, `center`, `projection` and other view related propeti
 
 ```javascript
 import { Map } from 'vuelayers'
+
+Vue.use(Map)
 ```
 
 ## Usage

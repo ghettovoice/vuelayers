@@ -4,4 +4,6 @@
 
 ```javascript
 import { ImageStaticSource } from 'vuelayers'
+
+Vue.use(ImageStaticSource)
 ```

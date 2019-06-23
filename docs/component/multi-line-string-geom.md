@@ -4,4 +4,6 @@
 
 ```javascript
 import { MultiLineStringGeom } from 'vuelayers'
+
+Vue.use(MultiLineStringGeom)
 ```

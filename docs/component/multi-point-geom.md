@@ -4,4 +4,6 @@
 
 ```javascript
 import { MultiPointGeom } from 'vuelayers'
+
+Vue.use(MultiPointGeom)
 ```

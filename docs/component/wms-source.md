@@ -4,4 +4,6 @@
 
 ```javascript
 import { WmsSource } from 'vuelayers'
+
+Vue.use(WmsSource)
 ```

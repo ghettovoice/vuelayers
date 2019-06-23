@@ -4,4 +4,6 @@
 
 ```javascript
 import { ModifyInteraction } from 'vuelayers'
+
+Vue.use(ModifyInteraction)
 ```

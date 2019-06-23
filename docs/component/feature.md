@@ -17,6 +17,8 @@ components placed inside default slot.
 
 ```javascript
 import { Feature } from 'vuelayers'
+
+Vue.use(Feature)
 ```
 
 ## Usage

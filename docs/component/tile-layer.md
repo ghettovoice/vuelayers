@@ -10,6 +10,8 @@ grids organized by zoom levels. It should be used together with tiled source com
 
 ```javascript
 import { TileLayer } from 'vuelayers'
+
+Vue.use(TileLayer)
 ```
 
 ## Usage

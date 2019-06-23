@@ -10,6 +10,8 @@ and **rotation** of the map.
 ```javascript
 // vl-view component comes with vl-map
 import { Map } from 'vuelayers'
+
+Vue.use(Map)
 ```
 
 ## Usage

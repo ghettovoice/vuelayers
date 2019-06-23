@@ -4,4 +4,6 @@
 
 ```javascript
 import { StyleBox } from 'vuelayers'
+
+Vue.use(StyleBox)
 ```

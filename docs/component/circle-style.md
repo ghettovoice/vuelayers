@@ -4,4 +4,6 @@
 
 ```javascript
 import { CircleStyle } from 'vuelayers'
+
+Vue.use(CircleStyle)
 ```

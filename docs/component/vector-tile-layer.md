@@ -9,6 +9,8 @@
 
 ```javascript
 import { VectorTileLayer } from 'vuelayers'
+
+Vue.use(VectorTileLayer)
 ```
 
 ## Usage

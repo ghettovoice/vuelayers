@@ -4,4 +4,6 @@
 
 ```javascript
 import { WmtsSource } from 'vuelayers'
+
+Vue.use(WmtsSource)
 ```

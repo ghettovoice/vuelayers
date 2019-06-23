@@ -9,6 +9,8 @@ draw any vector data on the map.
 
 ```javascript
 import { VectorSource } from 'vuelayers'
+
+Vue.use(VectorSource)
 ```
 
 ## Usage

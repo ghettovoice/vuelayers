@@ -4,4 +4,6 @@
 
 ```javascript
 import { MultiPolygonGeom } from 'vuelayers'
+
+Vue.use(MultiPolygonGeom)
 ```

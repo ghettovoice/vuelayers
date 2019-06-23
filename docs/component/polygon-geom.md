@@ -4,4 +4,6 @@
 
 ```javascript
 import { PolygonGeom } from 'vuelayers'
+
+Vue.use(PolygonGeom)
 ```

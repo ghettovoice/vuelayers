@@ -4,4 +4,6 @@
 
 ```javascript
 import { DrawInteraction } from 'vuelayers'
+
+Vue.use(DrawInteraction)
 ```

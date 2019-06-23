@@ -4,4 +4,6 @@
 
 ```javascript
 import { SnapInteraction } from 'vuelayers'
+
+Vue.use(SnapInteraction)
 ```

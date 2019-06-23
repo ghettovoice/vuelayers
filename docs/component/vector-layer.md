@@ -9,6 +9,8 @@ used with together with [`vl-source-vector`](/docs/component/vector-source.md) c
 
 ```javascript
 import { VectorLayer } from 'vuelayers'
+
+Vue.use(VectorLayer)
 ```
 
 ## Usage

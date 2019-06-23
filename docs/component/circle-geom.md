@@ -4,4 +4,6 @@
 
 ```javascript
 import { CircleGeom } from 'vuelayers'
+
+Vue.use(CircleGeom);
 ```

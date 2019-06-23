@@ -9,6 +9,8 @@ raster source, like [`vl-source-image-static`](/docs/component/image-static-sour
 
 ```javascript
 import { ImageLayer } from 'vuelayers'
+
+Vue.use(ImageLayer)
 ```
 
 ## Usage

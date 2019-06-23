@@ -4,4 +4,6 @@
 
 ```javascript
 import { SelectInteraction } from 'vuelayers'
+
+Vue.use(SelectInteraction)
 ```

@@ -4,4 +4,6 @@
 
 ```javascript
 import { XyzSource } from 'vuelayers'
+
+Vue.use(XyzSource)
 ```

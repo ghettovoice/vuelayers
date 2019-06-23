@@ -4,4 +4,6 @@
 
 ```javascript
 import { SputnikSource } from 'vuelayers'
+
+Vue.use(SputnikSource)
 ```

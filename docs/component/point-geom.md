@@ -4,4 +4,6 @@
 
 ```javascript
 import { PointGeom } from 'vuelayers'
+
+Vue.use(PointGeom)
 ```

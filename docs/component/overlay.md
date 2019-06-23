@@ -11,6 +11,8 @@ it to some coordinate (for example: inside `vl-feature` or `vl-view`).
 
 ```javascript
 import { Overlay } from 'vuelayers'
+
+Vue.use(Overlay)
 ```
 
 ## Usage

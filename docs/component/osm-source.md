@@ -4,4 +4,6 @@
 
 ```javascript
 import { OsmSource } from 'vuelayers'
+
+Vue.use(OsmSource)
 ```

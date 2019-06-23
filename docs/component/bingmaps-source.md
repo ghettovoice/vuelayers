@@ -9,6 +9,8 @@ this source you should get **API key** at https://www.bingmapsportal.com.
 
 ```javascript
 import { BingmapsSource } from 'vuelayers'
+
+Vue.use(BingmapsSource)
 ```
 
 ## Usage

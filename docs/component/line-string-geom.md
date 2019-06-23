@@ -4,4 +4,6 @@
 
 ```javascript
 import { LineStringGeom } from 'vuelayers'
+
+Vue.use(LineStringGeom)
 ```
