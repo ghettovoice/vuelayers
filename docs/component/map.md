@@ -6,11 +6,13 @@ It is a main container for all other VueLayers components and has one `default`
 slot to place them all. Usually you will use it together with [`vl-view`](/docs/component/view.md) 
 component to setup `zoom`, `center`, `projection` and other view related propeties for the map.
 
-## Module system
+## ES6 Module
 
-`vl-map` component is a part of **Map** module:
+```javascript
+import { Map } from 'vuelayers'
 
-- **ES6**: https://unpkg.com/vuelayers/lib/map/
+Vue.use(Map)
+```
 
 ## Usage
 

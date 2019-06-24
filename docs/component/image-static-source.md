@@ -1,3 +1,9 @@
 # vl-image-static-source
 
-// TODO
+## ES6 Module
+
+```javascript
+import { ImageStaticSource } from 'vuelayers'
+
+Vue.use(ImageStaticSource)
+```

@@ -5,11 +5,13 @@
 `vl-layer-vector` can render vector from verious backend services. It should be
 used with together with [`vl-source-vector`](/docs/component/vector-source.md) component.
 
-## Versions
+## ES6 Module
 
-`vl-layer-vector` is a part of **VectorLayer** module:
+```javascript
+import { VectorLayer } from 'vuelayers'
 
-- **ES6**: https://unpkg.com/vuelayers/lib/vector-layer/
+Vue.use(VectorLayer)
+```
 
 ## Usage
 

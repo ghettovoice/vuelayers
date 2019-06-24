@@ -5,11 +5,13 @@
 `vl-layer-vector-tile` can render tiled vector data in grids organized by zoom levels. It should be used together with 
 [`vl-source-vector-tile`](/docs/component/vector-tile-source.md) component.
 
-## Versions
+## ES6 Module
 
-`vl-layer-vector-tile` component is a part of **VectorTileLayer** module:
+```javascript
+import { VectorTileLayer } from 'vuelayers'
 
-- **ES6**: https://unpkg.com/vuelayers/lib/vector-tile-layer/
+Vue.use(VectorTileLayer)
+```
 
 ## Usage
 
