@@ -12,9 +12,9 @@ import { MultiLineStringGeom } from 'vuelayers'
 Vue.use(MultiLineStringGeom)
 ```
 
-<vuep template="#static-features-example"></vuep>
+<vuep template="#multi-line-string-geom-example"></vuep>
 
-<script v-pre type="text/x-template" id="static-features-example">
+<script v-pre type="text/x-template" id="multi-line-string-geom-example">
 <template>
   <vl-map data-projection="EPSG:4326" style="height: 400px">
     <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
@@ -48,4 +48,4 @@ Vue.use(MultiLineStringGeom)
 
 - **Type**: `number[][][]`
 
-An array of lines, each of which is an array of pairs of coordinates indicating each point of each line in units of the map's [`projection`](/docs/quickstart.md#global-data-projection).
+An array of lines, each of which is a [line string](https://tools.ietf.org/html/rfc7946#section-3.1.4) in units of the map's [`projection`](/docs/quickstart.md#global-data-projection).
