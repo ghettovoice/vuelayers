@@ -14,9 +14,9 @@ Vue.use(CircleGeom);
 
 ## Usage
 
-<vuep template="#static-features-example"></vuep>
+<vuep template="#circle-geom-example"></vuep>
 
-<script v-pre type="text/x-template" id="static-features-example">
+<script v-pre type="text/x-template" id="circle-geom-example">
 <template>
   <vl-map data-projection="EPSG:4326" style="height: 400px">
     <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
