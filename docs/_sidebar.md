@@ -51,6 +51,12 @@
 
     * [vl-style-box](/docs/component/style-box.md)
     * [vl-style-circle](/docs/component/circle-style.md)
+    * [vl-style-fill](/docs/component/fill-style.md)
+    * [vl-style-func](/docs/component/func-style.md)
+    * [vl-style-icon](/docs/component/icon-style.md)
+    * [vl-style-reg-shape](/docs/component/reg-shape-style.md)
+    * [vl-style-stroke](/docs/component/stroke-style.md)
+    * [vl-style-text](/docs/component/text-style.md)
 
 * Mixins
   
