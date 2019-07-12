@@ -54,30 +54,8 @@
         default: true,
       },
     },
-    methods: {
-      /**
-       * @return {VectorSource}
-       * @protected
-       */
-      createSource () {
-        return new VectorSource({
-          attributions: this.attributions,
-          features: this._featuresCollection,
-          projection: this.resolvedDataProjection,
-          loader: this.createLoader(),
-          useSpatialIndex: this.useSpatialIndex,
-          wrapX: this.wrapX,
-          logo: this.logo,
-          strategy: this.strategyFactory.call(undefined, this),
-          format: this.formatFactory.call(undefined, this),
-          url: this.createUrlFunc(),
-          overlaps: this.overlaps,
-        })
-      },
-      /**
-       * @protected
-       */
-      createUrlFunc () {
+    computed: {
+      urlFunc () {
         if (!this.url) {
           return
         }
@@ -93,11 +71,8 @@
           this.resolvedDataProjection,
         )
       },
-      /**
-       * @protected
-       */
-      createLoader () {
-        const loader = this.loaderFactory.call(undefined, this)
+      loaderFunc () {
+        const loader = this.loaderFactory(this)
         // wrap strategy function to transform map view projection to source projection
         return async (extent, resolution, projection) => {
           const features = await loader(
@@ -110,6 +85,33 @@
             this.addFeatures(features)
           }
         }
+      },
+      loadingStrategy () {
+        return this.strategyFactory()
+      },
+      dataFormat () {
+        return this.formatFactory()
+      },
+    },
+    methods: {
+      /**
+       * @return {VectorSource}
+       * @protected
+       */
+      createSource () {
+        return new VectorSource({
+          attributions: this.attributions,
+          features: this._featuresCollection,
+          projection: this.resolvedDataProjection,
+          loader: this.loaderFunc,
+          useSpatialIndex: this.useSpatialIndex,
+          wrapX: this.wrapX,
+          logo: this.logo,
+          strategy: this.loadingStrategy,
+          format: this.dataFormat,
+          url: this.urlFunc,
+          overlaps: this.overlaps,
+        })
       },
       /**
        * @return {void}
@@ -144,6 +146,9 @@
         },
       },
       ...makeWatchers([
+        'loadingStrategy',
+        'dataFormat',
+        'urlFunc',
         'loaderFactory',
         'formatFactory',
         'strategyFactory',
