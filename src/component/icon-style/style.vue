@@ -2,6 +2,7 @@
   import Icon from 'ol/style/Icon'
   import imageStyle from '../../mixin/image-style'
   import { isEqual } from '../../util/minilo'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   const props = {
     src: {
@@ -99,11 +100,41 @@
         this.scheduleRefresh()
       }
     },
+    color (value) {
+      if (this.$style && !isEqual(value, this.$style.getColor())) {
+        this.scheduleRefresh()
+      }
+    },
+    opacity (value) {
+      if (this.$style && !isEqual(value, this.$style.getOpacity())) {
+        this.scheduleRefresh()
+      }
+    },
     scale (value) {
       if (this.$style && !isEqual(value, this.$style.getScale())) {
         this.scheduleRefresh()
       }
     },
+    rotateWithView (value) {
+      if (this.$style && !isEqual(value, this.$style.getRotateWithView())) {
+        this.scheduleRefresh()
+      }
+    },
+    rotation (value) {
+      if (this.$style && !isEqual(value, this.$style.getRotation())) {
+        this.scheduleRefresh()
+      }
+    },
+    ...makeWatchers([
+      'anchorOrigin',
+      'anchorXUnits',
+      'anchorYUnits',
+      'crossOrigin',
+      'offset',
+      'offsetOrigin',
+    ], () => function () {
+      this.scheduleRefresh()
+    }),
   }
 
   export default {

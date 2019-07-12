@@ -91,6 +91,12 @@
         this.scheduleRefresh()
       }
     },
+    placement (value) {
+      if (this.$style && !isEqual(value, this.$style.getPlacement())) {
+        this.$style.setFont(value)
+        this.scheduleRefresh()
+      }
+    },
     offsetX (value) {
       if (this.$style && !isEqual(value, this.$style.getOffsetX())) {
         this.$style.setOffsetX(value)
@@ -105,6 +111,12 @@
     },
     rotation (value) {
       if (this.$style && !isEqual(value, this.$style.getRotation())) {
+        this.$style.setRotation(value)
+        this.scheduleRefresh()
+      }
+    },
+    rotateWithView (value) {
+      if (this.$style && !isEqual(value, this.$style.getRotateWithView())) {
         this.$style.setRotation(value)
         this.scheduleRefresh()
       }
