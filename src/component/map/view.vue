@@ -1,6 +1,6 @@
 <template>
   <i :class="[$options.name]" style="display: none !important;">
-    <slot :center="viewCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation"/>
+    <slot :center="currentCenter" :zoom="currentZoom" :resolution="currentResolution" :rotation="currentRotation"/>
   </i>
 </template>
 
@@ -105,33 +105,33 @@
       },
     },
     computed: {
-      viewZoom () {
+      currentZoom () {
         if (this.rev && this.$view) {
           return Math.round(this.$view.getZoom())
         }
 
         return this.zoom
       },
-      viewRotation () {
+      currentRotation () {
         if (this.rev && this.$view) {
           return this.$view.getRotation()
         }
 
         return this.rotation
       },
-      viewResolution () {
+      currentResolution () {
         if (this.rev && this.$view) {
           return this.$view.getResolution()
         }
 
         return this.resolution
       },
-      viewCenter () {
+      currentCenter () {
         if (this.rev && this.$view) {
           return this.pointToDataProj(this.$view.getCenter())
         }
       },
-      viewCenterViewProj () {
+      currentCenterViewProj () {
         if (this.rev && this.$view) {
           return this.$view.getCenter()
         }
@@ -180,6 +180,8 @@
        * @protected
        */
       createOlObject () {
+        console.log('create')
+
         return new View({
           center: this.pointToViewProj(this.center),
           constrainRotation: this.constrainRotation,
@@ -254,14 +256,14 @@
         if (!this.$view || this.$view.getAnimating()) return
 
         value = this.pointToViewProj(value)
-        if (!isEqual(value, this.viewCenterViewProj)) {
+        if (!isEqual(value, this.currentCenterViewProj)) {
           this.$view.setCenter(value)
         }
       },
       resolution (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
-        if (value !== this.viewResolution) {
+        if (value !== this.currentResolution) {
           this.$view.setResolution(value)
         }
       },
@@ -269,14 +271,14 @@
         if (!this.$view || this.$view.getAnimating()) return
 
         value = Math.round(value)
-        if (value !== this.viewZoom) {
+        if (value !== this.currentZoom) {
           this.$view.setZoom(value)
         }
       },
       rotation (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
-        if (value !== this.viewRotation) {
+        if (value !== this.currentRotation) {
           this.$view.setRotation(value)
         }
       },
@@ -294,12 +296,8 @@
           this.$view.setMaxZoom(value)
         }
       },
-      resolvedDataProjection () {
-        if (!this.$view) return
-
-        this.$view.setCenter(this.pointToViewProj(this.center))
-      },
       ...makeWatchers([
+        'resolvedDataProjection',
         'constrainRotation',
         'enableRotation',
         'extent',

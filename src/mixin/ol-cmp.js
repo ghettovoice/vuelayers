@@ -248,7 +248,7 @@ function defineLifeCyclePromises () {
 }
 
 function defineDebouncedHelpers () {
-  const t = 1000 / 60
+  const t = 1000 / 10
   // bind debounced functions at runtime
   // for each instance to avoid interfering between
   // different instances
