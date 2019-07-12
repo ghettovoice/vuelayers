@@ -48,10 +48,10 @@
           <!--<vl-geom-point :coordinates="[0, 0]" />-->
         <!--</vl-feature>-->
 
-<!--        <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">-->
-<!--          <vl-source-vector :features.sync="features" ref="featuresSource" />-->
-<!--          <vl-style-func :factory="styleFuncFactory" />-->
-<!--        </vl-layer-vector>-->
+        <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">
+          <vl-source-vector :features.sync="features" ref="featuresSource" />
+          <vl-style-func :factory="styleFuncFactory" />
+        </vl-layer-vector>
 
         <vl-layer-vector id="clusters" render-mode="image">
           <vl-source-cluster :distance="50">
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-  import { isFunction, range, random, forEach, throttle } from 'lodash'
+  import { isFunction, range, random, forEach, throttle, cloneDeep } from 'lodash'
   import * as eventCondition from 'ol/events/condition'
   import { inAndOut } from 'ol/easing'
   import Feature from 'ol/Feature'
@@ -86,7 +86,7 @@
       ]
       return {
         type: 'Feature',
-        id: 'random-' + i,
+        // id: 'random-' + i,
         geometry: {
           type: 'Point',
           coordinates: coordinate,
@@ -255,7 +255,7 @@
     },
     mounted () {
       setTimeout(() => {
-        this.features = features.slice()
+        this.features = cloneDeep(features)
       }, 1000)
     },
     beforeDestroy () {

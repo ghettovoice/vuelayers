@@ -2,7 +2,7 @@
   import VectorSource from 'ol/source/Vector'
   import { fetch } from 'whatwg-fetch'
   import { vectorSource } from '../../mixin'
-  import { createGeoJsonFmt, getFeatureId, loadingAll, transform } from '../../ol-ext'
+  import { createGeoJsonFmt, getFeatureId, initializeFeature, loadingAll, transform } from '../../ol-ext'
   import { constant, difference, isEmpty, isFinite, isFunction, stubArray } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -131,12 +131,15 @@
     watch: {
       features: {
         deep: true,
-        handler (value) {
+        handler (features) {
           if (!this.$source) return
 
-          this.addFeatures(value)
+          features = features.slice().map(feature => initializeFeature({
+            ...feature,
+          }))
+          this.addFeatures(features)
 
-          const forRemove = difference(this.getFeatures(), value, (a, b) => getFeatureId(a) === getFeatureId(b))
+          const forRemove = difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forRemove)
         },
       },

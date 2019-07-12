@@ -12,7 +12,7 @@
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapOp, debounceTime } from 'rxjs/operators'
   import { interaction, projTransforms, stylesContainer, featuresContainer } from '../../mixin'
-  import { getFeatureId, createStyle, defaultEditStyle, getLayerId } from '../../ol-ext'
+  import { getFeatureId, createStyle, defaultEditStyle, getLayerId, initializeFeature } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasInteraction, hasMap } from '../../util/assert'
   import { constant, difference, forEach, isEqual, isFunction, mapValues, stubArray } from '../../util/minilo'
@@ -262,12 +262,15 @@
     watch: {
       features: {
         deep: true,
-        handler (value) {
+        handler (features) {
           if (!this.$interaction) return
 
-          this.addFeatures(value)
+          features = features.slice().map(feature => initializeFeature({
+            ...feature,
+          }))
+          this.addFeatures(features)
 
-          let forUnselect = difference(this.getFeatures(), value, (a, b) => getFeatureId(a) === getFeatureId(b))
+          let forUnselect = difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forUnselect)
         },
       },

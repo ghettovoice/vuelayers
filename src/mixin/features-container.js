@@ -48,10 +48,10 @@ export default {
         feature = this.readFeatureInDataProj(feature)
       }
       instanceOf(feature, Feature)
+      initializeFeature(feature)
 
       const foundFeature = this.getFeatureById(getFeatureId(feature))
       if (foundFeature == null) {
-        initializeFeature(feature)
         this._featuresCollection.push(feature)
       } else {
         mergeFeatures(foundFeature, feature)
@@ -72,6 +72,7 @@ export default {
       feature = this.getFeatureById(getFeatureId(feature))
       if (!feature) return
 
+      initializeFeature(feature)
       this._featuresCollection.remove(feature)
     },
     /**
