@@ -83,9 +83,9 @@
     createTileGrid () {
       hasView(this)
 
-      var extent = createExtentFromProjection(this.$view.getProjection())
-      var resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
-      var origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
+      let extent = createExtentFromProjection(this.$view.getProjection())
+      let resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
+      let origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
 
       return new WMTSTileGrid({
         extent: extent,

@@ -10,7 +10,7 @@
     },
     serverType: {
       type: String,
-      validator: value => !value | Object.values(WMSServerType).includes(value),
+      validator: value => !value || Object.values(WMSServerType).includes(value),
     },
     imageLoadFunction: Function,
     ratio: {
