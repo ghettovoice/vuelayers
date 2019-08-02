@@ -130,7 +130,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^4.0.2",
     "loader-utils": "^1.1.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "magic-string": "^0.25.1",
     "mini-css-extract-plugin": "^0.4.3",
     "mocha": "^5.2.0",
