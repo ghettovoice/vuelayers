@@ -72,11 +72,11 @@ export default {
   },
   computed: {
     /**
-     * @type {string}
+     * @type {string|undefined}
      */
     urlTmpl () {
       if (!isString(this.url)) {
-        return ''
+        return
       }
 
       return replaceTokens(this.url, pick(this, this.urlTokens))
@@ -90,15 +90,9 @@ export default {
       }
 
       let url
-      if (isString(this.url)) {
-        const grid = createXyzGrid({
-          extent: createExtentFromProjection(this.projection),
-          maxZoom: this.maxZoom,
-          minZoom: this.minZoom,
-          tileSize: this.tileSize,
-        })
+      if (this.urlTmpl != null) {
         const extent = createExtentFromProjection(this.projection)
-        url = createTileUrlFunction(this.urlTmpl, grid, extent)
+        url = createTileUrlFunction(this.urlTmpl, this._tileGrid, extent)
       } else {
         url = this.url
       }
@@ -112,6 +106,17 @@ export default {
      * @protected
      */
     init () {
+      /**
+       * @type {module:ol/Tile~UrlFunction}
+       * @protected
+       */
+      this._tileGrid = createXyzGrid({
+        extent: createExtentFromProjection(this.projection),
+        maxZoom: this.maxZoom,
+        minZoom: this.minZoom,
+        tileSize: this.tileSize,
+      })
+
       return this::source.methods.init()
     },
     /**
@@ -133,7 +138,7 @@ export default {
      * @protected
      */
     unmount () {
-      this::source.methods.mount()
+      this::source.methods.unmount()
     },
     subscribeAll () {
       this::source.methods.subscribeAll()
