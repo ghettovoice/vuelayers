@@ -44,22 +44,26 @@
           <vl-source-sputnik />
         </vl-layer-tile>
 
+        <vl-layer-vector id="dyn-url" render-mode="image">
+          <vl-source-vector ref="dynUrlSource" :url="dynUrl" />
+        </vl-layer-vector>
+
         <!--<vl-feature id="marker">-->
           <!--<vl-geom-point :coordinates="[0, 0]" />-->
         <!--</vl-feature>-->
 
-        <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">
-          <vl-source-vector :features.sync="features" ref="featuresSource" />
-          <vl-style-func :factory="styleFuncFactory" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="features" ref="featuresLayer" render-mode="image">-->
+        <!--  <vl-source-vector :features.sync="features" ref="featuresSource" />-->
+        <!--  <vl-style-func :factory="styleFuncFactory" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-layer-vector id="clusters" render-mode="image">
-          <vl-source-cluster :distance="50">
-            <vl-source-vector :features="clusterFeatures"></vl-source-vector>
-          </vl-source-cluster>
+        <!--<vl-layer-vector id="clusters" render-mode="image">-->
+        <!--  <vl-source-cluster :distance="50">-->
+        <!--    <vl-source-vector :features="clusterFeatures"></vl-source-vector>-->
+        <!--  </vl-source-cluster>-->
 
-          <vl-style-func :factory="makeClusterStyleFunc"></vl-style-func>
-        </vl-layer-vector>
+        <!--  <vl-style-func :factory="makeClusterStyleFunc"></vl-style-func>-->
+        <!--</vl-layer-vector>-->
 
         <!--<vl-layer-vector id="draw-pane" v-if="drawType != null">-->
           <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
@@ -79,7 +83,7 @@
   import Point from 'ol/geom/Point'
   import { findPointOnSurface, defaultStyle, createStyle, pointFromLonLat } from '../src/ol-ext'
 
-  const features = range(0, 100).map(i => {
+  const features = range(0, 100).map(() => {
       let coordinate = [
         random(-50, 50),
         random(-50, 50),
@@ -109,7 +113,10 @@
         drawType: undefined,
         drawnFeatures: [],
         selectByHover: false,
-        clusterFeatures: []
+        clusterFeatures: [],
+        dynUrl: undefined,
+        countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
+        riversUrl: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_rivers_lake_centerlines.geojson',
       }
     },
     computed: {
@@ -257,6 +264,15 @@
       setTimeout(() => {
         this.features = cloneDeep(features)
       }, 1000)
+
+      this.dynUrl = this.countriesUrl
+      setInterval(() => {
+        if (this.dynUrl === this.countriesUrl) {
+          this.dynUrl = this.riversUrl
+        } else {
+          this.dynUrl = this.countriesUrl
+        }
+      }, 5000)
     },
     beforeDestroy () {
       forEach(this.featureAnimations, cancel => cancel())

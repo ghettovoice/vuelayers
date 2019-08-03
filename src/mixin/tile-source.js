@@ -12,7 +12,7 @@ import {
 import { createExtentFromProjection } from '../ol-ext/extent'
 import { createXyzGrid } from '../ol-ext/tile-grid'
 import { hasSource } from '../util/assert'
-import { isEqual, isFunction, isString, pick, replaceTokens } from '../util/minilo'
+import { isEqual, isString, pick, replaceTokens } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
 import withUrl from './with-url'
@@ -72,46 +72,35 @@ export default {
   },
   computed: {
     /**
-     * @type {string}
+     * @type {string|undefined}
      */
     urlTmpl () {
       if (!isString(this.url)) {
-        return ''
+        return
       }
 
       return replaceTokens(this.url, pick(this, this.urlTokens))
     },
-  },
-  methods: {
     /**
-     * @return {module:ol/tilegrid/TileGrid~TileGrid}
-     * @protected
+     * @returns {function}
      */
-    createTileGrid () {
-      return createXyzGrid({
-        extent: createExtentFromProjection(this.projection),
-        maxZoom: this.maxZoom,
-        minZoom: this.minZoom,
-        tileSize: this.tileSize,
-      })
-    },
-    /**
-     * @return {module:ol/Tile~UrlFunction}
-     * @protected
-     */
-    createUrlFunc () {
-      // custom url function provided
-      if (isFunction(this.url)) {
-        return this.url
+    urlFunc () {
+      if (!this.url) {
+        return
       }
 
-      // or use url function from ol-tilecache
-      return createTileUrlFunction(
-        this.urlTmpl,
-        this._tileGrid,
-        createExtentFromProjection(this.projection),
-      )
+      let url
+      if (this.urlTmpl != null) {
+        const extent = createExtentFromProjection(this.projection)
+        url = createTileUrlFunction(this.urlTmpl, this._tileGrid, extent)
+      } else {
+        url = this.url
+      }
+
+      return url
     },
+  },
+  methods: {
     /**
      * @return {Promise}
      * @protected
@@ -121,7 +110,12 @@ export default {
        * @type {module:ol/Tile~UrlFunction}
        * @protected
        */
-      this._tileGrid = this.createTileGrid()
+      this._tileGrid = createXyzGrid({
+        extent: createExtentFromProjection(this.projection),
+        maxZoom: this.maxZoom,
+        minZoom: this.minZoom,
+        tileSize: this.tileSize,
+      })
 
       return this::source.methods.init()
     },
@@ -130,8 +124,6 @@ export default {
      * @protected
      */
     deinit () {
-      this._tileGrid = undefined
-
       return this::source.methods.deinit()
     },
     /**
@@ -146,7 +138,7 @@ export default {
      * @protected
      */
     unmount () {
-      this::source.methods.mount()
+      this::source.methods.unmount()
     },
     subscribeAll () {
       this::source.methods.subscribeAll()
@@ -191,22 +183,13 @@ export default {
       'crossOrigin',
       'reprojectionErrorThreshold',
       'transition',
-    ], () => function (value, prevValue) {
-      if (isEqual(value, prevValue)) return
-
-      this.scheduleRecreate()
-    }),
-    ...makeWatchers([
       'maxZoom',
       'minZoom',
       'tileSize',
     ], () => function (value, prevValue) {
-      if (!this.$source || isEqual(value, prevValue)) return
+      if (isEqual(value, prevValue)) return
 
-      this._tileGrid = this.createTileGrid()
-      this.$source.setTileGridForProjection(this.projection, this._tileGrid)
-      this.$source.setTileUrlFunction(this.createUrlFunc())
-      this.scheduleRefresh()
+      this.scheduleRecreate()
     }),
   },
 }
