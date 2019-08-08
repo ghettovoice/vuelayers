@@ -17,13 +17,13 @@
         <vl-view :center="center" :rotation="rotation" :zoom="zoom" :extent="[0, 0, 100, 50]" ident="view" ref="view" />
 
         <!--<vl-graticule :show-labels="true" v-if="graticule">-->
-          <!--<vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>-->
-          <!--<vl-style-text slot="lon" text-baseline="bottom">-->
-            <!--<vl-style-stroke color="blue" />-->
-          <!--</vl-style-text>-->
-          <!--<vl-style-text slot="lat" text-align="end">-->
-            <!--<vl-style-stroke color="black" />-->
-          <!--</vl-style-text>-->
+        <!--<vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>-->
+        <!--<vl-style-text slot="lon" text-baseline="bottom">-->
+        <!--<vl-style-stroke color="blue" />-->
+        <!--</vl-style-text>-->
+        <!--<vl-style-text slot="lat" text-align="end">-->
+        <!--<vl-style-stroke color="black" />-->
+        <!--</vl-style-text>-->
         <!--</vl-graticule>-->
 
         <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">
@@ -33,7 +33,7 @@
                         :auto-pan-animation="{ duration: 300 }"
                         class-name="ol-overlay-container ol-selectable smooth-transition"
                         positioning="bottom-right">
-              <div style="background: #fff; padding: 10px; width: 200px">
+              <div style="background: #ffffff; padding: 10px; width: 200px">
                 {{ feature }}
               </div>
             </vl-overlay>
@@ -45,10 +45,11 @@
             <vl-feature v-if="geoloc.position" id="position-feature">
               <vl-geom-point :coordinates="geoloc.position"></vl-geom-point>
               <vl-style-box>
-                <vl-style-circle :radius="7">
-                  <vl-style-stroke color="red" />
-                  <vl-style-fill color="blue" />
-                </vl-style-circle>
+                <vl-style-icon :src="iconUrl" />
+                <!--<vl-style-circle :radius="7">-->
+                <!--  <vl-style-stroke color="red" />-->
+                <!--  <vl-style-fill color="blue" />-->
+                <!--</vl-style-circle>-->
               </vl-style-box>
             </vl-feature>
           </template>
@@ -63,7 +64,7 @@
         <!--</vl-layer-vector>-->
 
         <!--<vl-feature id="marker">-->
-          <!--<vl-geom-point :coordinates="[0, 0]" />-->
+        <!--<vl-geom-point :coordinates="[0, 0]" />-->
         <!--</vl-feature>-->
 
         <vl-layer-group>
@@ -82,7 +83,7 @@
         </vl-layer-group>
 
         <!--<vl-layer-vector id="draw-pane" v-if="drawType != null">-->
-          <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
+        <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
         <!--</vl-layer-vector>-->
 
         <!--<vl-interaction-draw :type="drawType" source="draw-target" v-if="drawType != null" />-->
@@ -92,27 +93,27 @@
 </template>
 
 <script>
-  import { isFunction, range, random, forEach, throttle, cloneDeep } from 'lodash'
-  import * as eventCondition from 'ol/events/condition'
+  import { cloneDeep, forEach, isFunction, random, range, throttle } from 'lodash'
   import { inAndOut } from 'ol/easing'
+  import * as eventCondition from 'ol/events/condition'
   import Feature from 'ol/Feature'
   import Point from 'ol/geom/Point'
-  import { findPointOnSurface, defaultStyle, createStyle, pointFromLonLat } from '../src/ol-ext'
+  import { createStyle, defaultStyle, findPointOnSurface, pointFromLonLat } from '../src/ol-ext'
 
   const features = range(0, 100).map(() => {
-      let coordinate = [
-        random(-50, 50),
-        random(-50, 50),
-      ]
-      return {
-        type: 'Feature',
-        // id: 'random-' + i,
-        geometry: {
-          type: 'Point',
-          coordinates: coordinate,
-        },
-      }
-    })
+    let coordinate = [
+      random(-50, 50),
+      random(-50, 50),
+    ]
+    return {
+      type: 'Feature',
+      // id: 'random-' + i,
+      geometry: {
+        type: 'Point',
+        coordinates: coordinate,
+      },
+    }
+  })
 
   export default {
     name: 'app',
@@ -133,6 +134,7 @@
         dynUrl: undefined,
         countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
         riversUrl: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_rivers_lake_centerlines.geojson',
+        iconUrl: 'https://openlayers.org/en/latest/examples/data/icon.png',
       }
     },
     computed: {
@@ -165,7 +167,7 @@
               undefined,
               (lon, lat) => {
                 feature.geometry.coordinates = [lon, lat]
-              }
+              },
             )
           })
         })
@@ -263,10 +265,10 @@
           if (!style) {
             style = createStyle({
               imageRadius: 10,
-              strokeColor: '#fff',
+              strokeColor: '#ffffff',
               fillColor: '#3399cc',
               text: size.toString(),
-              textFillColor: '#fff',
+              textFillColor: '#ffffff',
             })
 
             cache[size] = style
@@ -295,7 +297,7 @@
     },
     beforeDestroy () {
       forEach(this.featureAnimations, cancel => cancel())
-    }
+    },
   }
 </script>
 
