@@ -16,6 +16,7 @@
           visible: this.visible,
           extent: this.extent,
           zIndex: this.zIndex,
+          layers: this._layersCollection,
         })
       },
       getServices () {

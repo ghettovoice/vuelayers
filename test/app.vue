@@ -44,26 +44,28 @@
           <vl-source-sputnik />
         </vl-layer-tile>
 
-        <vl-layer-vector id="dyn-url" render-mode="image">
-          <vl-source-vector ref="dynUrlSource" :url="dynUrl" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="dyn-url" render-mode="image">-->
+        <!--  <vl-source-vector ref="dynUrlSource" :url="dynUrl" />-->
+        <!--</vl-layer-vector>-->
 
         <!--<vl-feature id="marker">-->
           <!--<vl-geom-point :coordinates="[0, 0]" />-->
         <!--</vl-feature>-->
 
-        <!--<vl-layer-vector id="features" ref="featuresLayer" render-mode="image">-->
-        <!--  <vl-source-vector :features.sync="features" ref="featuresSource" />-->
-        <!--  <vl-style-func :factory="styleFuncFactory" />-->
-        <!--</vl-layer-vector>-->
+        <vl-layer-group>
+          <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">
+            <vl-source-vector :features.sync="features" ref="featuresSource" />
+            <vl-style-func :factory="styleFuncFactory" />
+          </vl-layer-vector>
 
-        <!--<vl-layer-vector id="clusters" render-mode="image">-->
-        <!--  <vl-source-cluster :distance="50">-->
-        <!--    <vl-source-vector :features="clusterFeatures"></vl-source-vector>-->
-        <!--  </vl-source-cluster>-->
+          <vl-layer-vector id="clusters" render-mode="image">
+            <vl-source-cluster :distance="50">
+              <vl-source-vector :features="clusterFeatures"></vl-source-vector>
+            </vl-source-cluster>
 
-        <!--  <vl-style-func :factory="makeClusterStyleFunc"></vl-style-func>-->
-        <!--</vl-layer-vector>-->
+            <vl-style-func :factory="makeClusterStyleFunc"></vl-style-func>
+          </vl-layer-vector>
+        </vl-layer-group>
 
         <!--<vl-layer-vector id="draw-pane" v-if="drawType != null">-->
           <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
@@ -222,7 +224,7 @@
         this.$refs.map.$map.render()
       },
       loadClusterFeatures () {
-        this.clusterFeatures = _.range(0, 10000).map(i => {
+        this.clusterFeatures = _.range(0, 100).map(i => {
           let coordinate = [
             _.random(-50, 50),
             _.random(-50, 50),
