@@ -40,6 +40,20 @@
           </template>
         </vl-interaction-select>
 
+        <vl-geoloc @update:position="onUpdatePosition">
+          <template slot-scope="geoloc">
+            <vl-feature v-if="geoloc.position" id="position-feature">
+              <vl-geom-point :coordinates="geoloc.position"></vl-geom-point>
+              <vl-style-box>
+                <vl-style-circle :radius="7">
+                  <vl-style-stroke color="red" />
+                  <vl-style-fill color="blue" />
+                </vl-style-circle>
+              </vl-style-box>
+            </vl-feature>
+          </template>
+        </vl-geoloc>
+
         <vl-layer-tile>
           <vl-source-sputnik />
         </vl-layer-tile>
@@ -260,6 +274,9 @@
 
           return [style]
         }
+      },
+      onUpdatePosition (position) {
+        console.log('geoloc pos', position)
       },
     },
     mounted () {
