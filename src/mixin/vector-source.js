@@ -114,13 +114,4 @@ function subscribeToEvents () {
   this.subscribeTo(events, () => {
     this.$emit('update:features', this.featuresDataProj)
   })
-
-  // todo only for backward compatibility, remove later
-  this.subscribeTo(mergeObs(
-    observableFromOlEvent(this.$source, 'addfeature'),
-    observableFromOlEvent(this.$source, 'removefeature'),
-    observableFromOlEvent(this.$source, 'changefeature')
-  ), evt => {
-    this.$emit(evt.type, evt)
-  })
 }

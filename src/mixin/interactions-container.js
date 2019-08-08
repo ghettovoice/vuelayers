@@ -116,7 +116,7 @@ export default {
     this.subscribeTo(events, ({ type, element }) => {
       ++this.rev
 
-      this.$emit(type + ':interaction', getInteractionId(element))
+      this.$emit(type + ':interaction', element)
     })
   },
 }
