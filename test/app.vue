@@ -53,10 +53,10 @@
         <!--</vl-feature>-->
 
         <vl-layer-group>
-          <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">
+          <vl-layer-heatmap id="features" ref="featuresLayer" render-mode="image">
             <vl-source-vector :features.sync="features" ref="featuresSource" />
-            <vl-style-func :factory="styleFuncFactory" />
-          </vl-layer-vector>
+            <!--<vl-style-func :factory="styleFuncFactory" />-->
+          </vl-layer-heatmap>
 
           <vl-layer-vector id="clusters" render-mode="image">
             <vl-source-cluster :distance="50">
