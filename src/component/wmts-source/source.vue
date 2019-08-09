@@ -1,7 +1,7 @@
 <script>
   import WMTSSource from 'ol/source/WMTS'
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
-  import { makeWatchers } from 'util/vue-helpers'
+  import { makeWatchers } from '../../util/vue-helpers'
   import tileSource from '../../mixin/tile-source'
   import { EXTENT_CORNER, WMTS_FORMAT, WMTS_REQUEST_ENCODING, WMTS_VERSION } from '../../ol-ext/consts'
   import { createExtentFromProjection, getExtentCorner } from '../../ol-ext/extent'

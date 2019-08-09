@@ -1,7 +1,7 @@
 <script>
   import TileWMSSource from 'ol/source/TileWMS'
   import WMSServerType from 'ol/source/WMSServerType'
-  import { makeWatchers } from 'util/vue-helpers'
+  import { makeWatchers } from '../../util/vue-helpers'
   import { tileSource, wmsSource } from '../../mixin'
 
   export default {
