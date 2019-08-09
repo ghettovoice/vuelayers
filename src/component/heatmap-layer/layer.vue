@@ -1,7 +1,7 @@
 <script>
   import HeatmapLayer from 'ol/layer/Heatmap'
-  import { isEqual } from 'util/minilo'
-  import { makeWatchers } from 'util/vue-helpers'
+  import { isEqual } from '../../util/minilo'
+  import { makeWatchers } from '../../util/vue-helpers'
   import { vectorLayer } from '../../mixin'
 
   export default {
