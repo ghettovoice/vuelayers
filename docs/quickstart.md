@@ -1,7 +1,7 @@
 # Quick start
 
-VueLayers distributed as a set of separated components and mixins built as **ES2015** modules.
-For in browser usage there is full standalone **UMD** bundle provided.
+VueLayers is distributed as a set of separated components and mixins built as **ES2015** modules.
+For in-browser usage, there is a full standalone **UMD** bundle provided.
 
 ## Installation
 
@@ -26,7 +26,7 @@ npm install vuelayers@next
 Recommended: [unpkg](https://unpkg.com/)  
 You can browse the source of the npm package at [unpkg.com/vuelayers/](https://unpkg.com/vuelayers/).
 
-!> OpenLayers doesn't included into package, so you should add it yourself  
+!> OpenLayers isn't included in the package, so you should add it yourself.
 
 ```html
 <!-- include Vue -->
@@ -86,12 +86,12 @@ Vue.use(Geoloc)
 
 ### Global data projection
 
-By default all components accepts coordinates in map view projection (**EPSG:3857** by default)
+By default all components accept coordinates in map view projection (**EPSG:3857** by default)
 but you can bind all components to accept and return coordinates in another projection with
 `dataProjection` global option or with [`data-projection`](component/map.md#data-projection) property on the `vl-map` component. 
 
 This rule applies only for plain coordinates, GeoJSON encoded features or 
-geometries. It works only as thin projection transform layer between Vue and OpenLayers therefore
+geometries. It works only as a thin projection transform layer between Vue and OpenLayers therefore
 internally OpenLayers objects would still use current projection of the map view.
 
 ```js
@@ -102,7 +102,7 @@ Vue.use(VueLayers, {
 ```
 
 Now you are ready to build your awesome GIS application. Check the [VueLayers official demo](demo.md) to get 
-more ideas what you can make with VueLayers.
+more ideas on what you can make with VueLayers.
 
 Simple map with OSM layer example (editable)
 
