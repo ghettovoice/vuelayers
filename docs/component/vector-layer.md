@@ -210,14 +210,6 @@ Whether the layer will be visible on the map.
 
 Layer opacity value between `[0, 1]`.
 
-### overlay
-
-- **Type**: `boolean`
-- **Default**: `false`
-
-When set to `true` the layer will be rendered as overlay. The map will not manage this layer in its layers collection, 
-and the layer will be rendered on top.
-
 ### min-resolution
 
 - **Type**: `number`
