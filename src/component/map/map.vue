@@ -49,6 +49,15 @@
         default: true,
       },
       /**
+       * Options for default interactions added to the map by default. Object
+       * value is used to configure default interactions.
+       * @type {Object}
+       */
+      defaultInteractionsOptions: {
+        type: Object,
+        default: () => ({}),
+      },
+      /**
        * The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard
        * interactions will always trigger. If this option is not specified, the element the library listens to keyboard
        * events on is the component root element.
@@ -342,7 +351,7 @@
         : new Collection()
       // initialize default set of interactions
       // todo initialize without interactions and provide vl-interaction-default component
-      const interactions = createDefaultInteractions()
+      const interactions = createDefaultInteractions(this.defaultInteractionsOptions)
       interactions.forEach(interaction => initializeInteraction(interaction))
       this._interactionsCollection = interactions
       // prepare default overlay
