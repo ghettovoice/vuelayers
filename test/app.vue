@@ -28,34 +28,34 @@
         <!--</vl-style-text>-->
         <!--</vl-graticule>-->
 
-        <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">
-          <template slot-scope="select">
-            <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
-                        :position="pointOnSurface(feature.geometry)" :auto-pan="true"
-                        :auto-pan-animation="{ duration: 300 }"
-                        class-name="ol-overlay-container ol-selectable smooth-transition"
-                        positioning="bottom-right">
-              <div style="background: #ffffff; padding: 10px; width: 200px">
-                {{ feature }}
-              </div>
-            </vl-overlay>
-          </template>
-        </vl-interaction-select>
+        <!--<vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">-->
+        <!--  <template slot-scope="select">-->
+        <!--    <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"-->
+        <!--                :position="pointOnSurface(feature.geometry)" :auto-pan="true"-->
+        <!--                :auto-pan-animation="{ duration: 300 }"-->
+        <!--                class-name="ol-overlay-container ol-selectable smooth-transition"-->
+        <!--                positioning="bottom-right">-->
+        <!--      <div style="background: #ffffff; padding: 10px; width: 200px">-->
+        <!--        {{ feature }}-->
+        <!--      </div>-->
+        <!--    </vl-overlay>-->
+        <!--  </template>-->
+        <!--</vl-interaction-select>-->
 
-        <vl-geoloc @update:position="onUpdatePosition">
-          <template slot-scope="geoloc">
-            <vl-feature v-if="geoloc.position" id="position-feature">
-              <vl-geom-point :coordinates="geoloc.position"></vl-geom-point>
-              <vl-style-box>
-                <vl-style-icon :src="iconUrl" />
-                <!--<vl-style-circle :radius="7">-->
-                <!--  <vl-style-stroke color="red" />-->
-                <!--  <vl-style-fill color="blue" />-->
-                <!--</vl-style-circle>-->
-              </vl-style-box>
-            </vl-feature>
-          </template>
-        </vl-geoloc>
+        <!--<vl-geoloc @update:position="onUpdatePosition">-->
+        <!--  <template slot-scope="geoloc">-->
+        <!--    <vl-feature v-if="geoloc.position" id="position-feature">-->
+        <!--      <vl-geom-point :coordinates="geoloc.position" />-->
+        <!--      <vl-style-box>-->
+        <!--        <vl-style-icon :src="iconUrl" />-->
+        <!--        &lt;!&ndash;<vl-style-circle :radius="7">&ndash;&gt;-->
+        <!--        &lt;!&ndash;  <vl-style-stroke color="red" />&ndash;&gt;-->
+        <!--        &lt;!&ndash;  <vl-style-fill color="blue" />&ndash;&gt;-->
+        <!--        &lt;!&ndash;</vl-style-circle>&ndash;&gt;-->
+        <!--      </vl-style-box>-->
+        <!--    </vl-feature>-->
+        <!--  </template>-->
+        <!--</vl-geoloc>-->
 
         <vl-layer-tile>
           <vl-source-sputnik />
@@ -69,26 +69,35 @@
         <!--<vl-geom-point :coordinates="[0, 0]" />-->
         <!--</vl-feature>-->
 
-        <vl-layer-group>
-          <vl-layer-heatmap id="features" ref="featuresLayer" render-mode="image">
-            <vl-source-vector :features.sync="features" ref="featuresSource" />
-            <!--<vl-style-func :factory="styleFuncFactory" />-->
-          </vl-layer-heatmap>
+        <!--<vl-layer-group>-->
+        <!--  <vl-layer-heatmap id="features" ref="featuresLayer" render-mode="image">-->
+        <!--    <vl-source-vector :features.sync="features" ref="featuresSource" />-->
+        <!--    &lt;!&ndash;<vl-style-func :factory="styleFuncFactory" />&ndash;&gt;-->
+        <!--  </vl-layer-heatmap>-->
 
-          <vl-layer-vector id="clusters" render-mode="image">
-            <vl-source-cluster :distance="50">
-              <vl-source-vector :features="clusterFeatures"></vl-source-vector>
-            </vl-source-cluster>
+        <!--  <vl-layer-vector id="clusters" render-mode="image">-->
+        <!--    <vl-source-cluster :distance="50">-->
+        <!--      <vl-source-vector :features="clusterFeatures" />-->
+        <!--    </vl-source-cluster>-->
 
-            <vl-style-func :factory="makeClusterStyleFunc"></vl-style-func>
-          </vl-layer-vector>
-        </vl-layer-group>
+        <!--    <vl-style-func :factory="makeClusterStyleFunc" />-->
+        <!--  </vl-layer-vector>-->
+        <!--</vl-layer-group>-->
 
-        <!--<vl-layer-vector id="draw-pane" v-if="drawType != null">-->
-        <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
-        <!--</vl-layer-vector>-->
+        <vl-layer-vector id="draw-pane">
+          <vl-source-vector :features.sync="drawnFeatures" ident="drawTarget" />
+        </vl-layer-vector>
 
-        <!--<vl-interaction-draw :type="drawType" source="draw-target" v-if="drawType != null" />-->
+        <!--<vl-interaction-draw :type="drawType" source="drawTarget" v-if="drawType != null" />-->
+
+        <vl-interaction-modify source="drawTarget">
+          <vl-style-box>
+            <vl-style-circle :radius="5">
+              <vl-style-stroke color="green" />
+              <vl-style-fill color="green" />
+            </vl-style-circle>
+          </vl-style-box>
+        </vl-interaction-modify>
       </vl-map>
     </div>
   </div>
@@ -131,7 +140,24 @@
         graticule: false,
         showMap: true,
         drawType: undefined,
-        drawnFeatures: [],
+        drawnFeatures: [
+          {
+            id: 'drawn-1',
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [0, 0],
+                  [0, 20],
+                  [20, 20],
+                  [20, 0],
+                  [0, 0],
+                ],
+              ],
+            },
+          },
+        ],
         selectByHover: false,
         clusterFeatures: [],
         dynUrl: undefined,
