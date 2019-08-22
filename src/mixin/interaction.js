@@ -116,7 +116,6 @@ export default {
      * @protected
      */
     subscribeAll () {
-
     },
   },
   watch: {

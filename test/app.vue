@@ -88,7 +88,7 @@
           <vl-source-vector :features.sync="drawnFeatures" ident="drawTarget" />
         </vl-layer-vector>
 
-        <!--<vl-interaction-draw :type="drawType" source="drawTarget" v-if="drawType != null" />-->
+        <vl-interaction-draw v-if="drawType" :type="drawType" source="drawTarget" />
 
         <vl-interaction-modify source="drawTarget">
           <vl-style-box>
