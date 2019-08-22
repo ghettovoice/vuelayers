@@ -107,7 +107,7 @@
     computed: {
       currentZoom () {
         if (this.rev && this.$view) {
-          return Math.round(this.$view.getZoom())
+          return this.$view.getZoom()
         }
 
         return this.zoom
@@ -268,7 +268,6 @@
       zoom (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
-        value = Math.round(value)
         if (value !== this.currentZoom) {
           this.$view.setZoom(value)
         }
@@ -347,7 +346,7 @@
     const zoom = resolution.pipe(
       mapObs(() => ({
         prop: 'zoom',
-        value: Math.round(this.$view.getZoom()),
+        value: this.$view.getZoom(),
       })),
       distinctUntilKeyChanged('value'),
     )

@@ -14,7 +14,9 @@
       </div>
 
       <vl-map ref="map" v-if="showMap" data-projection="EPSG:4326">
-        <vl-view :center="center" :rotation="rotation" :zoom="zoom" :extent="[0, 0, 100, 50]" ident="view" ref="view" />
+        <vl-view :center.sync="center" :rotation.sync="rotation"
+                 :zoom.sync="zoom" :extent="[0, 0, 100, 50]"
+                 ident="view" ref="view" />
 
         <!--<vl-graticule :show-labels="true" v-if="graticule">-->
         <!--<vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>-->
@@ -120,6 +122,7 @@
     data () {
       return {
         zoom: 2,
+        resolution: 39135.75848201024,
         center: [100, 10],
         rotation: 0,
         features: [],
