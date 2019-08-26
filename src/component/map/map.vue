@@ -44,9 +44,18 @@
        * @type {Object|boolean}
        * @todo remove when vl-control-* components will be ready
        */
-      controls: {
+      defaultControls: {
         type: [Object, Boolean],
         default: true,
+      },
+      /**
+       * Options for default interactions added to the map by default. Object
+       * value is used to configure default interactions.
+       * @type {Object|boolean}
+       */
+      defaultInteractions: {
+        type: [Object, Boolean],
+        default: () => ({}),
       },
       /**
        * The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard
@@ -337,14 +346,14 @@
     created () {
       this._view = new View()
       // todo make controls handling like with interactions
-      this._controlsCollection = this.controls !== false
-        ? createDefaultControls(typeof this.controls === 'object' ? this.controls : undefined)
+      this._controlsCollection = this.defaultControls !== false
+        ? createDefaultControls(typeof this.defaultControls === 'object' ? this.defaultControls : undefined)
         : new Collection()
-      // initialize default set of interactions
       // todo initialize without interactions and provide vl-interaction-default component
-      const interactions = createDefaultInteractions()
-      interactions.forEach(interaction => initializeInteraction(interaction))
-      this._interactionsCollection = interactions
+      this._interactionsCollection = this.defaultInteractions !== false
+        ? createDefaultInteractions(typeof this.defaultInteractions === 'object' ? this.defaultInteractions : undefined)
+        : new Collection()
+      this._interactionsCollection.forEach(interaction => initializeInteraction(interaction))
       // prepare default overlay
       this._featuresOverlay = new VectorLayer({
         source: new VectorSource({
