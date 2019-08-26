@@ -42,6 +42,39 @@ You can browse the source of the npm package at [unpkg.com/vuelayers/](https://u
 </script>
 ```
 
+### Nuxt.js
+
+Create a plugin file (ex: `vuelayers.js`) in the `plugins/` directory, with this content
+
+```js
+import Vue from 'vue'
+import VueLayers from 'vuelayers'
+import 'vuelayers/lib/style.css' // needs css-loader
+
+Vue.use(VueLayers)
+```
+
+Create a file in `modules/` or `shared/` directory named `vuelayers.js`
+
+```js
+export default function (moduleOptions) {
+	this.options.css.push('vuelayers/lib/style.css')
+}
+```
+
+Then in the `nuxt.config.js` file, fill in the plugins and modules section properly. Note that `ssr: false` is mandatory if you use universal mode in Nuxt.
+
+```
+plugins: [{
+		src: '@/plugins/vueLayers',
+		ssr: false
+	}, { ... }],
+modules: [
+                ...,
+		'~/shared/vueLayers',
+	],
+```
+
 ### Build from source
 
 !> Node **v6+** is required
