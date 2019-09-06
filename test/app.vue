@@ -9,6 +9,10 @@
         <button @click="drawType = undefined">Stop draw</button>
         <button @click="loadClusterFeatures">Load cluster features</button>
         <div>
+          <input v-model="featureId" />
+          <button @click="selectById">Select by id</button>
+        </div>
+        <div>
           {{ selectedFeatures }}
         </div>
       </div>
@@ -28,19 +32,19 @@
         <!--</vl-style-text>-->
         <!--</vl-graticule>-->
 
-        <!--<vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">-->
-        <!--  <template slot-scope="select">-->
-        <!--    <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"-->
-        <!--                :position="pointOnSurface(feature.geometry)" :auto-pan="true"-->
-        <!--                :auto-pan-animation="{ duration: 300 }"-->
-        <!--                class-name="ol-overlay-container ol-selectable smooth-transition"-->
-        <!--                positioning="bottom-right">-->
-        <!--      <div style="background: #ffffff; padding: 10px; width: 200px">-->
-        <!--        {{ feature }}-->
-        <!--      </div>-->
-        <!--    </vl-overlay>-->
-        <!--  </template>-->
-        <!--</vl-interaction-select>-->
+        <vl-interaction-select ref="selectInteraction" :condition="selectCondition" :features.sync="selectedFeatures">
+          <template slot-scope="select">
+            <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
+                        :position="pointOnSurface(feature.geometry)" :auto-pan="true"
+                        :auto-pan-animation="{ duration: 300 }"
+                        class-name="ol-overlay-container ol-selectable smooth-transition"
+                        positioning="bottom-right">
+              <div style="background: #ffffff; padding: 10px; width: 200px">
+                {{ feature }}
+              </div>
+            </vl-overlay>
+          </template>
+        </vl-interaction-select>
 
         <!--<vl-geoloc @update:position="onUpdatePosition">-->
         <!--  <template slot-scope="geoloc">-->
@@ -75,29 +79,29 @@
         <!--    &lt;!&ndash;<vl-style-func :factory="styleFuncFactory" />&ndash;&gt;-->
         <!--  </vl-layer-heatmap>-->
 
-        <!--  <vl-layer-vector id="clusters" render-mode="image">-->
-        <!--    <vl-source-cluster :distance="50">-->
-        <!--      <vl-source-vector :features="clusterFeatures" />-->
-        <!--    </vl-source-cluster>-->
+          <vl-layer-vector id="clusters" render-mode="image">
+            <vl-source-cluster :distance="50">
+              <vl-source-vector :features="clusterFeatures" />
+            </vl-source-cluster>
 
-        <!--    <vl-style-func :factory="makeClusterStyleFunc" />-->
-        <!--  </vl-layer-vector>-->
+            <vl-style-func :factory="makeClusterStyleFunc" />
+          </vl-layer-vector>
         <!--</vl-layer-group>-->
 
-        <vl-layer-vector id="draw-pane">
-          <vl-source-vector :features.sync="drawnFeatures" ident="drawTarget" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="draw-pane">-->
+        <!--  <vl-source-vector :features.sync="drawnFeatures" ident="drawTarget" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-interaction-draw v-if="drawType" :type="drawType" source="drawTarget" />
+        <!--<vl-interaction-draw v-if="drawType" :type="drawType" source="drawTarget" />-->
 
-        <vl-interaction-modify source="drawTarget">
-          <vl-style-box>
-            <vl-style-circle :radius="5">
-              <vl-style-stroke color="green" />
-              <vl-style-fill color="green" />
-            </vl-style-circle>
-          </vl-style-box>
-        </vl-interaction-modify>
+        <!--<vl-interaction-modify source="drawTarget">-->
+        <!--  <vl-style-box>-->
+        <!--    <vl-style-circle :radius="5">-->
+        <!--      <vl-style-stroke color="green" />-->
+        <!--      <vl-style-fill color="green" />-->
+        <!--    </vl-style-circle>-->
+        <!--  </vl-style-box>-->
+        <!--</vl-interaction-modify>-->
       </vl-map>
     </div>
   </div>
@@ -164,6 +168,7 @@
         countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
         riversUrl: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_rivers_lake_centerlines.geojson',
         iconUrl: 'https://openlayers.org/en/latest/examples/data/icon.png',
+        featureId: undefined,
       }
     },
     computed: {
@@ -308,6 +313,11 @@
       },
       onUpdatePosition (position) {
         console.log('geoloc pos', position)
+      },
+      selectById () {
+        if (!this.featureId) return
+
+        this.$refs.selectInteraction.select(this.featureId)
       },
     },
     mounted () {
