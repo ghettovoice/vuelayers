@@ -22,6 +22,14 @@
   export default {
     name: 'vl-interaction-select',
     mixins: [interaction, featuresContainer, stylesContainer, projTransforms],
+    stubVNode: {
+      empty: false,
+      attrs () {
+        return {
+          class: this.$options.name,
+        }
+      },
+    },
     props: {
       /**
        * A function that takes an `ol.Feature` and an `ol.layer.Layer` and returns `true` if the feature may be selected or `false` otherwise.
@@ -294,14 +302,6 @@
       ], () => function () {
         this.scheduleRecreate()
       }),
-    },
-    stubVNode: {
-      empty: false,
-      attrs () {
-        return {
-          class: this.$options.name,
-        }
-      },
     },
   }
 

@@ -93,7 +93,7 @@ export default {
     this.subscribeTo(events, ({ type, element }) => {
       ++this.rev
 
-      this.$emit(type + ':layer', getLayerId(element))
+      this.$emit(type + ':layer', element)
     })
   },
 }

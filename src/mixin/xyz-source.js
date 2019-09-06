@@ -21,7 +21,7 @@ export default {
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         tileGrid: this._tileGrid,
         tilePixelRatio: this.tilePixelRatio,
-        tileUrlFunction: this.createUrlFunc(),
+        tileUrlFunction: this.urlFunc,
         tileLoadFunction: this.tileLoadFunction,
         wrapX: this.wrapX,
         transition: this.transition,

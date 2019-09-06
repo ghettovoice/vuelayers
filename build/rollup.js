@@ -189,6 +189,7 @@ function bundleOptions (format, package, env = 'development') {
         return false
       }
       options.replaces['process.env.NODE_ENV'] = `'${env}'`
+      options.replaces['process.env.VUELAYERS_DEBUG'] = JSON.stringify(process.env.NODE_ENV !== 'production')
       // options.minify = true
       // process.env.BABEL_ENV = 'es5-production'
       // options.defines.IS_STANDALONE = true

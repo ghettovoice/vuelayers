@@ -14,91 +14,124 @@
       </div>
 
       <vl-map ref="map" v-if="showMap" data-projection="EPSG:4326">
-        <vl-view :center="center" :rotation="rotation" :zoom="zoom" :extent="[0, 0, 100, 50]" ident="view" ref="view" />
+        <vl-view :center.sync="center" :rotation.sync="rotation"
+                 :zoom.sync="zoom" :extent="[0, 0, 100, 50]"
+                 ident="view" ref="view" />
 
         <!--<vl-graticule :show-labels="true" v-if="graticule">-->
-          <!--<vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>-->
-          <!--<vl-style-text slot="lon" text-baseline="bottom">-->
-            <!--<vl-style-stroke color="blue" />-->
-          <!--</vl-style-text>-->
-          <!--<vl-style-text slot="lat" text-align="end">-->
-            <!--<vl-style-stroke color="black" />-->
-          <!--</vl-style-text>-->
+        <!--<vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>-->
+        <!--<vl-style-text slot="lon" text-baseline="bottom">-->
+        <!--<vl-style-stroke color="blue" />-->
+        <!--</vl-style-text>-->
+        <!--<vl-style-text slot="lat" text-align="end">-->
+        <!--<vl-style-stroke color="black" />-->
+        <!--</vl-style-text>-->
         <!--</vl-graticule>-->
 
-        <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">
-          <template slot-scope="select">
-            <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
-                        :position="pointOnSurface(feature.geometry)" :auto-pan="true"
-                        :auto-pan-animation="{ duration: 300 }"
-                        class-name="ol-overlay-container ol-selectable smooth-transition"
-                        positioning="bottom-right">
-              <div style="background: #fff; padding: 10px; width: 200px">
-                {{ feature }}
-              </div>
-            </vl-overlay>
-          </template>
-        </vl-interaction-select>
+        <!--<vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">-->
+        <!--  <template slot-scope="select">-->
+        <!--    <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"-->
+        <!--                :position="pointOnSurface(feature.geometry)" :auto-pan="true"-->
+        <!--                :auto-pan-animation="{ duration: 300 }"-->
+        <!--                class-name="ol-overlay-container ol-selectable smooth-transition"-->
+        <!--                positioning="bottom-right">-->
+        <!--      <div style="background: #ffffff; padding: 10px; width: 200px">-->
+        <!--        {{ feature }}-->
+        <!--      </div>-->
+        <!--    </vl-overlay>-->
+        <!--  </template>-->
+        <!--</vl-interaction-select>-->
+
+        <!--<vl-geoloc @update:position="onUpdatePosition">-->
+        <!--  <template slot-scope="geoloc">-->
+        <!--    <vl-feature v-if="geoloc.position" id="position-feature">-->
+        <!--      <vl-geom-point :coordinates="geoloc.position" />-->
+        <!--      <vl-style-box>-->
+        <!--        <vl-style-icon :src="iconUrl" />-->
+        <!--        &lt;!&ndash;<vl-style-circle :radius="7">&ndash;&gt;-->
+        <!--        &lt;!&ndash;  <vl-style-stroke color="red" />&ndash;&gt;-->
+        <!--        &lt;!&ndash;  <vl-style-fill color="blue" />&ndash;&gt;-->
+        <!--        &lt;!&ndash;</vl-style-circle>&ndash;&gt;-->
+        <!--      </vl-style-box>-->
+        <!--    </vl-feature>-->
+        <!--  </template>-->
+        <!--</vl-geoloc>-->
 
         <vl-layer-tile>
           <vl-source-sputnik />
         </vl-layer-tile>
 
-        <!--<vl-feature id="marker">-->
-          <!--<vl-geom-point :coordinates="[0, 0]" />-->
-        <!--</vl-feature>-->
-
-        <vl-layer-vector id="features" ref="featuresLayer" render-mode="image">
-          <vl-source-vector :features.sync="features" ref="featuresSource" />
-          <vl-style-func :factory="styleFuncFactory" />
-        </vl-layer-vector>
-
-        <vl-layer-vector id="clusters" render-mode="image">
-          <vl-source-cluster :distance="50">
-            <vl-source-vector :features="clusterFeatures"></vl-source-vector>
-          </vl-source-cluster>
-
-          <vl-style-func :factory="makeClusterStyleFunc"></vl-style-func>
-        </vl-layer-vector>
-
-        <!--<vl-layer-vector id="draw-pane" v-if="drawType != null">-->
-          <!--<vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />-->
+        <!--<vl-layer-vector id="dyn-url" render-mode="image">-->
+        <!--  <vl-source-vector ref="dynUrlSource" :url="dynUrl" />-->
         <!--</vl-layer-vector>-->
 
-        <!--<vl-interaction-draw :type="drawType" source="draw-target" v-if="drawType != null" />-->
+        <!--<vl-feature id="marker">-->
+        <!--<vl-geom-point :coordinates="[0, 0]" />-->
+        <!--</vl-feature>-->
+
+        <!--<vl-layer-group>-->
+        <!--  <vl-layer-heatmap id="features" ref="featuresLayer" render-mode="image">-->
+        <!--    <vl-source-vector :features.sync="features" ref="featuresSource" />-->
+        <!--    &lt;!&ndash;<vl-style-func :factory="styleFuncFactory" />&ndash;&gt;-->
+        <!--  </vl-layer-heatmap>-->
+
+        <!--  <vl-layer-vector id="clusters" render-mode="image">-->
+        <!--    <vl-source-cluster :distance="50">-->
+        <!--      <vl-source-vector :features="clusterFeatures" />-->
+        <!--    </vl-source-cluster>-->
+
+        <!--    <vl-style-func :factory="makeClusterStyleFunc" />-->
+        <!--  </vl-layer-vector>-->
+        <!--</vl-layer-group>-->
+
+        <vl-layer-vector id="draw-pane">
+          <vl-source-vector :features.sync="drawnFeatures" ident="drawTarget" />
+        </vl-layer-vector>
+
+        <vl-interaction-draw v-if="drawType" :type="drawType" source="drawTarget" />
+
+        <vl-interaction-modify source="drawTarget">
+          <vl-style-box>
+            <vl-style-circle :radius="5">
+              <vl-style-stroke color="green" />
+              <vl-style-fill color="green" />
+            </vl-style-circle>
+          </vl-style-box>
+        </vl-interaction-modify>
       </vl-map>
     </div>
   </div>
 </template>
 
 <script>
-  import { isFunction, range, random, forEach, throttle, cloneDeep } from 'lodash'
-  import * as eventCondition from 'ol/events/condition'
+  import { cloneDeep, forEach, isFunction, random, range, throttle } from 'lodash'
   import { inAndOut } from 'ol/easing'
+  import * as eventCondition from 'ol/events/condition'
   import Feature from 'ol/Feature'
   import Point from 'ol/geom/Point'
-  import { findPointOnSurface, defaultStyle, createStyle, pointFromLonLat } from '../src/ol-ext'
+  import { createStyle, defaultStyle, findPointOnSurface, pointFromLonLat } from '../src/ol-ext'
 
-  const features = range(0, 100).map(i => {
-      let coordinate = [
-        random(-50, 50),
-        random(-50, 50),
-      ]
-      return {
-        type: 'Feature',
-        // id: 'random-' + i,
-        geometry: {
-          type: 'Point',
-          coordinates: coordinate,
-        },
-      }
-    })
+  const features = range(0, 100).map(() => {
+    let coordinate = [
+      random(-50, 50),
+      random(-50, 50),
+    ]
+    return {
+      type: 'Feature',
+      // id: 'random-' + i,
+      geometry: {
+        type: 'Point',
+        coordinates: coordinate,
+      },
+    }
+  })
 
   export default {
     name: 'app',
     data () {
       return {
         zoom: 2,
+        resolution: 39135.75848201024,
         center: [100, 10],
         rotation: 0,
         features: [],
@@ -107,9 +140,30 @@
         graticule: false,
         showMap: true,
         drawType: undefined,
-        drawnFeatures: [],
+        drawnFeatures: [
+          {
+            id: 'drawn-1',
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [0, 0],
+                  [0, 20],
+                  [20, 20],
+                  [20, 0],
+                  [0, 0],
+                ],
+              ],
+            },
+          },
+        ],
         selectByHover: false,
-        clusterFeatures: []
+        clusterFeatures: [],
+        dynUrl: undefined,
+        countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
+        riversUrl: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_rivers_lake_centerlines.geojson',
+        iconUrl: 'https://openlayers.org/en/latest/examples/data/icon.png',
       }
     },
     computed: {
@@ -142,7 +196,7 @@
               undefined,
               (lon, lat) => {
                 feature.geometry.coordinates = [lon, lat]
-              }
+              },
             )
           })
         })
@@ -215,7 +269,7 @@
         this.$refs.map.$map.render()
       },
       loadClusterFeatures () {
-        this.clusterFeatures = _.range(0, 10000).map(i => {
+        this.clusterFeatures = _.range(0, 100).map(i => {
           let coordinate = [
             _.random(-50, 50),
             _.random(-50, 50),
@@ -240,10 +294,10 @@
           if (!style) {
             style = createStyle({
               imageRadius: 10,
-              strokeColor: '#fff',
+              strokeColor: '#ffffff',
               fillColor: '#3399cc',
               text: size.toString(),
-              textFillColor: '#fff',
+              textFillColor: '#ffffff',
             })
 
             cache[size] = style
@@ -252,15 +306,27 @@
           return [style]
         }
       },
+      onUpdatePosition (position) {
+        console.log('geoloc pos', position)
+      },
     },
     mounted () {
       setTimeout(() => {
         this.features = cloneDeep(features)
       }, 1000)
+
+      this.dynUrl = this.countriesUrl
+      setInterval(() => {
+        if (this.dynUrl === this.countriesUrl) {
+          this.dynUrl = this.riversUrl
+        } else {
+          this.dynUrl = this.countriesUrl
+        }
+      }, 5000)
     },
     beforeDestroy () {
       forEach(this.featureAnimations, cancel => cancel())
-    }
+    },
   }
 </script>
 

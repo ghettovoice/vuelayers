@@ -13,7 +13,7 @@
   import { EPSG_3857, MAX_ZOOM, MIN_ZOOM, ZOOM_FACTOR } from '../../ol-ext'
   import { observableFromOlChangeEvent } from '../../rx-ext'
   import { hasView } from '../../util/assert'
-  import { coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
+  import { arrayLengthValidator, coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**
@@ -32,7 +32,7 @@
       center: {
         type: Array,
         default: () => [0, 0],
-        validator: value => value.length === 2,
+        validator: arrayLengthValidator(2),
       },
       constrainRotation: {
         type: [Boolean, Number],
@@ -49,7 +49,7 @@
        */
       extent: {
         type: Array,
-        validator: value => value.length === 4,
+        validator: arrayLengthValidator(4),
       },
       maxResolution: Number,
       minResolution: Number,
@@ -107,7 +107,7 @@
     computed: {
       currentZoom () {
         if (this.rev && this.$view) {
-          return Math.round(this.$view.getZoom())
+          return this.$view.getZoom()
         }
 
         return this.zoom
@@ -180,8 +180,6 @@
        * @protected
        */
       createOlObject () {
-        console.log('create')
-
         return new View({
           center: this.pointToViewProj(this.center),
           constrainRotation: this.constrainRotation,
@@ -270,7 +268,6 @@
       zoom (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
-        value = Math.round(value)
         if (value !== this.currentZoom) {
           this.$view.setZoom(value)
         }
@@ -349,7 +346,7 @@
     const zoom = resolution.pipe(
       mapObs(() => ({
         prop: 'zoom',
-        value: Math.round(this.$view.getZoom()),
+        value: this.$view.getZoom(),
       })),
       distinctUntilKeyChanged('value'),
     )

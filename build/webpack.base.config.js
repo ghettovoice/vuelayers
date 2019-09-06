@@ -110,6 +110,7 @@ module.exports = {
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin(Object.assign({}, config.replaces, {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+      'process.env.VUELAYERS_DEBUG': process.env.NODE_ENV !== 'production',
     })),
     new webpack.BannerPlugin({
       banner: config.banner,

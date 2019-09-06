@@ -93,7 +93,7 @@ export default {
     this.subscribeTo(events, ({ type, element }) => {
       ++this.rev
 
-      this.$emit(type + ':overlay', getOverlayId(element))
+      this.$emit(type + ':overlay', element)
     })
   },
 }

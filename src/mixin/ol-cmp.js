@@ -185,7 +185,7 @@ function defineLifeCyclePromises () {
   const makeEventEmitter = event => () => {
     this.$emit(event, this)
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.VUELAYERS_DEBUG) {
       log(event, this.name)
     }
 

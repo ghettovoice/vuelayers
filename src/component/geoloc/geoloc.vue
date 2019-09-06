@@ -27,7 +27,6 @@
        * @type {string}
        */
       projection: String,
-      // todo add autoCenter, bindToPosition
     },
     computed: {
       accuracy () {
@@ -61,7 +60,7 @@
         }
       },
       positionViewProj () {
-        if (this.position && this.resolvedDataProjection) {
+        if (this.position && this.viewProjection) {
           return this.pointToViewProj(this.position)
         }
       },
@@ -166,7 +165,7 @@
   function subscribeToGeolocation () {
     hasGeolocation(this)
 
-    const ft = 100
+    const ft = 1000 / 60
     const changes = merge(
       observableFromOlChangeEvent(
         this.$geolocation,
@@ -185,7 +184,6 @@
         'position',
         true,
         ft,
-        () => this.position,
       ),
     )
 
