@@ -1,4 +1,5 @@
 <script>
+  import { hasInnerSource } from 'util/assert'
   import { makeWatchers } from 'util/vue-helpers'
   import sourceContainer from '../../mixin/source-container'
   import vectorSource from '../../mixin/vector-source'
@@ -69,6 +70,10 @@
       getSourceTarget () {
         return this._sourceBuilder
       },
+      subscribeAll () {
+        this::vectorSource.methods.subscribeAll()
+        this::subscribeToSourceChanges()
+      },
     },
     watch: {
       distance (value) {
@@ -86,6 +91,13 @@
        * @private
        */
       this._sourceBuilder = new SourceBuilder()
+
+      Object.defineProperties(this, {
+        $innerSource: {
+          enumerable: true,
+          get: this.getSource,
+        },
+      })
     },
   }
 
@@ -102,5 +114,9 @@
         return createPointGeom(coordinate)
       }
     }
+  }
+
+  function subscribeToSourceChanges () {
+    hasInnerSource(this)
   }
 </script>
