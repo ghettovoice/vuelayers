@@ -1,5 +1,5 @@
 <template>
-  <i :class="[$options.name]" style="display: none !important;">
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
     <slot :features="featuresDataProj"/>
   </i>
 </template>
@@ -26,7 +26,8 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name,
+          id: this.vmId,
+          class: this.cmpName,
         }
       },
     },

@@ -6,10 +6,54 @@ import RegularShape from 'ol/style/RegularShape'
 import Stroke from 'ol/style/Stroke'
 import Style from 'ol/style/Style'
 import Text from 'ol/style/Text'
+import Vue from 'vue'
+import uuid from 'uuid/v4'
 import parseColor from 'parse-color'
 import { isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
 import { GEOMETRY_TYPE } from './consts'
 import * as geomHelper from './geom'
+
+export function getStyleId (style) {
+  if (
+    style instanceof Vue ||
+    style instanceof Style ||
+    style instanceof ImageStyle ||
+    style instanceof Text ||
+    style instanceof Stroke ||
+    style instanceof Fill ||
+    style instanceof Function
+  ) {
+    return style.id
+  }
+
+  throw new Error('Illegal style argument')
+}
+
+export function setStyleId (style, styleId) {
+  if (
+    style instanceof Vue ||
+    style instanceof Style ||
+    style instanceof ImageStyle ||
+    style instanceof Text ||
+    style instanceof Stroke ||
+    style instanceof Fill ||
+    style instanceof Function
+  ) {
+    style.id = styleId
+
+    return style
+  }
+
+  throw new Error('Illegal style argument')
+}
+
+export function initializeStyle (style, defaultStyleId) {
+  if (getStyleId(style) == null) {
+    setStyleId(style, defaultStyleId || uuid())
+  }
+
+  return style
+}
 
 /**
  * @return {VlStyle[]}

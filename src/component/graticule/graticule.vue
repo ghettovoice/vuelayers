@@ -1,5 +1,5 @@
 <template>
-  <i :class="$options.name" style="display: none !important;">
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
     <slot name="lon"></slot>
     <slot name="lat"></slot>
     <slot name="stroke"></slot>
@@ -66,7 +66,7 @@
     },
     methods: {
       createOlObject () {
-        return new Graticule({
+        const graticule = new Graticule({
           maxLines: this.maxLines,
           targetSize: this.targetSize,
           showLabels: this.showLabels,
@@ -79,6 +79,10 @@
           latLabelStyle: this._latLabelStyle,
           intervals: this.intervals,
         })
+
+        graticule.id = this.id
+
+        return graticule
       },
       /**
        * @return {Promise} Resolves when initialization completes
@@ -174,6 +178,13 @@
       },
     },
     watch: {
+      id (value) {
+        if (!this.$graticule || value === this.$graticule.id) {
+          return
+        }
+
+        this.$graticule.id = value
+      },
       ...makeWatchers([
         'maxLines',
         'targetSize',
@@ -191,7 +202,8 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name,
+          id: this.vmId,
+          class: this.cmpName,
         }
       },
     },

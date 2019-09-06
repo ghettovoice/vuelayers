@@ -125,22 +125,5 @@
     props,
     methods,
     watch,
-    created () {
-      /**
-       * @type {Image|undefined}
-       * @private
-       */
-      this._image = undefined
-      /**
-       * @type {Text|undefined}
-       * @private
-       */
-      this._text = undefined
-      /**
-       * @type {Geometry|undefined}
-       * @private
-       */
-      this._geometry = undefined
-    },
   }
 </script>

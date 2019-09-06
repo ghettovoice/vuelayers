@@ -1,6 +1,6 @@
 import { WMS_VERSION } from '../ol-ext'
 import { hasSource, hasView } from '../util/assert'
-import { isEqual, reduce } from '../util/minilo'
+import { reduce } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 
 const cleanExtParams = params => reduce(params, (params, value, key) => {
@@ -109,9 +109,7 @@ const watch = {
     'format',
     'bgColor',
     'time',
-  ], prop => function (value, prevValue) {
-    if (isEqual(value, prevValue)) return
-
+  ], prop => function (value) {
     prop = prop.toUpperCase()
     this.$source && this.$source.updateParams({ [prop]: value })
   }),

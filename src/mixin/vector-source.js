@@ -1,7 +1,7 @@
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime } from 'rxjs/operators'
 import { observableFromOlEvent } from '../rx-ext'
-import * as assert from '../util/assert'
+import { hasSource } from '../util/assert'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import featuresContainer from './features-container'
@@ -98,14 +98,15 @@ export default {
     empty: false,
     attrs () {
       return {
-        class: this.$options.name,
+        id: this.vmId,
+        class: this.cmpName,
       }
     },
   },
 }
 
 function subscribeToEvents () {
-  assert.hasSource(this)
+  hasSource(this)
 
   const add = observableFromOlEvent(this.getFeaturesCollection(), 'add')
   const remove = observableFromOlEvent(this.getFeaturesCollection(), 'remove')

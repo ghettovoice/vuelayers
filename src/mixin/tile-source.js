@@ -186,9 +186,7 @@ export default {
       'maxZoom',
       'minZoom',
       'tileSize',
-    ], () => function (value, prevValue) {
-      if (isEqual(value, prevValue)) return
-
+    ], () => function () {
       this.scheduleRecreate()
     }),
   },

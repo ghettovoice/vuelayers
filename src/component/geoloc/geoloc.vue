@@ -1,5 +1,5 @@
 <template>
-  <i :class="[$options.name]" style="display: none !important;">
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
     <slot :accuracy="accuracy" :altitude="altitude" :altitude-accuracy="altitudeAccuracy"
           :heading="heading" :position="position" :speed="speed">
     </slot>
@@ -71,11 +71,15 @@
        * @private
        */
       createOlObject () {
-        return new Geolocation({
+        const geoloc = new Geolocation({
           tracking: this.tracking,
           trackingOptions: this.trackingOptions,
           projection: this.resolvedDataProjection,
         })
+
+        geoloc.set('id', this.id)
+
+        return geoloc
       },
       /**
        * @return {void}
@@ -103,6 +107,13 @@
       },
     },
     watch: {
+      id (value) {
+        if (!this.$geolocation || value === this.geolocation.get('id')) {
+          return
+        }
+
+        this.$geolocation.set('id', value)
+      },
       /**
        * @param {boolean} value
        */
@@ -126,7 +137,7 @@
     },
     stubVNode: {
       empty () {
-        return this.$options.name
+        return this.vmId
       },
     },
     created () {

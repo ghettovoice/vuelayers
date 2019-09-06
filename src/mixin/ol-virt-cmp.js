@@ -81,4 +81,12 @@ export default {
       this::cmp.methods.subscribeAll()
     },
   },
+  stubVNode: {
+    attrs () {
+      return {
+        id: this.vmId,
+        class: this.cmpName,
+      }
+    },
+  },
 }

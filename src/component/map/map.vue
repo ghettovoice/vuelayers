@@ -1,5 +1,5 @@
 <template>
-  <div :class="[$options.name]" :tabindex="tabindex">
+  <div :id="vmId" :class="cmpName" :tabindex="tabindex">
     <slot/>
   </div>
 </template>
@@ -16,7 +16,7 @@
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
   import { olCmp, overlaysContainer, layersContainer, interactionsContainer, featuresContainer, projTransforms } from '../../mixin'
-  import { initializeInteraction, setMapDataProjection } from '../../ol-ext'
+  import { getMapId, initializeInteraction, setMapDataProjection, setMapId } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasMap, hasView } from '../../util/assert'
   import { isEqual } from '../../util/minilo'
@@ -143,6 +143,7 @@
           view: this._view,
         })
 
+        setMapId(map, this.id)
         setMapDataProjection(map, this.dataProjection)
         this._featuresOverlay.setMap(map)
 
@@ -318,6 +319,13 @@
       ], () => function () {
         this.scheduleRecreate()
       }),
+      id (value) {
+        if (!this.$map || value === getMapId(this.$map)) {
+          return
+        }
+
+        setMapId(this.$map, value)
+      },
       controls (value) {
         if (value === false) {
           this._controlsCollection.clear()

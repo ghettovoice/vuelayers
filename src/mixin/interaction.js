@@ -1,4 +1,3 @@
-import uuid from 'uuid/v4'
 import {
   getInteractionId,
   getInteractionPriority,
@@ -14,10 +13,6 @@ import useMapCmp from './use-map-cmp'
 export default {
   mixins: [cmp, useMapCmp],
   props: {
-    id: {
-      type: [String, Number],
-      default: () => uuid(),
-    },
     active: {
       type: Boolean,
       default: true,
@@ -120,7 +115,7 @@ export default {
   },
   watch: {
     id (value) {
-      if (!this.$interaction || isEqual(value, getInteractionId(value))) {
+      if (!this.$interaction || isEqual(value, getInteractionId(this.$interaction))) {
         return
       }
 
@@ -149,7 +144,7 @@ export default {
   },
   stubVNode: {
     empty () {
-      return this.$options.name
+      return this.vmId
     },
   },
   created () {
