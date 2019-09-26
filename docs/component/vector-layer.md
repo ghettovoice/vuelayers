@@ -2,7 +2,7 @@
 
 > Renders vector data
 
-`vl-layer-vector` can render vector from verious backend services. It should be
+`vl-layer-vector` can render vector from various backend services. It should be
 used with together with [`vl-source-vector`](/docs/component/vector-source.md) component.
 
 ## ES6 Module
@@ -16,7 +16,7 @@ Vue.use(VectorLayer)
 ## Usage
 
 Example below shows how you can use `vl-layer-vector` and [`vl-source-vector`](/docs/component/vector-source.md) to render some 
-vector vector features from remote backend.
+vector features from remote backend.
 
 <vuep template="#usage-example"></vuep>
 
