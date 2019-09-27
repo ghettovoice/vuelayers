@@ -2,6 +2,10 @@
   <div id="app">
     <div style="height: 100%">
       <div class="panel">
+        <div>
+          Selected:<br>
+          {{ selectedFeatureIds }}
+        </div>
       </div>
 
       <vl-map ref="map" data-projection="EPSG:4326" :default-controls="controls" :default-interactions="interactions">
@@ -13,14 +17,15 @@
           <vl-source-sputnik />
         </vl-layer-tile>
 
-        <!--<vl-layer-vector id="countries" render-mode="image">-->
-        <!--  <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />-->
-        <!--</vl-layer-vector>-->
+        <vl-layer-vector id="countries" render-mode="image">
+          <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />
+        </vl-layer-vector>
 
         <vl-layer-vector id="draw-target">
           <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
         </vl-layer-vector>
 
+        <vl-interaction-select :features.sync="selectedFeatures" />
         <vl-interaction-modify source="draw-target" />
       </vl-map>
     </div>
@@ -28,8 +33,6 @@
 </template>
 
 <script>
-  import { defaults as defaultControls, ScaleLine } from 'ol/control'
-  import Collection from 'ol/Collection'
   import { findPointOnSurface } from '../src/ol-ext'
 
   export default {
@@ -62,11 +65,14 @@
             },
           },
         ],
-        controls: defaultControls().extend([
-          new ScaleLine(),
-        ]),
-        interactions: new Collection(),
+        controls: true,
+        interactions: true,
       }
+    },
+    computed: {
+      selectedFeatureIds () {
+        return this.selectedFeatures.map(({ id }) => id)
+      },
     },
     methods: {
       pointOnSurface: findPointOnSurface,

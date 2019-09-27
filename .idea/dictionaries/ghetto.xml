@@ -2,6 +2,7 @@
   <dictionary name="ghetto">
     <words>
       <w>addfeature</w>
+      <w>altitudeaccuracy</w>
       <w>arcgis</w>
       <w>bingmaps</w>
       <w>declutter</w>
