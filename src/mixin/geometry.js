@@ -274,7 +274,7 @@ function defineServices () {
 function subscribeToGeomChanges () {
   hasGeometry(this)
 
-  const ft = 100
+  const ft = 1000 / 60
   const changes = observableFromOlEvent(
     this.$geometry,
     'change',

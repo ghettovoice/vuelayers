@@ -13,9 +13,15 @@
           <vl-source-sputnik />
         </vl-layer-tile>
 
-        <vl-layer-vector id="countries" render-mode="image">
-          <vl-source-vector :features.sync="countries" :url="countriesUrl" />
+        <!--<vl-layer-vector id="countries" render-mode="image">-->
+        <!--  <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />-->
+        <!--</vl-layer-vector>-->
+
+        <vl-layer-vector id="draw-target">
+          <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
         </vl-layer-vector>
+
+        <vl-interaction-modify source="draw-target" />
       </vl-map>
     </div>
   </div>
@@ -32,10 +38,28 @@
         resolution: 39135.75848201024,
         center: [100, 10],
         rotation: 0,
-        selectedFeatures: [],
         countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
         countries: [],
         featureId: undefined,
+        features: [],
+        selectedFeatures: [],
+        drawFeatures: [
+          {
+            type: 'Feature',
+            id: '213456789',
+            properties: {},
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [0, 0],
+                [20, 0],
+                [20, 20],
+                [0, 20],
+                [0, 0],
+              ]],
+            },
+          },
+        ],
       }
     },
     methods: {

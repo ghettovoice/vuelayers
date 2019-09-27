@@ -27,7 +27,7 @@ export default {
 
       if (this.getInteractionById(getInteractionId(interaction)) == null) {
         initializeInteraction(interaction)
-        this._interactionsCollection.push(interaction)
+        this.$interactionsCollection.push(interaction)
         this.sortInteractions()
       }
     },
@@ -39,14 +39,14 @@ export default {
       interaction = this.getInteractionById(getInteractionId(interaction))
       if (!interaction) return
 
-      this._interactionsCollection.remove(interaction)
+      this.$interactionsCollection.remove(interaction)
       this.sortInteractions()
     },
     /**
      * @return {Interaction[]}
      */
     getInteractions () {
-      return this._interactionsCollection.getArray()
+      return this.$interactionsCollection.getArray()
     },
     /**
      * @return {Collection<Interaction>>}
@@ -59,7 +59,7 @@ export default {
      * @return {Interaction|undefined}
      */
     getInteractionById (interactionId) {
-      return this._interactionsCollection.getArray().find(interaction => {
+      return this.$interactionsCollection.getArray().find(interaction => {
         return getInteractionId(interaction) === interactionId
       })
     },
@@ -69,7 +69,7 @@ export default {
     sortInteractions (sorter) {
       sorter || (sorter = this.getDefaultInteractionsSorter())
 
-      this._interactionsCollection.getArray().sort(sorter)
+      this.$interactionsCollection.getArray().sort(sorter)
     },
     /**
      * @return {function}
@@ -88,7 +88,7 @@ export default {
      * @return {void}
      */
     clearInteractions () {
-      this._interactionsCollection.clear()
+      this.$interactionsCollection.clear()
     },
     /**
      * @returns {Object}
@@ -109,15 +109,29 @@ export default {
      */
     this._interactionsCollection = new Collection()
 
-    const adds = observableFromOlEvent(this._interactionsCollection, 'add')
-    const removes = observableFromOlEvent(this._interactionsCollection, 'remove')
-
-    this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
-      ++this.rev
-
-      this.$nextTick(() => {
-        this.$emit(type + ':interaction', element)
-      })
-    })
+    this::defineServices()
+    this::subscribeToCollectionEvents()
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    $interactionsCollection: {
+      enumerable: true,
+      get: this.getInteractionsCollection,
+    },
+  })
+}
+
+function subscribeToCollectionEvents () {
+  const adds = observableFromOlEvent(this.$interactionsCollection, 'add')
+  const removes = observableFromOlEvent(this.$interactionsCollection, 'remove')
+
+  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(type + ':interaction', element)
+    })
+  })
 }

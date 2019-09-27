@@ -137,10 +137,10 @@
           keyboardEventTarget: this.keyboardEventTarget,
           maxTilesLoading: this.maxTilesLoading,
           controls: this._controlsCollection,
-          interactions: this._interactionsCollection,
-          layers: this._layersCollection,
-          overlays: this._overlaysCollection,
-          view: this._view,
+          interactions: this.$interactionsCollection,
+          layers: this.$layersCollection,
+          overlays: this.$overlaysCollection,
+          view: this.$view,
         })
 
         setMapId(map, this.id)
@@ -251,6 +251,12 @@
         if (this.$map && view !== this.$map.getView()) {
           this.$map.setView(view)
         }
+      },
+      /**
+       * @return {module:ol/View~View}
+       */
+      getView () {
+        return this._view
       },
       /**
        * @return {void}
@@ -390,7 +396,7 @@
        */
       $view: {
         enumerable: true,
-        get: () => this._view,
+        get: this.getView,
       },
     })
   }

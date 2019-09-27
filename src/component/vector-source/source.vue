@@ -1,5 +1,4 @@
 <script>
-  import debounce from 'debounce-promise'
   import VectorSource from 'ol/source/Vector'
   import { vectorSource } from '../../mixin'
   import { createGeoJsonFmt, getFeatureId, initializeFeature, loadingAll, transform } from '../../ol-ext'
@@ -145,7 +144,7 @@
     watch: {
       features: {
         deep: true,
-        handler: debounce(function (features) {
+        handler (features) {
           if (!this.$source || isEqual(features, this.featuresDataProj)) return
 
           features = features.map(feature => initializeFeature({ ...feature }))
@@ -153,7 +152,7 @@
 
           const forRemove = difference(this.featuresDataProj, features, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forRemove)
-        }, 1000 / 60),
+        },
       },
       ...makeWatchers([
         'loadingStrategy',
