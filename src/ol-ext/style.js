@@ -6,9 +6,9 @@ import RegularShape from 'ol/style/RegularShape'
 import Stroke from 'ol/style/Stroke'
 import Style from 'ol/style/Style'
 import Text from 'ol/style/Text'
-import Vue from 'vue'
-import uuid from 'uuid/v4'
 import parseColor from 'parse-color'
+import uuid from 'uuid/v4'
+import Vue from 'vue'
 import { isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
 import { GEOMETRY_TYPE } from './consts'
 import * as geomHelper from './geom'
@@ -139,6 +139,7 @@ export function createStyle (vlStyle) {
     image: createImageStyle(vlStyle),
     geometry: createGeomStyle(vlStyle),
     zIndex: vlStyle.zIndex,
+    renderer: vlStyle.renderer,
   }
 
   if (!isEmpty(olStyle)) {
@@ -199,7 +200,15 @@ export function createFillStyle (vlStyle, prefix = '') {
  */
 export function createStrokeStyle (vlStyle, prefix = '') {
   const prefixKey = addPrefix(prefix)
-  const keys = ['strokeColor', 'strokeWidth', 'strokeDash', 'strokeCap', 'strokeJoin'].map(prefixKey)
+  const keys = [
+    'strokeColor',
+    'strokeWidth',
+    'strokeMiterLimit',
+    'strokeCap',
+    'strokeJoin',
+    'strokeDash',
+    'strokeDashOffset',
+  ].map(prefixKey)
   const compiledKey = prefixKey('stroke')
 
   if (vlStyle[compiledKey] instanceof Stroke) return vlStyle[compiledKey]
@@ -211,11 +220,13 @@ export function createStrokeStyle (vlStyle, prefix = '') {
     switch (name) {
       case prefixKey('strokeColor'):
       case prefixKey('strokeWidth'):
+      case prefixKey('strokeMiterLimit'):
         name = lowerFirst(name.replace(new RegExp(prefixKey('stroke')), ''))
         break
-      case prefixKey('strokeDash'):
       case prefixKey('strokeCap'):
       case prefixKey('strokeJoin'):
+      case prefixKey('strokeDash'):
+      case prefixKey('strokeDashOffset'):
         name = 'line' + name.replace(new RegExp(prefixKey('stroke')), '')
         break
     }
@@ -372,12 +383,15 @@ export function createGeomStyle (vlStyle) {
  * @property {string|number[]|undefined} fillColor
  * @property {string|number[]|undefined} strokeColor
  * @property {number|undefined} strokeWidth
+ * @property {number|undefined} strokeMiterLimit
  * @property {number[]|undefined} strokeDash
+ * @property {number[]|undefined} strokeDashOffset
  * @property {string|undefined} strokeCap
  * @property {string|undefined} strokeJoin
  * @property {number|undefined} zIndex
  * @property {Fill|undefined} fill
  * @property {Stroke|undefined} stroke
+ * @property {RenderFunction|undefined} renderer
  *
  * Text only
  * @property {string|Text|undefined} text
