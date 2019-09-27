@@ -1,0 +1,37 @@
+<component name="ProjectDictionaryState">
+  <dictionary name="ghetto">
+    <words>
+      <w>addfeature</w>
+      <w>arcgis</w>
+      <w>bingmaps</w>
+      <w>declutter</w>
+      <w>deinit</w>
+      <w>drawend</w>
+      <w>drawstart</w>
+      <w>geoloc</w>
+      <w>hidpi</w>
+      <w>imageloadend</w>
+      <w>imageloaderror</w>
+      <w>imageloadstart</w>
+      <w>modifyend</w>
+      <w>modifystart</w>
+      <w>moveend</w>
+      <w>movestart</w>
+      <w>pluggable</w>
+      <w>pointerdrag</w>
+      <w>postcompose</w>
+      <w>postrender</w>
+      <w>precompose</w>
+      <w>proj</w>
+      <w>propertychange</w>
+      <w>removefeature</w>
+      <w>rendercomplete</w>
+      <w>reprojection</w>
+      <w>singleclick</w>
+      <w>tileloadend</w>
+      <w>tileloaderror</w>
+      <w>tileloadstart</w>
+      <w>wmts</w>
+    </words>
+  </dictionary>
+</component>

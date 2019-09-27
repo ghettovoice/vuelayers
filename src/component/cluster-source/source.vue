@@ -1,11 +1,12 @@
 <script>
-  import { hasInnerSource } from 'util/assert'
+  import { hasSource } from 'util/assert'
   import { makeWatchers } from 'util/vue-helpers'
   import sourceContainer from '../../mixin/source-container'
   import vectorSource from '../../mixin/vector-source'
   import { createPointGeom, findPointOnSurface } from '../../ol-ext/geom'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import SourceBuilder from './builder'
+  import { observableFromOlEvent } from '../../rx-ext'
 
   export default {
     name: 'vl-source-cluster',
@@ -117,6 +118,16 @@
   }
 
   function subscribeToSourceChanges () {
-    hasInnerSource(this)
+    hasSource(this)
+
+    const adds = observableFromOlEvent(this.$source, 'addfeature')
+    this.subscribeTo(adds, ({ feature }) => {
+      this.addFeature(feature)
+    })
+
+    const removes = observableFromOlEvent(this.$source, 'removefeature')
+    this.subscribeTo(removes, ({ feature }) => {
+      this.removeFeature(feature)
+    })
   }
 </script>

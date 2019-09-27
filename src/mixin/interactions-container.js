@@ -109,14 +109,15 @@ export default {
      */
     this._interactionsCollection = new Collection()
 
-    const add = observableFromOlEvent(this._interactionsCollection, 'add')
-    const remove = observableFromOlEvent(this._interactionsCollection, 'remove')
-    const events = mergeObs(add, remove)
+    const adds = observableFromOlEvent(this._interactionsCollection, 'add')
+    const removes = observableFromOlEvent(this._interactionsCollection, 'remove')
 
-    this.subscribeTo(events, ({ type, element }) => {
+    this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
       ++this.rev
 
-      this.$emit(type + ':interaction', element)
+      this.$nextTick(() => {
+        this.$emit(type + ':interaction', element)
+      })
     })
   },
 }

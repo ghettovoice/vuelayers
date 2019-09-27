@@ -86,14 +86,15 @@ export default {
      */
     this._overlaysCollection = new Collection()
 
-    const add = observableFromOlEvent(this._overlaysCollection, 'add')
-    const remove = observableFromOlEvent(this._overlaysCollection, 'remove')
-    const events = mergeObs(add, remove)
+    const adds = observableFromOlEvent(this._overlaysCollection, 'add')
+    const removes = observableFromOlEvent(this._overlaysCollection, 'remove')
 
-    this.subscribeTo(events, ({ type, element }) => {
+    this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
       ++this.rev
 
-      this.$emit(type + ':overlay', element)
+      this.$nextTick(() => {
+        this.$emit(type + ':overlay', element)
+      })
     })
   },
 }

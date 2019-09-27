@@ -86,14 +86,15 @@ export default {
      */
     this._layersCollection = new Collection()
 
-    const add = observableFromOlEvent(this._layersCollection, 'add')
-    const remove = observableFromOlEvent(this._layersCollection, 'remove')
-    const events = mergeObs(add, remove)
+    const adds = observableFromOlEvent(this._layersCollection, 'add')
+    const removes = observableFromOlEvent(this._layersCollection, 'remove')
 
-    this.subscribeTo(events, ({ type, element }) => {
+    this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
       ++this.rev
 
-      this.$emit(type + ':layer', element)
+      this.$nextTick(() => {
+        this.$emit(type + ':layer', element)
+      })
     })
   },
 }

@@ -1,7 +1,4 @@
-import { merge as mergeObs } from 'rxjs/observable'
-import { debounceTime } from 'rxjs/operators'
-import { observableFromOlEvent } from '../rx-ext'
-import { hasSource } from '../util/assert'
+import debounce from 'debounce-promise'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import featuresContainer from './features-container'
@@ -68,7 +65,6 @@ export default {
      */
     subscribeAll () {
       this::source.methods.subscribeAll()
-      this::subscribeToEvents()
     },
     /**
      * @param feature
@@ -93,6 +89,9 @@ export default {
     ], () => function () {
       return this.scheduleRecreate()
     }),
+    featuresDataProj: debounce(function (features) {
+      this.$emit('update:features', features)
+    }, 1000 / 60),
   },
   stubVNode: {
     empty: false,
@@ -103,16 +102,4 @@ export default {
       }
     },
   },
-}
-
-function subscribeToEvents () {
-  hasSource(this)
-
-  const add = observableFromOlEvent(this.getFeaturesCollection(), 'add')
-  const remove = observableFromOlEvent(this.getFeaturesCollection(), 'remove')
-  const events = mergeObs(add, remove).pipe(debounceTime(1000 / 60))
-  // emit event to allow `sync` modifier
-  this.subscribeTo(events, () => {
-    this.$emit('update:features', this.featuresDataProj)
-  })
 }
