@@ -282,7 +282,10 @@
     )
     this.subscribeTo(drawEvents, evt => {
       ++this.rev
-      this.$emit(evt.type, evt)
+
+      this.$nextTick(() => {
+        this.$emit(evt.type, evt)
+      })
     })
   }
 </script>

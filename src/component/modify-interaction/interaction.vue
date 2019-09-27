@@ -187,7 +187,10 @@
     const modifyEvents = observableFromOlEvent(this.$interaction, ['modifystart', 'modifyend'])
     this.subscribeTo(modifyEvents, evt => {
       ++this.rev
-      this.$emit(evt.type, evt)
+
+      this.$nextTick(() => {
+        this.$emit(evt.type, evt)
+      })
     })
   }
 </script>

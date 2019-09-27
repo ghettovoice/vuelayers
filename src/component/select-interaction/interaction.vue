@@ -5,12 +5,13 @@
 </template>
 
 <script>
+  import debounce from 'debounce-promise'
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
   import Vue from 'vue'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { map as mapOp, debounceTime } from 'rxjs/operators'
+  import { map as mapOp } from 'rxjs/operators'
   import { interaction, projTransforms, stylesContainer, featuresContainer } from '../../mixin'
   import { getFeatureId, createStyle, defaultEditStyle, getLayerId, initializeFeature } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
@@ -272,11 +273,9 @@
       features: {
         deep: true,
         handler (features) {
-          if (!this.$interaction) return
+          if (!this.$interaction || isEqual(features, this.featuresDataProj)) return
 
-          features = features.slice().map(feature => initializeFeature({
-            ...feature,
-          }))
+          features = features.slice().map(feature => initializeFeature({ ...feature }))
           this.addFeatures(features)
 
           let forUnselect = difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
@@ -285,11 +284,9 @@
       },
       featuresDataProj: {
         deep: true,
-        handler (value, prev) {
-          if (!isEqual(value, prev)) {
-            this.$emit('update:features', value)
-          }
-        },
+        handler: debounce(function (features) {
+          this.$emit('update:features', features)
+        }, 1000 / 60),
       },
       ...makeWatchers([
         'filter',
@@ -323,10 +320,10 @@
       )
     const events = mergeObs(select, unselect)
 
-    this.subscribeTo(events, evt => this.$emit(evt.type, evt.feature))
-    // emit event to allow `sync` modifier
-    this.subscribeTo(events.pipe(debounceTime(1000 / 60)), () => {
-      this.$emit('update:features', this.featuresDataProj)
+    this.subscribeTo(events, evt => {
+      this.$nextTick(() => {
+        this.$emit(evt.type, evt.feature)
+      })
     })
   }
 </script>

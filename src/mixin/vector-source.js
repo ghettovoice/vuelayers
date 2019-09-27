@@ -84,14 +84,17 @@ export default {
     },
   },
   watch: {
+    featuresDataProj: {
+      deep: true,
+      handler: debounce(function (features) {
+        this.$emit('update:features', features)
+      }, 1000 / 60),
+    },
     ...makeWatchers([
       'useSpatialIndex',
     ], () => function () {
       return this.scheduleRecreate()
     }),
-    featuresDataProj: debounce(function (features) {
-      this.$emit('update:features', features)
-    }, 1000 / 60),
   },
   stubVNode: {
     empty: false,

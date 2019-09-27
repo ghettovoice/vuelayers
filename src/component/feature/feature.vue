@@ -237,11 +237,13 @@
     this.subscribeTo(allChanges, ({ prop, value }) => {
       ++this.rev
 
-      if (prop === 'id') {
-        this.$emit(`update:${prop}`, value)
-      } else if (prop !== this.$feature.getGeometryName()) {
-        this.$emit('update:properties', { ...this.properties, [prop]: value })
-      }
+      this.$nextTick(() => {
+        if (prop === 'id') {
+          this.$emit(`update:${prop}`, value)
+        } else if (prop !== this.$feature.getGeometryName()) {
+          this.$emit('update:properties', { ...this.properties, [prop]: value })
+        }
+      })
     })
   }
 </script>

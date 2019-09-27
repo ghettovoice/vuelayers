@@ -216,7 +216,10 @@
 
     this.subscribeTo(changes, ({ prop, value }) => {
       ++this.rev
-      this.$emit(`update:${prop}`, value)
+
+      this.$nextTick(() => {
+        this.$emit(`update:${prop}`, value)
+      })
     })
   }
 </script>
