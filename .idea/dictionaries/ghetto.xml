@@ -6,6 +6,7 @@
       <w>bingmaps</w>
       <w>declutter</w>
       <w>deinit</w>
+      <w>docsify</w>
       <w>drawend</w>
       <w>drawstart</w>
       <w>geoloc</w>
@@ -13,6 +14,7 @@
       <w>imageloadend</w>
       <w>imageloaderror</w>
       <w>imageloadstart</w>
+      <w>jsdelivr</w>
       <w>jsnext</w>
       <w>mapbox</w>
       <w>modifyend</w>
@@ -35,7 +37,10 @@
       <w>tileloadend</w>
       <w>tileloaderror</w>
       <w>tileloadstart</w>
+      <w>unpkg</w>
+      <w>vershinin</w>
       <w>vuelayers</w>
+      <w>vuep</w>
       <w>wmts</w>
     </words>
   </dictionary>

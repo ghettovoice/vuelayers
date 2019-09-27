@@ -189,17 +189,17 @@ function bundleOptions (format, package, env = 'development') {
       options.output.globals = (id) => {
         if (id === 'vue') return 'Vue'
 
-        if (ol[id] != null) {
-          return ol[id]
-        }
+        // if (ol[id] != null) {
+        //   return ol[id]
+        // }
       }
       options.input.external = (id, parent, resolved) => {
         if (['vue'].includes(id)) return true
 
-        if (!resolved && /^ol\/.+/.test(id)) {
-          ol[id] = id.replace(/\//g, '.')
-          return true
-        }
+        // if (!resolved && /^ol\/.+/.test(id)) {
+        //   ol[id] = id.replace(/\//g, '.')
+        //   return true
+        // }
 
         return false
       }
