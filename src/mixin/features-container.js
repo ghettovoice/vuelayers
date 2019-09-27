@@ -52,7 +52,7 @@ export default {
 
       const foundFeature = this.getFeatureById(getFeatureId(feature))
       if (foundFeature == null) {
-        this._featuresCollection.push(feature)
+        this.$featuresCollection.push(feature)
       } else {
         mergeFeatures(foundFeature, feature)
       }
@@ -73,13 +73,13 @@ export default {
       if (!feature) return
 
       initializeFeature(feature)
-      this._featuresCollection.remove(feature)
+      this.$featuresCollection.remove(feature)
     },
     /**
      * @return {void}
      */
     clearFeatures () {
-      this._featuresCollection.clear()
+      this.$featuresCollection.clear()
     },
     /**
      * @param {string|number} featureId
@@ -87,7 +87,7 @@ export default {
      */
     getFeatureById (featureId) {
       // todo add hash {featureId => featureIdx, ....}
-      return this._featuresCollection.getArray().find(feature => {
+      return this.$featuresCollection.getArray().find(feature => {
         return getFeatureId(feature) === featureId
       })
     },
@@ -95,7 +95,7 @@ export default {
      * @return {Feature[]}
      */
     getFeatures () {
-      return this._featuresCollection.getArray()
+      return this.$featuresCollection.getArray()
     },
     /**
      * @return {Collection<Feature>>}
@@ -123,39 +123,53 @@ export default {
     this._featuresCollection = new Collection()
     this._featureSubs = {}
 
-    const adds = observableFromOlEvent(this._featuresCollection, 'add')
-    this.subscribeTo(adds, ({ element }) => {
-      const elementUid = getObjectUid(element)
-      const propChanges = observableFromOlEvent(element, 'propertychange')
-      const otherChanges = observableFromOlEvent(element, 'change')
-      const featureChanges = mergeObs(propChanges, otherChanges).pipe(
-        debounceTime(1000 / 60)
-      )
-
-      this._featureSubs[elementUid] = this.subscribeTo(featureChanges, () => {
-        ++this.rev
-      })
-
-      ++this.rev
-
-      this.$nextTick(() => {
-        this.$emit('add:feature', element)
-      })
-    })
-
-    const removes = observableFromOlEvent(this._featuresCollection, 'remove')
-    this.subscribeTo(removes, ({ element }) => {
-      const elementUid = getObjectUid(element)
-      if (this._featureSubs[elementUid]) {
-        this.unsubscribe(this._featureSubs[elementUid])
-        delete this._featureSubs[elementUid]
-      }
-
-      ++this.rev
-
-      this.$nextTick(() => {
-        this.$emit('remove:feature', element)
-      })
-    })
+    this::defineServices()
+    this::subscribeToCollectionEvents()
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    $featuresCollection: {
+      enumerable: true,
+      get: this.getFeaturesCollection,
+    },
+  })
+}
+
+function subscribeToCollectionEvents () {
+  const adds = observableFromOlEvent(this.$featuresCollection, 'add')
+  this.subscribeTo(adds, ({ element }) => {
+    const elementUid = getObjectUid(element)
+    const propChanges = observableFromOlEvent(element, 'propertychange')
+    const otherChanges = observableFromOlEvent(element, 'change')
+    const featureChanges = mergeObs(propChanges, otherChanges).pipe(
+      debounceTime(1000 / 60)
+    )
+
+    this._featureSubs[elementUid] = this.subscribeTo(featureChanges, () => {
+      ++this.rev
+    })
+
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit('add:feature', element)
+    })
+  })
+
+  const removes = observableFromOlEvent(this.$featuresCollection, 'remove')
+  this.subscribeTo(removes, ({ element }) => {
+    const elementUid = getObjectUid(element)
+    if (this._featureSubs[elementUid]) {
+      this.unsubscribe(this._featureSubs[elementUid])
+      delete this._featureSubs[elementUid]
+    }
+
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit('remove:feature', element)
+    })
+  })
 }

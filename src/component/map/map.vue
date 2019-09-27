@@ -340,7 +340,7 @@
         if (this._featuresOverlay == null) return
 
         this._featuresOverlay.setSource(new VectorSource({
-          features: this._featuresCollection,
+          features: this.$featuresCollection,
           wrapX: value,
         }))
       },
@@ -365,7 +365,7 @@
       // prepare default overlay
       this._featuresOverlay = new VectorLayer({
         source: new VectorSource({
-          features: this._featuresCollection,
+          features: this.$featuresCollection,
           wrapX: this.wrapX,
         }),
       })
