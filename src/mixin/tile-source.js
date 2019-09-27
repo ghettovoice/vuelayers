@@ -1,16 +1,16 @@
 import { createTileUrlFunction } from 'ol-tilecache'
-import { observableFromOlEvent } from '../rx-ext'
 import {
   CACHE_SIZE,
+  createExtentFromProjection,
+  createXyzGrid,
   EPSG_3857,
   MAX_ZOOM,
   MIN_ZOOM,
   PIXEL_RATIO,
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
-} from '../ol-ext/consts'
-import { createExtentFromProjection } from '../ol-ext/extent'
-import { createXyzGrid } from '../ol-ext/tile-grid'
+} from '../ol-ext'
+import { observableFromOlEvent } from '../rx-ext'
 import { hasSource } from '../util/assert'
 import { isEqual, isString, pick, replaceTokens } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
@@ -186,9 +186,7 @@ export default {
       'maxZoom',
       'minZoom',
       'tileSize',
-    ], () => function (value, prevValue) {
-      if (isEqual(value, prevValue)) return
-
+    ], () => function () {
       this.scheduleRecreate()
     }),
   },
@@ -203,5 +201,11 @@ function subscribeToSourceEvents () {
     'tileloaderror',
   ])
 
-  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
+  this.subscribeTo(events, evt => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(evt.type, evt)
+    })
+  })
 }

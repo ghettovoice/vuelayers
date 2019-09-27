@@ -1,8 +1,7 @@
 <script>
   import Text from 'ol/style/Text'
-  import style from '../../mixin/style'
+  import { style, withFillStrokeStyle } from '../../mixin'
   import { isEqual } from '../../util/minilo'
-  import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
@@ -157,7 +156,8 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name,
+          id: this.vmId,
+          class: this.cmpName,
         }
       },
     },

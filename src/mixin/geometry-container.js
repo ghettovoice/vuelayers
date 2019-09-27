@@ -45,6 +45,10 @@ export default {
       }
 
       if (geom !== this._geometry) {
+        /**
+         * @type {module:ol/geom/Geometry~Geometry|undefined}
+         * @private
+         */
         this._geometry = geom
       }
 
@@ -53,19 +57,5 @@ export default {
         geomTarget.setGeometry(geom)
       }
     },
-  },
-  created () {
-    /**
-     * @type {module:ol/geom/Geometry~Geometry|undefined}
-     * @private
-     */
-    this._geometry = undefined
-
-    Object.defineProperties(this, {
-      $geometry: {
-        enumerable: true,
-        get: this.getGeometry,
-      },
-    })
   },
 }

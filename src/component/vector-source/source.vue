@@ -1,9 +1,8 @@
 <script>
   import VectorSource from 'ol/source/Vector'
-  import { fetch } from 'whatwg-fetch'
   import { vectorSource } from '../../mixin'
   import { createGeoJsonFmt, getFeatureId, initializeFeature, loadingAll, transform } from '../../ol-ext'
-  import { constant, difference, isEmpty, isFinite, isFunction, stubArray } from '../../util/minilo'
+  import { constant, difference, isEqual, isFinite, isFunction, stubArray } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
@@ -25,7 +24,6 @@
        */
       loaderFactory: {
         type: Function,
-        default: defaultLoaderFactory,
       },
       /**
        * Source format factory
@@ -56,31 +54,34 @@
     },
     computed: {
       urlFunc () {
-        if (!this.url) {
-          return
-        }
+        if (!this.url) return
 
         let url = this.url
         if (!isFunction(url)) {
           url = constant(this.url)
         }
-        // wrap strategy function to transform map view projection to source projection
-        return (extent, resolution, projection) => url(
-          transformExtent(extent, projection, this.resolvedDataProjection),
-          resolution,
-          this.resolvedDataProjection,
-        )
+
+        return (extent, resolution, projection) => {
+          extent = transformExtent(extent, projection, this.resolvedDataProjection)
+          projection = this.resolvedDataProjection
+
+          return url(extent, resolution, projection)
+        }
       },
       loaderFunc () {
-        const loader = this.loaderFactory(this)
-        // wrap strategy function to transform map view projection to source projection
+        if (!this.loaderFactory) return
+
+        const loader = this.loaderFactory()
+
         return async (extent, resolution, projection) => {
-          const features = await loader(
+          let features = await loader(
             transformExtent(extent, projection, this.resolvedDataProjection),
             resolution,
             this.resolvedDataProjection,
           )
-
+          if (!Array.isArray(features)) {
+            features = this.readSourceData(features)
+          }
           if (Array.isArray(features)) {
             this.addFeatures(features)
           }
@@ -101,7 +102,7 @@
       createSource () {
         return new VectorSource({
           attributions: this.attributions,
-          features: this._featuresCollection,
+          features: this.$featuresCollection,
           projection: this.resolvedDataProjection,
           loader: this.loaderFunc,
           useSpatialIndex: this.useSpatialIndex,
@@ -129,19 +130,27 @@
         this.clear()
         this::vectorSource.methods.unmount()
       },
+      /**
+       * @param {mixed} data
+       * @returns {Array<FeatureLike>|Array<Feature>}
+       */
+      readSourceData (data) {
+        return this.dataFormat.readFeatures(data, {
+          featureProjection: this.viewProjection,
+          dataProjection: this.resolvedDataProjection,
+        })
+      },
     },
     watch: {
       features: {
         deep: true,
         handler (features) {
-          if (!this.$source) return
+          if (!this.$source || isEqual(features, this.featuresDataProj)) return
 
-          features = features.slice().map(feature => initializeFeature({
-            ...feature,
-          }))
+          features = features.map(feature => initializeFeature({ ...feature }))
           this.addFeatures(features)
 
-          const forRemove = difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
+          const forRemove = difference(this.featuresDataProj, features, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forRemove)
         },
       },
@@ -171,40 +180,6 @@
    */
   function defaultFormatFactory () {
     return createGeoJsonFmt()
-  }
-
-  /**
-   * Default loader for provided URL.
-   *
-   * @param vm
-   * @return {Function}
-   */
-  function defaultLoaderFactory (vm) {
-    return (extent, resolution, projection) => {
-      let url = vm.$source.getUrl()
-      if (isFunction(url)) {
-        url = url(extent, resolution, projection)
-      }
-
-      if (isEmpty(url)) {
-        return []
-      }
-
-      return fetch(url, {
-        credentials: 'same-origin',
-        mode: 'cors',
-      }).then(response => response.text())
-        .then(text => {
-          if (!vm.$source) {
-            return []
-          }
-
-          return vm.$source.getFormat().readFeatures(text, {
-            featureProjection: vm.viewProjection,
-            dataProjection: vm.resolvedDataProjection,
-          })
-        })
-    }
   }
 
   function transformExtent (extent, sourceProj, destProj) {

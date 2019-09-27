@@ -38,6 +38,16 @@ export default {
   created () {
     this::initIdentityMap()
   },
+  watch: {
+    ident (value, prev) {
+      if (prev && this.$identityMap.has(prev)) {
+        this.$identityMap.unset(prev)
+      }
+      if (value && !this.$identityMap.has(value)) {
+        this.$identityMap.set(value)
+      }
+    },
+  },
 }
 
 /**

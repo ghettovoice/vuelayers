@@ -27,7 +27,7 @@ export default {
 
       if (this.getLayerById(getLayerId(layer)) == null) {
         initializeLayer(layer)
-        this._layersCollection.push(layer)
+        this.$layersCollection.push(layer)
       }
     },
     /**
@@ -38,13 +38,13 @@ export default {
       layer = this.getLayerById(getLayerId(layer))
       if (!layer) return
 
-      this._layersCollection.remove(layer)
+      this.$layersCollection.remove(layer)
     },
     /**
      * @return {BaseLayer[]}
      */
     getLayers () {
-      return this._layersCollection.getArray()
+      return this.$layersCollection.getArray()
     },
     /**
      * @return {module:ol/Collection~Collection<BaseLayer>}
@@ -57,7 +57,7 @@ export default {
      * @return {BaseLayer|undefined}
      */
     getLayerById (layerId) {
-      return this._layersCollection.getArray().find(layer => {
+      return this.$layersCollection.getArray().find(layer => {
         return getLayerId(layer) === layerId
       })
     },
@@ -65,7 +65,7 @@ export default {
      * @return {void}
      */
     clearLayers () {
-      this._layersCollection.clear()
+      this.$layersCollection.clear()
     },
     /**
      * @returns {Object}
@@ -86,14 +86,29 @@ export default {
      */
     this._layersCollection = new Collection()
 
-    const add = observableFromOlEvent(this._layersCollection, 'add')
-    const remove = observableFromOlEvent(this._layersCollection, 'remove')
-    const events = mergeObs(add, remove)
+    this::defineServices()
+    this::subscribeToCollectionEvents()
+  },
+}
 
-    this.subscribeTo(events, ({ type, element }) => {
-      ++this.rev
+function defineServices () {
+  Object.defineProperties(this, {
+    $layersCollection: {
+      enumerable: true,
+      get: this.getLayersCollection,
+    },
+  })
+}
 
+function subscribeToCollectionEvents () {
+  const adds = observableFromOlEvent(this.$layersCollection, 'add')
+  const removes = observableFromOlEvent(this.$layersCollection, 'remove')
+
+  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
       this.$emit(type + ':layer', element)
     })
-  },
+  })
 }

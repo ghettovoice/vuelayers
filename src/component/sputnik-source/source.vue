@@ -1,5 +1,5 @@
 <script>
-  import xyzSource from '../../mixin/xyz-source'
+  import { xyzSource } from '../../mixin'
 
   /**
    * Layer source to work with Sputnik.ru tile server.

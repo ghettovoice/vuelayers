@@ -1,11 +1,9 @@
 <script>
   import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
   import ModifyInteraction from 'ol/interaction/Modify'
-  import interaction from '../../mixin/interaction'
-  import stylesContainer from '../../mixin/styles-container'
-  import { createStyle, defaultEditStyle } from '../../ol-ext/style'
-  import { isCollection, isVectorSource } from '../../ol-ext/util'
-  import observableFromOlEvent from '../../rx-ext/from-ol-event'
+  import { interaction, stylesContainer } from '../../mixin'
+  import { createStyle, defaultEditStyle, isCollection, isVectorSource } from '../../ol-ext'
+  import { observableFromOlEvent } from '../../rx-ext'
   import { assert, hasInteraction } from '../../util/assert'
   import { mapValues } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -23,7 +21,8 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name,
+          id: this.vmId,
+          class: this.cmpName,
         }
       },
     },

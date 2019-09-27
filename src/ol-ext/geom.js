@@ -1,3 +1,6 @@
+import Vue from 'vue'
+import Geometry from 'ol/geom/Geometry'
+import uuid from 'uuid/v4'
 import pointOnFeature from '@turf/point-on-feature'
 import Circle from 'ol/geom/Circle'
 import GeometryCollection from 'ol/geom/GeometryCollection'
@@ -131,4 +134,36 @@ export function findPointOnSurface (geom) {
   if (pointFeature && pointFeature.geometry) {
     return pointFeature.geometry.coordinates
   }
+}
+
+export function getGeometryId (geometry) {
+  if (geometry instanceof Vue) {
+    return geometry.id
+  } else if (geometry instanceof Geometry) {
+    return geometry.get('id')
+  }
+
+  throw new Error('Illegal geometry argument')
+}
+
+export function setGeometryId (geometry, geometryId) {
+  if (geometry instanceof Vue) {
+    geometry.id = geometryId
+
+    return geometry
+  } else if (geometry instanceof Geometry) {
+    geometry.set('id', geometryId)
+
+    return geometry
+  }
+
+  throw new Error('Illegal geometry argument')
+}
+
+export function initializeGeometry (geometry, defaultGeometryId) {
+  if (getGeometryId(geometry) == null) {
+    setGeometryId(geometry, defaultGeometryId || uuid())
+  }
+
+  return geometry
 }

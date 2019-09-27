@@ -1,5 +1,5 @@
 <template>
-  <div :id="[$options.name, id].join('-')" :class="classes">
+  <div :id="vmId" :class="classes">
     <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
   </div>
 </template>
@@ -7,18 +7,13 @@
 <script>
   import Overlay from 'ol/Overlay'
   import { merge as mergeObs } from 'rxjs/observable'
-  import uuid from 'uuid/v4'
   import { olCmp, projTransforms, useMapCmp } from '../../mixin'
-  import { initializeOverlay, OVERLAY_POSITIONING, setOverlayId } from '../../ol-ext'
+  import { getOverlayId, initializeOverlay, OVERLAY_POSITIONING, setOverlayId } from '../../ol-ext'
   import { observableFromOlChangeEvent } from '../../rx-ext'
   import { hasOverlay } from '../../util/assert'
   import { isEqual, identity } from '../../util/minilo'
 
   const props = {
-    id: {
-      type: [String, Number],
-      default: () => uuid(),
-    },
     offset: {
       type: Array,
       default: () => [0, 0],
@@ -71,7 +66,7 @@
     },
     classes () {
       return [
-        this.$options.name,
+        this.cmpName,
         this.visible ? 'visible' : undefined,
       ].filter(identity)
     },
@@ -140,7 +135,7 @@
 
   const watch = {
     id (value) {
-      if (!this.$overlay) return
+      if (!this.$overlay || value === getOverlayId(this.$overlay)) return
 
       setOverlayId(this.$overlay, value)
     },

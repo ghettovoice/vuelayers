@@ -27,7 +27,7 @@ export default {
 
       if (this.getOverlayById(getOverlayId(overlay)) == null) {
         initializeOverlay(overlay)
-        this._overlaysCollection.push(overlay)
+        this.$overlaysCollection.push(overlay)
       }
     },
     /**
@@ -38,13 +38,13 @@ export default {
       overlay = this.getOverlayById(getOverlayId(overlay))
       if (!overlay) return
 
-      this._overlaysCollection.remove(overlay)
+      this.$overlaysCollection.remove(overlay)
     },
     /**
      * @return {Overlay[]}
      */
     getOverlays () {
-      return this._overlaysCollection.getArray()
+      return this.$overlaysCollection.getArray()
     },
     /**
      * @return {Collection<Overlay>}
@@ -57,7 +57,7 @@ export default {
      * @return {Overlay|undefined}
      */
     getOverlayById (overlayId) {
-      return this._overlaysCollection.getArray().find(overlay => {
+      return this.$overlaysCollection.getArray().find(overlay => {
         return getOverlayId(overlay) === overlayId
       })
     },
@@ -65,7 +65,7 @@ export default {
      * @return {void}
      */
     clearOverlays () {
-      this._overlaysCollection.clear()
+      this.$overlaysCollection.clear()
     },
     /**
      * @returns {Object}
@@ -86,14 +86,29 @@ export default {
      */
     this._overlaysCollection = new Collection()
 
-    const add = observableFromOlEvent(this._overlaysCollection, 'add')
-    const remove = observableFromOlEvent(this._overlaysCollection, 'remove')
-    const events = mergeObs(add, remove)
+    this::defineServices()
+    this::subscribeToCollectionEvents()
+  },
+}
 
-    this.subscribeTo(events, ({ type, element }) => {
-      ++this.rev
+function defineServices () {
+  Object.defineProperties(this, {
+    $overlaysCollection: {
+      enumerable: true,
+      get: this.getOverlaysCollection,
+    },
+  })
+}
 
+function subscribeToCollectionEvents () {
+  const adds = observableFromOlEvent(this.$overlaysCollection, 'add')
+  const removes = observableFromOlEvent(this.$overlaysCollection, 'remove')
+
+  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
       this.$emit(type + ':overlay', element)
     })
-  },
+  })
 }

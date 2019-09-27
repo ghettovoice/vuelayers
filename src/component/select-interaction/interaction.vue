@@ -1,5 +1,5 @@
 <template>
-  <i :class="[$options.name]" style="display: none !important;">
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
     <slot :features="featuresDataProj"/>
   </i>
 </template>
@@ -26,7 +26,8 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name,
+          id: this.vmId,
+          class: this.cmpName,
         }
       },
     },
@@ -138,7 +139,7 @@
        */
       createInteraction () {
         return new SelectInteraction({
-          features: this._featuresCollection,
+          features: this.$featuresCollection,
           multi: this.multi,
           wrapX: this.wrapX,
           filter: this.filter,
@@ -312,11 +313,11 @@
   function subscribeToInteractionChanges () {
     hasInteraction(this)
 
-    const select = observableFromOlEvent(this._featuresCollection, 'add')
+    const select = observableFromOlEvent(this.$featuresCollection, 'add')
       .pipe(
         mapOp(({ element }) => ({ type: 'select', feature: element }))
       )
-    const unselect = observableFromOlEvent(this._featuresCollection, 'remove')
+    const unselect = observableFromOlEvent(this.$featuresCollection, 'remove')
       .pipe(
         mapOp(({ element }) => ({ type: 'unselect', feature: element }))
       )

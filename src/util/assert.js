@@ -107,6 +107,10 @@ export function hasSource (vm) {
   assert(vm.$source, 'component has "$source" property')
 }
 
+export function hasInnerSource (vm) {
+  assert(vm.$innerSource, 'component has "$innerSource" property')
+}
+
 /**
  * @param {Object} vm
  * @return {void}

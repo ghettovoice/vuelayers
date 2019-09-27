@@ -1,5 +1,5 @@
 <template>
-  <i :class="[$options.name]" style="display: none !important;">
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
     <slot :center="currentCenter" :zoom="currentZoom" :resolution="currentResolution" :rotation="currentRotation"/>
   </i>
 </template>
@@ -180,7 +180,7 @@
        * @protected
        */
       createOlObject () {
-        return new View({
+        const view = new View({
           center: this.pointToViewProj(this.center),
           constrainRotation: this.constrainRotation,
           enableRotation: this.enableRotation,
@@ -196,6 +196,10 @@
           zoom: this.zoom,
           zoomFactor: this.zoomFactor,
         })
+
+        view.set('id', this.id)
+
+        return view
       },
       /**
        * @see {@link https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#fit}
@@ -250,6 +254,13 @@
       },
     },
     watch: {
+      id (value) {
+        if (!this.$view || value === this.$view.get('id')) {
+          return
+        }
+
+        this.$view.set('id', value)
+      },
       center (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
@@ -309,7 +320,7 @@
     },
     stubVNode: {
       empty () {
-        return this.$options.name
+        return this.vmId
       },
     },
     created () {
