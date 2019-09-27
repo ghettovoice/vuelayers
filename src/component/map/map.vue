@@ -5,21 +5,28 @@
 </template>
 
 <script>
+  import Collection from 'ol/Collection'
   import { defaults as createDefaultControls } from 'ol/control'
   import { defaults as createDefaultInteractions } from 'ol/interaction'
   import VectorLayer from 'ol/layer/Vector'
-  import Collection from 'ol/Collection'
   import Map from 'ol/Map'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
-  import { olCmp, overlaysContainer, layersContainer, interactionsContainer, featuresContainer, projTransforms } from '../../mixin'
+  import {
+    featuresContainer,
+    interactionsContainer,
+    layersContainer,
+    olCmp,
+    overlaysContainer,
+    projTransforms,
+  } from '../../mixin'
   import { getMapId, initializeInteraction, setMapDataProjection, setMapId } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasMap, hasView } from '../../util/assert'
-  import { isEqual } from '../../util/minilo'
+  import { isEqual, isPlainObject } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -41,21 +48,21 @@
       /**
        * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
        * value is used to configure controls.
-       * @type {Object|boolean}
+       * @type {Object|boolean|Collection}
        * @todo remove when vl-control-* components will be ready
        */
       defaultControls: {
-        type: [Object, Boolean],
+        type: [Object, Boolean, Collection],
         default: true,
       },
       /**
        * Options for default interactions added to the map by default. Object
        * value is used to configure default interactions.
-       * @type {Object|boolean}
+       * @type {Object|boolean|Collection}
        */
       defaultInteractions: {
-        type: [Object, Boolean],
-        default: () => ({}),
+        type: [Object, Boolean, Collection],
+        default: true,
       },
       /**
        * The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard
@@ -360,13 +367,25 @@
     created () {
       this._view = new View()
       // todo make controls handling like with interactions
-      this._controlsCollection = this.defaultControls !== false
-        ? createDefaultControls(typeof this.defaultControls === 'object' ? this.defaultControls : undefined)
-        : new Collection()
+      if (this.defaultControls instanceof Collection) {
+        this._controlsCollection = this.defaultControls
+      } else if (this.defaultControls !== false) {
+        this._controlsCollection = createDefaultControls(
+          isPlainObject(this.defaultControls)
+            ? this.defaultControls
+            : undefined,
+        )
+      }
       // todo initialize without interactions and provide vl-interaction-default component
-      this._interactionsCollection = this.defaultInteractions !== false
-        ? createDefaultInteractions(typeof this.defaultInteractions === 'object' ? this.defaultInteractions : undefined)
-        : new Collection()
+      if (this.defaultInteractions instanceof Collection) {
+        this._interactionsCollection = this.defaultInteractions
+      } else if (this.defaultInteractions !== false) {
+        this._interactionsCollection = createDefaultInteractions(
+          isPlainObject(this.defaultInteractions)
+            ? this.defaultInteractions
+            : undefined,
+        )
+      }
       this._interactionsCollection.forEach(interaction => initializeInteraction(interaction))
       // prepare default overlay
       this._featuresOverlay = new VectorLayer({

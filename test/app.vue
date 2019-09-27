@@ -4,7 +4,7 @@
       <div class="panel">
       </div>
 
-      <vl-map ref="map" data-projection="EPSG:4326">
+      <vl-map ref="map" data-projection="EPSG:4326" :default-controls="controls" :default-interactions="interactions">
         <vl-view :center.sync="center" :rotation.sync="rotation"
                  :zoom.sync="zoom" :extent="[0, 0, 100, 50]"
                  ident="view" ref="view" />
@@ -28,6 +28,8 @@
 </template>
 
 <script>
+  import { defaults as defaultControls, ScaleLine } from 'ol/control'
+  import Collection from 'ol/Collection'
   import { findPointOnSurface } from '../src/ol-ext'
 
   export default {
@@ -60,6 +62,10 @@
             },
           },
         ],
+        controls: defaultControls().extend([
+          new ScaleLine(),
+        ]),
+        interactions: new Collection(),
       }
     },
     methods: {
