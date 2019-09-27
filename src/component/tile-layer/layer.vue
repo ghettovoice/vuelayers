@@ -1,6 +1,6 @@
 <script>
   import TileLayer from 'ol/layer/Tile'
-  import layer from '../../mixin/layer'
+  import { layer } from '../../mixin'
 
   /**
    * @vueProps

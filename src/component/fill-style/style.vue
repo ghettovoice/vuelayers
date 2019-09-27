@@ -1,6 +1,6 @@
 <script>
   import Fill from 'ol/style/Fill'
-  import style from '../../mixin/style'
+  import { style } from '../../mixin'
   import { isEqual } from '../../util/minilo'
 
   const props = {

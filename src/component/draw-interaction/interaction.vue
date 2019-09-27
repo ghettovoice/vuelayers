@@ -3,13 +3,16 @@
   import DrawInteraction from 'ol/interaction/Draw'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operators'
-  import interaction from '../../mixin/interaction'
-  import stylesContainer from '../../mixin/styles-container'
-  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
-  import { initializeFeature } from '../../ol-ext/feature'
-  import { createStyle, defaultEditStyle } from '../../ol-ext/style'
-  import { isCollection, isVectorSource } from '../../ol-ext/util'
-  import observableFromOlEvent from '../../rx-ext/from-ol-event'
+  import { interaction, stylesContainer } from '../../mixin'
+  import {
+    createStyle,
+    defaultEditStyle,
+    GEOMETRY_TYPE,
+    initializeFeature,
+    isCollection,
+    isVectorSource,
+  } from '../../ol-ext'
+  import { observableFromOlEvent } from '../../rx-ext'
   import { assert, hasInteraction } from '../../util/assert'
   import { camelCase, mapValues, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'

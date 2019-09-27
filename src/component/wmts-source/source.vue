@@ -1,12 +1,18 @@
 <script>
   import WMTSSource from 'ol/source/WMTS'
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
-  import { makeWatchers } from '../../util/vue-helpers'
-  import tileSource from '../../mixin/tile-source'
-  import { EXTENT_CORNER, WMTS_FORMAT, WMTS_REQUEST_ENCODING, WMTS_VERSION } from '../../ol-ext/consts'
-  import { createExtentFromProjection, getExtentCorner } from '../../ol-ext/extent'
-  import { resolutionsFromExtent } from '../../ol-ext/tile-grid'
+  import { tileSource } from '../../mixin'
+  import {
+    createExtentFromProjection,
+    EXTENT_CORNER,
+    getExtentCorner,
+    resolutionsFromExtent,
+    WMTS_FORMAT,
+    WMTS_REQUEST_ENCODING,
+    WMTS_VERSION,
+  } from '../../ol-ext'
   import { range } from '../../util/minilo'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
     name: 'vl-source-wmts',

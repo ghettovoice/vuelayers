@@ -1,12 +1,11 @@
 <script>
-  import { hasSource } from 'util/assert'
-  import { makeWatchers } from 'util/vue-helpers'
-  import sourceContainer from '../../mixin/source-container'
-  import vectorSource from '../../mixin/vector-source'
-  import { createPointGeom, findPointOnSurface } from '../../ol-ext/geom'
+  import { hasSource } from '../../util/assert'
+  import { makeWatchers } from '../../util/vue-helpers'
+  import { sourceContainer, vectorSource } from '../../mixin'
+  import { createPointGeom, findPointOnSurface } from '../../ol-ext'
+  import { observableFromOlEvent } from '../../rx-ext'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import SourceBuilder from './builder'
-  import { observableFromOlEvent } from '../../rx-ext'
 
   export default {
     name: 'vl-source-cluster',

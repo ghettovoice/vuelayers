@@ -1,8 +1,8 @@
 <script>
   import Icon from 'ol/style/Icon'
-  import imageStyle from '../../mixin/image-style'
-  import { isEqual, isEmpty, arrayLengthValidator } from '../../util/minilo'
+  import { imageStyle } from '../../mixin'
   import { assert } from '../../util/assert'
+  import { arrayLengthValidator, isEmpty, isEqual } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {

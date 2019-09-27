@@ -1,10 +1,9 @@
 <script>
-  import Vue from 'vue'
   import Style from 'ol/style/Style'
-  import style from '../../mixin/style'
-  import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import Vue from 'vue'
+  import { style, withFillStrokeStyle } from '../../mixin'
   import { isEqual } from '../../util/minilo'
+  import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   /**
    * Style box component.

@@ -1,7 +1,7 @@
 <script>
   import VectorTileSource from 'ol/source/VectorTile'
-  import tileSource from '../../mixin/tile-source'
-  import { createMvtFmt } from '../../ol-ext/format'
+  import { tileSource } from '../../mixin'
+  import { createMvtFmt } from '../../ol-ext'
 
   export default {
     name: 'vl-source-vector-tile',

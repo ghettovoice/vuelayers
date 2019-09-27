@@ -62,13 +62,25 @@ function getAllPackages () {
       globName: config.fullname,
       amdName: config.name,
     },
+    {
+      entry: utils.resolve('src/mixin/index.js'),
+      jsName: 'mixin',
+      pkgName: 'mixin',
+    },
+    {
+      entry: utils.resolve('src/ol-ext/index.js'),
+      jsName: 'ol-ext',
+      pkgName: 'ol-ext',
+    },
+    {
+      entry: utils.resolve('src/rx-ext/index.js'),
+      jsName: 'rx-ext',
+      pkgName: 'rx-ext',
+    },
   ]
 
   return Promise.all([
     packagesFromPath(utils.resolve('src/component'), utils.resolve('src/component')),
-    packagesFromPath(utils.resolve('src/mixin'), srcPath),
-    packagesFromPath(utils.resolve('src/ol-ext'), srcPath),
-    packagesFromPath(utils.resolve('src/rx-ext'), srcPath),
     packagesFromPath(utils.resolve('src/util'), srcPath),
   ]).then(otherPackages => {
     return packages.concat(otherPackages.reduce((all, packages) => all.concat(packages), []))
@@ -132,8 +144,11 @@ function bundleOptions (format, package, env = 'development') {
       return false
     }
     // embeddable
-    const embeddableRegExp = /(\.\/|src\/)(install)/i
-    if (embeddableRegExp.test(id)) {
+    const embeddableRegExp = /\/(mixin|ol-ext|rx-ext)\//i
+    if (
+      embeddableRegExp.test(parentId) &&
+      (/^\.\//.test(id) || embeddableRegExp.test(id))
+    ) {
       return false
     }
     // check internal component imports

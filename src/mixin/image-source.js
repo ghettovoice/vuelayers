@@ -1,5 +1,5 @@
+import { EPSG_3857 } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
-import { EPSG_3857 } from '../ol-ext/consts'
 import { hasSource } from '../util/assert'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'

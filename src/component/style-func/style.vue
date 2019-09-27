@@ -1,6 +1,5 @@
 <script>
-  import style from '../../mixin/style'
-  import stylesContainer from '../../mixin/styles-container'
+  import { style, stylesContainer } from '../../mixin'
   import { hasMap } from '../../util/assert'
   import { warn } from '../../util/log'
   import { isFunction, noop } from '../../util/minilo'
