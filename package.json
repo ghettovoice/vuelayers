@@ -52,12 +52,13 @@
   "dependencies": {
     "@babel/runtime-corejs2": "^7.1.2",
     "@turf/point-on-feature": "^5.1.5",
+    "babel-polyfill": "^6.26.0",
     "debounce-promise": "^3.1.0",
     "merge-descriptors": "^1.0.1",
-    "ol": "^5.3.1",
-    "ol-tilecache": "^3.0.1",
+    "ol": "^6.0.0",
+    "ol-tilecache": "^3.0.2",
     "parse-color": "^1.0.0",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.5.3",
     "uuid": "^3.3.2"
   },
   "peerDependencies": {
