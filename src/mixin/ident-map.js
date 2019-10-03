@@ -5,11 +5,7 @@ import { identity } from '../util/minilo'
 // todo uncomment when IE 11 will die
 // const IDENTITY_MAP_PROP = Symbol('identityMap')
 const IDENTITY_MAP_PROP = 'identityMap'
-/**
- * @alias module:mixin/ident-map
- * @title identMap
- * @vueProto
- */
+
 export default {
   IDENTITY_MAP_PROP,
   props: {
@@ -41,6 +37,16 @@ export default {
   },
   created () {
     this::initIdentityMap()
+  },
+  watch: {
+    ident (value, prev) {
+      if (prev && this.$identityMap.has(prev)) {
+        this.$identityMap.unset(prev)
+      }
+      if (value && !this.$identityMap.has(value)) {
+        this.$identityMap.set(value)
+      }
+    },
   },
 }
 

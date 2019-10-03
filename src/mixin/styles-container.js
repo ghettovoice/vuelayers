@@ -1,11 +1,12 @@
 import Vue from 'vue'
+import { Style } from 'ol/style'
 import { warn } from '../util/log'
 import { isFunction, reduce } from '../util/minilo'
 
 export default {
   created () {
     /**
-     * @type {Style[]|StyleFunction|Vue|undefined}
+     * @type {module:ol/style/Style~Style[]|module:ol/style/Style~StyleFunction|Vue|undefined}
      * @private
      */
     this._styles = undefined
@@ -13,7 +14,7 @@ export default {
   methods: {
     /**
      * Default style factory
-     * @return {Style[]|StyleFunction|undefined}
+     * @return {module:ol/style/Style~Style[]|module:ol/style/Style~StyleFunction|undefined}
      * @protected
      */
     getDefaultStyles () {},
@@ -29,13 +30,13 @@ export default {
       }
     },
     /**
-     * @return {Style[]|StyleFunction|Vue|undefined}
+     * @return {module:ol/style/Style~Style[]|module:ol/style/Style~StyleFunction|Vue|undefined}
      */
     getStyles () {
       return this._styles
     },
     /**
-     * @param {Style|StyleFunction|Vue|undefined} style
+     * @param {module:ol/style/Style~Style|module:ol/style/Style~StyleFunction|Vue|undefined} style
      * @return {void}
      */
     addStyle (style) {
@@ -65,7 +66,7 @@ export default {
       this.setStyle(currentStyles)
     },
     /**
-     * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|StyleFunction|Vue|undefined} styles
+     * @param {Array<{style: module:ol/style/Style~Style, condition: (function|boolean|undefined)}>|module:ol/style/Style~StyleFunction|Vue|undefined} styles
      * @return {void}
      */
     setStyle (styles) {
@@ -82,7 +83,7 @@ export default {
       }
     },
     /**
-     * @param {Style|StyleFunction|Vue|undefined} style
+     * @param {module:ol/style/Style~Style|module:ol/style/Style~StyleFunction|Vue|undefined} style
      * @return {void}
      */
     removeStyle (style) {
@@ -112,7 +113,7 @@ export default {
     },
     /**
      * Style function factory
-     * @returns {StyleFunction}
+     * @returns {module:ol/style/Style~StyleFunction}
      * @protected
      */
     createStyleFunc () {
@@ -149,7 +150,8 @@ export default {
         // not empty or null style
         if (
           styles === null ||
-          (Array.isArray(styles) && styles.length)
+          (Array.isArray(styles) && styles.length) ||
+          styles instanceof Style
         ) {
           return styles
         }

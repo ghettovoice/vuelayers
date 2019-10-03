@@ -1,7 +1,7 @@
 # Quick start
 
-VueLayers distributed as a set of separated components and mixins built as **ES2015** modules.
-For in browser usage there is full standalone **UMD** bundle provided.
+VueLayers is distributed as a set of separated components and mixins built as **ES2015** modules.
+For in-browser usage, there is a full standalone **UMD** bundle provided.
 
 ## Installation
 
@@ -26,13 +26,11 @@ npm install vuelayers@next
 Recommended: [unpkg](https://unpkg.com/)  
 You can browse the source of the npm package at [unpkg.com/vuelayers/](https://unpkg.com/vuelayers/).
 
-!> OpenLayers doesn't included into package, so you should add it yourself  
+!> OpenLayers isn't included in the package, so you should add it yourself.
 
 ```html
 <!-- include Vue -->
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
-<!-- include OpenLayers -->
-<script src="https://unpkg.com/openlayers/dist/ol.js"></script>
 <!-- include UMD VueLayers build -->
 <link rel="stylesheet" href="https://unpkg.com/vuelayers/lib/style.css">
 <script src="https://unpkg.com/vuelayers/lib/index.umd.js"></script>
@@ -40,6 +38,39 @@ You can browse the source of the npm package at [unpkg.com/vuelayers/](https://u
 <script>
   // ...
 </script>
+```
+
+### Nuxt.js
+
+Create a plugin file (ex: `vuelayers.js`) in the `plugins/` directory, with this content
+
+```js
+import Vue from 'vue'
+import VueLayers from 'vuelayers'
+import 'vuelayers/lib/style.css' // needs css-loader
+
+Vue.use(VueLayers)
+```
+
+Create a file in `modules/` or `shared/` directory named `vuelayers.js`
+
+```js
+export default function (moduleOptions) {
+	this.options.css.push('vuelayers/lib/style.css')
+}
+```
+
+Then in the `nuxt.config.js` file, fill in the plugins and modules section properly. Note that `ssr: false` is mandatory if you use universal mode in Nuxt.
+
+```
+plugins: [{
+		src: '@/plugins/vueLayers',
+		ssr: false
+	}, { ... }],
+modules: [
+                ...,
+		'~/shared/vueLayers',
+	],
 ```
 
 ### Build from source
@@ -86,12 +117,12 @@ Vue.use(Geoloc)
 
 ### Global data projection
 
-By default all components accepts coordinates in map view projection (**EPSG:3857** by default)
+By default all components accept coordinates in map view projection (**EPSG:3857** by default)
 but you can bind all components to accept and return coordinates in another projection with
 `dataProjection` global option or with [`data-projection`](component/map.md#data-projection) property on the `vl-map` component. 
 
 This rule applies only for plain coordinates, GeoJSON encoded features or 
-geometries. It works only as thin projection transform layer between Vue and OpenLayers therefore
+geometries. It works only as a thin projection transform layer between Vue and OpenLayers therefore
 internally OpenLayers objects would still use current projection of the map view.
 
 ```js
@@ -102,7 +133,7 @@ Vue.use(VueLayers, {
 ```
 
 Now you are ready to build your awesome GIS application. Check the [VueLayers official demo](demo.md) to get 
-more ideas what you can make with VueLayers.
+more ideas on what you can make with VueLayers.
 
 Simple map with OSM layer example (editable)
 

@@ -1,6 +1,6 @@
 <script>
   import SnapInteraction from 'ol/interaction/Snap'
-  import interaction from '../../mixin/interaction'
+  import { interaction } from '../../mixin'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**

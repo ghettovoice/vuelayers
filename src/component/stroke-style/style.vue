@@ -1,6 +1,6 @@
 <script>
   import Stroke from 'ol/style/Stroke'
-  import style from '../../mixin/style'
+  import { style } from '../../mixin'
   import { isEqual } from '../../util/minilo'
 
   const props = {

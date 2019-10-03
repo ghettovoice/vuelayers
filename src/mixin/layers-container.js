@@ -1,72 +1,114 @@
+import Collection from 'ol/Collection'
 import BaseLayer from 'ol/layer/Base'
 import Vue from 'vue'
+import { merge as mergeObs } from 'rxjs/observable'
+import { getLayerId, initializeLayer } from '../ol-ext'
+import { observableFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
+import rxSubs from './rx-subs'
 
-const methods = {
-  /**
-   * @return {IndexedCollectionAdapter}
-   * @protected
-   */
-  getLayersTarget () {
-    throw new Error('Not implemented method')
-  },
-  /**
-   * @param {Layer|Vue} layer
-   * @return {void}
-   */
-  addLayer (layer) {
-    layer = layer instanceof Vue ? layer.$layer : layer
-    instanceOf(layer, BaseLayer)
+export default {
+  mixins: [rxSubs],
+  computed: {
+    layerIds () {
+      if (!this.rev) return []
 
-    if (this.getLayersTarget().has(layer) === false) {
-      this.getLayersTarget().add(layer)
-    }
+      return this.getLayers().map(getLayerId)
+    },
   },
-  /**
-   * @param {Layer|Vue} layer
-   * @return {void}
-   */
-  removeLayer (layer) {
-    layer = layer instanceof Vue ? layer.$layer : layer
+  methods: {
+    /**
+     * @param {BaseLayer|Vue} layer
+     * @return {void}
+     */
+    addLayer (layer) {
+      layer = layer instanceof Vue ? layer.$layer : layer
+      instanceOf(layer, BaseLayer)
 
-    if (!layer) return
+      if (this.getLayerById(getLayerId(layer)) == null) {
+        initializeLayer(layer)
+        this.$layersCollection.push(layer)
+      }
+    },
+    /**
+     * @param {BaseLayer|Vue} layer
+     * @return {void}
+     */
+    removeLayer (layer) {
+      layer = this.getLayerById(getLayerId(layer))
+      if (!layer) return
 
-    if (this.getLayersTarget().has(layer)) {
-      this.getLayersTarget().remove(layer)
-    }
-  },
-  /**
-   * @return {Layer[]}
-   */
-  getLayers () {
-    return this.getLayersTarget().elements
-  },
-  /**
-   * @param {string|number} id
-   * @return {Layer|undefined}
-   */
-  getLayerById (id) {
-    return this.getLayersTarget().findByKey(id)
-  },
-  /**
-   * @return {void}
-   */
-  clearLayers () {
-    this.getLayersTarget().clear()
-  },
-  /**
-   * @returns {Object}
-   * @protected
-   */
-  getServices () {
-    const vm = this
+      this.$layersCollection.remove(layer)
+    },
+    /**
+     * @return {BaseLayer[]}
+     */
+    getLayers () {
+      return this.$layersCollection.getArray()
+    },
+    /**
+     * @return {module:ol/Collection~Collection<BaseLayer>}
+     */
+    getLayersCollection () {
+      return this._layersCollection
+    },
+    /**
+     * @param {string|number} layerId
+     * @return {BaseLayer|undefined}
+     */
+    getLayerById (layerId) {
+      return this.$layersCollection.getArray().find(layer => {
+        return getLayerId(layer) === layerId
+      })
+    },
+    /**
+     * @return {void}
+     */
+    clearLayers () {
+      this.$layersCollection.clear()
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
 
-    return {
-      get layersContainer () { return vm },
-    }
+      return {
+        get layersContainer () { return vm },
+      }
+    },
+  },
+  created () {
+    /**
+     * @type {Collection<BaseLayer>}
+     * @private
+     */
+    this._layersCollection = new Collection()
+
+    this::defineServices()
+    this::subscribeToCollectionEvents()
   },
 }
 
-export default {
-  methods,
+function defineServices () {
+  Object.defineProperties(this, {
+    $layersCollection: {
+      enumerable: true,
+      get: this.getLayersCollection,
+    },
+  })
+}
+
+function subscribeToCollectionEvents () {
+  const adds = observableFromOlEvent(this.$layersCollection, 'add')
+  const removes = observableFromOlEvent(this.$layersCollection, 'remove')
+
+  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(type + ':layer', element)
+    })
+  })
 }

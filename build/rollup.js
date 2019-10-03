@@ -62,13 +62,25 @@ function getAllPackages () {
       globName: config.fullname,
       amdName: config.name,
     },
+    {
+      entry: utils.resolve('src/mixin/index.js'),
+      jsName: 'mixin',
+      pkgName: 'mixin',
+    },
+    {
+      entry: utils.resolve('src/ol-ext/index.js'),
+      jsName: 'ol-ext',
+      pkgName: 'ol-ext',
+    },
+    {
+      entry: utils.resolve('src/rx-ext/index.js'),
+      jsName: 'rx-ext',
+      pkgName: 'rx-ext',
+    },
   ]
 
   return Promise.all([
     packagesFromPath(utils.resolve('src/component'), utils.resolve('src/component')),
-    packagesFromPath(utils.resolve('src/mixin'), srcPath),
-    packagesFromPath(utils.resolve('src/ol-ext'), srcPath),
-    packagesFromPath(utils.resolve('src/rx-ext'), srcPath),
     packagesFromPath(utils.resolve('src/util'), srcPath),
   ]).then(otherPackages => {
     return packages.concat(otherPackages.reduce((all, packages) => all.concat(packages), []))
@@ -128,12 +140,15 @@ function bundleOptions (format, package, env = 'development') {
     if (!parentId) {
       return false
     }
-    if (/\.(sass|vue)$/i.test(id)) {
+    if (/\.(sass|s?css|vue)$/i.test(id)) {
       return false
     }
     // embeddable
-    const embeddableRegExp = /(\.\/|src\/)(install)/i
-    if (embeddableRegExp.test(id)) {
+    const embeddableRegExp = /\/(mixin|ol-ext|rx-ext)\//i
+    if (
+      embeddableRegExp.test(parentId) &&
+      (/^\.\//.test(id) || embeddableRegExp.test(id))
+    ) {
       return false
     }
     // check internal component imports
@@ -174,21 +189,22 @@ function bundleOptions (format, package, env = 'development') {
       options.output.globals = (id) => {
         if (id === 'vue') return 'Vue'
 
-        if (ol[id] != null) {
-          return ol[id]
-        }
+        // if (ol[id] != null) {
+        //   return ol[id]
+        // }
       }
       options.input.external = (id, parent, resolved) => {
         if (['vue'].includes(id)) return true
 
-        if (!resolved && /^ol\/.+/.test(id)) {
-          ol[id] = id.replace(/\//g, '.')
-          return true
-        }
+        // if (!resolved && /^ol\/.+/.test(id)) {
+        //   ol[id] = id.replace(/\//g, '.')
+        //   return true
+        // }
 
         return false
       }
       options.replaces['process.env.NODE_ENV'] = `'${env}'`
+      options.replaces['process.env.VUELAYERS_DEBUG'] = JSON.stringify(process.env.NODE_ENV !== 'production')
       // options.minify = true
       // process.env.BABEL_ENV = 'es5-production'
       // options.defines.IS_STANDALONE = true
@@ -231,7 +247,7 @@ function makeBundle (options = {}) {
         indentedSyntax: true,
         includePaths: [
           utils.resolve('src'),
-          utils.resolve('src/sass'),
+          utils.resolve('src/styles'),
           utils.resolve('node_modules'),
         ],
       },

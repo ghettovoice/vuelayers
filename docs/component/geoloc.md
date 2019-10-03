@@ -6,11 +6,13 @@
 The [Geolocation API](https://www.w3.org/TR/geolocation-API/) is used to locate 
 a user's position. You can place it to the **default slot** of [`vl-map`](/docs/component/map.md) component.
 
-## Versions
+## ES6 Module
 
-`vl-geoloc` is a part of **Geoloc** module:
+```javascript
+import { Geoloc } from 'vuelayers'
 
-- **ES6**: https://unpkg.com/vuelayers/lib/geoloc/
+Vue.use(Geoloc)
+```
 
 ## Usage
 

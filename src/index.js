@@ -9,6 +9,7 @@ import * as FillStyle from './component/fill-style'
 import * as Geoloc from './component/geoloc'
 import * as Graticule from './component/graticule'
 import * as GroupLayer from './component/group-layer'
+import * as HeatmapLayer from './component/heatmap-layer'
 import * as IconStyle from './component/icon-style'
 import * as ImageLayer from './component/image-layer'
 import * as ImageStaticSource from './component/image-static-source'
@@ -41,7 +42,7 @@ import * as VectorTileSource from './component/vector-tile-source'
 import * as WmsSource from './component/wms-source'
 import * as WmtsSource from './component/wmts-source'
 import * as XyzSource from './component/xyz-source'
-import './sass/main.sass'
+import './styles/main.scss'
 
 /**
  * @const {string} VueLayers version.
@@ -71,6 +72,7 @@ function plugin (Vue, options = {}) {
   Vue.use(Geoloc, options)
   Vue.use(Graticule, options)
   Vue.use(GroupLayer, options)
+  Vue.use(HeatmapLayer, options)
   Vue.use(IconStyle, options)
   Vue.use(ImageLayer, options)
   Vue.use(ImageStaticSource, options)
@@ -122,6 +124,7 @@ export {
   Geoloc,
   Graticule,
   GroupLayer,
+  HeatmapLayer,
   IconStyle,
   ImageLayer,
   ImageStaticSource,

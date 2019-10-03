@@ -1,163 +1,171 @@
 <script>
   import VectorSource from 'ol/source/Vector'
-  import { fetch } from 'whatwg-fetch'
-  import vectorSource from '../../mixin/vector-source'
-  import { getFeatureId } from '../../ol-ext/feature'
-  import { createGeoJsonFmt } from '../../ol-ext/format'
-  import { loadingAll } from '../../ol-ext/load-strategy'
-  import { transform } from '../../ol-ext/proj'
-  import { constant, difference, isEmpty, isFinite, isFunction, stubArray } from '../../util/minilo'
-
-  const props = {
-    /**
-     * Array of GeoJSON features with coordinates in the map view projection.
-     * @type {Object[]} features
-     */
-    features: {
-      type: Array,
-      default: stubArray,
-    },
-    /**
-     * Source loader factory.
-     * Source loader should load features from some remote service, decode them and pas to `features` prop to render.
-     * @type {(function(): FeatureLoader|undefined)} loaderFactory
-     */
-    loaderFactory: {
-      type: Function,
-      default: defaultLoaderFactory,
-    },
-    /**
-     * Source format factory
-     * @type {(function(): Feature|undefined)} formatFactory
-     */
-    formatFactory: {
-      type: Function,
-      default: defaultFormatFactory,
-    },
-    /**
-     * String or url factory
-     * @type {(string|function(): string|FeatureUrlFunction|undefined)} url
-     */
-    url: [String, Function],
-    /**
-     * Loading strategy factory.
-     * Extent here in map view projection.
-     * @type {(function(): LoadingStrategy|undefined)} strategyFactory
-     */
-    strategyFactory: {
-      type: Function,
-      default: defaultStrategyFactory,
-    },
-    overlaps: {
-      type: Boolean,
-      default: true,
-    },
-  }
-
-  const computed = {
-    featureIds () {
-      return this.features.map(getFeatureId)
-    },
-  }
-
-  const methods = {
-    /**
-     * @return {VectorSource}
-     * @protected
-     */
-    createSource () {
-      return new VectorSource({
-        attributions: this.attributions,
-        projection: this.resolvedDataProjection,
-        loader: this.createLoader(),
-        useSpatialIndex: this.useSpatialIndex,
-        wrapX: this.wrapX,
-        logo: this.logo,
-        strategy: this.strategyFactory.call(undefined, this),
-        format: this.formatFactory.call(undefined, this),
-        url: this.createUrlFunc(),
-        overlaps: this.overlaps,
-      })
-    },
-    /**
-     * @protected
-     */
-    createUrlFunc () {
-      if (!this.url) {
-        return
-      }
-
-      let url = this.url
-      if (!isFunction(url)) {
-        url = constant(this.url)
-      }
-      // wrap strategy function to transform map view projection to source projection
-      return (extent, resolution, projection) => url(
-        transformExtent(extent, projection, this.resolvedDataProjection),
-        resolution,
-        this.resolvedDataProjection,
-      )
-    },
-    /**
-     * @protected
-     */
-    createLoader () {
-      if (!this.url) {
-        return
-      }
-
-      const loader = this.loaderFactory.call(undefined, this)
-      // wrap strategy function to transform map view projection to source projection
-      return async (extent, resolution, projection) => {
-        const features = await loader(
-          transformExtent(extent, projection, this.resolvedDataProjection),
-          resolution,
-          this.resolvedDataProjection,
-        )
-
-        if (Array.isArray(features)) {
-          this.$source.addFeatures(features)
-        }
-      }
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    mount () {
-      this::vectorSource.methods.mount()
-      this.addFeatures(this.features)
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    unmount () {
-      this.clear()
-      this::vectorSource.methods.unmount()
-    },
-  }
-
-  const diffById = (a, b) => a.id === b.id
-  const watch = {
-    features (value, oldValue) {
-      if (!this.$source) return
-
-      let forAdd = difference(value, oldValue, diffById)
-      let forRemove = difference(oldValue, value, diffById)
-
-      this.addFeatures(forAdd)
-      this.removeFeatures(forRemove)
-    },
-  }
+  import { vectorSource } from '../../mixin'
+  import { createGeoJsonFmt, getFeatureId, initializeFeature, loadingAll, transform } from '../../ol-ext'
+  import { constant, difference, isEqual, isFinite, isFunction, stubArray } from '../../util/minilo'
+  import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
     name: 'vl-source-vector',
     mixins: [vectorSource],
-    props,
-    computed,
-    methods,
-    watch,
+    props: {
+      /**
+       * Array of GeoJSON features with coordinates in the map view projection.
+       * @type {Object[]} features
+       */
+      features: {
+        type: Array,
+        default: stubArray,
+      },
+      /**
+       * Source loader factory.
+       * Source loader should load features from some remote service, decode them and pas to `features` prop to render.
+       * @type {(function(): FeatureLoader|undefined)} loaderFactory
+       */
+      loaderFactory: {
+        type: Function,
+      },
+      /**
+       * Source format factory
+       * @type {(function(): Feature|undefined)} formatFactory
+       */
+      formatFactory: {
+        type: Function,
+        default: defaultFormatFactory,
+      },
+      /**
+       * String or url factory
+       * @type {(string|function(): string|FeatureUrlFunction|undefined)} url
+       */
+      url: [String, Function],
+      /**
+       * Loading strategy factory.
+       * Extent here in map view projection.
+       * @type {(function(): LoadingStrategy|undefined)} strategyFactory
+       */
+      strategyFactory: {
+        type: Function,
+        default: defaultStrategyFactory,
+      },
+      overlaps: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    computed: {
+      urlFunc () {
+        if (!this.url) return
+
+        let url = this.url
+        if (!isFunction(url)) {
+          url = constant(this.url)
+        }
+
+        return (extent, resolution, projection) => {
+          extent = transformExtent(extent, projection, this.resolvedDataProjection)
+          projection = this.resolvedDataProjection
+
+          return url(extent, resolution, projection)
+        }
+      },
+      loaderFunc () {
+        if (!this.loaderFactory) return
+
+        const loader = this.loaderFactory()
+
+        return async (extent, resolution, projection) => {
+          let features = await loader(
+            transformExtent(extent, projection, this.resolvedDataProjection),
+            resolution,
+            this.resolvedDataProjection,
+          )
+          if (!Array.isArray(features)) {
+            features = this.readSourceData(features)
+          }
+          if (Array.isArray(features)) {
+            this.addFeatures(features)
+          }
+        }
+      },
+      loadingStrategy () {
+        return this.strategyFactory()
+      },
+      dataFormat () {
+        return this.formatFactory()
+      },
+    },
+    methods: {
+      /**
+       * @return {VectorSource}
+       * @protected
+       */
+      createSource () {
+        return new VectorSource({
+          attributions: this.attributions,
+          features: this.$featuresCollection,
+          projection: this.resolvedDataProjection,
+          loader: this.loaderFunc,
+          useSpatialIndex: this.useSpatialIndex,
+          wrapX: this.wrapX,
+          logo: this.logo,
+          strategy: this.loadingStrategy,
+          format: this.dataFormat,
+          url: this.urlFunc,
+          overlaps: this.overlaps,
+        })
+      },
+      /**
+       * @return {void}
+       * @protected
+       */
+      mount () {
+        this::vectorSource.methods.mount()
+        this.addFeatures(this.features)
+      },
+      /**
+       * @return {void}
+       * @protected
+       */
+      unmount () {
+        this.clear()
+        this::vectorSource.methods.unmount()
+      },
+      /**
+       * @param {mixed} data
+       * @returns {Array<FeatureLike>|Array<Feature>}
+       */
+      readSourceData (data) {
+        return this.dataFormat.readFeatures(data, {
+          featureProjection: this.viewProjection,
+          dataProjection: this.resolvedDataProjection,
+        })
+      },
+    },
+    watch: {
+      features: {
+        deep: true,
+        handler (features) {
+          if (!this.$source || isEqual(features, this.featuresDataProj)) return
+
+          features = features.map(feature => initializeFeature({ ...feature }))
+          this.addFeatures(features)
+
+          const forRemove = difference(this.featuresDataProj, features, (a, b) => getFeatureId(a) === getFeatureId(b))
+          this.removeFeatures(forRemove)
+        },
+      },
+      ...makeWatchers([
+        'loadingStrategy',
+        'dataFormat',
+        'urlFunc',
+        'loaderFactory',
+        'formatFactory',
+        'strategyFactory',
+        'overlaps',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
+    },
   }
 
   /**
@@ -172,40 +180,6 @@
    */
   function defaultFormatFactory () {
     return createGeoJsonFmt()
-  }
-
-  /**
-   * Default loader for provided URL.
-   *
-   * @param vm
-   * @return {Function}
-   */
-  function defaultLoaderFactory (vm) {
-    return (extent, resolution, projection) => {
-      let url = vm.$source.getUrl()
-      if (isFunction(url)) {
-        url = url(extent, resolution, projection)
-      }
-
-      if (isEmpty(url)) {
-        return []
-      }
-
-      return fetch(url, {
-        credentials: 'same-origin',
-        mode: 'cors',
-      }).then(response => response.text())
-        .then(text => {
-          if (!vm.$source) {
-            return []
-          }
-
-          return vm.$source.getFormat().readFeatures(text, {
-            featureProjection: vm.viewProjection,
-            dataProjection: vm.resolvedDataProjection,
-          })
-        })
-    }
   }
 
   function transformExtent (extent, sourceProj, destProj) {

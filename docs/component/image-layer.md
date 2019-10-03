@@ -5,11 +5,13 @@
 `vl-layer-image` components can render any server-rendered image, it is a container for
 raster source, like [`vl-source-image-static`](/docs/component/image-static-source.md).
 
-## Versions
+## ES6 Module
 
-`vl-layer-image` component is a part of **ImageLayer** module:
+```javascript
+import { ImageLayer } from 'vuelayers'
 
-- **ES6**: https://unpkg.com/vuelayers/lib/image-layer/
+Vue.use(ImageLayer)
+```
 
 ## Usage
 

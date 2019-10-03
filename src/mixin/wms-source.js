@@ -1,6 +1,7 @@
 import { WMS_VERSION } from '../ol-ext'
 import { hasSource, hasView } from '../util/assert'
 import { reduce } from '../util/minilo'
+import { makeWatchers } from '../util/vue-helpers'
 
 const cleanExtParams = params => reduce(params, (params, value, key) => {
   const filterKeys = [
@@ -100,24 +101,18 @@ const methods = {
 }
 
 const watch = {
-  layers (LAYERS) {
-    this.$source && this.$source.updateParams({ LAYERS })
-  },
-  version (VERSION) {
-    this.$source && this.$source.updateParams({ VERSION })
-  },
-  styles (STYLES) {
-    this.$source && this.$source.updateParams({ STYLES })
-  },
-  transparent (TRANSPARENT) {
-    this.$source && this.$source.updateParams({ TRANSPARENT })
-  },
-  time (TIME) {
-    this.$source && this.$source.updateParams({ TIME })
-  },
-  bgColor (BGCOLOR) {
-    this.$source && this.$source.updateParams({ BGCOLOR })
-  },
+  ...makeWatchers([
+    'layers',
+    'version',
+    'styles',
+    'transparent',
+    'format',
+    'bgColor',
+    'time',
+  ], prop => function (value) {
+    prop = prop.toUpperCase()
+    this.$source && this.$source.updateParams({ [prop]: value })
+  }),
   extParams (value) {
     this.$source && this.$source.updateParams(value ? cleanExtParams(value) : undefined)
   },

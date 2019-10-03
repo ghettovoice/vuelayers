@@ -2,106 +2,91 @@
   <div id="app">
     <div style="height: 100%">
       <div class="panel">
-        <button @click="selectByHover = !selectByHover">Select by {{ !selectByHover ? 'hover' : 'click' }}</button>
-        <button @click="graticule = !graticule">Graticule</button>
-        <button @click="drawType = 'Polygon'">Draw polygon</button>
-        <button @click="drawType = undefined">Stop draw</button>
         <div>
-          {{ selectedFeatures }}
+          Selected:<br>
+          {{ selectedFeatureIds }}
         </div>
       </div>
 
-      <vl-map ref="map" v-if="showMap" data-projection="EPSG:4326">
-        <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom" ident="view" ref="view" />
-
-        <vl-graticule :show-labels="true" v-if="graticule">
-          <vl-style-stroke :line-dash="[5, 10]" color="green" slot="stroke"></vl-style-stroke>
-          <vl-style-text slot="lon" text-baseline="bottom">
-            <vl-style-stroke color="blue" />
-          </vl-style-text>
-          <vl-style-text slot="lat" text-align="end">
-            <vl-style-stroke color="black" />
-          </vl-style-text>
-        </vl-graticule>
-
-        <vl-interaction-select :condition="selectCondition" :features.sync="selectedFeatures">
-          <template slot-scope="select">
-            <vl-overlay class="feature-popup" v-for="feature in select.features" :key="feature.id" :id="feature.id"
-                        :position="pointOnSurface(feature.geometry)" :auto-pan="true"
-                        :auto-pan-animation="{ duration: 300 }"
-                        positioning="bottom-right">
-              <div style="background: #fff; padding: 10px; width: 200px">
-                {{ feature }}
-              </div>
-            </vl-overlay>
-          </template>
-        </vl-interaction-select>
+      <vl-map ref="map" data-projection="EPSG:4326" :default-controls="controls" :default-interactions="interactions">
+        <vl-view :center.sync="center" :rotation.sync="rotation"
+                 :zoom.sync="zoom" :extent="[0, 0, 100, 50]"
+                 ident="view" ref="view" />
 
         <vl-layer-tile>
-          <vl-source-osm />
+          <vl-source-sputnik />
         </vl-layer-tile>
 
-        <vl-feature id="marker">
-          <vl-geom-point :coordinates="[0, 0]" />
-        </vl-feature>
-
-        <vl-layer-vector id="features">
-          <vl-source-vector :features.sync="features" />
+        <vl-layer-vector id="countries" render-mode="image">
+          <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />
+          <vl-style-func :factory="createCountriesStyleFunc" />
         </vl-layer-vector>
 
-        <vl-layer-vector id="draw-pane" v-if="drawType != null">
-          <vl-source-vector :features.sync="drawnFeatures" ident="draw-target" />
+        <vl-layer-vector id="draw-target">
+          <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
         </vl-layer-vector>
 
-        <vl-interaction-draw :type="drawType" source="draw-target" v-if="drawType != null" />
+        <vl-interaction-select :features.sync="selectedFeatures" />
+        <vl-interaction-modify source="draw-target" />
       </vl-map>
     </div>
   </div>
 </template>
 
 <script>
-  import * as eventCondition from 'ol/events/condition'
-  import { findPointOnSurface } from '../src/ol-ext'
-
-  const features = [
-    {
-      type: 'Feature',
-      id: 'feature-1',
-      properties: {},
-      geometry: {
-        type: 'Point',
-        coordinates: [10, 10],
-      },
-    },
-  ]
-
-  const computed = {
-    selectCondition () {
-      return this.selectByHover ? eventCondition.pointerMove : eventCondition.singleClick
-    },
-  }
-
-  const methods = {
-    pointOnSurface: findPointOnSurface,
-  }
+  import { findPointOnSurface, createStyle } from '../src/ol-ext'
 
   export default {
     name: 'app',
-    computed,
-    methods,
     data () {
       return {
         zoom: 2,
-        center: [0, 0],
+        resolution: 39135.75848201024,
+        center: [100, 10],
         rotation: 0,
-        features,
+        countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
+        countries: [],
+        featureId: undefined,
+        features: [],
         selectedFeatures: [],
-        graticule: false,
-        showMap: true,
-        drawType: undefined,
-        drawnFeatures: [],
-        selectByHover: false,
+        drawFeatures: [
+          {
+            type: 'Feature',
+            id: '213456789',
+            properties: {},
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [0, 0],
+                [20, 0],
+                [20, 20],
+                [0, 20],
+                [0, 0],
+              ]],
+            },
+          },
+        ],
+        controls: true,
+        interactions: true,
       }
+    },
+    computed: {
+      selectedFeatureIds () {
+        return this.selectedFeatures.map(({ id }) => id)
+      },
+    },
+    methods: {
+      pointOnSurface: findPointOnSurface,
+      createCountriesStyleFunc () {
+        return () => {
+          return createStyle({
+            fillColor: 'rgba(0, 0, 0, 0.4)',
+            strokeColor: 'blue',
+          })
+        }
+      },
+    },
+    mounted () {
     },
   }
 </script>
@@ -139,5 +124,9 @@
       padding: 5px 10px;
       text-transform: uppercase;
     }
+  }
+
+  .smooth-transition {
+    transition: all 0.3s ease-in-out;
   }
 </style>

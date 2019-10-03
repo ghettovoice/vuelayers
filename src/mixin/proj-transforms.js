@@ -1,6 +1,8 @@
-import { EPSG_3857 } from '../ol-ext/consts'
-import { readGeoJsonFeature, readGeoJsonGeometry, writeGeoJsonFeature, writeGeoJsonGeometry } from '../ol-ext/geojson'
 import {
+  EPSG_3857,
+  getMapDataProjection,
+  readGeoJsonFeature,
+  readGeoJsonGeometry,
   transformExtent,
   transformLine,
   transformMultiLine,
@@ -8,32 +10,33 @@ import {
   transformMultiPolygon,
   transformPoint,
   transformPolygon,
-} from '../ol-ext/proj'
+  writeGeoJsonFeature,
+  writeGeoJsonGeometry,
+} from '../ol-ext'
 import { coalesce } from '../util/minilo'
 
 /**
  * Mixin with helpers for projection transforms between current view projection and global defined projection.
  */
-
 export default {
   computed: {
     /**
-     * @return {ProjectionLike}
+     * @return {module:ol/proj~ProjectionLike}
      */
     viewProjection () {
       if (this.rev && this.$view) {
         return this.$view.getProjection().getCode()
       }
-      return EPSG_3857
+      return this.projection || EPSG_3857
     },
     /**
-     * @return {ProjectionLike}
+     * @return {module:ol/proj~ProjectionLike}
      */
     resolvedDataProjection () {
       return coalesce(
         this.dataProjection, // may or may not be present
         this.projection, // may or may not be present
-        this.$map && this.$map.get('dataProjection'),
+        this.$map && getMapDataProjection(this.$map),
         this.$options.dataProjection,
         this.viewProjection,
       )

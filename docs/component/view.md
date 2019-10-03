@@ -5,11 +5,14 @@
 `vl-view` is the component to act upon to change the **center**, **resolution** 
 and **rotation** of the map.
 
-## Versions
+## ES6 Module
 
-`vl-view` component is a part of **Map** module:
+```javascript
+// vl-view component comes with vl-map
+import { Map } from 'vuelayers'
 
-- **ES6**: https://unpkg.com/vuelayers/lib/map/
+Vue.use(Map)
+```
 
 ## Usage
 

@@ -1,8 +1,7 @@
 <script>
   import Text from 'ol/style/Text'
-  import style from '../../mixin/style'
+  import { style, withFillStrokeStyle } from '../../mixin'
   import { isEqual } from '../../util/minilo'
-  import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   const props = {
@@ -91,6 +90,12 @@
         this.scheduleRefresh()
       }
     },
+    placement (value) {
+      if (this.$style && !isEqual(value, this.$style.getPlacement())) {
+        this.$style.setFont(value)
+        this.scheduleRefresh()
+      }
+    },
     offsetX (value) {
       if (this.$style && !isEqual(value, this.$style.getOffsetX())) {
         this.$style.setOffsetX(value)
@@ -105,6 +110,12 @@
     },
     rotation (value) {
       if (this.$style && !isEqual(value, this.$style.getRotation())) {
+        this.$style.setRotation(value)
+        this.scheduleRefresh()
+      }
+    },
+    rotateWithView (value) {
+      if (this.$style && !isEqual(value, this.$style.getRotateWithView())) {
         this.$style.setRotation(value)
         this.scheduleRefresh()
       }
@@ -145,7 +156,8 @@
       empty: false,
       attrs () {
         return {
-          class: this.$options.name,
+          id: this.vmId,
+          class: this.cmpName,
         }
       },
     },

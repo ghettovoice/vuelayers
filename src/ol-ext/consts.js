@@ -94,3 +94,23 @@ export const WMTS_VERSION = '1.0.0'
 export const WMTS_REQUEST_ENCODING = 'KVP'
 export const WMTS_FORMAT = 'image/jpeg'
 export const LAYER_PROP = 'layer'
+
+export const ARCGIS_EXTRA_PARAMS = [
+  'FORMAT',
+  'F',
+  'LAYERS',
+  'LAYERDEFS',
+  'DYNAMICLAYERS',
+  'DPI',
+  'TRANSPARENT',
+  'TIME',
+  'LAYERTIMEOPTIONS',
+  'GDBVERSION',
+  'MAPSCALE',
+  'ROTATION',
+  'DATUMTRANSFORMATIONS',
+  'MAPRANGEVALUES',
+  'LAYERRANGEVALUES',
+  'LAYERPARAMETERVALUES',
+  'HISTORICMOMENT',
+]

@@ -1,6 +1,5 @@
 /**
  * Mini Lodash.
- * @module util/minilo
  */
 const glob = typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : {}
 const globIsFinite = glob.isFinite || noop
@@ -314,4 +313,8 @@ export function camelCase (str) {
   let regExp = /([-_]\w)/g
 
   return str.replace(regExp, matches => matches[1].toUpperCase())
+}
+
+export function arrayLengthValidator (len) {
+  return len => value => isArray(value) && value.length === len
 }

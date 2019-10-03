@@ -1,72 +1,114 @@
+import Collection from 'ol/Collection'
 import Overlay from 'ol/Overlay'
 import Vue from 'vue'
+import { merge as mergeObs } from 'rxjs/observable'
+import { getOverlayId, initializeOverlay } from '../ol-ext'
+import { observableFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
+import rxSubs from './rx-subs'
 
-const methods = {
-  /**
-   * @return {IndexedCollectionAdapter}
-   * @protected
-   */
-  getOverlaysTarget () {
-    throw new Error('Not implemented method')
-  },
-  /**
-   * @param {Overlay|Vue} overlay
-   * @return {void}
-   */
-  addOverlay (overlay) {
-    overlay = overlay instanceof Vue ? overlay.$overlay : overlay
-    instanceOf(overlay, Overlay)
+export default {
+  mixins: [rxSubs],
+  computed: {
+    overlayIds () {
+      if (!this.rev) return []
 
-    if (this.getOverlaysTarget().has(overlay) === false) {
-      this.getOverlaysTarget().add(overlay)
-    }
+      return this.getOverlays().map(getOverlayId)
+    },
   },
-  /**
-   * @param {Overlay|Vue} overlay
-   * @return {void}
-   */
-  removeOverlay (overlay) {
-    overlay = overlay instanceof Vue ? overlay.$overlay : overlay
+  methods: {
+    /**
+     * @param {Overlay|Vue} overlay
+     * @return {void}
+     */
+    addOverlay (overlay) {
+      overlay = overlay instanceof Vue ? overlay.$overlay : overlay
+      instanceOf(overlay, Overlay)
 
-    if (!overlay) return
+      if (this.getOverlayById(getOverlayId(overlay)) == null) {
+        initializeOverlay(overlay)
+        this.$overlaysCollection.push(overlay)
+      }
+    },
+    /**
+     * @param {Overlay|Vue} overlay
+     * @return {void}
+     */
+    removeOverlay (overlay) {
+      overlay = this.getOverlayById(getOverlayId(overlay))
+      if (!overlay) return
 
-    if (this.getOverlaysTarget().has(overlay)) {
-      this.getOverlaysTarget().remove(overlay)
-    }
-  },
-  /**
-   * @return {Overlay[]}
-   */
-  getOverlays () {
-    return this.getOverlaysTarget().elements
-  },
-  /**
-   * @param {string|number} id
-   * @return {Overlay|undefined}
-   */
-  getOverlayById (id) {
-    return this.getOverlaysTarget().findByKey(id)
-  },
-  /**
-   * @return {void}
-   */
-  clearOverlays () {
-    this.getOverlaysTarget().clear()
-  },
-  /**
-   * @returns {Object}
-   * @protected
-   */
-  getServices () {
-    const vm = this
+      this.$overlaysCollection.remove(overlay)
+    },
+    /**
+     * @return {Overlay[]}
+     */
+    getOverlays () {
+      return this.$overlaysCollection.getArray()
+    },
+    /**
+     * @return {Collection<Overlay>}
+     */
+    getOverlaysCollection () {
+      return this._overlaysCollection
+    },
+    /**
+     * @param {string|number} overlayId
+     * @return {Overlay|undefined}
+     */
+    getOverlayById (overlayId) {
+      return this.$overlaysCollection.getArray().find(overlay => {
+        return getOverlayId(overlay) === overlayId
+      })
+    },
+    /**
+     * @return {void}
+     */
+    clearOverlays () {
+      this.$overlaysCollection.clear()
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
 
-    return {
-      get overlaysContainer () { return vm },
-    }
+      return {
+        get overlaysContainer () { return vm },
+      }
+    },
+  },
+  created () {
+    /**
+     * @type {Collection<Overlay>}
+     * @private
+     */
+    this._overlaysCollection = new Collection()
+
+    this::defineServices()
+    this::subscribeToCollectionEvents()
   },
 }
 
-export default {
-  methods,
+function defineServices () {
+  Object.defineProperties(this, {
+    $overlaysCollection: {
+      enumerable: true,
+      get: this.getOverlaysCollection,
+    },
+  })
+}
+
+function subscribeToCollectionEvents () {
+  const adds = observableFromOlEvent(this.$overlaysCollection, 'add')
+  const removes = observableFromOlEvent(this.$overlaysCollection, 'remove')
+
+  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(type + ':overlay', element)
+    })
+  })
 }

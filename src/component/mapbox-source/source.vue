@@ -1,6 +1,6 @@
 <script>
-  import xyzSource from '../../mixin/xyz-source'
-  import { EPSG_3857, TILE_FORMAT } from '../../ol-ext/consts'
+  import { xyzSource } from '../../mixin'
+  import { EPSG_3857, TILE_FORMAT } from '../../ol-ext'
   import { coalesce } from '../../util/minilo'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'

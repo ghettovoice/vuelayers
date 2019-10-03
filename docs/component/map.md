@@ -2,19 +2,21 @@
 
 > The core component of VueLayers
 
-It is a main container for all other VueLayers components and has one `default` 
+This is the main container for all other VueLayers components and has one `default` 
 slot to place them all. Usually you will use it together with [`vl-view`](/docs/component/view.md) 
 component to setup `zoom`, `center`, `projection` and other view related propeties for the map.
 
-## Module system
+## ES6 Module
 
-`vl-map` component is a part of **Map** module:
+```javascript
+import { Map } from 'vuelayers'
 
-- **ES6**: https://unpkg.com/vuelayers/lib/map/
+Vue.use(Map)
+```
 
 ## Usage
 
-Example of simple map.  
+Example of a simple map.  
 See also documentation of [`vl-view`](/docs/component/view.md) component.
 
 <vuep template="#usage-example"></vuep>
@@ -50,7 +52,7 @@ See also documentation of [`vl-view`](/docs/component/view.md) component.
 - **Type**: `Object, boolean`
 - **Default**: `true`
 
-Options for default controls added to the map by default. Set to `false` to disable 
+Options for default controls are added to the map by default. Set to `false` to disable 
 all map controls. Object value is used to configure controls.
 
 ### keyboard-event-target
@@ -135,7 +137,7 @@ Pointer events that emits [`ol.MapBrowserEvent`](http://openlayers.org/en/latest
 - `pointerdrag`
 - `pointermove` 
 
-Other events that emits [`ol.MapEvent`](http://openlayers.org/en/latest/apidoc/module-ol_MapEvent-MapEvent.html)
+Other events that emit [`ol.MapEvent`](http://openlayers.org/en/latest/apidoc/module-ol_MapEvent-MapEvent.html)
 
 - `movestart`
 - `moveend`

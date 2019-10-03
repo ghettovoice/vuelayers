@@ -1,5 +1,5 @@
 <template>
-  <div :id="[$options.name, id].join('-')" :class="classes">
+  <div :id="vmId" :class="classes">
     <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
   </div>
 </template>
@@ -7,20 +7,13 @@
 <script>
   import Overlay from 'ol/Overlay'
   import { merge as mergeObs } from 'rxjs/observable'
-  import uuid from 'uuid/v4'
-  import olCmp from '../../mixin/ol-cmp'
-  import projTransforms from '../../mixin/proj-transforms'
-  import useMapCmp from '../../mixin/use-map-cmp'
-  import { OVERLAY_POSITIONING } from '../../ol-ext/consts'
-  import observableFromOlChangeEvent from '../../rx-ext/from-ol-change-event'
+  import { olCmp, projTransforms, useMapCmp } from '../../mixin'
+  import { getOverlayId, initializeOverlay, OVERLAY_POSITIONING, setOverlayId } from '../../ol-ext'
+  import { observableFromOlChangeEvent } from '../../rx-ext'
   import { hasOverlay } from '../../util/assert'
   import { isEqual, identity } from '../../util/minilo'
 
   const props = {
-    id: {
-      type: [String, Number],
-      default: () => uuid(),
-    },
     offset: {
       type: Array,
       default: () => [0, 0],
@@ -57,11 +50,9 @@
       default: 20,
     },
     autoPanAnimation: Object,
+    className: String,
   }
 
-  /**
-   * @vueComputed
-   */
   const computed = {
     positionViewProj () {
       if (this.rev && this.$overlay) {
@@ -75,22 +66,19 @@
     },
     classes () {
       return [
-        this.$options.name,
+        this.cmpName,
         this.visible ? 'visible' : undefined,
       ].filter(identity)
     },
   }
 
-  /**
-   * @vueMethods
-   */
-  const methods = /** @lends module:overlay/overlay# */{
+  const methods = {
     /**
-     * @return {Overlay}
+     * @return {module:ol/Overlay~Overlay}
      * @protected
      */
     createOlObject () {
-      return new Overlay({
+      const overlay = new Overlay({
         id: this.id,
         offset: this.offset,
         position: this.pointToViewProj(this.position),
@@ -100,7 +88,12 @@
         autoPan: this.autoPan,
         autoPanMargin: this.autoPanMargin,
         autoPanAnimation: this.autoPanAnimation,
+        className: this.className,
       })
+
+      initializeOverlay(overlay, this.id)
+
+      return overlay
     },
     /**
      * @return {void}
@@ -128,6 +121,7 @@
       this.unsubscribeAll()
       this.$overlay.setElement(undefined)
       this.$overlaysContainer && this.$overlaysContainer.removeOverlay(this.$overlay)
+
       this.visible = false
     },
     /**
@@ -140,6 +134,11 @@
   }
 
   const watch = {
+    id (value) {
+      if (!this.$overlay || value === getOverlayId(this.$overlay)) return
+
+      setOverlayId(this.$overlay, value)
+    },
     offset (value) {
       if (this.$overlay && !isEqual(value, this.$overlay.getOffset())) {
         this.$overlay.setOffset(value)
@@ -147,7 +146,7 @@
     },
     position (value) {
       value = this.pointToViewProj(value)
-      if (this.$overlay && !isEqual(value, this.positionViewProj)) {
+      if (this.$overlay && !isEqual(value, this.$overlay.getPosition())) {
         this.$overlay.setPosition(value)
       }
     },
@@ -163,11 +162,6 @@
     },
   }
 
-  /**
-   * @alias module:overlay/overlay
-   * @title vl-overlay
-   * @vueProto
-   */
   export default {
     name: 'vl-overlay',
     mixins: [olCmp, useMapCmp, projTransforms],
@@ -176,9 +170,9 @@
     methods,
     watch,
     created () {
-      Object.defineProperties(this, /** @lends module:overlay/overlay# */{
+      Object.defineProperties(this, {
         /**
-         * @type {Overlay|undefined}
+         * @type {module:ol/Overlay~Overlay|undefined}
          */
         $overlay: {
           enumerable: true,
@@ -212,19 +206,20 @@
   function subscribeToOverlayChanges () {
     hasOverlay(this)
 
-    const ft = 1000 / 60
     const changes = mergeObs(
-      observableFromOlChangeEvent(this.$overlay, 'position', true, ft,
-        () => this.pointToDataProj(this.$overlay.getPosition())),
+      observableFromOlChangeEvent(this.$overlay, 'position', true, undefined, () => this.pointToDataProj(this.$overlay.getPosition())),
       observableFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
-      ], true, ft),
+      ], true),
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {
       ++this.rev
-      this.$emit(`update:${prop}`, value)
+
+      this.$nextTick(() => {
+        this.$emit(`update:${prop}`, value)
+      })
     })
   }
 </script>

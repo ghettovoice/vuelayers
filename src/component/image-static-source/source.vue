@@ -1,7 +1,6 @@
 <script>
   import ImageStaticSource from 'ol/source/ImageStatic'
-  import imageSource from '../../mixin/image-source'
-  import withUrl from '../../mixin/with-url'
+  import { imageSource, withUrl } from '../../mixin'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**

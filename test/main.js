@@ -3,6 +3,9 @@ import Vue from 'vue'
 import VueLayers from '@'
 import App from './app.vue'
 
+Vue.performance = true
+Vue.productionTip = true
+
 Vue.use(VueLayers, {
   // dataProjection: 'EPSG:4326',
 })
