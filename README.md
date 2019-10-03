@@ -23,13 +23,11 @@ It can display maps with tiled, raster or vector layers loaded from different so
 
 ## Versions
 
-**NOTE**: you are reading README for the next version **v0.12.x**.  
-
-| Vuelayers           | Branch                                                           | Vue     | OpenLayers |
-| :------------------ | :--------------------------------------------------------------- | :------ | :--------- |
-| Current **0.11.x**  | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **2.3** | **5.x**    |
-| Next **0.12.x**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)   | **2.3** | **5.x**    |
-| Previous **0.10.x** | [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/v0.10.x) | **2.3** | **4.x**    |
+| VueLayers         | Branch                                                           | Vue      | OpenLayers | NPM tag   |
+|:------------------|:-----------------------------------------------------------------|:---------|:-----------|:----------|
+| Current **0.11**  | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **^2.3** | **^5.0**   | `latest`  |
+| Next **0.12**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)   | **^2.3** | **^6.0**   | `next`    |
+| Previous **0.10** | [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/v0.10.x) | **^2.0** | **^4.0**   | `v0.10`   |
 
 ## Links
 
@@ -84,5 +82,5 @@ npm test
 
 ## License
 
-**MIT** (c) 2017-2018, Vladimir Vershinin  
+**MIT** (c) 2017-2019, Vladimir Vershinin  
 Based on [Vue](https://vuejs.org/) and [OpenLayers](https://openlayers.org/)
