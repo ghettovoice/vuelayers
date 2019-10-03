@@ -19,6 +19,7 @@
 
         <vl-layer-vector id="countries" render-mode="image">
           <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />
+          <vl-style-func :factory="createCountriesStyleFunc" />
         </vl-layer-vector>
 
         <vl-layer-vector id="draw-target">
@@ -33,7 +34,7 @@
 </template>
 
 <script>
-  import { findPointOnSurface } from '../src/ol-ext'
+  import { findPointOnSurface, createStyle } from '../src/ol-ext'
 
   export default {
     name: 'app',
@@ -76,6 +77,14 @@
     },
     methods: {
       pointOnSurface: findPointOnSurface,
+      createCountriesStyleFunc () {
+        return () => {
+          return createStyle({
+            fillColor: 'rgba(0, 0, 0, 0.4)',
+            strokeColor: 'blue',
+          })
+        }
+      },
     },
     mounted () {
     },

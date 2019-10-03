@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { Style } from 'ol/style'
 import { warn } from '../util/log'
 import { isFunction, reduce } from '../util/minilo'
 
@@ -149,7 +150,8 @@ export default {
         // not empty or null style
         if (
           styles === null ||
-          (Array.isArray(styles) && styles.length)
+          (Array.isArray(styles) && styles.length) ||
+          styles instanceof Style
         ) {
           return styles
         }
