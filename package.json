@@ -1,7 +1,7 @@
 {
   "name": "vuelayers",
   "fullname": "VueLayers",
-  "version": "0.11.6",
+  "version": "0.12.0",
   "description": "Web map Vue components with the power of OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "main": "./lib/index.js",
@@ -175,8 +175,8 @@
     "yargs": "^12.0.2"
   },
   "engines": {
-    "node": ">=8.9.0",
-    "npm": ">=5.0.0"
+    "node": ">=10.0",
+    "npm": ">=6.0"
   },
   "files": [
     "LICENSE",

@@ -23,8 +23,9 @@ See the [Quick start](quickstart.md "Quick start guide") for more details how to
 
 | VueLayers         | Branch                                                           | Vue      | OpenLayers | NPM tag   |
 |:------------------|:-----------------------------------------------------------------|:---------|:-----------|:----------|
-| Current **0.11**  | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **^2.3** | **^5.0**   | `latest`  |
-| Next **0.12**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)   | **^2.3** | **^6.0**   | `next`    |
+| Current **0.12**  | [v0.12.x](https://github.com/ghettovoice/vuelayers/tree/v0.12.x) | **^2.3** | **^6.0**   | `latest`  |
+| Next **0.13**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)   | **^2.3** | **???**    | `next`    |
+| Previous **0.11** | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **^2.3** | **^5.0**   | `v0.11`   |
 | Previous **0.10** | [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/v0.10.x) | **^2.0** | **^4.0**   | `v0.10`   |
 
 ## Features
@@ -37,7 +38,7 @@ See the [Quick start](quickstart.md "Quick start guide") for more details how to
 ## Requirements
 
 - [Vue](https://vuejs.org/) version **^2.3**
-- [OpenLayers](https://openlayers.org/) version **^5.0**
+- [OpenLayers](https://openlayers.org/) version **^6.0**
 
 ## Live demo
 
