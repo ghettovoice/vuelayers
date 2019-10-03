@@ -13,6 +13,14 @@
                  :zoom.sync="zoom" :extent="[0, 0, 100, 50]"
                  ident="view" ref="view" />
 
+        <vl-geoloc>
+          <template slot-scope="geoloc">
+            <vl-feature v-if="geoloc.position" id="position-feature">
+              <vl-geom-point :coordinates="geoloc.position" />
+            </vl-feature>
+          </template>
+        </vl-geoloc>
+
         <vl-layer-tile>
           <vl-source-sputnik />
         </vl-layer-tile>

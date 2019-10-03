@@ -226,7 +226,7 @@ export default {
   },
   stubVNode: {
     empty () {
-      return this.vmId()
+      return this.vmId
     },
   },
   created () {
