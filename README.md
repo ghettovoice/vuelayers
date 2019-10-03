@@ -23,6 +23,9 @@ It can display maps with tiled, raster or vector layers loaded from different so
 
 ## Versions
 
+**NOTE: you are looking for README file for the upcoming v0.12 version. To see README file for the current v0.11
+version switch to the [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) branch.**
+
 | VueLayers         | Branch                                                           | Vue      | OpenLayers | NPM tag   |
 |:------------------|:-----------------------------------------------------------------|:---------|:-----------|:----------|
 | Current **0.12**  | [v0.12.x](https://github.com/ghettovoice/vuelayers/tree/v0.12.x) | **^2.3** | **^6.0**   | `latest`  |
