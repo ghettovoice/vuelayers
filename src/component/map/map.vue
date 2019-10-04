@@ -72,22 +72,6 @@
        */
       keyboardEventTarget: [String, Element, Document],
       /**
-       * When set to `true`, tiles will be loaded during animations.
-       * @type {boolean}
-       */
-      loadTilesWhileAnimating: {
-        type: Boolean,
-        default: false,
-      },
-      /**
-       * When set to `true`, tiles will be loaded while interacting with the map.
-       * @type {boolean}
-       */
-      loadTilesWhileInteracting: {
-        type: Boolean,
-        default: false,
-      },
-      /**
        * The minimum distance in pixels the cursor must move to be detected as a map move event instead of a click.
        * Increasing this value can make it easier to click on the map.
        * @type {Number}

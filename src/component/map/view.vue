@@ -10,9 +10,8 @@
   import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
   import Vue from 'vue'
   import { olCmp, projTransforms } from '../../mixin'
-  import { EPSG_3857, MAX_ZOOM, MIN_ZOOM, ZOOM_FACTOR } from '../../ol-ext'
+  import { EPSG_3857, getViewId, initializeView, MAX_ZOOM, MIN_ZOOM, setViewId, ZOOM_FACTOR } from '../../ol-ext'
   import { observableFromOlChangeEvent } from '../../rx-ext'
-  import { hasView } from '../../util/assert'
   import { arrayLengthValidator, coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -34,13 +33,9 @@
         default: () => [0, 0],
         validator: arrayLengthValidator(2),
       },
-      constrainRotation: {
-        type: [Boolean, Number],
-        default: true,
-      },
-      enableRotation: {
+      constrainOnlyCenter: {
         type: Boolean,
-        default: true,
+        default: false,
       },
       /**
        * The extent that constrains the center defined in the view projection,
@@ -51,8 +46,54 @@
         type: Array,
         validator: arrayLengthValidator(4),
       },
+      smoothExtentConstraint: {
+        type: Boolean,
+        default: true,
+      },
+      /**
+       * The initial rotation for the view in **radians** (positive rotation clockwise).
+       * @type {number}
+       */
+      rotation: {
+        type: Number,
+        default: 0,
+      },
+      enableRotation: {
+        type: Boolean,
+        default: true,
+      },
+      constrainRotation: {
+        type: [Boolean, Number],
+        default: true,
+      },
+      resolution: Number,
+      resolutions: Array,
       maxResolution: Number,
       minResolution: Number,
+      constrainResolution: {
+        type: Boolean,
+        default: false,
+      },
+      smoothResolutionConstraint: {
+        type: Boolean,
+        default: true,
+      },
+      /**
+       * Zoom level used to calculate the resolution for the view as `int` value. Only used if `resolution` is not defined.
+       * @type {number}
+       * @default 0
+       */
+      zoom: {
+        type: Number,
+        default: MIN_ZOOM,
+      },
+      /**
+       * @default 2
+       */
+      zoomFactor: {
+        type: Number,
+        default: ZOOM_FACTOR,
+      },
       /**
        * @default 28
        */
@@ -67,6 +108,10 @@
         type: Number,
         default: MIN_ZOOM,
       },
+      multiWorld: {
+        type: Boolean,
+        default: false,
+      },
       /**
        * @type {string}
        * @default EPSG:3857
@@ -74,34 +119,6 @@
       projection: {
         type: String,
         default: EPSG_3857,
-      },
-      resolution: Number,
-      resolutions: Array,
-      /**
-       * The initial rotation for the view in **radians** (positive rotation clockwise).
-       * @type {number}
-       * @vueSync
-       */
-      rotation: {
-        type: Number,
-        default: 0,
-      },
-      /**
-       * Zoom level used to calculate the resolution for the view as `int` value. Only used if `resolution` is not defined.
-       * @type {number}
-       * @default 0
-       * @vueSync
-       */
-      zoom: {
-        type: Number,
-        default: MIN_ZOOM,
-      },
-      /**
-       * @default 2
-       */
-      zoomFactor: {
-        type: Number,
-        default: ZOOM_FACTOR,
       },
     },
     computed: {
@@ -151,13 +168,42 @@
     },
     methods: {
       /**
+       * @return {module:ol/View~View}
+       * @protected
+       */
+      createOlObject () {
+        const view = new View({
+          center: this.pointToViewProj(this.center),
+          constrainOnlyCenter: this.constrainOnlyCenter,
+          extent: this.extent ? this.extentToViewProj(this.extent) : undefined,
+          smoothExtentConstraint: this.smoothExtentConstraint,
+          rotation: this.rotation,
+          enableRotation: this.enableRotation,
+          constrainRotation: this.constrainRotation,
+          resolution: this.resolution,
+          resolutions: this.resolutions,
+          maxResolution: this.maxResolution,
+          minResolution: this.minResolution,
+          constrainResolution: this.constrainResolution,
+          smoothResolutionConstraint: this.smoothResolutionConstraint,
+          zoom: this.zoom,
+          zoomFactor: this.zoomFactor,
+          maxZoom: this.maxZoom,
+          minZoom: this.minZoom,
+          multiWorld: this.multiWorld,
+          projection: this.projection,
+        })
+
+        initializeView(view, this.id)
+
+        return view
+      },
+      /**
        * @see {@link https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#animate}
        * @param {...(AnimationOptions|function(boolean))} args
        * @return {Promise} Resolves when animation completes
        */
-      animate (...args) {
-        hasView(this)
-
+      async animate (...args) {
         let cb = noop
         if (isFunction(args[args.length - 1])) {
           cb = args[args.length - 1]
@@ -168,38 +214,24 @@
           opts.center = this.pointToViewProj(opts.center)
         })
 
-        return new Promise(
-          resolve => this.$view.animate(...args, complete => {
+        await this.$createPromise
+
+        return new Promise(resolve => {
+          return this.$view.animate(...args, complete => {
             cb(complete)
             resolve(complete)
-          }),
-        )
-      },
-      /**
-       * @return {ol/View~View}
-       * @protected
-       */
-      createOlObject () {
-        const view = new View({
-          center: this.pointToViewProj(this.center),
-          constrainRotation: this.constrainRotation,
-          enableRotation: this.enableRotation,
-          extent: this.extent ? this.extentToViewProj(this.extent) : undefined,
-          maxResolution: this.maxResolution,
-          minResolution: this.minResolution,
-          maxZoom: this.maxZoom,
-          minZoom: this.minZoom,
-          projection: this.projection,
-          resolution: this.resolution,
-          resolutions: this.resolutions,
-          rotation: this.rotation,
-          zoom: this.zoom,
-          zoomFactor: this.zoomFactor,
+          })
         })
+      },
+      async getAnimating () {
+        await this.$createPromise
 
-        view.set('id', this.id)
+        return this.$view.getAnimating()
+      },
+      async cancelAnimations () {
+        await this.$createPromise
 
-        return view
+        return this.$view.cancelAnimations()
       },
       /**
        * @see {@link https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#fit}
@@ -207,9 +239,7 @@
        * @param {FitOptions} [options]
        * @return {Promise} Resolves when view changes
        */
-      fit (geometryOrExtent, options = {}) {
-        hasView(this)
-
+      async fit (geometryOrExtent, options = {}) {
         // transform from GeoJSON, vl-feature to ol.Feature
         if (isPlainObject(geometryOrExtent)) {
           geometryOrExtent = this.readGeometryInDataProj(geometryOrExtent)
@@ -219,8 +249,10 @@
 
         let cb = options.callback || noop
 
+        await this.$createPromise
+
         return new Promise(resolve => {
-          this.$view.fit(geometryOrExtent, {
+          return this.$view.fit(geometryOrExtent, {
             ...options,
             callback: complete => {
               cb(complete)
@@ -229,91 +261,223 @@
           })
         })
       },
+      async beginInteraction () {
+        await this.$createPromise
+
+        this.$view.beginInteraction()
+      },
+      async endInteraction (duration, resolutionDirection, anchor) {
+        await this.$createPromise
+
+        this.$view.endInteraction(duration, resolutionDirection, anchor)
+      },
+      async getInteracting () {
+        await this.$createPromise
+
+        return this.getInteracting()
+      },
+      async calculateExtent () {
+        await this.$createPromise
+
+        return this.$view.calculateExtent()
+      },
+      async centerOn (coordinate, size, position) {
+        await this.$createPromise
+
+        this.$view.centerOn(coordinate, size, position)
+      },
+      async getCenter () {
+        await this.$createPromise
+
+        return this.$view.getCenter()
+      },
+      async setCenter (center) {
+        await this.$createPromise
+
+        if (isEqual(center, this.$view.getCenter())) return
+
+        return this.$view.setCenter(center)
+      },
+      async getResolution () {
+        await this.$createPromise
+
+        return this.$view.getResolution()
+      },
+      async setResolution (resolution) {
+        await this.$createPromise
+
+        if (resolution === this.$view.getResolution()) return
+
+        this.$view.setResolution(resolution)
+      },
+      async getResolutionForExtent (extent, size) {
+        await this.$createPromise
+
+        return this.$view.getResolutionForExtent(extent, size)
+      },
+      async getResolutionForZoom (zoom) {
+        await this.$createPromise
+
+        return this.$view.getResolutionForZoom(zoom)
+      },
+      async getResolutions () {
+        await this.$createPromise
+
+        return this.$view.getResolutions()
+      },
+      async getMaxResolution () {
+        await this.$createPromise
+
+        return this.$view.getMaxResolution()
+      },
+      async getMinResolution () {
+        await this.$createPromise
+
+        return this.$view.getMinResolution()
+      },
+      async getZoom () {
+        await this.$createPromise
+
+        return this.$view.getZoom()
+      },
+      async setZoom (zoom) {
+        await this.$createPromise
+
+        if (zoom === this.$view.getZoom()) return
+
+        this.$view.setZoom(zoom)
+      },
+      async getZoomForResolution (resolution) {
+        await this.$createPromise
+
+        return this.$view.getZoomForResolution(resolution)
+      },
+      async getMaxZoom () {
+        await this.$createPromise
+
+        return this.$view.getMaxZoom()
+      },
+      async setMaxZoom (zoom) {
+        await this.$createPromise
+
+        if (zoom === this.$view.getMaxZoom()) return
+
+        this.$view.setMaxZoom(zoom)
+      },
+      async getMinZoom () {
+        await this.$createPromise
+
+        return this.$view.getMinZoom()
+      },
+      async setMinZoom (zoom) {
+        await this.$createPromise
+
+        if (zoom === this.$view.getMinZoom()) return
+
+        return this.$view.setMinZoom(zoom)
+      },
+      async getProjection () {
+        await this.$createPromise
+
+        return this.$view.getProjection()
+      },
+      async getRotation () {
+        await this.$createPromise
+
+        return this.$view.getRotation()
+      },
+      async setRotation (rotation) {
+        await this.$createPromise
+
+        if (rotation === this.$view.getRotation()) return
+
+        this.$view.setRotation(rotation)
+      },
+      async getId () {
+        await this.$createPromise
+
+        return getViewId(this.$view)
+      },
+      async setId (id) {
+        await this.$createPromise
+
+        if (id === getViewId(this.$view)) return
+
+        setViewId(this.$view, id)
+      },
       /**
-       * @return {void}
+       * @return {Promise<void>}
        * @protected
        */
-      mount () {
+      async mount () {
+        await this.$createPromise
+
         this.$viewContainer && this.$viewContainer.setView(this)
-        this.subscribeAll()
+
+        return this.subscribeAll()
       },
       /**
        * @return {void}
        * @protected
        */
-      unmount () {
-        this.unsubscribeAll()
+      async unmount () {
+        await this.unsubscribeAll()
+
         this.$viewContainer && this.$viewContainer.setView(undefined)
       },
       /**
-       * @return {void}
+       * @return {void|Promise<void>}
        * @protected
        */
       subscribeAll () {
-        this::subscribeToEvents()
+        return this::subscribeToEvents()
       },
     },
     watch: {
       id (value) {
-        if (!this.$view || value === this.$view.get('id')) {
-          return
-        }
-
-        this.$view.set('id', value)
+        this.setId(value)
       },
-      center (value) {
-        if (!this.$view || this.$view.getAnimating()) return
+      async center (value) {
+        if (await this.getAnimating()) return
 
-        value = this.pointToViewProj(value)
-        if (!isEqual(value, this.currentCenterViewProj)) {
-          this.$view.setCenter(value)
-        }
+        this.setCenter(this.pointToViewProj(value))
       },
-      resolution (value) {
-        if (!this.$view || this.$view.getAnimating()) return
+      async rotation (value) {
+        if (await this.getAnimating()) return
 
-        if (value !== this.currentResolution) {
-          this.$view.setResolution(value)
-        }
+        this.setRotation(value)
       },
-      zoom (value) {
-        if (!this.$view || this.$view.getAnimating()) return
+      async resolution (value) {
+        if (await this.getAnimating()) return
 
-        if (value !== this.currentZoom) {
-          this.$view.setZoom(value)
-        }
+        this.setResolution(value)
       },
-      rotation (value) {
-        if (!this.$view || this.$view.getAnimating()) return
+      async zoom (value) {
+        if (await this.getAnimating()) return
 
-        if (value !== this.currentRotation) {
-          this.$view.setRotation(value)
-        }
+        this.setZoom(value)
       },
       minZoom (value) {
-        if (!this.$view) return
-
-        if (value !== this.$view.getMinZoom()) {
-          this.$view.setMinZoom(value)
-        }
+        this.setMinZoom(value)
       },
       maxZoom (value) {
-        if (!this.$view) return
-
-        if (value !== this.$view.getMaxZoom()) {
-          this.$view.setMaxZoom(value)
-        }
+        this.setMaxZoom(value)
       },
       ...makeWatchers([
-        'resolvedDataProjection',
-        'constrainRotation',
-        'enableRotation',
+        'constrainOnlyCenter',
         'extent',
+        'smoothExtentConstraint',
+        'enableRotation',
+        'constrainRotation',
+        'resolutions',
         'maxResolution',
         'minResolution',
-        'projection',
-        'resolutions',
+        'constrainResolution',
+        'smoothResolutionConstraint',
         'zoomFactor',
+        'multiWorld',
+        'resolvedDataProjection',
+        'projection',
       ], () => function () {
         this.scheduleRecreate()
       }),
@@ -331,7 +495,7 @@
   function defineServices () {
     Object.defineProperties(this, {
       /**
-       * @type {ol/View~View|undefined}
+       * @type {module:ol/View~View|undefined}
        */
       $view: {
         enumerable: true,
@@ -349,8 +513,8 @@
    * @return {void}
    * @private
    */
-  function subscribeToEvents () {
-    hasView(this)
+  async function subscribeToEvents () {
+    await this.$createPromise
 
     const ft = 1000 / 60
     const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
