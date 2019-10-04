@@ -242,9 +242,7 @@ function makeBundle (options = {}) {
       extensions: ['.js', '.jsx', '.es6', '.es', '.mjs', '.vue'],
     }),
     nodeResolve({
-      main: true,
-      module: true,
-      jsnext: true,
+      mainFields: ['module', 'main'],
       browser: true,
     }),
     cjs(),

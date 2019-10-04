@@ -7,6 +7,7 @@ const utils = require('./utils')
 const config = require('./config')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
+process.env.EFF_ABSOLUTE_PATHS = process.env.EFF_ABSOLUTE_PATHS || true
 
 const isProduction = process.env.NODE_ENV === 'production'
 

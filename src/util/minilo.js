@@ -8,6 +8,7 @@ const objectProto = Object.prototype
 const funcProto = Object.prototype
 
 const objectToString = objectProto.toString
+const objectHasOwnProp = objectProto.hasOwnProperty
 const funcToString = funcProto.toString
 
 const objectTag = {}::objectToString()
@@ -54,7 +55,7 @@ export function isArray (value) {
 }
 
 export function isArrayLike (value) {
-  return isObjectLike(value) && value.hasOwnProperty('length')
+  return isObjectLike(value) && value::objectHasOwnProp('length')
 }
 
 export function isFinite (value) {
@@ -81,11 +82,11 @@ export function isPlainObject (value) {
   if (!isObjectLike(value) || value::objectToString() !== objectTag) {
     return false
   }
-  let proto = Object.getPrototypeOf(value)
+  const proto = Object.getPrototypeOf(value)
   if (proto == null) {
     return true
   }
-  let Ctor = proto.constructor
+  const Ctor = proto.constructor
   return typeof Ctor === 'function' &&
     Ctor instanceof Ctor &&
     Ctor::funcToString() === objectCtorString
@@ -105,8 +106,8 @@ export function coalesce (...args) {
  * @return {Object} Returns object only with plain properties.
  */
 export function plainProps (object) {
-  let newObject = {}
-  let isPlain = x => isNumeric(x) || isString(x) || isArray(x) || isBoolean(x) || isPlainObject(x)
+  const newObject = {}
+  const isPlain = x => isNumeric(x) || isString(x) || isArray(x) || isBoolean(x) || isPlainObject(x)
   Object.keys(object).forEach(key => {
     if (isPlain(object[key])) {
       newObject[key] = object[key]
@@ -138,25 +139,25 @@ export function isEqual (value, other) {
     return value !== value && other !== other
   }
 
-  let valueProps = Object.keys(value)
-  let otherProps = Object.keys(other)
+  const valueProps = Object.keys(value)
+  const otherProps = Object.keys(other)
   if (valueProps.length !== otherProps.length) {
     return false
   }
 
-  let checked = []
-  let traverse = (valueProps, otherProps) => {
+  const checked = []
+  const traverse = (valueProps, otherProps) => {
     for (let i = 0, l = valueProps.length; i < l; i++) {
-      let valueProp = valueProps[i]
+      const valueProp = valueProps[i]
 
       if (checked.includes(valueProp)) {
         continue
       }
-      if (other.hasOwnProperty(valueProp) === false) {
+      if (other::objectHasOwnProp(valueProp) === false) {
         return false
       }
 
-      let otherProp = otherProps[i]
+      const otherProp = otherProps[i]
 
       if (!isEqual(value[valueProp], other[otherProp])) {
         return false
@@ -186,10 +187,10 @@ export function isNotEmpty (value) {
 }
 
 export function forEach (collection, iteratee) {
-  let keys = Object.keys(collection)
+  const keys = Object.keys(collection)
   for (let i = 0, l = keys.length; i < l; i++) {
-    let key = keys[i]
-    let value = collection[key]
+    const key = keys[i]
+    const value = collection[key]
     if (iteratee(value, key) === false) {
       return
     }
@@ -292,12 +293,12 @@ export function* range (start, end, step = 1) {
 
 export function get (object, path, defaultValue) {
   // eslint-disable-next-line no-new-func
-  let fn = new Function('object', `try { return object.${path} } catch (e) {}`)
+  const fn = new Function('object', `try { return object.${path} } catch (e) {}`)
   return coalesce(fn(object), defaultValue)
 }
 
 export function includes (array, value, comparator = isEqual) {
-  let elems = filter(array, elem => comparator(elem, value))
+  const elems = filter(array, elem => comparator(elem, value))
   return elems.shift()
 }
 
@@ -310,8 +311,7 @@ export function difference (array1, array2, comparator = isEqual) {
  * @return {string}
  */
 export function camelCase (str) {
-  let regExp = /([-_]\w)/g
-
+  const regExp = /([-_]\w)/g
   return str.replace(regExp, matches => matches[1].toUpperCase())
 }
 
