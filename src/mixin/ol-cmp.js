@@ -109,21 +109,21 @@ export default {
      * @protected
      */
     mount () {
-      this.subscribeAll()
+      return this.subscribeAll()
     },
     /**
      * @return {void|Promise<void>}
      * @protected
      */
     unmount () {
-      this.unsubscribeAll()
+      return this.unsubscribeAll()
     },
     /**
      * Refresh internal ol objects
      * @return {Promise<void>}
      */
-    refresh () {
-      if (this.$olObject == null) return Promise.resolve()
+    async refresh () {
+      await this.$createPromise
 
       return new Promise(resolve => {
         if (this.$olObject && isFunction(this.$olObject.changed)) {
@@ -140,7 +140,7 @@ export default {
      * @protected
      */
     async remount () {
-      if (this.$olObject == null) return
+      await this.$createPromise
 
       await this.unmount()
       await this.mount()
@@ -152,13 +152,16 @@ export default {
      * @protected
      */
     async recreate () {
-      if (this.$olObject == null) return
+      await this.$createPromise
 
       await this.unmount()
       await this.deinit()
       await this.init()
       await this.mount()
     },
+    /**
+     * @return {void|Promise<void>}
+     */
     subscribeAll () {},
   },
   created () {

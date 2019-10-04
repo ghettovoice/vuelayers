@@ -75,10 +75,11 @@ export default {
       return this::cmp.methods.recreate()
     },
     /**
+     * @return {void|Promise<void>}
      * @protected
      */
     subscribeAll () {
-      this::cmp.methods.subscribeAll()
+      return this::cmp.methods.subscribeAll()
     },
   },
   stubVNode: {

@@ -12,6 +12,15 @@ import useMapCmp from './use-map-cmp'
 export default {
   mixins: [cmp, useMapCmp, sourceContainer],
   props: {
+    className: String,
+    opacity: {
+      type: Number,
+      default: 1,
+    },
+    visible: {
+      type: Boolean,
+      default: true,
+    },
     /**
      * The bounding extent for layer rendering defined in the map view projection.
      * The layer will not be rendered outside of this extent.
@@ -22,21 +31,14 @@ export default {
       type: Array,
       validator: value => value.length === 4,
     },
+    zIndex: Number,
     minResolution: Number,
     maxResolution: Number,
-    opacity: {
-      type: Number,
-      default: 1,
-    },
     overlay: {
       type: Boolean,
       default: false,
     },
-    visible: {
-      type: Boolean,
-      default: true,
-    },
-    zIndex: Number,
+    render: Function,
   },
   methods: {
     /**
@@ -44,7 +46,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      let layer = await this.createLayer()
+      const layer = await this.createLayer()
 
       initializeLayer(layer, this.id)
 
@@ -107,7 +109,7 @@ export default {
       return this.$layer
     },
     /**
-     * @return {Promise}
+     * @return {Promise<void>}
      * @protected
      */
     mount () {
@@ -120,7 +122,7 @@ export default {
       return this::cmp.methods.mount()
     },
     /**
-     * @return {Promise}
+     * @return {Promise<void>}
      * @protected
      */
     unmount () {
@@ -134,14 +136,14 @@ export default {
     },
     /**
      * Updates layer state
-     * @return {Promise}
+     * @return {Promise<void>}
      */
     refresh () {
       return this::cmp.methods.refresh()
     },
     /**
      * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise}
+     * @return {Promise<void>}
      * @protected
      */
     remount () {
@@ -149,18 +151,19 @@ export default {
     },
     /**
      * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise}
+     * @return {Promise<void>}
      * @protected
      */
     recreate () {
       return this::cmp.methods.remount()
     },
     /**
+     * @return {Promise<void>}
      * @protected
      */
-    subscribeAll () {
-      this::cmp.methods.subscribeAll()
-      this::subscribeToLayerEvents()
+    async subscribeAll () {
+      await this::cmp.methods.subscribeAll()
+      await this::subscribeToLayerEvents()
     },
     /**
      * @param {module:ol/Map~Map|Vue|undefined} map
