@@ -11,6 +11,10 @@ import services from './services'
 const VM_PROP = 'vm'
 const INSTANCE_PROMISE_POOL = 'instance_promise'
 
+const STATE_UNDEF = 0
+const STATE_CREATED = 1
+const STATE_MOUNTED = 2
+
 /**
  * Basic ol component mixin.
  * todo try to subscribe to generic change event here and update rev according to internal ol counter
@@ -83,15 +87,6 @@ export default {
       throw new Error('Not implemented method')
     },
     /**
-     * @returns {Promise<Object>}
-     * @throws {Error} If underlying OpenLayers object not initialized (incorrect initialization, already destroy).
-     */
-    async resolveOlObject () {
-      await this.$createPromise
-
-      return this.$olObject || throw new Error('OpenLayers object is undefined')
-    },
-    /**
      * @return {void|Promise<void>}
      * @protected
      */
@@ -132,12 +127,12 @@ export default {
      * @return {Promise<void>}
      */
     async refresh () {
-      await this.$createPromise
+      const olObj = await this.resolveOlObject()
 
       return new Promise(resolve => {
-        if (this.$olObject && isFunction(this.$olObject.changed)) {
-          this.$olObject.once('change', () => resolve())
-          this.$olObject.changed()
+        if (isFunction(olObj.changed)) {
+          olObj.once('change', () => resolve())
+          olObj.changed()
         } else {
           resolve()
         }
@@ -149,9 +144,12 @@ export default {
      * @protected
      */
     async remount () {
-      await this.$createPromise
+      const state = await this.resolveOlObjectState()
 
-      await this.unmount()
+      if (state === STATE_MOUNTED) {
+        await this.unmount()
+      }
+
       await this.mount()
     },
     /**
@@ -161,10 +159,13 @@ export default {
      * @protected
      */
     async recreate () {
-      await this.$createPromise
+      const state = await this.resolveOlObjectState()
 
-      await this.unmount()
-      await this.deinit()
+      if (state === STATE_MOUNTED) {
+        await this.unmount()
+        await this.deinit()
+      }
+
       await this.init()
       await this.mount()
     },
@@ -172,6 +173,27 @@ export default {
      * @return {void|Promise<void>}
      */
     subscribeAll () {},
+    /**
+     * @returns {Promise<Object>}
+     * @throws {Error} If underlying OpenLayers object not initialized (incorrect initialization, already destroy).
+     */
+    async resolveOlObject () {
+      await this.$createPromise
+
+      return this.$olObject || throw new Error('OpenLayers object is undefined')
+    },
+    /**
+     * @returns {Promise<number>}
+     * @protected
+     */
+    resolveOlObjectState () {
+      return Promise.race([
+        this.$createPromise.then(() => STATE_CREATED),
+        this.$mountPromise.then(() => STATE_MOUNTED),
+        this.$unmountPromise.then(() => STATE_CREATED),
+        this.$destroyPromise.then(() => STATE_UNDEF),
+      ])
+    },
   },
   created () {
     /**
@@ -221,8 +243,9 @@ function defineLifeCyclePromises () {
     .then(::this.init)
     .then(makeEventEmitter('created'))
 
+  const t = 1000 / 60
   // mount
-  const mountObs = intervalObs(1000 / 60)
+  const mountObs = intervalObs(t)
     .pipe(
       skipWhile(() => !this._mounted),
       firstObs(),
@@ -232,7 +255,7 @@ function defineLifeCyclePromises () {
     .then(makeEventEmitter('mounted'))
 
   // unmount
-  const unmountObs = intervalObs(1000 / 60)
+  const unmountObs = intervalObs(t)
     .pipe(
       skipUntil(mountObs),
       skipWhile(() => this._mounted),
@@ -243,7 +266,7 @@ function defineLifeCyclePromises () {
     .then(makeEventEmitter('unmounted'))
 
   // destroy
-  const destroyObs = intervalObs(1000 / 60)
+  const destroyObs = intervalObs(t)
     .pipe(
       skipWhile(() => !this._destroyed),
       firstObs(),
@@ -277,13 +300,7 @@ function defineDebouncedHelpers () {
   // bind debounced functions at runtime
   // for each instance to avoid interfering between
   // different instances
-  this.scheduleRefresh = debounce(function () {
-    return this.refresh()
-  }, t)
-  this.scheduleRemount = debounce(function () {
-    return this.remount()
-  }, t)
-  this.scheduleRecreate = debounce(function () {
-    return this.recreate()
-  }, t)
+  this.scheduleRefresh = debounce(::this.refresh, t)
+  this.scheduleRemount = debounce(::this.remount, t)
+  this.scheduleRecreate = debounce(::this.recreate, t)
 }
