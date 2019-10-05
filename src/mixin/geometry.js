@@ -9,14 +9,15 @@ import {
 } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
 import { hasGeometry } from '../util/assert'
-import { isEqual } from '../util/minilo'
+import { isEqual, isEmpty, negate } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './ol-virt-cmp'
+import cmp from './ol-cmp'
 import projTransforms from './proj-transforms'
 import useMapCmp from './use-map-cmp'
+import stubVNode from './stub-vnode'
 
 export default {
-  mixins: [cmp, useMapCmp, projTransforms],
+  mixins: [cmp, stubVNode, useMapCmp, projTransforms],
   stubVNode: {
     empty () {
       return this.vmId
@@ -30,7 +31,7 @@ export default {
     coordinates: {
       type: Array,
       required: true,
-      validator: val => val.length,
+      validator: negate(isEmpty),
     },
   },
   computed: {

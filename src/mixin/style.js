@@ -2,14 +2,32 @@ import { first as firstObs } from 'rxjs/operators'
 import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './ol-virt-cmp'
+import cmp from './ol-cmp'
 import useMapCmp from './use-map-cmp'
+import stubVNode from './stub-vnode'
 
 /**
  * Basic style mixin.
  */
 export default {
-  mixins: [cmp, useMapCmp],
+  mixins: [cmp, stubVNode, useMapCmp],
+  stubVNode: {
+    empty () {
+      return this.vmId
+    },
+  },
+  watch: {
+    id (value) {
+      if (!this.$style || value === getStyleId(this.$style)) {
+        return
+      }
+
+      setStyleId(this.$style, value)
+    },
+  },
+  created () {
+    this::defineServices()
+  },
   methods: {
     /**
      * @return {OlStyle|Promise<OlStyle>}
@@ -73,23 +91,6 @@ export default {
             .pipe(firstObs())
             .toPromise()
         })
-    },
-  },
-  stubVNode: {
-    empty () {
-      return this.vmId
-    },
-  },
-  created () {
-    this::defineServices()
-  },
-  watch: {
-    id (value) {
-      if (!this.$style || value === getStyleId(this.$style)) {
-        return
-      }
-
-      setStyleId(this.$style, value)
     },
   },
 }

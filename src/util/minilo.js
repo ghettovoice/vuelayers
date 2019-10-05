@@ -34,6 +34,12 @@ export function identity (value) {
   return value
 }
 
+export function negate (func) {
+  return function (...args) {
+    return !func(...args)
+  }
+}
+
 export function toArray (value) {
   return Array.from(value)
 }

@@ -7,11 +7,17 @@ import {
 } from '../ol-ext'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './ol-virt-cmp'
+import cmp from './ol-cmp'
 import useMapCmp from './use-map-cmp'
+import stubVNode from './stub-vnode'
 
 export default {
-  mixins: [cmp, useMapCmp],
+  mixins: [cmp, stubVNode, useMapCmp],
+  stubVNode: {
+    empty () {
+      return this.vmId
+    },
+  },
   props: {
     active: {
       type: Boolean,
@@ -26,6 +32,38 @@ export default {
       type: Number,
       default: 0,
     },
+  },
+  watch: {
+    id (value) {
+      if (!this.$interaction || isEqual(value, getInteractionId(this.$interaction))) {
+        return
+      }
+
+      setInteractionId(this.$interaction, value)
+    },
+    active (value) {
+      if (!this.$interaction || value === this.$interaction.getActive()) {
+        return
+      }
+
+      this.$interaction.setActive(value)
+    },
+    priority (value) {
+      if (
+        !this.$interaction ||
+        !this.$interactionsContainer ||
+        value === getInteractionPriority(this.$interaction)
+      ) {
+        return
+      }
+
+      setInteractionPriority(this.$interaction, value)
+      // todo replace with event
+      this.$interactionsContainer.sortInteractions()
+    },
+  },
+  created () {
+    this::defineServices()
   },
   methods: {
     /**
@@ -112,43 +150,6 @@ export default {
      */
     subscribeAll () {
     },
-  },
-  watch: {
-    id (value) {
-      if (!this.$interaction || isEqual(value, getInteractionId(this.$interaction))) {
-        return
-      }
-
-      setInteractionId(this.$interaction, value)
-    },
-    active (value) {
-      if (!this.$interaction || value === this.$interaction.getActive()) {
-        return
-      }
-
-      this.$interaction.setActive(value)
-    },
-    priority (value) {
-      if (
-        !this.$interaction ||
-        !this.$interactionsContainer ||
-        value === getInteractionPriority(this.$interaction)
-      ) {
-        return
-      }
-
-      setInteractionPriority(this.$interaction, value)
-      // todo replace with event
-      this.$interactionsContainer.sortInteractions()
-    },
-  },
-  stubVNode: {
-    empty () {
-      return this.vmId
-    },
-  },
-  created () {
-    this::defineServices()
   },
 }
 

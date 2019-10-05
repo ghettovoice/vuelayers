@@ -1,11 +1,17 @@
 import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import { isArray, isEqual, isString } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './ol-virt-cmp'
+import cmp from './ol-cmp'
 import useMapCmp from './use-map-cmp'
+import stubVNode from './stub-vnode'
 
 export default {
-  mixins: [cmp, useMapCmp],
+  mixins: [cmp, stubVNode, useMapCmp],
+  stubVNode: {
+    empty () {
+      return this.vmId
+    },
+  },
   props: {
     attributions: {
       type: [String, Array],
@@ -29,6 +35,49 @@ export default {
 
       return this.$source.getState()
     },
+  },
+  watch: {
+    id (value) {
+      if (!this.$source || value === getSourceId(this.$source)) {
+        return
+      }
+
+      setSourceId(this.$source, value)
+    },
+    attributions (value) {
+      if (!this.$source || isEqual(value, this.$source.getAttributions())) {
+        return
+      }
+
+      this.$source.setAttributions(value)
+    },
+    attributionsCollapsible (value) {
+      if (!this.$source || value === this.$source.getAttributionsCollapsible()) {
+        return
+      }
+
+      this.scheduleRecreate()
+    },
+    projection (value) {
+      if (
+        !this.$source ||
+        (this.$source.getProjection() && value === this.$source.getProjection().getCode())
+      ) {
+        return
+      }
+
+      this.scheduleRecreate()
+    },
+    wrapX (value) {
+      if (!this.$source || value === this.$source.getWrapX()) {
+        return
+      }
+
+      this.scheduleRecreate()
+    },
+  },
+  created () {
+    this::defineServices()
   },
   methods: {
     /**
@@ -130,54 +179,6 @@ export default {
     subscribeAll () {
       this::cmp.methods.subscribeAll()
     },
-  },
-  watch: {
-    id (value) {
-      if (!this.$source || value === getSourceId(this.$source)) {
-        return
-      }
-
-      setSourceId(this.$source, value)
-    },
-    attributions (value) {
-      if (!this.$source || isEqual(value, this.$source.getAttributions())) {
-        return
-      }
-
-      this.$source.setAttributions(value)
-    },
-    attributionsCollapsible (value) {
-      if (!this.$source || value === this.$source.getAttributionsCollapsible()) {
-        return
-      }
-
-      this.scheduleRecreate()
-    },
-    projection (value) {
-      if (
-        !this.$source ||
-        (this.$source.getProjection() && value === this.$source.getProjection().getCode())
-      ) {
-        return
-      }
-
-      this.scheduleRecreate()
-    },
-    wrapX (value) {
-      if (!this.$source || value === this.$source.getWrapX()) {
-        return
-      }
-
-      this.scheduleRecreate()
-    },
-  },
-  stubVNode: {
-    empty () {
-      return this.vmId
-    },
-  },
-  created () {
-    this::defineServices()
   },
 }
 

@@ -4,12 +4,13 @@ import { observableFromOlEvent } from '../rx-ext'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
-import cmp from './ol-virt-cmp'
+import cmp from './ol-cmp'
 import sourceContainer from './source-container'
 import useMapCmp from './use-map-cmp'
+import stubVNode from './stub-vnode'
 
 export default {
-  mixins: [cmp, useMapCmp, sourceContainer],
+  mixins: [cmp, stubVNode, useMapCmp, sourceContainer],
   stubVNode: {
     attrs () {
       return {
