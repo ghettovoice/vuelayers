@@ -29,6 +29,8 @@ You can browse the source of the npm package at [unpkg.com/vuelayers/](https://u
 ```html
 <!-- include Vue -->
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- include OpenLayers -->
+<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v5.3.0/build/ol.js"></script>
 <!-- include UMD VueLayers build -->
 <link rel="stylesheet" href="https://unpkg.com/vuelayers/lib/style.css">
 <script src="https://unpkg.com/vuelayers/lib/index.umd.js"></script>
