@@ -19,7 +19,7 @@ export class AssertionError extends Error {
  */
 export function assert (value, message) {
   if (!value) {
-    throw new AssertionError(message || `Assertion failed`)
+    throw new AssertionError(message || 'Assertion failed')
   }
 }
 

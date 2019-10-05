@@ -35,7 +35,7 @@ export default class IdentityMap {
   get (id, pool = 'default') {
     this._preparePool(pool)
 
-    let rec = this.pools[pool][id]
+    const rec = this.pools[pool][id]
     if (!rec || rec.value == null) return
 
     rec.refs++
@@ -51,7 +51,7 @@ export default class IdentityMap {
   unset (id, pool = 'default') {
     this._preparePool(pool)
 
-    let rec = this.pools[pool][id]
+    const rec = this.pools[pool][id]
     if (!rec || rec.value == null) return
 
     rec.refs--
