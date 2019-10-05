@@ -18,9 +18,9 @@ export default function fromOlChangeEvent (target, prop, distinct, debounce, sel
   }
 
   selector = selector || ((target, prop) => target.get(prop))
-  let event = `change:${prop}`
-  let observable = fromOlEvent(target, event, () => selector(target, prop))
-  let operations = []
+  const event = `change:${prop}`
+  const observable = fromOlEvent(target, event, () => selector(target, prop))
+  const operations = []
 
   if (debounce != null) {
     operations.push(debounceTime(debounce))
