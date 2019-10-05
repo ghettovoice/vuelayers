@@ -1,14 +1,6 @@
 import Vue from 'vue'
 
 export default {
-  created () {
-    Object.defineProperties(this, {
-      $source: {
-        enumerable: true,
-        get: this.getSource,
-      },
-    })
-  },
   methods: {
     /**
      * @return {Promise<{
@@ -21,21 +13,10 @@ export default {
       throw new Error('Not implemented method')
     },
     /**
-     * @return {module:ol/source/Source~Source|undefined}
+     * @return {Promise<module:ol/source/Source~Source|undefined>}
      */
-    getSource () {
-      return this._source
-    },
-    /**
-     * @returns {Object}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return {
-        get sourceContainer () { return vm },
-      }
+    async getSource () {
+      return (await this.getSourceTarget()).getSource()
     },
     /**
      * @param {module:ol/source/Source~Source|Vue|undefined} source
@@ -46,11 +27,20 @@ export default {
         source = await source.resolveOlObject()
       }
 
-      this._source = source
       const sourceTarget = await this.getSourceTarget()
-
       if (sourceTarget && source !== sourceTarget.getSource()) {
         sourceTarget.setSource(source)
+      }
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return {
+        get sourceContainer () { return vm },
       }
     },
   },

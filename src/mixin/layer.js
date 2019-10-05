@@ -294,7 +294,6 @@ export default {
         this::cmp.methods.getServices(),
         this::sourceContainer.methods.getServices(),
         {
-          get layer () { return vm.$layer },
           get layerVm () { return vm },
         },
       )
@@ -353,6 +352,10 @@ function defineServices () {
     $layer: {
       enumerable: true,
       get: () => this.$olObject,
+    },
+    $source: {
+      enumerable: true,
+      get: () => this.$layer?.getSource(),
     },
     $mapVm: {
       enumerable: true,

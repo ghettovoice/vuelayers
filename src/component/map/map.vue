@@ -32,6 +32,9 @@
   /**
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
    * rendering and low level interaction events.
+   *
+   * todo make render function that injects VlView if it is not provided by the user,
+   *      then it can be provided to lower components
    */
   export default {
     name: 'VlMap',
@@ -144,7 +147,6 @@
       }),
     },
     created () {
-      this._view = new View()
       // prepare default overlay
       this._featuresOverlay = this::createFeaturesOverlay()
 
@@ -170,7 +172,6 @@
           interactions: this.$interactionsCollection,
           layers: this.$layersCollection,
           overlays: this.$overlaysCollection,
-          view: this.$view,
         })
 
         setMapId(map, this.id)
@@ -355,8 +356,6 @@
         }
         view || (view = new View())
 
-        this._view = view
-
         const map = await this.resolveMap()
         if (view !== map.getView()) {
           map.setView(view)
@@ -365,8 +364,8 @@
       /**
        * @return {module:ol/View~View}
        */
-      getView () {
-        return this._view
+      async getView () {
+        return (await this.resolveMap()).getView()
       },
       /**
        * @return {void}
@@ -374,17 +373,18 @@
        */
       async mount () {
         await this.setTarget(this.$el)
-        await this::olCmp.methods.mount()
-
         this.$nextTick(::this.updateSize)
+
+        return this::olCmp.methods.mount()
       },
       /**
        * @return {Promise<void>}
        * @protected
        */
       async unmount () {
-        await this::olCmp.methods.unmount()
         await this.setTarget(null)
+
+        return this::olCmp.methods.unmount()
       },
       /**
        * @return {Promise<void>}
@@ -410,9 +410,7 @@
           this::overlaysContainer.methods.getServices(),
           this::featuresContainer.methods.getServices(),
           {
-            get map () { return vm.$map },
             get mapVm () { return vm },
-            get view () { return vm.$view },
             get viewContainer () { return vm },
           },
         )
@@ -431,13 +429,9 @@
         enumerable: true,
         get: () => this.$olObject,
       },
-      /**
-       * OpenLayers view instance.
-       * @type {module:ol/View~View}
-       */
       $view: {
         enumerable: true,
-        get: this.getView,
+        get: () => this.$map?.getView(),
       },
     })
   }

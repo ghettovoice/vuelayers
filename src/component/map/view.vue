@@ -444,11 +444,11 @@
        * @protected
        */
       async unmount () {
-        await this::olCmp.methods.unmount()
-
         if (this.$viewContainer) {
           await this.$viewContainer.setView(null)
         }
+
+        return this::olCmp.methods.unmount()
       },
       /**
        * @return {Promise<void>}
