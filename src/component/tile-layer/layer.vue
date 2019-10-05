@@ -1,6 +1,7 @@
 <script>
   import { Tile as TileLayer } from 'ol/layer'
   import { layer } from '../../mixin'
+  import { obsFromOlChangeEvent } from '../../rx-ext'
 
   /**
    * Layer that provide pre-rendered, tiled images in grid that are organized by zoom levels for
@@ -56,9 +57,16 @@
           source: this.$source,
         })
       },
+      /**
+       * @returns {Promise<number>}
+       */
       async getPreload () {
         return (await this.resolveLayer()).getPreload()
       },
+      /**
+       * @param {number} preload
+       * @returns {Promise<void>}
+       */
       async setPreload (preload) {
         const layer = await this.resolveLayer()
 
@@ -66,9 +74,16 @@
 
         layer.setPreload(preload)
       },
+      /**
+       * @returns {Promise<boolean>}
+       */
       async getUseInterimTilesOnError () {
         return (await this.resolveLayer()).getUseInterimTilesOnError()
       },
+      /**
+       * @param {boolean} useInterimTilesOnError
+       * @returns {Promise<void>}
+       */
       async setUseInterimTilesOnError (useInterimTilesOnError) {
         const layer = await this.resolveLayer()
 
@@ -76,6 +91,33 @@
 
         layer.setUseInterimTilesOnError(useInterimTilesOnError)
       },
+      /**
+       * @returns {Promise<void>}
+       */
+      subscribeAll () {
+        return Promise.all([
+          this::layer.methods.subscribeAll(),
+          this::subscribeToLayerEvents(),
+        ])
+      },
     },
+  }
+
+  async function subscribeToLayerEvents () {
+    const layer = await this.resolveLayer()
+
+    const t = 1000 / 60
+    const changes = obsFromOlChangeEvent(layer, [
+      'preload',
+      'useInterimTilesOnError',
+    ], true, t)
+
+    this.subscribeTo(changes, ({ prop, value }) => {
+      ++this.rev
+
+      this.$nextTick(() => {
+        this.$emit(`update:${prop}`, value)
+      })
+    })
   }
 </script>
