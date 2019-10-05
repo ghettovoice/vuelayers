@@ -185,7 +185,7 @@ function bundleOptions (format, package, env = 'development') {
       }
       options.replaces['process.env.NODE_ENV'] = `'${env}'`
       options.replaces['process.env.VUELAYERS_DEBUG'] = JSON.stringify(process.env.NODE_ENV !== 'production')
-      options.minify = true
+      // options.minify = true
       break
     case 'cjs':
       options.input.external = external
