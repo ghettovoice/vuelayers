@@ -1,12 +1,20 @@
 import Vue from 'vue'
 
 export default {
+  created () {
+    Object.defineProperties(this, {
+      $source: {
+        enumerable: true,
+        get: this.getSource,
+      },
+    })
+  },
   methods: {
     /**
-     * @return {{
+     * @return {Promise<{
      *     setSource: function(module:ol/source/Source~Source): void,
      *     getSource: function(): module:ol/source/Source~Source
-     *   }|undefined}
+     *   }|undefined>}
      * @protected
      */
     getSourceTarget () {
@@ -33,15 +41,14 @@ export default {
      * @param {module:ol/source/Source~Source|Vue|undefined} source
      * @return {void}
      */
-    setSource (source) {
-      source = source instanceof Vue ? source.$source : source
-      if (source !== this._source) {
-        this._source = source
+    async setSource (source) {
+      if (source instanceof Vue) {
+        source = await source.resolveOlObject()
       }
-      /**
-       * @type {module:ol/layer/Layer~Layer|Builder}
-       */
-      const sourceTarget = this.getSourceTarget()
+
+      this._source = source
+      const sourceTarget = await this.getSourceTarget()
+
       if (sourceTarget && source !== sourceTarget.getSource()) {
         sourceTarget.setSource(source)
       }

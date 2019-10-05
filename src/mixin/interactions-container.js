@@ -1,11 +1,12 @@
-import Collection from 'ol/Collection'
-import Interaction from 'ol/interaction/Interaction'
-import Vue from 'vue'
+import { Collection } from 'ol'
+import { defaults as createDefaultInteractions, Interaction } from 'ol/interaction'
 import { merge as mergeObs } from 'rxjs/observable'
+import Vue from 'vue'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
-import { instanceOf } from '../util/assert'
-import rxSubs from './rx-subs'
 import { observableFromOlEvent } from '../rx-ext'
+import { instanceOf } from '../util/assert'
+import { isArray, isPlainObject } from '../util/minilo'
+import rxSubs from './rx-subs'
 
 export default {
   mixins: [rxSubs],
@@ -17,12 +18,32 @@ export default {
     },
   },
   methods: {
+    initDefaultInteractions (defaultInteractions) {
+      this.clearInteractions()
+
+      let interactions
+      if (isArray(defaultInteractions) || defaultInteractions instanceof Collection) {
+        interactions = defaultInteractions
+      } else if (defaultInteractions !== false) {
+        interactions = createDefaultInteractions(
+          isPlainObject(defaultInteractions)
+            ? this.defaultInteractions
+            : undefined,
+        )
+      }
+      if (interactions) {
+        interactions.forEach(::this.addInteraction)
+      }
+    },
     /**
      * @param {Interaction|Vue} interaction
      * @return {void}
      */
-    addInteraction (interaction) {
-      interaction = interaction instanceof Vue ? interaction.$interaction : interaction
+    async addInteraction (interaction) {
+      if (interaction instanceof Vue) {
+        interaction = await interaction.resolveOlObject()
+      }
+
       instanceOf(interaction, Interaction)
 
       if (this.getInteractionById(getInteractionId(interaction)) == null) {
@@ -35,7 +56,11 @@ export default {
      * @param {Interaction|Vue} interaction
      * @return {void}
      */
-    removeInteraction (interaction) {
+    async removeInteraction (interaction) {
+      if (interaction instanceof Vue) {
+        interaction = await interaction.resolveOlObject()
+      }
+
       interaction = this.getInteractionById(getInteractionId(interaction))
       if (!interaction) return
 
@@ -79,8 +104,8 @@ export default {
       // sort interactions by priority in asc order
       // the higher the priority, the earlier the interaction handles the event
       return (a, b) => {
-        let ap = getInteractionPriority(a) || 0
-        let bp = getInteractionPriority(b) || 0
+        const ap = getInteractionPriority(a) || 0
+        const bp = getInteractionPriority(b) || 0
         return ap === bp ? 0 : ap - bp
       }
     },

@@ -1,7 +1,6 @@
-import Collection from 'ol/Collection'
-import Overlay from 'ol/Overlay'
-import Vue from 'vue'
+import { Collection, Overlay } from 'ol'
 import { merge as mergeObs } from 'rxjs/observable'
+import Vue from 'vue'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
@@ -21,8 +20,11 @@ export default {
      * @param {Overlay|Vue} overlay
      * @return {void}
      */
-    addOverlay (overlay) {
-      overlay = overlay instanceof Vue ? overlay.$overlay : overlay
+    async addOverlay (overlay) {
+      if (overlay instanceof Vue) {
+        overlay = await overlay.resolveOlObject()
+      }
+
       instanceOf(overlay, Overlay)
 
       if (this.getOverlayById(getOverlayId(overlay)) == null) {
@@ -34,7 +36,11 @@ export default {
      * @param {Overlay|Vue} overlay
      * @return {void}
      */
-    removeOverlay (overlay) {
+    async removeOverlay (overlay) {
+      if (overlay instanceof Vue) {
+        overlay = await overlay.resolveOlObject()
+      }
+
       overlay = this.getOverlayById(getOverlayId(overlay))
       if (!overlay) return
 
@@ -57,7 +63,7 @@ export default {
      * @return {Overlay|undefined}
      */
     getOverlayById (overlayId) {
-      return this.$overlaysCollection.getArray().find(overlay => {
+      return this.getOverlays().find(overlay => {
         return getOverlayId(overlay) === overlayId
       })
     },

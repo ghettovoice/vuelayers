@@ -1,7 +1,7 @@
-import Collection from 'ol/Collection'
+import { Collection } from 'ol'
 import BaseLayer from 'ol/layer/Base'
-import Vue from 'vue'
 import { merge as mergeObs } from 'rxjs/observable'
+import Vue from 'vue'
 import { getLayerId, initializeLayer } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
@@ -16,13 +16,26 @@ export default {
       return this.getLayers().map(getLayerId)
     },
   },
+  created () {
+    /**
+     * @type {Collection<BaseLayer>}
+     * @private
+     */
+    this._layersCollection = new Collection()
+
+    this::defineServices()
+    this::subscribeToCollectionEvents()
+  },
   methods: {
     /**
      * @param {BaseLayer|Vue} layer
-     * @return {void}
+     * @return {Promise<void>}
      */
-    addLayer (layer) {
-      layer = layer instanceof Vue ? layer.$layer : layer
+    async addLayer (layer) {
+      if (layer instanceof Vue) {
+        layer = await layer.resolveOlObject()
+      }
+
       instanceOf(layer, BaseLayer)
 
       if (this.getLayerById(getLayerId(layer)) == null) {
@@ -34,7 +47,11 @@ export default {
      * @param {BaseLayer|Vue} layer
      * @return {void}
      */
-    removeLayer (layer) {
+    async removeLayer (layer) {
+      if (layer instanceof Vue) {
+        layer = await layer.resolveOlObject()
+      }
+
       layer = this.getLayerById(getLayerId(layer))
       if (!layer) return
 
@@ -57,7 +74,7 @@ export default {
      * @return {BaseLayer|undefined}
      */
     getLayerById (layerId) {
-      return this.$layersCollection.getArray().find(layer => {
+      return this.getLayers().find(layer => {
         return getLayerId(layer) === layerId
       })
     },
@@ -78,16 +95,6 @@ export default {
         get layersContainer () { return vm },
       }
     },
-  },
-  created () {
-    /**
-     * @type {Collection<BaseLayer>}
-     * @private
-     */
-    this._layersCollection = new Collection()
-
-    this::defineServices()
-    this::subscribeToCollectionEvents()
   },
 }
 

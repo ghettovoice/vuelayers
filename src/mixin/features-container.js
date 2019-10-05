@@ -1,14 +1,14 @@
 import Collection from 'ol/Collection'
 import Feature from 'ol/Feature'
-import Vue from 'vue'
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime } from 'rxjs/operators'
+import Vue from 'vue'
 import { getFeatureId, getObjectUid, initializeFeature, mergeFeatures } from '../ol-ext'
+import { observableFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { forEach, isPlainObject } from '../util/minilo'
+import { isPlainObject, map } from '../util/minilo'
 import projTransforms from './proj-transforms'
 import rxSubs from './rx-subs'
-import { observableFromOlEvent } from '../rx-ext'
 
 export default {
   mixins: [rxSubs, projTransforms],
@@ -32,21 +32,22 @@ export default {
   methods: {
     /**
      * @param {Array<(Feature|Vue|Object)>} features
-     * @return {void}
+     * @return {Promise<void>}
      */
     addFeatures (features) {
-      forEach(features, ::this.addFeature)
+      return Promise.all(map(features, ::this.addFeature))
     },
     /**
      * @param {Feature|Vue|Object} feature
-     * @return {void}
+     * @return {Promise<void>}
      */
-    addFeature (feature) {
+    async addFeature (feature) {
       if (feature instanceof Vue) {
-        feature = feature.$feature
+        feature = await feature.resolveOlObject()
       } else if (isPlainObject(feature)) {
         feature = this.readFeatureInDataProj(feature)
       }
+
       instanceOf(feature, Feature)
       initializeFeature(feature)
 
@@ -59,16 +60,20 @@ export default {
     },
     /**
      * @param {Array<(Feature|Vue|Object)>} features
-     * @return {void}
+     * @return {Promise<void>}
      */
     removeFeatures (features) {
-      forEach(features, ::this.removeFeature)
+      return Promise.all(map(features, ::this.removeFeature))
     },
     /**
      * @param {Feature|Vue|Object} feature
-     * @return {void}
+     * @return {Promise<void>}
      */
-    removeFeature (feature) {
+    async removeFeature (feature) {
+      if (feature instanceof Vue) {
+        feature = await feature.resolveOlObject()
+      }
+
       feature = this.getFeatureById(getFeatureId(feature))
       if (!feature) return
 
@@ -144,7 +149,7 @@ function subscribeToCollectionEvents () {
     const propChanges = observableFromOlEvent(element, 'propertychange')
     const otherChanges = observableFromOlEvent(element, 'change')
     const featureChanges = mergeObs(propChanges, otherChanges).pipe(
-      debounceTime(1000 / 60)
+      debounceTime(1000 / 60),
     )
 
     this._featureSubs[elementUid] = this.subscribeTo(featureChanges, () => {
