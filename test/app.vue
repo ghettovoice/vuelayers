@@ -22,27 +22,37 @@
         </vl-geoloc>
 
         <vl-layer-tile>
-          <vl-source-sputnik />
+          <vl-source-osm />
         </vl-layer-tile>
 
-        <vl-layer-vector id="countries" render-mode="image">
-          <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />
-          <vl-style-func :factory="createCountriesStyleFunc" />
+        <!--<vl-layer-vector id="countries" render-mode="image">-->
+        <!--  <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />-->
+        <!--  <vl-style-func :factory="createCountriesStyleFunc" />-->
+        <!--</vl-layer-vector>-->
+
+        <vl-layer-vector render-mode="image">
+          <vl-source-cluster :distance="50">
+            <vl-source-vector ref="placesSource" @mounted="getPlaceFeatures" />
+          </vl-source-cluster>
+          <vl-style-func :factory="makeClusterStyleFunc" />
         </vl-layer-vector>
 
-        <vl-layer-vector id="draw-target">
-          <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector id="draw-target">-->
+        <!--  <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />-->
+        <!--</vl-layer-vector>-->
 
-        <vl-interaction-select :features.sync="selectedFeatures" />
-        <vl-interaction-modify source="draw-target" />
+        <!--<vl-interaction-select :features.sync="selectedFeatures" />-->
+        <!--<vl-interaction-modify source="draw-target" />-->
       </vl-map>
     </div>
   </div>
 </template>
 
 <script>
-  import { findPointOnSurface, createStyle } from '../src/ol-ext'
+  import { Feature } from 'ol'
+  import { Point } from 'ol/geom'
+  import { range, random } from 'lodash'
+  import { createStyle, findPointOnSurface } from '../src/ol-ext'
 
   export default {
     name: 'app',
@@ -76,6 +86,13 @@
         ],
         controls: true,
         interactions: true,
+        places: range(0, 100).map(i => ({
+          id: 'random-' + i,
+          geo: [
+            random(0, 50),
+            random(0, 50),
+          ],
+        })),
       }
     },
     computed: {
@@ -92,6 +109,45 @@
             strokeColor: 'blue',
           })
         }
+      },
+      makeClusterStyleFunc () {
+        const cache = {}
+
+        return function __clusterStyleFunc (feature) {
+          const size = feature.get('features').length
+          let style = cache[size]
+
+          if (!style) {
+            style = createStyle({
+              imageRadius: 10,
+              strokeColor: '#fff',
+              fillColor: '#3399cc',
+              text: size.toString(),
+              textFillColor: '#fff',
+            })
+
+            cache[size] = style
+          }
+
+          return [style]
+        }
+      },
+      getPlaceFeatures () {
+        const sourceVm = this.$refs.placesSource
+        sourceVm.$source.clear()
+
+        const features = this.places.map(place => {
+          const geometry = new Point(place.geo)
+          geometry.transform('EPSG:4326', 'EPSG:3857')
+
+          let feature = new Feature({ geometry })
+          feature.setProperties(place)
+          feature.setId(place.id)
+
+          return feature
+        })
+
+        sourceVm.$source.addFeatures(features)
       },
     },
     mounted () {
