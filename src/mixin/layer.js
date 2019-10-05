@@ -1,7 +1,8 @@
 import Vue from 'vue'
+import { merge as mergeObs } from 'rxjs/observable'
 import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
-import { isEqual } from '../util/minilo'
+import { observableFromOlEvent, observableFromOlChangeEvent } from '../rx-ext'
+import { isEqual, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import cmp from './ol-cmp'
@@ -299,50 +300,6 @@ export default {
       )
     },
     /**
-     * Updates layer state
-     * @return {Promise<void>}
-     */
-    refresh () {
-      return this::cmp.methods.refresh()
-    },
-    /**
-     * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise<void>}
-     * @protected
-     */
-    remount () {
-      return this::cmp.methods.remount()
-    },
-    /**
-     * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise<void>}
-     * @protected
-     */
-    recreate () {
-      return this::cmp.methods.recreate()
-    },
-    /**
-     * @return {Promise<module:ol/layer/Base~BaseLayer>}
-     * @protected
-     */
-    getSourceTarget () {
-      return this.resolveLayer()
-    },
-    /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    init () {
-      return this::cmp.methods.init()
-    },
-    /**
-     * @return {void|Promise<void>}
-     * @protected
-     */
-    deinit () {
-      return this::cmp.methods.deinit()
-    },
-    /**
      * @return {Promise<void>}
      * @protected
      */
@@ -372,9 +329,9 @@ export default {
      * @return {Promise<void>}
      * @protected
      */
-    async subscribeAll () {
-      await this::cmp.methods.subscribeAll()
-      await this::subscribeToLayerEvents()
+    subscribeAll () {
+      return Promise.resolve(this::cmp.methods.subscribeAll())
+        .then(this::subscribeToLayerEvents)
     },
     /**
      * @returns {Promise<module:ol/layer/Base~BaseLayer>}
@@ -382,6 +339,15 @@ export default {
     async resolveLayer () {
       return this.resolveOlObject()
     },
+    getSourceTarget: cmp.methods.resolveOlObject,
+    ...pick(cmp.methods, [
+      'init',
+      'deinit',
+      'refresh',
+      'recreate',
+      'remount',
+      'recreate',
+    ]),
   },
 }
 
@@ -408,6 +374,28 @@ function defineServices () {
 
 async function subscribeToLayerEvents () {
   const layer = await this.resolveLayer()
+
+  const t = 1000 / 60
+  const changes = mergeObs(
+    observableFromOlChangeEvent(layer, 'extent', true, t, () => this.extentToDataProj(layer.getExtent())),
+    observableFromOlChangeEvent(layer, [
+      'opacity',
+      'visible',
+      'zIndex',
+      'minResolution',
+      'maxResolution',
+      'minZoom',
+      'maxZoom',
+    ], true, t)
+  )
+
+  this.subscribeTo(changes, ({ prop, value }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(`update:${prop}`, value)
+    })
+  })
 
   const events = observableFromOlEvent(layer, [
     // todo review which events are actually exists in the current ol version
