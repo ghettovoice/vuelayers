@@ -130,7 +130,7 @@ module.exports = {
     chunkModules: false,
   },
   devServer: {
-    open: true,
+    open: false,
     hot: true,
     contentBase: config.outputPath,
     clientLogLevel: 'info',
