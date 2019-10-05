@@ -43,7 +43,7 @@
   }
 
   export default {
-    name: 'vl-source-image-wms',
+    name: 'VlSourceImageWms',
     mixins: [imageSource, withUrl, wmsSource],
     props,
     methods,

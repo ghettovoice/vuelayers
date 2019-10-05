@@ -12,14 +12,14 @@
    * and style target for inner style containers (vl-style-box) as fallback style.
    */
   export default {
-    name: 'vl-style-func',
+    name: 'VlStyleFunc',
     mixins: [style, stylesContainer],
     stubVNode: {
       empty: false,
       attrs () {
         return {
           id: this.vmId,
-          class: this.cmpName,
+          class: this.vmClass,
         }
       },
     },
@@ -37,12 +37,17 @@
         let func = this.factory()
         if (!isFunction(func)) {
           if (process.env.NODE_ENV !== 'production') {
-            warn(`Factory returned a value not of Function type, fallback style will be used`)
+            warn('Factory returned a value not of Function type, fallback style will be used')
           }
           func = noop
         }
 
         return func
+      },
+    },
+    watch: {
+      factory () {
+        this.scheduleRefresh()
       },
     },
     methods: {
@@ -114,11 +119,6 @@
       refresh () {
         // recreate style
         return this.recreate()
-      },
-    },
-    watch: {
-      factory () {
-        this.scheduleRefresh()
       },
     },
   }

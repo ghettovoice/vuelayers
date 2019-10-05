@@ -49,7 +49,7 @@
   }
 
   export default {
-    name: 'vl-source-mapbox',
+    name: 'VlSourceMapbox',
     mixins: [xyzSource],
     props,
     computed,

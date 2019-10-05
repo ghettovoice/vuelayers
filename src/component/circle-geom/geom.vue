@@ -11,7 +11,7 @@
    * @vueProto
    */
   export default {
-    name: 'vl-geom-circle',
+    name: 'VlGeomCircle',
     mixins: [geometry],
     props: {
       coordinates: {
@@ -30,8 +30,17 @@
        * @type {Array|undefined}
        */
       coordinatesViewProj () {
-        if (this.rev && this.$geometry) {
-          return this.$geometry.getCenter()
+        if (!(this.rev && this.$geometry)) return
+
+        return this.$geometry.getCenter()
+      },
+    },
+    watch: {
+      radius (value) {
+        if (!this.$geometry) return
+
+        if (value !== this.$geometry.getRadius()) {
+          this.$geometry.setRadius(value)
         }
       },
     },
@@ -58,15 +67,6 @@
         hasGeometry(this)
 
         this.$geometry.setCenter(this.toViewProj(coordinate))
-      },
-    },
-    watch: {
-      radius (value) {
-        if (!this.$geometry) return
-
-        if (value !== this.$geometry.getRadius()) {
-          this.$geometry.setRadius(value)
-        }
       },
     },
   }

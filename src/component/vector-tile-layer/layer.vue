@@ -43,7 +43,7 @@
   }
 
   export default {
-    name: 'vl-layer-vector-tile',
+    name: 'VlLayerVectorTile',
     mixins: [vectorLayer],
     props,
     methods,

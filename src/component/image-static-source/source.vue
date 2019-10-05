@@ -74,10 +74,10 @@
    * @alias module:image-static-source/source
    */
   export default {
-    name: 'vl-source-image-static',
+    name: 'VlSourceImageStatic',
     mixins: [imageSource, withUrl],
     props,
-    methods,
     watch,
+    methods,
   }
 </script>

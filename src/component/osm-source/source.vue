@@ -39,7 +39,7 @@
   }
 
   export default {
-    name: 'vl-source-osm',
+    name: 'VlSourceOsm',
     mixins: [xyzSource],
     props,
     methods,

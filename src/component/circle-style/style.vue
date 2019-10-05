@@ -70,10 +70,10 @@
   }
 
   export default {
-    name: 'vl-style-circle',
+    name: 'VlStyleCircle',
     mixins: [imageStyle, withFillStrokeStyle],
     props,
-    methods,
     watch,
+    methods,
   }
 </script>

@@ -5,7 +5,7 @@
   import { vectorLayer } from '../../mixin'
 
   export default {
-    name: 'vl-layer-heatmap',
+    name: 'VlLayerHeatmap',
     mixins: [vectorLayer],
     props: {
       gradient: {
@@ -27,25 +27,6 @@
       weight: {
         type: String,
         default: 'weight',
-      },
-    },
-    methods: {
-      createLayer () {
-        return new HeatmapLayer({
-          id: this.id,
-          minResolution: this.minResolution,
-          maxResolution: this.maxResolution,
-          opacity: this.opacity,
-          visible: this.visible,
-          extent: this.extent,
-          zIndex: this.zIndex,
-          renderMode: this.renderMode,
-          gradient: this.gradient,
-          radius: this.radius,
-          blur: this.blur,
-          shadow: this.shadow,
-          weight: this.weight,
-        })
       },
     },
     watch: {
@@ -70,6 +51,25 @@
       ], () => function () {
         this.scheduleRecreate()
       }),
+    },
+    methods: {
+      createLayer () {
+        return new HeatmapLayer({
+          id: this.id,
+          minResolution: this.minResolution,
+          maxResolution: this.maxResolution,
+          opacity: this.opacity,
+          visible: this.visible,
+          extent: this.extent,
+          zIndex: this.zIndex,
+          renderMode: this.renderMode,
+          gradient: this.gradient,
+          radius: this.radius,
+          blur: this.blur,
+          shadow: this.shadow,
+          weight: this.weight,
+        })
+      },
     },
   }
 </script>

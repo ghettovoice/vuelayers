@@ -8,7 +8,7 @@
   import SourceBuilder from './builder'
 
   export default {
-    name: 'vl-source-cluster',
+    name: 'VlSourceCluster',
     mixins: [vectorSource, sourceContainer],
     props: {
       distance: {
@@ -28,6 +28,30 @@
       geomFunc () {
         return this.geomFuncFactory()
       },
+    },
+    watch: {
+      distance (value) {
+        if (this.$source && value !== this.$source.getDistance()) {
+          this.$source.setDistance(value)
+        }
+      },
+      ...makeWatchers(['geomFunc'], () => function () {
+        this.scheduleRecreate()
+      }),
+    },
+    created () {
+      /**
+       * @type {SourceBuilder}
+       * @private
+       */
+      this._sourceBuilder = new SourceBuilder()
+
+      Object.defineProperties(this, {
+        $innerSource: {
+          enumerable: true,
+          get: this.getSource,
+        },
+      })
     },
     methods: {
       /**
@@ -75,30 +99,6 @@
         this::subscribeToSourceChanges()
       },
     },
-    watch: {
-      distance (value) {
-        if (this.$source && value !== this.$source.getDistance()) {
-          this.$source.setDistance(value)
-        }
-      },
-      ...makeWatchers(['geomFunc'], () => function () {
-        this.scheduleRecreate()
-      }),
-    },
-    created () {
-      /**
-       * @type {SourceBuilder}
-       * @private
-       */
-      this._sourceBuilder = new SourceBuilder()
-
-      Object.defineProperties(this, {
-        $innerSource: {
-          enumerable: true,
-          get: this.getSource,
-        },
-      })
-    },
   }
 
   /**
@@ -109,7 +109,7 @@
       const geometry = feature.getGeometry()
       if (!geometry) return
 
-      let coordinate = findPointOnSurface(geometry)
+      const coordinate = findPointOnSurface(geometry)
       if (coordinate) {
         return createPointGeom(coordinate)
       }

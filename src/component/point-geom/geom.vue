@@ -27,7 +27,7 @@
   }
 
   export default {
-    name: 'vl-geom-point',
+    name: 'VlGeomPoint',
     mixins: [geometry],
     props,
     computed,

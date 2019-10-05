@@ -3,7 +3,7 @@
   import { tileSource, arcgisSource } from '../../mixin'
 
   export default {
-    name: 'vl-source-arcgis-rest',
+    name: 'VlSourceArcgisRest',
     mixins: [tileSource, arcgisSource],
     props: {
       url: {

@@ -43,10 +43,10 @@
   }
 
   export default {
-    name: 'vl-style-fill',
+    name: 'VlStyleFill',
     mixins: [style],
     props,
-    methods,
     watch,
+    methods,
   }
 </script>

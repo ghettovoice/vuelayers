@@ -21,7 +21,7 @@
   }
 
   export default {
-    name: 'vl-geom-multi-point',
+    name: 'VlGeomMultiPoint',
     mixins: [geometry],
     props,
     computed,

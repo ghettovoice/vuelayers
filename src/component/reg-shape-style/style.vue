@@ -121,10 +121,10 @@
   }
 
   export default {
-    name: 'vl-style-reg-shape',
+    name: 'VlStyleRegShape',
     mixins: [imageStyle, withFillStrokeStyle],
     props,
-    methods,
     watch,
+    methods,
   }
 </script>

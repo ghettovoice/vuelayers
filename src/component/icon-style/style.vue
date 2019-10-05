@@ -6,7 +6,7 @@
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
-    name: 'vl-style-icon',
+    name: 'VlStyleIcon',
     mixins: [imageStyle],
     props: {
       src: String,
@@ -64,35 +64,6 @@
         default: 0,
       },
     },
-    methods: {
-      /**
-       * @return {Icon}
-       * @protected
-       */
-      createStyle () {
-        assert((this.src && !this.img) || (!this.src && this.img), `vl-style-icon one of 'image' or 'src' prop must be provided.`)
-        assert(!this.img || (this.img && !isEmpty(this.imgSize)), `vl-style-icon 'imgSize' must be set when image is provided.`)
-
-        return new Icon({
-          anchor: this.anchor,
-          anchorOrigin: this.anchorOrigin,
-          anchorXUnits: this.anchorXUnits,
-          anchorYUnits: this.anchorYUnits,
-          color: this.color,
-          crossOrigin: this.crossOrigin,
-          offset: this.offset,
-          offsetOrigin: this.offsetOrigin,
-          opacity: this.opacity,
-          scale: this.scale,
-          rotateWithView: this.rotateWithView,
-          rotation: this.rotation,
-          size: this.size,
-          src: this.src,
-          img: this.img,
-          imgSize: this.imgSize,
-        })
-      },
-    },
     watch: {
       src (value) {
         if (this.$style && !isEqual(value, this.$style.getSrc())) {
@@ -146,6 +117,35 @@
       ], () => function () {
         this.scheduleRefresh()
       }),
+    },
+    methods: {
+      /**
+       * @return {Icon}
+       * @protected
+       */
+      createStyle () {
+        assert((this.src && !this.img) || (!this.src && this.img), 'vl-style-icon one of \'image\' or \'src\' prop must be provided.')
+        assert(!this.img || (this.img && !isEmpty(this.imgSize)), 'vl-style-icon \'imgSize\' must be set when image is provided.')
+
+        return new Icon({
+          anchor: this.anchor,
+          anchorOrigin: this.anchorOrigin,
+          anchorXUnits: this.anchorXUnits,
+          anchorYUnits: this.anchorYUnits,
+          color: this.color,
+          crossOrigin: this.crossOrigin,
+          offset: this.offset,
+          offsetOrigin: this.offsetOrigin,
+          opacity: this.opacity,
+          scale: this.scale,
+          rotateWithView: this.rotateWithView,
+          rotation: this.rotation,
+          size: this.size,
+          src: this.src,
+          img: this.img,
+          imgSize: this.imgSize,
+        })
+      },
     },
   }
 </script>

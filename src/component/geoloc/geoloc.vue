@@ -1,8 +1,15 @@
 <template>
-  <i :id="vmId" :class="cmpName" style="display: none !important;">
-    <slot :accuracy="accuracy" :altitude="altitude" :altitude-accuracy="altitudeAccuracy"
-          :heading="heading" :position="position" :speed="speed">
-    </slot>
+  <i
+    :id="vmId"
+    :class="vmClass"
+    style="display: none !important;">
+    <slot
+      :accuracy="accuracy"
+      :altitude="altitude"
+      :altitude-accuracy="altitudeAccuracy"
+      :heading="heading"
+      :position="position"
+      :speed="speed" />
   </i>
 </template>
 
@@ -15,7 +22,7 @@
   import { isEqual } from '../../util/minilo'
 
   export default {
-    name: 'vl-geoloc',
+    name: 'VlGeoloc',
     mixins: [olCmp, useMapCmp, projTransforms],
     props: {
       tracking: {
@@ -30,40 +37,72 @@
     },
     computed: {
       accuracy () {
-        if (this.rev && this.$geolocation) {
-          return this.$geolocation.getAccuracy()
-        }
+        if (!(this.rev && this.$geolocation)) return
+
+        return this.$geolocation.getAccuracy()
       },
       altitude () {
-        if (this.rev && this.$geolocation) {
-          return this.$geolocation.getAltitude()
-        }
+        if (!(this.rev && this.$geolocation)) return
+
+        return this.$geolocation.getAltitude()
       },
       altitudeAccuracy () {
-        if (this.rev && this.$geolocation) {
-          return this.$geolocation.getAltitudeAccuracy()
-        }
+        if (!(this.rev && this.$geolocation)) return
+
+        return this.$geolocation.getAltitudeAccuracy()
       },
       heading () {
-        if (this.rev && this.$geolocation) {
-          return this.$geolocation.getHeading()
-        }
+        if (!(this.rev && this.$geolocation)) return
+
+        return this.$geolocation.getHeading()
       },
       speed () {
-        if (this.rev && this.$geolocation) {
-          return this.$geolocation.getSpeed()
-        }
+        if (!(this.rev && this.$geolocation)) return
+
+        return this.$geolocation.getSpeed()
       },
       position () {
-        if (this.rev && this.$geolocation) {
-          return this.$geolocation.getPosition()
-        }
+        if (!(this.rev && this.$geolocation)) return
+
+        return this.$geolocation.getPosition()
       },
       positionViewProj () {
-        if (this.position && this.viewProjection) {
-          return this.pointToViewProj(this.position)
-        }
+        if (!(this.position && this.viewProjection)) return
+
+        return this.pointToViewProj(this.position)
       },
+    },
+    watch: {
+      id (value) {
+        if (!this.$geolocation || value === this.geolocation.get('id')) {
+          return
+        }
+
+        this.$geolocation.set('id', value)
+      },
+      /**
+       * @param {boolean} value
+       */
+      tracking (value) {
+        if (!this.$geolocation && value === this.$geolocation.getTracking()) {
+          return
+        }
+
+        this.$geolocation.setTracking(value)
+      },
+      tracingOptions (value, prevValue) {
+        if (isEqual(value, prevValue) || !this.$geolocation) return
+
+        this.$geolocation.setTrackingOptions(value)
+      },
+      resolvedDataProjection (value) {
+        if (!this.$geolocation) return
+
+        this.$geolocation.setProjection(value)
+      },
+    },
+    created () {
+      this::defineServices()
     },
     methods: {
       /**
@@ -106,42 +145,10 @@
         this::subscribeToGeolocation()
       },
     },
-    watch: {
-      id (value) {
-        if (!this.$geolocation || value === this.geolocation.get('id')) {
-          return
-        }
-
-        this.$geolocation.set('id', value)
-      },
-      /**
-       * @param {boolean} value
-       */
-      tracking (value) {
-        if (!this.$geolocation && value === this.$geolocation.getTracking()) {
-          return
-        }
-
-        this.$geolocation.setTracking(value)
-      },
-      tracingOptions (value, prevValue) {
-        if (isEqual(value, prevValue) || !this.$geolocation) return
-
-        this.$geolocation.setTrackingOptions(value)
-      },
-      resolvedDataProjection (value) {
-        if (!this.$geolocation) return
-
-        this.$geolocation.setProjection(value)
-      },
-    },
     stubVNode: {
       empty () {
         return this.vmId
       },
-    },
-    created () {
-      this::defineServices()
     },
   }
 

@@ -5,7 +5,7 @@
   import { tileSource, wmsSource } from '../../mixin'
 
   export default {
-    name: 'vl-source-wms',
+    name: 'VlSourceWms',
     mixins: [tileSource, wmsSource],
     props: {
       gutter: Number,
@@ -22,6 +22,15 @@
         required: true,
         validator: value => !!value.length,
       },
+    },
+    watch: {
+      ...makeWatchers([
+        'gutter',
+        'hidpi',
+        'serverType',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
     },
     methods: {
       /**
@@ -47,15 +56,6 @@
           tileLoadFunction: this.tileLoadFunction,
         })
       },
-    },
-    watch: {
-      ...makeWatchers([
-        'gutter',
-        'hidpi',
-        'serverType',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
     },
   }
 </script>

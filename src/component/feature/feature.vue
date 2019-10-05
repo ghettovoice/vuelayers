@@ -1,6 +1,13 @@
 <template>
-  <i :id="vmId" :class="cmpName" style="display: none !important;">
-    <slot :id="id" :properties="properties" :geometry="geometry" :point="point" />
+  <i
+    :id="vmId"
+    :class="vmClass"
+    style="display: none !important;">
+    <slot
+      :id="id"
+      :properties="properties"
+      :geometry="geometry"
+      :point="point" />
   </i>
 </template>
 
@@ -21,7 +28,7 @@
    * similar to the features in vector file formats like **GeoJSON**.
    */
   export default {
-    name: 'vl-feature',
+    name: 'VlFeature',
     mixins: [olCmp, useMapCmp, geometryContainer, stylesContainer, projTransforms],
     props: {
       /**
@@ -40,28 +47,50 @@
        * @type {Object|undefined}
        */
       geometry () {
-        if (this.rev && this.resolvedDataProjection && this.$geometry) {
-          return this.writeGeometryInDataProj(this.$geometry)
-        }
+        if (!(this.rev && this.resolvedDataProjection && this.$geometry)) return
+
+        return this.writeGeometryInDataProj(this.$geometry)
       },
       /**
        * @return {number[]|undefined}
        */
       point () {
-        if (this.pointViewProj && this.resolvedDataProjection) {
-          return this.pointToDataProj(this.pointViewProj)
-        }
+        if (!(this.pointViewProj && this.resolvedDataProjection)) return
+
+        return this.pointToDataProj(this.pointViewProj)
       },
       geometryViewProj () {
-        if (this.rev && this.resolvedDataProjection && this.$geometry) {
-          return this.writeGeometryInViewProj(this.$geometry)
-        }
+        if (!(this.rev && this.resolvedDataProjection && this.$geometry)) return
+
+        return this.writeGeometryInViewProj(this.$geometry)
       },
       pointViewProj () {
-        if (this.rev && this.$geometry) {
-          return findPointOnSurface(this.$geometry)
+        if (!(this.rev && this.$geometry)) return
+
+        return findPointOnSurface(this.$geometry)
+      },
+    },
+    watch: {
+      /**
+       * @param {string|number} value
+       */
+      id (value) {
+        if (this.$feature && value !== getFeatureId(this.$feature)) {
+          setFeatureId(this.$feature, value)
         }
       },
+      /**
+       * @param {Object} value
+       */
+      properties (value) {
+        value = plainProps(value)
+        if (this.$feature && !isEqual(value, plainProps(this.$feature.getProperties()))) {
+          this.$feature.setProperties(value)
+        }
+      },
+    },
+    created () {
+      this::defineServices()
     },
     methods: {
       /**
@@ -71,7 +100,7 @@
        * @protected
        */
       createOlObject () {
-        let feature = new Feature(this.properties)
+        const feature = new Feature(this.properties)
 
         initializeFeature(feature, this.id)
         feature.setGeometry(this.$geometry)
@@ -148,28 +177,6 @@
       subscribeAll () {
         this::subscribeToEvents()
       },
-    },
-    watch: {
-      /**
-       * @param {string|number} value
-       */
-      id (value) {
-        if (this.$feature && value !== getFeatureId(this.$feature)) {
-          setFeatureId(this.$feature, value)
-        }
-      },
-      /**
-       * @param {Object} value
-       */
-      properties (value) {
-        value = plainProps(value)
-        if (this.$feature && !isEqual(value, plainProps(this.$feature.getProperties()))) {
-          this.$feature.setProperties(value)
-        }
-      },
-    },
-    created () {
-      this::defineServices()
     },
   }
 

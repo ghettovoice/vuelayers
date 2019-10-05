@@ -4,7 +4,7 @@
   import { createMvtFmt } from '../../ol-ext'
 
   export default {
-    name: 'vl-source-vector-tile',
+    name: 'VlSourceVectorTile',
     mixins: [tileSource],
     props: {
       cacheSize: {

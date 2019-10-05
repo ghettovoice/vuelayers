@@ -1,14 +1,20 @@
 <script>
-  import BingMapsSource from 'ol/source/BingMaps'
+  import { BingMaps as BingMapsLayer } from 'ol/source'
   import { tileSource } from '../../mixin'
   import { makeWatchers } from '../../util/vue-helpers'
+  import { omit } from '../../util/minilo'
 
   const BINGMAPS_MAX_ZOOM = 21
   const BINGMAPS_CULTURE = 'en-us'
 
   export default {
-    name: 'vl-source-bingmaps',
-    mixins: [tileSource],
+    name: 'VlSourceBingmaps',
+    mixins: [
+      {
+        ...tileSource,
+        props: omit(tileSource, ['url']),
+      },
+    ],
     props: {
       /**
        * Enables hidpi tiles.
@@ -46,15 +52,22 @@
         type: Number,
         default: BINGMAPS_MAX_ZOOM,
       },
-      url: String,
+    },
+    watch: {
+      ...makeWatchers([
+        'apiKey',
+        'imagerySet',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
     },
     methods: {
       /**
-       * @return {BingMaps}
+       * @return {module:ol/source/BingMaps}
        * @protected
        */
       createSource () {
-        return new BingMapsSource({
+        return new BingMapsLayer({
           cacheSize: this.cacheSize,
           hidpi: this.hidpi,
           culture: this.culture,
@@ -67,14 +80,6 @@
           tileLoadFunction: this.tileLoadFunction,
         })
       },
-    },
-    watch: {
-      ...makeWatchers([
-        'apiKey',
-        'imagerySet',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
     },
   }
 </script>

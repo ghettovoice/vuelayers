@@ -1,8 +1,11 @@
 <template>
-  <i :id="vmId" :class="cmpName" style="display: none !important;">
-    <slot name="lon"></slot>
-    <slot name="lat"></slot>
-    <slot name="stroke"></slot>
+  <i
+    :id="vmId"
+    :class="vmClass"
+    style="display: none !important;">
+    <slot name="lon" />
+    <slot name="lat" />
+    <slot name="stroke" />
   </i>
 </template>
 
@@ -18,8 +21,17 @@
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
-    name: 'vl-graticule',
+    name: 'VlGraticule',
     mixins: [olCmp, useMapCmp, projTransforms],
+    stubVNode: {
+      empty: false,
+      attrs () {
+        return {
+          id: this.vmId,
+          class: this.vmClass,
+        }
+      },
+    },
     props: {
       maxLines: {
         type: Number,
@@ -63,6 +75,30 @@
 
         return []
       },
+    },
+    watch: {
+      id (value) {
+        if (!this.$graticule || value === this.$graticule.id) {
+          return
+        }
+
+        this.$graticule.id = value
+      },
+      ...makeWatchers([
+        'maxLines',
+        'targetSize',
+        'showLabels',
+        'lonLabelFormatter',
+        'latLabelFormatter',
+        'lonLabelPosition',
+        'latLabelPosition',
+        'intervals',
+      ], () => function () {
+        this.scheduleRefresh()
+      }),
+    },
+    created () {
+      this::defineServices()
     },
     methods: {
       createOlObject () {
@@ -176,39 +212,6 @@
       subscribeAll () {
         this::subscribeToEvents()
       },
-    },
-    watch: {
-      id (value) {
-        if (!this.$graticule || value === this.$graticule.id) {
-          return
-        }
-
-        this.$graticule.id = value
-      },
-      ...makeWatchers([
-        'maxLines',
-        'targetSize',
-        'showLabels',
-        'lonLabelFormatter',
-        'latLabelFormatter',
-        'lonLabelPosition',
-        'latLabelPosition',
-        'intervals',
-      ], () => function () {
-        this.scheduleRefresh()
-      }),
-    },
-    stubVNode: {
-      empty: false,
-      attrs () {
-        return {
-          id: this.vmId,
-          class: this.cmpName,
-        }
-      },
-    },
-    created () {
-      this::defineServices()
     },
   }
 

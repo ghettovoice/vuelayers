@@ -21,7 +21,7 @@
   }
 
   export default {
-    name: 'vl-geom-polygon',
+    name: 'VlGeomPolygon',
     mixins: [geometry],
     props,
     computed,

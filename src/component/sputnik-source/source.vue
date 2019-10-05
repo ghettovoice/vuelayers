@@ -34,7 +34,7 @@
   }
 
   export default {
-    name: 'vl-source-sputnik',
+    name: 'VlSourceSputnik',
     mixins: [xyzSource],
     props,
     computed,

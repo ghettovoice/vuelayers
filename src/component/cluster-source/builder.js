@@ -7,6 +7,7 @@ export default class Builder {
   getSource () {
     return this.source
   }
+
   /**
    * @param {Vector|undefined} value
    * @returns {Builder}

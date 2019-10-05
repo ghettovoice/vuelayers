@@ -39,7 +39,7 @@
   }
 
   export default {
-    name: 'vl-source-stamen',
+    name: 'VlSourceStamen',
     mixins: [xyzSource],
     props,
     methods,

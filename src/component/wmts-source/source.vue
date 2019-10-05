@@ -15,7 +15,7 @@
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
-    name: 'vl-source-wmts',
+    name: 'VlSourceWmts',
     mixins: [tileSource],
     props: {
       dimensions: Object,
@@ -54,6 +54,21 @@
         type: Array,
       },
     },
+    watch: {
+      ...makeWatchers([
+        'dimensions',
+        'format',
+        'layerName',
+        'matrixSet',
+        'requestEncoding',
+        'styleName',
+        'version',
+        'resolutions',
+        'origin',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
+    },
     methods: {
       /**
        * @returns {WMTS}
@@ -89,10 +104,10 @@
        * @protected
        */
       init () {
-        let extent = createExtentFromProjection(this.projection)
-        let resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
-        let origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
-        let matrixIds = Array.from(range(this.minZoom, resolutions.length))
+        const extent = createExtentFromProjection(this.projection)
+        const resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
+        const origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
+        const matrixIds = Array.from(range(this.minZoom, resolutions.length))
         /**
          * @type {module:ol/Tile~UrlFunction}
          * @protected
@@ -108,21 +123,6 @@
 
         return this::tileSource.methods.init()
       },
-    },
-    watch: {
-      ...makeWatchers([
-        'dimensions',
-        'format',
-        'layerName',
-        'matrixSet',
-        'requestEncoding',
-        'styleName',
-        'version',
-        'resolutions',
-        'origin',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
     },
   }
 </script>

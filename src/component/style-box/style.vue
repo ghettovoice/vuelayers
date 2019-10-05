@@ -119,10 +119,10 @@
   }
 
   export default {
-    name: 'vl-style-box',
+    name: 'VlStyleBox',
     mixins: [style, withFillStrokeStyle],
     props,
-    methods,
     watch,
+    methods,
   }
 </script>

@@ -21,7 +21,7 @@
   }
 
   export default {
-    name: 'vl-geom-line-string',
+    name: 'VlGeomLineString',
     mixins: [geometry],
     props,
     computed,

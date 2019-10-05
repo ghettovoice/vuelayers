@@ -147,17 +147,17 @@
   }
 
   export default {
-    name: 'vl-style-text',
+    name: 'VlStyleText',
     mixins: [style, withFillStrokeStyle],
     props,
-    methods,
     watch,
+    methods,
     stubVNode: {
       empty: false,
       attrs () {
         return {
           id: this.vmId,
-          class: this.cmpName,
+          class: this.vmClass,
         }
       },
     },

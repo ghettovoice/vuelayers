@@ -1,11 +1,10 @@
 <script>
-  import GroupLayer from 'ol/layer/Group'
+  import { Group as GroupLayer } from 'ol/layer'
   import { layer, layersContainer } from '../../mixin'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
-  // todo add computed property layerIds - ids of child layers
   export default {
-    name: 'vl-layer-group',
+    name: 'VlLayerGroup',
     mixins: [layer, layersContainer],
     methods: {
       createLayer () {

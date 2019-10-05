@@ -50,8 +50,8 @@
      * @protected
      */
     async createInteraction () {
-      let sourceIdent = this.makeIdent(this.source)
-      let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
+      const sourceIdent = this.makeIdent(this.source)
+      const source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
 
       return new SnapInteraction({
         source: source,
@@ -89,10 +89,10 @@
    * @vueProto
    */
   export default {
-    name: 'vl-interaction-snap',
+    name: 'VlInteractionSnap',
     mixins: [interaction],
     props,
-    methods,
     watch,
+    methods,
   }
 </script>

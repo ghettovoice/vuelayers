@@ -1,6 +1,9 @@
 <template>
-  <i :id="vmId" :class="cmpName" style="display: none !important;">
-    <slot :features="featuresDataProj"/>
+  <i
+    :id="vmId"
+    :class="vmClass"
+    style="display: none !important;">
+    <slot :features="featuresDataProj" />
   </i>
 </template>
 
@@ -21,14 +24,14 @@
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
-    name: 'vl-interaction-select',
+    name: 'VlInteractionSelect',
     mixins: [interaction, featuresContainer, stylesContainer, projTransforms],
     stubVNode: {
       empty: false,
       attrs () {
         return {
           id: this.vmId,
-          class: this.cmpName,
+          class: this.vmClass,
         }
       },
     },
@@ -132,6 +135,38 @@
           ? layer => this.layers.includes(getLayerId(layer))
           : this.layers
       },
+    },
+    watch: {
+      features: {
+        deep: true,
+        handler (features) {
+          if (!this.$interaction || isEqual(features, this.featuresDataProj)) return
+
+          features = features.slice().map(feature => initializeFeature({ ...feature }))
+          this.addFeatures(features)
+
+          const forUnselect = difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
+          this.removeFeatures(forUnselect)
+        },
+      },
+      featuresDataProj: {
+        deep: true,
+        handler: debounce(function (features) {
+          this.$emit('update:features', features)
+        }, 1000 / 60),
+      },
+      ...makeWatchers([
+        'filter',
+        'hitTolerance',
+        'multi',
+        'wrapX',
+        'addCondition',
+        'condition',
+        'removeCondition',
+        'toggleCondition',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
     },
     methods: {
       /**
@@ -268,38 +303,6 @@
         this::interaction.methods.subscribeAll()
         this::subscribeToInteractionChanges()
       },
-    },
-    watch: {
-      features: {
-        deep: true,
-        handler (features) {
-          if (!this.$interaction || isEqual(features, this.featuresDataProj)) return
-
-          features = features.slice().map(feature => initializeFeature({ ...feature }))
-          this.addFeatures(features)
-
-          let forUnselect = difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
-          this.removeFeatures(forUnselect)
-        },
-      },
-      featuresDataProj: {
-        deep: true,
-        handler: debounce(function (features) {
-          this.$emit('update:features', features)
-        }, 1000 / 60),
-      },
-      ...makeWatchers([
-        'filter',
-        'hitTolerance',
-        'multi',
-        'wrapX',
-        'addCondition',
-        'condition',
-        'removeCondition',
-        'toggleCondition',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
     },
   }
 

@@ -2,7 +2,7 @@
   import { xyzSource } from '../../mixin'
 
   export default {
-    name: 'vl-source-xyz',
+    name: 'VlSourceXyz',
     mixins: [xyzSource],
   }
 </script>

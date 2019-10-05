@@ -15,14 +15,14 @@
    * @title vl-interaction-modify
    */
   export default {
-    name: 'vl-interaction-modify',
+    name: 'VlInteractionModify',
     mixins: [interaction, stylesContainer],
     stubVNode: {
       empty: false,
       attrs () {
         return {
           id: this.vmId,
-          class: this.cmpName,
+          class: this.vmClass,
         }
       },
     },
@@ -79,17 +79,29 @@
         default: false,
       },
     },
+    watch: {
+      ...makeWatchers([
+        'source',
+        'condition',
+        'deleteCondition',
+        'insertVertexCondition',
+        'pixelTolerance',
+        'wrapX',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
+    },
     methods: {
       /**
        * @return {Promise<Modify>}
        * @protected
        */
       async createInteraction () {
-        let sourceIdent = this.makeIdent(this.source)
-        let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
+        const sourceIdent = this.makeIdent(this.source)
+        const source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
         assert(isVectorSource(source), `Source "${sourceIdent}" doesn't exists in the identity map.`)
         assert(isCollection(source.getFeaturesCollection()),
-          `Source "${sourceIdent}" doesn't provide features collection.`)
+               `Source "${sourceIdent}" doesn't provide features collection.`)
 
         return new ModifyInteraction({
           features: source.getFeaturesCollection(),
@@ -163,18 +175,6 @@
         this::interaction.methods.subscribeAll()
         this::subscribeToInteractionChanges()
       },
-    },
-    watch: {
-      ...makeWatchers([
-        'source',
-        'condition',
-        'deleteCondition',
-        'insertVertexCondition',
-        'pixelTolerance',
-        'wrapX',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
     },
   }
 

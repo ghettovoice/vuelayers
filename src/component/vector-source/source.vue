@@ -6,7 +6,7 @@
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
-    name: 'vl-source-vector',
+    name: 'VlSourceVector',
     mixins: [vectorSource],
     props: {
       /**
@@ -94,6 +94,31 @@
         return this.formatFactory()
       },
     },
+    watch: {
+      features: {
+        deep: true,
+        handler (features) {
+          if (!this.$source || isEqual(features, this.featuresDataProj)) return
+
+          features = features.map(feature => initializeFeature({ ...feature }))
+          this.addFeatures(features)
+
+          const forRemove = difference(this.featuresDataProj, features, (a, b) => getFeatureId(a) === getFeatureId(b))
+          this.removeFeatures(forRemove)
+        },
+      },
+      ...makeWatchers([
+        'loadingStrategy',
+        'dataFormat',
+        'urlFunc',
+        'loaderFactory',
+        'formatFactory',
+        'strategyFactory',
+        'overlaps',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
+    },
     methods: {
       /**
        * @return {VectorSource}
@@ -140,31 +165,6 @@
           dataProjection: this.resolvedDataProjection,
         })
       },
-    },
-    watch: {
-      features: {
-        deep: true,
-        handler (features) {
-          if (!this.$source || isEqual(features, this.featuresDataProj)) return
-
-          features = features.map(feature => initializeFeature({ ...feature }))
-          this.addFeatures(features)
-
-          const forRemove = difference(this.featuresDataProj, features, (a, b) => getFeatureId(a) === getFeatureId(b))
-          this.removeFeatures(forRemove)
-        },
-      },
-      ...makeWatchers([
-        'loadingStrategy',
-        'dataFormat',
-        'urlFunc',
-        'loaderFactory',
-        'formatFactory',
-        'strategyFactory',
-        'overlaps',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
     },
   }
 

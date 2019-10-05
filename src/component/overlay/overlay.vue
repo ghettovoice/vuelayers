@@ -1,6 +1,12 @@
 <template>
-  <div :id="vmId" :class="classes">
-    <slot :id="id" :position="position" :offset="offset" :positioning="positioning"/>
+  <div
+    :id="vmId"
+    :class="classes">
+    <slot
+      :id="id"
+      :position="position"
+      :offset="offset"
+      :positioning="positioning" />
   </div>
 </template>
 
@@ -66,7 +72,7 @@
     },
     classes () {
       return [
-        this.cmpName,
+        this.vmClass,
         this.visible ? 'visible' : undefined,
       ].filter(identity)
     },
@@ -163,11 +169,15 @@
   }
 
   export default {
-    name: 'vl-overlay',
+    name: 'VlOverlay',
     mixins: [olCmp, useMapCmp, projTransforms],
     props,
+    data () {
+      return {
+        visible: false,
+      }
+    },
     computed,
-    methods,
     watch,
     created () {
       Object.defineProperties(this, {
@@ -192,11 +202,7 @@
         },
       })
     },
-    data () {
-      return {
-        visible: false,
-      }
-    },
+    methods,
   }
 
   /**

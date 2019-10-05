@@ -94,7 +94,7 @@
   }
 
   export default {
-    name: 'vl-style-stroke',
+    name: 'VlStyleStroke',
     mixins: [style],
     props,
     watch,
