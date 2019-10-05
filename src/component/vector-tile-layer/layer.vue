@@ -1,51 +1,51 @@
 <script>
   import VectorTileLayer from 'ol/layer/VectorTile'
-  import { vectorLayer } from '../../mixin'
-
-  const RENDER_MODES = ['vector', 'image', 'hybrid']
-
-  const props = {
-    renderMode: {
-      type: String,
-      default: 'hybrid',
-      validator: val => RENDER_MODES.includes(val),
-    },
-    preload: {
-      type: Number,
-      default: 0,
-    },
-  }
-
-  const methods = {
-    /**
-     * @return {VectorTileLayer}
-     * @protected
-     */
-    createLayer () {
-      return new VectorTileLayer({
-        id: this.id,
-        minResolution: this.minResolution,
-        maxResolution: this.maxResolution,
-        opacity: this.opacity,
-        visible: this.visible,
-        preload: this.preload,
-        extent: this.extent,
-        zIndex: this.zIndex,
-        updateWhileAnimating: this.updateWhileAnimating,
-        updateWhileInteracting: this.updateWhileInteracting,
-        source: this._source,
-        renderMode: this.renderMode,
-        renderBuffer: this.renderBuffer,
-        renderOrder: this.renderOrder,
-        declutter: this.declutter,
-      })
-    },
-  }
+  import { vectorLayer, tileLayer } from '../../mixin'
 
   export default {
     name: 'VlLayerVectorTile',
-    mixins: [vectorLayer],
-    props,
-    methods,
+    mixins: [tileLayer, vectorLayer],
+    props: {
+      renderMode: {
+        type: String,
+        default: 'hybrid',
+        validator: val => ['image', 'hybrid'].includes(val),
+      },
+    },
+    methods: {
+      /**
+       * @return {VectorTileLayer}
+       * @protected
+       */
+      createLayer () {
+        return new VectorTileLayer({
+          // layer props
+          id: this.id,
+          className: this.className,
+          opacity: this.opacity,
+          visible: this.visible,
+          extent: this.extent,
+          zIndex: this.zIndex,
+          minResolution: this.minResolution,
+          maxResolution: this.maxResolution,
+          minZoom: this.minZoom,
+          maxZoom: this.maxZoom,
+          render: this.render,
+          // vector layer props
+          renderOrder: this.renderOrder,
+          renderBuffer: this.renderBuffer,
+          declutter: this.declutter,
+          updateWhileAnimating: this.updateWhileAnimating,
+          updateWhileInteracting: this.updateWhileInteracting,
+          // tile layer props
+          preload: this.preload,
+          useInterimTilesOnError: this.useInterimTilesOnError,
+          // vector tile props
+          renderMode: this.renderMode,
+          // instance props
+          source: this.$source,
+        })
+      },
+    },
   }
 </script>

@@ -1,3 +1,4 @@
+import { pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import layer from './layer'
 import stylesContainer from './styles-container'
@@ -98,20 +99,6 @@ export default {
       return (await this.resolveLayer()).getUpdateWhileInteracting()
     },
     /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    init () {
-      return this::layer.methods.init()
-    },
-    /**
-     * @return {void|Promise<void>}
-     * @protected
-     */
-    deinit () {
-      return this::layer.methods.deinit()
-    },
-    /**
      * @returns {Object}
      * @protected
      */
@@ -121,56 +108,16 @@ export default {
         this::stylesContainer.methods.getServices(),
       )
     },
-    /**
-     * @return {Promise<module:ol/layer/Vector~Vector|undefined>}
-     * @protected
-     */
-    getStyleTarget () {
-      return this.resolveLayer()
-    },
-    /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    mount () {
-      return this::layer.methods.mount()
-    },
-    /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    unmount () {
-      return this::layer.methods.unmount()
-    },
-    /**
-     * Updates layer state
-     * @return {Promise<void>}
-     */
-    refresh () {
-      return this::layer.methods.refresh()
-    },
-    /**
-     * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise<void>}
-     * @protected
-     */
-    remount () {
-      return this::layer.methods.remount()
-    },
-    /**
-     * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise<void>}
-     * @protected
-     */
-    recreate () {
-      return this::layer.methods.recreate()
-    },
-    /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    subscribeAll () {
-      return this::layer.methods.subscribeAll()
-    },
+    getStyleTarget: layer.methods.resolveLayer,
+    ...pick(layer.methods, [
+      'init',
+      'deinit',
+      'mount',
+      'unmount',
+      'refresh',
+      'remount',
+      'recreate',
+      'subscribeAll',
+    ]),
   },
 }

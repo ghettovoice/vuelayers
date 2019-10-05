@@ -1,5 +1,6 @@
 <script>
-  import { Vector as VectorLayer } from 'ol/layer'
+  import { VectorImage as VectorImageLayer } from 'ol/layer'
+  import { makeWatchers } from 'util/vue-helpers'
   import { vectorLayer } from '../../mixin'
 
   /**
@@ -8,13 +9,26 @@
   export default {
     name: 'VlLayerVector',
     mixins: [vectorLayer],
+    props: {
+      imageRatio: {
+        type: Number,
+        default: 1,
+      },
+    },
+    watch: {
+      ...makeWatchers([
+        'imageRatio',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
+    },
     methods: {
       /**
-       * @return {module:ol/layer/Vector~VectorLayer}
+       * @return {module:ol/layer/VectorImage~VectorImageLayer}
        * @protected
        */
       createLayer () {
-        return new VectorLayer({
+        return new VectorImageLayer({
           id: this.id,
           className: this.className,
           opacity: this.opacity,
@@ -31,8 +45,15 @@
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          imageRatio: this.imageRatio,
           source: this.$source,
         })
+      },
+      /**
+       * @returns {Promise<number>}
+       */
+      async getImageRatio () {
+        return (await this.resolveLayer()).getImageRatio()
       },
     },
   }
