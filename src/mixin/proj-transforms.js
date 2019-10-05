@@ -24,8 +24,8 @@ export default {
      * @return {module:ol/proj~ProjectionLike}
      */
     viewProjection () {
-      if (this.rev && this.$view) {
-        return this.$view.getProjection().getCode()
+      if (this.rev && this.$mapVm?.$view) {
+        return this.$mapVm?.$view.getProjection().getCode()
       }
       return this.projection || EPSG_3857
     },
@@ -36,7 +36,7 @@ export default {
       return coalesce(
         this.dataProjection, // may or may not be present
         this.projection, // may or may not be present
-        this.$map && getMapDataProjection(this.$map),
+        this.$mapVm && getMapDataProjection(this.$mapVm),
         this.$options.dataProjection,
         this.viewProjection,
       )

@@ -19,8 +19,7 @@
   import { geometryContainer, olCmp, projTransforms, stylesContainer, useMapCmp } from '../../mixin'
   import { findPointOnSurface, getFeatureId, initializeFeature, setFeatureId } from '../../ol-ext'
   import { obsFromOlEvent } from '../../rx-ext'
-  import { hasFeature, hasMap } from '../../util/assert'
-  import { isEqual, plainProps } from '../../util/minilo'
+  import { isEqual, newPlainObject } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   /**
@@ -38,7 +37,7 @@
        */
       properties: {
         type: Object,
-        default: () => Object.create(null),
+        default: newPlainObject,
       },
     },
     computed: {
@@ -75,18 +74,13 @@
        * @param {string|number} value
        */
       id (value) {
-        if (this.$feature && value !== getFeatureId(this.$feature)) {
-          setFeatureId(this.$feature, value)
-        }
+        this.setId(value)
       },
       /**
        * @param {Object} value
        */
       properties (value) {
-        value = plainProps(value)
-        if (this.$feature && !isEqual(value, plainProps(this.$feature.getProperties()))) {
-          this.$feature.setProperties(value)
-        }
+        this.setProperties(value)
       },
     },
     created () {
@@ -108,14 +102,70 @@
         return feature
       },
       /**
-       * @return {{
-       *     getGeometry: function(): (module:ol/geom/Geometry~Geometry|undefined),
-       *     setGeometry: function((module:ol/geom/Geometry~Geometry|undefined)): void
-       *   }|Feature|undefined}
-       * @protected
+       * @return {Promise<string|number>}
        */
-      getGeometryTarget () {
-        return this.$feature
+      async getId () {
+        return getFeatureId(await this.resolveFeature())
+      },
+      /**
+       * @param {string|number} id
+       * @return {Promise<void>}
+       */
+      async setId (id) {
+        const feature = await this.resolveFeature()
+
+        if (id === getFeatureId(feature)) return
+
+        setFeatureId(feature, id)
+      },
+      /**
+       * @return {Promise<string>}
+       */
+      async getGeometryName () {
+        return (await this.resolveFeature()).getGeometryName()
+      },
+      /**
+       * @param {string} geometryName
+       * @return {Promise<void>}
+       */
+      async setGeometryName (geometryName) {
+        const feature = await this.resolveFeature()
+
+        if (geometryName === feature.getGeometryName()) return
+
+        feature.setGeometryName(geometryName)
+      },
+      /**
+       * @return {Promise<Object>}
+       */
+      async getProperties () {
+        return (await this.resolveFeature()).getProperties()
+      },
+      /**
+       * @param {Object} properties
+       * @return {Promise<void>}
+       */
+      async setProperties (properties) {
+        const feature = await this.resolveFeature()
+
+        if (isEqual(properties, feature.getProperties())) return
+
+        feature.setProperties(properties)
+      },
+      /**
+       * Checks if feature lies at `pixel`.
+       * @param {number[]} pixel
+       * @return {Promise<boolean>}
+       */
+      async isAtPixel (pixel) {
+        const selfFeature = await this.resolveFeature()
+        let layerFilter
+        if (this.$layerVm) {
+          const selfLayer = await this.$layerVm.resolveLayer()
+          layerFilter = layer => layer === selfLayer
+        }
+
+        return this.$mapVm.forEachFeatureAtPixel(pixel, feature => feature === selfFeature, { layerFilter })
       },
       /**
        * @return {Object}
@@ -129,54 +179,45 @@
           this::geometryContainer.methods.getServices(),
           this::stylesContainer.methods.getServices(),
           {
-            get feature () { return vm.$feature },
+            get featureVm () { return vm },
           },
         )
       },
       /**
-       * @return {module:ol/Feature~Feature|undefined}
+       * @return {Promise<void>}
        * @protected
        */
-      getStyleTarget () {
-        return this.$feature
-      },
-      /**
-       * Checks if feature lies at `pixel`.
-       * @param {number[]} pixel
-       * @return {boolean}
-       */
-      isAtPixel (pixel) {
-        hasMap(this)
+      async mount () {
+        if (this.$featuresContainer) {
+          await this.$featuresContainer.addFeature(this)
+        }
 
-        return this.$map.forEachFeatureAtPixel(
-          pixel,
-          f => f === this.$feature,
-          { layerFilter: l => l === this.$layer },
-        )
+        return this::olCmp.methods.mount()
       },
       /**
-       * @return {void}
+       * @return {Promise<void>}
        * @protected
        */
-      mount () {
-        this.$featuresContainer && this.$featuresContainer.addFeature(this)
-        this.subscribeAll()
-      },
-      /**
-       * @return {void}
-       * @protected
-       */
-      unmount () {
-        this.unsubscribeAll()
-        this.$featuresContainer && this.$featuresContainer.removeFeature(this)
+      async unmount () {
+        if (this.$featuresContainer) {
+          await this.$featuresContainer.removeFeature(this)
+        }
+
+        return this::olCmp.methods.unmount()
       },
       /**
        * @return {void}
        * @protected
        */
       subscribeAll () {
-        this::subscribeToEvents()
+        return Promise.all([
+          this::olCmp.methods.subscribeAll(),
+          this::subscribeToEvents(),
+        ])
       },
+      resolveFeature: olCmp.methods.resolveOlObject,
+      getGeometryTarget: olCmp.methods.resolveOlObject,
+      getStyleTarget: olCmp.methods.resolveOlObject,
     },
   }
 
@@ -188,49 +229,41 @@
       },
       $geometry: {
         enumerable: true,
-        get: this.getGeometry,
+        get: () => this.$feature?.getGeometry(),
       },
-      $layer: {
+      $layerVm: {
         enumerable: true,
-        get: () => this.$services && this.$services.layer,
+        get: () => this.$services?.layerVm,
       },
-      $map: {
+      $mapVm: {
         enumerable: true,
-        get: () => this.$services && this.$services.map,
-      },
-      $view: {
-        enumerable: true,
-        get: () => this.$services && this.$services.view,
+        get: () => this.$services?.mapVm,
       },
       $featuresContainer: {
         enumerable: true,
-        get: () => this.$services && this.$services.featuresContainer,
+        get: () => this.$services?.featuresContainer,
       },
     })
   }
 
-  /**
-   * @return {void}
-   * @private
-   */
-  function subscribeToEvents () {
-    hasFeature(this)
+  async function subscribeToEvents () {
+    const feature = await this.resolveFeature()
 
-    const getPropValue = prop => this.$feature.get(prop)
+    const getPropValue = prop => feature.get(prop)
     // all plain properties + geometry
     const propChanges = obsFromOlEvent(
-      this.$feature,
+      feature,
       'propertychange',
       ({ key }) => ({ prop: key, value: getPropValue(key) }),
     )
     // id, style and other generic changes
     const changes = obsFromOlEvent(
-      this.$feature,
+      feature,
       'change',
     ).pipe(
       mapObs(() => Observable.create(obs => {
-        if (this.$feature.getId() !== this.id) {
-          obs.next({ prop: 'id', value: this.$feature.getId() })
+        if (feature.getId() !== this.id) {
+          obs.next({ prop: 'id', value: feature.getId() })
         }
         // todo style?
       })),
@@ -247,7 +280,7 @@
       this.$nextTick(() => {
         if (prop === 'id') {
           this.$emit(`update:${prop}`, value)
-        } else if (prop !== this.$feature.getGeometryName()) {
+        } else if (prop !== feature.getGeometryName()) {
           this.$emit('update:properties', { ...this.properties, [prop]: value })
         }
       })

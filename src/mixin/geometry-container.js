@@ -16,21 +16,10 @@ export default {
       throw new Error('Not implemented method')
     },
     /**
-     * @return {module:ol/geom/Geometry~Geometry|undefined}
+     * @return {Promise<module:ol/geom/Geometry~Geometry|undefined>}
      */
-    getGeometry () {
-      return this._geometry
-    },
-    /**
-     * @return {Object}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return {
-        get geometryContainer () { return vm },
-      }
+    async getGeometry () {
+      return (await this.getGeometryTarget()).getGeometry()
     },
     /**
      * @param {module:ol/geom/Geometry~Geometry|Vue|Object|undefined} geom
@@ -44,11 +33,20 @@ export default {
         geom = this.readGeometryInDataProj(geom)
       }
 
-      this._geometry = geom
       const geomTarget = await this.getGeometryTarget()
-
       if (geomTarget && geom !== geomTarget.getGeometry()) {
         geomTarget.setGeometry(geom)
+      }
+    },
+    /**
+     * @return {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return {
+        get geometryContainer () { return vm },
       }
     },
   },

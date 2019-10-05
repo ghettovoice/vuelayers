@@ -331,3 +331,7 @@ export function kebabCase (str) {
 export function arrayLengthValidator (len) {
   return len => value => isArray(value) && value.length === len
 }
+
+export function newPlainObject () {
+  return Object.create(null)
+}
