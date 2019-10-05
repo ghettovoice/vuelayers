@@ -12,7 +12,7 @@
     isCollection,
     isVectorSource,
   } from '../../ol-ext'
-  import { observableFromOlEvent } from '../../rx-ext'
+  import { obsFromOlEvent } from '../../rx-ext'
   import { assert, hasInteraction } from '../../util/assert'
   import { camelCase, mapValues, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -271,14 +271,14 @@
     hasInteraction(this)
 
     const drawEvents = mergeObs(
-      observableFromOlEvent(this.$interaction, 'drawstart')
+      obsFromOlEvent(this.$interaction, 'drawstart')
         .pipe(
           mapObs(evt => {
             initializeFeature(evt.feature)
             return evt
           }),
         ),
-      observableFromOlEvent(this.$interaction, 'drawend'),
+      obsFromOlEvent(this.$interaction, 'drawend'),
     )
     this.subscribeTo(drawEvents, evt => {
       ++this.rev

@@ -3,7 +3,7 @@ import BaseLayer from 'ol/layer/Base'
 import { merge as mergeObs } from 'rxjs/observable'
 import Vue from 'vue'
 import { getLayerId, initializeLayer } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import rxSubs from './rx-subs'
 
@@ -108,8 +108,8 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = observableFromOlEvent(this.$layersCollection, 'add')
-  const removes = observableFromOlEvent(this.$layersCollection, 'remove')
+  const adds = obsFromOlEvent(this.$layersCollection, 'add')
+  const removes = obsFromOlEvent(this.$layersCollection, 'remove')
 
   this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
     ++this.rev

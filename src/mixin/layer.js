@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import { merge as mergeObs } from 'rxjs/observable'
 import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
-import { observableFromOlEvent, observableFromOlChangeEvent } from '../rx-ext'
+import { obsFromOlEvent, obsFromOlChangeEvent } from '../rx-ext'
 import { isEqual, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
@@ -377,8 +377,8 @@ async function subscribeToLayerEvents () {
 
   const t = 1000 / 60
   const changes = mergeObs(
-    observableFromOlChangeEvent(layer, 'extent', true, t, () => this.extentToDataProj(layer.getExtent())),
-    observableFromOlChangeEvent(layer, [
+    obsFromOlChangeEvent(layer, 'extent', true, t, () => this.extentToDataProj(layer.getExtent())),
+    obsFromOlChangeEvent(layer, [
       'opacity',
       'visible',
       'zIndex',
@@ -397,7 +397,7 @@ async function subscribeToLayerEvents () {
     })
   })
 
-  const events = observableFromOlEvent(layer, [
+  const events = obsFromOlEvent(layer, [
     // todo review which events are actually exists in the current ol version
     'postcompose',
     'precompose',

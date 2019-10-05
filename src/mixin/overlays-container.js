@@ -2,7 +2,7 @@ import { Collection, Overlay } from 'ol'
 import { merge as mergeObs } from 'rxjs/observable'
 import Vue from 'vue'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import rxSubs from './rx-subs'
 
@@ -107,8 +107,8 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = observableFromOlEvent(this.$overlaysCollection, 'add')
-  const removes = observableFromOlEvent(this.$overlaysCollection, 'remove')
+  const adds = obsFromOlEvent(this.$overlaysCollection, 'add')
+  const removes = obsFromOlEvent(this.$overlaysCollection, 'remove')
 
   this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
     ++this.rev

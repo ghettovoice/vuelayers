@@ -3,7 +3,7 @@
   import ModifyInteraction from 'ol/interaction/Modify'
   import { interaction, stylesContainer } from '../../mixin'
   import { createStyle, defaultEditStyle, isCollection, isVectorSource } from '../../ol-ext'
-  import { observableFromOlEvent } from '../../rx-ext'
+  import { obsFromOlEvent } from '../../rx-ext'
   import { assert, hasInteraction } from '../../util/assert'
   import { mapValues } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -184,7 +184,7 @@
   function subscribeToInteractionChanges () {
     hasInteraction(this)
 
-    const modifyEvents = observableFromOlEvent(this.$interaction, ['modifystart', 'modifyend'])
+    const modifyEvents = obsFromOlEvent(this.$interaction, ['modifystart', 'modifyend'])
     this.subscribeTo(modifyEvents, evt => {
       ++this.rev
 

@@ -3,7 +3,7 @@
   import { makeWatchers } from '../../util/vue-helpers'
   import { sourceContainer, vectorSource } from '../../mixin'
   import { createPointGeom, findPointOnSurface } from '../../ol-ext'
-  import { observableFromOlEvent } from '../../rx-ext'
+  import { obsFromOlEvent } from '../../rx-ext'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import SourceBuilder from './builder'
 
@@ -119,12 +119,12 @@
   function subscribeToSourceChanges () {
     hasSource(this)
 
-    const adds = observableFromOlEvent(this.$source, 'addfeature')
+    const adds = obsFromOlEvent(this.$source, 'addfeature')
     this.subscribeTo(adds, ({ feature }) => {
       this.addFeature(feature)
     })
 
-    const removes = observableFromOlEvent(this.$source, 'removefeature')
+    const removes = obsFromOlEvent(this.$source, 'removefeature')
     this.subscribeTo(removes, ({ feature }) => {
       this.removeFeature(feature)
     })

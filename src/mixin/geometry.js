@@ -7,7 +7,7 @@ import {
   setGeometryId,
   transforms,
 } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { hasGeometry } from '../util/assert'
 import { isEqual, isEmpty, negate } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
@@ -276,7 +276,7 @@ function subscribeToGeomChanges () {
   hasGeometry(this)
 
   const ft = 1000 / 60
-  const changes = observableFromOlEvent(
+  const changes = obsFromOlEvent(
     this.$geometry,
     'change',
     () => ({

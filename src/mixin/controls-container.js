@@ -1,6 +1,6 @@
 import { Collection } from 'ol'
 import { Control, defaults as createDefaultControls } from 'ol/control'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { merge as mergeObs } from 'rxjs/observable'
 import Vue from 'vue'
 import { getControlId, initializeControl } from '../ol-ext'
@@ -97,8 +97,8 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = observableFromOlEvent(this.$controlsCollection, 'add')
-  const removes = observableFromOlEvent(this.$controlsCollection, 'remove')
+  const adds = obsFromOlEvent(this.$controlsCollection, 'add')
+  const removes = obsFromOlEvent(this.$controlsCollection, 'remove')
 
   this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
     ++this.rev

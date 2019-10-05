@@ -1,5 +1,5 @@
 import { EPSG_3857 } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { hasSource } from '../util/assert'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
@@ -59,7 +59,7 @@ export default {
 function subscribeToSourceEvents () {
   hasSource(this)
 
-  const events = observableFromOlEvent(this.$source, [
+  const events = obsFromOlEvent(this.$source, [
     'imageloadend',
     'imageloaderror',
     'imageloadstart',

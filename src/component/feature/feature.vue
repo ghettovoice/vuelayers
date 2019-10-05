@@ -18,7 +18,7 @@
   import { distinctUntilChanged, map as mapObs, mergeAll } from 'rxjs/operators'
   import { geometryContainer, olCmp, projTransforms, stylesContainer, useMapCmp } from '../../mixin'
   import { findPointOnSurface, getFeatureId, initializeFeature, setFeatureId } from '../../ol-ext'
-  import { observableFromOlEvent } from '../../rx-ext'
+  import { obsFromOlEvent } from '../../rx-ext'
   import { hasFeature, hasMap } from '../../util/assert'
   import { isEqual, plainProps } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -218,13 +218,13 @@
 
     const getPropValue = prop => this.$feature.get(prop)
     // all plain properties + geometry
-    const propChanges = observableFromOlEvent(
+    const propChanges = obsFromOlEvent(
       this.$feature,
       'propertychange',
       ({ key }) => ({ prop: key, value: getPropValue(key) }),
     )
     // id, style and other generic changes
-    const changes = observableFromOlEvent(
+    const changes = obsFromOlEvent(
       this.$feature,
       'change',
     ).pipe(

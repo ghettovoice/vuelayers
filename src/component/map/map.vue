@@ -24,7 +24,7 @@
     projTransforms,
   } from '../../mixin'
   import { getMapId, setMapDataProjection, setMapId } from '../../ol-ext'
-  import { observableFromOlEvent } from '../../rx-ext'
+  import { obsFromOlEvent } from '../../rx-ext'
   import { isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -456,12 +456,12 @@
     const ft = 1000 / 60
     // pointer
     const pointerEvents = mergeObs(
-      observableFromOlEvent(map, [
+      obsFromOlEvent(map, [
         'click',
         'dblclick',
         'singleclick',
       ]),
-      observableFromOlEvent(map, [
+      obsFromOlEvent(map, [
         'pointerdrag',
         'pointermove',
       ]).pipe(
@@ -475,7 +475,7 @@
       }),
     )
     // other
-    const otherEvents = observableFromOlEvent(map, [
+    const otherEvents = obsFromOlEvent(map, [
       'movestart',
       'moveend',
       'postrender',

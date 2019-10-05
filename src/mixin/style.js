@@ -1,6 +1,6 @@
 import { first as firstObs } from 'rxjs/operators'
 import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-cmp'
 import useMapCmp from './use-map-cmp'
@@ -87,7 +87,7 @@ export default {
 
           this.$map.render()
 
-          return observableFromOlEvent(this.$map, 'postcompose')
+          return obsFromOlEvent(this.$map, 'postcompose')
             .pipe(firstObs())
             .toPromise()
         })

@@ -15,7 +15,7 @@
   import { merge as mergeObs } from 'rxjs/observable'
   import { olCmp, projTransforms, useMapCmp } from '../../mixin'
   import { getOverlayId, initializeOverlay, OVERLAY_POSITIONING, setOverlayId } from '../../ol-ext'
-  import { observableFromOlChangeEvent } from '../../rx-ext'
+  import { obsFromOlChangeEvent } from '../../rx-ext'
   import { hasOverlay } from '../../util/assert'
   import { isEqual, identity } from '../../util/minilo'
 
@@ -213,8 +213,8 @@
     hasOverlay(this)
 
     const changes = mergeObs(
-      observableFromOlChangeEvent(this.$overlay, 'position', true, undefined, () => this.pointToDataProj(this.$overlay.getPosition())),
-      observableFromOlChangeEvent(this.$overlay, [
+      obsFromOlChangeEvent(this.$overlay, 'position', true, undefined, () => this.pointToDataProj(this.$overlay.getPosition())),
+      obsFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
       ], true),

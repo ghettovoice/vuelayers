@@ -4,7 +4,7 @@ import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime } from 'rxjs/operators'
 import Vue from 'vue'
 import { getFeatureId, getObjectUid, initializeFeature, mergeFeatures } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import { isPlainObject, map } from '../util/minilo'
 import projTransforms from './proj-transforms'
@@ -143,11 +143,11 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = observableFromOlEvent(this.$featuresCollection, 'add')
+  const adds = obsFromOlEvent(this.$featuresCollection, 'add')
   this.subscribeTo(adds, ({ element }) => {
     const elementUid = getObjectUid(element)
-    const propChanges = observableFromOlEvent(element, 'propertychange')
-    const otherChanges = observableFromOlEvent(element, 'change')
+    const propChanges = obsFromOlEvent(element, 'propertychange')
+    const otherChanges = obsFromOlEvent(element, 'change')
     const featureChanges = mergeObs(propChanges, otherChanges).pipe(
       debounceTime(1000 / 60),
     )
@@ -163,7 +163,7 @@ function subscribeToCollectionEvents () {
     })
   })
 
-  const removes = observableFromOlEvent(this.$featuresCollection, 'remove')
+  const removes = obsFromOlEvent(this.$featuresCollection, 'remove')
   this.subscribeTo(removes, ({ element }) => {
     const elementUid = getObjectUid(element)
     if (this._featureSubs[elementUid]) {

@@ -18,7 +18,7 @@
   import Vue from 'vue'
   import { olCmp, projTransforms } from '../../mixin'
   import { EPSG_3857, getViewId, initializeView, MAX_ZOOM, MIN_ZOOM, setViewId, ZOOM_FACTOR } from '../../ol-ext'
-  import { observableFromOlChangeEvent } from '../../rx-ext'
+  import { obsFromOlChangeEvent } from '../../rx-ext'
   import { arrayLengthValidator, coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -491,7 +491,7 @@
     const view = await this.resolveView()
 
     const ft = 1000 / 60
-    const resolution = observableFromOlChangeEvent(view, 'resolution', true, ft)
+    const resolution = obsFromOlChangeEvent(view, 'resolution', true, ft)
     const zoom = resolution.pipe(
       mapObs(() => ({
         prop: 'zoom',
@@ -501,8 +501,8 @@
     )
 
     const changes = mergeObs(
-      observableFromOlChangeEvent(view, 'center', true, ft, () => this.pointToDataProj(view.getCenter())),
-      observableFromOlChangeEvent(view, 'rotation', true, ft),
+      obsFromOlChangeEvent(view, 'center', true, ft, () => this.pointToDataProj(view.getCenter())),
+      obsFromOlChangeEvent(view, 'rotation', true, ft),
       resolution,
       zoom,
     )

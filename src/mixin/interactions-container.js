@@ -3,7 +3,7 @@ import { defaults as createDefaultInteractions, Interaction } from 'ol/interacti
 import { merge as mergeObs } from 'rxjs/observable'
 import Vue from 'vue'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import { isArray, isPlainObject } from '../util/minilo'
 import rxSubs from './rx-subs'
@@ -149,8 +149,8 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = observableFromOlEvent(this.$interactionsCollection, 'add')
-  const removes = observableFromOlEvent(this.$interactionsCollection, 'remove')
+  const adds = obsFromOlEvent(this.$interactionsCollection, 'add')
+  const removes = obsFromOlEvent(this.$interactionsCollection, 'remove')
 
   this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
     ++this.rev

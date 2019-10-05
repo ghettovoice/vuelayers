@@ -10,7 +10,7 @@ import {
   REPROJ_ERR_THRESHOLD,
   TILE_SIZE,
 } from '../ol-ext'
-import { observableFromOlEvent } from '../rx-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { hasSource } from '../util/assert'
 import { isEqual, isString, pick, replaceTokens } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
@@ -195,7 +195,7 @@ export default {
 function subscribeToSourceEvents () {
   hasSource(this)
 
-  const events = observableFromOlEvent(this.$source, [
+  const events = obsFromOlEvent(this.$source, [
     'tileloadstart',
     'tileloadend',
     'tileloaderror',

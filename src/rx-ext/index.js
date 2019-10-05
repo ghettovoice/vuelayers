@@ -1,2 +1,2 @@
-export observableFromOlChangeEvent from './from-ol-change-event'
-export observableFromOlEvent from './from-ol-event'
+export obsFromOlChangeEvent from './from-ol-change-event'
+export obsFromOlEvent from './from-ol-event'

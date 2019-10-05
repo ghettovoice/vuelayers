@@ -13,7 +13,7 @@
   import Vue from 'vue'
   import Graticule from 'ol/Graticule'
   import { throttleTime } from 'rxjs/operators'
-  import { observableFromOlEvent } from '../../rx-ext'
+  import { obsFromOlEvent } from '../../rx-ext'
   import { olCmp, useMapCmp, projTransforms } from '../../mixin'
   import { hasGraticule, hasMap } from '../../util/assert'
   import { firstEl, map } from '../../util/minilo'
@@ -236,7 +236,7 @@
     hasMap(this)
 
     const ft = 1000 / 60
-    const postcompose = observableFromOlEvent(this.$map, 'postcompose')
+    const postcompose = obsFromOlEvent(this.$map, 'postcompose')
       .pipe(throttleTime(ft))
 
     this.subscribeTo(postcompose, () => {

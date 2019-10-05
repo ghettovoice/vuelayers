@@ -17,7 +17,7 @@
   import { map as mapOp } from 'rxjs/operators'
   import { interaction, projTransforms, stylesContainer, featuresContainer } from '../../mixin'
   import { getFeatureId, createStyle, defaultEditStyle, getLayerId, initializeFeature } from '../../ol-ext'
-  import { observableFromOlEvent } from '../../rx-ext'
+  import { obsFromOlEvent } from '../../rx-ext'
   import { hasInteraction, hasMap } from '../../util/assert'
   import { constant, difference, forEach, isEqual, isFunction, mapValues, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -313,11 +313,11 @@
   function subscribeToInteractionChanges () {
     hasInteraction(this)
 
-    const select = observableFromOlEvent(this.$featuresCollection, 'add')
+    const select = obsFromOlEvent(this.$featuresCollection, 'add')
       .pipe(
         mapOp(({ element }) => ({ type: 'select', feature: element }))
       )
-    const unselect = observableFromOlEvent(this.$featuresCollection, 'remove')
+    const unselect = obsFromOlEvent(this.$featuresCollection, 'remove')
       .pipe(
         mapOp(({ element }) => ({ type: 'unselect', feature: element }))
       )

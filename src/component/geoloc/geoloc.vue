@@ -17,7 +17,7 @@
   import Geolocation from 'ol/Geolocation'
   import { merge } from 'rxjs/observable'
   import { olCmp, useMapCmp, projTransforms } from '../../mixin'
-  import { observableFromOlChangeEvent } from '../../rx-ext'
+  import { obsFromOlChangeEvent } from '../../rx-ext'
   import { hasGeolocation } from '../../util/assert'
   import { isEqual } from '../../util/minilo'
 
@@ -185,7 +185,7 @@
 
     const ft = 1000 / 60
     const changes = merge(
-      observableFromOlChangeEvent(
+      obsFromOlChangeEvent(
         this.$geolocation,
         [
           'accuracy',
@@ -197,7 +197,7 @@
         true,
         ft,
       ),
-      observableFromOlChangeEvent(
+      obsFromOlChangeEvent(
         this.$geolocation,
         'position',
         true,
