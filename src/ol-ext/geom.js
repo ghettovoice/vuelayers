@@ -88,7 +88,7 @@ export function createCircularPolygon (center, radius) {
  * @throws {Error}
  */
 export function isMultiGeom (geom) {
-  let multiTypes = [
+  const multiTypes = [
     GEOMETRY_TYPE.MULTI_POINT,
     GEOMETRY_TYPE.MULTI_LINE_STRING,
     GEOMETRY_TYPE.MULTI_POLYGON,

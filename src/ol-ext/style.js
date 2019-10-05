@@ -74,10 +74,10 @@ export function defaultStyle () {
  */
 export function defaultEditStyle () {
   /** @type {Object<GEOMETRY_TYPE, VlStyle[]>} */
-  let styles = {}
-  let white = [255, 255, 255, 1]
-  let blue = [0, 153, 255, 1]
-  let width = 3
+  const styles = {}
+  const white = [255, 255, 255, 1]
+  const blue = [0, 153, 255, 1]
+  const width = 3
 
   styles[GEOMETRY_TYPE.LINE_STRING] = [
     {
@@ -329,8 +329,8 @@ export function createTextStyle (vlStyle) {
     text: vlStyle.text,
   }
 
-  let fontSize = vlStyle.textFontSize ? vlStyle.textFontSize + 'px' : undefined
-  let font = ['normal', fontSize, vlStyle.textFont].filter(x => !!x).join(' ')
+  const fontSize = vlStyle.textFontSize ? vlStyle.textFontSize + 'px' : undefined
+  const font = ['normal', fontSize, vlStyle.textFont].filter(x => !!x).join(' ')
 
   Object.assign(
     textStyle,

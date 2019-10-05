@@ -54,7 +54,7 @@ class GeoJSON extends BaseGeoJSON {
 
   writeFeatureObject (feature, options) {
     const object = /** @type {Object} */ ({
-      'type': 'Feature',
+      type: 'Feature',
     })
     const id = feature.getId()
     if (id !== undefined) {

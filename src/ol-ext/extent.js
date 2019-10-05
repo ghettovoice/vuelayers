@@ -80,7 +80,7 @@ export function createExtentFromProjection (projection) {
   let extent = projection.getExtent()
 
   if (!extent) {
-    let half = 180 * METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
+    const half = 180 * METERS_PER_UNIT[PROJ_UNIT.DEGREES] /
       projection.getMetersPerUnit()
     extent = createOrUpdateExtent(-half, -half, half, half)
   }
