@@ -1,4 +1,5 @@
 export arcgisSource from './arcgis-source'
+export controlsContainer from './controls-container'
 export featuresContainer from './features-container'
 export geometry from './geometry'
 export geometryContainer from './geometry-container'

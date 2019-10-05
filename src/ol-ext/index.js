@@ -1,4 +1,5 @@
 export * from './consts'
+export * from './control'
 export * from './extent'
 export * from './feature'
 export * from './format'
