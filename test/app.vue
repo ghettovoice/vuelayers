@@ -8,35 +8,50 @@
         </div>
       </div>
 
-      <vl-map ref="map" data-projection="EPSG:4326" :default-controls="controls" :default-interactions="interactions">
-        <vl-view :center.sync="center" :rotation.sync="rotation"
-                 :zoom.sync="zoom" :extent="[0, 0, 100, 50]"
-                 ident="view" ref="view" />
+      <VlMap
+        ref="map"
+        data-projection="EPSG:4326"
+        :default-controls="controls"
+        :default-interactions="interactions">
+        <VlView
+          ref="view"
+          :center.sync="center"
+          :rotation.sync="rotation"
+          :zoom.sync="zoom" />
 
-        <vl-geoloc>
+        <VlGeoloc>
           <template slot-scope="geoloc">
-            <vl-feature v-if="geoloc.position" id="position-feature">
-              <vl-geom-point :coordinates="geoloc.position" />
-            </vl-feature>
+            <VlFeature
+              v-if="geoloc.position"
+              id="position-feature">
+              <VlGeomPoint :coordinates="geoloc.position" />
+            </VlFeature>
           </template>
-        </vl-geoloc>
+        </VlGeoloc>
 
-        <vl-layer-tile>
-          <vl-source-osm />
-        </vl-layer-tile>
+        <VlLayerTile>
+          <VlSourceOsm />
+        </VlLayerTile>
 
-        <vl-layer-vector id="countries" render-mode="image">
-          <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />
-          <vl-style-func :factory="createCountriesStyleFunc" />
-        </vl-layer-vector>
+        <!--<VlLayerVector-->
+        <!--  id="countries"-->
+        <!--  render-mode="image">-->
+        <!--  <VlSourceVector-->
+        <!--    ident="countries-source"-->
+        <!--    :features.sync="countries"-->
+        <!--    :url="countriesUrl" />-->
+        <!--  <VlStyleFunc :factory="createCountriesStyleFunc" />-->
+        <!--</VlLayerVector>-->
 
-        <vl-layer-vector id="draw-target">
-          <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
-        </vl-layer-vector>
+        <!--<VlLayerVector id="draw-target">-->
+        <!--  <VlSourceVector-->
+        <!--    ident="draw-target"-->
+        <!--    :features.sync="drawFeatures" />-->
+        <!--</VlLayerVector>-->
 
-        <vl-interaction-select :features.sync="selectedFeatures" />
-        <vl-interaction-modify source="draw-target" />
-      </vl-map>
+        <!--<VlInteractionSelect :features.sync="selectedFeatures" />-->
+        <!--<VlInteractionModify source="draw-target" />-->
+      </VlMap>
     </div>
   </div>
 </template>
@@ -45,7 +60,7 @@
   import { findPointOnSurface, createStyle } from '../src/ol-ext'
 
   export default {
-    name: 'app',
+    name: 'App',
     data () {
       return {
         zoom: 2,
@@ -83,6 +98,8 @@
         return this.selectedFeatures.map(({ id }) => id)
       },
     },
+    mounted () {
+    },
     methods: {
       pointOnSurface: findPointOnSurface,
       createCountriesStyleFunc () {
@@ -93,8 +110,6 @@
           })
         }
       },
-    },
-    mounted () {
     },
   }
 </script>

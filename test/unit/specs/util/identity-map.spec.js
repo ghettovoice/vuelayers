@@ -43,7 +43,7 @@ describe('IdentityMap', () => {
    */
   describe('#get()', () => {
     let identMap
-    let val = [1, 2, 3]
+    const val = [1, 2, 3]
     beforeEach(() => {
       identMap = new IdentityMap()
       identMap.set('ident', val)
@@ -55,7 +55,7 @@ describe('IdentityMap', () => {
     it('should return value from map and increase refs count', () => {
       expect(identMap.refs('ident')).to.equal(1)
 
-      let val_ = identMap.get('ident')
+      const val_ = identMap.get('ident')
       expect(val_).to.deep.equal(val)
       expect(identMap.refs('ident')).to.equal(2)
     })
@@ -69,7 +69,7 @@ describe('IdentityMap', () => {
    */
   describe('#unset()', () => {
     let identMap
-    let val = [1, 2, 3]
+    const val = [1, 2, 3]
     beforeEach(() => {
       identMap = new IdentityMap()
       identMap.set('ident', val)

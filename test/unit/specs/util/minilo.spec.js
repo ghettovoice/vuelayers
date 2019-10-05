@@ -1,3 +1,4 @@
+/* eslint-disable no-new-wrappers,no-new-object,no-array-constructor */
 /* global describe, it, expect, sinon */
 import * as lo from '@/util/minilo'
 
@@ -57,8 +58,8 @@ describe('minilo lib', () => {
     it('should return true for object values', () => {
       expect(lo.isObjectLike([])).to.be.true
       expect(lo.isObjectLike({})).to.be.true
-      expect(lo.isObjectLike(new Object)).to.be.true
-      expect(lo.isObjectLike(new Array)).to.be.true
+      expect(lo.isObjectLike(new Object())).to.be.true
+      expect(lo.isObjectLike(new Array())).to.be.true
     })
     it('should return false for primitives', () => {
       expect(lo.isObjectLike(0)).to.be.false
@@ -70,13 +71,13 @@ describe('minilo lib', () => {
   describe('isPlainObject()', () => {
     it('should return true only for plain objects', () => {
       expect(lo.isPlainObject({})).to.be.true
-      expect(lo.isPlainObject(new Object)).to.be.true
+      expect(lo.isPlainObject(new Object())).to.be.true
     })
     it('should return false for all other values', () => {
       expect(lo.isPlainObject(0)).to.be.false
       expect(lo.isPlainObject('')).to.be.false
       expect(lo.isPlainObject(function () {})).to.be.false
-      expect(lo.isPlainObject(new Array)).to.be.false
+      expect(lo.isPlainObject(new Array())).to.be.false
     })
   })
 
@@ -128,10 +129,10 @@ describe('minilo lib', () => {
       expect(lo.isEqual(123, 123)).to.be.true
       expect(lo.isEqual('123', '123')).to.be.true
       expect(lo.isEqual([1, 2, 3], [1, 2, 3])).to.be.true
-      expect(lo.isEqual({q: 1, w: 2, e: 3}, {q: 1, w: 2, e: 3})).to.be.true
+      expect(lo.isEqual({ q: 1, w: 2, e: 3 }, { q: 1, w: 2, e: 3 })).to.be.true
       expect(lo.isEqual(
-        {q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: {q: 'q', w: 'w', o: {}}},
-        {q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: {q: 'q', w: 'w', o: {}}}
+        { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: {} } },
+        { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: {} } }
       )).to.be.true
       expect(lo.isEqual(true, true)).to.be.true
     })
@@ -140,10 +141,10 @@ describe('minilo lib', () => {
       expect(lo.isEqual('123', '132')).to.be.false
       expect(lo.isEqual([1, 3, 4], [1, 2, 3])).to.be.false
       expect(lo.isEqual([1, 2, [2, 1]], [1, 2, [2, 2]])).to.be.false
-      expect(lo.isEqual({q: 1, w: 2, e: 3}, {q: 1, w: 2, e: 3, r: 123})).to.be.false
+      expect(lo.isEqual({ q: 1, w: 2, e: 3 }, { q: 1, w: 2, e: 3, r: 123 })).to.be.false
       expect(lo.isEqual(
-        {q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: {q: 'q', w: 'w', o: [1, 2, 3]}},
-        {q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: {q: 'q', w: 'w', o: {}}}
+        { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: [1, 2, 3] } },
+        { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: {} } }
       )).to.be.false
       expect(lo.isEqual(true, false)).to.be.false
     })
@@ -151,8 +152,8 @@ describe('minilo lib', () => {
 
   describe('forEach()', () => {
     it('should call iteratee for each array element', () => {
-      let arr = [1, 2, 3]
-      let iteratee = sinon.spy((value, key) => {
+      const arr = [1, 2, 3]
+      const iteratee = sinon.spy((value, key) => {
         expect(value).to.be.equal(arr[key])
       })
       lo.forEach(arr, iteratee)
@@ -160,8 +161,8 @@ describe('minilo lib', () => {
       expect(iteratee).to.have.callCount(arr.length)
     })
     it('should call iteratee for each object key/value pair', () => {
-      let obj = {q: 1, w: 2, e: 3}
-      let iteratee = sinon.spy((value, key) => {
+      const obj = { q: 1, w: 2, e: 3 }
+      const iteratee = sinon.spy((value, key) => {
         expect(value).to.be.equal(obj[key])
       })
       lo.forEach(obj, iteratee)
@@ -179,7 +180,7 @@ describe('minilo lib', () => {
 
   describe('get()', () => {
     it('should return value from object by provided path', () => {
-      let obj = {
+      const obj = {
         q: 123,
         w: [
           {
@@ -201,7 +202,7 @@ describe('minilo lib', () => {
       expect(lo.filter([0, 1, true, false, 'qwe'])).to.be.deep.equal([1, true, 'qwe'])
     })
     it('should filter object properties', () => {
-      expect(lo.filter({q: undefined, w: 'www', e: []})).to.be.deep.equal({w: 'www'})
+      expect(lo.filter({ q: undefined, w: 'www', e: [] })).to.be.deep.equal({ w: 'www' })
     })
   })
 
@@ -215,7 +216,7 @@ describe('minilo lib', () => {
   describe('pick()', () => {
     describe('with object', () => {
       it('should return new object with picked props', () => {
-        let obj = {
+        const obj = {
           tileSize: [256, 256],
           get tileFormat () { return 'png' },
           id: 123,
@@ -239,7 +240,7 @@ describe('minilo lib', () => {
   describe('omit()', () => {
     describe('with object', () => {
       it('should return new object without omitted props', () => {
-        let obj = {
+        const obj = {
           tileSize: [256, 256],
           get tileFormat () { return 'png' },
           id: 123,

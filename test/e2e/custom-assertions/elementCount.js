@@ -19,7 +19,7 @@ exports.assertion = function (selector, count) {
     const self = this
     return this.api.execute(function (selector) {
       return document.querySelectorAll(selector).length
-    }, [ selector ], function (res) {
+    }, [selector], function (res) {
       cb.call(self, res)
     })
   }

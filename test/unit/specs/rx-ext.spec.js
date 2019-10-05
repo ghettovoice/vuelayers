@@ -8,7 +8,7 @@ const identity = val => val
 
 describe('RxJS extensions', () => {
   describe('fromOlEvent', () => {
-    let olMock = new OlObject()
+    const olMock = new OlObject()
     beforeEach(() => {
       sinon.spy(olMock, 'on')
       sinon.spy(olMock, 'un')
@@ -75,7 +75,7 @@ describe('RxJS extensions', () => {
       const subs = observable.subscribe(
         evt => {
           expect(evt).to.be.an('object')
-          expect([ 'move', 'click', 'dblclick' ]).to.include(evt.type)
+          expect(['move', 'click', 'dblclick']).to.include(evt.type)
         },
         done
       )
