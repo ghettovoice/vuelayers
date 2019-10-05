@@ -22,7 +22,7 @@
         </vl-geoloc>
 
         <vl-layer-tile>
-          <vl-source-sputnik />
+          <vl-source-osm />
         </vl-layer-tile>
 
         <vl-layer-vector id="countries" render-mode="image">
