@@ -350,14 +350,14 @@
        * @protected
        */
       async setView (view) {
-        const map = await this.resolveMap()
-
         if (view instanceof Vue) {
           view = await view.resolveView()
         }
         view || (view = new View())
 
         this._view = view
+
+        const map = await this.resolveMap()
         if (view !== map.getView()) {
           map.setView(view)
         }
@@ -374,26 +374,24 @@
        */
       async mount () {
         await this.setTarget(this.$el)
+        await this.subscribeAll()
 
         this.$nextTick(::this.updateSize)
-
-        await this.subscribeAll()
       },
       /**
        * @return {Promise<void>}
        * @protected
        */
       async unmount () {
-        this.unsubscribeAll()
-
+        await this.unsubscribeAll()
         await this.setTarget(null)
       },
       /**
        * @return {Promise<void>}
        * @protected
        */
-      async subscribeAll () {
-        await this::subscribeToEvents()
+      subscribeAll () {
+        return this::subscribeToEvents()
       },
       /**
        * @returns {Object}

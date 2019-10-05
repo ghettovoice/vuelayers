@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import View from 'ol/View'
+  import { View } from 'ol'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
   import Vue from 'vue'
@@ -451,7 +451,7 @@
         }
       },
       /**
-       * @return {void|Promise<void>}
+       * @return {Promise<void>}
        * @protected
        */
       subscribeAll () {
@@ -460,7 +460,7 @@
       /**
        * @return {Promise<module:ol/View~View>}
        */
-      async resolveView () {
+      resolveView () {
         return this.resolveOlObject()
       },
     },
@@ -489,7 +489,6 @@
    */
   async function subscribeToEvents () {
     const view = await this.resolveView()
-    const getCenter = () => this.pointToDataProj(view.getCenter())
 
     const ft = 1000 / 60
     const resolution = observableFromOlChangeEvent(view, 'resolution', true, ft)
@@ -502,7 +501,7 @@
     )
 
     const changes = mergeObs(
-      observableFromOlChangeEvent(view, 'center', true, ft, getCenter),
+      observableFromOlChangeEvent(view, 'center', true, ft, () => this.pointToDataProj(view.getCenter())),
       observableFromOlChangeEvent(view, 'rotation', true, ft),
       resolution,
       zoom,
