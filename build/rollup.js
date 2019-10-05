@@ -169,36 +169,31 @@ function bundleOptions (format, package, env = 'development') {
       options.output.globals = (id) => {
         if (id === 'vue') return 'Vue'
 
-        // if (ol[id] != null) {
-        //   return ol[id]
-        // }
+        if (ol[id] != null) {
+          return ol[id]
+        }
       }
       options.input.external = (id, parent, resolved) => {
         if (['vue'].includes(id)) return true
 
-        // if (!resolved && /^ol\/.+/.test(id)) {
-        //   ol[id] = id.replace(/\//g, '.')
-        //   return true
-        // }
+        if (!resolved && /^ol\/.+/.test(id)) {
+          ol[id] = id.replace(/\//g, '.')
+          return true
+        }
 
         return false
       }
       options.replaces['process.env.NODE_ENV'] = `'${env}'`
       options.replaces['process.env.VUELAYERS_DEBUG'] = JSON.stringify(process.env.NODE_ENV !== 'production')
-      // options.minify = true
-      // process.env.BABEL_ENV = 'es5-production'
-      // options.defines.IS_STANDALONE = true
+      options.minify = true
       break
     case 'cjs':
       options.input.external = external
       options.patterns = patterns
-      // process.env.BABEL_ENV = 'es5-production'
       break
     case 'es':
       options.input.external = external
       options.patterns = patterns
-      // options.outputPath = path.join(options.outputPath, '_esm')
-      // options.cssName = undefined
       break
   }
 
