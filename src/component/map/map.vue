@@ -374,7 +374,7 @@
        */
       async mount () {
         await this.setTarget(this.$el)
-        await this.subscribeAll()
+        await this::olCmp.methods.mount()
 
         this.$nextTick(::this.updateSize)
       },
@@ -383,7 +383,7 @@
        * @protected
        */
       async unmount () {
-        await this.unsubscribeAll()
+        await this::olCmp.methods.unmount()
         await this.setTarget(null)
       },
       /**
@@ -391,7 +391,10 @@
        * @protected
        */
       subscribeAll () {
-        return this::subscribeToEvents()
+        return Promise.all([
+          this::olCmp.methods.subscribeAll(),
+          this::subscribeToEvents(),
+        ])
       },
       /**
        * @returns {Object}
@@ -414,12 +417,7 @@
           },
         )
       },
-      /**
-       * @return {Promise<module:ol/Map~Map>}
-       */
-      resolveMap () {
-        return this.resolveOlObject()
-      },
+      resolveMap: olCmp.methods.resolveOlObject,
     },
   }
 

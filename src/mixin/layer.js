@@ -330,15 +330,12 @@ export default {
      * @protected
      */
     subscribeAll () {
-      return Promise.resolve(this::cmp.methods.subscribeAll())
-        .then(this::subscribeToLayerEvents)
+      return Promise.all([
+        this::cmp.methods.subscribeAll(),
+        this::subscribeToLayerEvents(),
+      ])
     },
-    /**
-     * @returns {Promise<module:ol/layer/Base~BaseLayer>}
-     */
-    async resolveLayer () {
-      return this.resolveOlObject()
-    },
+    resolveLayer: cmp.methods.resolveOlObject,
     getSourceTarget: cmp.methods.resolveOlObject,
     ...pick(cmp.methods, [
       'init',

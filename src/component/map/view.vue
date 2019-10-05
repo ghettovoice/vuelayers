@@ -437,14 +437,14 @@
           await this.$viewContainer.setView(this)
         }
 
-        return this.subscribeAll()
+        return this::olCmp.methods.mount()
       },
       /**
        * @return {void}
        * @protected
        */
       async unmount () {
-        await this.unsubscribeAll()
+        await this::olCmp.methods.unmount()
 
         if (this.$viewContainer) {
           await this.$viewContainer.setView(null)
@@ -455,14 +455,12 @@
        * @protected
        */
       subscribeAll () {
-        return this::subscribeToEvents()
+        return Promise.all([
+          this::olCmp.methods.subscribeAll(),
+          this::subscribeToEvents(),
+        ])
       },
-      /**
-       * @return {Promise<module:ol/View~View>}
-       */
-      resolveView () {
-        return this.resolveOlObject()
-      },
+      resolveView: olCmp.methods.resolveOlObject,
     },
   }
 
