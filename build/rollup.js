@@ -32,8 +32,8 @@ getAllPackages()
           packages[0].entry = config.umdEntry
         }
         // bundle each package in provided format
-        return packages.reduce((prev, package) => {
-          return prev.then(() => makeBundle(bundleOptions(format, package, process.env.NODE_ENV)))
+        return packages.reduce((prev, pkg) => {
+          return prev.then(() => makeBundle(bundleOptions(format, pkg, process.env.NODE_ENV)))
         }, Promise.resolve())
       })
     }, Promise.resolve())
@@ -87,8 +87,8 @@ function entryToPackage (entry, basePath = srcPath) {
   if (!/\.js$/i.test(entryPath)) {
     entryPath = path.join(entry.path, 'index.js')
   }
-  let jsName = path.relative(basePath, entryPath.replace(/\.js$/i, ''))
-  let pkgName = jsName.replace(/\/index$/i, '')
+  const jsName = path.relative(basePath, entryPath.replace(/\.js$/i, ''))
+  const pkgName = jsName.replace(/\/index$/i, '')
 
   return {
     entry: entryPath,
@@ -97,18 +97,18 @@ function entryToPackage (entry, basePath = srcPath) {
   }
 }
 
-function bundleOptions (format, package, env = 'development') {
-  let options = Object.assign({}, package, {
+function bundleOptions (format, pkg, env = 'development') {
+  const options = Object.assign({}, pkg, {
     outputPath: config.outputPath,
     input: {
-      input: package.entry,
+      input: pkg.entry,
     },
     output: {
       format,
       banner: config.banner,
-      name: package.globName,
-      amd: package.amdName ? {
-        id: package.amdName,
+      name: pkg.globName,
+      amd: pkg.amdName ? {
+        id: pkg.amdName,
       } : undefined,
     },
     format,
@@ -137,8 +137,8 @@ function bundleOptions (format, package, env = 'development') {
       componentsRegExp.test(parentId) && (
         id.slice(0, 2) === './' ||
         id.match(/\.vue\?rollup-plugin-vue/i) ||
-        componentsRegExp.test(id) &&
-        path.basename(path.dirname(id)) === path.basename(path.dirname(parentId))
+        (componentsRegExp.test(id) &&
+        path.basename(path.dirname(id)) === path.basename(path.dirname(parentId)))
       )
     )
   }
@@ -161,12 +161,12 @@ function bundleOptions (format, package, env = 'development') {
     ],
   ]
 
+  const ol = {}
   switch (format) {
     case 'umd':
       options.jsName += '.' + format
       options.cssName = undefined
-      let ol = {}
-      options.output.globals = (id) => {
+      options.output.globals = id => {
         if (id === 'vue') return 'Vue'
 
         if (ol[id] != null) {
@@ -275,8 +275,8 @@ function makeBundle (options = {}) {
         },
         output: {
           comments: (node, comment) => {
-            let text = comment.value
-            let type = comment.type
+            const text = comment.value
+            const type = comment.type
             if (type === 'comment2') {
               // multiline comment
               return /@preserve|@license|@cc_on/i.test(text)
@@ -306,7 +306,7 @@ function makeBundle (options = {}) {
   }).then(js => {
     // concatenate all styles from Sass and Vue files
     if (!cssOutputPath) {
-      return {js, css: undefined}
+      return { js, css: undefined }
     }
 
     return stylesPromise.then(styles => {

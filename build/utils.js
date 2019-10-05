@@ -60,19 +60,23 @@ function cssLoaders (options) {
     postcss: generateLoaders(),
     less: generateLoaders('less'),
     sass: generateLoaders('sass', {
-      includePaths: [
-        resolve('src'),
-        resolve('src/styles'),
-        resolve('node_modules'),
-      ],
-      indentedSyntax: true,
+      sassOptions: {
+        includePaths: [
+          resolve('src'),
+          resolve('src/styles'),
+          resolve('node_modules'),
+        ],
+        indentedSyntax: true,
+      },
     }),
     scss: generateLoaders('sass', {
-      includePaths: [
-        resolve('src'),
-        resolve('src/styles'),
-        resolve('node_modules'),
-      ],
+      sassOptions: {
+        includePaths: [
+          resolve('src'),
+          resolve('src/styles'),
+          resolve('node_modules'),
+        ],
+      },
     }),
     stylus: generateLoaders('stylus'),
     styl: generateLoaders('stylus'),
@@ -83,7 +87,7 @@ function cssLoaders (options) {
 function styleLoaders (options) {
   const output = []
   const loaders = cssLoaders(options)
-  for (let extension in loaders) {
+  for (const extension in loaders) {
     const loader = loaders[extension]
     output.push({
       test: new RegExp('\\.' + extension + '$'),

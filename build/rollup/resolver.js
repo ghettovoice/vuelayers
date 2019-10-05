@@ -13,7 +13,7 @@ module.exports = function (options = {}) {
       // disregard entry module
       if (!importer) return
 
-      let parts = importee.split(/[/\\]/)
+      const parts = importee.split(/[/\\]/)
       let id = parts.shift()
 
       if (id[0] === '.') {
@@ -21,7 +21,7 @@ module.exports = function (options = {}) {
         id = path.resolve(importer, '..', importee)
       }
 
-      let module = (options.modules || []).find(m => {
+      const module = (options.modules || []).find(m => {
         return m.entry === id || m.entry === path.join(id, 'index.js')
       })
       if (!module) return

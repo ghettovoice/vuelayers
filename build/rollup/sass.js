@@ -52,33 +52,29 @@ module.exports = function sass (options) {
         ? sassConfig.includePaths.concat(paths.filter(x => !sassConfig.includePaths.includes(x)))
         : paths
 
-      try {
-        let { css, map } = require('node-sass').renderSync(sassConfig)
-        code = css.toString().trim()
-        map = map.toString()
+      let { css, map } = require('node-sass').renderSync(sassConfig)
+      code = css.toString().trim()
+      map = map.toString()
 
-        if (!code) return
+      if (!code) return
 
-        return Promise.resolve({ id, code, map })
-          .then(options.postProcess)
-          .then(style => {
-            if (!styleMaps[id]) {
-              styles.push(styleMaps[id] = style)
+      return Promise.resolve({ id, code, map })
+        .then(options.postProcess)
+        .then(style => {
+          if (!styleMaps[id]) {
+            styles.push(styleMaps[id] = style)
+          }
+
+          if (options.output === false) {
+            return {
+              id: id,
+              code: `export default ${JSON.stringify(style.code)}`,
+              map: style.map,
             }
+          }
 
-            if (options.output === false) {
-              return {
-                id: id,
-                code: `export default ${JSON.stringify(style.code)}`,
-                map: style.map,
-              }
-            }
-
-            return ''
-          })
-      } catch (error) {
-        throw error
-      }
+          return ''
+        })
     },
     ongenerate () {
       if (!styles.length || options.output === false) {

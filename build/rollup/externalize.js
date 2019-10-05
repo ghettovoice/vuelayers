@@ -28,9 +28,9 @@ module.exports = function externalize (options) {
         start = match.index + 1
         end = start + match[1].length
 
-        let extModulePath = path.resolve(path.dirname(id), match[1])
-        let extModuleRelPath = path.relative(options.root, extModulePath)
-        let extModuleMap = options.map.find(({ from }) => from === extModuleRelPath)
+        const extModulePath = path.resolve(path.dirname(id), match[1])
+        const extModuleRelPath = path.relative(options.root, extModulePath)
+        const extModuleMap = options.map.find(({ from }) => from === extModuleRelPath)
 
         if (extModuleMap) {
           ms.overwrite(start, end, path.join(options.newRoot, extModuleMap.to))

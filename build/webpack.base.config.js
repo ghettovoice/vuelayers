@@ -13,7 +13,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
   entry: {
-    [ config.name ]: config.entry,
+    [config.name]: config.entry,
   },
   mode: ['production', 'development'].includes(process.env.NODE_ENV)
     ? process.env.NODE_ENV
@@ -29,7 +29,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.json', '.md'],
     modules: [
-      utils.resolve('src'),
+      // utils.resolve('src'),
       'node_modules',
     ],
     alias: {
@@ -57,7 +57,7 @@ module.exports = {
       // duplicated CSS from different components can be deduped.
       new OptimizeCSSPlugin({
         cssProcessorOptions: {
-          map: {inline: false},
+          map: { inline: false },
         },
       }),
     ],
