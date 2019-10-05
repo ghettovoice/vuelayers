@@ -17,6 +17,11 @@ import useMapCmp from './use-map-cmp'
 
 export default {
   mixins: [cmp, useMapCmp, projTransforms],
+  stubVNode: {
+    empty () {
+      return this.vmId
+    },
+  },
   props: {
     /**
      * Coordinates in the map view projection.
@@ -77,6 +82,40 @@ export default {
         return this.$geometry.getCoordinates()
       }
     },
+  },
+  watch: {
+    id (value) {
+      if (!this.$geometry || value === getGeometryId(this.$geometry)) {
+        return
+      }
+
+      setGeometryId(this.$geometry, value)
+    },
+    coordinates (value) {
+      if (!this.$geometry || !this.$view) return
+
+      // compares in data projection
+      const isEq = isEqualGeom({
+        coordinates: value,
+        extent: boundingExtent(value),
+      }, {
+        coordinates: this.getCoordinates(),
+        extent: this.extent,
+      })
+
+      if (isEq) return
+
+      this.setCoordinates(value)
+    },
+    resolvedDataProjection () {
+      if (!this.$geometry) return
+
+      this.setupTransformFunctions()
+      this.setCoordinates(this.coordinates)
+    },
+  },
+  created () {
+    this::defineServices()
   },
   methods: {
     /**
@@ -192,45 +231,6 @@ export default {
     subscribeAll () {
       this::subscribeToGeomChanges()
     },
-  },
-  watch: {
-    id (value) {
-      if (!this.$geometry || value === getGeometryId(this.$geometry)) {
-        return
-      }
-
-      setGeometryId(this.$geometry, value)
-    },
-    coordinates (value) {
-      if (!this.$geometry || !this.$view) return
-
-      // compares in data projection
-      let isEq = isEqualGeom({
-        coordinates: value,
-        extent: boundingExtent(value),
-      }, {
-        coordinates: this.getCoordinates(),
-        extent: this.extent,
-      })
-
-      if (isEq) return
-
-      this.setCoordinates(value)
-    },
-    resolvedDataProjection () {
-      if (!this.$geometry) return
-
-      this.setupTransformFunctions()
-      this.setCoordinates(this.coordinates)
-    },
-  },
-  stubVNode: {
-    empty () {
-      return this.vmId
-    },
-  },
-  created () {
-    this::defineServices()
   },
 }
 
