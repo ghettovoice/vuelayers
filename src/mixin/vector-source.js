@@ -101,7 +101,7 @@ export default {
     attrs () {
       return {
         id: this.vmId,
-        class: this.cmpName,
+        class: this.vmClass,
       }
     },
   },

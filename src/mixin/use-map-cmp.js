@@ -12,8 +12,8 @@ export default {
      */
     beforeInit () {
       // waits while $map service will be injected
-      return intervalObs(100).pipe(
-        skipWhile(() => !this.$map),
+      return intervalObs(1000 / 60).pipe(
+        skipWhile(() => !(this.$map || this.$mapVm)),
         firstObs(),
         mapObs(() => this),
       ).toPromise(Promise)

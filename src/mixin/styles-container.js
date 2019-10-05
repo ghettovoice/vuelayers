@@ -41,7 +41,7 @@ export default {
      */
     addStyle (style) {
       let currentStyles = this.getStyles()
-      let olStyle = style instanceof Vue ? style.$style : style
+      const olStyle = style instanceof Vue ? style.$style : style
 
       if (isFunction(olStyle)) {
         if (process.env.NODE_ENV !== 'production' && currentStyles) {
@@ -127,7 +127,7 @@ export default {
         // handle provided styles
         // styles - StyleFunction or vl-style-func
         if (styles && (isFunction(styles) || isFunction(styles.$style))) {
-          let styleFunc = isFunction(styles) ? styles : styles.$style
+          const styleFunc = isFunction(styles) ? styles : styles.$style
           styles = styleFunc(feature, resolution)
         }
         // styles is array of { $style: Style, condition: (bool|function():bool) }

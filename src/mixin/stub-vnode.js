@@ -12,7 +12,7 @@ export default {
     const options = this.$options.stubVNode || {}
     // render as HTML comment
     if (options.empty) {
-      let vnode = h()
+      const vnode = h()
       if (typeof options.empty === 'string') {
         vnode.text = options.empty
       } else if (typeof options.empty === 'function') {
@@ -29,11 +29,11 @@ export default {
       children = extractChildren(this.$slots, options.slots)
     }
 
-    let attrs = typeof options.attrs === 'function'
+    const attrs = typeof options.attrs === 'function'
       ? this::options.attrs()
       : options.attrs
 
-    let data = {
+    const data = {
       attrs,
       style: {
         display: 'none !important',

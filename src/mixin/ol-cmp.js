@@ -3,7 +3,7 @@ import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, skipUntil, skipWhile } from 'rxjs/operators'
 import uuid from 'uuid/v4'
 import { log } from '../util/log'
-import { identity, isFunction } from '../util/minilo'
+import { identity, isFunction, kebabCase } from '../util/minilo'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
 import services from './services'
@@ -31,14 +31,14 @@ export default {
     }
   },
   computed: {
-    cmpName () {
-      return this.$options.name
+    vmClass () {
+      return kebabCase(this.$options.name)
     },
     vmId () {
-      return [this.cmpName, this.id].filter(identity).join('-')
+      return [this.vmClass, this.id].filter(identity).join('-')
     },
     vmName () {
-      return [this.cmpName, this.id].filter(identity).join(' ')
+      return [this.$options.name, this.id].filter(identity).join(' ')
     },
   },
   methods: {
@@ -81,6 +81,15 @@ export default {
      */
     createOlObject () {
       throw new Error('Not implemented method')
+    },
+    /**
+     * @returns {Promise<Object>}
+     * @throws {Error} If underlying OpenLayers object not initialized (incorrect initialization, already destroy).
+     */
+    async resolveOlObject () {
+      await this.$createPromise
+
+      return this.$olObject || throw new Error('OpenLayers object is undefined')
     },
     /**
      * @return {void|Promise<void>}
@@ -209,7 +218,7 @@ function defineLifeCyclePromises () {
   }
   // create
   this._createPromise = Promise.resolve(this.beforeInit())
-    .then(() => this.init())
+    .then(::this.init)
     .then(makeEventEmitter('created'))
 
   // mount
@@ -219,7 +228,7 @@ function defineLifeCyclePromises () {
       firstObs(),
     )
   this._mountPromise = mountObs.toPromise(Promise)
-    .then(() => this.mount())
+    .then(::this.mount)
     .then(makeEventEmitter('mounted'))
 
   // unmount
@@ -230,7 +239,7 @@ function defineLifeCyclePromises () {
       firstObs(),
     )
   this._unmountPromise = unmountObs.toPromise(Promise)
-    .then(() => this.unmount())
+    .then(::this.unmount)
     .then(makeEventEmitter('unmounted'))
 
   // destroy
@@ -240,7 +249,7 @@ function defineLifeCyclePromises () {
       firstObs(),
     )
   this._destroyPromise = destroyObs.toPromise(Promise)
-    .then(() => this.deinit())
+    .then(::this.deinit)
     .then(makeEventEmitter('destroyed'))
 
   Object.defineProperties(this, {
