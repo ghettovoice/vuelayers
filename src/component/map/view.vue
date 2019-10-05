@@ -1,6 +1,13 @@
 <template>
-  <i :id="vmId" :class="cmpName" style="display: none !important;">
-    <slot :center="currentCenter" :zoom="currentZoom" :resolution="currentResolution" :rotation="currentRotation"/>
+  <i
+    :id="vmId"
+    :class="vmClass"
+    style="display: none !important;">
+    <slot
+      :center="currentCenter"
+      :zoom="currentZoom"
+      :resolution="currentResolution"
+      :rotation="currentRotation" />
   </i>
 </template>
 
@@ -20,8 +27,13 @@
    * **resolution**, and **rotation** of the map.
    */
   export default {
-    name: 'vl-view',
+    name: 'VlView',
     mixins: [olCmp, projTransforms],
+    stubVNode: {
+      empty () {
+        return this.vmId
+      },
+    },
     props: {
       /**
        * The center coordinate in the view projection.
@@ -144,14 +156,14 @@
         return this.resolution
       },
       currentCenter () {
-        if (this.rev && this.$view) {
-          return this.pointToDataProj(this.$view.getCenter())
-        }
+        if (!(this.rev && this.$view)) return
+
+        return this.pointToDataProj(this.$view.getCenter())
       },
       currentCenterViewProj () {
-        if (this.rev && this.$view) {
-          return this.$view.getCenter()
-        }
+        if (!(this.rev && this.$view)) return
+
+        return this.$view.getCenter()
       },
       /**
        * @return {ProjectionLike}
@@ -165,6 +177,58 @@
           this.viewProjection,
         )
       },
+    },
+    watch: {
+      id (value) {
+        this.setId(value)
+      },
+      async center (value) {
+        if (await this.getAnimating()) return
+
+        this.setCenter(value)
+      },
+      async rotation (value) {
+        if (await this.getAnimating()) return
+
+        this.setRotation(value)
+      },
+      async resolution (value) {
+        if (await this.getAnimating()) return
+
+        this.setResolution(value)
+      },
+      async zoom (value) {
+        if (await this.getAnimating()) return
+
+        this.setZoom(value)
+      },
+      minZoom (value) {
+        this.setMinZoom(value)
+      },
+      maxZoom (value) {
+        this.setMaxZoom(value)
+      },
+      ...makeWatchers([
+        'constrainOnlyCenter',
+        'extent',
+        'smoothExtentConstraint',
+        'enableRotation',
+        'constrainRotation',
+        'resolutions',
+        'maxResolution',
+        'minResolution',
+        'constrainResolution',
+        'smoothResolutionConstraint',
+        'zoomFactor',
+        'multiWorld',
+        'resolvedDataProjection',
+        'projection',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
+    },
+    created () {
+      this::defineServices()
     },
     methods: {
       /**
@@ -214,24 +278,20 @@
           opts.center = this.pointToViewProj(opts.center)
         })
 
-        await this.$createPromise
+        const view = await this.resolveView()
 
         return new Promise(resolve => {
-          return this.$view.animate(...args, complete => {
+          view.animate(...args, complete => {
             cb(complete)
             resolve(complete)
           })
         })
       },
       async getAnimating () {
-        await this.$createPromise
-
-        return this.$view.getAnimating()
+        return (await this.resolveView()).getAnimating()
       },
       async cancelAnimations () {
-        await this.$createPromise
-
-        return this.$view.cancelAnimations()
+        return (await this.resolveView()).cancelAnimations()
       },
       /**
        * @see {@link https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#fit}
@@ -247,12 +307,12 @@
           geometryOrExtent = geometryOrExtent.$geometry
         }
 
-        let cb = options.callback || noop
+        const cb = options.callback || noop
 
-        await this.$createPromise
+        const view = await this.resolveView()
 
         return new Promise(resolve => {
-          return this.$view.fit(geometryOrExtent, {
+          view.fit(geometryOrExtent, {
             ...options,
             callback: complete => {
               cb(complete)
@@ -262,157 +322,120 @@
         })
       },
       async beginInteraction () {
-        await this.$createPromise
-
-        this.$view.beginInteraction()
+        (await this.resolveView()).beginInteraction()
       },
       async endInteraction (duration, resolutionDirection, anchor) {
-        await this.$createPromise
-
-        this.$view.endInteraction(duration, resolutionDirection, anchor)
+        (await this.resolveView()).endInteraction(duration, resolutionDirection, anchor)
       },
       async getInteracting () {
-        await this.$createPromise
-
-        return this.getInteracting()
+        return (await this.resolveView()).getInteracting()
       },
       async calculateExtent () {
-        await this.$createPromise
-
-        return this.$view.calculateExtent()
+        return this.extentToDataProj((await this.resolveView()).calculateExtent())
       },
       async centerOn (coordinate, size, position) {
-        await this.$createPromise
-
-        this.$view.centerOn(coordinate, size, position)
+        (await this.resolveView()).centerOn(this.pointToViewProj(coordinate), size, position)
       },
       async getCenter () {
-        await this.$createPromise
-
-        return this.$view.getCenter()
+        return this.pointToDataProj((await this.resolveView()).getCenter())
       },
       async setCenter (center) {
-        await this.$createPromise
+        center = this.pointToViewProj(center)
+        const view = await this.resolveView()
 
-        if (isEqual(center, this.$view.getCenter())) return
+        if (isEqual(center, view.getCenter())) return
 
-        return this.$view.setCenter(center)
+        return view.setCenter(center)
       },
       async getResolution () {
-        await this.$createPromise
-
-        return this.$view.getResolution()
+        return (await this.resolveView()).getResolution()
       },
       async setResolution (resolution) {
-        await this.$createPromise
+        const view = await this.resolveView()
 
-        if (resolution === this.$view.getResolution()) return
+        if (resolution === view.getResolution()) return
 
-        this.$view.setResolution(resolution)
+        view.setResolution(resolution)
       },
       async getResolutionForExtent (extent, size) {
-        await this.$createPromise
-
-        return this.$view.getResolutionForExtent(extent, size)
+        return (await this.resolveView()).getResolutionForExtent(this.extentToViewProj(extent), size)
       },
       async getResolutionForZoom (zoom) {
-        await this.$createPromise
-
-        return this.$view.getResolutionForZoom(zoom)
+        return (await this.resolveView()).getResolutionForZoom(zoom)
       },
       async getResolutions () {
-        await this.$createPromise
-
-        return this.$view.getResolutions()
+        return (await this.resolveView()).getResolutions()
       },
       async getMaxResolution () {
-        await this.$createPromise
-
-        return this.$view.getMaxResolution()
+        return (await this.resolveView()).getMaxResolution()
       },
       async getMinResolution () {
-        await this.$createPromise
-
-        return this.$view.getMinResolution()
+        return (await this.resolveView()).getMinResolution()
       },
       async getZoom () {
-        await this.$createPromise
-
-        return this.$view.getZoom()
+        return (await this.resolveView()).getZoom()
       },
       async setZoom (zoom) {
-        await this.$createPromise
+        const view = await this.resolveView()
 
-        if (zoom === this.$view.getZoom()) return
+        if (zoom === view.getZoom()) return
 
-        this.$view.setZoom(zoom)
+        view.setZoom(zoom)
       },
       async getZoomForResolution (resolution) {
-        await this.$createPromise
-
-        return this.$view.getZoomForResolution(resolution)
+        return (await this.resolveView()).getZoomForResolution(resolution)
       },
       async getMaxZoom () {
-        await this.$createPromise
-
-        return this.$view.getMaxZoom()
+        return (await this.resolveView()).getMaxZoom()
       },
       async setMaxZoom (zoom) {
-        await this.$createPromise
+        const view = await this.resolveView()
 
-        if (zoom === this.$view.getMaxZoom()) return
+        if (zoom === view.getMaxZoom()) return
 
-        this.$view.setMaxZoom(zoom)
+        view.setMaxZoom(zoom)
       },
       async getMinZoom () {
-        await this.$createPromise
-
-        return this.$view.getMinZoom()
+        return (await this.resolveView()).getMinZoom()
       },
       async setMinZoom (zoom) {
-        await this.$createPromise
+        const view = await this.resolveView()
 
-        if (zoom === this.$view.getMinZoom()) return
+        if (zoom === view.getMinZoom()) return
 
-        return this.$view.setMinZoom(zoom)
+        return view.setMinZoom(zoom)
       },
       async getProjection () {
-        await this.$createPromise
-
-        return this.$view.getProjection()
+        return (await this.resolveView()).getProjection()
       },
       async getRotation () {
-        await this.$createPromise
-
-        return this.$view.getRotation()
+        return (await this.resolveView()).getRotation()
       },
       async setRotation (rotation) {
-        await this.$createPromise
+        const view = await this.resolveView()
 
-        if (rotation === this.$view.getRotation()) return
+        if (rotation === view.getRotation()) return
 
-        this.$view.setRotation(rotation)
+        view.setRotation(rotation)
       },
       async getId () {
-        await this.$createPromise
-
-        return getViewId(this.$view)
+        return getViewId(await this.resolveView())
       },
       async setId (id) {
-        await this.$createPromise
+        const view = await this.resolveView()
 
-        if (id === getViewId(this.$view)) return
+        if (id === getViewId(view)) return
 
-        setViewId(this.$view, id)
+        setViewId(view, id)
       },
       /**
        * @return {Promise<void>}
        * @protected
        */
       async mount () {
-        await this.$createPromise
-
-        this.$viewContainer && this.$viewContainer.setView(this)
+        if (this.$viewContainer) {
+          await this.$viewContainer.setView(this)
+        }
 
         return this.subscribeAll()
       },
@@ -423,7 +446,9 @@
       async unmount () {
         await this.unsubscribeAll()
 
-        this.$viewContainer && this.$viewContainer.setView(undefined)
+        if (this.$viewContainer) {
+          await this.$viewContainer.setView(null)
+        }
       },
       /**
        * @return {void|Promise<void>}
@@ -432,63 +457,12 @@
       subscribeAll () {
         return this::subscribeToEvents()
       },
-    },
-    watch: {
-      id (value) {
-        this.setId(value)
+      /**
+       * @return {Promise<module:ol/View~View>}
+       */
+      async resolveView () {
+        return this.resolveOlObject()
       },
-      async center (value) {
-        if (await this.getAnimating()) return
-
-        this.setCenter(this.pointToViewProj(value))
-      },
-      async rotation (value) {
-        if (await this.getAnimating()) return
-
-        this.setRotation(value)
-      },
-      async resolution (value) {
-        if (await this.getAnimating()) return
-
-        this.setResolution(value)
-      },
-      async zoom (value) {
-        if (await this.getAnimating()) return
-
-        this.setZoom(value)
-      },
-      minZoom (value) {
-        this.setMinZoom(value)
-      },
-      maxZoom (value) {
-        this.setMaxZoom(value)
-      },
-      ...makeWatchers([
-        'constrainOnlyCenter',
-        'extent',
-        'smoothExtentConstraint',
-        'enableRotation',
-        'constrainRotation',
-        'resolutions',
-        'maxResolution',
-        'minResolution',
-        'constrainResolution',
-        'smoothResolutionConstraint',
-        'zoomFactor',
-        'multiWorld',
-        'resolvedDataProjection',
-        'projection',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
-    },
-    stubVNode: {
-      empty () {
-        return this.vmId
-      },
-    },
-    created () {
-      this::defineServices()
     },
   }
 
@@ -503,7 +477,7 @@
       },
       $viewContainer: {
         enumerable: true,
-        get: () => this.$services && this.$services.viewContainer,
+        get: () => this.$services?.viewContainer,
       },
     })
   }
@@ -514,21 +488,22 @@
    * @private
    */
   async function subscribeToEvents () {
-    await this.$createPromise
+    const view = await this.resolveView()
+    const getCenter = () => this.pointToDataProj(view.getCenter())
 
     const ft = 1000 / 60
-    const resolution = observableFromOlChangeEvent(this.$view, 'resolution', true, ft)
+    const resolution = observableFromOlChangeEvent(view, 'resolution', true, ft)
     const zoom = resolution.pipe(
       mapObs(() => ({
         prop: 'zoom',
-        value: this.$view.getZoom(),
+        value: view.getZoom(),
       })),
       distinctUntilKeyChanged('value'),
     )
 
     const changes = mergeObs(
-      observableFromOlChangeEvent(this.$view, 'center', true, ft, () => this.pointToDataProj(this.$view.getCenter())),
-      observableFromOlChangeEvent(this.$view, 'rotation', true, ft),
+      observableFromOlChangeEvent(view, 'center', true, ft, getCenter),
+      observableFromOlChangeEvent(view, 'rotation', true, ft),
       resolution,
       zoom,
     )

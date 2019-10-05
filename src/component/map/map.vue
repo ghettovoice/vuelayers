@@ -1,32 +1,31 @@
 <template>
-  <div :id="vmId" :class="cmpName" :tabindex="tabindex">
-    <slot/>
+  <div
+    :id="vmId"
+    :class="vmClass"
+    :tabindex="tabindex">
+    <slot />
   </div>
 </template>
 
 <script>
-  import Collection from 'ol/Collection'
-  import { defaults as createDefaultControls } from 'ol/control'
-  import { defaults as createDefaultInteractions } from 'ol/interaction'
-  import VectorLayer from 'ol/layer/Vector'
-  import Map from 'ol/Map'
-  import VectorSource from 'ol/source/Vector'
-  import View from 'ol/View'
+  import { Collection, Map, View } from 'ol'
+  import { Vector as VectorLayer } from 'ol/layer'
+  import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
   import {
     featuresContainer,
+    controlsContainer,
     interactionsContainer,
     layersContainer,
     olCmp,
     overlaysContainer,
     projTransforms,
   } from '../../mixin'
-  import { getMapId, initializeInteraction, setMapDataProjection, setMapId } from '../../ol-ext'
+  import { getMapId, setMapDataProjection, setMapId } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
-  import { hasMap, hasView } from '../../util/assert'
-  import { isEqual, isPlainObject } from '../../util/minilo'
+  import { isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -35,10 +34,11 @@
    * rendering and low level interaction events.
    */
   export default {
-    name: 'vl-map',
+    name: 'VlMap',
     mixins: [
       olCmp,
       layersContainer,
+      controlsContainer,
       interactionsContainer,
       overlaysContainer,
       featuresContainer,
@@ -48,20 +48,20 @@
       /**
        * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
        * value is used to configure controls.
-       * @type {Object|boolean|Collection}
+       * @type {Object|boolean|Array<module:ol/control/Control~Control>|Collection<module:ol/control/Control~Control>}
        * @todo remove when vl-control-* components will be ready
        */
       defaultControls: {
-        type: [Object, Boolean, Collection],
+        type: [Object, Boolean, Array, Collection],
         default: true,
       },
       /**
        * Options for default interactions added to the map by default. Object
        * value is used to configure default interactions.
-       * @type {Object|boolean|Collection}
+       * @type {Object|boolean|Array<module:ol/interaction/Interaction~Interaction>|Collection<module:ol/interaction/Interaction~Interaction>}
        */
       defaultInteractions: {
-        type: [Object, Boolean, Collection],
+        type: [Object, Boolean, Array, Collection],
         default: true,
       },
       /**
@@ -74,7 +74,7 @@
       /**
        * The minimum distance in pixels the cursor must move to be detected as a map move event instead of a click.
        * Increasing this value can make it easier to click on the map.
-       * @type {Number}
+       * @type {number}
        */
       moveTolerance: {
         type: Number,
@@ -114,20 +114,59 @@
         default: true,
       },
     },
+    watch: {
+      id (value) {
+        this.setId(value)
+      },
+      defaultControls (value) {
+        this.initDefaultControls(value)
+      },
+      defaultInteractions (value) {
+        this.initDefaultInteractions(value)
+      },
+      wrapX (value) {
+        if (this._featuresOverlay == null) return
+
+        const newSource = this::createFeaturesOverlay({ wrapX: value })
+        this._featuresOverlay.setSource(newSource)
+      },
+      async dataProjection (value) {
+        setMapDataProjection(await this.resolveMap(), value)
+        this.scheduleRefresh()
+      },
+      ...makeWatchers([
+        'keyboardEventTarget',
+        'moveTolerance',
+        'pixelRatio',
+        'maxTilesLoading',
+      ], () => function () {
+        this.scheduleRecreate()
+      }),
+    },
+    created () {
+      this._view = new View()
+      // prepare default overlay
+      this._featuresOverlay = this::createFeaturesOverlay()
+
+      this::defineServices()
+    },
     methods: {
       /**
-       * @return {module:ol/PluggableMap~PluggableMap}
+       * @return {module:ol/Map~Map}
        * @protected
        */
       createOlObject () {
+        // todo make controls handling like with interactions
+        this.initDefaultControls(this.defaultControls)
+        // todo initialize without interactions and provide vl-interaction-default component
+        this.initDefaultInteractions(this.defaultInteractions)
+
         const map = new Map({
-          loadTilesWhileAnimating: this.loadTilesWhileAnimating,
-          loadTilesWhileInteracting: this.loadTilesWhileInteracting,
           pixelRatio: this.pixelRatio,
           moveTolerance: this.moveTolerance,
           keyboardEventTarget: this.keyboardEventTarget,
           maxTilesLoading: this.maxTilesLoading,
-          controls: this._controlsCollection,
+          controls: this.$controlsCollection,
           interactions: this.$interactionsCollection,
           layers: this.$layersCollection,
           overlays: this.$overlaysCollection,
@@ -142,23 +181,134 @@
       },
       /**
        * @param {number[]} pixel
-       * @return {number[]} Coordinates in the map data projection.
+       * @param {function} callback
+       * @param {Object} [opts]
+       * @return {Promise}
        */
-      getCoordinateFromPixel (pixel) {
-        hasMap(this)
-
-        let coordinate = this.$map.getCoordinateFromPixel(pixel)
-
-        return this.pointToDataProj(coordinate)
+      async forEachFeatureAtPixel (pixel, callback, opts = {}) {
+        return (await this.resolveMap()).forEachFeatureAtPixel(pixel, callback, opts)
       },
       /**
-       * @param {number[]} coordinate Coordinates in map data projection
-       * @return {number[]}
+       * @param {number[]} pixel
+       * @param {function} callback
+       * @param {Object} [opts]
+       * @return {Promise}
        */
-      getPixelFromCoordinate (coordinate) {
-        hasMap(this)
+      async forEachLayerAtPixel (pixel, callback, opts = {}) {
+        return (await this.resolveMap()).forEachLayerAtPixel(pixel, callback, opts)
+      },
+      /**
+       * @param {number[]} pixel
+       * @return {Promise<number[]>} Coordinates in the map view projection.
+       */
+      async getCoordinateFromPixel (pixel) {
+        return this.pointToDataProj((await this.resolveMap()).getCoordinateFromPixel(pixel))
+      },
+      /**
+       * @param {Event} event
+       * @return {Promise<number[]>}
+       */
+      async getEventCoordinate (event) {
+        return this.pointToDataProj((await this.resolveMap()).getEventCoordinate(event))
+      },
+      /**
+       * @param {Event} event
+       * @return {Promise<number[]>}
+       */
+      async getEventPixel (event) {
+        return (await this.resolveMap()).getEventPixel(event)
+      },
+      /**
+       * @param {number[]} pixel
+       * @param {Object} [opts]
+       * @return {Promise}
+       */
+      async getFeaturesAtPixel (pixel, opts = {}) {
+        return (await this.resolveMap()).getFeaturesAtPixel(pixel, opts)
+      },
+      /**
+       * @param {number[]} pixel
+       * @param {Object} [options]
+       * @return {Promise<boolean>}
+       */
+      async hasFeatureAtPixel (pixel, options = {}) {
+        return (await this.resolveMap()).hasFeatureAtPixel(pixel, options)
+      },
+      /**
+       * @param {number[]} coordinate Coordinates in map view projection
+       * @return {Promise<number[]>}
+       */
+      async getPixelFromCoordinate (coordinate) {
+        return (await this.resolveMap()).getPixelFromCoordinate(this.pointToViewProj(coordinate))
+      },
+      /**
+       * @return {Promise<number[]>}
+       */
+      async getSize () {
+        return (await this.resolveMap()).getSize()
+      },
+      /**
+       * @return {Promise<void>}
+       */
+      async setSize (size) {
+        const map = await this.resolveMap()
 
-        return this.$map.getPixelFromCoordinate(this.pointToViewProj(coordinate))
+        if (isEqual(size, map.getSize())) return
+
+        map.setSize(size)
+      },
+      /**
+       * Updates map size.
+       * @return {Promise<void>}
+       */
+      async updateSize () {
+        (await this.resolveMap()).updateSize()
+      },
+      /**
+       * @return {Promise<void>}
+       */
+      async render () {
+        const map = await this.resolveMap()
+
+        return new Promise(resolve => {
+          map.once('postrender', () => resolve())
+          map.render()
+        })
+      },
+      /**
+       * @return {Promise<void>}
+       */
+      async renderSync () {
+        (await this.resolveMap()).renderSync()
+      },
+      /**
+       * @return {Promise<HTMLElement>}
+       */
+      async getTarget () {
+        return (await this.resolveMap()).getTarget()
+      },
+      /**
+       * @param {HTMLElement} target
+       * @return {Promise<void>}
+       */
+      async setTarget (target) {
+        const map = await this.resolveMap()
+
+        if (target === map.getTarget()) return
+
+        map.setTarget(target)
+      },
+      /**
+       * @return {Promise<HTMLElement>}
+       */
+      async getTargetElement () {
+        return (await this.resolveMap()).getTargetElement()
+      },
+      /**
+       * @return {Promise<HTMLElement>}
+       */
+      async getViewport () {
+        return (await this.resolveMap()).getViewport()
       },
       /**
        * Triggers focus on map container.
@@ -168,79 +318,48 @@
         this.$el.focus()
       },
       /**
-       * @param {number[]} pixel
-       * @param {function} callback
-       * @param {Object} [opts]
-       * @return {*|undefined}
-       */
-      forEachFeatureAtPixel (pixel, callback, opts = {}) {
-        hasMap(this)
-
-        return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
-      },
-      /**
-       * @param {number[]} pixel
-       * @param {function} callback
-       * @param {Object} [opts]
-       * @return {*|undefined}
-       */
-      forEachLayerAtPixel (pixel, callback, opts = {}) {
-        hasMap(this)
-
-        return this.$map.forEachLayerAtPixel(pixel, callback, opts)
-      },
-      /**
-       * @param {number[]} pixel
-       * @param {Object} [opts]
-       */
-      getFeaturesAtPixel (pixel, opts = {}) {
-        hasMap(this)
-
-        return this.$map.getFeaturesAtPixel(pixel, opts)
-      },
-      /**
        * Updates map size and re-renders map.
        * @return {Promise}
        */
-      refresh () {
-        this.updateSize()
+      async refresh () {
+        await this.updateSize()
+        await this.render()
 
-        return this.render().then(() => this::olCmp.methods.refresh())
+        return this::olCmp.methods.refresh()
       },
       /**
-       * @return {Promise}
+       * @return {Promise<string|number>}
        */
-      render () {
-        return new Promise(resolve => {
-          hasMap(this)
-
-          this.$map.once('postrender', () => resolve())
-          this.$map.render()
-        })
+      async getId () {
+        return getMapId(await this.resolveMap())
       },
       /**
-       * Updates map size.
-       * @return {void}
+       * @param {string|number} id
+       * @return {Promise<void>}
        */
-      updateSize () {
-        hasMap(this)
+      async setId (id) {
+        const map = this.resolveMap()
 
-        this.$map.updateSize()
+        if (id === getMapId(map)) return
+
+        setMapId(map, id)
       },
       /**
        * @param {module:ol/View~View|Vue|undefined} view
-       * @return {void}
+       * @return {Promise<void>}
        * @protected
        */
-      setView (view) {
-        view = view instanceof Vue ? view.$view : view
+      async setView (view) {
+        const map = await this.resolveMap()
+
+        if (view instanceof Vue) {
+          view = await view.resolveView()
+        }
         view || (view = new View())
 
-        if (view !== this._view) {
-          this._view = view
-        }
-        if (this.$map && view !== this.$map.getView()) {
-          this.$map.setView(view)
+        this._view = view
+        if (view !== map.getView()) {
+          map.setView(view)
         }
       },
       /**
@@ -253,35 +372,28 @@
        * @return {void}
        * @protected
        */
-      mount () {
-        hasMap(this)
+      async mount () {
+        await this.setTarget(this.$el)
 
-        this.$map.setTarget(this.$el)
         this.$nextTick(::this.updateSize)
 
-        this.subscribeAll()
+        await this.subscribeAll()
       },
       /**
-       * @return {void}
+       * @return {Promise<void>}
        * @protected
        */
-      unmount () {
-        hasMap(this)
-
-        this.clearFeatures()
-        this.clearLayers()
-        this.clearInteractions()
-        this.clearOverlays()
-
+      async unmount () {
         this.unsubscribeAll()
-        this.$map.setTarget(null)
+
+        await this.setTarget(null)
       },
       /**
-       * @return {void}
+       * @return {Promise<void>}
        * @protected
        */
-      subscribeAll () {
-        this::subscribeToEvents()
+      async subscribeAll () {
+        await this::subscribeToEvents()
       },
       /**
        * @returns {Object}
@@ -298,88 +410,18 @@
           this::featuresContainer.methods.getServices(),
           {
             get map () { return vm.$map },
+            get mapVm () { return vm },
             get view () { return vm.$view },
             get viewContainer () { return vm },
           },
         )
       },
-    },
-    watch: {
-      ...makeWatchers([
-        'keyboardEventTarget',
-        'loadTilesWhileAnimating',
-        'loadTilesWhileInteracting',
-        'moveTolerance',
-        'pixelRatio',
-        'renderer',
-        'maxTilesLoading',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
-      id (value) {
-        if (!this.$map || value === getMapId(this.$map)) {
-          return
-        }
-
-        setMapId(this.$map, value)
+      /**
+       * @return {Promise<module:ol/Map~Map>}
+       */
+      resolveMap () {
+        return this.resolveOlObject()
       },
-      controls (value) {
-        if (value === false) {
-          this._controlsCollection.clear()
-          return
-        }
-
-        value = typeof value === 'object' ? value : undefined
-        this._controlsCollection.clear()
-        this._controlsCollection.extend(createDefaultControls(value).getArray())
-      },
-      wrapX (value) {
-        if (this._featuresOverlay == null) return
-
-        this._featuresOverlay.setSource(new VectorSource({
-          features: this.$featuresCollection,
-          wrapX: value,
-        }))
-      },
-      dataProjection (value) {
-        if (!this.$map) return
-
-        setMapDataProjection(this.$map, value)
-        this.scheduleRefresh()
-      },
-    },
-    created () {
-      this._view = new View()
-      // todo make controls handling like with interactions
-      if (this.defaultControls instanceof Collection) {
-        this._controlsCollection = this.defaultControls
-      } else if (this.defaultControls !== false) {
-        this._controlsCollection = createDefaultControls(
-          isPlainObject(this.defaultControls)
-            ? this.defaultControls
-            : undefined,
-        )
-      }
-      // todo initialize without interactions and provide vl-interaction-default component
-      if (this.defaultInteractions instanceof Collection) {
-        this._interactionsCollection = this.defaultInteractions
-      } else if (this.defaultInteractions !== false) {
-        this._interactionsCollection = createDefaultInteractions(
-          isPlainObject(this.defaultInteractions)
-            ? this.defaultInteractions
-            : undefined,
-        )
-      }
-      this._interactionsCollection.forEach(interaction => initializeInteraction(interaction))
-      // prepare default overlay
-      this._featuresOverlay = new VectorLayer({
-        source: new VectorSource({
-          features: this.$featuresCollection,
-          wrapX: this.wrapX,
-        }),
-      })
-
-      this::defineServices()
     },
   }
 
@@ -387,7 +429,7 @@
     Object.defineProperties(this, {
       /**
        * OpenLayers map instance.
-       * @type {module:ol/PluggableMap~PluggableMap|undefined}
+       * @type {module:ol/Map~Map|undefined}
        */
       $map: {
         enumerable: true,
@@ -410,19 +452,18 @@
    * @return {void}
    * @private
    */
-  function subscribeToEvents () {
-    hasMap(this)
-    hasView(this)
+  async function subscribeToEvents () {
+    const map = await this.resolveMap()
 
     const ft = 1000 / 60
     // pointer
     const pointerEvents = mergeObs(
-      observableFromOlEvent(this.$map, [
+      observableFromOlEvent(map, [
         'click',
         'dblclick',
         'singleclick',
       ]),
-      observableFromOlEvent(this.$map, [
+      observableFromOlEvent(map, [
         'pointerdrag',
         'pointermove',
       ]).pipe(
@@ -430,13 +471,13 @@
         distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
       ),
     ).pipe(
-      mapObs(evt => ({
-        ...evt,
-        coordinate: this.pointToDataProj(evt.coordinate),
-      })),
+      mapObs(evt => {
+        evt.coordinate = this.pointToDataProj(evt.coordinate)
+        return evt
+      }),
     )
     // other
-    const otherEvents = observableFromOlEvent(this.$map, [
+    const otherEvents = observableFromOlEvent(map, [
       'movestart',
       'moveend',
       'postrender',
@@ -450,6 +491,21 @@
 
     this.subscribeTo(events, evt => {
       this.$emit(evt.type, evt)
+    })
+  }
+
+  /**
+   * @returns {module:ol/layer/Vector~Vector}
+   */
+  function createFeaturesOverlay (sourceOptions = {}) {
+    sourceOptions = {
+      features: this.$featuresCollection,
+      wrapX: this.wrapX,
+      ...sourceOptions,
+    }
+
+    return new VectorLayer({
+      source: new VectorSource(sourceOptions),
     })
   }
 </script>
