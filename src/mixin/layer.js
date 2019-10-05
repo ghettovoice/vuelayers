@@ -395,10 +395,6 @@ async function subscribeToLayerEvents () {
   })
 
   const events = obsFromOlEvent(layer, [
-    // todo review which events are actually exists in the current ol version
-    'postcompose',
-    'precompose',
-    'render',
     'postrender',
     'prerender',
   ])
