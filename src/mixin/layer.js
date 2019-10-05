@@ -1,9 +1,8 @@
 import Vue from 'vue'
 import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
-import { hasLayer, hasMap } from '../util/assert'
+import { observableFromOlEvent } from '../rx-ext'
 import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import { observableFromOlEvent } from '../rx-ext'
 import { makeWatchers } from '../util/vue-helpers'
 import cmp from './ol-virt-cmp'
 import sourceContainer from './source-container'
@@ -11,6 +10,14 @@ import useMapCmp from './use-map-cmp'
 
 export default {
   mixins: [cmp, useMapCmp, sourceContainer],
+  stubVNode: {
+    attrs () {
+      return {
+        id: this.vmId,
+        class: this.vmClass,
+      }
+    },
+  },
   props: {
     className: String,
     opacity: {
@@ -34,15 +41,55 @@ export default {
     zIndex: Number,
     minResolution: Number,
     maxResolution: Number,
+    minZoom: Number,
+    maxZoom: Number,
     overlay: {
       type: Boolean,
       default: false,
     },
     render: Function,
   },
+  watch: {
+    id (value) {
+      this.setId(value)
+    },
+    opacity (value) {
+      this.setOpacity(value)
+    },
+    visible (value) {
+      this.setVisible(value)
+    },
+    extent (value) {
+      this.setExtent(value)
+    },
+    zIndex (value) {
+      this.setZIndex(value)
+    },
+    minResolution (value) {
+      this.setMinResolution(value)
+    },
+    maxResolution (value) {
+      this.setMaxResolution(value)
+    },
+    minZoom (value) {
+      this.setMinZoom(value)
+    },
+    maxZoom (value) {
+      this.setMaxZoom(value)
+    },
+    ...makeWatchers([
+      'overlay',
+      'render',
+    ], () => function () {
+      this.scheduleRecreate()
+    }),
+  },
+  created () {
+    this::defineServices()
+  },
   methods: {
     /**
-     * @return {Promise<module:ol/layer/BaseLayer~BaseLayer>}
+     * @return {Promise<module:ol/layer/Base~BaseLayer>}
      * @protected
      */
     async createOlObject () {
@@ -53,7 +100,7 @@ export default {
       return layer
     },
     /**
-     * @return {module:ol/layer/BaseLayer~BaseLayer|Promise<module:ol/layer/BaseLayer~BaseLayer>}
+     * @return {module:ol/layer/Base~BaseLayer|Promise<module:ol/layer/Base~BaseLayer>}
      * @protected
      * @abstract
      */
@@ -61,27 +108,178 @@ export default {
       throw new Error('Not implemented method')
     },
     /**
-     * @return {Promise<Vue<module:ol/layer/BaseLayer~BaseLayer>>}
-     * @protected
+     * @returns {Promise<string|number>}
      */
-    init () {
-      return this::cmp.methods.init()
+    async getId () {
+      return getLayerId(await this.resolveLayer())
     },
     /**
-     * @return {void|Promise}
-     * @protected
+     * @param {string|number} id
+     * @returns {Promise<void>}
      */
-    deinit () {
-      return this::cmp.methods.deinit()
+    async setId (id) {
+      const layer = await this.resolveLayer()
+
+      if (id === getLayerId(layer)) return
+
+      setLayerId(layer, id)
+    },
+    /**
+     * @returns {Promise<number[]>}
+     */
+    async getExtent () {
+      return this.extentToDataProj((await this.resolveLayer()).getExtent())
+    },
+    /**
+     * @param {number[]} extent
+     * @returns {Promise<void>}
+     */
+    async setExtent (extent) {
+      extent = this.extentToViewProj(extent)
+      const layer = await this.resolveLayer()
+
+      if (isEqual(extent, layer.getExtent())) return
+
+      layer.setExtent(extent)
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getMaxResolution () {
+      return (await this.resolveLayer()).getMaxResolution()
+    },
+    /**
+     * @param {number} resolution
+     * @returns {Promise<void>}
+     */
+    async setMaxResolution (resolution) {
+      const layer = await this.resolveLayer()
+
+      if (resolution === layer.getMaxResolution()) return
+
+      layer.setMaxResolution(resolution)
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getMinResolution () {
+      return (await this.resolveLayer()).getMinResolution()
+    },
+    /**
+     * @param {number} resolution
+     * @returns {Promise<void>}
+     */
+    async setMinResolution (resolution) {
+      const layer = await this.resolveLayer()
+
+      if (resolution === layer.getMinResolution()) return
+
+      layer.setMinResolution(resolution)
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getMaxZoom () {
+      return (await this.resolveLayer()).getMaxZoom()
+    },
+    /**
+     * @param {number} zoom
+     * @returns {Promise<void>}
+     */
+    async setMaxZoom (zoom) {
+      const layer = await this.resolveLayer()
+
+      if (zoom === layer.getMaxZoom()) return
+
+      layer.setMaxZoom(zoom)
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getMinZoom () {
+      return (await this.resolveLayer()).getMinZoom()
+    },
+    /**
+     * @param {number} zoom
+     * @returns {Promise<void>}
+     */
+    async setMinZoom (zoom) {
+      const layer = await this.resolveLayer()
+
+      if (zoom === layer.getMinZoom()) return
+
+      layer.setMinZoom(zoom)
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getOpacity () {
+      return (await this.resolveLayer()).getOpacity()
+    },
+    /**
+     * @param {number} opacity
+     * @returns {Promise<void>}
+     */
+    async setOpacity (opacity) {
+      const layer = await this.resolveLayer()
+
+      if (opacity === layer.getOpacity()) return
+
+      layer.setOpacity(opacity)
+    },
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async getVisible () {
+      return (await this.resolveLayer()).getVisible()
+    },
+    /**
+     * @param {boolean} visible
+     * @returns {Promise<void>}
+     */
+    async setVisible (visible) {
+      const layer = await this.resolveLayer()
+
+      if (visible === layer.getVisible()) return
+
+      layer.setVisible(visible)
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getZIndex () {
+      return (await this.resolveLayer()).getZIndex()
+    },
+    /**
+     * @param {number} zIndex
+     * @returns {Promise<void>}
+     */
+    async setZIndex (zIndex) {
+      const layer = await this.resolveLayer()
+
+      if (zIndex === layer.getZIndex()) return
+
+      layer.setZIndex(zIndex)
+    },
+    /**
+     * @param {module:ol/Map~Map|Vue|undefined} map
+     * @return {Promise<void>}
+     */
+    async setMap (map) {
+      if (map instanceof Vue) {
+        map = await map.resolveMap()
+      }
+
+      (await this.resolveLayer()).setMap(map)
     },
     /**
      * @param {number[]} pixel
      * @return {boolean}
      */
-    isAtPixel (pixel) {
-      hasMap(this)
+    async isAtPixel (pixel) {
+      const layer = await this.resolveLayer()
 
-      return this.$map.forEachLayerAtPixel(pixel, layer => layer === this.$layer)
+      return this.$mapVm.forEachLayerAtPixel(pixel, mapLayer => mapLayer === layer)
     },
     /**
      * @returns {Object}
@@ -95,44 +293,9 @@ export default {
         this::sourceContainer.methods.getServices(),
         {
           get layer () { return vm.$layer },
+          get layerVm () { return vm },
         },
       )
-    },
-    /**
-     * @return {{
-     *     setSource: function(module:ol/source/Source~Source): void,
-     *     getSource: function(): module:ol/source/Source~Source
-     *   }|undefined}
-     * @protected
-     */
-    getSourceTarget () {
-      return this.$layer
-    },
-    /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    mount () {
-      if (this.overlay && this.$map) {
-        this.setMap(this.$map)
-      } else if (this.$layersContainer) {
-        this.$layersContainer.addLayer(this)
-      }
-
-      return this::cmp.methods.mount()
-    },
-    /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    unmount () {
-      if (this.overlay) {
-        this.setMap(undefined)
-      } else if (this.$layersContainer) {
-        this.$layersContainer.removeLayer(this)
-      }
-
-      return this::cmp.methods.unmount()
     },
     /**
      * Updates layer state
@@ -155,7 +318,54 @@ export default {
      * @protected
      */
     recreate () {
-      return this::cmp.methods.remount()
+      return this::cmp.methods.recreate()
+    },
+    /**
+     * @return {Promise<module:ol/layer/Base~BaseLayer>}
+     * @protected
+     */
+    getSourceTarget () {
+      return this.resolveLayer()
+    },
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    init () {
+      return this::cmp.methods.init()
+    },
+    /**
+     * @return {void|Promise<void>}
+     * @protected
+     */
+    deinit () {
+      return this::cmp.methods.deinit()
+    },
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async mount () {
+      if (this.overlay && this.$map) {
+        await this.setMap(this.$map)
+      } else if (this.$layersContainer) {
+        await this.$layersContainer.addLayer(this)
+      }
+
+      return this::cmp.methods.mount()
+    },
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async unmount () {
+      if (this.overlay) {
+        await this.setMap(null)
+      } else if (this.$layersContainer) {
+        await this.$layersContainer.removeLayer(this)
+      }
+
+      return this::cmp.methods.unmount()
     },
     /**
      * @return {Promise<void>}
@@ -166,82 +376,11 @@ export default {
       await this::subscribeToLayerEvents()
     },
     /**
-     * @param {module:ol/Map~Map|Vue|undefined} map
+     * @returns {Promise<module:ol/layer/Base~BaseLayer>}
      */
-    setMap (map) {
-      hasLayer(this)
-
-      map = map instanceof Vue ? map.$map : map
-
-      this.$layer.setMap(map)
+    async resolveLayer () {
+      return this.resolveOlObject()
     },
-  },
-  watch: {
-    id (value) {
-      if (!this.$layer || value === getLayerId(this.$layer)) {
-        return
-      }
-
-      setLayerId(this.$layer, value)
-    },
-    maxResolution (value) {
-      if (!this.$layer || value === this.$layer.getMaxResolution()) {
-        return
-      }
-
-      this.$layer.setMaxResolution(value)
-    },
-    minResolution (value) {
-      if (!this.$layer || value === this.$layer.getMinResolution()) {
-        return
-      }
-
-      this.$layer.setMinResolution(value)
-    },
-    opacity (value) {
-      if (!this.$layer || value === this.$layer.getOpacity()) {
-        return
-      }
-
-      this.$layer.setOpacity(value)
-    },
-    visible (value) {
-      if (!this.$layer || value === this.$layer.getVisible()) {
-        return
-      }
-
-      this.$layer.setVisible(value)
-    },
-    zIndex (value) {
-      if (!this.$layer || value === this.$layer.getZIndex()) {
-        return
-      }
-
-      this.$layer.setZIndex(value)
-    },
-    extent (value) {
-      if (!this.$layer || isEqual(value, this.$layer.getExtent())) {
-        return
-      }
-
-      this.$layer.setExtent(value)
-    },
-    ...makeWatchers([
-      'overlay',
-    ], () => function () {
-      this.scheduleRecreate()
-    }),
-  },
-  stubVNode: {
-    attrs () {
-      return {
-        id: this.vmId,
-        class: this.cmpName,
-      }
-    },
-  },
-  created () {
-    this::defineServices()
   },
 }
 
@@ -251,32 +390,31 @@ function defineServices () {
       enumerable: true,
       get: () => this.$olObject,
     },
-    $source: {
+    $mapVm: {
       enumerable: true,
-      get: this.getSource,
-    },
-    $map: {
-      enumerable: true,
-      get: () => this.$services && this.$services.map,
+      get: () => this.$services?.mapVm,
     },
     $view: {
       enumerable: true,
-      get: () => this.$services && this.$services.view,
+      get: () => this.$mapVm?.$view,
     },
     $layersContainer: {
       enumerable: true,
-      get: () => this.$services && this.$services.layersContainer,
+      get: () => this.$services?.layersContainer,
     },
   })
 }
 
-function subscribeToLayerEvents () {
-  hasLayer(this)
+async function subscribeToLayerEvents () {
+  const layer = await this.resolveLayer()
 
-  const events = observableFromOlEvent(this.$layer, [
+  const events = observableFromOlEvent(layer, [
+    // todo review which events are actually exists in the current ol version
     'postcompose',
     'precompose',
     'render',
+    'postrender',
+    'prerender',
   ])
 
   this.subscribeTo(events, evt => {

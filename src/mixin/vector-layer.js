@@ -1,4 +1,3 @@
-import { isEqual } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import layer from './layer'
 import stylesContainer from './styles-container'
@@ -6,6 +5,18 @@ import stylesContainer from './styles-container'
 export default {
   mixins: [layer, stylesContainer],
   props: {
+    renderOrder: Function,
+    /**
+     * @type {number|undefined}
+     */
+    renderBuffer: {
+      type: Number,
+      default: 100,
+    },
+    /**
+     * @type {boolean}
+     */
+    declutter: Boolean,
     /**
      * When set to `true`, feature batches will be recreated during animations.
      * @type {boolean}
@@ -18,27 +29,76 @@ export default {
      * @default false
      */
     updateWhileInteracting: Boolean,
-    /**
-     * @type {number|undefined}
-     */
-    renderBuffer: {
-      type: Number,
-      default: 100,
+  },
+  watch: {
+    renderOrder (value) {
+      this.setRenderOrder(value)
     },
-    renderOrder: Function,
-    renderMode: {
-      type: String,
-      default: 'vector',
-      validator: value => ['vector', 'image'].includes(value),
+    async renderBuffer (value) {
+      if (value === await this.getRenderBuffer()) return
+
+      this.scheduleRecreate()
     },
-    /**
-     * @type {boolean}
-     */
-    declutter: Boolean,
+    async declutter (value) {
+      if (value === await this.getDeclutter()) return
+
+      this.scheduleRecreate()
+    },
+    async updateWhileAnimating (value) {
+      if (value === await this.getUpdateWhileAnimating()) return
+
+      this.scheduleRecreate()
+    },
+    async updateWhileInteracting (value) {
+      if (value === await this.getUpdateWhileInteracting()) return
+
+      this.scheduleRecreate()
+    },
   },
   methods: {
     /**
-     * @return {Promise<Vue<Layer>>}
+     * @returns {Promise<boolean>}
+     */
+    async getDeclutter () {
+      return (await this.resolveLayer()).getDeclutter()
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getRenderBuffer () {
+      return (await this.resolveLayer()).getRenderBuffer()
+    },
+    /**
+     * @returns {Promise<function>}
+     */
+    async getRenderOrder () {
+      return (await this.resolveLayer()).getRenderOrder()
+    },
+    /**
+     * @param {function} renderOrder
+     * @returns {Promise<void>}
+     */
+    async setRenderOrder (renderOrder) {
+      const layer = await this.resolveLayer()
+
+      if (renderOrder === layer.getRenderOrder()) return
+
+      layer.setRenderOrder(renderOrder)
+    },
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async getUpdateWhileAnimating () {
+      return (await this.resolveLayer()).getUpdateWhileAnimating()
+    },
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async getUpdateWhileInteracting () {
+      return (await this.resolveLayer()).getUpdateWhileInteracting()
+    },
+    /**
+     * @return {Promise<void>}
      * @protected
      */
     init () {
@@ -62,21 +122,21 @@ export default {
       )
     },
     /**
-     * @return {Vector|undefined}
+     * @return {Promise<module:ol/layer/Vector~Vector|undefined>}
      * @protected
      */
     getStyleTarget () {
-      return this.$layer
+      return this.resolveLayer()
     },
     /**
-     * @return {Promise|void}
+     * @return {Promise<void>}
      * @protected
      */
     mount () {
       return this::layer.methods.mount()
     },
     /**
-     * @return {Promise|void}
+     * @return {Promise<void>}
      * @protected
      */
     unmount () {
@@ -84,7 +144,7 @@ export default {
     },
     /**
      * Updates layer state
-     * @return {Promise}
+     * @return {Promise<void>}
      */
     refresh () {
       return this::layer.methods.refresh()
@@ -103,50 +163,14 @@ export default {
      * @protected
      */
     recreate () {
-      return this::layer.methods.remount()
+      return this::layer.methods.recreate()
     },
     /**
+     * @return {Promise<void>}
      * @protected
      */
     subscribeAll () {
-      this::layer.methods.subscribeAll()
-    },
-  },
-  watch: {
-    updateWhileAnimating (value) {
-      if (!this.$layer || value === this.$layer.getUpdateWhileAnimating()) {
-        return
-      }
-
-      this.scheduleRecreate()
-    },
-    updateWhileInteracting (value) {
-      if (!this.$layer || value === this.$layer.getUpdateWhileInteracting()) {
-        return
-      }
-
-      this.scheduleRecreate()
-    },
-    renderBuffer (value) {
-      if (!this.$layer || value === this.$layer.getRenderBuffer()) {
-        return
-      }
-
-      this.scheduleRecreate()
-    },
-    renderOrder (value) {
-      if (!this.$layer || isEqual(value, this.$layer.getRenderOrder())) {
-        return
-      }
-
-      this.$layer.setRenderOrder(value)
-    },
-    declutter (value) {
-      if (!this.$layer || value === this.$layer.getDeclutter()) {
-        return
-      }
-
-      this.$layer.setDeclutter(value)
+      return this::layer.methods.subscribeAll()
     },
   },
 }
