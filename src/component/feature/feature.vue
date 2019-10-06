@@ -19,7 +19,7 @@
   import { geometryContainer, olCmp, projTransforms, stylesContainer, useMapCmp } from '../../mixin'
   import { findPointOnSurface, getFeatureId, initializeFeature, setFeatureId } from '../../ol-ext'
   import { obsFromOlEvent } from '../../rx-ext'
-  import { isEqual, newPlainObject } from '../../util/minilo'
+  import { isEqual, stubObject } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   /**
@@ -37,7 +37,7 @@
        */
       properties: {
         type: Object,
-        default: newPlainObject,
+        default: stubObject,
       },
     },
     computed: {
@@ -209,8 +209,8 @@
        * @return {void}
        * @protected
        */
-      subscribeAll () {
-        return Promise.all([
+      async subscribeAll () {
+        await Promise.all([
           this::olCmp.methods.subscribeAll(),
           this::subscribeToEvents(),
         ])

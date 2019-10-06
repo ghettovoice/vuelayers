@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import Geolocation from 'ol/Geolocation'
+  import { Geolocation } from 'ol'
   import { merge } from 'rxjs/observable'
   import { olCmp, useMapCmp, projTransforms } from '../../mixin'
   import { obsFromOlChangeEvent } from '../../rx-ext'

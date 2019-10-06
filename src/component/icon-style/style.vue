@@ -2,7 +2,7 @@
   import Icon from 'ol/style/Icon'
   import { imageStyle } from '../../mixin'
   import { assert } from '../../util/assert'
-  import { arrayLengthValidator, isEmpty, isEqual } from '../../util/minilo'
+  import { newArrayLengthValidator, isEmpty, isEqual } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
@@ -12,17 +12,17 @@
       src: String,
       size: {
         type: Array,
-        validator: arrayLengthValidator(2),
+        validator: newArrayLengthValidator(2),
       },
       img: Image,
       imgSize: {
         type: Array,
-        validator: arrayLengthValidator(2),
+        validator: newArrayLengthValidator(2),
       },
       anchor: {
         type: Array,
         default: () => [0.5, 0.5],
-        validator: arrayLengthValidator(2),
+        validator: newArrayLengthValidator(2),
       },
       anchorOrigin: {
         type: String,
@@ -41,7 +41,7 @@
       offset: {
         type: Array,
         default: () => [0, 0],
-        validator: arrayLengthValidator(2),
+        validator: newArrayLengthValidator(2),
       },
       offsetOrigin: {
         type: String,

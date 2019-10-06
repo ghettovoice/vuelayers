@@ -30,6 +30,10 @@ export function stubArray () {
   return []
 }
 
+export function stubObject () {
+  return Object.create(null)
+}
+
 export function identity (value) {
   return value
 }
@@ -328,10 +332,6 @@ export function kebabCase (str) {
     .join('-')
 }
 
-export function arrayLengthValidator (len) {
-  return len => value => isArray(value) && value.length === len
-}
-
-export function newPlainObject () {
-  return Object.create(null)
+export function newArrayLengthValidator (len) {
+  return value => isArray(value) && value.length === len
 }

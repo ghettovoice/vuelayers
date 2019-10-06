@@ -390,8 +390,8 @@
        * @return {Promise<void>}
        * @protected
        */
-      subscribeAll () {
-        return Promise.all([
+      async subscribeAll () {
+        await Promise.all([
           this::olCmp.methods.subscribeAll(),
           this::subscribeToEvents(),
         ])

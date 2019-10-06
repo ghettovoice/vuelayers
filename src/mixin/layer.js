@@ -328,8 +328,8 @@ export default {
      * @return {Promise<void>}
      * @protected
      */
-    subscribeAll () {
-      return Promise.all([
+    async subscribeAll () {
+      await Promise.all([
         this::cmp.methods.subscribeAll(),
         this::subscribeToLayerEvents(),
       ])

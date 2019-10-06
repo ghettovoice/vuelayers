@@ -19,7 +19,7 @@
   import { olCmp, projTransforms } from '../../mixin'
   import { EPSG_3857, getViewId, initializeView, MAX_ZOOM, MIN_ZOOM, setViewId, ZOOM_FACTOR } from '../../ol-ext'
   import { obsFromOlChangeEvent } from '../../rx-ext'
-  import { arrayLengthValidator, coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
+  import { newArrayLengthValidator, coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**
@@ -43,7 +43,7 @@
       center: {
         type: Array,
         default: () => [0, 0],
-        validator: arrayLengthValidator(2),
+        validator: newArrayLengthValidator(2),
       },
       constrainOnlyCenter: {
         type: Boolean,
@@ -56,7 +56,7 @@
        */
       extent: {
         type: Array,
-        validator: arrayLengthValidator(4),
+        validator: newArrayLengthValidator(4),
       },
       smoothExtentConstraint: {
         type: Boolean,
@@ -454,8 +454,8 @@
        * @return {Promise<void>}
        * @protected
        */
-      subscribeAll () {
-        return Promise.all([
+      async subscribeAll () {
+        await Promise.all([
           this::olCmp.methods.subscribeAll(),
           this::subscribeToEvents(),
         ])
