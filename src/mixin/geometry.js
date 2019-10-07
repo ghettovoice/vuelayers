@@ -9,15 +9,15 @@ import {
 } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { hasGeometry } from '../util/assert'
-import { isEqual, isEmpty, negate } from '../util/minilo'
+import { isEmpty, isEqual, negate } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-cmp'
 import projTransforms from './proj-transforms'
-import useMapCmp from './use-map-cmp'
 import stubVNode from './stub-vnode'
+import waitForMap from './wait-for-map'
 
 export default {
-  mixins: [cmp, stubVNode, useMapCmp, projTransforms],
+  mixins: [cmp, stubVNode, waitForMap, projTransforms],
   stubVNode: {
     empty () {
       return this.vmId

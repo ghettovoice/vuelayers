@@ -13,11 +13,11 @@
 <script>
   import Overlay from 'ol/Overlay'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { olCmp, projTransforms, useMapCmp } from '../../mixin'
+  import { olCmp, projTransforms, waitForMap } from '../../mixin'
   import { getOverlayId, initializeOverlay, OVERLAY_POSITIONING, setOverlayId } from '../../ol-ext'
   import { obsFromOlChangeEvent } from '../../rx-ext'
   import { hasOverlay } from '../../util/assert'
-  import { isEqual, identity } from '../../util/minilo'
+  import { identity, isEqual } from '../../util/minilo'
 
   const props = {
     offset: {
@@ -170,7 +170,11 @@
 
   export default {
     name: 'VlOverlay',
-    mixins: [olCmp, useMapCmp, projTransforms],
+    mixins: [
+      projTransforms,
+      olCmp,
+      waitForMap,
+    ],
     props,
     data () {
       return {

@@ -1,20 +1,26 @@
 <script>
-  import VectorTileLayer from 'ol/layer/VectorTile'
-  import { vectorLayer, tileLayer } from '../../mixin'
+  import { VectorTile as VectorTileLayer } from 'ol/layer'
+  import { tileLayer, vectorLayer } from '../../mixin'
 
   export default {
     name: 'VlLayerVectorTile',
-    mixins: [tileLayer, vectorLayer],
+    mixins: [
+      tileLayer,
+      vectorLayer,
+    ],
     props: {
       renderMode: {
         type: String,
         default: 'hybrid',
-        validator: val => ['image', 'hybrid'].includes(val),
+        validator: val => [
+          'image',
+          'hybrid',
+        ].includes(val),
       },
     },
     methods: {
       /**
-       * @return {VectorTileLayer}
+       * @return {module:ol/layer/VectorTile~VectorTileLayer}
        * @protected
        */
       createLayer () {

@@ -16,6 +16,19 @@ export default {
      */
     ident: [String, Number],
   },
+  watch: {
+    ident (value, prev) {
+      if (prev && this.$identityMap.has(prev)) {
+        this.$identityMap.unset(prev)
+      }
+      if (value && !this.$identityMap.has(value)) {
+        this.$identityMap.set(value)
+      }
+    },
+  },
+  created () {
+    this::initIdentityMap()
+  },
   methods: {
     /**
      * @param parts
@@ -33,19 +46,6 @@ export default {
      */
     makeIdent (...parts) {
       return parts.filter(identity).join('.')
-    },
-  },
-  created () {
-    this::initIdentityMap()
-  },
-  watch: {
-    ident (value, prev) {
-      if (prev && this.$identityMap.has(prev)) {
-        this.$identityMap.unset(prev)
-      }
-      if (value && !this.$identityMap.has(value)) {
-        this.$identityMap.set(value)
-      }
     },
   },
 }

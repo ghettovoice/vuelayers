@@ -331,7 +331,3 @@ export function kebabCase (str) {
     .map(x => x.toLowerCase())
     .join('-')
 }
-
-export function newArrayLengthValidator (len) {
-  return value => isArray(value) && value.length === len
-}

@@ -26,7 +26,7 @@ export default {
   props: {
     id: {
       type: [String, Number],
-      default: () => uuid(),
+      default: uuid,
     },
   },
   data () {

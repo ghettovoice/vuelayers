@@ -5,14 +5,18 @@ import {
   setInteractionId,
   setInteractionPriority,
 } from '../ol-ext'
-import { isEqual } from '../util/minilo'
+import { isEqual, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-cmp'
-import useMapCmp from './use-map-cmp'
 import stubVNode from './stub-vnode'
+import waitForMap from './wait-for-map'
 
 export default {
-  mixins: [cmp, stubVNode, useMapCmp],
+  mixins: [
+    stubVNode,
+    cmp,
+    waitForMap,
+  ],
   stubVNode: {
     empty () {
       return this.vmId
@@ -86,6 +90,29 @@ export default {
     createInteraction () {
       throw new Error('Not implemented method')
     },
+    // todo add methods
+    /**
+     * @return {void}
+     * @protected
+     */
+    async mount () {
+      if (this.$interactionsContainer) {
+        await this.$interactionsContainer.addInteraction(this)
+      }
+
+      return this::cmp.methods.mount()
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    async unmount () {
+      if (this.$interactionsContainer) {
+        await this.$interactionsContainer.removeInteraction(this)
+      }
+
+      return this::cmp.methods.unmount()
+    },
     /**
      * @returns {Object}
      * @protected
@@ -93,63 +120,25 @@ export default {
     getServices () {
       const vm = this
 
-      return mergeDescriptors(this::cmp.methods.getServices(), {
-        get interaction () { return vm.$interaction },
-      })
+      return mergeDescriptors(
+        this::cmp.methods.getServices(),
+        {
+          get interactionVm () { return vm },
+        },
+      )
     },
-    /**
-     * @return {Promise} Resolves when initialization completes
-     * @protected
-     */
-    init () {
-      return this::cmp.methods.init()
-    },
-    /**
-     * @return {void|Promise<void>}
-     * @protected
-     */
-    deinit () {
-      return this::cmp.methods.deinit()
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    mount () {
-      this.$interactionsContainer && this.$interactionsContainer.addInteraction(this)
-      this.subscribeAll()
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    unmount () {
-      this.unsubscribeAll()
-      this.$interactionsContainer && this.$interactionsContainer.removeInteraction(this)
-    },
-    /**
-     * @return {Promise}
-     */
-    refresh () {
-      return this::cmp.methods.refresh()
-    },
-    /**
-     * @return {Promise}
-     */
-    recreate () {
-      return this::cmp.methods.recreate()
-    },
-    /**
-     * @return {Promise}
-     */
-    remount () {
-      return this::cmp.methods.remount()
-    },
-    /**
-     * @protected
-     */
-    subscribeAll () {
-    },
+    resolveInteraction: cmp.methods.resolveOlObject,
+    ...pick(cmp.methods, [
+      'init',
+      'deinit',
+      'refresh',
+      'scheduleRefresh',
+      'recreate',
+      'scheduleRecreate',
+      'remount',
+      'scheduleRemount',
+      'subscribeAll',
+    ]),
   },
 }
 

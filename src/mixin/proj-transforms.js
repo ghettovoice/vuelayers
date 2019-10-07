@@ -37,6 +37,7 @@ export default {
         this.dataProjection, // may or may not be present
         this.projection, // may or may not be present
         this.$mapVm && getMapDataProjection(this.$mapVm),
+        this.$map && getMapDataProjection(this.$map),
         this.$options.dataProjection,
         this.viewProjection,
       )

@@ -5,18 +5,25 @@
 
   export default {
     name: 'VlLayerGroup',
-    mixins: [layer, layersContainer],
+    mixins: [
+      layersContainer,
+      layer,
+    ],
     methods: {
       createLayer () {
         return new GroupLayer({
           id: this.id,
-          minResolution: this.minResolution,
-          maxResolution: this.maxResolution,
+          className: this.className,
           opacity: this.opacity,
           visible: this.visible,
           extent: this.extent,
           zIndex: this.zIndex,
-          layers: this._layersCollection,
+          minResolution: this.minResolution,
+          maxResolution: this.maxResolution,
+          minZoom: this.minZoom,
+          maxZoom: this.maxZoom,
+          render: this.render,
+          layers: this.$layersCollection,
         })
       },
       getServices () {

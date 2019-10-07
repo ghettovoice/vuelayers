@@ -1,9 +1,9 @@
 import { Collection } from 'ol'
 import { Control, defaults as createDefaultControls } from 'ol/control'
-import { obsFromOlEvent } from '../rx-ext'
 import { merge as mergeObs } from 'rxjs/observable'
 import Vue from 'vue'
 import { getControlId, initializeControl } from '../ol-ext'
+import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import { isArray, isPlainObject } from '../util/minilo'
 import rxSubs from './rx-subs'
@@ -16,6 +16,12 @@ export default {
 
       return this.getControls().map(getControlId)
     },
+  },
+  created () {
+    this._controlsCollection = new Collection()
+
+    this::defineServices()
+    this::subscribeToCollectionEvents()
   },
   methods: {
     initDefaultControls (defaultControls) {
@@ -78,12 +84,6 @@ export default {
         get controlsContainer () { return vm },
       }
     },
-  },
-  created () {
-    this._controlsCollection = new Collection()
-
-    this::defineServices()
-    this::subscribeToCollectionEvents()
   },
 }
 

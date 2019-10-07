@@ -12,11 +12,11 @@
 </template>
 
 <script>
-  import Feature from 'ol/Feature'
+  import { Feature } from 'ol'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, mergeAll } from 'rxjs/operators'
-  import { geometryContainer, olCmp, projTransforms, stylesContainer, useMapCmp } from '../../mixin'
+  import { geometryContainer, olCmp, projTransforms, stylesContainer, waitForMap } from '../../mixin'
   import { findPointOnSurface, getFeatureId, initializeFeature, setFeatureId } from '../../ol-ext'
   import { obsFromOlEvent } from '../../rx-ext'
   import { isEqual, stubObject } from '../../util/minilo'
@@ -28,13 +28,14 @@
    */
   export default {
     name: 'VlFeature',
-    mixins: [olCmp, useMapCmp, geometryContainer, stylesContainer, projTransforms],
+    mixins: [
+      geometryContainer,
+      stylesContainer,
+      projTransforms,
+      olCmp,
+      waitForMap,
+    ],
     props: {
-      /**
-       * All feature properties.
-       * @type {Object}
-       * @default {}
-       */
       properties: {
         type: Object,
         default: stubObject,
@@ -70,15 +71,9 @@
       },
     },
     watch: {
-      /**
-       * @param {string|number} value
-       */
       id (value) {
         this.setId(value)
       },
-      /**
-       * @param {Object} value
-       */
       properties (value) {
         this.setProperties(value)
       },

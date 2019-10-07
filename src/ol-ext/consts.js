@@ -29,22 +29,9 @@ export const CACHE_SIZE = 2048
  */
 export const PIXEL_RATIO = 1
 /**
- * @type {string}
- */
-export const CROSS_ORIGIN = 'anonymous'
-/**
  * @type {number}
  */
 export const REPROJ_ERR_THRESHOLD = 0.5
-/**
- * @type {number} Earth radius in meters
- */
-export const EARTH_RADIUS = 6378137
-
-export const RENDERER_TYPE = {
-  CANVAS: 'canvas',
-  WEBGL: 'webgl',
-}
 
 export const GEOMETRY_TYPE = {
   POINT: 'Point',
@@ -93,7 +80,6 @@ export const WMS_VERSION = '1.3.0'
 export const WMTS_VERSION = '1.0.0'
 export const WMTS_REQUEST_ENCODING = 'KVP'
 export const WMTS_FORMAT = 'image/jpeg'
-export const LAYER_PROP = 'layer'
 
 export const ARCGIS_EXTRA_PARAMS = [
   'FORMAT',

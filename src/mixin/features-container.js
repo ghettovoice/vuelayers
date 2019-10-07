@@ -1,5 +1,4 @@
-import Collection from 'ol/Collection'
-import Feature from 'ol/Feature'
+import { Collection, Feature } from 'ol'
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime } from 'rxjs/operators'
 import Vue from 'vue'

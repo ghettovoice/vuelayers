@@ -15,8 +15,8 @@
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import Vue from 'vue'
   import {
-    featuresContainer,
     controlsContainer,
+    featuresContainer,
     interactionsContainer,
     layersContainer,
     olCmp,
@@ -39,13 +39,13 @@
   export default {
     name: 'VlMap',
     mixins: [
-      olCmp,
       layersContainer,
       controlsContainer,
       interactionsContainer,
       overlaysContainer,
       featuresContainer,
       projTransforms,
+      olCmp,
     ],
     props: {
       /**
@@ -142,9 +142,7 @@
         'moveTolerance',
         'pixelRatio',
         'maxTilesLoading',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
+      ], () => olCmp.methods.scheduleRecreate),
     },
     created () {
       // prepare default overlay

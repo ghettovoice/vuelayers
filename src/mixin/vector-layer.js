@@ -4,8 +4,12 @@ import layer from './layer'
 import stylesContainer from './styles-container'
 
 export default {
-  mixins: [layer, stylesContainer],
+  mixins: [
+    stylesContainer,
+    layer,
+  ],
   props: {
+    // ol/layer/BaseVector
     renderOrder: Function,
     /**
      * @type {number|undefined}
@@ -115,8 +119,11 @@ export default {
       'mount',
       'unmount',
       'refresh',
+      'scheduleRefresh',
       'remount',
+      'scheduleRemount',
       'recreate',
+      'scheduleRecreate',
       'subscribeAll',
     ]),
   },

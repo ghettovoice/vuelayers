@@ -2,11 +2,11 @@ import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import { isArray, isEqual, isString } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-cmp'
-import useMapCmp from './use-map-cmp'
 import stubVNode from './stub-vnode'
+import waitForMap from './wait-for-map'
 
 export default {
-  mixins: [cmp, stubVNode, useMapCmp],
+  mixins: [cmp, stubVNode, waitForMap],
   stubVNode: {
     empty () {
       return this.vmId

@@ -8,7 +8,9 @@
    */
   export default {
     name: 'VlLayerVector',
-    mixins: [vectorLayer],
+    mixins: [
+      vectorLayer,
+    ],
     props: {
       imageRatio: {
         type: Number,
@@ -18,9 +20,7 @@
     watch: {
       ...makeWatchers([
         'imageRatio',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
+      ], () => vectorLayer.methods.scheduleRecreate),
     },
     methods: {
       /**

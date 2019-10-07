@@ -3,14 +3,18 @@ import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-cmp'
-import useMapCmp from './use-map-cmp'
 import stubVNode from './stub-vnode'
+import waitForMap from './wait-for-map'
 
 /**
  * Basic style mixin.
  */
 export default {
-  mixins: [cmp, stubVNode, useMapCmp],
+  mixins: [
+    stubVNode,
+    cmp,
+    waitForMap,
+  ],
   stubVNode: {
     empty () {
       return this.vmId
@@ -48,6 +52,7 @@ export default {
     createStyle () {
       throw new Error('Not implemented method')
     },
+    // todo refactor methods, add missed
     /**
      * @return {Promise}
      * @protected

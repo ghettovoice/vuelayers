@@ -17,6 +17,16 @@ export default {
       return this.getInteractions().map(getInteractionId)
     },
   },
+  created () {
+    /**
+     * @type {Collection<Interaction>>}
+     * @private
+     */
+    this._interactionsCollection = new Collection()
+
+    this::defineServices()
+    this::subscribeToCollectionEvents()
+  },
   methods: {
     initDefaultInteractions (defaultInteractions) {
       this.clearInteractions()
@@ -126,16 +136,6 @@ export default {
         get interactionsContainer () { return vm },
       }
     },
-  },
-  created () {
-    /**
-     * @type {Collection<Interaction>>}
-     * @private
-     */
-    this._interactionsCollection = new Collection()
-
-    this::defineServices()
-    this::subscribeToCollectionEvents()
   },
 }
 

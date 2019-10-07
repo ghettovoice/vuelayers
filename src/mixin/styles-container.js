@@ -1,16 +1,9 @@
-import Vue from 'vue'
 import { Style } from 'ol/style'
+import Vue from 'vue'
 import { warn } from '../util/log'
 import { isFunction, reduce } from '../util/minilo'
 
 export default {
-  created () {
-    /**
-     * @type {module:ol/style/Style~Style[]|module:ol/style/Style~StyleFunction|Vue|undefined}
-     * @private
-     */
-    this._styles = undefined
-  },
   methods: {
     /**
      * Default style factory

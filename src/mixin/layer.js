@@ -1,17 +1,22 @@
-import Vue from 'vue'
 import { merge as mergeObs } from 'rxjs/observable'
+import Vue from 'vue'
 import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
-import { obsFromOlEvent, obsFromOlChangeEvent } from '../rx-ext'
+import { obsFromOlChangeEvent, obsFromOlEvent } from '../rx-ext'
 import { isEqual, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import cmp from './ol-cmp'
 import sourceContainer from './source-container'
-import useMapCmp from './use-map-cmp'
 import stubVNode from './stub-vnode'
+import waitForMap from './wait-for-map'
 
 export default {
-  mixins: [cmp, stubVNode, useMapCmp, sourceContainer],
+  mixins: [
+    stubVNode,
+    sourceContainer,
+    cmp,
+    waitForMap,
+  ],
   stubVNode: {
     attrs () {
       return {
@@ -21,6 +26,7 @@ export default {
     },
   },
   props: {
+    // ol/layer/Base
     className: String,
     opacity: {
       type: Number,
@@ -30,12 +36,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    /**
-     * The bounding extent for layer rendering defined in the map view projection.
-     * The layer will not be rendered outside of this extent.
-     * @default undefined
-     * @type {number[]|undefined}
-     */
     extent: {
       type: Array,
       validator: value => value.length === 4,
@@ -45,11 +45,11 @@ export default {
     maxResolution: Number,
     minZoom: Number,
     maxZoom: Number,
+    render: Function,
     overlay: {
       type: Boolean,
       default: false,
     },
-    render: Function,
   },
   watch: {
     id (value) {
@@ -82,9 +82,7 @@ export default {
     ...makeWatchers([
       'overlay',
       'render',
-    ], () => function () {
-      this.scheduleRecreate()
-    }),
+    ], () => cmp.methods.scheduleRecreate),
   },
   created () {
     this::defineServices()
@@ -340,9 +338,11 @@ export default {
       'init',
       'deinit',
       'refresh',
+      'scheduleRefresh',
       'recreate',
+      'scheduleRecreate',
       'remount',
-      'recreate',
+      'scheduleRecreate',
     ]),
   },
 }

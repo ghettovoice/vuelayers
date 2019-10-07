@@ -1,7 +1,15 @@
 /**
  * Projection transform helpers
  */
-import { addProjection as addProj, fromLonLat, get as getProj, toLonLat, transform, transformExtent } from 'ol/proj'
+import {
+  addProjection as addProj,
+  fromLonLat,
+  get as getProj,
+  toLonLat,
+  transform,
+  transformExtent,
+  equivalent as isEqProj,
+} from 'ol/proj'
 import Projection from 'ol/proj/Projection'
 import { EPSG_3857, EPSG_4326, GEOMETRY_TYPE } from './consts'
 
@@ -10,6 +18,7 @@ export {
   transformExtent,
   getProj,
   addProj,
+  isEqProj,
 }
 
 /**

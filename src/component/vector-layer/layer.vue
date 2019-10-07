@@ -7,7 +7,9 @@
    */
   export default {
     name: 'VlLayerVector',
-    mixins: [vectorLayer],
+    mixins: [
+      vectorLayer,
+    ],
     methods: {
       /**
        * @return {module:ol/layer/Vector~VectorLayer}

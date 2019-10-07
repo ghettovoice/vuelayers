@@ -1,16 +1,24 @@
 <script>
-  import HeatmapLayer from 'ol/layer/Heatmap'
+  import { Heatmap as HeatmapLayer } from 'ol/layer'
+  import { vectorLayer } from '../../mixin'
   import { isEqual } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
-  import { vectorLayer } from '../../mixin'
 
   export default {
     name: 'VlLayerHeatmap',
-    mixins: [vectorLayer],
+    mixins: [
+      vectorLayer,
+    ],
     props: {
       gradient: {
         type: Array,
-        default: () => ['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#f00'],
+        default: () => [
+          '#0000ff',
+          '#00ffff',
+          '#00ff00',
+          '#ffff00',
+          '#ff0000',
+        ],
       },
       radius: {
         type: Number,
@@ -20,10 +28,6 @@
         type: Number,
         default: 15,
       },
-      shadow: {
-        type: Number,
-        default: 250,
-      },
       weight: {
         type: String,
         default: 'weight',
@@ -31,44 +35,75 @@
     },
     watch: {
       blur (value) {
-        if (!this.$layer || this.$layer.getBlur() === value) return
-
-        this.$layer.setBlur(value)
+        this.setBlur(value)
       },
       gradient (value) {
-        if (!this.$layer || isEqual(this.$layer.getGradient(), value)) return
-
-        this.$layer.setGradient(value)
+        this.setGradient(value)
       },
       radius (value) {
-        if (!this.$layer || this.$layer.getRadius() === value) return
-
-        this.$layer.setRadius(value)
+        this.setRadius(value)
       },
       ...makeWatchers([
-        'shadow',
         'weight',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
+      ], () => vectorLayer.methods.scheduleRecreate),
     },
     methods: {
+      /**
+       * @returns {module:ol/layer/Heatmap~Heatmap}
+       */
       createLayer () {
         return new HeatmapLayer({
           id: this.id,
-          minResolution: this.minResolution,
-          maxResolution: this.maxResolution,
+          className: this.className,
           opacity: this.opacity,
           visible: this.visible,
           extent: this.extent,
           zIndex: this.zIndex,
-          renderMode: this.renderMode,
+          minResolution: this.minResolution,
+          maxResolution: this.maxResolution,
+          minZoom: this.minZoom,
+          maxZoom: this.maxZoom,
+          render: this.render,
+          renderOrder: this.renderOrder,
+          renderBuffer: this.renderBuffer,
+          declutter: this.declutter,
+          updateWhileAnimating: this.updateWhileAnimating,
+          updateWhileInteracting: this.updateWhileInteracting,
+          blur: this.blur,
           gradient: this.gradient,
           radius: this.radius,
-          blur: this.blur,
-          shadow: this.shadow,
           weight: this.weight,
         })
+      },
+      async getBlur () {
+        return (await this.resolveLayer()).getBlur()
+      },
+      async setBlur (blur) {
+        const layer = await this.resolveLayer()
+
+        if (blur === layer.getBlur()) return
+
+        layer.setBlur(blur)
+      },
+      async getGradient () {
+        return (await this.resolveLayer()).getGradient()
+      },
+      async setGradient (gradient) {
+        const layer = await this.resolveLayer()
+
+        if (isEqual(gradient, layer.getGradient())) return
+
+        layer.setGradient(gradient)
+      },
+      async getRadius () {
+        return (await this.resolveLayer()).getRadius()
+      },
+      async setRadius (radius) {
+        const layer = await this.resolveLayer()
+
+        if (radius === layer.getRadius()) return
+
+        layer.setRadius(radius)
       },
     },
   }

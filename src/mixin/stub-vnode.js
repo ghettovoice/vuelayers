@@ -9,7 +9,7 @@ export default {
    * @returns {VNode}
    */
   render (h) {
-    const options = this.$options.stubVNode || {}
+    const options = this.$options?.stubVNode || {}
     // render as HTML comment
     if (options.empty) {
       const vnode = h()

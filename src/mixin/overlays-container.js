@@ -15,6 +15,16 @@ export default {
       return this.getOverlays().map(getOverlayId)
     },
   },
+  created () {
+    /**
+     * @type {Collection<Overlay>}
+     * @private
+     */
+    this._overlaysCollection = new Collection()
+
+    this::defineServices()
+    this::subscribeToCollectionEvents()
+  },
   methods: {
     /**
      * @param {Overlay|Vue} overlay
@@ -84,16 +94,6 @@ export default {
         get overlaysContainer () { return vm },
       }
     },
-  },
-  created () {
-    /**
-     * @type {Collection<Overlay>}
-     * @private
-     */
-    this._overlaysCollection = new Collection()
-
-    this::defineServices()
-    this::subscribeToCollectionEvents()
   },
 }
 

@@ -9,7 +9,9 @@
    */
   export default {
     name: 'VlLayerTile',
-    mixins: [tileLayer],
+    mixins: [
+      tileLayer,
+    ],
     methods: {
       /**
        * @return {Tile}

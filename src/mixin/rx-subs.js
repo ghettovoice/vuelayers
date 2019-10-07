@@ -16,7 +16,7 @@ export default {
      * @protected
      */
     unsubscribeAll () {
-      this._rxSubs.forEach(x => x.unsubscribe())
+      this._rxSubs.forEach(subs => subs.unsubscribe())
       this._rxSubs = []
     },
     /**

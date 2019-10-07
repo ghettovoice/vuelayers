@@ -1,14 +1,11 @@
-import layer from './layer'
 import { obsFromOlChangeEvent } from '../rx-ext'
+import { pick } from '../util/minilo'
+import layer from './layer'
 
 export default {
   mixins: [layer],
   props: {
-    /**
-     * Load low-resolution tiles up to `preload` levels.
-     * @type {number}
-     * @default 0
-     */
+    // ol/layer/BaseTile
     preload: {
       type: Number,
       default: 0,
@@ -70,6 +67,18 @@ export default {
         this::subscribeToLayerEvents(),
       ])
     },
+    ...pick(layer.methods, [
+      'init',
+      'deinit',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'recreate',
+      'scheduleRecreate',
+      'remount',
+      'scheduleRecreate',
+    ]),
   },
 }
 

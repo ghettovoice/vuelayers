@@ -10,11 +10,11 @@
 </template>
 
 <script>
-  import Vue from 'vue'
   import Graticule from 'ol/Graticule'
   import { throttleTime } from 'rxjs/operators'
+  import Vue from 'vue'
+  import { olCmp, projTransforms, waitForMap } from '../../mixin'
   import { obsFromOlEvent } from '../../rx-ext'
-  import { olCmp, useMapCmp, projTransforms } from '../../mixin'
   import { hasGraticule, hasMap } from '../../util/assert'
   import { firstEl, map } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -22,7 +22,11 @@
 
   export default {
     name: 'VlGraticule',
-    mixins: [olCmp, useMapCmp, projTransforms],
+    mixins: [
+      projTransforms,
+      olCmp,
+      waitForMap,
+    ],
     stubVNode: {
       empty: false,
       attrs () {

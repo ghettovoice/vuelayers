@@ -19,7 +19,14 @@
   import { olCmp, projTransforms } from '../../mixin'
   import { EPSG_3857, getViewId, initializeView, MAX_ZOOM, MIN_ZOOM, setViewId, ZOOM_FACTOR } from '../../ol-ext'
   import { obsFromOlChangeEvent } from '../../rx-ext'
-  import { newArrayLengthValidator, coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
+  import {
+    coalesce,
+    isEqual,
+    isFunction,
+    isNumber,
+    isPlainObject,
+    noop,
+  } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**
@@ -28,44 +35,30 @@
    */
   export default {
     name: 'VlView',
-    mixins: [olCmp, projTransforms],
+    mixins: [
+      projTransforms,
+      olCmp,
+    ],
     stubVNode: {
       empty () {
         return this.vmId
       },
     },
     props: {
-      /**
-       * The center coordinate in the view projection.
-       * @type {number[]}
-       * @default [0, 0]
-       */
       center: {
         type: Array,
         default: () => [0, 0],
-        validator: newArrayLengthValidator(2),
+        validator: value => value.length === 2 && value.every(isNumber),
       },
-      constrainOnlyCenter: {
-        type: Boolean,
-        default: false,
-      },
-      /**
-       * The extent that constrains the center defined in the view projection,
-       * in other words, center cannot be set outside this extent.
-       * @default undefined
-       */
+      constrainOnlyCenter: Boolean,
       extent: {
         type: Array,
-        validator: newArrayLengthValidator(4),
+        validator: value => value.length === 4 && value.every(isNumber),
       },
       smoothExtentConstraint: {
         type: Boolean,
         default: true,
       },
-      /**
-       * The initial rotation for the view in **radians** (positive rotation clockwise).
-       * @type {number}
-       */
       rotation: {
         type: Number,
         default: 0,
@@ -82,52 +75,28 @@
       resolutions: Array,
       maxResolution: Number,
       minResolution: Number,
-      constrainResolution: {
-        type: Boolean,
-        default: false,
-      },
+      constrainResolution: Boolean,
       smoothResolutionConstraint: {
         type: Boolean,
         default: true,
       },
-      /**
-       * Zoom level used to calculate the resolution for the view as `int` value. Only used if `resolution` is not defined.
-       * @type {number}
-       * @default 0
-       */
       zoom: {
         type: Number,
         default: MIN_ZOOM,
       },
-      /**
-       * @default 2
-       */
       zoomFactor: {
         type: Number,
         default: ZOOM_FACTOR,
       },
-      /**
-       * @default 28
-       */
       maxZoom: {
         type: Number,
         default: MAX_ZOOM,
       },
-      /**
-       * @default 0
-       */
       minZoom: {
         type: Number,
         default: MIN_ZOOM,
       },
-      multiWorld: {
-        type: Boolean,
-        default: false,
-      },
-      /**
-       * @type {string}
-       * @default EPSG:3857
-       */
+      multiWorld: Boolean,
       projection: {
         type: String,
         default: EPSG_3857,
@@ -172,8 +141,8 @@
         // exclude this.projection from lookup to allow view rendering in projection
         // that differs from data projection
         return coalesce(
-          this.$viewContainer && this.$viewContainer.resolvedDataProjection,
-          this.$options.dataProjection,
+          this.$mapVm?.resolvedDataProjection,
+          this.$options?.dataProjection,
           this.viewProjection,
         )
       },
@@ -223,9 +192,7 @@
         'multiWorld',
         'resolvedDataProjection',
         'projection',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
+      ], () => olCmp.methods.scheduleRecreate),
     },
     created () {
       this::defineServices()
@@ -287,12 +254,6 @@
           })
         })
       },
-      async getAnimating () {
-        return (await this.resolveView()).getAnimating()
-      },
-      async cancelAnimations () {
-        return (await this.resolveView()).cancelAnimations()
-      },
       /**
        * @see {@link https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#fit}
        * @param {Object|module:ol/geom/SimpleGeometry~SimpleGeometry|module:ol/extent~Extent|Vue} geometryOrExtent
@@ -321,24 +282,61 @@
           })
         })
       },
+      /**
+       * @return {Promise<boolean>}
+       */
+      async getAnimating () {
+        return (await this.resolveView()).getAnimating()
+      },
+      /**
+       * @return {Promise<void>}
+       */
+      async cancelAnimations () {
+        return (await this.resolveView()).cancelAnimations()
+      },
+      /**
+       * @return {Promise<void>}
+       */
       async beginInteraction () {
         (await this.resolveView()).beginInteraction()
       },
+      /**
+       * @return {Promise<void>}
+       */
       async endInteraction (duration, resolutionDirection, anchor) {
         (await this.resolveView()).endInteraction(duration, resolutionDirection, anchor)
       },
+      /**
+       * @return {Promise<boolean>}
+       */
       async getInteracting () {
         return (await this.resolveView()).getInteracting()
       },
+      /**
+       * @return {Promise<number[]>}
+       */
       async calculateExtent () {
         return this.extentToDataProj((await this.resolveView()).calculateExtent())
       },
+      /**
+       * @param {number[]} coordinate
+       * @param {number[]} size
+       * @param {number[]} position
+       * @return {Promise<void>}
+       */
       async centerOn (coordinate, size, position) {
         (await this.resolveView()).centerOn(this.pointToViewProj(coordinate), size, position)
       },
+      /**
+       * @return {Promise<number[]>}
+       */
       async getCenter () {
         return this.pointToDataProj((await this.resolveView()).getCenter())
       },
+      /**
+       * @param {number[]} center
+       * @return {Promise<void>}
+       */
       async setCenter (center) {
         center = this.pointToViewProj(center)
         const view = await this.resolveView()
@@ -347,9 +345,16 @@
 
         return view.setCenter(center)
       },
+      /**
+       * @return {Promise<number>}
+       */
       async getResolution () {
         return (await this.resolveView()).getResolution()
       },
+      /**
+       * @param {number} resolution
+       * @return {Promise<void>}
+       */
       async setResolution (resolution) {
         const view = await this.resolveView()
 
@@ -357,6 +362,11 @@
 
         view.setResolution(resolution)
       },
+      /**
+       * @param {number[]} extent
+       * @param {number[]} size
+       * @return {Promise<number>}
+       */
       async getResolutionForExtent (extent, size) {
         return (await this.resolveView()).getResolutionForExtent(this.extentToViewProj(extent), size)
       },
@@ -476,6 +486,10 @@
       $viewContainer: {
         enumerable: true,
         get: () => this.$services?.viewContainer,
+      },
+      $mapVm: {
+        enumerable: true,
+        get: () => this.$services?.mapVm,
       },
     })
   }
