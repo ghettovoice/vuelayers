@@ -84,20 +84,13 @@
           tileLoadFunction: this.tileLoadFunction,
         })
       },
-      /**
-       * @return {Promise}
-       * @protected
-       */
-      init () {
+      createTileGrid () {
         let extent = createExtentFromProjection(this.projection)
         let resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
         let origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
         let matrixIds = Array.from(range(this.minZoom, resolutions.length))
-        /**
-         * @type {module:ol/Tile~UrlFunction}
-         * @protected
-         */
-        this._tileGrid = new WMTSTileGrid({
+
+        return new WMTSTileGrid({
           extent,
           origin,
           resolutions,
@@ -105,8 +98,6 @@
           minZoom: this.minZoom,
           matrixIds,
         })
-
-        return this::tileSource.methods.init()
       },
     },
     watch: {

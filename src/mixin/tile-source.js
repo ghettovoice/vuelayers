@@ -101,6 +101,14 @@ export default {
     },
   },
   methods: {
+    createTileGrid () {
+      return createXyzGrid({
+        extent: createExtentFromProjection(this.projection),
+        maxZoom: this.maxZoom,
+        minZoom: this.minZoom,
+        tileSize: this.tileSize,
+      })
+    },
     /**
      * @return {Promise}
      * @protected
@@ -110,12 +118,7 @@ export default {
        * @type {module:ol/Tile~UrlFunction}
        * @protected
        */
-      this._tileGrid = createXyzGrid({
-        extent: createExtentFromProjection(this.projection),
-        maxZoom: this.maxZoom,
-        minZoom: this.minZoom,
-        tileSize: this.tileSize,
-      })
+      this._tileGrid = this.createTileGrid()
 
       return this::source.methods.init()
     },
@@ -124,6 +127,8 @@ export default {
      * @protected
      */
     deinit () {
+      this._tileGrid = undefined
+
       return this::source.methods.deinit()
     },
     /**
