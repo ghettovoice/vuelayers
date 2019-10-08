@@ -1,3 +1,6 @@
+import { interval as intervalObs } from 'rxjs/Observable'
+import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
+
 /**
  * Mini Lodash.
  */
@@ -325,9 +328,25 @@ export function camelCase (str) {
   return str.replace(regExp, matches => matches[1].toUpperCase())
 }
 
+/**
+ * @param {string} str
+ * @returns {string}
+ */
 export function kebabCase (str) {
   return str.match(/[A-Z]{2,}(?=[A-Z][a-z0-9]*|\b)|[A-Z]?[a-z0-9]*|[A-Z]|[0-9]+/g)
     .filter(Boolean)
     .map(x => x.toLowerCase())
     .join('-')
+}
+
+/**
+ * @param {function} condition
+ * @returns {Promise<boolean>}
+ */
+export function waitFor (condition) {
+  return intervalObs(1000 / 60).pipe(
+    skipWhile(negate(condition)),
+    firstObs(),
+    mapObs(() => true),
+  ).toPromise(Promise)
 }

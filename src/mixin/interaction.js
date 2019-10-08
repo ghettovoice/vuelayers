@@ -5,17 +5,15 @@ import {
   setInteractionId,
   setInteractionPriority,
 } from '../ol-ext'
-import { isEqual, pick } from '../util/minilo'
+import { pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './ol-cmp'
+import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
-import waitForMap from './wait-for-map'
 
 export default {
   mixins: [
     stubVNode,
-    cmp,
-    waitForMap,
+    olCmp,
   ],
   stubVNode: {
     empty () {
@@ -39,31 +37,13 @@ export default {
   },
   watch: {
     id (value) {
-      if (!this.$interaction || isEqual(value, getInteractionId(this.$interaction))) {
-        return
-      }
-
-      setInteractionId(this.$interaction, value)
+      this.setId(value)
     },
     active (value) {
-      if (!this.$interaction || value === this.$interaction.getActive()) {
-        return
-      }
-
-      this.$interaction.setActive(value)
+      this.setActive(value)
     },
     priority (value) {
-      if (
-        !this.$interaction ||
-        !this.$interactionsContainer ||
-        value === getInteractionPriority(this.$interaction)
-      ) {
-        return
-      }
-
-      setInteractionPriority(this.$interaction, value)
-      // todo replace with event
-      this.$interactionsContainer.sortInteractions()
+      this.setPriority(value)
     },
   },
   created () {
@@ -90,7 +70,68 @@ export default {
     createInteraction () {
       throw new Error('Not implemented method')
     },
-    // todo add methods
+    /**
+     * @returns {Promise<string|number>}
+     */
+    async getId () {
+      return getInteractionId(await this.resolveInteraction())
+    },
+    /**
+     * @param {string|number} id
+     * @returns {Promise<void>}
+     */
+    async setId (id) {
+      const interaction = await this.resolveInteraction()
+
+      if (id === getInteractionId(interaction)) return
+
+      setInteractionId(interaction, id)
+    },
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async getActive () {
+      return (await this.resolveInteraction()).getActive()
+    },
+    /**
+     * @param {boolean} active
+     * @returns {Promise<void>}
+     */
+    async setActive (active) {
+      const interaction = await this.resolveInteraction()
+
+      if (active === interaction.getActive()) return
+
+      interaction.setActive(active)
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getPriority () {
+      return getInteractionPriority(await this.resolveInteraction())
+    },
+    /**
+     * @param {number} priority
+     * @returns {Promise<void>}
+     */
+    async setPriority (priority) {
+      const interaction = await this.resolveInteraction()
+
+      if (priority === getInteractionPriority(interaction)) return
+
+      setInteractionPriority(interaction, priority)
+      // eslint-disable-next-line no-unused-expressions
+      this.$interactionsContainer?.sortInteractions()
+    },
+    /**
+     * @returns {Promise<void>}
+     * @protected
+     */
+    async init () {
+      await waitFor(() => this.$mapVm != null)
+
+      return this::olCmp.methods.init()
+    },
     /**
      * @return {void}
      * @protected
@@ -100,7 +141,7 @@ export default {
         await this.$interactionsContainer.addInteraction(this)
       }
 
-      return this::cmp.methods.mount()
+      return this::olCmp.methods.mount()
     },
     /**
      * @return {void}
@@ -111,7 +152,7 @@ export default {
         await this.$interactionsContainer.removeInteraction(this)
       }
 
-      return this::cmp.methods.unmount()
+      return this::olCmp.methods.unmount()
     },
     /**
      * @returns {Object}
@@ -121,15 +162,14 @@ export default {
       const vm = this
 
       return mergeDescriptors(
-        this::cmp.methods.getServices(),
+        this::olCmp.methods.getServices(),
         {
           get interactionVm () { return vm },
         },
       )
     },
-    resolveInteraction: cmp.methods.resolveOlObject,
-    ...pick(cmp.methods, [
-      'init',
+    resolveInteraction: olCmp.methods.resolveOlObject,
+    ...pick(olCmp.methods, [
       'deinit',
       'refresh',
       'scheduleRefresh',
@@ -151,17 +191,26 @@ function defineServices () {
       enumerable: true,
       get: () => this.$olObject,
     },
-    $map: {
+    /**
+     * @type {Object|Vue|undefined}
+     */
+    $mapVm: {
       enumerable: true,
-      get: () => this.$services && this.$services.map,
+      get: () => this.$services?.mapVm,
     },
+    /**
+     * @type {module:ol/View~View|undefined}
+     */
     $view: {
       enumerable: true,
-      get: () => this.$services && this.$services.view,
+      get: () => this.$mapVm?.$view,
     },
+    /**
+     * @type {Object|Vue|undefined}
+     */
     $interactionsContainer: {
       enumerable: true,
-      get: () => this.$services && this.$services.interactionsContainer,
+      get: () => this.$services?.interactionsContainer,
     },
   })
 }

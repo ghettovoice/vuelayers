@@ -1,27 +1,42 @@
 import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
-import { isArray, isEqual, isString } from '../util/minilo'
+import { isArray, isEqual, isString, pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './ol-cmp'
+import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
-import waitForMap from './wait-for-map'
 
 export default {
-  mixins: [cmp, stubVNode, waitForMap],
+  mixins: [
+    stubVNode,
+    olCmp,
+  ],
   stubVNode: {
     empty () {
       return this.vmId
     },
   },
   props: {
+    // ol/source/Source
+    /**
+     * @type {string|string[]|undefined}
+     */
     attributions: {
       type: [String, Array],
       validator: value => isString(value) || (isArray(value) && value.every(isString)),
     },
+    /**
+     * @type {boolean}
+     */
     attributionsCollapsible: {
       type: Boolean,
       default: true,
     },
+    /**
+     * @type {string|undefined}
+     */
     projection: String,
+    /**
+     * @type {boolean}
+     */
     wrapX: {
       type: Boolean,
       default: true,
@@ -29,49 +44,41 @@ export default {
   },
   computed: {
     state () {
-      if (!this.rev || !this.$source) {
-        return
-      }
+      if (!(this.rev && this.$source)) return
 
       return this.$source.getState()
+    },
+    resolutions () {
+      if (!(this.rev && this.$source)) return
+
+      return this.$source.getResolutions() || []
     },
   },
   watch: {
     id (value) {
-      if (!this.$source || value === getSourceId(this.$source)) {
-        return
-      }
-
-      setSourceId(this.$source, value)
+      this.setId(value)
     },
     attributions (value) {
-      if (!this.$source || isEqual(value, this.$source.getAttributions())) {
-        return
-      }
-
-      this.$source.setAttributions(value)
+      this.setAttributions(value)
     },
-    attributionsCollapsible (value) {
-      if (!this.$source || value === this.$source.getAttributionsCollapsible()) {
-        return
-      }
+    async attributionsCollapsible (value) {
+      const source = await this.resolveSource()
+
+      if (value === source.getAttributionsCollapsible()) return
 
       this.scheduleRecreate()
     },
-    projection (value) {
-      if (
-        !this.$source ||
-        (this.$source.getProjection() && value === this.$source.getProjection().getCode())
-      ) {
-        return
-      }
+    async projection (value) {
+      const source = await this.resolveSource()
+
+      if (value === source.getProjection()?.getCode()) return
 
       this.scheduleRecreate()
     },
-    wrapX (value) {
-      if (!this.$source || value === this.$source.getWrapX()) {
-        return
-      }
+    async wrapX (value) {
+      const source = await this.resolveSource()
+
+      if (value === source.getWrapX()) return
 
       this.scheduleRecreate()
     },
@@ -81,7 +88,7 @@ export default {
   },
   methods: {
     /**
-     * @return {module:ol/source/Source~Source|Promise<module:ol/source/Source~Source>}
+     * @return {Promise<module:ol/source/Source~Source>}
      * @protected
      */
     async createOlObject () {
@@ -100,18 +107,99 @@ export default {
       throw new Error('Not implemented method')
     },
     /**
-     * @return {Promise|void}
-     * @protected
+     * @returns {Promise<string|number>}
      */
-    init () {
-      return this::cmp.methods.init()
+    async getId () {
+      return (await this.resolveSource()).getId()
     },
     /**
-     * @return {Promise|void}
+     * @param {string|number} id
+     * @returns {Promise<void>}
+     */
+    async setId (id) {
+      const source = await this.resolveSource()
+
+      if (id === getSourceId(source)) return
+
+      setSourceId(source, id)
+    },
+    /**
+     * @returns {Promise<string>}
+     */
+    async getAttributions () {
+      return (await this.resolveSource()).getAttributions()
+    },
+    /**
+     * @param {string} attributions
+     * @returns {Promise<void>}
+     */
+    async setAttributions (attributions) {
+      const source = await this.resolveSource()
+
+      if (isEqual(attributions, source.getAttributions())) return
+
+      source.setAttributions(attributions)
+    },
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async getAttributionsCollapsible () {
+      return (await this.resolveSource()).getAttributionsCollapsible()
+    },
+    /**
+     * @returns {Promise<module:ol/proj/Projection~Projection>}
+     */
+    async getProjection () {
+      return (await this.resolveSource()).getProjection()
+    },
+    /**
+     * @returns {Promise<string>}
+     */
+    async getState () {
+      return (await this.resolveSource()).getState()
+    },
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async getWrapX () {
+      return (await this.resolveSource()).getWrapX()
+    },
+    /**
+     * @returns {Promise<number[]>}
+     */
+    async getResolutions () {
+      return (await this.resolveSource()).getResolutions()
+    },
+    /**
+     * @returns {Promise<void>}
      * @protected
      */
-    deinit () {
-      return this::cmp.methods.deinit()
+    async init () {
+      await waitFor(() => this.$mapVm != null)
+
+      return this::olCmp.methods.init()
+    },
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async mount () {
+      if (this.$sourceContainer) {
+        await this.$sourceContainer.setSource(this)
+      }
+
+      return this::olCmp.methods.mount()
+    },
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async unmount () {
+      if (this.$sourceContainer) {
+        await this.$sourceContainer.setSource(null)
+      }
+
+      return this::olCmp.methods.unmount()
     },
     /**
      * @return {Object}
@@ -120,65 +208,24 @@ export default {
     getServices () {
       const vm = this
 
-      return mergeDescriptors(this::cmp.methods.getServices(), {
-        get source () { return vm.$source },
-      })
+      return mergeDescriptors(
+        this::olCmp.methods.getServices(),
+        {
+          get sourceVm () { return vm },
+        },
+      )
     },
-    /**
-     * @return {Promise|void}
-     * @protected
-     */
-    mount () {
-      this.$sourceContainer && this.$sourceContainer.setSource(this)
-
-      return this::cmp.methods.mount()
-    },
-    /**
-     * @return {Promise|void}
-     * @protected
-     */
-    unmount () {
-      this.$sourceContainer && this.$sourceContainer.setSource(undefined)
-
-      return this::cmp.methods.unmount()
-    },
-    /**
-     * @return {Promise}
-     */
-    refresh () {
-      if (!this.$source) return Promise.resolve()
-
-      return new Promise(resolve => {
-        if (this.$source) {
-          this.$source.once('change', () => resolve)
-          this.$source.refresh()
-        } else {
-          resolve()
-        }
-      })
-    },
-    /**
-     * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise}
-     * @protected
-     */
-    remount () {
-      return this::cmp.methods.remount()
-    },
-    /**
-     * Internal usage only in components that doesn't support refreshing.
-     * @return {Promise}
-     * @protected
-     */
-    recreate () {
-      return this::cmp.methods.recreate()
-    },
-    /**
-     * @protected
-     */
-    subscribeAll () {
-      this::cmp.methods.subscribeAll()
-    },
+    resolveSource: olCmp.methods.resolveOlObject,
+    ...pick(olCmp.methods, [
+      'deinit',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'subscribeAll',
+    ]),
   },
 }
 
@@ -191,17 +238,26 @@ function defineServices () {
       enumerable: true,
       get: () => this.$olObject,
     },
-    $map: {
+    /**
+     * @type {Object|Vue|undefined}
+     */
+    $mapVm: {
       enumerable: true,
-      get: () => this.$services && this.$services.map,
+      get: () => this.$services?.mapVm,
     },
+    /**
+     * @type {module:ol/View~View|undefined}
+     */
     $view: {
       enumerable: true,
-      get: () => this.$services && this.$services.view,
+      get: () => this.$mapVm?.$view,
     },
+    /**
+     * @type {Object|undefined}
+     */
     $sourceContainer: {
       enumerable: true,
-      get: () => this.$services && this.$services.sourceContainer,
+      get: () => this.$services?.sourceContainer,
     },
   })
 }

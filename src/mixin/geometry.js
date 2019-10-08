@@ -1,118 +1,66 @@
-import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
-import {
-  boundingExtent,
-  findPointOnSurface,
-  getGeometryId,
-  initializeGeometry,
-  setGeometryId,
-  transforms,
-} from '../ol-ext'
-import { obsFromOlEvent } from '../rx-ext'
-import { hasGeometry } from '../util/assert'
-import { isEmpty, isEqual, negate } from '../util/minilo'
+import { findPointOnSurface, getGeometryId, initializeGeometry, setGeometryId, transforms } from '../ol-ext'
+import { pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './ol-cmp'
+import olCmp from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
-import waitForMap from './wait-for-map'
 
 export default {
-  mixins: [cmp, stubVNode, waitForMap, projTransforms],
+  mixins: [
+    stubVNode,
+    projTransforms,
+    olCmp,
+  ],
   stubVNode: {
     empty () {
       return this.vmId
     },
   },
-  props: {
-    /**
-     * Coordinates in the map view projection.
-     * @type {number[]}
-     */
-    coordinates: {
-      type: Array,
-      required: true,
-      validator: negate(isEmpty),
-    },
-  },
   computed: {
     /**
-     * @type {string}
-     * @abstract
-     * @readonly
+     * @returns {string|undefined}
      */
     type () {
-      throw new Error('Not implemented computed property')
+      if (!(this.rev && this.$geometry)) return
+
+      return this.$geometry.getType()
     },
     /**
-     * @type {number[]|undefined}
+     * @returns {number[]|undefined}
      */
     extent () {
-      if (this.extentViewProj && this.resolvedDataProjection) {
-        return this.extentToDataProj(this.extentViewProj)
-      }
+      if (!(this.extentViewProj && this.resolvedDataProjection)) return
+
+      return this.extentToDataProj(this.extentViewProj)
     },
     /**
-     * @type {number[]|undefined}
+     * @returns {number[]|undefined}
      */
     extentViewProj () {
-      if (this.rev && this.$geometry) {
-        return this.$geometry.getExtent()
-      }
+      if (!(this.rev && this.$geometry)) return
+
+      return this.$geometry.getExtent()
     },
     /**
-     * @type {number[]|undefined}
+     * @returns {number[]|undefined}
      */
     point () {
-      if (this.pointViewProj && this.resolvedDataProjection) {
-        return this.pointToDataProj(this.pointViewProj)
-      }
+      if (!(this.pointViewProj && this.resolvedDataProjection)) return
+
+      return this.pointToDataProj(this.pointViewProj)
     },
     /**
-     * @type {number[]}
+     * @returns {number[]|undefined}
      */
     pointViewProj () {
-      if (this.rev && this.$geometry) {
-        return findPointOnSurface(this.$geometry)
-      }
-    },
-    /**
-     * @type {number[]|undefined}
-     */
-    coordinatesViewProj () {
-      if (this.rev && this.$geometry) {
-        return this.$geometry.getCoordinates()
-      }
+      if (!(this.rev && this.$geometry)) return
+
+      return findPointOnSurface(this.$geometry)
     },
   },
   watch: {
     id (value) {
-      if (!this.$geometry || value === getGeometryId(this.$geometry)) {
-        return
-      }
-
-      setGeometryId(this.$geometry, value)
-    },
-    coordinates (value) {
-      if (!this.$geometry || !this.$view) return
-
-      // compares in data projection
-      const isEq = isEqualGeom({
-        coordinates: value,
-        extent: boundingExtent(value),
-      }, {
-        coordinates: this.getCoordinates(),
-        extent: this.extent,
-      })
-
-      if (isEq) return
-
-      this.setCoordinates(value)
-    },
-    resolvedDataProjection () {
-      if (!this.$geometry) return
-
-      this.setupTransformFunctions()
-      this.setCoordinates(this.coordinates)
+      this.setId(value)
     },
   },
   created () {
@@ -120,7 +68,7 @@ export default {
   },
   methods: {
     /**
-     * @return {module:ol/geom/Geometry~Geometry|Promise<module:ol/geom/Geometry~Geometry>}
+     * @return {Promise<module:ol/geom/Geometry~Geometry>}
      * @protected
      */
     async createOlObject () {
@@ -139,64 +87,169 @@ export default {
       throw new Error('Not implemented method')
     },
     /**
-     * @return {number[]}
+     * @returns {Promise<string|number>}
      */
-    getCoordinates () {
-      hasGeometry(this)
+    async getId () {
+      return getGeometryId(await this.resolveGeometry())
+    },
+    /**
+     * @param {string|number} id
+     * @returns {Promise<void>}
+     */
+    async setId (id) {
+      const geometry = await this.resolveGeometry()
 
-      return this.toDataProj(this.$geometry.getCoordinates())
+      if (id === getGeometryId(geometry)) return
+
+      setGeometryId(geometry, id)
+    },
+    /**
+     * @returns {Promise<string>}
+     */
+    async getType () {
+      return (await this.resolveGeometry()).getType()
+    },
+    /**
+     * @param {number[]} [extent]
+     * @returns {Promise<number[]>}
+     */
+    async getExtent (extent) {
+      extent = extent != null ? this.extentToViewProj(extent) : undefined
+
+      return (await this.resolveGeometry()).getExtent(extent)
+    },
+    /**
+     * @param {number[]} point
+     * @param {number[]} [closestPoint]
+     * @returns {Promise<number[]>}
+     */
+    async getClosestPoint (point, closestPoint) {
+      point = this.pointToViewProj(point)
+      closestPoint = closestPoint != null ? this.pointToViewProj(closestPoint) : undefined
+
+      return (await this.resolveGeometry()).getClosestPoint(point, closestPoint)
+    },
+    /**
+     * @param {number[]} coordinate
+     * @returns {Promise<boolean>}
+     */
+    async intersectsCoordinate (coordinate) {
+      coordinate = this.pointToViewProj(coordinate)
+
+      return (await this.resolveGeometry()).intersectsCoordinate(coordinate)
+    },
+    /**
+     * @param {number[]} extent
+     * @returns {Promise<number[]>}
+     */
+    async computeExtent (extent) {
+      extent = this.extentToViewProj(extent)
+
+      return (await this.resolveGeometry()).computeExtent(extent)
+    },
+    /**
+     * @param {number[]} extent
+     * @returns {Promise<boolean>}
+     */
+    async intersectsExtent (extent) {
+      extent = this.extentToViewProj(extent)
+
+      return (await this.resolveGeometry()).intersectsExtent(extent)
+    },
+    /**
+     * @param {number} angle Angle in radians
+     * @param {number[]} anchor
+     * @returns {Promise<void>}
+     */
+    async rotate (angle, anchor) {
+      const geom = await this.resolveGeometry()
+      anchor = this.pointToViewProj(anchor)
+
+      geom.rotate(angle, anchor)
+    },
+    /**
+     * @param {number} sx
+     * @param {number} [sy]
+     * @param {number[]} [anchor]
+     * @returns {Promise<void>}
+     */
+    async scale (sx, sy, anchor) {
+      const geom = await this.resolveGeometry()
+      anchor = anchor != null ? this.pointToViewProj(anchor) : undefined
+
+      geom.scale(sx, sy, anchor)
+    },
+    /**
+     * @param {number} tolerance
+     * @returns {Promise<module:ol/geom/Geometry~Geometry>}
+     */
+    async simplify (tolerance) {
+      return (await this.resolveGeometry()).simplify(tolerance)
+    },
+    /**
+     * @param dx
+     * @param dy
+     * @returns {Promise<*>}
+     */
+    async translate (dx, dy) {
+      return (await this.resolveGeometry()).translate(dx, dy)
+    },
+    /**
+     * @returns {Promise<function>}
+     */
+    async getTransformFunction () {
+      const { transform } = transforms[await this.getType()]
+
+      return transform
     },
     /**
      * @param {number[]} coordinates
+     * @returns {Promise<number[]>}
      */
-    setCoordinates (coordinates) {
-      hasGeometry(this)
+    async toDataProj (coordinates) {
+      const transform = await this.getTransformFunction()
 
-      this.$geometry.setCoordinates(this.toViewProj(coordinates))
+      return transform(coordinates, this.viewProjection, this.resolvedDataProjection)
     },
     /**
-     * @return {Promise}
-     * @throws {AssertionError}
-     * @protected
+     * @param {number[]} coordinates
+     * @returns {Promise<number[]>}
      */
-    init () {
-      this.setupTransformFunctions()
+    async toViewProj (coordinates) {
+      const transform = await this.getTransformFunction()
 
-      return this::cmp.methods.init()
+      return transform(coordinates, this.viewProjection, this.resolvedDataProjection)
     },
     /**
+     * @returns {Promise<void>}
      * @protected
      */
-    setupTransformFunctions () {
-      // define helper methods based on geometry type
-      const { transform } = transforms[this.type]
-      /**
-       * @method
-       * @param {number[]} coordinates
-       * @return {number[]}
-       * @protected
-       */
-      this.toDataProj = coordinates => transform(coordinates, this.viewProjection, this.resolvedDataProjection)
-      /**
-       * @method
-       * @param {number[]} coordinates
-       * @return {number[]}
-       * @protected
-       */
-      this.toViewProj = coordinates => transform(coordinates, this.resolvedDataProjection, this.viewProjection)
+    async init () {
+      await waitFor(() => this.$mapVm != null)
+
+      return this::olCmp.methods.init()
     },
     /**
-     * @return {void|Promise}
+     * @return {Promise<void>}
      * @protected
      */
-    deinit () {
-      return this::cmp.methods.deinit()
+    async mount () {
+      if (this.$geometryContainer) {
+        await this.$geometryContainer.setGeometry(this)
+      }
+
+      return this::olCmp.methods.mount()
     },
     /**
-     * @return {Promise}
+     * @return {Promise<void>}
+     * @protected
      */
-    refresh () {
-      return this::cmp.methods.refresh()
+    async unmount () {
+      if (this.$geometryContainer) {
+        await this.$geometryContainer.setGeometry(null)
+      }
+
+      return this::olCmp.methods.unmount()
     },
     /**
      * @return {Object}
@@ -205,33 +258,24 @@ export default {
     getServices () {
       const vm = this
 
-      return mergeDescriptors(this::cmp.methods.getServices(), {
-        get geometry () { return vm.$geometry },
-      })
+      return mergeDescriptors(
+        this::olCmp.methods.getServices(),
+        {
+          get geometryVm () { return vm },
+        },
+      )
     },
-    /**
-     * @return {void}
-     * @protected
-     */
-    mount () {
-      this.$geometryContainer && this.$geometryContainer.setGeometry(this)
-      this.subscribeAll()
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    unmount () {
-      this.unsubscribeAll()
-      this.$geometryContainer && this.$geometryContainer.setGeometry(undefined)
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    subscribeAll () {
-      this::subscribeToGeomChanges()
-    },
+    resolveGeometry: olCmp.methods.resolveOlObject,
+    ...pick(olCmp.methods, [
+      'deinit',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'subscribeAll',
+    ]),
   },
 }
 
@@ -245,69 +289,25 @@ function defineServices () {
       get: () => this.$olObject,
     },
     /**
-     * @type {module:ol/PluggableMap~PluggableMap|undefined}
+     * @type {Object|Vue}
      */
-    $map: {
+    $mapVm: {
       enumerable: true,
-      get: () => this.$services && this.$services.map,
+      get: () => this.$services?.mapVm,
     },
     /**
-     * @type {module:ol/View~View|undefined}
+     * @type {module:ol/View~View}
      */
     $view: {
       enumerable: true,
-      get: () => this.$services && this.$services.view,
+      get: () => this.$mapVm?.$view,
     },
     /**
-     * @type {Object|undefined}
+     * @type {Object|Vue}
      */
     $geometryContainer: {
       enumerable: true,
-      get: () => this.$services && this.$services.geometryContainer,
+      get: () => this.$services?.geometryContainer,
     },
   })
-}
-
-/**
- * @return {void}
- * @private
- */
-function subscribeToGeomChanges () {
-  hasGeometry(this)
-
-  const ft = 1000 / 60
-  const changes = obsFromOlEvent(
-    this.$geometry,
-    'change',
-    () => ({
-      coordinates: this.getCoordinates(),
-      extent: this.extent,
-    }),
-  ).pipe(
-    throttleTime(ft),
-    distinctUntilChanged(isEqualGeom),
-    mapObs(({ coordinates }) => ({
-      prop: 'coordinates',
-      value: coordinates,
-    })),
-  )
-
-  this.subscribeTo(changes, ({ prop, value }) => {
-    ++this.rev
-
-    this.$nextTick(() => {
-      this.$emit(`update:${prop}`, value)
-    })
-  })
-}
-
-/**
- * @param {{coordinates: number[], extent: number[]}} a
- * @param {{coordinates: number[], extent: number[]}} b
- * @returns {boolean}
- */
-function isEqualGeom (a, b) {
-  return isEqual(a.extent, b.extent)
-    ? isEqual(a.coordinates, b.coordinates)
-    : false
 }

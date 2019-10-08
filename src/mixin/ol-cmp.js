@@ -47,11 +47,6 @@ export default {
   },
   methods: {
     /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    beforeInit () {},
-    /**
      * @return {Promise<void>} Resolves when initialization completes
      * @protected
      */
@@ -239,8 +234,7 @@ function defineLifeCyclePromises () {
     return this
   }
   // create
-  this._createPromise = Promise.resolve(this.beforeInit())
-    .then(::this.init)
+  this._createPromise = Promise.resolve(this.init())
     .then(makeEventEmitter('created'))
 
   const t = 1000 / 60

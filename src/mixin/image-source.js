@@ -1,65 +1,82 @@
-import { EPSG_3857 } from '../ol-ext'
+import { EPSG_3857, getProj } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
-import { hasSource } from '../util/assert'
+import { isString, pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
 
 export default {
-  mixins: [source],
+  mixins: [
+    source,
+  ],
   props: {
+    // ol/source/Image
+    /**
+     * @type {string|undefined}
+     */
     crossOrigin: String,
+    /**
+     * @type {string}
+     */
     projection: {
       type: String,
       default: EPSG_3857,
     },
-  },
-  methods: {
     /**
-     * @return {Promise}
-     * @protected
+     * @type {number[]|undefined}
      */
-    init () {
-      return this::source.methods.init()
-    },
-    /**
-     * @return {void|Promise<void>}
-     * @protected
-     */
-    deinit () {
-      return this::source.methods.deinit()
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    mount () {
-      this::source.methods.mount()
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    unmount () {
-      this::source.methods.unmount()
-    },
-    subscribeAll () {
-      this::source.methods.subscribeAll()
-      this::subscribeToSourceEvents()
-    },
+    resolutions: Array,
   },
   watch: {
     ...makeWatchers([
       'crossOrigin',
-    ], () => function () {
-      this.scheduleRecreate()
-    }),
+      'resolutions',
+    ], () => source.methods.scheduleRecreate),
+  },
+  methods: {
+    /**
+     * @param {number[]} extent
+     * @param {number} resolution
+     * @param {number} pixelRatio
+     * @param {string} projection
+     * @returns {Promise<module:ol/ImageBase~ImageBase>}
+     */
+    async getImage (extent, resolution, pixelRatio, projection) {
+      if (isString(projection)) {
+        projection = getProj(projection)
+      }
+
+      return (await this.resolveSource()).getImage(extent, resolution, pixelRatio, projection)
+    },
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async subscribeAll () {
+      await Promise.all([
+        this::source.methods.subscribeAll(),
+        this::subscribeToSourceEvents(),
+      ])
+    },
+    ...pick(source.methods, [
+      'init',
+      'deinit',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'getServices',
+    ]),
   },
 }
 
-function subscribeToSourceEvents () {
-  hasSource(this)
+async function subscribeToSourceEvents () {
+  const source = await this.resolveSource()
 
-  const events = obsFromOlEvent(this.$source, [
+  const events = obsFromOlEvent(source, [
     'imageloadend',
     'imageloaderror',
     'imageloadstart',

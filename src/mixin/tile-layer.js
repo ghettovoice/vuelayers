@@ -78,6 +78,7 @@ export default {
       'scheduleRecreate',
       'remount',
       'scheduleRecreate',
+      'getServices',
     ]),
   },
 }

@@ -2,20 +2,18 @@ import { merge as mergeObs } from 'rxjs/observable'
 import Vue from 'vue'
 import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
 import { obsFromOlChangeEvent, obsFromOlEvent } from '../rx-ext'
-import { isEqual, pick } from '../util/minilo'
+import { isEqual, pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
-import cmp from './ol-cmp'
+import olCmp from './ol-cmp'
 import sourceContainer from './source-container'
 import stubVNode from './stub-vnode'
-import waitForMap from './wait-for-map'
 
 export default {
   mixins: [
     stubVNode,
     sourceContainer,
-    cmp,
-    waitForMap,
+    olCmp,
   ],
   stubVNode: {
     attrs () {
@@ -46,6 +44,7 @@ export default {
     minZoom: Number,
     maxZoom: Number,
     render: Function,
+    // custom
     overlay: {
       type: Boolean,
       default: false,
@@ -82,7 +81,7 @@ export default {
     ...makeWatchers([
       'overlay',
       'render',
-    ], () => cmp.methods.scheduleRecreate),
+    ], () => olCmp.methods.scheduleRecreate),
   },
   created () {
     this::defineServices()
@@ -282,19 +281,13 @@ export default {
       return this.$mapVm.forEachLayerAtPixel(pixel, mapLayer => mapLayer === layer)
     },
     /**
-     * @returns {Object}
+     * @returns {Promise<void>}
      * @protected
      */
-    getServices () {
-      const vm = this
+    async init () {
+      await waitFor(() => this.$mapVm != null)
 
-      return mergeDescriptors(
-        this::cmp.methods.getServices(),
-        this::sourceContainer.methods.getServices(),
-        {
-          get layerVm () { return vm },
-        },
-      )
+      return this::olCmp.methods.init()
     },
     /**
      * @return {Promise<void>}
@@ -307,7 +300,7 @@ export default {
         await this.$layersContainer.addLayer(this)
       }
 
-      return this::cmp.methods.mount()
+      return this::olCmp.methods.mount()
     },
     /**
      * @return {Promise<void>}
@@ -320,7 +313,22 @@ export default {
         await this.$layersContainer.removeLayer(this)
       }
 
-      return this::cmp.methods.unmount()
+      return this::olCmp.methods.unmount()
+    },
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(
+        this::olCmp.methods.getServices(),
+        this::sourceContainer.methods.getServices(),
+        {
+          get layerVm () { return vm },
+        },
+      )
     },
     /**
      * @return {Promise<void>}
@@ -328,20 +336,19 @@ export default {
      */
     async subscribeAll () {
       await Promise.all([
-        this::cmp.methods.subscribeAll(),
+        this::olCmp.methods.subscribeAll(),
         this::subscribeToLayerEvents(),
       ])
     },
-    resolveLayer: cmp.methods.resolveOlObject,
-    getSourceTarget: cmp.methods.resolveOlObject,
-    ...pick(cmp.methods, [
-      'init',
+    resolveLayer: olCmp.methods.resolveOlObject,
+    getSourceTarget: olCmp.methods.resolveOlObject,
+    ...pick(olCmp.methods, [
       'deinit',
       'refresh',
       'scheduleRefresh',
-      'recreate',
-      'scheduleRecreate',
       'remount',
+      'scheduleRemount',
+      'recreate',
       'scheduleRecreate',
     ]),
   },

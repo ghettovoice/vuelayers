@@ -2,9 +2,9 @@ import { first as firstObs } from 'rxjs/operators'
 import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import cmp from './ol-cmp'
+import { waitFor } from '../util/minilo'
+import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
-import waitForMap from './wait-for-map'
 
 /**
  * Basic style mixin.
@@ -12,8 +12,7 @@ import waitForMap from './wait-for-map'
 export default {
   mixins: [
     stubVNode,
-    cmp,
-    waitForMap,
+    olCmp,
   ],
   stubVNode: {
     empty () {
@@ -54,18 +53,20 @@ export default {
     },
     // todo refactor methods, add missed
     /**
-     * @return {Promise}
+     * @returns {Promise<void>}
      * @protected
      */
-    init () {
-      return this::cmp.methods.init()
+    async init () {
+      await waitFor(() => this.$mapVm != null)
+
+      return this::olCmp.methods.init()
     },
     /**
      * @return {void|Promise<void>}
      * @protected
      */
     deinit () {
-      return this::cmp.methods.deinit()
+      return this::olCmp.methods.deinit()
     },
     /**
      * @return {Object}
@@ -74,7 +75,7 @@ export default {
     getServices () {
       const vm = this
 
-      return mergeDescriptors(this::cmp.methods.getServices(), {
+      return mergeDescriptors(this::olCmp.methods.getServices(), {
         get style () { return vm.$style },
       })
     },
@@ -106,17 +107,17 @@ function defineServices () {
       enumerable: true,
       get: () => this.$olObject,
     },
-    $map: {
+    $mapVm: {
       enumerable: true,
-      get: () => this.$services && this.$services.map,
+      get: () => this.$services?.mapVm,
     },
     $view: {
       enumerable: true,
-      get: () => this.$services && this.$services.view,
+      get: () => this.$mapVm?.$view,
     },
     $stylesContainer: {
       enumerable: true,
-      get: () => this.$services && this.$services.stylesContainer,
+      get: () => this.$services?.stylesContainer,
     },
   })
 }
