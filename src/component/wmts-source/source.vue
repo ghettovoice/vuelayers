@@ -7,9 +7,6 @@
     EXTENT_CORNER,
     getExtentCorner,
     resolutionsFromExtent,
-    WMTS_FORMAT,
-    WMTS_REQUEST_ENCODING,
-    WMTS_VERSION,
   } from '../../ol-ext'
   import { range } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -21,7 +18,7 @@
       dimensions: Object,
       format: {
         type: String,
-        default: WMTS_FORMAT,
+        default: 'image/jpeg',
       },
       layerName: {
         type: String,
@@ -33,7 +30,7 @@
       },
       requestEncoding: {
         type: String,
-        default: WMTS_REQUEST_ENCODING,
+        default: 'KVP',
       },
       styleName: {
         type: String,
@@ -41,7 +38,7 @@
       },
       version: {
         type: String,
-        default: WMTS_VERSION,
+        default: '1.0.0',
       },
       url: {
         type: String,

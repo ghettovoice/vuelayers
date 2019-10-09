@@ -1,4 +1,4 @@
-import { cleanSourceExtraParams, ARCGIS_EXTRA_PARAMS } from '../ol-ext'
+import { cleanSourceExtraParams } from '../ol-ext'
 import { isEqual, pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 
@@ -10,11 +10,6 @@ const serialize = value => {
 
 export default {
   props: {
-    /**
-     * Extra ArcGIS request parameters
-     * todo rename to extraParams
-     */
-    extParams: Object,
     format: {
       type: String,
       default: 'PNG32',
@@ -37,12 +32,35 @@ export default {
     layerRangeValues: [Array, String],
     layerParameterValues: [Array, String],
     historicMoment: Number,
+    /**
+     * Extra ArcGIS request parameters
+     * todo rename to extraParams
+     */
+    extParams: Object,
   },
   computed: {
     // todo rename to cleanExtraParams
     cleanExtParams () {
       return this.extParams
-        ? cleanSourceExtraParams(this.extParams, ARCGIS_EXTRA_PARAMS)
+        ? cleanSourceExtraParams(this.extParams, [
+          'FORMAT',
+          'F',
+          'LAYERS',
+          'LAYERDEFS',
+          'DYNAMICLAYERS',
+          'DPI',
+          'TRANSPARENT',
+          'TIME',
+          'LAYERTIMEOPTIONS',
+          'GDBVERSION',
+          'MAPSCALE',
+          'ROTATION',
+          'DATUMTRANSFORMATIONS',
+          'MAPRANGEVALUES',
+          'LAYERRANGEVALUES',
+          'LAYERPARAMETERVALUES',
+          'HISTORICMOMENT',
+        ])
         : undefined
     },
     allParams () {

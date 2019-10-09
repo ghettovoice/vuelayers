@@ -1,4 +1,4 @@
-import Overlay from 'ol/Overlay'
+import { Overlay } from 'ol'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 

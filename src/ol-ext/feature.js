@@ -1,8 +1,7 @@
-import Feature from 'ol/Feature'
+import { Feature } from 'ol'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
-import { isNumber, isPlainObject, isString, isArray } from '../util/minilo'
-import { GEOMETRY_TYPE } from './consts'
+import { isNumber, isPlainObject, isString } from '../util/minilo'
 
 /**
  * @param {Object|Vue|Feature|string|number} feature
@@ -64,15 +63,4 @@ export function mergeFeatures (destFeature, srcFeature) {
   destFeature.setStyle(srcFeature.getStyle() != null ? srcFeature.getStyle().clone() : undefined)
 
   return destFeature
-}
-
-/**
- * @param {Object} feature
- * @returns {boolean}
- */
-export function isGeoJSONFeature (feature) {
-  return isPlainObject(feature) && feature.type === 'Feature' &&
-    isPlainObject(feature.geometry) &&
-    Object.values(GEOMETRY_TYPE).includes(feature.geometry.type) &&
-    isArray(feature.geometry.coordinates)
 }

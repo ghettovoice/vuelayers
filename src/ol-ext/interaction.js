@@ -1,4 +1,4 @@
-import Interaction from 'ol/interaction/Interaction'
+import { Interaction } from 'ol/interaction'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 

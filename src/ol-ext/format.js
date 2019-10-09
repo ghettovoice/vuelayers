@@ -1,13 +1,10 @@
-import BaseGeoJSON from 'ol/format/GeoJSON'
-import MVT from 'ol/format/MVT'
-import TopoJSON from 'ol/format/TopoJSON'
-import { isEmpty } from '../util/minilo'
-import { EPSG_4326 } from './consts'
-import { createCircularPolygon } from './geom'
-import { transformPoint } from './proj'
-import { isCircle } from './util'
-import LineString from 'ol/geom/LineString'
+import { GeoJSON as BaseGeoJSON, MVT, TopoJSON } from 'ol/format'
+import { LineString } from 'ol/geom'
 import { getLength } from 'ol/sphere'
+import { isEmpty } from '../util/minilo'
+import { createCircularPolygon } from './geom'
+import { EPSG_4326, transformPoint } from './proj'
+import { isCircle } from './util'
 
 /**
  * @param {Object} [options]
@@ -45,7 +42,7 @@ class GeoJSON extends BaseGeoJSON {
           options.featureProjection || this.defaultFeatureProjection,
           EPSG_4326,
         ),
-        radius
+        radius,
       )
       options.featureProjection = EPSG_4326
     }

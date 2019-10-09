@@ -1,4 +1,4 @@
-import PluggableMap from 'ol/PluggableMap'
+import { PluggableMap } from 'ol'
 import Vue from 'vue'
 
 export function getMapId (map) {

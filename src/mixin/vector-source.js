@@ -1,5 +1,6 @@
 import debounce from 'debounce-promise'
-import { createGeoJsonFmt, getFeatureId, initializeFeature, isGeoJSONFeature, loadingAll, transform } from '../ol-ext'
+import { all as loadAll } from 'ol/loadingstrategy'
+import { createGeoJsonFmt, getFeatureId, initializeFeature, isGeoJSONFeature, transform } from '../ol-ext'
 import { constant, difference, isArray, isEqual, isFunction, pick, stubArray } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
@@ -55,7 +56,7 @@ export default {
      */
     strategyFactory: {
       type: Function,
-      default: () => loadingAll,
+      default: () => loadAll,
     },
     /**
      * String or url factory

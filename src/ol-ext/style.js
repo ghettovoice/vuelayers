@@ -1,17 +1,9 @@
-import Circle from 'ol/style/Circle'
-import Fill from 'ol/style/Fill'
-import Icon from 'ol/style/Icon'
-import ImageStyle from 'ol/style/Image'
-import RegularShape from 'ol/style/RegularShape'
-import Stroke from 'ol/style/Stroke'
-import Style from 'ol/style/Style'
-import Text from 'ol/style/Text'
+import GeometryType from 'ol/geom/GeometryType'
+import { Circle, Fill, Icon, Image as ImageStyle, RegularShape, Stroke, Style, Text } from 'ol/style'
 import parseColor from 'parse-color'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 import { isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
-import { GEOMETRY_TYPE } from './consts'
-import * as geomHelper from './geom'
 
 export function getStyleId (style) {
   if (
@@ -70,16 +62,16 @@ export function defaultStyle () {
 }
 
 /**
- * @return {Object<GEOMETRY_TYPE, VlStyle[]>}
+ * @return {Object<GeometryType, VlStyle[]>}
  */
 export function defaultEditStyle () {
-  /** @type {Object<GEOMETRY_TYPE, VlStyle[]>} */
+  /** @type {Object<GeometryType, VlStyle[]>} */
   const styles = {}
   const white = [255, 255, 255, 1]
   const blue = [0, 153, 255, 1]
   const width = 3
 
-  styles[GEOMETRY_TYPE.LINE_STRING] = [
+  styles[GeometryType.LINE_STRING] = [
     {
       strokeColor: white,
       strokeWidth: width + 2,
@@ -88,18 +80,18 @@ export function defaultEditStyle () {
       strokeWidth: width,
     },
   ]
-  styles[GEOMETRY_TYPE.MULTI_LINE_STRING] = styles[GEOMETRY_TYPE.LINE_STRING]
+  styles[GeometryType.MULTI_LINE_STRING] = styles[GeometryType.LINE_STRING]
 
-  styles[GEOMETRY_TYPE.POLYGON] = [
+  styles[GeometryType.POLYGON] = [
     {
       fillColor: [255, 255, 255, 0.5],
     },
-  ].concat(styles[GEOMETRY_TYPE.LINE_STRING])
-  styles[GEOMETRY_TYPE.MULTI_POLYGON] = styles[GEOMETRY_TYPE.POLYGON]
+  ].concat(styles[GeometryType.LINE_STRING])
+  styles[GeometryType.MULTI_POLYGON] = styles[GeometryType.POLYGON]
 
-  styles[GEOMETRY_TYPE.CIRCLE] = styles[GEOMETRY_TYPE.POLYGON].concat(styles[GEOMETRY_TYPE.LINE_STRING])
+  styles[GeometryType.CIRCLE] = styles[GeometryType.POLYGON].concat(styles[GeometryType.LINE_STRING])
 
-  styles[GEOMETRY_TYPE.POINT] = [
+  styles[GeometryType.POINT] = [
     {
       imageRadius: width * 2,
       fillColor: blue,
@@ -108,11 +100,11 @@ export function defaultEditStyle () {
       zIndex: Infinity,
     },
   ]
-  styles[GEOMETRY_TYPE.MULTI_POINT] = styles[GEOMETRY_TYPE.POINT]
+  styles[GeometryType.MULTI_POINT] = styles[GeometryType.POINT]
 
-  styles[GEOMETRY_TYPE.GEOMETRY_COLLECTION] = styles[GEOMETRY_TYPE.POLYGON].concat(
-    styles[GEOMETRY_TYPE.LINE_STRING],
-    styles[GEOMETRY_TYPE.POINT],
+  styles[GeometryType.GEOMETRY_COLLECTION] = styles[GeometryType.POLYGON].concat(
+    styles[GeometryType.LINE_STRING],
+    styles[GeometryType.POINT],
   )
 
   return styles
@@ -365,7 +357,7 @@ export function createTextStyle (vlStyle) {
 export function createGeomStyle (vlStyle) {
   if (isFunction(vlStyle.geom)) {
     return function __styleGeomFunc (feature) {
-      return vlStyle.geom(feature, geomHelper)
+      return vlStyle.geom(feature)
     }
   }
 

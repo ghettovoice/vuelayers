@@ -1,9 +1,5 @@
-import { getUid } from 'ol'
-import { isFunction, reduce } from '../util/minilo'
-
-export function getObjectUid (object) {
-  return getUid(object)
-}
+import GeometryType from 'ol/geom/GeometryType'
+import { isArray, isFunction, isPlainObject, reduce } from '../util/minilo'
 
 /**
  * heuristic check that value is ol collection
@@ -29,6 +25,17 @@ export function isVectorSource (value) {
  */
 export function isCircle (value) {
   return isFunction(value.getCenter) && isFunction(value.getRadius)
+}
+
+/**
+ * @param {Object} feature
+ * @returns {boolean}
+ */
+export function isGeoJSONFeature (feature) {
+  return isPlainObject(feature) && feature.type === 'Feature' &&
+    isPlainObject(feature.geometry) &&
+    Object.values(GeometryType).includes(feature.geometry.type) &&
+    isArray(feature.geometry.coordinates)
 }
 
 export function cleanSourceExtraParams (params, filterKeys) {

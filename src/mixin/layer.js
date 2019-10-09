@@ -393,7 +393,7 @@ async function subscribeToLayerEvents () {
       'maxResolution',
       'minZoom',
       'maxZoom',
-    ], true, t)
+    ], true, t),
   )
 
   this.subscribeTo(changes, ({ prop, value }) => {

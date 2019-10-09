@@ -1,4 +1,4 @@
-import Feature from 'ol/Feature'
+import { Feature } from 'ol'
 import { get, isPlainObject } from '../util/minilo'
 import { createGeoJsonFmt } from './format'
 

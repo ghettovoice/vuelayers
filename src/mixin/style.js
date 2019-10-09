@@ -1,8 +1,8 @@
 import { first as firstObs } from 'rxjs/operators'
 import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
-import mergeDescriptors from '../util/multi-merge-descriptors'
 import { waitFor } from '../util/minilo'
+import mergeDescriptors from '../util/multi-merge-descriptors'
 import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
 

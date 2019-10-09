@@ -13,11 +13,23 @@
 <script>
   import Overlay from 'ol/Overlay'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { olCmp, projTransforms, waitForMap } from '../../mixin'
-  import { getOverlayId, initializeOverlay, OVERLAY_POSITIONING, setOverlayId } from '../../ol-ext'
+  import { olCmp, projTransforms } from '../../mixin'
+  import { getOverlayId, initializeOverlay, setOverlayId } from '../../ol-ext'
   import { obsFromOlChangeEvent } from '../../rx-ext'
   import { hasOverlay } from '../../util/assert'
   import { identity, isEqual } from '../../util/minilo'
+
+  const OVERLAY_POSITIONING = {
+    BOTTOM_LEFT: 'bottom-left',
+    BOTTOM_CENTER: 'bottom-center',
+    BOTTOM_RIGHT: 'bottom-right',
+    CENTER_LEFT: 'center-left',
+    CENTER_CENTER: 'center-center',
+    CENTER_RIGHT: 'center-right',
+    TOP_LEFT: 'top-left',
+    TOP_CENTER: 'top-center',
+    TOP_RIGHT: 'top-right',
+  }
 
   const props = {
     offset: {

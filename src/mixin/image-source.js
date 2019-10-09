@@ -1,4 +1,5 @@
-import { EPSG_3857, getProj } from '../ol-ext'
+import { get as getProj } from 'ol/proj/projections'
+import { EPSG_3857 } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { isString, pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'

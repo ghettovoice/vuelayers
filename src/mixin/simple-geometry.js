@@ -1,12 +1,10 @@
+import { boundingExtent } from 'ol/extent'
+import GeometryLayout from 'ol/geom/GeometryLayout'
 import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
-import { makeWatchers } from 'util/vue-helpers'
-import {
-  boundingExtent,
-  transforms,
-} from '../ol-ext'
+import { transforms } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { isEmpty, isEqual, negate, pick } from '../util/minilo'
-import GeometryLayout from 'ol/geom/GeometryLayout'
+import { makeWatchers } from '../util/vue-helpers'
 import geometry from './geometry'
 
 export default {

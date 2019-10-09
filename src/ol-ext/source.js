@@ -1,4 +1,4 @@
-import Source from 'ol/source/Source'
+import { Source } from 'ol/source'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
 

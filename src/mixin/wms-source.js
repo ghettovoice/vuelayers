@@ -1,4 +1,3 @@
-import { WMS_VERSION } from '../ol-ext'
 import { hasSource, hasView } from '../util/assert'
 import { reduce } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
@@ -41,7 +40,7 @@ export default {
     styles: String, // WMS Request styles
     version: {
       type: String,
-      default: WMS_VERSION,
+      default: '1.3.0',
     },
     transparent: {
       type: Boolean,

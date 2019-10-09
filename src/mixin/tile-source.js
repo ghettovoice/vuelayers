@@ -1,74 +1,68 @@
 import { createTileUrlFunction } from 'ol-tilecache'
-import {
-  CACHE_SIZE,
-  createExtentFromProjection,
-  createXyzGrid,
-  EPSG_3857,
-  MAX_ZOOM,
-  MIN_ZOOM,
-  PIXEL_RATIO,
-  REPROJ_ERR_THRESHOLD,
-  TILE_SIZE,
-} from '../ol-ext'
+import { createXYZ as newXYZGrid, extentFromProjection } from 'ol/tilegrid'
+import { EPSG_3857 } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { hasSource } from '../util/assert'
 import { isEqual, isString, pick, replaceTokens } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
-import withUrl from './with-url'
 
 export default {
-  mixins: [source, withUrl],
+  mixins: [
+    source,
+  ],
   props: {
-    cacheSize: {
-      type: Number,
-      default: CACHE_SIZE,
-    },
-    crossOrigin: String,
-    maxZoom: {
-      type: Number,
-      default: MAX_ZOOM,
-    },
-    minZoom: {
-      type: Number,
-      default: MIN_ZOOM,
-    },
+    // ol/source/Tile
+    cacheSize: Number,
     opaque: Boolean,
+    tilePixelRatio: {
+      type: Number,
+      default: 1,
+    },
     projection: {
       type: String,
       default: EPSG_3857,
-    },
-    reprojectionErrorThreshold: {
-      type: Number,
-      default: REPROJ_ERR_THRESHOLD,
-    },
-    tilePixelRatio: {
-      type: Number,
-      default: PIXEL_RATIO,
-    },
-    tileSize: {
-      type: Array,
-      default: () => [TILE_SIZE, TILE_SIZE],
-      validator: value => value.length === 2,
-    },
-    /**
-     * @type {module:ol/Tile~LoadFunction}
-     */
-    tileLoadFunction: Function,
-    tileKey: String,
-    /**
-     * URL template or custom tile URL function.
-     * @type {string|module:ol/Tile~UrlFunction}
-     */
-    url: {
-      type: [String, Function],
-      required: true,
     },
     /**
      * Duration of the opacity transition for rendering. To disable the opacity transition, pass `0`.
      * @type {number}
      */
     transition: Number,
+    tileKey: String,
+    zDirection: {
+      type: Number,
+      default: 0,
+    },
+    // crossOrigin: String,
+    // maxZoom: {
+    //   type: Number,
+    //   default: MAX_ZOOM,
+    // },
+    // minZoom: {
+    //   type: Number,
+    //   default: MIN_ZOOM,
+    // },
+    // reprojectionErrorThreshold: {
+    //   type: Number,
+    //   default: REPROJ_ERR_THRESHOLD,
+    // },
+    // tileSize: {
+    //   type: Array,
+    //   default: () => [TILE_SIZE, TILE_SIZE],
+    //   validator: value => value.length === 2,
+    // },
+    // /**
+    //  * @type {module:ol/Tile~LoadFunction}
+    //  */
+    // tileLoadFunction: Function,
+    // /**
+    //  * URL template or custom tile URL function.
+    //  * @type {string|module:ol/Tile~UrlFunction}
+    //  */
+    // url: {
+    //   type: [String, Function],
+    //   required: true,
+    // },
   },
   computed: {
     /**
@@ -91,7 +85,7 @@ export default {
 
       let url
       if (this.urlTmpl != null) {
-        const extent = createExtentFromProjection(this.projection)
+        const extent = extentFromProjection(this.projection)
         url = createTileUrlFunction(this.urlTmpl, this._tileGrid, extent)
       } else {
         url = this.url
@@ -110,8 +104,8 @@ export default {
        * @type {module:ol/Tile~UrlFunction}
        * @protected
        */
-      this._tileGrid = createXyzGrid({
-        extent: createExtentFromProjection(this.projection),
+      this._tileGrid = newXYZGrid({
+        extent: extentFromProjection(this.projection),
         maxZoom: this.maxZoom,
         minZoom: this.minZoom,
         tileSize: this.tileSize,

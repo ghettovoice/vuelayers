@@ -1,16 +1,19 @@
-import Vue from 'vue'
-import Geometry from 'ol/geom/Geometry'
-import uuid from 'uuid/v4'
 import pointOnFeature from '@turf/point-on-feature'
-import Circle from 'ol/geom/Circle'
-import GeometryCollection from 'ol/geom/GeometryCollection'
-import LineString from 'ol/geom/LineString'
-import MultiLineString from 'ol/geom/MultiLineString'
-import MultiPoint from 'ol/geom/MultiPoint'
-import MultiPolygon from 'ol/geom/MultiPolygon'
-import Point from 'ol/geom/Point'
-import Polygon, { circular as circularPolygon } from 'ol/geom/Polygon'
-import { GEOMETRY_TYPE } from './consts'
+import {
+  Circle,
+  Geometry,
+  GeometryCollection,
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon,
+} from 'ol/geom'
+import GeometryType from 'ol/geom/GeometryType'
+import { circular as circularPolygon } from 'ol/geom/Polygon'
+import uuid from 'uuid/v4'
+import Vue from 'vue'
 
 /**
  * @param {number|number[]} lonOrCoordinates
@@ -89,10 +92,10 @@ export function createCircularPolygon (center, radius) {
  */
 export function isMultiGeom (geom) {
   const multiTypes = [
-    GEOMETRY_TYPE.MULTI_POINT,
-    GEOMETRY_TYPE.MULTI_LINE_STRING,
-    GEOMETRY_TYPE.MULTI_POLYGON,
-    GEOMETRY_TYPE.GEOMETRY_COLLECTION,
+    GeometryType.MULTI_POINT,
+    GeometryType.MULTI_LINE_STRING,
+    GeometryType.MULTI_POLYGON,
+    GeometryType.GEOMETRY_COLLECTION,
   ]
 
   return multiTypes.includes(geom.type || geom.getType())
@@ -110,7 +113,7 @@ export function toSimpleGeom (geom) {
 
   const type = geom.type || geom.getType()
   const complexTypes = [
-    GEOMETRY_TYPE.GEOMETRY_COLLECTION,
+    GeometryType.GEOMETRY_COLLECTION,
   ]
 
   if (complexTypes.includes(type) === false) {
