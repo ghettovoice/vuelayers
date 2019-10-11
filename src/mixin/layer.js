@@ -52,31 +52,31 @@ export default {
   },
   watch: {
     id (value) {
-      this.setId(value)
+      this.setLayerId(value)
     },
     opacity (value) {
-      this.setOpacity(value)
+      this.setLayerOpacity(value)
     },
     visible (value) {
-      this.setVisible(value)
+      this.setLayerVisible(value)
     },
     extent (value) {
-      this.setExtent(value)
+      this.setLayerExtent(value)
     },
     zIndex (value) {
-      this.setZIndex(value)
+      this.setLayerZIndex(value)
     },
     minResolution (value) {
-      this.setMinResolution(value)
+      this.setLayerMinResolution(value)
     },
     maxResolution (value) {
-      this.setMaxResolution(value)
+      this.setLayerMaxResolution(value)
     },
     minZoom (value) {
-      this.setMinZoom(value)
+      this.setLayerMinZoom(value)
     },
     maxZoom (value) {
-      this.setMaxZoom(value)
+      this.setLayerMaxZoom(value)
     },
     ...makeWatchers([
       'overlay',
@@ -109,14 +109,14 @@ export default {
     /**
      * @returns {Promise<string|number>}
      */
-    async getId () {
+    async getLayerId () {
       return getLayerId(await this.resolveLayer())
     },
     /**
      * @param {string|number} id
      * @returns {Promise<void>}
      */
-    async setId (id) {
+    async setLayerId (id) {
       const layer = await this.resolveLayer()
 
       if (id === getLayerId(layer)) return
@@ -126,14 +126,14 @@ export default {
     /**
      * @returns {Promise<number[]>}
      */
-    async getExtent () {
+    async getLayerExtent () {
       return this.extentToDataProj((await this.resolveLayer()).getExtent())
     },
     /**
      * @param {number[]} extent
      * @returns {Promise<void>}
      */
-    async setExtent (extent) {
+    async setLayerExtent (extent) {
       extent = this.extentToViewProj(extent)
       const layer = await this.resolveLayer()
 
@@ -144,14 +144,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getMaxResolution () {
+    async getLayerMaxResolution () {
       return (await this.resolveLayer()).getMaxResolution()
     },
     /**
      * @param {number} resolution
      * @returns {Promise<void>}
      */
-    async setMaxResolution (resolution) {
+    async setLayerMaxResolution (resolution) {
       const layer = await this.resolveLayer()
 
       if (resolution === layer.getMaxResolution()) return
@@ -161,14 +161,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getMinResolution () {
+    async getLayerMinResolution () {
       return (await this.resolveLayer()).getMinResolution()
     },
     /**
      * @param {number} resolution
      * @returns {Promise<void>}
      */
-    async setMinResolution (resolution) {
+    async setLayerMinResolution (resolution) {
       const layer = await this.resolveLayer()
 
       if (resolution === layer.getMinResolution()) return
@@ -178,14 +178,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getMaxZoom () {
+    async getLayerMaxZoom () {
       return (await this.resolveLayer()).getMaxZoom()
     },
     /**
      * @param {number} zoom
      * @returns {Promise<void>}
      */
-    async setMaxZoom (zoom) {
+    async setLayerMaxZoom (zoom) {
       const layer = await this.resolveLayer()
 
       if (zoom === layer.getMaxZoom()) return
@@ -195,14 +195,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getMinZoom () {
+    async getLayerMinZoom () {
       return (await this.resolveLayer()).getMinZoom()
     },
     /**
      * @param {number} zoom
      * @returns {Promise<void>}
      */
-    async setMinZoom (zoom) {
+    async setLayerMinZoom (zoom) {
       const layer = await this.resolveLayer()
 
       if (zoom === layer.getMinZoom()) return
@@ -212,14 +212,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getOpacity () {
+    async getLayerOpacity () {
       return (await this.resolveLayer()).getOpacity()
     },
     /**
      * @param {number} opacity
      * @returns {Promise<void>}
      */
-    async setOpacity (opacity) {
+    async setLayerOpacity (opacity) {
       const layer = await this.resolveLayer()
 
       if (opacity === layer.getOpacity()) return
@@ -229,14 +229,14 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getVisible () {
+    async getLayerVisible () {
       return (await this.resolveLayer()).getVisible()
     },
     /**
      * @param {boolean} visible
      * @returns {Promise<void>}
      */
-    async setVisible (visible) {
+    async setLayerVisible (visible) {
       const layer = await this.resolveLayer()
 
       if (visible === layer.getVisible()) return
@@ -246,14 +246,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getZIndex () {
+    async getLayerZIndex () {
       return (await this.resolveLayer()).getZIndex()
     },
     /**
      * @param {number} zIndex
      * @returns {Promise<void>}
      */
-    async setZIndex (zIndex) {
+    async setLayerZIndex (zIndex) {
       const layer = await this.resolveLayer()
 
       if (zIndex === layer.getZIndex()) return
@@ -264,7 +264,7 @@ export default {
      * @param {module:ol/Map~Map|Vue|undefined} map
      * @return {Promise<void>}
      */
-    async setMap (map) {
+    async setLayerMap (map) {
       if (map instanceof Vue) {
         map = await map.resolveMap()
       }
@@ -272,10 +272,24 @@ export default {
       (await this.resolveLayer()).setMap(map)
     },
     /**
+     * @return {Promise<module:ol/layer/Base~BaseLayer>}
+     * @protected
+     */
+    getSourceTarget: olCmp.methods.resolveOlObject,
+    /**
+     * @returns {Promise<module:ol/sourceSource~Source|undefined>}
+     */
+    getLayerSource: sourceContainer.methods.getSource,
+    /**
+     * @param {module:ol/sourceSource~Source|undefined} source
+     * @returns {Promise<void>}
+     */
+    setLayerSource: sourceContainer.methods.setSource,
+    /**
      * @param {number[]} pixel
      * @return {boolean}
      */
-    async isAtPixel (pixel) {
+    async isLayerAtPixel (pixel) {
       const layer = await this.resolveLayer()
 
       return this.$mapVm.forEachLayerAtPixel(pixel, mapLayer => mapLayer === layer)
@@ -295,7 +309,7 @@ export default {
      */
     async mount () {
       if (this.overlay && this.$map) {
-        await this.setMap(this.$map)
+        await this.setLayerMap(this.$map)
       } else if (this.$layersContainer) {
         await this.$layersContainer.addLayer(this)
       }
@@ -308,7 +322,7 @@ export default {
      */
     async unmount () {
       if (this.overlay) {
-        await this.setMap(null)
+        await this.setLayerMap(null)
       } else if (this.$layersContainer) {
         await this.$layersContainer.removeLayer(this)
       }
@@ -341,7 +355,6 @@ export default {
       ])
     },
     resolveLayer: olCmp.methods.resolveOlObject,
-    getSourceTarget: olCmp.methods.resolveOlObject,
     ...pick(olCmp.methods, [
       'deinit',
       'refresh',
@@ -386,6 +399,7 @@ async function subscribeToLayerEvents () {
   const changes = mergeObs(
     obsFromOlChangeEvent(layer, 'extent', true, t, () => this.extentToDataProj(layer.getExtent())),
     obsFromOlChangeEvent(layer, [
+      'id',
       'opacity',
       'visible',
       'zIndex',

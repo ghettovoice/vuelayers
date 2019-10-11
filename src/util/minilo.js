@@ -1,4 +1,5 @@
 import { interval as intervalObs } from 'rxjs/Observable'
+import { Collection } from 'ol'
 import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
 
 /**
@@ -37,6 +38,10 @@ export function stubObject () {
   return Object.create(null)
 }
 
+export function stubCollection () {
+  return new Collection()
+}
+
 export function identity (value) {
   return value
 }
@@ -69,6 +74,10 @@ export function isArray (value) {
 
 export function isArrayLike (value) {
   return isObjectLike(value) && value::objectHasOwnProp('length')
+}
+
+export function isCollection (value) {
+  return value instanceof Collection
 }
 
 export function isFinite (value) {
@@ -189,17 +198,30 @@ export function isEqual (value, other) {
   return traverse(otherProps, valueProps)
 }
 
-export function isEmpty (value) {
-  return !value ||
-    (isArrayLike(value) && value.length === 0) ||
-    (isObjectLike(value) && Object.keys(value).length === 0)
+export function getLength (value) {
+  if (isCollection(value)) {
+    value = value.getArray()
+  }
+  if (isArrayLike(value)) {
+    return value.length
+  }
+  return 0
 }
 
-export function isNotEmpty (value) {
-  return !isEmpty(value)
+export function isEmpty (value) {
+  if (isCollection(value)) {
+    value = value.getArray()
+  }
+  if (isObjectLike(value)) {
+    value = Object.values(value).filter(negate(isEmpty))
+  }
+  return !value || (isArrayLike(value) && getLength(value) === 0)
 }
 
 export function forEach (collection, iteratee) {
+  if (isCollection(collection)) {
+    collection = collection.getArray()
+  }
   const keys = Object.keys(collection)
   for (let i = 0, l = keys.length; i < l; i++) {
     const key = keys[i]
@@ -218,7 +240,7 @@ export function reduce (collection, iteratee, initial) {
   return result
 }
 
-export function filter (collection, iteratee = isNotEmpty) {
+export function filter (collection, iteratee = negate(isEmpty)) {
   return reduce(collection, (newCollection, value, key) => {
     if (iteratee(value, key)) {
       if (isArray(newCollection)) {
@@ -228,14 +250,14 @@ export function filter (collection, iteratee = isNotEmpty) {
       }
     }
     return newCollection
-  }, isArray(collection) ? [] : {})
+  }, isArrayLike(collection) || isCollection(collection) ? [] : {})
 }
 
 export function map (collection, iteratee = identity) {
   return reduce(collection, (newCollection, value, key) => {
     newCollection[key] = iteratee(value, key)
     return newCollection
-  }, isArray(collection) ? [] : {})
+  }, isArrayLike(collection) || isCollection(collection) ? [] : {})
 }
 
 export function mapValues (object, iteratee = identity) {
@@ -246,16 +268,22 @@ export function mapKeys (object, iteratee = identity) {
   return reduce(object, (newObject, value, key) => {
     newObject[iteratee(value, key)] = value
     return newObject
-  })
+  }, {})
 }
 
 export function firstEl (object) {
+  if (isCollection(object)) {
+    object = object.getArray()
+  }
   if (!isArrayLike(object)) return
 
   return object[0]
 }
 
 export function lastEl (object) {
+  if (isCollection(object)) {
+    object = object.getArray()
+  }
   if (!isArrayLike(object)) return
 
   return object[object.length - 1]

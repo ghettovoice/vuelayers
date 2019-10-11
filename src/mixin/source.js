@@ -1,6 +1,7 @@
 import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import { isArray, isEqual, isString, pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
+import { obsFromOlChangeEvent } from '../rx-ext'
 import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
 
@@ -43,11 +44,17 @@ export default {
     },
   },
   computed: {
+    /**
+     * @returns {string|undefined}
+     */
     state () {
       if (!(this.rev && this.$source)) return
 
       return this.$source.getState()
     },
+    /**
+     * @returns {number[]|undefined}
+     */
     resolutions () {
       if (!(this.rev && this.$source)) return
 
@@ -56,29 +63,24 @@ export default {
   },
   watch: {
     id (value) {
-      this.setId(value)
+      this.setSourceId(value)
     },
     attributions (value) {
-      this.setAttributions(value)
+      this.setSourceAttributions(value)
     },
     async attributionsCollapsible (value) {
-      const source = await this.resolveSource()
-
-      if (value === source.getAttributionsCollapsible()) return
+      if (value === await this.getSourceAttributionsCollapsible()) return
 
       this.scheduleRecreate()
     },
     async projection (value) {
-      const source = await this.resolveSource()
-
-      if (value === source.getProjection()?.getCode()) return
+      const projection = await this.getSourceProjection()
+      if (value === projection?.getCode()) return
 
       this.scheduleRecreate()
     },
     async wrapX (value) {
-      const source = await this.resolveSource()
-
-      if (value === source.getWrapX()) return
+      if (value === await this.getSourceWrapX()) return
 
       this.scheduleRecreate()
     },
@@ -109,14 +111,14 @@ export default {
     /**
      * @returns {Promise<string|number>}
      */
-    async getId () {
+    async getSourceId () {
       return (await this.resolveSource()).getId()
     },
     /**
      * @param {string|number} id
      * @returns {Promise<void>}
      */
-    async setId (id) {
+    async setSourceId (id) {
       const source = await this.resolveSource()
 
       if (id === getSourceId(source)) return
@@ -126,14 +128,14 @@ export default {
     /**
      * @returns {Promise<string>}
      */
-    async getAttributions () {
+    async getSourceAttributions () {
       return (await this.resolveSource()).getAttributions()
     },
     /**
      * @param {string} attributions
      * @returns {Promise<void>}
      */
-    async setAttributions (attributions) {
+    async setSourceAttributions (attributions) {
       const source = await this.resolveSource()
 
       if (isEqual(attributions, source.getAttributions())) return
@@ -143,32 +145,44 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getAttributionsCollapsible () {
+    async getSourceAttributionsCollapsible () {
       return (await this.resolveSource()).getAttributionsCollapsible()
     },
     /**
      * @returns {Promise<module:ol/proj/Projection~Projection>}
      */
-    async getProjection () {
+    async getSourceProjection () {
       return (await this.resolveSource()).getProjection()
     },
     /**
      * @returns {Promise<string>}
      */
-    async getState () {
+    async getSourceState () {
       return (await this.resolveSource()).getState()
     },
     /**
      * @returns {Promise<boolean>}
      */
-    async getWrapX () {
+    async getSourceWrapX () {
       return (await this.resolveSource()).getWrapX()
     },
     /**
      * @returns {Promise<number[]>}
      */
-    async getResolutions () {
+    async getSourceResolutions () {
       return (await this.resolveSource()).getResolutions()
+    },
+    /**
+     * @returns {Promise<void>}
+     */
+    async reloadSource () {
+      (await this.resolveSource()).refresh()
+    },
+    /**
+     * @return {Promise<void>}
+     */
+    async clearSource () {
+      (await this.resolveSource()).clear()
     },
     /**
      * @returns {Promise<void>}
@@ -215,6 +229,18 @@ export default {
         },
       )
     },
+    /**
+     * @returns {Promise<void>}
+     */
+    async subscribeAll () {
+      await Promise.all(
+        this::olCmp.methods.subscribeAll(),
+        this::subscribeToSourceEvents(),
+      )
+    },
+    /**
+     * @return {Promise<module:ol/source/Source~Source>}
+     */
     resolveSource: olCmp.methods.resolveOlObject,
     ...pick(olCmp.methods, [
       'deinit',
@@ -224,7 +250,6 @@ export default {
       'scheduleRemount',
       'recreate',
       'scheduleRecreate',
-      'subscribeAll',
     ]),
   },
 }
@@ -259,5 +284,21 @@ function defineServices () {
       enumerable: true,
       get: () => this.$services?.sourceContainer,
     },
+  })
+}
+
+async function subscribeToSourceEvents () {
+  const source = await this.resolveSource()
+
+  const changes = obsFromOlChangeEvent(source, [
+    'id',
+  ], true, 1000 / 60)
+
+  this.subscribeTo(changes, ({ prop, value }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(`update:${prop}`, value)
+    })
   })
 }

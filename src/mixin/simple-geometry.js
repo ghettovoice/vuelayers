@@ -1,10 +1,10 @@
 import { boundingExtent } from 'ol/extent'
-import GeometryLayout from 'ol/geom/GeometryLayout'
+// import GeometryLayout from 'ol/geom/GeometryLayout'
 import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
 import { transforms } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { isEmpty, isEqual, negate, pick } from '../util/minilo'
-import { makeWatchers } from '../util/vue-helpers'
+// import { makeWatchers } from '../util/vue-helpers'
 import geometry from './geometry'
 
 export default {
@@ -21,14 +21,14 @@ export default {
       required: true,
       validator: negate(isEmpty),
     },
-    /**
-     * @type {string}
-     */
-    layout: {
-      type: String,
-      default: GeometryLayout.XY,
-      validator: value => Object.values(GeometryLayout).includes(value.toUpperCase()),
-    },
+    // /**
+    //  * @type {string}
+    //  */
+    // layout: {
+    //   type: String,
+    //   default: GeometryLayout.XY,
+    //   validator: value => Object.values(GeometryLayout).includes(value.toUpperCase()),
+    // },
   },
   computed: {
     coordinatesViewProj () {
@@ -36,46 +36,46 @@ export default {
 
       return this.$geometry.getCoordinates()
     },
-    layoutUCase () {
-      return this.layout.toUpperCase()
-    },
+    // layoutUpCase () {
+    //   return this.layout.toUpperCase()
+    // },
   },
   watch: {
     coordinates (value) {
-      this.setCoordinates(value)
+      this.setGeometryCoordinates(value)
     },
     resolvedDataProjection () {
-      this.setCoordinates(this.coordinates)
+      this.setGeometryCoordinates(this.coordinates)
     },
-    ...makeWatchers([
-      'layoutUCase',
-    ], () => geometry.methods.scheduleRecreate),
+    // ...makeWatchers([
+    //   'layoutUpCase',
+    // ], () => geometry.methods.scheduleRecreate),
   },
   methods: {
     /**
      * @return {Promise<number[]>}
      */
-    async getCoordinates () {
+    async getGeometryCoordinates () {
       const coordinates = (await this.resolveGeometry()).getCoordinates()
 
-      return this.toDataProj(coordinates)
+      return this.coordinatesToDataProj(coordinates)
     },
     /**
      * @param {number[]} coordinates
      */
-    async setCoordinates (coordinates) {
+    async setGeometryCoordinates (coordinates) {
       // compares in data projection
       const isEq = isEqualGeom({
         coordinates,
         extent: boundingExtent(coordinates),
       }, {
-        coordinates: await this.getCoordinates(),
+        coordinates: await this.getGeometryCoordinates(),
         extent: this.extent,
       })
 
       if (isEq) return
 
-      coordinates = await this.toViewProj(coordinates)
+      coordinates = await this.coordinatesToViewProj(coordinates)
       const geom = await this.resolveGeometry()
 
       geom.setCoordinates(coordinates)
@@ -83,24 +83,24 @@ export default {
     /**
      * @returns {number[]>}
      */
-    async getFirstCoordinate () {
+    async getGeometryFirstCoordinate () {
       const coordinate = (await this.resolveGeometry()).getFirstCoordinate()
+
+      return this.pointToDataProj(coordinate)
+    },
+    /**
+     * @returns {Promise<number[]>}
+     */
+    async getGeometryLastCoordinate () {
+      const coordinate = (await this.resolveGeometry()).getLastCoordinate()
 
       return this.pointToDataProj(coordinate)
     },
     /**
      * @returns {Promise<string>}
      */
-    async getLayout () {
+    async getGeometryCoordinatesLayout () {
       return (await this.resolveGeometry()).getLayout()
-    },
-    /**
-     * @returns {Promise<number[]>}
-     */
-    async getLastCoordinate () {
-      const coordinate = (await this.resolveGeometry()).getLastCoordinate()
-
-      return this.pointToDataProj(coordinate)
     },
     /**
      * @return {Promise<void>}

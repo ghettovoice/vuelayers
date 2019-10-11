@@ -24,7 +24,6 @@ export default {
     /**
      * @param {module:ol/geom/Geometry~Geometry|Vue|Object|undefined} geom
      * @return {Promise<void>}
-     * @throws {AssertionError}
      */
     async setGeometry (geom) {
       if (geom instanceof Vue) {

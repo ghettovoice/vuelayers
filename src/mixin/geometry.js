@@ -1,4 +1,5 @@
 import { findPointOnSurface, getGeometryId, initializeGeometry, setGeometryId, transforms } from '../ol-ext'
+import { obsFromOlChangeEvent } from '../rx-ext'
 import { pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import olCmp from './ol-cmp'
@@ -60,7 +61,7 @@ export default {
   },
   watch: {
     id (value) {
-      this.setId(value)
+      this.setGeometryId(value)
     },
   },
   created () {
@@ -89,14 +90,14 @@ export default {
     /**
      * @returns {Promise<string|number>}
      */
-    async getId () {
+    async getGeometryId () {
       return getGeometryId(await this.resolveGeometry())
     },
     /**
      * @param {string|number} id
      * @returns {Promise<void>}
      */
-    async setId (id) {
+    async setGeometryId (id) {
       const geometry = await this.resolveGeometry()
 
       if (id === getGeometryId(geometry)) return
@@ -106,14 +107,14 @@ export default {
     /**
      * @returns {Promise<string>}
      */
-    async getType () {
+    async getGeometryType () {
       return (await this.resolveGeometry()).getType()
     },
     /**
      * @param {number[]} [extent]
      * @returns {Promise<number[]>}
      */
-    async getExtent (extent) {
+    async getGeometryExtent (extent) {
       extent = extent != null ? this.extentToViewProj(extent) : undefined
 
       return (await this.resolveGeometry()).getExtent(extent)
@@ -123,7 +124,7 @@ export default {
      * @param {number[]} [closestPoint]
      * @returns {Promise<number[]>}
      */
-    async getClosestPoint (point, closestPoint) {
+    async getGeometryClosestPoint (point, closestPoint) {
       point = this.pointToViewProj(point)
       closestPoint = closestPoint != null ? this.pointToViewProj(closestPoint) : undefined
 
@@ -133,25 +134,16 @@ export default {
      * @param {number[]} coordinate
      * @returns {Promise<boolean>}
      */
-    async intersectsCoordinate (coordinate) {
+    async geometryIntersectsCoordinate (coordinate) {
       coordinate = this.pointToViewProj(coordinate)
 
       return (await this.resolveGeometry()).intersectsCoordinate(coordinate)
     },
     /**
      * @param {number[]} extent
-     * @returns {Promise<number[]>}
-     */
-    async computeExtent (extent) {
-      extent = this.extentToViewProj(extent)
-
-      return (await this.resolveGeometry()).computeExtent(extent)
-    },
-    /**
-     * @param {number[]} extent
      * @returns {Promise<boolean>}
      */
-    async intersectsExtent (extent) {
+    async geometryIntersectsExtent (extent) {
       extent = this.extentToViewProj(extent)
 
       return (await this.resolveGeometry()).intersectsExtent(extent)
@@ -161,7 +153,7 @@ export default {
      * @param {number[]} anchor
      * @returns {Promise<void>}
      */
-    async rotate (angle, anchor) {
+    async rotateGeometry (angle, anchor) {
       const geom = await this.resolveGeometry()
       anchor = this.pointToViewProj(anchor)
 
@@ -173,7 +165,7 @@ export default {
      * @param {number[]} [anchor]
      * @returns {Promise<void>}
      */
-    async scale (sx, sy, anchor) {
+    async scaleGeometry (sx, sy, anchor) {
       const geom = await this.resolveGeometry()
       anchor = anchor != null ? this.pointToViewProj(anchor) : undefined
 
@@ -183,7 +175,7 @@ export default {
      * @param {number} tolerance
      * @returns {Promise<module:ol/geom/Geometry~Geometry>}
      */
-    async simplify (tolerance) {
+    async simplifyGeometry (tolerance) {
       return (await this.resolveGeometry()).simplify(tolerance)
     },
     /**
@@ -191,13 +183,13 @@ export default {
      * @param dy
      * @returns {Promise<*>}
      */
-    async translate (dx, dy) {
+    async translateGeometry (dx, dy) {
       return (await this.resolveGeometry()).translate(dx, dy)
     },
     /**
      * @returns {Promise<function>}
      */
-    async getTransformFunction () {
+    async getCoordinatesTransformFunction () {
       const { transform } = transforms[await this.getType()]
 
       return transform
@@ -206,8 +198,8 @@ export default {
      * @param {number[]} coordinates
      * @returns {Promise<number[]>}
      */
-    async toDataProj (coordinates) {
-      const transform = await this.getTransformFunction()
+    async coordinatesToDataProj (coordinates) {
+      const transform = await this.getCoordinatesTransformFunction()
 
       return transform(coordinates, this.viewProjection, this.resolvedDataProjection)
     },
@@ -215,8 +207,8 @@ export default {
      * @param {number[]} coordinates
      * @returns {Promise<number[]>}
      */
-    async toViewProj (coordinates) {
-      const transform = await this.getTransformFunction()
+    async coordinatesToViewProj (coordinates) {
+      const transform = await this.getCoordinatesTransformFunction()
 
       return transform(coordinates, this.viewProjection, this.resolvedDataProjection)
     },
@@ -265,6 +257,15 @@ export default {
         },
       )
     },
+    /**
+     * @returns {Promise<void>}
+     */
+    async subscribeAll () {
+      await Promise.all(
+        this::olCmp.methods.subscribeAll(),
+        this::subscribeToGeometryEvents(),
+      )
+    },
     resolveGeometry: olCmp.methods.resolveOlObject,
     ...pick(olCmp.methods, [
       'deinit',
@@ -274,7 +275,6 @@ export default {
       'scheduleRemount',
       'recreate',
       'scheduleRecreate',
-      'subscribeAll',
     ]),
   },
 }
@@ -309,5 +309,21 @@ function defineServices () {
       enumerable: true,
       get: () => this.$services?.geometryContainer,
     },
+  })
+}
+
+async function subscribeToGeometryEvents () {
+  const geometry = await this.resolveGeometry()
+
+  const changes = obsFromOlChangeEvent(geometry, [
+    'id',
+  ], true, 1000 / 60)
+
+  this.subscribeTo(changes, ({ prop, value }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(`update:${prop}`, value)
+    })
   })
 }

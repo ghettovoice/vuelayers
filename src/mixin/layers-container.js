@@ -5,6 +5,7 @@ import Vue from 'vue'
 import { getLayerId, initializeLayer } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
+import { map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
 export default {
@@ -32,6 +33,8 @@ export default {
      * @return {Promise<void>}
      */
     async addLayer (layer) {
+      initializeLayer(layer)
+
       if (layer instanceof Vue) {
         layer = await layer.resolveOlObject()
       }
@@ -39,9 +42,11 @@ export default {
       instanceOf(layer, BaseLayer)
 
       if (this.getLayerById(getLayerId(layer)) == null) {
-        initializeLayer(layer)
         this.$layersCollection.push(layer)
       }
+    },
+    async addLayers (layers) {
+      await Promise.all(map(layers, ::this.addLayer))
     },
     /**
      * @param {BaseLayer|Vue} layer
@@ -56,6 +61,9 @@ export default {
       if (!layer) return
 
       this.$layersCollection.remove(layer)
+    },
+    async removeLayers (layers) {
+      await Promise.all(map(layers, ::this.removeLayer))
     },
     /**
      * @return {BaseLayer[]}

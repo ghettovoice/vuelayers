@@ -3,13 +3,21 @@ import { pick } from '../util/minilo'
 import layer from './layer'
 
 export default {
-  mixins: [layer],
+  mixins: [
+    layer,
+  ],
   props: {
     // ol/layer/BaseTile
+    /**
+     * @type {number}
+     */
     preload: {
       type: Number,
       default: 0,
     },
+    /**
+     * @type {boolean}
+     */
     useInterimTilesOnError: {
       type: Boolean,
       default: true,
@@ -17,24 +25,24 @@ export default {
   },
   watch: {
     preload (value) {
-      this.setPreload(value)
+      this.setLayerPreload(value)
     },
     useInterimTilesOnError (value) {
-      this.setUseInterimTilesOnError(value)
+      this.setLayerUseInterimTilesOnError(value)
     },
   },
   methods: {
     /**
      * @returns {Promise<number>}
      */
-    async getPreload () {
+    async getLayerPreload () {
       return (await this.resolveLayer()).getPreload()
     },
     /**
      * @param {number} preload
      * @returns {Promise<void>}
      */
-    async setPreload (preload) {
+    async setLayerPreload (preload) {
       const layer = await this.resolveLayer()
 
       if (preload === layer.getPreload()) return
@@ -44,14 +52,14 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getUseInterimTilesOnError () {
+    async getLayerUseInterimTilesOnError () {
       return (await this.resolveLayer()).getUseInterimTilesOnError()
     },
     /**
      * @param {boolean} useInterimTilesOnError
      * @returns {Promise<void>}
      */
-    async setUseInterimTilesOnError (useInterimTilesOnError) {
+    async setLayerUseInterimTilesOnError (useInterimTilesOnError) {
       const layer = await this.resolveLayer()
 
       if (useInterimTilesOnError === layer.getUseInterimTilesOnError()) return

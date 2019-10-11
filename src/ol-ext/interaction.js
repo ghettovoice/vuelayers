@@ -3,7 +3,7 @@ import uuid from 'uuid/v4'
 import Vue from 'vue'
 
 /**
- * @param {Interaction|Vue} interaction
+ * @param {module:ol/interaction/Interaction~Interaction|Vue|Object} interaction
  * @returns {string|null}
  */
 export function getInteractionId (interaction) {
@@ -17,9 +17,9 @@ export function getInteractionId (interaction) {
 }
 
 /**
- * @param {Interaction|Vue} interaction
+ * @param {module:ol/interaction/Interaction~Interaction|Vue|Object} interaction
  * @param {string} interactionId
- * @returns {Vue|Interaction}
+ * @returns {Vue|module:ol/interaction/Interaction~Interaction|Object}
  */
 export function setInteractionId (interaction, interactionId) {
   if (interaction instanceof Vue) {

@@ -5,7 +5,7 @@ import Vue from 'vue'
 import { getControlId, initializeControl } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isArray, isPlainObject } from '../util/minilo'
+import { isArray, isPlainObject, map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
 export default {
@@ -24,7 +24,7 @@ export default {
     this::subscribeToCollectionEvents()
   },
   methods: {
-    initDefaultControls (defaultControls) {
+    async initDefaultControls (defaultControls) {
       this.clearControls()
 
       let controls
@@ -38,10 +38,12 @@ export default {
         )
       }
       if (controls) {
-        controls.forEach(::this.addControl)
+        await this.addControls(controls)
       }
     },
     async addControl (control) {
+      initializeControl(control)
+
       if (control instanceof Vue) {
         control = await control.resolveOlObject()
       }
@@ -49,9 +51,11 @@ export default {
       instanceOf(control, Control)
 
       if (this.getControlById(getControlId(control)) == null) {
-        initializeControl(control)
         this.$controlsCollection.push(control)
       }
+    },
+    async addControls (controls) {
+      await Promise.all(map(controls, ::this.addControl))
     },
     async removeControl (control) {
       if (control instanceof Vue) {
@@ -59,9 +63,12 @@ export default {
       }
 
       control = this.getControlById(getControlId(control))
-      if (control == null) return
+      if (!control) return
 
       this.$controlsCollection.remove(control)
+    },
+    async removeControls (controls) {
+      await Promise.all(map(controls, ::this.removeControl))
     },
     getControls () {
       return this.$controlsCollection.getArray()

@@ -1,3 +1,4 @@
+import { obsFromOlChangeEvent } from '../rx-ext'
 import { pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import layer from './layer'
@@ -10,6 +11,9 @@ export default {
   ],
   props: {
     // ol/layer/BaseVector
+    /**
+     * @type {function|undefined}
+     */
     renderOrder: Function,
     /**
      * @type {number|undefined}
@@ -37,25 +41,25 @@ export default {
   },
   watch: {
     renderOrder (value) {
-      this.setRenderOrder(value)
+      this.setLayerRenderOrder(value)
     },
     async renderBuffer (value) {
-      if (value === await this.getRenderBuffer()) return
+      if (value === await this.getLayerRenderBuffer()) return
 
       this.scheduleRecreate()
     },
     async declutter (value) {
-      if (value === await this.getDeclutter()) return
+      if (value === await this.getLayerDeclutter()) return
 
       this.scheduleRecreate()
     },
     async updateWhileAnimating (value) {
-      if (value === await this.getUpdateWhileAnimating()) return
+      if (value === await this.getLayerUpdateWhileAnimating()) return
 
       this.scheduleRecreate()
     },
     async updateWhileInteracting (value) {
-      if (value === await this.getUpdateWhileInteracting()) return
+      if (value === await this.getLayerUpdateWhileInteracting()) return
 
       this.scheduleRecreate()
     },
@@ -64,26 +68,26 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getDeclutter () {
+    async getLayerDeclutter () {
       return (await this.resolveLayer()).getDeclutter()
     },
     /**
      * @returns {Promise<number>}
      */
-    async getRenderBuffer () {
+    async getLayerRenderBuffer () {
       return (await this.resolveLayer()).getRenderBuffer()
     },
     /**
      * @returns {Promise<function>}
      */
-    async getRenderOrder () {
+    async getLayerRenderOrder () {
       return (await this.resolveLayer()).getRenderOrder()
     },
     /**
      * @param {function} renderOrder
      * @returns {Promise<void>}
      */
-    async setRenderOrder (renderOrder) {
+    async setLayerRenderOrder (renderOrder) {
       const layer = await this.resolveLayer()
 
       if (renderOrder === layer.getRenderOrder()) return
@@ -93,15 +97,28 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getUpdateWhileAnimating () {
+    async getLayerUpdateWhileAnimating () {
       return (await this.resolveLayer()).getUpdateWhileAnimating()
     },
     /**
      * @returns {Promise<boolean>}
      */
-    async getUpdateWhileInteracting () {
+    async getLayerUpdateWhileInteracting () {
       return (await this.resolveLayer()).getUpdateWhileInteracting()
     },
+    /**
+     * @return {Promise<module:ol/layer/BaseVector~BaseVectorLayer>}
+     */
+    getStyleTarget: layer.methods.resolveLayer,
+    /**
+     * @return {Promise<module:ol/style/Style~Style[]|module:ol/style/Style~StyleFunction|Vue|undefined>}
+     */
+    getLayerStyle: stylesContainer.methods.getStyles,
+    /**
+     * @param {Array<{style: module:ol/style/Style~Style, condition: (function|boolean|undefined)}>|module:ol/style/Style~StyleFunction|Vue|undefined} styles
+     * @return {Promise<void>}
+     */
+    setLayerStyle: stylesContainer.methods.setStyle,
     /**
      * @returns {Object}
      * @protected
@@ -112,7 +129,15 @@ export default {
         this::stylesContainer.methods.getServices(),
       )
     },
-    getStyleTarget: layer.methods.resolveLayer,
+    /**
+     * @returns {Promise<void>}
+     */
+    async subscribeAll () {
+      await Promise.all(
+        this::layer.methods.subscribeAll(),
+        this::subscribeToLayerEvents(),
+      )
+    },
     ...pick(layer.methods, [
       'init',
       'deinit',
@@ -124,7 +149,20 @@ export default {
       'scheduleRemount',
       'recreate',
       'scheduleRecreate',
-      'subscribeAll',
     ]),
   },
+}
+
+async function subscribeToLayerEvents () {
+  const layer = await this.resolveLayer()
+
+  const changes = obsFromOlChangeEvent(layer, [
+    'renderOrder',
+  ], true, 1000 / 60)
+
+  this.subscribeTo(changes, ({ prop, value }) => {
+    ++this.rev
+
+    this.$emit(`update:${prop}`, value)
+  })
 }

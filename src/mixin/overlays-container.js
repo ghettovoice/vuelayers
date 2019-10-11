@@ -4,6 +4,7 @@ import Vue from 'vue'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
+import { map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
 export default {
@@ -31,6 +32,8 @@ export default {
      * @return {void}
      */
     async addOverlay (overlay) {
+      initializeOverlay(overlay)
+
       if (overlay instanceof Vue) {
         overlay = await overlay.resolveOlObject()
       }
@@ -38,9 +41,11 @@ export default {
       instanceOf(overlay, Overlay)
 
       if (this.getOverlayById(getOverlayId(overlay)) == null) {
-        initializeOverlay(overlay)
         this.$overlaysCollection.push(overlay)
       }
+    },
+    async addOverlays (overlays) {
+      await Promise.all(map(overlays, ::this.addOverlay))
     },
     /**
      * @param {Overlay|Vue} overlay
@@ -55,6 +60,9 @@ export default {
       if (!overlay) return
 
       this.$overlaysCollection.remove(overlay)
+    },
+    async removeOverlays (overlays) {
+      await Promise.all(map(overlays, ::this.removeOverlay))
     },
     /**
      * @return {Overlay[]}

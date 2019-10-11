@@ -5,7 +5,7 @@ import Vue from 'vue'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isArray, isPlainObject } from '../util/minilo'
+import { isArray, isPlainObject, map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
 export default {
@@ -28,7 +28,7 @@ export default {
     this::subscribeToCollectionEvents()
   },
   methods: {
-    initDefaultInteractions (defaultInteractions) {
+    async initDefaultInteractions (defaultInteractions) {
       this.clearInteractions()
 
       let interactions
@@ -42,7 +42,7 @@ export default {
         )
       }
       if (interactions) {
-        interactions.forEach(::this.addInteraction)
+        await this.addInteractions(interactions)
       }
     },
     /**
@@ -50,6 +50,8 @@ export default {
      * @return {void}
      */
     async addInteraction (interaction) {
+      initializeInteraction(interaction)
+
       if (interaction instanceof Vue) {
         interaction = await interaction.resolveOlObject()
       }
@@ -57,10 +59,19 @@ export default {
       instanceOf(interaction, Interaction)
 
       if (this.getInteractionById(getInteractionId(interaction)) == null) {
-        initializeInteraction(interaction)
         this.$interactionsCollection.push(interaction)
         this.sortInteractions()
       }
+    },
+    /**
+     * @param {
+     *          Array<module:ol/interaction/Interaction~Interaction|Vue|Object>|
+     *          Collection<module:ol/interaction/Interaction~Interaction|Vue|Object>
+     *        } interactions
+     * @returns {Promise<void>}
+     */
+    async addInteractions (interactions) {
+      await Promise.all(map(interactions, ::this.addInteraction))
     },
     /**
      * @param {Interaction|Vue} interaction
@@ -76,6 +87,16 @@ export default {
 
       this.$interactionsCollection.remove(interaction)
       this.sortInteractions()
+    },
+    /**
+     * @param {
+     *          Array<module:ol/interaction/Interaction~Interaction|Vue|Object>|
+     *          Collection<module:ol/interaction/Interaction~Interaction|Vue|Object>
+     *        } interactions
+     * @returns {Promise<void>}
+     */
+    async removeInteractions (interactions) {
+      await Promise.all(map(interactions, ::this.removeInteraction))
     },
     /**
      * @return {Interaction[]}

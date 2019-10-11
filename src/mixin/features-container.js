@@ -12,35 +12,60 @@ import rxSubs from './rx-subs'
 export default {
   mixins: [rxSubs, projTransforms],
   computed: {
+    /**
+     * @type {Array<string|number>}
+     */
     featureIds () {
       if (!this.rev) return []
 
       return this.getFeatures().map(getFeatureId)
     },
+    /**
+     * @type {Object[]}
+     */
     featuresViewProj () {
       if (!this.rev) return []
 
       return this.getFeatures().map(::this.writeFeatureInViewProj)
     },
+    /**
+     * @type {Object[]}
+     */
     featuresDataProj () {
       if (!this.rev) return []
 
       return this.getFeatures().map(::this.writeFeatureInDataProj)
     },
   },
+  created () {
+    /**
+     * @type {module:ol/Collection~Collection<module:ol/Feature~Feature>>}
+     * @private
+     */
+    this._featuresCollection = new Collection()
+    this._featureSubs = {}
+
+    this::defineServices()
+    this::subscribeToCollectionEvents()
+  },
   methods: {
     /**
-     * @param {Array<(Feature|Vue|Object)>} features
+     * @param {
+     *          Array<(module:ol/Feature~Feature|Vue|Object)>|
+     *          module:ol/Collection~Collection<(module:ol/Feature~Feature|Vue|Object)>
+     *        } features
      * @return {Promise<void>}
      */
-    addFeatures (features) {
-      return Promise.all(map(features, ::this.addFeature))
+    async addFeatures (features) {
+      await Promise.all(map(features, ::this.addFeature))
     },
     /**
-     * @param {Feature|Vue|Object} feature
+     * @param {module:ol/Feature~Feature|Vue|Object} feature
      * @return {Promise<void>}
      */
     async addFeature (feature) {
+      initializeFeature(feature)
+
       if (feature instanceof Vue) {
         feature = await feature.resolveOlObject()
       } else if (isPlainObject(feature)) {
@@ -48,7 +73,6 @@ export default {
       }
 
       instanceOf(feature, Feature)
-      initializeFeature(feature)
 
       const foundFeature = this.getFeatureById(getFeatureId(feature))
       if (foundFeature == null) {
@@ -58,14 +82,17 @@ export default {
       }
     },
     /**
-     * @param {Array<(Feature|Vue|Object)>} features
+     * @param {
+     *          Array<(module:ol/Feature~Feature|Vue|Object)>|
+     *          module:ol/Collection~Collection<(module:ol/Feature~Feature|Vue|Object)>
+     *        } features
      * @return {Promise<void>}
      */
-    removeFeatures (features) {
-      return Promise.all(map(features, ::this.removeFeature))
+    async removeFeatures (features) {
+      await Promise.all(map(features, ::this.removeFeature))
     },
     /**
-     * @param {Feature|Vue|Object} feature
+     * @param {module:ol/Feature~Feature|Vue|Object} feature
      * @return {Promise<void>}
      */
     async removeFeature (feature) {
@@ -76,7 +103,6 @@ export default {
       feature = this.getFeatureById(getFeatureId(feature))
       if (!feature) return
 
-      initializeFeature(feature)
       this.$featuresCollection.remove(feature)
     },
     /**
@@ -87,7 +113,7 @@ export default {
     },
     /**
      * @param {string|number} featureId
-     * @return {Feature|undefined}
+     * @return {module:ol/Feature~Feature|undefined}
      */
     getFeatureById (featureId) {
       // todo add hash {featureId => featureIdx, ....}
@@ -96,13 +122,13 @@ export default {
       })
     },
     /**
-     * @return {Feature[]}
+     * @return {module:ol/Feature~Feature[]}
      */
     getFeatures () {
       return this.$featuresCollection.getArray()
     },
     /**
-     * @return {Collection<Feature>>}
+     * @return {module:ol/Collection~Collection<module:ol/Feature~Feature>>}
      */
     getFeaturesCollection () {
       return this._featuresCollection
@@ -118,17 +144,6 @@ export default {
         get featuresContainer () { return vm },
       }
     },
-  },
-  created () {
-    /**
-     * @type {Collection<Feature>>}
-     * @private
-     */
-    this._featuresCollection = new Collection()
-    this._featureSubs = {}
-
-    this::defineServices()
-    this::subscribeToCollectionEvents()
   },
 }
 

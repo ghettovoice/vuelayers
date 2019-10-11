@@ -5,6 +5,7 @@ import {
   setInteractionId,
   setInteractionPriority,
 } from '../ol-ext'
+import { obsFromOlChangeEvent } from '../rx-ext'
 import { pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import olCmp from './ol-cmp'
@@ -21,6 +22,9 @@ export default {
     },
   },
   props: {
+    /**
+     * @type {boolean}
+     */
     active: {
       type: Boolean,
       default: true,
@@ -37,13 +41,13 @@ export default {
   },
   watch: {
     id (value) {
-      this.setId(value)
+      this.setInteractionId(value)
     },
     active (value) {
-      this.setActive(value)
+      this.setInteractionActive(value)
     },
     priority (value) {
-      this.setPriority(value)
+      this.setInteractionPriority(value)
     },
   },
   created () {
@@ -73,14 +77,14 @@ export default {
     /**
      * @returns {Promise<string|number>}
      */
-    async getId () {
+    async getInteractionId () {
       return getInteractionId(await this.resolveInteraction())
     },
     /**
      * @param {string|number} id
      * @returns {Promise<void>}
      */
-    async setId (id) {
+    async setInteractionId (id) {
       const interaction = await this.resolveInteraction()
 
       if (id === getInteractionId(interaction)) return
@@ -90,14 +94,14 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getActive () {
+    async getInteractionActive () {
       return (await this.resolveInteraction()).getActive()
     },
     /**
      * @param {boolean} active
      * @returns {Promise<void>}
      */
-    async setActive (active) {
+    async setInteractionActive (active) {
       const interaction = await this.resolveInteraction()
 
       if (active === interaction.getActive()) return
@@ -107,14 +111,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getPriority () {
+    async getInteractionPriority () {
       return getInteractionPriority(await this.resolveInteraction())
     },
     /**
      * @param {number} priority
      * @returns {Promise<void>}
      */
-    async setPriority (priority) {
+    async setInteractionPriority (priority) {
       const interaction = await this.resolveInteraction()
 
       if (priority === getInteractionPriority(interaction)) return
@@ -168,6 +172,15 @@ export default {
         },
       )
     },
+    /**
+     * @returns {Promise<void>}
+     */
+    async subscribeAll () {
+      await Promise.all(
+        this::olCmp.methods.subscribeAll(),
+        this::subscribeToInteractionEvents(),
+      )
+    },
     resolveInteraction: olCmp.methods.resolveOlObject,
     ...pick(olCmp.methods, [
       'deinit',
@@ -177,7 +190,6 @@ export default {
       'scheduleRecreate',
       'remount',
       'scheduleRemount',
-      'subscribeAll',
     ]),
   },
 }
@@ -212,5 +224,23 @@ function defineServices () {
       enumerable: true,
       get: () => this.$services?.interactionsContainer,
     },
+  })
+}
+
+async function subscribeToInteractionEvents () {
+  const interaction = await this.resolveInteraction()
+
+  const changes = obsFromOlChangeEvent(interaction, [
+    'id',
+    'active',
+    'priority',
+  ], true, 1000 / 60)
+
+  this.subscribeTo(changes, ({ prop, value }) => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(`update:${prop}`, value)
+    })
   })
 }

@@ -1,4 +1,4 @@
-import { get as getProj } from 'ol/proj/projections'
+import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { isString, pick } from '../util/minilo'
@@ -34,20 +34,20 @@ export default {
     ], () => source.methods.scheduleRecreate),
   },
   methods: {
-    /**
-     * @param {number[]} extent
-     * @param {number} resolution
-     * @param {number} pixelRatio
-     * @param {string} projection
-     * @returns {Promise<module:ol/ImageBase~ImageBase>}
-     */
-    async getImage (extent, resolution, pixelRatio, projection) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).getImage(extent, resolution, pixelRatio, projection)
-    },
+    // /**
+    //  * @param {number[]} extent
+    //  * @param {number} resolution
+    //  * @param {number} pixelRatio
+    //  * @param {string} projection
+    //  * @returns {Promise<module:ol/ImageBase~ImageBase>}
+    //  */
+    // async getSourceImage (extent, resolution, pixelRatio, projection) {
+    //   if (isString(projection)) {
+    //     projection = getProj(projection)
+    //   }
+    //
+    //   return (await this.resolveSource()).getImage(extent, resolution, pixelRatio, projection)
+    // },
     /**
      * @return {Promise<void>}
      * @protected
