@@ -177,7 +177,7 @@ function subscribeToCollectionEvents () {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit(type + ':interaction', element)
+      this.$emit(type + 'interaction', element)
     })
   })
 }

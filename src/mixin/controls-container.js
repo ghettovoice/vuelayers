@@ -111,7 +111,7 @@ function subscribeToCollectionEvents () {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit(type + ':control', element)
+      this.$emit(type + 'control', element)
     })
   })
 }

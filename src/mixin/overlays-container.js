@@ -122,7 +122,7 @@ function subscribeToCollectionEvents () {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit(type + ':overlay', element)
+      this.$emit(type + 'overlay', element)
     })
   })
 }

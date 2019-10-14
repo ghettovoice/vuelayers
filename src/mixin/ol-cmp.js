@@ -67,7 +67,8 @@ export default {
       this._olObject = await createPromise
       this._olObject[VM_PROP] || (this._olObject[VM_PROP] = [])
 
-      if (!this._olObject[VM_PROP].includes(this)) { // for loaded from IdentityMap
+      // for loaded from IdentityMap
+      if (!this._olObject[VM_PROP].includes(this)) {
         this._olObject[VM_PROP].push(this)
       }
 

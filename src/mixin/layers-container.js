@@ -123,7 +123,7 @@ function subscribeToCollectionEvents () {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit(type + ':layer', element)
+      this.$emit(type + 'layer', element)
     })
   })
 }

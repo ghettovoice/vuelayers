@@ -1,7 +1,7 @@
 import debounce from 'debounce-promise'
 import { all as loadAll } from 'ol/loadingstrategy'
 import { createGeoJsonFmt, getFeatureId, isGeoJSONFeature, transform } from '../ol-ext'
-import { constant, difference, isArray, isEqual, isFunction, pick, stubArray } from '../util/minilo'
+import { constant, difference, isArray, isEmpty, isEqual, isFunction, isString, pick, stubArray } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import featuresContainer from './features-container'
@@ -60,9 +60,12 @@ export default {
     },
     /**
      * String or url factory
-     * @type {(string|function(): string|FeatureUrlFunction|undefined)} url
+     * @type {(string|function(): string|function|undefined)} url
      */
-    url: [String, Function],
+    url: {
+      type: [String, Function],
+      validator: value => isFunction(value) || (isString(value) && !isEmpty(value)),
+    },
     /**
      * @type {boolean}
      */
@@ -325,9 +328,16 @@ export default {
     getSourceFeatures: featuresContainer.methods.getFeatures,
     getSourceFeaturesCollection: featuresContainer.methods.getFeaturesCollection,
     getSourceFeatureById: featuresContainer.methods.getFeatureById,
+    /**
+     * @param {module:ol/Feature~Feature} feature
+     * @returns {Promise<boolean>}
+     */
     async sourceHasFeature (feature) {
       return (await this.resolveSource()).hasFeature(feature)
     },
+    /**
+     * @returns {Promise<boolean>}
+     */
     async isSourceEmpty () {
       return (await this.resolveSource()).isEmpty()
     },

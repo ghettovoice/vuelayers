@@ -173,7 +173,7 @@ function subscribeToCollectionEvents () {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit('add:feature', element)
+      this.$emit('addfeature', element)
     })
   })
 
@@ -188,7 +188,7 @@ function subscribeToCollectionEvents () {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit('remove:feature', element)
+      this.$emit('removefeature', element)
     })
   })
 }
