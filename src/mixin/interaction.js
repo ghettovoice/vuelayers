@@ -11,6 +11,9 @@ import mergeDescriptors from '../util/multi-merge-descriptors'
 import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
 
+/**
+ * Base interaction mixin.
+ */
 export default {
   mixins: [
     stubVNode,

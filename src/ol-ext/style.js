@@ -365,7 +365,14 @@ export function createGeomStyle (vlStyle) {
 }
 
 /**
- * @typedef {Style|Image|Fill|Stroke|Text|StyleFunction} OlStyle
+ * @typedef {
+ *            module:ol/style/Style~Style |
+ *            module:ol/style/Image~ImageStyle |
+ *            module:ol/style/Fill~Fill |
+ *            module:ol/style/Stroke~Stroke |
+ *            module:ol/style/Text~Text |
+ *            module:ol/style/Style~StyleFunction
+ *          } OlAllStyle
  */
 
 /**

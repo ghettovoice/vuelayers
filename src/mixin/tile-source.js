@@ -33,6 +33,10 @@ export default {
       default: EPSG_3857,
     },
     /**
+     * @type {function|undefined}
+     */
+    tileGridFactory: Function,
+    /**
      * @type {number}
      */
     transition: Number,

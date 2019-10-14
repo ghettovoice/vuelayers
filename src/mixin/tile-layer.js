@@ -2,6 +2,9 @@ import { obsFromOlChangeEvent } from '../rx-ext'
 import { pick } from '../util/minilo'
 import layer from './layer'
 
+/**
+ * Base tile layer mixin.
+ */
 export default {
   mixins: [
     layer,

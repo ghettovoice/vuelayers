@@ -2,14 +2,23 @@ import Vue from 'vue'
 import { isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
 
+/**
+ * @typedef {module:ol/geom/Geometry~Geometry|Vue|Object} GeometryLike
+ */
+/**
+ * @typedef {Object} GeometryTarget
+ * @property {function(): module:ol/geom/Geometry~Geometry|undefined} getGeometry
+ * @property {function(module:ol/geom/Geometry~Geometry|undefined): void} setGeometry
+ */
+
+/**
+ * Geometry container
+ */
 export default {
   mixins: [projTransforms],
   methods: {
     /**
-     * @return {Promise<{
-     *     getGeometry: function(): module:ol/geom/Geometry~Geometry|undefined,
-     *     setGeometry: function(module:ol/geom/Geometry~Geometry|undefined)
-     *   }>|undefined}
+     * @return {Promise<GeometryTarget|undefined>}
      * @protected
      */
     getGeometryTarget () {
@@ -22,7 +31,7 @@ export default {
       return (await this.getGeometryTarget()).getGeometry()
     },
     /**
-     * @param {module:ol/geom/Geometry~Geometry|Vue|Object|undefined} geom
+     * @param {GeometryLike|undefined} geom
      * @return {Promise<void>}
      */
     async setGeometry (geom) {
@@ -38,7 +47,7 @@ export default {
       }
     },
     /**
-     * @return {Object}
+     * @returns {{readonly geometryContainer: Object}}
      * @protected
      */
     getServices () {

@@ -7,6 +7,13 @@ import { instanceOf } from '../util/assert'
 import { map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
+/**
+ * @typedef {module:ol/Overlay~Overlay|Object|Vue} OverlayLike
+ */
+
+/**
+ * Overlays container mixin.
+ */
 export default {
   mixins: [rxSubs],
   computed: {
@@ -18,7 +25,7 @@ export default {
   },
   created () {
     /**
-     * @type {Collection<Overlay>}
+     * @type {module:ol/Collection~Collection<module:ol/Overlay~Overlay>}
      * @private
      */
     this._overlaysCollection = new Collection()
@@ -28,7 +35,7 @@ export default {
   },
   methods: {
     /**
-     * @param {Overlay|Vue} overlay
+     * @param {OverlayLike} overlay
      * @return {void}
      */
     async addOverlay (overlay) {
@@ -44,11 +51,15 @@ export default {
         this.$overlaysCollection.push(overlay)
       }
     },
+    /**
+     * @param {OverlayLike[]|module:ol/Collection~Collection<OverlayLike>} overlays
+     * @returns {Promise<void>}
+     */
     async addOverlays (overlays) {
       await Promise.all(map(overlays, ::this.addOverlay))
     },
     /**
-     * @param {Overlay|Vue} overlay
+     * @param {OverlayLike} overlay
      * @return {void}
      */
     async removeOverlay (overlay) {
@@ -61,24 +72,28 @@ export default {
 
       this.$overlaysCollection.remove(overlay)
     },
+    /**
+     * @param {OverlayLike[]|module:ol/Collection~Collection<OverlayLike>} overlays
+     * @returns {Promise<void>}
+     */
     async removeOverlays (overlays) {
       await Promise.all(map(overlays, ::this.removeOverlay))
     },
     /**
-     * @return {Overlay[]}
+     * @return {Array<module:ol/Overlay~Overlay>}
      */
     getOverlays () {
       return this.$overlaysCollection.getArray()
     },
     /**
-     * @return {Collection<Overlay>}
+     * @return {module:ol/Collection~Collection<module:ol/Overlay~Overlay>}
      */
     getOverlaysCollection () {
       return this._overlaysCollection
     },
     /**
      * @param {string|number} overlayId
-     * @return {Overlay|undefined}
+     * @return {module:ol/Overlay~Overlay|undefined}
      */
     getOverlayById (overlayId) {
       return this.getOverlays().find(overlay => {
@@ -92,7 +107,7 @@ export default {
       this.$overlaysCollection.clear()
     },
     /**
-     * @returns {Object}
+     * @returns {readonly overlaysContainer: Object|Vue}}
      * @protected
      */
     getServices () {

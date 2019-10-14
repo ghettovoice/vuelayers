@@ -8,6 +8,9 @@ import featuresContainer from './features-container'
 import projTransforms from './proj-transforms'
 import source from './source'
 
+/**
+ * Basic vector source mixin.
+ */
 export default {
   mixins: [
     source,
@@ -44,7 +47,7 @@ export default {
     /**
      * Source loader factory.
      * Source loader should load features from some remote service, decode them and pas to `features` prop to render.
-     * @type {(function(): FeatureLoader|undefined)} loaderFactory
+     * @type {(function(): module:ol/featureloader~FeatureLoader|undefined)} loaderFactory
      */
     loaderFactory: {
       type: Function,

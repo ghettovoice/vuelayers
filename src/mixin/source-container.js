@@ -1,12 +1,21 @@
 import Vue from 'vue'
 
+/**
+ * @typedef {module:ol/source/Source~Source|Object|Vue} SourceLike
+ */
+/**
+ * @typedef {Object} SourceTarget
+ * @property {function(module:ol/source/Source~Source): void} setSource
+ * @property {function(): module:ol/source/Source~Source} getSource
+ */
+
+/**
+ * Source container mixin.
+ */
 export default {
   methods: {
     /**
-     * @return {Promise<{
-     *     setSource: function(module:ol/source/Source~Source): void,
-     *     getSource: function(): module:ol/source/Source~Source
-     *   }|undefined>}
+     * @return {Promise<SourceTarget|undefined>}
      * @protected
      */
     getSourceTarget () {
@@ -19,7 +28,7 @@ export default {
       return (await this.getSourceTarget()).getSource()
     },
     /**
-     * @param {module:ol/source/Source~Source|Vue|undefined} source
+     * @param {SourceLike|undefined} source
      * @return {void}
      */
     async setSource (source) {
@@ -33,7 +42,7 @@ export default {
       }
     },
     /**
-     * @returns {Object}
+     * @returns {{readonly sourceContainer: Object|Vue}}
      * @protected
      */
     getServices () {

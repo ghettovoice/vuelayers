@@ -12,7 +12,6 @@ export default {
     /**
      * Unique key for saving to identity map
      * @type {string|number}
-     * @experimental
      */
     ident: [String, Number],
   },

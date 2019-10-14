@@ -8,6 +8,13 @@ import { instanceOf } from '../util/assert'
 import { isArray, isPlainObject, map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
+/**
+ * @typedef {module:ol/interaction/Interaction~Interaction|Object|Vue} InteractionLike
+ */
+
+/**
+ * Interactions container
+ */
 export default {
   mixins: [rxSubs],
   computed: {
@@ -19,7 +26,7 @@ export default {
   },
   created () {
     /**
-     * @type {Collection<Interaction>>}
+     * @type {module:ol/Collection~Collection<module:ol/interaction/Interaction~Interaction>}
      * @private
      */
     this._interactionsCollection = new Collection()
@@ -28,6 +35,10 @@ export default {
     this::subscribeToCollectionEvents()
   },
   methods: {
+    /**
+     * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} defaultInteractions
+     * @returns {Promise<void>}
+     */
     async initDefaultInteractions (defaultInteractions) {
       this.clearInteractions()
 
@@ -46,7 +57,7 @@ export default {
       }
     },
     /**
-     * @param {Interaction|Vue} interaction
+     * @param {InteractionLike} interaction
      * @return {void}
      */
     async addInteraction (interaction) {
@@ -64,17 +75,14 @@ export default {
       }
     },
     /**
-     * @param {
-     *          Array<module:ol/interaction/Interaction~Interaction|Vue|Object>|
-     *          Collection<module:ol/interaction/Interaction~Interaction|Vue|Object>
-     *        } interactions
+     * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} interactions
      * @returns {Promise<void>}
      */
     async addInteractions (interactions) {
       await Promise.all(map(interactions, ::this.addInteraction))
     },
     /**
-     * @param {Interaction|Vue} interaction
+     * @param {InteractionLike} interaction
      * @return {void}
      */
     async removeInteraction (interaction) {
@@ -89,30 +97,27 @@ export default {
       this.sortInteractions()
     },
     /**
-     * @param {
-     *          Array<module:ol/interaction/Interaction~Interaction|Vue|Object>|
-     *          Collection<module:ol/interaction/Interaction~Interaction|Vue|Object>
-     *        } interactions
+     * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} interactions
      * @returns {Promise<void>}
      */
     async removeInteractions (interactions) {
       await Promise.all(map(interactions, ::this.removeInteraction))
     },
     /**
-     * @return {Interaction[]}
+     * @return {module:ol/interaction/Interaction~Interaction[]}
      */
     getInteractions () {
       return this.$interactionsCollection.getArray()
     },
     /**
-     * @return {Collection<Interaction>>}
+     * @return {module:ol/Collection~Collection<module:ol/interaction/Interaction~Interaction>}
      */
     getInteractionsCollection () {
       return this._interactionsCollection
     },
     /**
      * @param {string|number} interactionId
-     * @return {Interaction|undefined}
+     * @return {module:ol/interaction/Interaction~Interaction|undefined}
      */
     getInteractionById (interactionId) {
       return this.$interactionsCollection.getArray().find(interaction => {
@@ -128,7 +133,7 @@ export default {
       this.$interactionsCollection.getArray().sort(sorter)
     },
     /**
-     * @return {function}
+     * @return {function(): number}
      * @protected
      */
     getDefaultInteractionsSorter () {
@@ -147,7 +152,7 @@ export default {
       this.$interactionsCollection.clear()
     },
     /**
-     * @returns {Object}
+     * @returns {{readonly interactionsContainer: Object|Vue}}
      * @protected
      */
     getServices () {

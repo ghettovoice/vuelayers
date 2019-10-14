@@ -9,6 +9,9 @@ import olCmp from './ol-cmp'
 import sourceContainer from './source-container'
 import stubVNode from './stub-vnode'
 
+/**
+ * Base layer mixin.
+ */
 export default {
   mixins: [
     stubVNode,

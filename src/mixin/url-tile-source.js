@@ -8,12 +8,24 @@ export default {
   ],
   props: {
     // ol/source/UrlTile
+    /**
+     * @type {function|undefined}
+     */
     tileLoadFunction: Function,
+    /**
+     * @type {function|undefined}
+     */
     tileUrlFunction: Function,
+    /**
+     * @type {string|undefined}
+     */
     url: {
       type: String,
       validator: value => isString(value) && !isEmpty(value),
     },
+    /**
+     * @type {string[]|undefined}
+     */
     urls: {
       type: Array,
       validator: value => value.every(url => isString(url) && !isEmpty(url)),

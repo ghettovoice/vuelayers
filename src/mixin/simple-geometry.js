@@ -7,6 +7,9 @@ import { isEmpty, isEqual, negate, pick } from '../util/minilo'
 // import { makeWatchers } from '../util/vue-helpers'
 import geometry from './geometry'
 
+/**
+ * Base simple geometry with coordinates mixin.
+ */
 export default {
   mixins: [
     geometry,
@@ -21,6 +24,7 @@ export default {
       required: true,
       validator: negate(isEmpty),
     },
+    // todo add support of coord layout
     // /**
     //  * @type {string}
     //  */

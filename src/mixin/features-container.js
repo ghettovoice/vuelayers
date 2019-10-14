@@ -9,6 +9,13 @@ import { isPlainObject, map } from '../util/minilo'
 import projTransforms from './proj-transforms'
 import rxSubs from './rx-subs'
 
+/**
+ * @typedef {module:ol/Feature~Feature|Vue|Object} FeatureLike
+ */
+
+/**
+ * Features container
+ */
 export default {
   mixins: [rxSubs, projTransforms],
   computed: {
@@ -39,7 +46,7 @@ export default {
   },
   created () {
     /**
-     * @type {module:ol/Collection~Collection<module:ol/Feature~Feature>>}
+     * @type {module:ol/Collection~Collection<module:ol/Feature~Feature>}
      * @private
      */
     this._featuresCollection = new Collection()
@@ -50,17 +57,14 @@ export default {
   },
   methods: {
     /**
-     * @param {
-     *          Array<(module:ol/Feature~Feature|Vue|Object)>|
-     *          module:ol/Collection~Collection<(module:ol/Feature~Feature|Vue|Object)>
-     *        } features
+     * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features
      * @return {Promise<void>}
      */
     async addFeatures (features) {
       await Promise.all(map(features, ::this.addFeature))
     },
     /**
-     * @param {module:ol/Feature~Feature|Vue|Object} feature
+     * @param {FeatureLike} feature
      * @return {Promise<void>}
      */
     async addFeature (feature) {
@@ -82,17 +86,14 @@ export default {
       }
     },
     /**
-     * @param {
-     *          Array<(module:ol/Feature~Feature|Vue|Object)>|
-     *          module:ol/Collection~Collection<(module:ol/Feature~Feature|Vue|Object)>
-     *        } features
+     * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features
      * @return {Promise<void>}
      */
     async removeFeatures (features) {
       await Promise.all(map(features, ::this.removeFeature))
     },
     /**
-     * @param {module:ol/Feature~Feature|Vue|Object} feature
+     * @param {FeatureLike} feature
      * @return {Promise<void>}
      */
     async removeFeature (feature) {
@@ -122,19 +123,19 @@ export default {
       })
     },
     /**
-     * @return {module:ol/Feature~Feature[]}
+     * @return {Array<module:ol/Feature~Feature>}
      */
     getFeatures () {
       return this.$featuresCollection.getArray()
     },
     /**
-     * @return {module:ol/Collection~Collection<module:ol/Feature~Feature>>}
+     * @return {module:ol/Collection~Collection<module:ol/Feature~Feature>}
      */
     getFeaturesCollection () {
       return this._featuresCollection
     },
     /**
-     * @returns {Object}
+     * @returns {{readonly featuresContainer: Object}}
      * @protected
      */
     getServices () {

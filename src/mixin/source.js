@@ -5,6 +5,9 @@ import { obsFromOlChangeEvent } from '../rx-ext'
 import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
 
+/**
+ * Base source mixin.
+ */
 export default {
   mixins: [
     stubVNode,

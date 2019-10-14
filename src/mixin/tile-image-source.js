@@ -2,17 +2,26 @@ import { pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import urlTileSource from './url-tile-source'
 
+/**
+ * Base tile image source mixin.
+ */
 export default {
   mixins: [
     urlTileSource,
   ],
   props: {
     // ol/source/TileImage
+    /**
+     * @type {string|undefined}
+     */
     crossOrigin: String,
-    reprojectionErrorThreshold: {
-      type: Number,
-      default: 0.5,
-    },
+    /**
+     * @type {number|undefined}
+     */
+    reprojectionErrorThreshold: Number,
+    /**
+     * @type {string|undefined}
+     */
     tileClass: String,
   },
   watch: {

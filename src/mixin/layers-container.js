@@ -8,6 +8,13 @@ import { instanceOf } from '../util/assert'
 import { map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
+/**
+ * @typedef {module:ol/layer/Base~BaseLayer|Object|Vue} LayerLike
+ */
+
+/**
+ * Layers container mixin.
+ */
 export default {
   mixins: [rxSubs],
   computed: {
@@ -19,7 +26,7 @@ export default {
   },
   created () {
     /**
-     * @type {Collection<BaseLayer>}
+     * @type {module:ol/Collection~Collection<module:ol/layer/Base~BaseLayer>}
      * @private
      */
     this._layersCollection = new Collection()
@@ -29,7 +36,7 @@ export default {
   },
   methods: {
     /**
-     * @param {BaseLayer|Vue} layer
+     * @param {LayerLike} layer
      * @return {Promise<void>}
      */
     async addLayer (layer) {
@@ -45,11 +52,15 @@ export default {
         this.$layersCollection.push(layer)
       }
     },
+    /**
+     * @param {LayerLike[]|module:ol/Collection~Collection<LayerLike>} layers
+     * @returns {Promise<void>}
+     */
     async addLayers (layers) {
       await Promise.all(map(layers, ::this.addLayer))
     },
     /**
-     * @param {BaseLayer|Vue} layer
+     * @param {LayerLike} layer
      * @return {void}
      */
     async removeLayer (layer) {
@@ -62,24 +73,28 @@ export default {
 
       this.$layersCollection.remove(layer)
     },
+    /**
+     * @param {LayerLike[]|module:ol/Collection~Collection<LayerLike>} layers
+     * @returns {Promise<void>}
+     */
     async removeLayers (layers) {
       await Promise.all(map(layers, ::this.removeLayer))
     },
     /**
-     * @return {BaseLayer[]}
+     * @return {Array<module:ol/layer/Base~BaseLayer>}
      */
     getLayers () {
       return this.$layersCollection.getArray()
     },
     /**
-     * @return {module:ol/Collection~Collection<BaseLayer>}
+     * @return {module:ol/Collection~Collection<module:ol/layer/Base~BaseLayer>}
      */
     getLayersCollection () {
       return this._layersCollection
     },
     /**
      * @param {string|number} layerId
-     * @return {BaseLayer|undefined}
+     * @return {module:ol/layer/Base~BaseLayer|undefined}
      */
     getLayerById (layerId) {
       return this.getLayers().find(layer => {
@@ -93,7 +108,7 @@ export default {
       this.$layersCollection.clear()
     },
     /**
-     * @returns {Object}
+     * @returns {{readonly layersContainer: Object|Vue}}
      * @protected
      */
     getServices () {

@@ -1,6 +1,9 @@
 import { XYZ as XYZSource } from 'ol/source'
 import tileImageSource from './tile-image-source'
 
+/**
+ * Base XYZ source mixin.
+ */
 export default {
   mixins: [
     tileImageSource,

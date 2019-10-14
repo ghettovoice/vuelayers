@@ -3,16 +3,34 @@ import Vue from 'vue'
 import { warn } from '../util/log'
 import { isFunction, reduce } from '../util/minilo'
 
+/**
+ * @typedef {
+ *            module:ol/style/Style~Style |
+ *            Array<module:ol/style/Style~Style> |
+ *            module:ol/style/Style~StyleFunction
+ *          } OlStyleLike
+ */
+/**
+ * @typedef {Object} StyleTarget
+ * @property {function(OlStyleLike|undefined): void} setStyle
+ */
+/**
+ * @typedef {OlStyleLike|Object|Vue} StyleLike
+ */
+
+/**
+ * Styles container mixin.
+ */
 export default {
   methods: {
     /**
      * Default style factory
-     * @return {module:ol/style/Style~Style[]|module:ol/style/Style~StyleFunction|undefined}
+     * @return {OlStyleLike|undefined}
      * @protected
      */
     getDefaultStyles () {},
     /**
-     * @returns {Object}
+     * @returns {{readonly stylesContainer: Object|Vue}}
      * @protected
      */
     getServices () {
@@ -23,13 +41,13 @@ export default {
       }
     },
     /**
-     * @return {module:ol/style/Style~Style[]|module:ol/style/Style~StyleFunction|Vue|undefined}
+     * @return {StyleLike|undefined}
      */
     getStyles () {
       return this._styles
     },
     /**
-     * @param {module:ol/style/Style~Style|module:ol/style/Style~StyleFunction|Vue|undefined} style
+     * @param {StyleLike} style
      * @return {void}
      */
     addStyle (style) {
@@ -59,7 +77,7 @@ export default {
       this.setStyle(currentStyles)
     },
     /**
-     * @param {Array<{style: module:ol/style/Style~Style, condition: (function|boolean|undefined)}>|module:ol/style/Style~StyleFunction|Vue|undefined} styles
+     * @param {Array<{style: OlStyleLike, condition: (function|boolean|undefined)}>|module:ol/style/Style~StyleFunction|Object|Vue|undefined} styles
      * @return {void}
      */
     setStyle (styles) {
@@ -76,7 +94,7 @@ export default {
       }
     },
     /**
-     * @param {module:ol/style/Style~Style|module:ol/style/Style~StyleFunction|Vue|undefined} style
+     * @param {StyleLike|undefined} style
      * @return {void}
      */
     removeStyle (style) {
@@ -97,7 +115,7 @@ export default {
     },
     /**
      * Returns OL object that can be styled (i.e. has setStyle/getStyle methods) or undefined
-     * @return {*}
+     * @return {StyleTarget}
      * @protected
      * @abstract
      */

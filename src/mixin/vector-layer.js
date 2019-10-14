@@ -16,7 +16,7 @@ export default {
      */
     renderOrder: Function,
     /**
-     * @type {number|undefined}
+     * @type {number}
      */
     renderBuffer: {
       type: Number,
@@ -29,13 +29,11 @@ export default {
     /**
      * When set to `true`, feature batches will be recreated during animations.
      * @type {boolean}
-     * @default false
      */
     updateWhileAnimating: Boolean,
     /**
      * When set to `true`, feature batches will be recreated during interactions.
      * @type {boolean}
-     * @default false
      */
     updateWhileInteracting: Boolean,
   },
@@ -107,15 +105,15 @@ export default {
       return (await this.resolveLayer()).getUpdateWhileInteracting()
     },
     /**
-     * @return {Promise<module:ol/layer/BaseVector~BaseVectorLayer>}
+     * @return {Promise<StyleTarget|undefined>}
      */
     getStyleTarget: layer.methods.resolveLayer,
     /**
-     * @return {Promise<module:ol/style/Style~Style[]|module:ol/style/Style~StyleFunction|Vue|undefined>}
+     * @return {Promise<StyleLike|undefined>}
      */
     getLayerStyle: stylesContainer.methods.getStyles,
     /**
-     * @param {Array<{style: module:ol/style/Style~Style, condition: (function|boolean|undefined)}>|module:ol/style/Style~StyleFunction|Vue|undefined} styles
+     * @param {StyleLike} styles
      * @return {Promise<void>}
      */
     setLayerStyle: stylesContainer.methods.setStyle,
