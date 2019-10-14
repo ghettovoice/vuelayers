@@ -12,10 +12,6 @@ export default {
   props: {
     // ol/source/Image
     /**
-     * @type {string|undefined}
-     */
-    crossOrigin: String,
-    /**
      * @type {string}
      */
     projection: {
@@ -29,25 +25,24 @@ export default {
   },
   watch: {
     ...makeWatchers([
-      'crossOrigin',
       'resolutions',
     ], () => source.methods.scheduleRecreate),
   },
   methods: {
-    // /**
-    //  * @param {number[]} extent
-    //  * @param {number} resolution
-    //  * @param {number} pixelRatio
-    //  * @param {string} projection
-    //  * @returns {Promise<module:ol/ImageBase~ImageBase>}
-    //  */
-    // async getSourceImage (extent, resolution, pixelRatio, projection) {
-    //   if (isString(projection)) {
-    //     projection = getProj(projection)
-    //   }
-    //
-    //   return (await this.resolveSource()).getImage(extent, resolution, pixelRatio, projection)
-    // },
+    /**
+     * @param {number[]} extent
+     * @param {number} resolution
+     * @param {number} pixelRatio
+     * @param {string} projection
+     * @returns {Promise<module:ol/ImageBase~ImageBase>}
+     */
+    async getSourceImage (extent, resolution, pixelRatio, projection) {
+      if (isString(projection)) {
+        projection = getProj(projection)
+      }
+
+      return (await this.resolveSource()).getImage(extent, resolution, pixelRatio, projection)
+    },
     /**
      * @return {Promise<void>}
      * @protected

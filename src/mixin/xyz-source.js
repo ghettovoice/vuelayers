@@ -1,30 +1,38 @@
-import XYZSource from 'ol/source/XYZ'
-import tileSource from './tile-source'
+import { XYZ as XYZSource } from 'ol/source'
+import tileImageSource from './tile-image-source'
 
 export default {
-  mixins: [tileSource],
+  mixins: [
+    tileImageSource,
+  ],
   methods: {
     /**
-     * @return {XYZ}
+     * @return {module:ol/source/XYZ~XYZSource}
      * @protected
      */
     createSource () {
       return new XYZSource({
+        // ol/source/Source
         attributions: this.attributions,
         attributionsCollapsible: this.attributionsCollapsible,
-        cacheSize: this.cacheSize,
-        crossOrigin: this.crossOrigin,
-        maxZoom: this.maxZoom,
-        minZoom: this.minZoom,
-        opaque: this.opaque,
         projection: this.projection,
-        reprojectionErrorThreshold: this.reprojectionErrorThreshold,
-        tileGrid: this._tileGrid,
-        tilePixelRatio: this.tilePixelRatio,
-        tileUrlFunction: this.urlFunc,
-        tileLoadFunction: this.tileLoadFunction,
         wrapX: this.wrapX,
+        // ol/source/Tile
+        cacheSize: this.cacheSize,
+        opaque: this.opaque,
+        tilePixelRatio: this.tilePixelRatio,
+        tileKey: this.tileKey,
         transition: this.transition,
+        zDirection: this.zDirection,
+        // ol/source/UrlTile
+        tileLoadFunction: this.tileLoadFunction,
+        tileUrlFunction: this.tileUrlFunction,
+        url: this.url,
+        urls: this.urls,
+        // ol/source/TileImage
+        crossOrigin: this.crossOrigin,
+        reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+        tileClass: this.tileClass,
       })
     },
   },
