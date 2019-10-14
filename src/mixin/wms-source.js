@@ -1,3 +1,4 @@
+import WMSServerType from 'ol/source/WMSServerType'
 import { hasSource, hasView } from '../util/assert'
 import { reduce } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
@@ -23,47 +24,85 @@ const cleanParams = params => reduce(params, (params, value, key) => {
   return params
 }, {})
 
+/**
+ * Basic WMS params and methods mixin.
+ */
 export default {
   props: {
+    /**
+     * @type {boolean}
+     */
     hidpi: {
       type: Boolean,
       default: true,
     },
+    /**
+     * @type {string|undefined}
+     */
     serverType: {
       type: String,
-      validator: value => value == null || Object.values(WMSServerType).includes(value),
+      validator: value => Object.values(WMSServerType).includes(value),
     },
+    /**
+     * @type {string}
+     */
     layers: {
       type: String,
       required: true,
     },
-    styles: String, // WMS Request styles
+    /**
+     * WMS Request styles
+     * @type {string|undefined}
+     */
+    styles: String,
+    /**
+     * @type {string}
+     */
     version: {
       type: String,
       default: '1.3.0',
     },
+    /**
+     * @type {boolean}
+     */
     transparent: {
       type: Boolean,
       default: true,
     },
+    /**
+     * @type {string}
+     */
     format: {
       type: String,
       default: 'image/png',
     },
+    /**
+     * @type {string|undefined}
+     */
     bgColor: String,
+    /**
+     * @type {string|undefined}
+     */
     time: String,
     /**
      * Additional WMS request parameters
+     * @type {Object|undefined}
      */
     params: Object,
   },
   computed: {
+    /**
+     * @returns {Object|null}
+     */
     customParams () {
-      return this.params ? cleanParams(this.params) : undefined
+      return this.params ? cleanParams(this.params) : null
     },
+    /**
+     * @returns {Object}
+     */
     allParams () {
       return {
-        ...this.customParams,
+        ...this.customParams || {},
         LAYERS: this.layers,
         STYLES: this.styles,
         VERSION: this.version,
@@ -75,6 +114,9 @@ export default {
     },
   },
   watch: {
+    customParams (value) {
+      this.updateSourceParams(value)
+    },
     ...makeWatchers([
       'layers',
       'version',
@@ -84,12 +126,8 @@ export default {
       'bgColor',
       'time',
     ], prop => function (value) {
-      prop = prop.toUpperCase()
-      this.$source && this.$source.updateParams({ [prop]: value })
+      this.updateSourceParam(prop, value)
     }),
-    params (value) {
-      this.$source && this.$source.updateParams(value ? cleanParams(value) : undefined)
-    },
   },
   methods: {
     /**
@@ -101,12 +139,7 @@ export default {
      *                          `version` should not be specified here (value from `version` prop will be used).
      * @return {string|undefined}
      */
-    getFeatureInfoUrl (
-      coordinate,
-      resolution,
-      projection,
-      params = {},
-    ) {
+    async getFeatureInfoUrl (coordinate, resolution, projection, params = {}) {
       hasView(this)
       hasSource(this)
 
@@ -114,12 +147,27 @@ export default {
       projection || (projection = this.projection)
       params = { ...this.allParams, ...params }
 
-      return this.$source.getGetFeatureInfoUrl(
+      return (await this.resolveSource()).getFeatureInfoUrl(
         coordinate,
         resolution,
         projection,
         params,
       )
+    },
+    /**
+     * @param {string} param
+     * @param {*} value
+     * @returns {Promise<void>}
+     */
+    async updateSourceParam (param, value) {
+      (await this.resolveSource()).updateParams({ [param.toUpperCase()]: value })
+    },
+    /**
+     * @param {Object} params
+     * @returns {Promise<void>}
+     */
+    async updateSourceParams (params) {
+      (await this.resolveSource()).updateParams()
     },
   },
 }
