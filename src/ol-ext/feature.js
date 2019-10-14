@@ -1,18 +1,17 @@
 import { Feature } from 'ol'
 import uuid from 'uuid/v4'
-import Vue from 'vue'
-import { isNumber, isPlainObject, isString } from '../util/minilo'
+import { hasProp, isNumber, isString } from '../util/minilo'
 
 /**
- * @param {Object|Vue|Feature|string|number} feature
+ * @param {Object|module:ol/Feature~Feature|string|number} feature
  * @return {string|number}
  * @throws {Error}
  */
 export function getFeatureId (feature) {
-  if (isPlainObject(feature) || feature instanceof Vue) {
-    return feature.id
-  } else if (feature instanceof Feature) {
+  if (feature instanceof Feature) {
     return feature.getId()
+  } else if (hasProp(feature, 'id')) {
+    return feature.id
   } else if (isString(feature) || isNumber(feature)) {
     return feature
   }
@@ -21,17 +20,17 @@ export function getFeatureId (feature) {
 }
 
 /**
- * @param {Feature|Vue|Object} feature
+ * @param {module:ol/Feature~Feature|Object} feature
  * @param {string} featureId
- * @returns {Feature|Vue|Object}
+ * @returns {module:ol/Feature~Feature|Object}
  */
 export function setFeatureId (feature, featureId) {
-  if (isPlainObject(feature) || feature instanceof Vue) {
-    feature.id = featureId
+  if (feature instanceof Feature) {
+    feature.setId(featureId)
 
     return feature
-  } else if (feature instanceof Feature) {
-    feature.setId(featureId)
+  } else if (hasProp(feature, 'id')) {
+    feature.id = featureId
 
     return feature
   }
@@ -40,7 +39,7 @@ export function setFeatureId (feature, featureId) {
 }
 
 /**
- * @param {Feature} feature
+ * @param {module:ol/Feature~Feature} feature
  * @param {string|undefined} defaultFeatureId
  * @returns {Feature}
  */
@@ -53,9 +52,9 @@ export function initializeFeature (feature, defaultFeatureId) {
 }
 
 /**
- * @param {Feature} destFeature
- * @param {Feature} srcFeature
- * @returns {Feature}
+ * @param {module:ol/Feature~Feature} destFeature
+ * @param {module:ol/Feature~Feature} srcFeature
+ * @returns {module:ol/Feature~Feature}
  */
 export function mergeFeatures (destFeature, srcFeature) {
   destFeature.setProperties({ ...srcFeature.getProperties() })

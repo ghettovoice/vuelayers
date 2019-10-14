@@ -1,16 +1,15 @@
 import { Collection, Feature, getUid as getObjectUid } from 'ol'
 import { merge as mergeObs } from 'rxjs/observable'
 import { debounceTime } from 'rxjs/operators'
-import Vue from 'vue'
 import { getFeatureId, initializeFeature, mergeFeatures } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isPlainObject, map } from '../util/minilo'
+import { isFunction, isPlainObject, map } from '../util/minilo'
 import projTransforms from './proj-transforms'
 import rxSubs from './rx-subs'
 
 /**
- * @typedef {module:ol/Feature~Feature|Vue|Object} FeatureLike
+ * @typedef {module:ol/Feature~Feature|Object} FeatureLike
  */
 
 /**
@@ -70,7 +69,7 @@ export default {
     async addFeature (feature) {
       initializeFeature(feature)
 
-      if (feature instanceof Vue) {
+      if (isFunction(feature.resolveOlObject)) {
         feature = await feature.resolveOlObject()
       } else if (isPlainObject(feature)) {
         feature = this.readFeatureInDataProj(feature)
@@ -97,7 +96,7 @@ export default {
      * @return {Promise<void>}
      */
     async removeFeature (feature) {
-      if (feature instanceof Vue) {
+      if (isFunction(feature.resolveOlObject)) {
         feature = await feature.resolveOlObject()
       }
 

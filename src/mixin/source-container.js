@@ -1,7 +1,7 @@
-import Vue from 'vue'
+import { isFunction } from '../util/minilo'
 
 /**
- * @typedef {module:ol/source/Source~Source|Object|Vue} SourceLike
+ * @typedef {module:ol/source/Source~Source|Object} SourceLike
  */
 /**
  * @typedef {Object} SourceTarget
@@ -32,7 +32,7 @@ export default {
      * @return {void}
      */
     async setSource (source) {
-      if (source instanceof Vue) {
+      if (isFunction(source.resolveOlObject)) {
         source = await source.resolveOlObject()
       }
 
@@ -42,7 +42,7 @@ export default {
       }
     },
     /**
-     * @returns {{readonly sourceContainer: Object|Vue}}
+     * @returns {{readonly sourceContainer: Object}}
      * @protected
      */
     getServices () {

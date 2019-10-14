@@ -1,7 +1,7 @@
 import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
+import { obsFromOlChangeEvent } from '../rx-ext'
 import { isArray, isEqual, isString, pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import { obsFromOlChangeEvent } from '../rx-ext'
 import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
 
@@ -267,7 +267,7 @@ function defineServices () {
       get: () => this.$olObject,
     },
     /**
-     * @type {Object|Vue|undefined}
+     * @type {Object|undefined}
      */
     $mapVm: {
       enumerable: true,

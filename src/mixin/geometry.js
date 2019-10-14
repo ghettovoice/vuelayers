@@ -6,6 +6,9 @@ import olCmp from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 
+/**
+ * Base geometry mixin.
+ */
 export default {
   mixins: [
     stubVNode,
@@ -266,6 +269,9 @@ export default {
         this::subscribeToGeometryEvents(),
       )
     },
+    /**
+     * @return {Promise<module:ol/geom/Geometry~Geometry>}
+     */
     resolveGeometry: olCmp.methods.resolveOlObject,
     ...pick(olCmp.methods, [
       'deinit',
@@ -289,21 +295,21 @@ function defineServices () {
       get: () => this.$olObject,
     },
     /**
-     * @type {Object|Vue}
+     * @type {Object|undefined}
      */
     $mapVm: {
       enumerable: true,
       get: () => this.$services?.mapVm,
     },
     /**
-     * @type {module:ol/View~View}
+     * @type {module:ol/View~View|undefined}
      */
     $view: {
       enumerable: true,
       get: () => this.$mapVm?.$view,
     },
     /**
-     * @type {Object|Vue}
+     * @type {Object|undefined}
      */
     $geometryContainer: {
       enumerable: true,

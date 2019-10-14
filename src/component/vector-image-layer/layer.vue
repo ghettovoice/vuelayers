@@ -1,6 +1,6 @@
 <script>
   import { VectorImage as VectorImageLayer } from 'ol/layer'
-  import { makeWatchers } from 'util/vue-helpers'
+  import { makeWatchers } from '../../util/vue-helpers'
   import { vectorLayer } from '../../mixin'
 
   /**

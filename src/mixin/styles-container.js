@@ -15,7 +15,7 @@ import { isFunction, reduce } from '../util/minilo'
  * @property {function(OlStyleLike|undefined): void} setStyle
  */
 /**
- * @typedef {OlStyleLike|Object|Vue} StyleLike
+ * @typedef {OlStyleLike|Object} StyleLike
  */
 
 /**
@@ -30,7 +30,7 @@ export default {
      */
     getDefaultStyles () {},
     /**
-     * @returns {{readonly stylesContainer: Object|Vue}}
+     * @returns {{readonly stylesContainer: Object}}
      * @protected
      */
     getServices () {
@@ -77,7 +77,7 @@ export default {
       this.setStyle(currentStyles)
     },
     /**
-     * @param {Array<{style: OlStyleLike, condition: (function|boolean|undefined)}>|module:ol/style/Style~StyleFunction|Object|Vue|undefined} styles
+     * @param {Array<{style: OlStyleLike, condition: (function|boolean|undefined)}>|module:ol/style/Style~StyleFunction|Object|undefined} styles
      * @return {void}
      */
     setStyle (styles) {

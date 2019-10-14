@@ -1,15 +1,14 @@
 import { Collection } from 'ol'
 import { defaults as createDefaultInteractions, Interaction } from 'ol/interaction'
 import { merge as mergeObs } from 'rxjs/observable'
-import Vue from 'vue'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isArray, isPlainObject, map } from '../util/minilo'
+import { isArray, isFunction, isPlainObject, map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
 /**
- * @typedef {module:ol/interaction/Interaction~Interaction|Object|Vue} InteractionLike
+ * @typedef {module:ol/interaction/Interaction~Interaction|Object} InteractionLike
  */
 
 /**
@@ -63,7 +62,7 @@ export default {
     async addInteraction (interaction) {
       initializeInteraction(interaction)
 
-      if (interaction instanceof Vue) {
+      if (isFunction(interaction.resolveOlObject)) {
         interaction = await interaction.resolveOlObject()
       }
 
@@ -86,7 +85,7 @@ export default {
      * @return {void}
      */
     async removeInteraction (interaction) {
-      if (interaction instanceof Vue) {
+      if (isFunction(interaction.resolveOlObject)) {
         interaction = await interaction.resolveOlObject()
       }
 
@@ -152,7 +151,7 @@ export default {
       this.$interactionsCollection.clear()
     },
     /**
-     * @returns {{readonly interactionsContainer: Object|Vue}}
+     * @returns {{readonly interactionsContainer: Object}}
      * @protected
      */
     getServices () {

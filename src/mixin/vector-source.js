@@ -45,13 +45,11 @@ export default {
       default: createGeoJsonFmt,
     },
     /**
-     * Source loader factory.
-     * Source loader should load features from some remote service, decode them and pas to `features` prop to render.
-     * @type {(function(): module:ol/featureloader~FeatureLoader|undefined)} loaderFactory
+     * Feature loader.
+     * Feature loader should load features from some remote service, decode them and pas to `features` prop to render.
+     * @type {(module:ol/featureloader~FeatureLoader|undefined)} loader
      */
-    loaderFactory: {
-      type: Function,
-    },
+    loader: Function,
     /**
      * Loading strategy factory.
      * Extent here in map view projection.
@@ -85,6 +83,12 @@ export default {
     },
   },
   computed: {
+    mappedFeatures () {
+      return this.features.map(feature => ({
+        ...feature,
+        id: feature.id || null,
+      }))
+    },
     /**
      * @returns {function|undefined}
      */
@@ -95,7 +99,7 @@ export default {
      * @type {function|undefined}
      */
     loaderFunc () {
-      return this.newLoaderFunc(this.loaderFactory)
+      return this.newLoaderFunc(this.loader)
     },
     /**
      * @returns {function}
@@ -111,15 +115,18 @@ export default {
     },
   },
   watch: {
-    features: {
+    mappedFeatures: {
       deep: true,
       async handler (features) {
         if (!this.$source || isEqual(features, this.featuresDataProj)) return
 
-        features = features.map(feature => ({ ...feature }))
         this.addFeatures(features)
 
-        const forRemove = difference(this.featuresDataProj, features, (a, b) => getFeatureId(a) === getFeatureId(b))
+        const forRemove = difference(
+          this.featuresDataProj,
+          features,
+          (a, b) => getFeatureId(a) === getFeatureId(b),
+        )
         await this.removeFeatures(forRemove)
       },
     },
@@ -292,14 +299,11 @@ export default {
       }
     },
     /**
-     * @param {function|undefined} loaderFactory
+     * @param {function|undefined} loader
      * @return {function|undefined}
      * @protected
      */
-    newLoaderFunc (loaderFactory) {
-      if (!isFunction(loaderFactory)) return
-
-      const loader = loaderFactory()
+    newLoaderFunc (loader) {
       if (!isFunction(loader)) return
 
       return this.wrapLoaderFunc(loader)
@@ -360,7 +364,7 @@ export default {
      */
     async init () {
       await this::source.mount()
-      await this.addFeatures(this.features)
+      await this.addFeatures(this.mappedFeatures)
     },
     /**
      * @return {Object}

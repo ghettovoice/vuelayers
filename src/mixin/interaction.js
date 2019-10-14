@@ -184,6 +184,9 @@ export default {
         this::subscribeToInteractionEvents(),
       )
     },
+    /**
+     * @return {Promise<module:ol/interaction/Interaction~Interaction>}
+     */
     resolveInteraction: olCmp.methods.resolveOlObject,
     ...pick(olCmp.methods, [
       'deinit',
@@ -207,7 +210,7 @@ function defineServices () {
       get: () => this.$olObject,
     },
     /**
-     * @type {Object|Vue|undefined}
+     * @type {Object|undefined}
      */
     $mapVm: {
       enumerable: true,
@@ -221,7 +224,7 @@ function defineServices () {
       get: () => this.$mapVm?.$view,
     },
     /**
-     * @type {Object|Vue|undefined}
+     * @type {Object|undefined}
      */
     $interactionsContainer: {
       enumerable: true,

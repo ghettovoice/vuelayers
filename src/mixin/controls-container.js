@@ -1,15 +1,14 @@
 import { Collection } from 'ol'
 import { Control, defaults as createDefaultControls } from 'ol/control'
 import { merge as mergeObs } from 'rxjs/observable'
-import Vue from 'vue'
 import { getControlId, initializeControl } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isArray, isPlainObject, map } from '../util/minilo'
+import { isArray, isFunction, isPlainObject, map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
 /**
- * @typedef {module:ol/control/Control~Control|Object|Vue} ControlLike
+ * @typedef {module:ol/control/Control~Control|Object} ControlLike
  */
 
 /**
@@ -63,7 +62,7 @@ export default {
     async addControl (control) {
       initializeControl(control)
 
-      if (control instanceof Vue) {
+      if (isFunction(control.resolveOlObject)) {
         control = await control.resolveOlObject()
       }
 
@@ -85,7 +84,7 @@ export default {
      * @returns {Promise<void>}
      */
     async removeControl (control) {
-      if (control instanceof Vue) {
+      if (isFunction(control.resolveOlObject)) {
         control = await control.resolveOlObject()
       }
 

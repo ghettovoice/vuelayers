@@ -1,9 +1,8 @@
-import Vue from 'vue'
-import { isPlainObject } from '../util/minilo'
+import { isFunction, isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
 
 /**
- * @typedef {module:ol/geom/Geometry~Geometry|Vue|Object} GeometryLike
+ * @typedef {module:ol/geom/Geometry~Geometry|Object} GeometryLike
  */
 /**
  * @typedef {Object} GeometryTarget
@@ -35,7 +34,7 @@ export default {
      * @return {Promise<void>}
      */
     async setGeometry (geom) {
-      if (geom instanceof Vue) {
+      if (isFunction(geom.resolveOlObject)) {
         geom = await geom.resolveOlObject()
       } else if (isPlainObject(geom)) {
         geom = this.readGeometryInDataProj(geom)

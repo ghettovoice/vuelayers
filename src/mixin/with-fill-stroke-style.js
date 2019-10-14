@@ -3,7 +3,7 @@ import Vue from 'vue'
 export default {
   methods: {
     /**
-     * @param {Fill|Vue|undefined} fill
+     * @param {Fill|undefined} fill
      * @return {void}
      * @protected
      */
@@ -23,7 +23,7 @@ export default {
       }
     },
     /**
-     * @param {Stroke|Vue|undefined} stroke
+     * @param {Stroke|undefined} stroke
      * @return {void}
      * @protected
      */

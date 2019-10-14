@@ -1,5 +1,5 @@
-import { isEmpty, isEqual, isString, pick } from '../util/minilo'
 import { obsFromOlEvent } from '../rx-ext'
+import { isEmpty, isEqual, isString, pick } from '../util/minilo'
 import tileSource from './tile-source'
 
 export default {

@@ -1,24 +1,24 @@
 import { View } from 'ol'
 import uuid from 'uuid/v4'
-import Vue from 'vue'
+import { hasProp } from '../util/minilo'
 
 export function getViewId (view) {
-  if (view instanceof Vue) {
-    return view.id
-  } else if (view instanceof View) {
+  if (view instanceof View) {
     return view.get('id')
+  } else if (hasProp(view, 'id')) {
+    return view.id
   }
 
   throw new Error('Illegal view argument')
 }
 
 export function setViewId (view, viewId) {
-  if (view instanceof Vue) {
-    view.id = viewId
+  if (view instanceof View) {
+    view.set('id', viewId)
 
     return view
-  } else if (view instanceof View) {
-    view.set('id', viewId)
+  } else if (hasProp(view, 'id')) {
+    view.id = viewId
 
     return view
   }

@@ -1,24 +1,24 @@
 import { Overlay } from 'ol'
 import uuid from 'uuid/v4'
-import Vue from 'vue'
+import { hasProp } from '../util/minilo'
 
 export function getOverlayId (overlay) {
-  if (overlay instanceof Vue) {
-    return overlay.id
-  } else if (overlay instanceof Overlay) {
+  if (overlay instanceof Overlay) {
     return overlay.get('id')
+  } else if (hasProp(overlay, 'id')) {
+    return overlay.id
   }
 
   throw new Error('Illegal overlay argument')
 }
 
 export function setOverlayId (overlay, overlayId) {
-  if (overlay instanceof Vue && overlay) {
-    overlay.id = overlayId
+  if (overlay instanceof Overlay) {
+    overlay.set('id', overlayId)
 
     return overlay
-  } else if (overlay instanceof Overlay) {
-    overlay.set('id', overlayId)
+  } else if (hasProp(overlay, 'id')) {
+    overlay.id = overlayId
 
     return overlay
   }

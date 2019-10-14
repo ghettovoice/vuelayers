@@ -5,6 +5,9 @@ import { isString, pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
 
+/**
+ * Base image source mixin.
+ */
 export default {
   mixins: [
     source,

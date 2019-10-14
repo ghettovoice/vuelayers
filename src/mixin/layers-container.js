@@ -1,15 +1,14 @@
 import { Collection } from 'ol'
 import BaseLayer from 'ol/layer/Base'
 import { merge as mergeObs } from 'rxjs/observable'
-import Vue from 'vue'
 import { getLayerId, initializeLayer } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { map } from '../util/minilo'
+import { isFunction, map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
 /**
- * @typedef {module:ol/layer/Base~BaseLayer|Object|Vue} LayerLike
+ * @typedef {module:ol/layer/Base~BaseLayer|Object} LayerLike
  */
 
 /**
@@ -42,7 +41,7 @@ export default {
     async addLayer (layer) {
       initializeLayer(layer)
 
-      if (layer instanceof Vue) {
+      if (isFunction(layer.resolveOlObject)) {
         layer = await layer.resolveOlObject()
       }
 
@@ -64,7 +63,7 @@ export default {
      * @return {void}
      */
     async removeLayer (layer) {
-      if (layer instanceof Vue) {
+      if (isFunction(layer.resolveOlObject)) {
         layer = await layer.resolveOlObject()
       }
 
@@ -108,7 +107,7 @@ export default {
       this.$layersCollection.clear()
     },
     /**
-     * @returns {{readonly layersContainer: Object|Vue}}
+     * @returns {{readonly layersContainer: Object}}
      * @protected
      */
     getServices () {

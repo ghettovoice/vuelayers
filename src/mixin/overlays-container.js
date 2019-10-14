@@ -1,14 +1,13 @@
 import { Collection, Overlay } from 'ol'
 import { merge as mergeObs } from 'rxjs/observable'
-import Vue from 'vue'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { map } from '../util/minilo'
+import { isFunction, map } from '../util/minilo'
 import rxSubs from './rx-subs'
 
 /**
- * @typedef {module:ol/Overlay~Overlay|Object|Vue} OverlayLike
+ * @typedef {module:ol/Overlay~Overlay|Object} OverlayLike
  */
 
 /**
@@ -41,7 +40,7 @@ export default {
     async addOverlay (overlay) {
       initializeOverlay(overlay)
 
-      if (overlay instanceof Vue) {
+      if (isFunction(overlay.resolveOlObject)) {
         overlay = await overlay.resolveOlObject()
       }
 
@@ -63,7 +62,7 @@ export default {
      * @return {void}
      */
     async removeOverlay (overlay) {
-      if (overlay instanceof Vue) {
+      if (isFunction(overlay.resolveOlObject)) {
         overlay = await overlay.resolveOlObject()
       }
 
@@ -107,7 +106,7 @@ export default {
       this.$overlaysCollection.clear()
     },
     /**
-     * @returns {readonly overlaysContainer: Object|Vue}}
+     * @returns {readonly overlaysContainer: Object}}
      * @protected
      */
     getServices () {

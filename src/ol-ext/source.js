@@ -1,24 +1,24 @@
 import { Source } from 'ol/source'
 import uuid from 'uuid/v4'
-import Vue from 'vue'
+import { hasProp } from '../util/minilo'
 
 export function getSourceId (source) {
-  if (source instanceof Vue) {
-    return source.id
-  } else if (source instanceof Source) {
+  if (source instanceof Source) {
     return source.get('id')
+  } else if (hasProp(source, 'id')) {
+    return source.id
   }
 
   throw new Error('Illegal source argument')
 }
 
 export function setSourceId (source, sourceId) {
-  if (source instanceof Vue) {
-    source.id = sourceId
+  if (source instanceof Source) {
+    source.set('id', sourceId)
 
     return source
-  } else if (source instanceof Source) {
-    source.set('id', sourceId)
+  } else if (hasProp(source, 'id')) {
+    source.id = sourceId
 
     return source
   }

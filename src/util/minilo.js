@@ -338,6 +338,14 @@ export function get (object, path, defaultValue) {
   return coalesce(fn(object), defaultValue)
 }
 
+export function hasOwnProp (object, prop) {
+  return isObjectLike(object) && object::objectHasOwnProp(prop)
+}
+
+export function hasProp (object, prop) {
+  return isObjectLike(object) && (prop in object)
+}
+
 export function includes (array, value, comparator = isEqual) {
   const elems = filter(array, elem => comparator(elem, value))
   return elems.shift()

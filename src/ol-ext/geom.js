@@ -13,7 +13,7 @@ import {
 import GeometryType from 'ol/geom/GeometryType'
 import { circular as circularPolygon } from 'ol/geom/Polygon'
 import uuid from 'uuid/v4'
-import Vue from 'vue'
+import { hasProp } from '../util/minilo'
 
 /**
  * @param {number|number[]} lonOrCoordinates
@@ -140,22 +140,22 @@ export function findPointOnSurface (geom) {
 }
 
 export function getGeometryId (geometry) {
-  if (geometry instanceof Vue) {
-    return geometry.id
-  } else if (geometry instanceof Geometry) {
+  if (geometry instanceof Geometry) {
     return geometry.get('id')
+  } else if (hasProp(geometry, 'id')) {
+    return geometry.id
   }
 
   throw new Error('Illegal geometry argument')
 }
 
 export function setGeometryId (geometry, geometryId) {
-  if (geometry instanceof Vue) {
-    geometry.id = geometryId
+  if (geometry instanceof Geometry) {
+    geometry.set('id', geometryId)
 
     return geometry
-  } else if (geometry instanceof Geometry) {
-    geometry.set('id', geometryId)
+  } else if (hasProp(geometry, 'id')) {
+    geometry.id = geometryId
 
     return geometry
   }

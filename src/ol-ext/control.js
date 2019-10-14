@@ -1,24 +1,24 @@
 import { Control } from 'ol/control'
 import uuid from 'uuid/v4'
-import Vue from 'vue'
+import { hasProp } from '../util/minilo'
 
 export function getControlId (control) {
-  if (control instanceof Vue) {
-    return control.id
-  } else if (control instanceof Control) {
+  if (control instanceof Control) {
     return control.get('id')
+  } else if (hasProp(control, 'id')) {
+    return control.id
   }
 
   throw new Error('Illegal control argument')
 }
 
 export function setControlId (control, controlId) {
-  if (control instanceof Vue) {
-    control.id = controlId
+  if (control instanceof Control) {
+    control.set('id', controlId)
 
     return control
-  } else if (control instanceof Control) {
-    control.set('id', controlId)
+  } else if (hasProp(control, 'id')) {
+    control.id = controlId
 
     return control
   }
