@@ -55,7 +55,7 @@
     "debounce-promise": "^3.1.2",
     "merge-descriptors": "^1.0.1",
     "ol": "^6.0.1",
-    "ol-tilecache": "^4.0.0",
+    "ol-tilecache": "^5.0.0",
     "parse-color": "^1.0.0",
     "rxjs": "^6.5.3",
     "uuid": "^3.3.3"
