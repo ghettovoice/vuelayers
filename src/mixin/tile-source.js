@@ -1,6 +1,6 @@
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
-import { isString } from '../util/minilo'
+import { isFunction, isString, pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
 
@@ -50,6 +50,16 @@ export default {
     zDirection: {
       type: Number,
       default: 0,
+    },
+  },
+  computed: {
+    /**
+     * @returns {module:ol/tilegrid/TileGrid|undefined}
+     */
+    tileGrid () {
+      if (!isFunction(this.tileGridFactory)) return
+
+      return Object.seal(this.tileGridFactory())
     },
   },
   watch: {
@@ -196,5 +206,19 @@ export default {
 
       return (await this.resolveSource()).getTileCoordForTileUrlFunction(tileCoord, projection)
     },
+    ...pick(source.methods, [
+      'init',
+      'deinit',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'getServices',
+      'subscribeAll',
+    ]),
   },
 }

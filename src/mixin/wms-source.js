@@ -1,28 +1,7 @@
 import WMSServerType from 'ol/source/WMSServerType'
-import { hasSource, hasView } from '../util/assert'
-import { reduce } from '../util/minilo'
+import { cleanSourceParams } from '../ol-ext'
+import { isArray, isEqual } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
-
-const cleanParams = params => reduce(params, (params, value, key) => {
-  const filterKeys = [
-    'LAYERS',
-    'VERSION',
-    'STYLES',
-    'FORMAT',
-    'TRANSPARENT',
-    'BGCOLOR',
-    'TIME',
-  ]
-
-  key = key.toUpperCase()
-  if (filterKeys.includes(key)) {
-    return params
-  }
-
-  params[key] = value
-
-  return params
-}, {})
 
 /**
  * Basic WMS params and methods mixin.
@@ -44,7 +23,7 @@ export default {
       validator: value => Object.values(WMSServerType).includes(value),
     },
     /**
-     * @type {string}
+     * @type {string|string[]}
      */
     layers: {
       type: String,
@@ -52,7 +31,7 @@ export default {
     },
     /**
      * WMS Request styles
-     * @type {string|undefined}
+     * @type {string|string[]|undefined}
      */
     styles: String,
     /**
@@ -92,10 +71,30 @@ export default {
   },
   computed: {
     /**
+     * @returns {string}
+     */
+    layersStr () {
+      return isArray(this.layers) ? this.layers.join(',') : this.layers
+    },
+    /**
+     * @returns {string|undefined}
+     */
+    stylesStr () {
+      return isArray(this.styles) ? this.styles.join(',') : this.styles
+    },
+    /**
      * @returns {Object|null}
      */
     customParams () {
-      return this.params ? cleanParams(this.params) : null
+      return this.params ? cleanSourceParams(this.params, [
+        'LAYERS',
+        'VERSION',
+        'STYLES',
+        'FORMAT',
+        'TRANSPARENT',
+        'BGCOLOR',
+        'TIME',
+      ]) : null
     },
     /**
      * @returns {Object}
@@ -103,8 +102,8 @@ export default {
     allParams () {
       return {
         ...this.customParams || {},
-        LAYERS: this.layers,
-        STYLES: this.styles,
+        LAYERS: this.layersStr,
+        STYLES: this.stylesStr,
         VERSION: this.version,
         FORMAT: this.format,
         TRANSPARENT: this.transparent,
@@ -117,10 +116,14 @@ export default {
     customParams (value) {
       this.updateSourceParams(value)
     },
+    layersStr (value) {
+      this.updateSourceParam('layers', value)
+    },
+    stylesStr (value) {
+      this.updateSourceParam('styles', value)
+    },
     ...makeWatchers([
-      'layers',
       'version',
-      'styles',
       'transparent',
       'format',
       'bgColor',
@@ -140,10 +143,7 @@ export default {
      * @return {string|undefined}
      */
     async getFeatureInfoUrl (coordinate, resolution, projection, params = {}) {
-      hasView(this)
-      hasSource(this)
-
-      resolution || (resolution = this.$view.getResolution())
+      resolution || (resolution = this.$view && this.$view.getResolution())
       projection || (projection = this.projection)
       params = { ...this.allParams, ...params }
 
@@ -155,19 +155,30 @@ export default {
       )
     },
     /**
-     * @param {string} param
-     * @param {*} value
-     * @returns {Promise<void>}
+     * @returns {Promise<Object>}
      */
-    async updateSourceParam (param, value) {
-      (await this.resolveSource()).updateParams({ [param.toUpperCase()]: value })
+    async getParams () {
+      return (await this.resolveSource()).getParams()
     },
     /**
      * @param {Object} params
      * @returns {Promise<void>}
      */
     async updateSourceParams (params) {
-      (await this.resolveSource()).updateParams()
+      params = { ...this.allParams, ...params }
+      const source = await this.resolveSource()
+
+      if (isEqual(params, source.getParams())) return
+
+      source.updateParams(params)
+    },
+    /**
+     * @param {string} param
+     * @param {*} value
+     * @returns {Promise<void>}
+     */
+    async updateSourceParam (param, value) {
+      await this.updateSourceParam({ [param.toUpperCase()]: value })
     },
   },
 }

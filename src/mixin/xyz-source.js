@@ -1,4 +1,5 @@
 import { XYZ as XYZSource } from 'ol/source'
+import { pick } from '../util/minilo'
 import tileImageSource from './tile-image-source'
 
 /**
@@ -38,5 +39,19 @@ export default {
         tileClass: this.tileClass,
       })
     },
+    ...pick(tileImageSource.methods, [
+      'init',
+      'deinit',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'getServices',
+      'subscribeAll',
+    ]),
   },
 }

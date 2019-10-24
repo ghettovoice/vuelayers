@@ -29,7 +29,7 @@ export default {
       'crossOrigin',
       'reprojectionErrorThreshold',
       'tileClass',
-    ], () => urlTileSource.scheduleRecreate),
+    ], () => urlTileSource.methods.scheduleRecreate),
   },
   methods: {
     ...pick(urlTileSource.methods, [

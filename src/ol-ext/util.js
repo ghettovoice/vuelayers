@@ -38,7 +38,7 @@ export function isGeoJSONFeature (feature) {
     isArray(feature.geometry.coordinates)
 }
 
-export function cleanSourceExtraParams (params, filterKeys) {
+export function cleanSourceParams (params, filterKeys) {
   return reduce(params, (params, value, key) => {
     key = key.toUpperCase()
     if (filterKeys.includes(key)) {

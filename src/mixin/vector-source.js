@@ -38,7 +38,7 @@ export default {
     },
     /**
      * Source format factory
-     * @type {(function(): Feature)} formatFactory
+     * @type {function} formatFactory
      */
     formatFactory: {
       type: Function,
@@ -47,13 +47,13 @@ export default {
     /**
      * Feature loader.
      * Feature loader should load features from some remote service, decode them and pas to `features` prop to render.
-     * @type {(module:ol/featureloader~FeatureLoader|undefined)} loader
+     * @type {module:ol/featureloader~FeatureLoader|undefined} loader
      */
     loader: Function,
     /**
      * Loading strategy factory.
      * Extent here in map view projection.
-     * @type {(function(): LoadingStrategy)} strategyFactory
+     * @type {function} strategyFactory
      */
     strategyFactory: {
       type: Function,
@@ -61,7 +61,7 @@ export default {
     },
     /**
      * String or url factory
-     * @type {(string|function(): string|function|undefined)} url
+     * @type {string|function} url
      */
     url: {
       type: [String, Function],
@@ -108,10 +108,10 @@ export default {
       return this.strategyFactory()
     },
     /**
-     * @returns {function}
+     * @returns {module:ol/format/Feature~FeatureFormat}
      */
     dataFormat () {
-      return this.formatFactory()
+      return Object.seal(this.formatFactory())
     },
   },
   watch: {

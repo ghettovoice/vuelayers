@@ -1,5 +1,6 @@
+import { createTileUrlFunction, createTileUrlFunctionFromTemplates } from 'ol-tilecache'
 import { obsFromOlEvent } from '../rx-ext'
-import { isEmpty, isEqual, isString, pick } from '../util/minilo'
+import { isEmpty, isEqual, isFunction, isString, pick } from '../util/minilo'
 import tileSource from './tile-source'
 
 export default {
@@ -29,6 +30,23 @@ export default {
     urls: {
       type: Array,
       validator: value => value.every(url => isString(url) && !isEmpty(url)),
+    },
+  },
+  computed: {
+    urlFunc () {
+      if (isFunction(this.tileUrlFunction)) {
+        return this.tileUrlFunction
+      }
+
+      let urlFunc
+
+      if (this.urls) {
+        urlFunc = createTileUrlFunctionFromTemplates(this.urls, this.tileGrid)
+      } else if (this.url) {
+        urlFunc = createTileUrlFunction(this.url, this.tileGrid)
+      }
+
+      return urlFunc
     },
   },
   watch: {
