@@ -6,14 +6,20 @@ import { getLayerId, initializeLayer } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import rxSubs from './rx-subs'
+import identMap from './ident-map'
 
 export default {
-  mixins: [rxSubs],
+  mixins: [identMap, rxSubs],
   computed: {
     layerIds () {
       if (!this.rev) return []
 
       return this.getLayers().map(getLayerId)
+    },
+    layersCollectionIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'layers_collection')
     },
   },
   methods: {
@@ -80,11 +86,7 @@ export default {
     },
   },
   created () {
-    /**
-     * @type {Collection<BaseLayer>}
-     * @private
-     */
-    this._layersCollection = new Collection()
+    this._layersCollection = this.instanceFactoryCall(this.layersCollectionIdent, () => new Collection())
 
     this::defineServices()
     this::subscribeToCollectionEvents()

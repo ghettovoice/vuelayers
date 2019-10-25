@@ -90,8 +90,13 @@
       loadingStrategy () {
         return this.strategyFactory()
       },
+      dataFormatIdent () {
+        if (!this.olObjIdent) return
+
+        return this.makeIdent(this.olObjIdent, 'data_format')
+      },
       dataFormat () {
-        return this.formatFactory()
+        return this.instanceFactoryCall(this.dataFormatIdent, ::this.formatFactory)
       },
     },
     methods: {

@@ -1,13 +1,11 @@
 import Vue from 'vue'
 import IdentityMap from '../util/identity-map'
-import { identity } from '../util/minilo'
+import { identity, stubObject, keys } from '../util/minilo'
 
-// todo uncomment when IE 11 will die
-// const IDENTITY_MAP_PROP = Symbol('identityMap')
-const IDENTITY_MAP_PROP = 'identityMap'
+const INSTANCES_POOL = 'instances'
 
 export default {
-  IDENTITY_MAP_PROP,
+  INSTANCES_POOL,
   props: {
     /**
      * Unique key for saving to identity map
@@ -15,6 +13,32 @@ export default {
      * @experimental
      */
     ident: [String, Number],
+  },
+  data () {
+    return {
+      idents: stubObject(),
+    }
+  },
+  computed: {
+    selfIdent () {
+      return this.makeSelfIdent()
+    },
+  },
+  watch: {
+    ident (value, prev) {
+      if (prev && this.$identityMap.has(prev)) {
+        this.$identityMap.unset(prev)
+      }
+      if (value && !this.$identityMap.has(value)) {
+        this.$identityMap.set(value)
+      }
+    },
+  },
+  beforeCreate () {
+    initIdentityMap()
+  },
+  destroyed () {
+    this.unsetInstances()
   },
   methods: {
     /**
@@ -34,33 +58,65 @@ export default {
     makeIdent (...parts) {
       return parts.filter(identity).join('.')
     },
-  },
-  created () {
-    this::initIdentityMap()
-  },
-  watch: {
-    ident (value, prev) {
-      if (prev && this.$identityMap.has(prev)) {
-        this.$identityMap.unset(prev)
+    /**
+     * Caches or reuse factory result in the identity map
+     * and returns result.
+     *
+     * @param {string|undefined} ident
+     * @param {function} factory
+     * @returns {*}
+     */
+    instanceFactoryCall (ident, factory) {
+      if (ident && this.$identityMap.has(ident, INSTANCES_POOL)) {
+        return this.$identityMap.get(ident, INSTANCES_POOL)
       }
-      if (value && !this.$identityMap.has(value)) {
-        this.$identityMap.set(value)
+
+      const val = factory()
+
+      if (ident) {
+        this.idents[ident] = true
+        this.$identityMap.set(ident, val, INSTANCES_POOL)
       }
+
+      return val
+    },
+    /**
+     * @param {string|undefined} ident
+     * @returns {*}
+     */
+    getInstance (ident) {
+      if (!ident) return
+
+      return this.$identityMap.get(ident, INSTANCES_POOL)
+    },
+    /**
+     * Unsets all self indets
+     * @return {void}
+     */
+    unsetInstances () {
+      keys(this.idents).forEach(ident => this.$identityMap.unset(ident, INSTANCES_POOL))
     },
   },
 }
 
-/**
- * @private
- */
 function initIdentityMap () {
-  if (!this[IDENTITY_MAP_PROP]) {
-    Vue[IDENTITY_MAP_PROP] = Vue.prototype[IDENTITY_MAP_PROP] = new IdentityMap()
+  const imap = new IdentityMap()
+
+  if (!('$identityMap' in Vue)) {
+    Object.defineProperties(Vue, {
+      $identityMap: {
+        enumerable: true,
+        get: () => imap,
+      },
+    })
   }
-  Object.defineProperties(this, {
-    $identityMap: {
-      enumerable: true,
-      get: () => this[IDENTITY_MAP_PROP],
-    },
-  })
+
+  if (!('$identityMap' in Vue.prototype)) {
+    Object.defineProperties(Vue.prototype, {
+      $identityMap: {
+        enumerable: true,
+        get: () => imap,
+      },
+    })
+  }
 }

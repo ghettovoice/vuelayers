@@ -8,10 +8,11 @@ import { instanceOf } from '../util/assert'
 import { forEach, isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
 import rxSubs from './rx-subs'
+import identMap from './ident-map'
 import { observableFromOlEvent } from '../rx-ext'
 
 export default {
-  mixins: [rxSubs, projTransforms],
+  mixins: [identMap, rxSubs, projTransforms],
   computed: {
     featureIds () {
       if (!this.rev) return []
@@ -27,6 +28,11 @@ export default {
       if (!this.rev) return []
 
       return this.getFeatures().map(::this.writeFeatureInDataProj)
+    },
+    featuresCollectionIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'features_collection')
     },
   },
   methods: {
@@ -116,11 +122,7 @@ export default {
     },
   },
   created () {
-    /**
-     * @type {Collection<Feature>>}
-     * @private
-     */
-    this._featuresCollection = new Collection()
+    this._featuresCollection = this.instanceFactoryCall(this.featuresCollectionIdent, () => new Collection())
     this._featureSubs = {}
 
     this::defineServices()

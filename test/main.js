@@ -1,6 +1,6 @@
 import '@babel/polyfill'
 import Vue from 'vue'
-import VueLayers from '@'
+import VueLayers from '../src'
 import App from './app.vue'
 
 Vue.performance = true
@@ -10,6 +10,7 @@ Vue.use(VueLayers, {
   // dataProjection: 'EPSG:4326',
 })
 console.log(process.env.NODE_ENV)
+console.dir(Vue)
 console.dir(VueLayers)
 /* eslint-disable no-new */
 new Vue({

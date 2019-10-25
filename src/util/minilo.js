@@ -29,6 +29,10 @@ export function stubArray () {
   return []
 }
 
+export function stubObject () {
+  return Object.create(null)
+}
+
 export function identity (value) {
   return value
 }
@@ -183,6 +187,14 @@ export function isEmpty (value) {
 
 export function isNotEmpty (value) {
   return !isEmpty(value)
+}
+
+export function keys (object) {
+  return Object.keys(object)
+}
+
+export function values (object) {
+  return Object.values(object)
 }
 
 export function forEach (collection, iteratee) {

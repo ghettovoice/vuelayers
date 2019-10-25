@@ -1,10 +1,12 @@
 <script>
   import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
-  import ModifyInteraction from 'ol/interaction/Modify'
+  import { Collection } from 'ol'
+  import { Modify as ModifyInteraction } from 'ol/interaction'
+  import { Vector as VectorSource } from 'ol/source'
   import { interaction, stylesContainer } from '../../mixin'
-  import { createStyle, defaultEditStyle, isCollection, isVectorSource } from '../../ol-ext'
+  import { createStyle, defaultEditStyle } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
-  import { assert, hasInteraction } from '../../util/assert'
+  import { hasInteraction, instanceOf } from '../../util/assert'
   import { mapValues } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -85,11 +87,9 @@
        * @protected
        */
       async createInteraction () {
-        let sourceIdent = this.makeIdent(this.source)
-        let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
-        assert(isVectorSource(source), `Source "${sourceIdent}" doesn't exists in the identity map.`)
-        assert(isCollection(source.getFeaturesCollection()),
-          `Source "${sourceIdent}" doesn't provide features collection.`)
+        let source = await this.getInstance(this.source)
+        instanceOf(source, VectorSource, `Source "${this.source}" doesn't exists in the identity map.`)
+        instanceOf(source.getFeaturesCollection(), Collection, `Source "${this.source}" doesn't provide features collection.`)
 
         return new ModifyInteraction({
           features: source.getFeaturesCollection(),

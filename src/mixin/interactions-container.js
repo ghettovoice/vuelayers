@@ -5,15 +5,21 @@ import { merge as mergeObs } from 'rxjs/observable'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
 import { instanceOf } from '../util/assert'
 import rxSubs from './rx-subs'
+import identMap from './ident-map'
 import { observableFromOlEvent } from '../rx-ext'
 
 export default {
-  mixins: [rxSubs],
+  mixins: [identMap, rxSubs],
   computed: {
     interactionIds () {
       if (!this.rev) return []
 
       return this.getInteractions().map(getInteractionId)
+    },
+    interactionsCollectionIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'interactions_collection')
     },
   },
   methods: {
@@ -103,11 +109,7 @@ export default {
     },
   },
   created () {
-    /**
-     * @type {Collection<Interaction>>}
-     * @private
-     */
-    this._interactionsCollection = new Collection()
+    this._interactionsCollection = this.instanceFactoryCall(this.interactionsCollectionIdent, () => new Collection())
 
     this::defineServices()
     this::subscribeToCollectionEvents()

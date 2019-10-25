@@ -34,19 +34,21 @@ export function ok (value, message) {
 
 /**
  * @param {*} value
+ * @param {string|undefined} [msg]
  * @throws {AssertionError}
  */
-export function numeric (value) {
-  assert(isNumeric(value), 'value is a number')
+export function numeric (value, msg) {
+  assert(isNumeric(value), msg || 'value is a number')
 }
 
 /**
  * @param {*} value
  * @param {Function} Ctor
+ * @param {string|undefined} [msg]
  * @throws {AssertionError}
  */
-export function instanceOf (value, Ctor) {
-  assert(value instanceof Ctor, `value is an instance of ${Ctor.name}`)
+export function instanceOf (value, Ctor, msg) {
+  assert(value instanceof Ctor, msg || `value is an instance of ${Ctor.name}`)
 }
 
 export function hasOlObject (vm) {

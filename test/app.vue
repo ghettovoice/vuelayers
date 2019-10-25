@@ -6,9 +6,11 @@
           Selected:<br>
           {{ selectedFeatureIds }}
         </div>
+        <button @click="toggleMap">Toggle map</button>
       </div>
 
-      <vl-map ref="map" data-projection="EPSG:4326" :default-controls="controls" :default-interactions="interactions">
+      <vl-map v-if="mapVisible" ref="map" data-projection="EPSG:4326"
+              :default-controls="controls" :default-interactions="interactions">
         <vl-view :center.sync="center" :rotation.sync="rotation"
                  :zoom.sync="zoom" :extent="[0, 0, 100, 50]"
                  ident="view" ref="view" />
@@ -30,18 +32,19 @@
         <!--  <vl-style-func :factory="createCountriesStyleFunc" />-->
         <!--</vl-layer-vector>-->
 
-        <vl-layer-vector render-mode="image">
-          <vl-source-cluster :distance="50">
-            <vl-source-vector ref="placesSource" @mounted="getPlaceFeatures" />
-          </vl-source-cluster>
-          <vl-style-func :factory="makeClusterStyleFunc" />
-        </vl-layer-vector>
-
-        <!--<vl-layer-vector id="draw-target">-->
-        <!--  <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />-->
+        <!--<vl-layer-vector render-mode="image">-->
+          <!--<vl-source-cluster :distance="50">-->
+          <!--  <vl-source-vector :features="points" />-->
+          <!--</vl-source-cluster>-->
+          <!--<vl-style-func :factory="makeClusterStyleFunc" />-->
         <!--</vl-layer-vector>-->
 
+        <vl-layer-vector id="draw-target">
+          <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
+        </vl-layer-vector>
+
         <!--<vl-interaction-select :features.sync="selectedFeatures" />-->
+        <vl-interaction-draw source="draw-target" type="Polygon" />
         <!--<vl-interaction-modify source="draw-target" />-->
       </vl-map>
     </div>
@@ -62,36 +65,25 @@
         resolution: 39135.75848201024,
         center: [100, 10],
         rotation: 0,
+        mapVisible: true,
         countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
         countries: [],
         featureId: undefined,
         features: [],
         selectedFeatures: [],
-        drawFeatures: [
-          {
-            type: 'Feature',
-            id: '213456789',
-            properties: {},
-            geometry: {
-              type: 'Polygon',
-              coordinates: [[
-                [0, 0],
-                [20, 0],
-                [20, 20],
-                [0, 20],
-                [0, 0],
-              ]],
-            },
-          },
-        ],
+        drawFeatures: [],
         controls: true,
         interactions: true,
-        places: range(0, 100).map(i => ({
+        points: range(0, 100).map(i => ({
+          type: 'Feature',
           id: 'random-' + i,
-          geo: [
-            random(0, 50),
-            random(0, 50),
-          ],
+          geometry: {
+            type: 'Point',
+            coordinates: [
+              random(0, 50),
+              random(0, 50),
+            ],
+          },
         })),
       }
     },
@@ -132,25 +124,10 @@
           return [style]
         }
       },
-      getPlaceFeatures () {
-        const sourceVm = this.$refs.placesSource
-        sourceVm.$source.clear()
-
-        const features = this.places.map(place => {
-          const geometry = new Point(place.geo)
-          geometry.transform('EPSG:4326', 'EPSG:3857')
-
-          let feature = new Feature({ geometry })
-          feature.setProperties(place)
-          feature.setId(place.id)
-
-          return feature
-        })
-
-        sourceVm.$source.addFeatures(features)
+      toggleMap () {
+        this.mapVisible = !this.mapVisible
+        this.drawFeatures = []
       },
-    },
-    mounted () {
     },
   }
 </script>

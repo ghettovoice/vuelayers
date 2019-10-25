@@ -99,6 +99,11 @@ export default {
 
       return url
     },
+    tileGridIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'tile_grid')
+    },
   },
   methods: {
     createTileGrid () {
@@ -118,7 +123,7 @@ export default {
        * @type {module:ol/Tile~UrlFunction}
        * @protected
        */
-      this._tileGrid = this.createTileGrid()
+      this._tileGrid = this.instanceFactoryCall(this.tileGridIdent, ::this.createTileGrid)
 
       return this::source.methods.init()
     },

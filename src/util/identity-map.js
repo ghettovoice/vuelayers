@@ -2,14 +2,14 @@
  * Simple Identity map with refs count
  */
 export default class IdentityMap {
-  pools = Object.create(null)
+  _pools = Object.create(null)
 
   /**
    * @param {string} pool
    * @private
    */
   _preparePool (pool) {
-    this.pools[pool] || (this.pools[pool] = Object.create(null))
+    this._pools[pool] || (this._pools[pool] = Object.create(null))
   }
 
   /**
@@ -22,7 +22,7 @@ export default class IdentityMap {
 
     this._preparePool(pool)
 
-    this.pools[pool][id] = {
+    this._pools[pool][id] = {
       value,
       refs: 1,
     }
@@ -35,11 +35,11 @@ export default class IdentityMap {
   get (id, pool = 'default') {
     this._preparePool(pool)
 
-    let rec = this.pools[pool][id]
+    let rec = this._pools[pool][id]
     if (!rec || rec.value == null) return
 
     rec.refs++
-    this.pools[pool][id] = rec
+    this._pools[pool][id] = rec
 
     return rec.value
   }
@@ -51,14 +51,12 @@ export default class IdentityMap {
   unset (id, pool = 'default') {
     this._preparePool(pool)
 
-    let rec = this.pools[pool][id]
+    let rec = this._pools[pool][id]
     if (!rec || rec.value == null) return
 
     rec.refs--
     if (rec.refs === 0) {
-      delete this.pools[pool][id]
-    } else {
-      this.pools[pool][id] = rec
+      delete this._pools[pool][id]
     }
   }
 
@@ -70,7 +68,7 @@ export default class IdentityMap {
   has (id, pool = 'default') {
     this._preparePool(pool)
 
-    return !!this.pools[pool][id]
+    return !!this._pools[pool][id]
   }
 
   /**
@@ -80,7 +78,7 @@ export default class IdentityMap {
   ids (pool = 'default') {
     this._preparePool(pool)
 
-    return Object.keys(this.pools[pool])
+    return Object.keys(this._pools[pool])
   }
 
   /**
@@ -91,6 +89,6 @@ export default class IdentityMap {
   refs (id, pool = 'default') {
     this._preparePool(pool)
 
-    return this.has(id, pool) ? this.pools[pool][id].refs : undefined
+    return this.has(id, pool) ? this._pools[pool][id].refs : undefined
   }
 }

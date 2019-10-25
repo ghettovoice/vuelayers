@@ -1,6 +1,8 @@
 <script>
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
-  import DrawInteraction from 'ol/interaction/Draw'
+  import { Collection } from 'ol'
+  import { Draw as DrawInteraction } from 'ol/interaction'
+  import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operators'
   import { interaction, stylesContainer } from '../../mixin'
@@ -9,11 +11,9 @@
     defaultEditStyle,
     GEOMETRY_TYPE,
     initializeFeature,
-    isCollection,
-    isVectorSource,
   } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
-  import { assert, hasInteraction } from '../../util/assert'
+  import { hasInteraction, instanceOf } from '../../util/assert'
   import { camelCase, mapValues, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -153,11 +153,9 @@
        * @protected
        */
       async createInteraction () {
-        let sourceIdent = this.makeIdent(this.source)
-        let source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
-        assert(isVectorSource(source), `Source "${sourceIdent}" doesn't exists in the identity map.`)
-        assert(isCollection(source.getFeaturesCollection()),
-          `Source "${sourceIdent}" doesn't provide features collection.`)
+        let source = await this.getInstance(this.source)
+        instanceOf(source, VectorSource, `Source "${this.source}" doesn't exists in the identity map.`)
+        instanceOf(source.getFeaturesCollection(), Collection, `Source "${this.source}" doesn't provide features collection.`)
 
         return new DrawInteraction({
           features: source.getFeaturesCollection(),

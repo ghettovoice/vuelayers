@@ -9,7 +9,6 @@ import rxSubs from './rx-subs'
 import services from './services'
 
 const VM_PROP = 'vm'
-const INSTANCE_PROMISE_POOL = 'instance_promise'
 
 /**
  * Basic ol component mixin.
@@ -17,7 +16,6 @@ const INSTANCE_PROMISE_POOL = 'instance_promise'
  */
 export default {
   VM_PROP,
-  INSTANCE_PROMISE_POOL,
   mixins: [identMap, rxSubs, services],
   props: {
     id: {
@@ -40,6 +38,9 @@ export default {
     vmName () {
       return [this.cmpName, this.id].filter(identity).join(' ')
     },
+    olObjIdent () {
+      return this.selfIdent
+    },
   },
   methods: {
     /**
@@ -52,20 +53,7 @@ export default {
      * @protected
      */
     async init () {
-      let createPromise
-
-      const ident = this.makeSelfIdent()
-      if (ident && this.$identityMap.has(ident, INSTANCE_PROMISE_POOL)) {
-        createPromise = this.$identityMap.get(ident, INSTANCE_PROMISE_POOL)
-      } else {
-        createPromise = this.createOlObject()
-
-        if (ident) {
-          this.$identityMap.set(ident, createPromise, INSTANCE_PROMISE_POOL)
-        }
-      }
-
-      this._olObject = await createPromise
+      this._olObject = await this.instanceFactoryCall(this.olObjIdent, ::this.createOlObject)
       this._olObject[VM_PROP] || (this._olObject[VM_PROP] = [])
 
       if (!this._olObject[VM_PROP].includes(this)) { // for loaded from IdentityMap
@@ -87,10 +75,8 @@ export default {
      * @protected
      */
     deinit () {
-      const ident = this.makeSelfIdent()
-      if (ident) {
-        this.$identityMap.unset(ident, INSTANCE_PROMISE_POOL)
-      }
+      this.unsetInstances()
+
       if (this._olObject) {
         this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
         this._olObject = undefined
