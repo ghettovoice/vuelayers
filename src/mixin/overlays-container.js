@@ -4,6 +4,7 @@ import { getOverlayId, initializeOverlay } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import { isFunction, map } from '../util/minilo'
+import identMap from './ident-map'
 import rxSubs from './rx-subs'
 
 /**
@@ -14,12 +15,20 @@ import rxSubs from './rx-subs'
  * Overlays container mixin.
  */
 export default {
-  mixins: [rxSubs],
+  mixins: [
+    identMap,
+    rxSubs,
+  ],
   computed: {
     overlayIds () {
       if (!this.rev) return []
 
       return this.getOverlays().map(getOverlayId)
+    },
+    overlaysCollectionIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'overlays_collection')
     },
   },
   created () {
@@ -27,7 +36,7 @@ export default {
      * @type {module:ol/Collection~Collection<module:ol/Overlay~Overlay>}
      * @private
      */
-    this._overlaysCollection = new Collection()
+    this._overlaysCollection = this.instanceFactoryCall(this.overlaysCollectionIdent, () => new Collection())
 
     this::defineServices()
     this::subscribeToCollectionEvents()

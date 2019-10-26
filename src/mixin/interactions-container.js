@@ -5,6 +5,7 @@ import { getInteractionId, getInteractionPriority, initializeInteraction } from 
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import { isArray, isFunction, isPlainObject, map } from '../util/minilo'
+import identMap from './ident-map'
 import rxSubs from './rx-subs'
 
 /**
@@ -15,12 +16,20 @@ import rxSubs from './rx-subs'
  * Interactions container
  */
 export default {
-  mixins: [rxSubs],
+  mixins: [
+    identMap,
+    rxSubs,
+  ],
   computed: {
     interactionIds () {
       if (!this.rev) return []
 
       return this.getInteractions().map(getInteractionId)
+    },
+    interactionsCollectionIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'interactions_collection')
     },
   },
   created () {
@@ -28,7 +37,7 @@ export default {
      * @type {module:ol/Collection~Collection<module:ol/interaction/Interaction~Interaction>}
      * @private
      */
-    this._interactionsCollection = new Collection()
+    this._interactionsCollection = this.instanceFactoryCall(this.interactionsCollectionIdent, () => new Collection())
 
     this::defineServices()
     this::subscribeToCollectionEvents()

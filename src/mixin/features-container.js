@@ -5,6 +5,7 @@ import { getFeatureId, initializeFeature, mergeFeatures } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import { isFunction, isPlainObject, map } from '../util/minilo'
+import identMap from './ident-map'
 import projTransforms from './proj-transforms'
 import rxSubs from './rx-subs'
 
@@ -16,7 +17,11 @@ import rxSubs from './rx-subs'
  * Features container
  */
 export default {
-  mixins: [rxSubs, projTransforms],
+  mixins: [
+    identMap,
+    rxSubs,
+    projTransforms,
+  ],
   computed: {
     /**
      * @type {Array<string|number>}
@@ -42,13 +47,18 @@ export default {
 
       return this.getFeatures().map(::this.writeFeatureInDataProj)
     },
+    featuresCollectionIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'features_collection')
+    },
   },
   created () {
     /**
      * @type {module:ol/Collection~Collection<module:ol/Feature~Feature>}
      * @private
      */
-    this._featuresCollection = new Collection()
+    this._featuresCollection = this.instanceFactoryCall(this.featuresCollectionIdent, () => new Collection())
     this._featureSubs = {}
 
     this::defineServices()

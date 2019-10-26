@@ -218,6 +218,14 @@ export function isEmpty (value) {
   return !value || (isArrayLike(value) && getLength(value) === 0)
 }
 
+export function keys (object) {
+  return Object.keys(object)
+}
+
+export function values (object) {
+  return Object.values(object)
+}
+
 export function forEach (collection, iteratee) {
   if (isCollection(collection)) {
     collection = collection.getArray()

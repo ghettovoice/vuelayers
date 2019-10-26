@@ -4,7 +4,9 @@
 
   export default {
     name: 'VlSourceVector',
-    mixins: [vectorSource],
+    mixins: [
+      vectorSource,
+    ],
     methods: {
       /**
        * @return {module:ol/source/Vector~VectorSource}

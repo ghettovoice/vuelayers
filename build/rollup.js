@@ -176,7 +176,7 @@ function bundleOptions (format, pkg, env = 'development') {
       options.input.external = (id, parent, resolved) => {
         if (['vue'].includes(id)) return true
 
-        if (!resolved && /^ol\/.+/.test(id)) {
+        if (!resolved && /^ol(?:\/.+)?$/.test(id)) {
           ol[id] = id.replace(/\//g, '.')
           return true
         }

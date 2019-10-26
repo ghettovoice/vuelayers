@@ -1,33 +1,25 @@
 <script>
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
-  import DrawInteraction from 'ol/interaction/Draw'
+  import { Draw as DrawInteraction } from 'ol/interaction'
+  import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapObs } from 'rxjs/operators'
   import { interaction, stylesContainer } from '../../mixin'
-  import {
-    createStyle,
-    defaultEditStyle,
-    GEOMETRY_TYPE,
-    initializeFeature,
-    isCollection,
-    isVectorSource,
-  } from '../../ol-ext'
+  import { createStyle, defaultEditStyle, GEOMETRY_TYPE, initializeFeature } from '../../ol-ext'
   import { obsFromOlEvent } from '../../rx-ext'
-  import { assert, hasInteraction } from '../../util/assert'
+  import { hasInteraction, instanceOf } from '../../util/assert'
   import { camelCase, mapValues, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
   const transformType = type => upperFirst(camelCase(type))
 
-  /**
-   * @alias module:draw-interaction/interaction
-   * @title vl-interaction-draw
-   * @vueProto
-   */
   export default {
     name: 'VlInteractionDraw',
-    mixins: [interaction, stylesContainer],
+    mixins: [
+      interaction,
+      stylesContainer,
+    ],
     stubVNode: {
       empty: false,
       attrs () {
@@ -163,9 +155,7 @@
         'freehand',
         'freehandCondition',
         'wrapX',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
+      ], () => interaction.methods.scheduleRecreate),
     },
     methods: {
       /**
@@ -173,14 +163,11 @@
        * @protected
        */
       async createInteraction () {
-        const sourceIdent = this.makeIdent(this.source)
-        const source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
-        assert(isVectorSource(source), `Source "${sourceIdent}" doesn't exists in the identity map.`)
-        assert(isCollection(source.getFeaturesCollection()),
-               `Source "${sourceIdent}" doesn't provide features collection.`)
+        const source = await this.getInstance(this.source)
+        instanceOf(source, VectorSource, `source "${this.source}" is Vector source.`)
 
         return new DrawInteraction({
-          features: source.getFeaturesCollection(),
+          source,
           clickTolerance: this.clickTolerance,
           snapTolerance: this.snapTolerance,
           type: transformType(this.type),

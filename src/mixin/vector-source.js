@@ -108,10 +108,18 @@ export default {
       return this.strategyFactory()
     },
     /**
+     * @returns {string|undefined}
+     */
+    dataFormatIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'data_format')
+    },
+    /**
      * @returns {module:ol/format/Feature~FeatureFormat}
      */
     dataFormat () {
-      return Object.seal(this.formatFactory())
+      return this.instanceFactoryCall(this.dataFormatIdent, () => Object.seal(this.formatFactory()))
     },
   },
   watch: {

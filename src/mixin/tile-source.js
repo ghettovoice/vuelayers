@@ -54,12 +54,20 @@ export default {
   },
   computed: {
     /**
+     * @returns {string|undefined}
+     */
+    tileGridIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'tile_grid')
+    },
+    /**
      * @returns {module:ol/tilegrid/TileGrid|undefined}
      */
     tileGrid () {
       if (!isFunction(this.tileGridFactory)) return
 
-      return Object.seal(this.tileGridFactory())
+      return this.instanceFactoryCall(this.tileGridIdent, () => Object.seal(this.tileGridFactory()))
     },
   },
   watch: {

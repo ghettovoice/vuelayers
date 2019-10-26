@@ -1,22 +1,21 @@
 <script>
   import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
-  import ModifyInteraction from 'ol/interaction/Modify'
+  import { Modify as ModifyInteraction } from 'ol/interaction'
+  import { Vector as VectorSource } from 'ol/source'
   import { interaction, stylesContainer } from '../../mixin'
-  import { createStyle, defaultEditStyle, isCollection, isVectorSource } from '../../ol-ext'
+  import { createStyle, defaultEditStyle } from '../../ol-ext'
   import { obsFromOlEvent } from '../../rx-ext'
-  import { assert, hasInteraction } from '../../util/assert'
+  import { hasInteraction, instanceOf } from '../../util/assert'
   import { mapValues } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
-  /**
-   * @vueProto
-   * @alias module:modify-interaction/interaction
-   * @title vl-interaction-modify
-   */
   export default {
     name: 'VlInteractionModify',
-    mixins: [interaction, stylesContainer],
+    mixins: [
+      interaction,
+      stylesContainer,
+    ],
     stubVNode: {
       empty: false,
       attrs () {
@@ -87,9 +86,7 @@
         'insertVertexCondition',
         'pixelTolerance',
         'wrapX',
-      ], () => function () {
-        this.scheduleRecreate()
-      }),
+      ], () => interaction.methods.scheduleRecreate),
     },
     methods: {
       /**
@@ -97,14 +94,11 @@
        * @protected
        */
       async createInteraction () {
-        const sourceIdent = this.makeIdent(this.source)
-        const source = await this.$identityMap.get(sourceIdent, this.$options.INSTANCE_PROMISE_POOL)
-        assert(isVectorSource(source), `Source "${sourceIdent}" doesn't exists in the identity map.`)
-        assert(isCollection(source.getFeaturesCollection()),
-               `Source "${sourceIdent}" doesn't provide features collection.`)
+        const source = await this.getInstance(this.source)
+        instanceOf(source, VectorSource, `source "${this.source}" is Vector source.`)
 
         return new ModifyInteraction({
-          features: source.getFeaturesCollection(),
+          source,
           deleteCondition: this.deleteCondition,
           insertVertexCondition: this.insertVertexCondition,
           pixelTolerance: this.pixelTolerance,
@@ -141,20 +135,6 @@
        */
       getStyleTarget () {
         return this.$interaction
-      },
-      /**
-       * @return {void}
-       * @protected
-       */
-      mount () {
-        this::interaction.methods.mount()
-      },
-      /**
-       * @return {void}
-       * @protected
-       */
-      unmount () {
-        this::interaction.methods.unmount()
       },
       /**
        * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|function(feature: Feature): Style|Vue|undefined} styles

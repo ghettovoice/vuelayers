@@ -5,6 +5,7 @@ import { getLayerId, initializeLayer } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import { isFunction, map } from '../util/minilo'
+import identMap from './ident-map'
 import rxSubs from './rx-subs'
 
 /**
@@ -15,12 +16,20 @@ import rxSubs from './rx-subs'
  * Layers container mixin.
  */
 export default {
-  mixins: [rxSubs],
+  mixins: [
+    identMap,
+    rxSubs,
+  ],
   computed: {
     layerIds () {
       if (!this.rev) return []
 
       return this.getLayers().map(getLayerId)
+    },
+    layersCollectionIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'layers_collection')
     },
   },
   created () {
@@ -28,7 +37,7 @@ export default {
      * @type {module:ol/Collection~Collection<module:ol/layer/Base~BaseLayer>}
      * @private
      */
-    this._layersCollection = new Collection()
+    this._layersCollection = this.instanceFactoryCall(this.layersCollectionIdent, () => new Collection())
 
     this::defineServices()
     this::subscribeToCollectionEvents()
