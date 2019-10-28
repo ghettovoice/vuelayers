@@ -43,7 +43,7 @@ export default {
      * @abstract
      */
     createStyle () {
-      throw new Error('Not implemented method')
+      throw new Error('Not implemented method: createStyle')
     },
     /**
      * @returns {Promise<string|number|undefined>}
@@ -139,9 +139,9 @@ function defineServices () {
     /**
      * @type {Object|undefined}
      */
-    $stylesContainer: {
+    $styleContainer: {
       enumerable: true,
-      get: () => this.$services?.stylesContainer,
+      get: () => this.$services?.styleContainer,
     },
   })
 }

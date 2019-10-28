@@ -101,7 +101,7 @@
         })
       },
       /**
-       * Overrides stylesContainer `setStyle` method
+       * Overrides styleContainer `setStyle` method
        * @param {Array<{ style: Style, condition: (function|boolean|undefined) }>|function(feature: Feature): Style|Vue|undefined} styles
        * @return {void}
        */

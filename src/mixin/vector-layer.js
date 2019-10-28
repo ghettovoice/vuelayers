@@ -2,11 +2,11 @@ import { obsFromOlChangeEvent } from '../rx-ext'
 import { pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import layer from './layer'
-import stylesContainer from './styles-container'
+import styleContainer from './style-container'
 
 export default {
   mixins: [
-    stylesContainer,
+    styleContainer,
     layer,
   ],
   props: {
@@ -111,12 +111,12 @@ export default {
     /**
      * @return {Promise<StyleLike|undefined>}
      */
-    getLayerStyle: stylesContainer.methods.getStyles,
+    getLayerStyle: styleContainer.methods.getStyle,
     /**
      * @param {StyleLike} styles
      * @return {Promise<void>}
      */
-    setLayerStyle: stylesContainer.methods.setStyle,
+    setLayerStyle: styleContainer.methods.setStyle,
     /**
      * @returns {Object}
      * @protected
@@ -124,7 +124,7 @@ export default {
     getServices () {
       return mergeDescriptors(
         this::layer.methods.getServices(),
-        this::stylesContainer.methods.getServices(),
+        this::styleContainer.methods.getServices(),
       )
     },
     /**

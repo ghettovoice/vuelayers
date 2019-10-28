@@ -2,12 +2,12 @@ import { isFunction, isPlainObject } from '../util/minilo'
 import projTransforms from './proj-transforms'
 
 /**
- * @typedef {module:ol/geom/Geometry~Geometry|Object} GeometryLike
+ * @typedef {module:ol/geom/Geometry~Geometry|module:ol/style/Style~GeometryFunction|Object} GeometryLike
  */
 /**
  * @typedef {Object} GeometryTarget
- * @property {function(): module:ol/geom/Geometry~Geometry|undefined} getGeometry
- * @property {function(module:ol/geom/Geometry~Geometry|undefined): void} setGeometry
+ * @property {function(): module:ol/geom/Geometry~Geometry|module:ol/style/Style~GeometryFunction|undefined} getGeometry
+ * @property {function(module:ol/geom/Geometry~Geometry|module:ol/style/Style~GeometryFunction|undefined): void} setGeometry
  */
 
 /**
@@ -21,7 +21,7 @@ export default {
      * @protected
      */
     getGeometryTarget () {
-      throw new Error('Not implemented method')
+      throw new Error('Not implemented method: getGeometryTarget')
     },
     /**
      * @return {Promise<module:ol/geom/Geometry~Geometry|undefined>}
@@ -43,6 +43,7 @@ export default {
       const geomTarget = await this.getGeometryTarget()
       if (geomTarget && geom !== geomTarget.getGeometry()) {
         geomTarget.setGeometry(geom)
+        await this.scheduleRefresh()
       }
     },
     /**
