@@ -7,7 +7,9 @@
    */
   export default {
     name: 'VlLayerImage',
-    mixins: [layer],
+    mixins: [
+      layer,
+    ],
     methods: {
       /**
        * @return {Image}
@@ -15,6 +17,7 @@
        */
       createLayer () {
         return new ImageLayer({
+          // layer props
           id: this.id,
           className: this.className,
           opacity: this.opacity,
@@ -26,7 +29,6 @@
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
           render: this.render,
-          source: this.$source,
         })
       },
     },

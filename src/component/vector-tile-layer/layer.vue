@@ -48,8 +48,6 @@
           useInterimTilesOnError: this.useInterimTilesOnError,
           // vector tile props
           renderMode: this.renderMode,
-          // instance props
-          source: this.$source,
         })
       },
     },

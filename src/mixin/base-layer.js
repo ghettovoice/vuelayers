@@ -124,7 +124,7 @@ export default {
      * @abstract
      */
     createLayer () {
-      throw new Error('Not implemented method')
+      throw new Error('Not implemented method: createLayer')
     },
     /**
      * @returns {Promise<string|number>}

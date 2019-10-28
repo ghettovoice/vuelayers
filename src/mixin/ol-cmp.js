@@ -72,7 +72,7 @@ export default {
      * @abstract
      */
     createOlObject () {
-      throw new Error('Not implemented method')
+      throw new Error('Not implemented method: createOlObject')
     },
     /**
      * @return {void|Promise<void>}

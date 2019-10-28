@@ -93,13 +93,13 @@ export default {
      * @returns {function|undefined}
      */
     urlFunc () {
-      return this.newUrlFunc(this.url)
+      return this.createUrlFunc(this.url)
     },
     /**
      * @type {function|undefined}
      */
     loaderFunc () {
-      return this.newLoaderFunc(this.loader)
+      return this.createLoaderFunc(this.loader)
     },
     /**
      * @returns {function}
@@ -245,7 +245,7 @@ export default {
      * @returns {Promise<void>}
      */
     async setSourceUrl (url) {
-      await this.setSourceUrlInternal(this.newUrlFunc(url))
+      await this.setSourceUrlInternal(this.createUrlFunc(url))
     },
     /**
      * @param {string|function} url
@@ -284,7 +284,7 @@ export default {
      * @return {function|undefined}
      * @protected
      */
-    newUrlFunc (url) {
+    createUrlFunc (url) {
       if (!url) return
 
       if (!isFunction(url)) {
@@ -311,7 +311,7 @@ export default {
      * @return {function|undefined}
      * @protected
      */
-    newLoaderFunc (loader) {
+    createLoaderFunc (loader) {
       if (!isFunction(loader)) return
 
       return this.wrapLoaderFunc(loader)

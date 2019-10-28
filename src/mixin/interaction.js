@@ -75,7 +75,7 @@ export default {
      * @abstract
      */
     createInteraction () {
-      throw new Error('Not implemented method')
+      throw new Error('Not implemented method: createInteraction')
     },
     /**
      * @returns {Promise<string|number>}

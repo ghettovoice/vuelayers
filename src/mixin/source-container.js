@@ -19,7 +19,7 @@ export default {
      * @protected
      */
     getSourceTarget () {
-      throw new Error('Not implemented method')
+      throw new Error('Not implemented method: getSourceTarget')
     },
     /**
      * @return {Promise<module:ol/source/Source~Source|undefined>}

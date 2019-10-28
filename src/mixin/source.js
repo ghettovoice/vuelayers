@@ -109,7 +109,7 @@ export default {
      * @abstract
      */
     createSource () {
-      throw new Error('Not implemented method')
+      throw new Error('Not implemented method: createSource')
     },
     /**
      * @returns {Promise<string|number>}

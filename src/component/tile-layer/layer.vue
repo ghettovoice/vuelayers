@@ -19,6 +19,7 @@
        */
       createLayer () {
         return new TileLayer({
+          // layer props
           id: this.id,
           className: this.className,
           opacity: this.opacity,
@@ -30,9 +31,9 @@
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
           render: this.render,
+          // tile layer props
           preload: this.preload,
           useInterimTilesOnError: this.useInterimTilesOnError,
-          source: this.$source,
         })
       },
     },

@@ -29,6 +29,7 @@
        */
       createLayer () {
         return new VectorImageLayer({
+          // layer props
           id: this.id,
           className: this.className,
           opacity: this.opacity,
@@ -40,19 +41,20 @@
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
           render: this.render,
+          // vector layer props
           renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          // self props
           imageRatio: this.imageRatio,
-          source: this.$source,
         })
       },
       /**
        * @returns {Promise<number>}
        */
-      async getImageRatio () {
+      async getLayerImageRatio () {
         return (await this.resolveLayer()).getImageRatio()
       },
     },

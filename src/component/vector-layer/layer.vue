@@ -17,6 +17,7 @@
        */
       createLayer () {
         return new VectorLayer({
+          // layer props
           id: this.id,
           className: this.className,
           opacity: this.opacity,
@@ -28,12 +29,12 @@
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
           render: this.render,
+          // vector layer props
           renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
-          source: this.$source,
         })
       },
     },

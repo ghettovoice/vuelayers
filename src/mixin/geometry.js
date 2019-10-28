@@ -88,7 +88,7 @@ export default {
      * @abstract
      */
     createGeometry () {
-      throw new Error('Not implemented method')
+      throw new Error('Not implemented method: createGeometry')
     },
     /**
      * @returns {Promise<string|number>}
