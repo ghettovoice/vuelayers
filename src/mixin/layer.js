@@ -1,7 +1,7 @@
 import { isFunction, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
-import baseLayer from './layer'
+import baseLayer from './base-layer'
 import olCmp from './ol-cmp'
 import sourceContainer from './source-container'
 

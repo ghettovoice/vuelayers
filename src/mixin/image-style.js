@@ -1,51 +1,10 @@
+import { pick } from '../util/minilo'
 import style from './style'
 
 export default {
-  mixins: [style],
-  methods: {
-    /**
-     * @return {Promise}
-     * @protected
-     */
-    init () {
-      return this::style.methods.init()
-    },
-    /**
-     * @return {void|Promise<void>}
-     * @protected
-     */
-    deinit () {
-      return this::style.methods.deinit()
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    mount () {
-      this.$stylesContainer && this.$stylesContainer.setImage(this)
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    unmount () {
-      this.$stylesContainer && this.$stylesContainer.setImage(undefined)
-    },
-    /**
-     * @return {Object}
-     * @protected
-     */
-    getServices () {
-      return this::style.methods.getServices()
-    },
-    /**
-     * @return {Promise}
-     */
-    refresh () {
-      // recreate style
-      return this.recreate()
-    },
-  },
+  mixins: [
+    style,
+  ],
   stubVNode: {
     empty: false,
     attrs () {
@@ -54,5 +13,41 @@ export default {
         class: this.vmClass,
       }
     },
+  },
+  methods: {
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async mount () {
+      if (this.$stylesContainer) {
+        await this.$stylesContainer.setImage(this)
+      }
+
+      return this::style.methods.mount()
+    },
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async unmount () {
+      if (this.$stylesContainer) {
+        await this.$stylesContainer.setImage(null)
+      }
+
+      return this::style.methods.unmount()
+    },
+    ...pick(style.methods, [
+      'init',
+      'deinit',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'getServices',
+      'subscribeAll',
+    ]),
   },
 }

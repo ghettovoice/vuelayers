@@ -1,7 +1,5 @@
-import { first as firstObs } from 'rxjs/operators'
 import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
-import { obsFromOlEvent } from '../rx-ext'
-import { waitFor } from '../util/minilo'
+import { pick, waitFor } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
@@ -21,11 +19,7 @@ export default {
   },
   watch: {
     id (value) {
-      if (!this.$style || value === getStyleId(this.$style)) {
-        return
-      }
-
-      setStyleId(this.$style, value)
+      this.setStyleId(value)
     },
   },
   created () {
@@ -51,7 +45,23 @@ export default {
     createStyle () {
       throw new Error('Not implemented method')
     },
-    // todo refactor methods, add missed
+    /**
+     * @returns {Promise<string|number|undefined>}
+     */
+    async getStyleId () {
+      return getStyleId(await this.resolveStyle())
+    },
+    /**
+     * @param {string|number|undefined} id
+     * @returns {Promise<void>}
+     */
+    async setStyleId (id) {
+      const style = await this.resolveStyle()
+
+      if (id === getStyleId(style)) return
+
+      setStyleId(style, id)
+    },
     /**
      * @returns {Promise<void>}
      * @protected
@@ -62,11 +72,14 @@ export default {
       return this::olCmp.methods.init()
     },
     /**
-     * @return {void|Promise<void>}
-     * @protected
+     * @return {Promise<void>}
      */
-    deinit () {
-      return this::olCmp.methods.deinit()
+    async refresh () {
+      await this.remount()
+
+      if (this.$mapVm) {
+        await this.$mapVm.render()
+      }
     },
     /**
      * @return {Object}
@@ -75,46 +88,57 @@ export default {
     getServices () {
       const vm = this
 
-      return mergeDescriptors(this::olCmp.methods.getServices(), {
-        get style () { return vm.$style },
-      })
+      return mergeDescriptors(
+        this::olCmp.methods.getServices(),
+        {
+          get styleVm () { return vm },
+        },
+      )
     },
     /**
-     * @return {Promise}
+     * @return {Promise<OlStyle>}
      */
-    refresh () {
-      if (this.$olObject == null) return Promise.resolve()
-
-      return this.remount()
-        .then(() => {
-          if (!this.$map) {
-            return
-          }
-
-          this.$map.render()
-
-          return obsFromOlEvent(this.$map, 'postcompose')
-            .pipe(firstObs())
-            .toPromise()
-        })
-    },
+    resolveStyle: olCmp.methods.resolveOlObject,
+    ...pick(olCmp.methods, [
+      'deinit',
+      'mount',
+      'unmount',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'subscribeAll',
+    ]),
   },
 }
 
 function defineServices () {
   Object.defineProperties(this, {
+    /**
+     * @type {OlStyle|undefined}
+     */
     $style: {
       enumerable: true,
       get: () => this.$olObject,
     },
+    /**
+     * @type {Object|undefined}
+     */
     $mapVm: {
       enumerable: true,
       get: () => this.$services?.mapVm,
     },
+    /**
+     * @type {module:ol/View~View|undefined}
+     */
     $view: {
       enumerable: true,
       get: () => this.$mapVm?.$view,
     },
+    /**
+     * @type {Object|undefined}
+     */
     $stylesContainer: {
       enumerable: true,
       get: () => this.$services?.stylesContainer,
