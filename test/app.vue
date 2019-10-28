@@ -32,12 +32,13 @@
         <!--  <vl-style-func :factory="createCountriesStyleFunc" />-->
         <!--</vl-layer-vector>-->
 
-        <!--<vl-layer-vector render-mode="image">-->
+        <vl-layer-vector render-mode="image">
           <!--<vl-source-cluster :distance="50">-->
-          <!--  <vl-source-vector :features="points" />-->
+            <vl-source-vector :features="points" />
           <!--</vl-source-cluster>-->
           <!--<vl-style-func :factory="makeClusterStyleFunc" />-->
-        <!--</vl-layer-vector>-->
+          <vl-style-func :factory="makePointStyleFunc" />
+        </vl-layer-vector>
 
         <vl-layer-vector id="draw-target">
           <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
@@ -122,6 +123,22 @@
           }
 
           return [style]
+        }
+      },
+      makePointStyleFunc () {
+        return feature => {
+          return [
+            createStyle({
+              fillColor: 'red',
+              strokeColor: 'green',
+              strokeWidth: 2,
+              imageRadius: 10,
+              textScale: 1.4,
+              text: feature.getId(),
+              textAlign: 'end',
+              textFillColor: '#fff',
+            }),
+          ]
         }
       },
       toggleMap () {
