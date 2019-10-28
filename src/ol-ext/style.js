@@ -37,7 +37,7 @@ export function defaultStyle () {
   return [
     {
       fillColor: [255, 255, 255, 0.4],
-      strokeColor: '#3399CC',
+      strokeColor: '#3399cc',
       strokeWidth: 1.25,
       imageRadius: 5,
     },
@@ -309,7 +309,7 @@ export function createTextStyle (vlStyle) {
 
   Object.assign(
     textStyle,
-    pick(['textAlign', 'textBaseline'], vlStyle),
+    pick(vlStyle, ['textAlign', 'textBaseline']),
     {
       font,
       fill: createFillStyle(vlStyle, 'text') || createFillStyle(vlStyle),
