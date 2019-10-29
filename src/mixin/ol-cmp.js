@@ -26,10 +26,18 @@ export default {
     services,
   ],
   props: {
+    /**
+     * @type {string|number}
+     */
     id: {
       type: [String, Number],
       default: uuid,
     },
+    /**
+     * Unique key for saving to identity map
+     * @type {string|number|undefined}
+     */
+    ident: [String, Number],
   },
   data () {
     return {
@@ -37,17 +45,42 @@ export default {
     }
   },
   computed: {
+    /**
+     * @type {string}
+     */
     vmClass () {
       return kebabCase(this.$options.name)
     },
+    /**
+     * @type {string}
+     */
     vmId () {
       return [this.vmClass, this.id].filter(identity).join('-')
     },
+    /**
+     * @type {string}
+     */
     vmName () {
       return [this.$options.name, this.id].filter(identity).join(' ')
     },
+    /**
+     * @type {string|undefined}
+     */
     olObjIdent () {
-      return this.selfIdent
+      if (!this.ident) return
+
+      return this.makeIdent(this.ident)
+    },
+  },
+  watch: {
+    olObjIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue) {
+        this.setInstance(value, this.$olObject)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
     },
   },
   methods: {

@@ -21,15 +21,32 @@ export default {
     rxSubs,
   ],
   computed: {
+    /**
+     * @returns {string[]}
+     */
     layerIds () {
       if (!this.rev) return []
 
       return this.getLayers().map(getLayerId)
     },
+    /**
+     * @returns {string|undefined}
+     */
     layersCollectionIdent () {
       if (!this.olObjIdent) return
 
       return this.makeIdent(this.olObjIdent, 'layers_collection')
+    },
+  },
+  watch: {
+    layersCollectionIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue) {
+        this.setInstance(value, this.$layersCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
     },
   },
   created () {

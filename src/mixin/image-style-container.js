@@ -15,6 +15,9 @@ import { isFunction } from '../util/minilo'
  */
 export default {
   methods: {
+    /**
+     * @return {ImageStyleTarget}
+     */
     getImageStyleTarget () {
       throw new Error('Not implemented method: getImageStyleTarget')
     },

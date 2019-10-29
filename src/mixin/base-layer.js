@@ -75,32 +75,32 @@ export default {
     maxZoom: Number,
   },
   watch: {
-    id (value) {
-      this.setLayerId(value)
+    async id (value) {
+      await this.setLayerId(value)
     },
-    opacity (value) {
-      this.setLayerOpacity(value)
+    async opacity (value) {
+      await this.setLayerOpacity(value)
     },
-    visible (value) {
-      this.setLayerVisible(value)
+    async visible (value) {
+      await this.setLayerVisible(value)
     },
-    extent (value) {
-      this.setLayerExtent(value)
+    async extent (value) {
+      await this.setLayerExtent(value)
     },
-    zIndex (value) {
-      this.setLayerZIndex(value)
+    async zIndex (value) {
+      await this.setLayerZIndex(value)
     },
-    minResolution (value) {
-      this.setLayerMinResolution(value)
+    async minResolution (value) {
+      await this.setLayerMinResolution(value)
     },
-    maxResolution (value) {
-      this.setLayerMaxResolution(value)
+    async maxResolution (value) {
+      await this.setLayerMaxResolution(value)
     },
-    minZoom (value) {
-      this.setLayerMinZoom(value)
+    async minZoom (value) {
+      await this.setLayerMinZoom(value)
     },
-    maxZoom (value) {
-      this.setLayerMaxZoom(value)
+    async maxZoom (value) {
+      await this.setLayerMaxZoom(value)
     },
   },
   created () {

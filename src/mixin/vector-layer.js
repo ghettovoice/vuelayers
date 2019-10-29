@@ -38,28 +38,28 @@ export default {
     updateWhileInteracting: Boolean,
   },
   watch: {
-    renderOrder (value) {
-      this.setLayerRenderOrder(value)
+    async renderOrder (value) {
+      await this.setLayerRenderOrder(value)
     },
     async renderBuffer (value) {
       if (value === await this.getLayerRenderBuffer()) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
     async declutter (value) {
       if (value === await this.getLayerDeclutter()) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
     async updateWhileAnimating (value) {
       if (value === await this.getLayerUpdateWhileAnimating()) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
     async updateWhileInteracting (value) {
       if (value === await this.getLayerUpdateWhileInteracting()) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
   },
   methods: {

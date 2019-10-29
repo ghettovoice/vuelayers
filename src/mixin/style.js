@@ -18,8 +18,8 @@ export default {
     },
   },
   watch: {
-    id (value) {
-      this.setStyleId(value)
+    async id (value) {
+      await this.setStyleId(value)
     },
   },
   created () {

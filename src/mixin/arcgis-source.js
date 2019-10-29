@@ -160,14 +160,14 @@ export default {
     },
   },
   watch: {
-    customParams (value) {
-      this.updateSearchParams(value)
+    async customParams (value) {
+      await this.updateSearchParams(value)
     },
-    layersStr (value) {
-      this.updateSourceParam('layers', value)
+    async layersStr (value) {
+      await this.updateSourceParam('layers', value)
     },
-    timeStr (value) {
-      this.updateSourceParam('time', value)
+    async timeStr (value) {
+      await this.updateSourceParam('time', value)
     },
     ...makeWatchers([
       'format',
@@ -184,8 +184,8 @@ export default {
       'layerRangeValues',
       'layerParameterValues',
       'historicMoment',
-    ], prop => function (value) {
-      this.updateSourceParam(prop, serialize(value))
+    ], prop => async function (value) {
+      await this.updateSourceParam(prop, serialize(value))
     }),
   },
   methods: {

@@ -27,11 +27,11 @@ export default {
     },
   },
   watch: {
-    preload (value) {
-      this.setLayerPreload(value)
+    async preload (value) {
+      await this.setLayerPreload(value)
     },
-    useInterimTilesOnError (value) {
-      this.setLayerUseInterimTilesOnError(value)
+    async useInterimTilesOnError (value) {
+      await this.setLayerUseInterimTilesOnError(value)
     },
   },
   methods: {

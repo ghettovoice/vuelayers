@@ -15,6 +15,9 @@ import { isFunction } from '../util/minilo'
  */
 export default {
   methods: {
+    /**
+     * @return {Promise<module:ol/style/Text~Text|undefined>}
+     */
     getTextStyleTarget () {
       throw new Error('Not implemented method: getTextStyleTarget')
     },

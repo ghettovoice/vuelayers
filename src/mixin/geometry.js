@@ -63,8 +63,8 @@ export default {
     },
   },
   watch: {
-    id (value) {
-      this.setGeometryId(value)
+    async id (value) {
+      await this.setGeometryId(value)
     },
   },
   created () {

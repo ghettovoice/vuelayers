@@ -14,14 +14,17 @@ export default {
       }
     },
   },
+  created () {
+    this::defineServices()
+  },
   methods: {
     /**
      * @return {Promise<void>}
      * @protected
      */
     async mount () {
-      if (this.$stylesContainer) {
-        await this.$stylesContainer.setImage(this)
+      if (this.$imageStyleContainer) {
+        await this.$imageStyleContainer.setImage(this)
       }
 
       return this::style.methods.mount()
@@ -31,8 +34,8 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$stylesContainer) {
-        await this.$stylesContainer.setImage(null)
+      if (this.$imageStyleContainer) {
+        await this.$imageStyleContainer.setImage(null)
       }
 
       return this::style.methods.unmount()
@@ -50,4 +53,16 @@ export default {
       'subscribeAll',
     ]),
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    /**
+     * @type {Object|undefined}
+     */
+    $imageStyleContainer: {
+      enumerable: true,
+      get: () => this.$services?.imageStyleContainer,
+    },
+  })
 }

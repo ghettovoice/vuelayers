@@ -50,17 +50,17 @@ export default {
     },
   },
   watch: {
-    tileLoadFunction (value) {
-      this.setSourceTileLoadFunction(value)
+    async tileLoadFunction (value) {
+      await this.setSourceTileLoadFunction(value)
     },
-    tileUrlFunction (value) {
-      this.setSourceTileUrlFunction(value)
+    async tileUrlFunction (value) {
+      await this.setSourceTileUrlFunction(value)
     },
-    url (value) {
-      this.setSourceUrl(value)
+    async url (value) {
+      await this.setSourceUrl(value)
     },
-    urls (value) {
-      this.setSourceUrls(value)
+    async urls (value) {
+      await this.setSourceUrls(value)
     },
   },
   methods: {

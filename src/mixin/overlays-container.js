@@ -20,16 +20,33 @@ export default {
     rxSubs,
   ],
   computed: {
+    /**
+     * @returns {string[]}
+     */
     overlayIds () {
       if (!this.rev) return []
 
       return this.getOverlays().map(getOverlayId)
     },
+    /**
+     * @returns {string|undefined}
+     */
     overlaysCollectionIdent () {
       if (!this.olObjIdent) return
 
       return this.makeIdent(this.olObjIdent, 'overlays_collection')
     },
+  },
+  watch: {
+    overlaysCollectionIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue) {
+        this.setInstance(value, this.$overlaysCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
+    }
   },
   created () {
     /**

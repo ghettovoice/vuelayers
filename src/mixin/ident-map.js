@@ -6,32 +6,10 @@ const INSTANCES_POOL = 'instances'
 
 export default {
   INSTANCES_POOL,
-  props: {
-    /**
-     * Unique key for saving to identity map
-     * @type {string|number}
-     */
-    ident: [String, Number],
-  },
   data () {
     return {
       idents: stubObject(),
     }
-  },
-  computed: {
-    selfIdent () {
-      return this.makeSelfIdent()
-    },
-  },
-  watch: {
-    ident (value, prev) {
-      if (prev && this.$identityMap.has(prev)) {
-        this.$identityMap.unset(prev)
-      }
-      if (value && !this.$identityMap.has(value)) {
-        this.$identityMap.set(value)
-      }
-    },
   },
   beforeCreate () {
     initIdentityMap()
@@ -40,16 +18,6 @@ export default {
     this.unsetInstances()
   },
   methods: {
-    /**
-     * @param parts
-     * @return {string|undefined}
-     * @protected
-     */
-    makeSelfIdent (...parts) {
-      if (!this.ident) return
-
-      return this.makeIdent(this.ident, ...parts)
-    },
     /**
      * @param parts
      * @return {string}
@@ -66,15 +34,15 @@ export default {
      * @returns {*}
      */
     instanceFactoryCall (ident, factory) {
-      if (ident && this.$identityMap.has(ident, INSTANCES_POOL)) {
-        return this.$identityMap.get(ident, INSTANCES_POOL)
+      if (ident && this.hasInstance(ident)) {
+        return this.getInstance(ident)
       }
 
       const val = factory()
 
       if (ident) {
         this.idents[ident] = true
-        this.$identityMap.set(ident, val, INSTANCES_POOL)
+        this.setInstance(ident, val)
       }
 
       return val
@@ -89,11 +57,46 @@ export default {
       return this.$identityMap.get(ident, INSTANCES_POOL)
     },
     /**
+     * @param ident
+     * @param inst
+     */
+    setInstance (ident, inst) {
+      if (!ident) return
+
+      this.$identityMap.set(ident, inst, INSTANCES_POOL)
+    },
+    /**
+     * @param {string|undefined} ident
+     * @returns {*}
+     */
+    hasInstance (ident) {
+      if (!ident) return
+
+      return this.$identityMap.has(ident, INSTANCES_POOL)
+    },
+    /**
+     * @param {string|undefined} ident
+     * @return {void}
+     */
+    unsetInstance (ident) {
+      if (!ident) return
+
+      this.$identityMap.unset(ident, INSTANCES_POOL)
+    },
+    /**
+     * @param {string|undefined} fromIdent
+     * @param {string|undefined} toIdent
+     * @returns {boolean}
+     */
+    moveInstance (fromIdent, toIdent) {
+      return this.$identityMap.move(fromIdent, toIdent, INSTANCES_POOL)
+    },
+    /**
      * Unsets all self indets
      * @return {void}
      */
     unsetInstances () {
-      keys(this.idents).forEach(ident => this.$identityMap.unset(ident, INSTANCES_POOL))
+      keys(this.idents).forEach(::this.unsetInstance)
     },
   },
 }

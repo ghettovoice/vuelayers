@@ -1,6 +1,6 @@
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
-import { isFunction, isString, pick } from '../util/minilo'
+import { isFunction, isString, pick, sealFactory } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
 
@@ -52,9 +52,17 @@ export default {
       default: 0,
     },
   },
+  data () {
+    return {
+      /**
+       * @type {module:ol/tilegrid/TileGrid|undefined}
+       */
+      tileGrid: undefined,
+    }
+  },
   computed: {
     /**
-     * @returns {string|undefined}
+     * @type {string|undefined}
      */
     tileGridIdent () {
       if (!this.olObjIdent) return
@@ -62,33 +70,60 @@ export default {
       return this.makeIdent(this.olObjIdent, 'tile_grid')
     },
     /**
-     * @returns {module:ol/tilegrid/TileGrid|undefined}
+     * @returns {function|undefined}
      */
-    tileGrid () {
+    sealTileGridFactory () {
       if (!isFunction(this.tileGridFactory)) return
 
-      return this.instanceFactoryCall(this.tileGridIdent, () => Object.seal(this.tileGridFactory()))
+      return sealFactory(::this.tileGridFactory)
     },
   },
   watch: {
     async opaque (value) {
       if (value === await this.getSourceOpaque()) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
     async tilePixelRatio (value) {
       if (value === await this.getSourceTilePixelRatio(value)) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
     async tileKey (value) {
-      this.setSourceTileKey(value)
+      await this.setSourceTileKey(value)
+    },
+    async sealTileGridFactory (value) {
+      while (this.hasInstance(this.tileGridIdent)) {
+        this.unsetInstance(this.tileGridIdent)
+      }
+
+      if (isFunction(value)) {
+        this.tileGrid = this.instanceFactoryCall(this.tileGridIdent, this::value)
+      } else {
+        this.tileGrid = undefined
+      }
+
+      await this.scheduleRecreate()
+    },
+    tileGridIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue) {
+        this.setInstance(value, this.tileGrid)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
     },
     ...makeWatchers([
       'cacheSize',
       'transition',
       'zDirection',
     ], () => source.methods.scheduleRecreate),
+  },
+  created () {
+    if (isFunction(this.sealTileGridFactory)) {
+      this.tileGrid = this.instanceFactoryCall(this.tileGridIdent, ::this.sealTileGridFactory)
+    }
   },
   methods: {
     /**

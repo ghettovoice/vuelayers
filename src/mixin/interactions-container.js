@@ -21,15 +21,32 @@ export default {
     rxSubs,
   ],
   computed: {
+    /**
+     * @returns {string[]}
+     */
     interactionIds () {
       if (!this.rev) return []
 
       return this.getInteractions().map(getInteractionId)
     },
+    /**
+     * @returns {string|undefined}
+     */
     interactionsCollectionIdent () {
       if (!this.olObjIdent) return
 
       return this.makeIdent(this.olObjIdent, 'interactions_collection')
+    },
+  },
+  watch: {
+    interactionsCollectionIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue) {
+        this.setInstance(value, this.$interactionsCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
     },
   },
   created () {

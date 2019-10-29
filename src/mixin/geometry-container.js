@@ -14,7 +14,9 @@ import projTransforms from './proj-transforms'
  * Geometry container
  */
 export default {
-  mixins: [projTransforms],
+  mixins: [
+    projTransforms,
+  ],
   methods: {
     /**
      * @return {Promise<GeometryTarget|undefined>}

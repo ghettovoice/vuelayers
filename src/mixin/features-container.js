@@ -47,11 +47,25 @@ export default {
 
       return this.getFeatures().map(::this.writeFeatureInDataProj)
     },
+    /**
+     * @returns {string|undefined}
+     */
     featuresCollectionIdent () {
       if (!this.olObjIdent) return
 
       return this.makeIdent(this.olObjIdent, 'features_collection')
     },
+  },
+  watch: {
+    featuresCollectionIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue) {
+        this.setInstance(value, this.$featuresCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
+    }
   },
   created () {
     /**

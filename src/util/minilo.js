@@ -226,6 +226,26 @@ export function values (object) {
   return Object.values(object)
 }
 
+export function seal (object) {
+  return Object.seal(object)
+}
+
+export function freeze (object) {
+  return Object.freeze(object)
+}
+
+export function sealFactory (factory) {
+  return function (...args) {
+    return seal(factory(...args))
+  }
+}
+
+export function freezeFactory (factory) {
+  return function (...args) {
+    return freeze(factory(...args))
+  }
+}
+
 export function forEach (collection, iteratee) {
   if (isCollection(collection)) {
     collection = collection.getArray()

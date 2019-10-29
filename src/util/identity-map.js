@@ -72,6 +72,21 @@ export default class IdentityMap {
   }
 
   /**
+   * @param {string} fromId
+   * @param {string} toId
+   * @param {string} [pool]
+   * @returns {boolean}
+   */
+  move (fromId, toId, pool = 'default') {
+    if (!this.has(fromId, pool) || !toId) return false
+
+    this._pools[pool][toId] = this._pools[pool][fromId]
+    delete this._pools[pool][fromId]
+
+    return true
+  }
+
+  /**
    * @param {string} pool
    * @return {string[]}
    */

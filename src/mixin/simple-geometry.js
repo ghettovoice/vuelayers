@@ -45,11 +45,11 @@ export default {
     // },
   },
   watch: {
-    coordinates (value) {
-      this.setGeometryCoordinates(value)
+    async coordinates (value) {
+      await this.setGeometryCoordinates(value)
     },
-    resolvedDataProjection () {
-      this.setGeometryCoordinates(this.coordinates)
+    async resolvedDataProjection () {
+      await this.setGeometryCoordinates(this.coordinates)
     },
     // ...makeWatchers([
     //   'layoutUpCase',

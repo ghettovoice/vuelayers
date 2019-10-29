@@ -43,14 +43,14 @@ export default {
     },
   },
   watch: {
-    id (value) {
-      this.setInteractionId(value)
+    async id (value) {
+      await this.setInteractionId(value)
     },
-    active (value) {
-      this.setInteractionActive(value)
+    async active (value) {
+      await this.setInteractionActive(value)
     },
-    priority (value) {
-      this.setInteractionPriority(value)
+    async priority (value) {
+      await this.setInteractionPriority(value)
     },
   },
   created () {

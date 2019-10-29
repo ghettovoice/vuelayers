@@ -1,7 +1,18 @@
 import debounce from 'debounce-promise'
 import { all as loadAll } from 'ol/loadingstrategy'
 import { createGeoJsonFmt, getFeatureId, isGeoJSONFeature, transform } from '../ol-ext'
-import { constant, difference, isArray, isEmpty, isEqual, isFunction, isString, pick, stubArray } from '../util/minilo'
+import {
+  constant,
+  difference,
+  isArray,
+  isEmpty,
+  isEqual,
+  isFunction,
+  isString,
+  pick,
+  sealFactory,
+  stubArray,
+} from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import featuresContainer from './features-container'
@@ -82,6 +93,14 @@ export default {
       default: true,
     },
   },
+  data () {
+    return {
+      /**
+       * @returns {module:ol/format/Feature~FeatureFormat|undefined}
+       */
+      dataFormat: undefined,
+    }
+  },
   computed: {
     mappedFeatures () {
       return this.features.map(feature => ({
@@ -116,10 +135,10 @@ export default {
       return this.makeIdent(this.olObjIdent, 'data_format')
     },
     /**
-     * @returns {module:ol/format/Feature~FeatureFormat}
+     * @returns {function}
      */
-    dataFormat () {
-      return this.instanceFactoryCall(this.dataFormatIdent, () => Object.seal(this.formatFactory()))
+    sealDataFormatFactory () {
+      return sealFactory(::this.formatFactory)
     },
   },
   watch: {
@@ -145,10 +164,32 @@ export default {
       }, 1000 / 60),
     },
     async urlFunc (value) {
-      this.setSourceUrlInternal(value)
+      await this.setSourceUrlInternal(value)
     },
     async loaderFunc (value) {
-      this.setSourceLoaderInternal(value)
+      await this.setSourceLoaderInternal(value)
+    },
+    async sealDataFormatFactory (value) {
+      while (this.hasInstance(this.dataFormatIdent)) {
+        this.unsetInstance(this.dataFormatIdent)
+      }
+
+      if (isFunction(value)) {
+        this.dataFormat = this.instanceFactoryCall(this.dataFormatIdent, this::value)
+      } else {
+        this.dataFormat = undefined
+      }
+
+      await this.scheduleRecreate()
+    },
+    dataFormatIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue) {
+        this.setInstance(value, this.dataFormat)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
     },
     ...makeWatchers([
       'loadingStrategy',
@@ -156,6 +197,11 @@ export default {
       'overlaps',
       'useSpatialIndex',
     ], () => source.methods.scheduleRecreate()),
+  },
+  created () {
+    if (isFunction(this.sealDataFormatFactory)) {
+      this.dataFormat = this.instanceFactoryCall(this.dataFormatIdent, ::this.sealDataFormatFactory)
+    }
   },
   methods: {
     /**

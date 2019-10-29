@@ -113,14 +113,14 @@ export default {
     },
   },
   watch: {
-    customParams (value) {
-      this.updateSourceParams(value)
+    async customParams (value) {
+      await this.updateSourceParams(value)
     },
-    layersStr (value) {
-      this.updateSourceParam('layers', value)
+    async layersStr (value) {
+      await this.updateSourceParam('layers', value)
     },
-    stylesStr (value) {
-      this.updateSourceParam('styles', value)
+    async stylesStr (value) {
+      await this.updateSourceParam('styles', value)
     },
     ...makeWatchers([
       'version',
@@ -128,8 +128,8 @@ export default {
       'format',
       'bgColor',
       'time',
-    ], prop => function (value) {
-      this.updateSourceParam(prop, value)
+    ], prop => async function (value) {
+      await this.updateSourceParam(prop, value)
     }),
   },
   methods: {

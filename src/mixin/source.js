@@ -65,27 +65,27 @@ export default {
     },
   },
   watch: {
-    id (value) {
-      this.setSourceId(value)
+    async id (value) {
+      await this.setSourceId(value)
     },
-    attributions (value) {
-      this.setSourceAttributions(value)
+    async attributions (value) {
+      await this.setSourceAttributions(value)
     },
     async attributionsCollapsible (value) {
       if (value === await this.getSourceAttributionsCollapsible()) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
     async projection (value) {
       const projection = await this.getSourceProjection()
       if (value === projection?.getCode()) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
     async wrapX (value) {
       if (value === await this.getSourceWrapX()) return
 
-      this.scheduleRecreate()
+      await this.scheduleRecreate()
     },
   },
   created () {

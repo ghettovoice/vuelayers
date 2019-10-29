@@ -5,6 +5,7 @@ import { getControlId, initializeControl } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
 import { isArray, isFunction, isPlainObject, map } from '../util/minilo'
+import identMap from './ident-map'
 import rxSubs from './rx-subs'
 
 /**
@@ -15,12 +16,37 @@ import rxSubs from './rx-subs'
  * Controls collection
  */
 export default {
-  mixins: [rxSubs],
+  mixins: [
+    identMap,
+    rxSubs,
+  ],
   computed: {
+    /**
+     * @returns {string[]}
+     */
     controlIds () {
       if (!this.rev) return []
 
       return this.getControls().map(getControlId)
+    },
+    /**
+     * @type {string|undefined}
+     */
+    controlsCollectionIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'controls_collection')
+    },
+  },
+  watch: {
+    controlsCollectionIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue) {
+        this.setInstance(value, this.$controlsCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
     },
   },
   created () {
@@ -28,7 +54,7 @@ export default {
      * @type {module:ol/Collection~Collection<module:ol/control/Control~Control>}
      * @private
      */
-    this._controlsCollection = new Collection()
+    this._controlsCollection = this.instanceFactoryCall(this.controlsCollectionIdent, () => new Collection())
 
     this::defineServices()
     this::subscribeToCollectionEvents()
