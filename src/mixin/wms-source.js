@@ -113,7 +113,7 @@ export default {
     },
   },
   watch: {
-    async customParams (value) {
+    async allParams (value) {
       await this.updateSourceParams(value)
     },
     async layersStr (value) {

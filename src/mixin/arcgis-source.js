@@ -160,8 +160,8 @@ export default {
     },
   },
   watch: {
-    async customParams (value) {
-      await this.updateSearchParams(value)
+    async allParams (value) {
+      await this.updateSourceParams(value)
     },
     async layersStr (value) {
       await this.updateSourceParam('layers', value)
