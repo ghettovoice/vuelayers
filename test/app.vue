@@ -32,13 +32,13 @@
         <!--  <vl-style-func :factory="createCountriesStyleFunc" />-->
         <!--</vl-layer-vector>-->
 
-        <vl-layer-vector render-mode="image">
-          <!--<vl-source-cluster :distance="50">-->
-            <vl-source-vector :features="points" />
-          <!--</vl-source-cluster>-->
-          <!--<vl-style-func :factory="makeClusterStyleFunc" />-->
-          <vl-style-func :factory="makePointStyleFunc" />
-        </vl-layer-vector>
+        <!--<vl-layer-vector render-mode="image">-->
+        <!--<vl-source-cluster :distance="50">-->
+        <!--  <vl-source-vector :features="points" />-->
+        <!--</vl-source-cluster>-->
+        <!--<vl-style-func :factory="makeClusterStyleFunc" />-->
+        <!--  <vl-style-func :factory="makePointStyleFunc" />-->
+        <!--</vl-layer-vector>-->
 
         <vl-layer-vector id="draw-target">
           <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
@@ -46,17 +46,25 @@
 
         <!--<vl-interaction-select :features.sync="selectedFeatures" />-->
         <vl-interaction-draw source="draw-target" type="Polygon" />
-        <!--<vl-interaction-modify source="draw-target" />-->
+        <vl-interaction-modify source="draw-target" />
       </vl-map>
     </div>
   </div>
 </template>
 
 <script>
+  import { random, range, cloneDeep } from 'lodash'
   import { Feature } from 'ol'
-  import { Point } from 'ol/geom'
-  import { range, random } from 'lodash'
   import { createStyle, findPointOnSurface } from '../src/ol-ext'
+
+  const drawFeature = {
+    id: 1,
+    type: 'Feature',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]],
+    },
+  }
 
   export default {
     name: 'app',
@@ -72,7 +80,9 @@
         featureId: undefined,
         features: [],
         selectedFeatures: [],
-        drawFeatures: [],
+        drawFeatures: [
+          cloneDeep(drawFeature),
+        ],
         controls: true,
         interactions: true,
         points: range(0, 100).map(i => ({
@@ -113,10 +123,10 @@
           if (!style) {
             style = createStyle({
               imageRadius: 10,
-              strokeColor: '#fff',
+              strokeColor: '#ffffff',
               fillColor: '#3399cc',
               text: size.toString(),
-              textFillColor: '#fff',
+              textFillColor: '#ffffff',
             })
 
             cache[size] = style
@@ -142,8 +152,10 @@
         }
       },
       toggleMap () {
+        this.drawFeatures = [
+          cloneDeep(drawFeature),
+        ]
         this.mapVisible = !this.mapVisible
-        this.drawFeatures = []
       },
     },
   }

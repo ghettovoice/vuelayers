@@ -68,17 +68,18 @@ export default {
      */
     instanceFactoryCall (ident, factory) {
       if (ident && this.$identityMap.has(ident, INSTANCES_POOL)) {
+        this.idents[ident] = true
         return this.$identityMap.get(ident, INSTANCES_POOL)
       }
 
-      const val = factory()
+      const inst = factory()
 
       if (ident) {
         this.idents[ident] = true
-        this.$identityMap.set(ident, val, INSTANCES_POOL)
+        this.$identityMap.set(ident, inst, INSTANCES_POOL)
       }
 
-      return val
+      return inst
     },
     /**
      * @param {string|undefined} ident
@@ -87,14 +88,37 @@ export default {
     getInstance (ident) {
       if (!ident) return
 
+      if (!this.hasInstance(ident)) return
+
+      this.idents[ident] = true
+
       return this.$identityMap.get(ident, INSTANCES_POOL)
+    },
+    /**
+     * @param {string|undefined} ident
+     * @returns {*}
+     */
+    hasInstance (ident) {
+      if (!ident) return false
+
+      return this.$identityMap.has(ident, INSTANCES_POOL)
+    },
+    /**
+     * @param {string|undefined} ident
+     */
+    unsetInstance (ident) {
+      if (!ident) return
+
+      delete this.idents[ident]
+
+      this.$identityMap.unset(ident, INSTANCES_POOL)
     },
     /**
      * Unsets all self indets
      * @return {void}
      */
     unsetInstances () {
-      keys(this.idents).forEach(ident => this.$identityMap.unset(ident, INSTANCES_POOL))
+      keys(this.idents).forEach(::this.unsetInstance)
     },
   },
 }
