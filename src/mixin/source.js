@@ -1,3 +1,4 @@
+import { get as getProj } from 'ol/proj'
 import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import { obsFromOlChangeEvent } from '../rx-ext'
 import { isArray, isEqual, isString, pick, waitFor } from '../util/minilo'
@@ -37,7 +38,10 @@ export default {
     /**
      * @type {string|undefined}
      */
-    projection: String,
+    projection: {
+      type: String,
+      validator: value => getProj(value) != null,
+    },
     /**
      * @type {boolean}
      */

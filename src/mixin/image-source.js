@@ -20,6 +20,7 @@ export default {
     projection: {
       type: String,
       default: EPSG_3857,
+      validator: value => getProj(value) != null,
     },
     /**
      * @type {number[]|undefined}
@@ -36,7 +37,7 @@ export default {
      * @param {number[]} extent
      * @param {number} resolution
      * @param {number} pixelRatio
-     * @param {string} projection
+     * @param {module:ol/proj~ProjectionLike} projection
      * @returns {Promise<module:ol/ImageBase~ImageBase>}
      */
     async getSourceImage (extent, resolution, pixelRatio, projection) {

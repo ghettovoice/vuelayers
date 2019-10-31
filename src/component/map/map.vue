@@ -10,10 +10,10 @@
 <script>
   import { Collection, Map, View } from 'ol'
   import { Vector as VectorLayer } from 'ol/layer'
+  import { get as getProj } from 'ol/proj'
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
-  import Vue from 'vue'
   import {
     controlsContainer,
     featuresContainer,
@@ -23,9 +23,10 @@
     overlaysContainer,
     projTransforms,
   } from '../../mixin'
-  import { getMapId, setMapDataProjection, setMapId } from '../../ol-ext'
+  import { getMapDataProjection, getMapId, setMapDataProjection, setMapId } from '../../ol-ext'
   import { obsFromOlEvent } from '../../rx-ext'
-  import { isEqual } from '../../util/minilo'
+  import { assert } from '../../util/assert'
+  import { isEqual, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -71,7 +72,7 @@
        * The element to listen to keyboard events on. For example, if this option is set to `document` the keyboard
        * interactions will always trigger. If this option is not specified, the element the library listens to keyboard
        * events on is the component root element.
-       * @type {string|Element|Document}
+       * @type {string|Element|Document|undefined}
        */
       keyboardEventTarget: [String, Element, Document],
       /**
@@ -106,9 +107,12 @@
       tabindex: [String, Number],
       /**
        * Projection for input/output coordinates in plain data.
-       * @type {string}
+       * @type {string|undefined}
        */
-      dataProjection: String,
+      dataProjection: {
+        type: String,
+        validator: value => getProj(value) != null,
+      },
       /**
        * @type {boolean}
        */
@@ -117,25 +121,31 @@
         default: true,
       },
     },
+    computed: {
+      /**
+       * @return {string|undefined}
+       */
+      featuresOverlayIdent () {
+        if (!this.olObjIdent) return
+
+        return this.makeIdent(this.olObjIdent, 'features_overlay')
+      },
+    },
     watch: {
-      id (value) {
-        this.setId(value)
+      async id (value) {
+        await this.setMapId(value)
       },
-      defaultControls (value) {
-        this.initDefaultControls(value)
+      async defaultControls (value) {
+        await this.initDefaultControls(value)
       },
-      defaultInteractions (value) {
-        this.initDefaultInteractions(value)
+      async defaultInteractions (value) {
+        await this.initDefaultInteractions(value)
       },
       wrapX (value) {
-        if (this._featuresOverlay == null) return
-
-        const newSource = this::createFeaturesOverlay({ wrapX: value })
-        this._featuresOverlay.setSource(newSource)
+        this.setMapWrapX(value)
       },
       async dataProjection (value) {
-        setMapDataProjection(await this.resolveMap(), value)
-        this.scheduleRefresh()
+        await this.setMapDataProjection(value)
       },
       ...makeWatchers([
         'keyboardEventTarget',
@@ -146,7 +156,7 @@
     },
     created () {
       // prepare default overlay
-      this._featuresOverlay = this::createFeaturesOverlay()
+      this._featuresOverlay = this.instanceFactoryCall(this.featuresOverlayIdent, this::createFeaturesOverlay)
 
       this::defineServices()
     },
@@ -174,9 +184,26 @@
 
         setMapId(map, this.id)
         setMapDataProjection(map, this.dataProjection)
-        this._featuresOverlay.setMap(map)
+        this.$featuresOverlay.setMap(map)
 
         return map
+      },
+      /**
+       * @return {Promise<string|number>}
+       */
+      async getMapId () {
+        return getMapId(await this.resolveMap())
+      },
+      /**
+       * @param {string|number} id
+       * @return {Promise<void>}
+       */
+      async setMapId (id) {
+        const map = this.resolveMap()
+
+        if (id === getMapId(map)) return
+
+        setMapId(map, id)
       },
       /**
        * @param {number[]} pixel
@@ -184,7 +211,7 @@
        * @param {Object} [opts]
        * @return {Promise}
        */
-      async forEachFeatureAtPixel (pixel, callback, opts = {}) {
+      async forEachMapFeatureAtPixel (pixel, callback, opts = {}) {
         return (await this.resolveMap()).forEachFeatureAtPixel(pixel, callback, opts)
       },
       /**
@@ -193,28 +220,28 @@
        * @param {Object} [opts]
        * @return {Promise}
        */
-      async forEachLayerAtPixel (pixel, callback, opts = {}) {
+      async forEachMapLayerAtPixel (pixel, callback, opts = {}) {
         return (await this.resolveMap()).forEachLayerAtPixel(pixel, callback, opts)
       },
       /**
        * @param {number[]} pixel
        * @return {Promise<number[]>} Coordinates in the map view projection.
        */
-      async getCoordinateFromPixel (pixel) {
+      async getMapCoordinateFromPixel (pixel) {
         return this.pointToDataProj((await this.resolveMap()).getCoordinateFromPixel(pixel))
       },
       /**
        * @param {Event} event
        * @return {Promise<number[]>}
        */
-      async getEventCoordinate (event) {
+      async getMapEventCoordinate (event) {
         return this.pointToDataProj((await this.resolveMap()).getEventCoordinate(event))
       },
       /**
        * @param {Event} event
        * @return {Promise<number[]>}
        */
-      async getEventPixel (event) {
+      async getMapEventPixel (event) {
         return (await this.resolveMap()).getEventPixel(event)
       },
       /**
@@ -222,7 +249,7 @@
        * @param {Object} [opts]
        * @return {Promise}
        */
-      async getFeaturesAtPixel (pixel, opts = {}) {
+      async getMapFeaturesAtPixel (pixel, opts = {}) {
         return (await this.resolveMap()).getFeaturesAtPixel(pixel, opts)
       },
       /**
@@ -230,26 +257,26 @@
        * @param {Object} [options]
        * @return {Promise<boolean>}
        */
-      async hasFeatureAtPixel (pixel, options = {}) {
+      async hasMapFeatureAtPixel (pixel, options = {}) {
         return (await this.resolveMap()).hasFeatureAtPixel(pixel, options)
       },
       /**
        * @param {number[]} coordinate Coordinates in map view projection
        * @return {Promise<number[]>}
        */
-      async getPixelFromCoordinate (coordinate) {
+      async getMapPixelFromCoordinate (coordinate) {
         return (await this.resolveMap()).getPixelFromCoordinate(this.pointToViewProj(coordinate))
       },
       /**
        * @return {Promise<number[]>}
        */
-      async getSize () {
+      async getMapSize () {
         return (await this.resolveMap()).getSize()
       },
       /**
        * @return {Promise<void>}
        */
-      async setSize (size) {
+      async setMapSize (size) {
         const map = await this.resolveMap()
 
         if (isEqual(size, map.getSize())) return
@@ -260,13 +287,13 @@
        * Updates map size.
        * @return {Promise<void>}
        */
-      async updateSize () {
+      async updateMapSize () {
         (await this.resolveMap()).updateSize()
       },
       /**
        * @return {Promise<void>}
        */
-      async render () {
+      async renderMap () {
         const map = await this.resolveMap()
 
         return new Promise(resolve => {
@@ -277,20 +304,20 @@
       /**
        * @return {Promise<void>}
        */
-      async renderSync () {
+      async renderMapSync () {
         (await this.resolveMap()).renderSync()
       },
       /**
        * @return {Promise<HTMLElement>}
        */
-      async getTarget () {
+      async getMapTarget () {
         return (await this.resolveMap()).getTarget()
       },
       /**
        * @param {HTMLElement} target
        * @return {Promise<void>}
        */
-      async setTarget (target) {
+      async setMapTarget (target) {
         const map = await this.resolveMap()
 
         if (target === map.getTarget()) return
@@ -300,14 +327,88 @@
       /**
        * @return {Promise<HTMLElement>}
        */
-      async getTargetElement () {
+      async getMapTargetElement () {
         return (await this.resolveMap()).getTargetElement()
       },
       /**
        * @return {Promise<HTMLElement>}
        */
-      async getViewport () {
+      async getMapViewport () {
         return (await this.resolveMap()).getViewport()
+      },
+      /**
+       * @return {module:ol/View~View}
+       */
+      async getMapView () {
+        return (await this.resolveMap()).getView()
+      },
+      /**
+       * @return {module:ol/View~View}
+       */
+      getView () {
+        return this.getMapView()
+      },
+      /**
+       * @param {module:ol/View~View|Vue|undefined} view
+       * @return {Promise<void>}
+       */
+      async setMapView (view) {
+        if (isFunction(view.resolveOlObject)) {
+          view = await view.resolveOlObject()
+        }
+        view || (view = new View())
+
+        const map = await this.resolveMap()
+        if (view !== map.getView()) {
+          map.setView(view)
+        }
+      },
+      /**
+       * @param {module:ol/View~View|Vue|undefined} view
+       * @return {Promise<void>}
+       */
+      setView (view) {
+        return this.setMapView(view)
+      },
+      /**
+       * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
+       */
+      async getMapDataProjection () {
+        return getMapDataProjection(await this.resolveMap())
+      },
+      /**
+       * @param {module:ol/proj~ProjectionLike} projection
+       * @return {Promise<void>}
+       */
+      async setMapDataProjection (projection) {
+        assert(getProj(projection) != null, 'Map data projection is registered')
+
+        const map = await this.resolveMap()
+
+        if (projection === getMapDataProjection(map)) return
+
+        setMapDataProjection(map, projection)
+        await this.scheduleRefresh()
+      },
+      /**
+       * @return {boolean}
+       */
+      getMapWrapX () {
+        if (!this.$featuresOverlaySource) return false
+
+        return this.$featuresOverlaySource.getWrapX()
+      },
+      /**
+       * @param {boolean} wrapX
+       * @return {void}
+       */
+      setMapWrapX (wrapX) {
+        if (this.$featuresOverlaySource == null) return
+
+        if (wrapX === this.$featuresOverlaySource.getWrapX()) return
+
+        const layer = this::createFeaturesOverlay({ wrapX })
+        this.$featuresOverlay.setSource(layer.getSource())
       },
       /**
        * Triggers focus on map container.
@@ -321,49 +422,10 @@
        * @return {Promise}
        */
       async refresh () {
-        await this.updateSize()
-        await this.render()
+        await this.updateMapSize()
+        await this.renderMap()
 
         return this::olCmp.methods.refresh()
-      },
-      /**
-       * @return {Promise<string|number>}
-       */
-      async getId () {
-        return getMapId(await this.resolveMap())
-      },
-      /**
-       * @param {string|number} id
-       * @return {Promise<void>}
-       */
-      async setId (id) {
-        const map = this.resolveMap()
-
-        if (id === getMapId(map)) return
-
-        setMapId(map, id)
-      },
-      /**
-       * @param {module:ol/View~View|Vue|undefined} view
-       * @return {Promise<void>}
-       * @protected
-       */
-      async setView (view) {
-        if (view instanceof Vue) {
-          view = await view.resolveView()
-        }
-        view || (view = new View())
-
-        const map = await this.resolveMap()
-        if (view !== map.getView()) {
-          map.setView(view)
-        }
-      },
-      /**
-       * @return {module:ol/View~View}
-       */
-      async getView () {
-        return (await this.resolveMap()).getView()
       },
       /**
        * @return {void}
@@ -413,6 +475,9 @@
           },
         )
       },
+      /**
+       * @return {Promise<module:ol/Map~Map>}
+       */
       resolveMap: olCmp.methods.resolveOlObject,
     },
   }
@@ -427,9 +492,26 @@
         enumerable: true,
         get: () => this.$olObject,
       },
+      /**
+       * @type {module:ol/View~View|undefined}
+       */
       $view: {
         enumerable: true,
         get: () => this.$map?.getView(),
+      },
+      /**
+       * @type {module:ol/layer/Vector~VectorLayer|undefined}
+       */
+      $featuresOverlay: {
+        enumerable: true,
+        get: () => this._featuresOverlay,
+      },
+      /**
+       * @type {module:ol/source/Vector~VectorSource|undefined}
+       */
+      $featuresOverlaySource: {
+        enumerable: true,
+        get: () => this.$featuresOverlay?.getSource(),
       },
     })
   }

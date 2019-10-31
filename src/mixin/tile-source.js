@@ -31,6 +31,7 @@ export default {
     projection: {
       type: String,
       default: EPSG_3857,
+      validator: value => getProj(value) != null,
     },
     /**
      * @type {function|undefined}
