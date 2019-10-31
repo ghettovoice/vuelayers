@@ -3,16 +3,14 @@
     <div style="height: 100%">
       <div class="panel">
         <div>
-          Selected:<br>
-          {{ selectedFeatureIds }}
+          Selected: {{ selectedFeatureIds }}
         </div>
         <button @click="toggleMap">Toggle map</button>
+        <button @click="resetDrawFeatures">Reset draw features</button>
       </div>
 
-      <vl-map v-if="mapVisible" ref="map" data-projection="EPSG:4326"
-              :default-controls="controls" :default-interactions="interactions">
-        <vl-view :center.sync="center" :rotation.sync="rotation"
-                 :zoom.sync="zoom" :extent="[0, 0, 100, 50]"
+      <vl-map v-if="mapVisible" ref="map" data-projection="EPSG:4326">
+        <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
                  ident="view" ref="view" />
 
         <vl-geoloc>
@@ -45,8 +43,9 @@
         </vl-layer-vector>
 
         <!--<vl-interaction-select :features.sync="selectedFeatures" />-->
-        <vl-interaction-draw source="draw-target" type="Polygon" />
+        <vl-interaction-draw v-if="drawingEnabled" source="draw-target" type="Polygon" />
         <vl-interaction-modify source="draw-target" />
+        <vl-interaction-snap source="draw-target" />
       </vl-map>
     </div>
   </div>
@@ -55,14 +54,14 @@
 <script>
   import { random, range, cloneDeep } from 'lodash'
   import { Feature } from 'ol'
-  import { createStyle, findPointOnSurface } from '../src/ol-ext'
+  import { createStyle } from '../src/ol-ext'
 
   const drawFeature = {
     id: 1,
     type: 'Feature',
     geometry: {
       type: 'Polygon',
-      coordinates: [[[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]]],
+      coordinates: [[[0, 0], [0, 30], [30, 30], [30, 0], [0, 0]]],
     },
   }
 
@@ -71,20 +70,15 @@
     data () {
       return {
         zoom: 2,
-        resolution: 39135.75848201024,
         center: [100, 10],
         rotation: 0,
         mapVisible: true,
         countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
         countries: [],
-        featureId: undefined,
-        features: [],
         selectedFeatures: [],
         drawFeatures: [
           cloneDeep(drawFeature),
         ],
-        controls: true,
-        interactions: true,
         points: range(0, 100).map(i => ({
           type: 'Feature',
           id: 'random-' + i,
@@ -102,9 +96,11 @@
       selectedFeatureIds () {
         return this.selectedFeatures.map(({ id }) => id)
       },
+      drawingEnabled () {
+        return !this.drawFeatures.length
+      },
     },
     methods: {
-      pointOnSurface: findPointOnSurface,
       createCountriesStyleFunc () {
         return () => {
           return createStyle({
@@ -157,6 +153,21 @@
         ]
         this.mapVisible = !this.mapVisible
       },
+      async resetDrawFeatures () {
+        this.drawFeatures = []
+
+        await this.$nextTick()
+
+        console.log('draw enabled', this.drawingEnabled)
+
+        this.drawFeatures = [
+          _.cloneDeep(drawFeature),
+        ]
+
+        await this.$nextTick()
+
+        console.log('draw enabled', this.drawingEnabled)
+      },
     },
   }
 </script>
@@ -194,9 +205,5 @@
       padding: 5px 10px;
       text-transform: uppercase;
     }
-  }
-
-  .smooth-transition {
-    transition: all 0.3s ease-in-out;
   }
 </style>
