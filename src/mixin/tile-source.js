@@ -92,6 +92,15 @@ export default {
     async tileKey (value) {
       await this.setSourceTileKey(value)
     },
+    tileGridIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue && this.tileGrid) {
+        this.setInstance(value, this.tileGrid)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
+    },
     async sealTileGridFactory (value) {
       while (this.hasInstance(this.tileGridIdent)) {
         this.unsetInstance(this.tileGridIdent)
@@ -104,15 +113,6 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    tileGridIdent (value, prevValue) {
-      if (value && prevValue) {
-        this.moveInstance(value, prevValue)
-      } else if (value && !prevValue) {
-        this.setInstance(value, this.tileGrid)
-      } else if (!value && prevValue) {
-        this.unsetInstance(prevValue)
-      }
     },
     ...makeWatchers([
       'cacheSize',

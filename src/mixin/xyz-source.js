@@ -28,11 +28,10 @@ export default {
         tileKey: this.tileKey,
         transition: this.transition,
         zDirection: this.zDirection,
+        tileGrid: this.tileGrid,
         // ol/source/UrlTile
         tileLoadFunction: this.tileLoadFunction,
-        tileUrlFunction: this.tileUrlFunction,
-        url: this.url,
-        urls: this.urls,
+        tileUrlFunction: this.urlFunc,
         // ol/source/TileImage
         crossOrigin: this.crossOrigin,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,

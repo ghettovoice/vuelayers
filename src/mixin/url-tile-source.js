@@ -53,14 +53,8 @@ export default {
     async tileLoadFunction (value) {
       await this.setSourceTileLoadFunction(value)
     },
-    async tileUrlFunction (value) {
+    async urlFunc (value) {
       await this.setSourceTileUrlFunction(value)
-    },
-    async url (value) {
-      await this.setSourceUrl(value)
-    },
-    async urls (value) {
-      await this.setSourceUrls(value)
     },
   },
   methods: {

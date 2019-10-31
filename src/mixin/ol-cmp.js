@@ -1,6 +1,6 @@
 import debounce from 'debounce-promise'
 import { interval as intervalObs } from 'rxjs/observable'
-import { first as firstObs, skipUntil, skipWhile } from 'rxjs/operators'
+import { first as firstObs, skipWhile } from 'rxjs/operators'
 import uuid from 'uuid/v4'
 import { log } from '../util/log'
 import { identity, isFunction, kebabCase } from '../util/minilo'
@@ -76,7 +76,7 @@ export default {
     olObjIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
-      } else if (value && !prevValue) {
+      } else if (value && !prevValue && this.$olObject) {
         this.setInstance(value, this.$olObject)
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
@@ -265,7 +265,7 @@ function defineLifeCyclePromises () {
   // mount
   const mountObs = intervalObs(t)
     .pipe(
-      skipWhile(() => !this._mounted),
+      skipWhile(() => this._mounted !== true),
       firstObs(),
     )
   this._mountPromise = mountObs.toPromise(Promise)
@@ -275,8 +275,7 @@ function defineLifeCyclePromises () {
   // unmount
   const unmountObs = intervalObs(t)
     .pipe(
-      skipUntil(mountObs),
-      skipWhile(() => this._mounted),
+      skipWhile(() => this._mounted !== false),
       firstObs(),
     )
   this._unmountPromise = unmountObs.toPromise(Promise)
@@ -286,7 +285,7 @@ function defineLifeCyclePromises () {
   // destroy
   const destroyObs = intervalObs(t)
     .pipe(
-      skipWhile(() => !this._destroyed),
+      skipWhile(() => this._destroyed !== true),
       firstObs(),
     )
   this._destroyPromise = destroyObs.toPromise(Promise)

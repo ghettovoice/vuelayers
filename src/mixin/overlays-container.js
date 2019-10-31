@@ -41,7 +41,7 @@ export default {
     overlaysCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
-      } else if (value && !prevValue) {
+      } else if (value && !prevValue && this.$overlaysCollection) {
         this.setInstance(value, this.$overlaysCollection)
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)

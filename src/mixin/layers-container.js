@@ -42,7 +42,7 @@ export default {
     layersCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
-      } else if (value && !prevValue) {
+      } else if (value && !prevValue && this.$layersCollection) {
         this.setInstance(value, this.$layersCollection)
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)

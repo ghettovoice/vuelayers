@@ -38,21 +38,22 @@ export default {
         return this.getInstance(ident)
       }
 
-      const val = factory()
+      const inst = factory()
 
       if (ident) {
-        this.idents[ident] = true
-        this.setInstance(ident, val)
+        this.setInstance(ident, inst)
       }
 
-      return val
+      return inst
     },
     /**
      * @param {string|undefined} ident
      * @returns {*}
      */
     getInstance (ident) {
-      if (!ident) return
+      if (!ident || !this.hasInstance(ident)) return
+
+      this.idents[ident] = true
 
       return this.$identityMap.get(ident, INSTANCES_POOL)
     },
@@ -63,6 +64,7 @@ export default {
     setInstance (ident, inst) {
       if (!ident) return
 
+      this.idents[ident] = true
       this.$identityMap.set(ident, inst, INSTANCES_POOL)
     },
     /**
@@ -81,7 +83,15 @@ export default {
     unsetInstance (ident) {
       if (!ident) return
 
+      delete this.idents[ident]
       this.$identityMap.unset(ident, INSTANCES_POOL)
+    },
+    /**
+     * Unsets all self indets
+     * @return {void}
+     */
+    unsetInstances () {
+      keys(this.idents).forEach(::this.unsetInstance)
     },
     /**
      * @param {string|undefined} fromIdent
@@ -90,13 +100,6 @@ export default {
      */
     moveInstance (fromIdent, toIdent) {
       return this.$identityMap.move(fromIdent, toIdent, INSTANCES_POOL)
-    },
-    /**
-     * Unsets all self indets
-     * @return {void}
-     */
-    unsetInstances () {
-      keys(this.idents).forEach(::this.unsetInstance)
     },
   },
 }

@@ -60,7 +60,7 @@ export default {
     featuresCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
-      } else if (value && !prevValue) {
+      } else if (value && !prevValue && this.$featuresCollection) {
         this.setInstance(value, this.$featuresCollection)
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)

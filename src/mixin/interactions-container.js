@@ -42,7 +42,7 @@ export default {
     interactionsCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
-      } else if (value && !prevValue) {
+      } else if (value && !prevValue && this.$interactionsCollection) {
         this.setInstance(value, this.$interactionsCollection)
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)

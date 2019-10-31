@@ -169,6 +169,15 @@ export default {
     async loaderFunc (value) {
       await this.setSourceLoaderInternal(value)
     },
+    dataFormatIdent (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue && this.dataFormat) {
+        this.setInstance(value, this.dataFormat)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
+    },
     async sealDataFormatFactory (value) {
       while (this.hasInstance(this.dataFormatIdent)) {
         this.unsetInstance(this.dataFormatIdent)
@@ -181,15 +190,6 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    dataFormatIdent (value, prevValue) {
-      if (value && prevValue) {
-        this.moveInstance(value, prevValue)
-      } else if (value && !prevValue) {
-        this.setInstance(value, this.dataFormat)
-      } else if (!value && prevValue) {
-        this.unsetInstance(prevValue)
-      }
     },
     ...makeWatchers([
       'loadingStrategy',

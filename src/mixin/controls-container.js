@@ -42,7 +42,7 @@ export default {
     controlsCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
-      } else if (value && !prevValue) {
+      } else if (value && !prevValue && this.$controlsCollection) {
         this.setInstance(value, this.$controlsCollection)
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
