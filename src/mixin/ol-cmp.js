@@ -1,6 +1,6 @@
 import debounce from 'debounce-promise'
 import { interval as intervalObs } from 'rxjs/observable'
-import { first as firstObs, skipUntil, skipWhile } from 'rxjs/operators'
+import { first as firstObs, skipWhile } from 'rxjs/operators'
 import uuid from 'uuid/v4'
 import { log } from '../util/log'
 import { identity, isFunction } from '../util/minilo'
@@ -198,7 +198,7 @@ function defineLifeCyclePromises () {
   // mount
   const mountObs = intervalObs(1000 / 60)
     .pipe(
-      skipWhile(() => !this._mounted),
+      skipWhile(() => this._mounted !== true),
       firstObs(),
     )
   this._mountPromise = mountObs.toPromise(Promise)
@@ -208,8 +208,7 @@ function defineLifeCyclePromises () {
   // unmount
   const unmountObs = intervalObs(1000 / 60)
     .pipe(
-      skipUntil(mountObs),
-      skipWhile(() => this._mounted),
+      skipWhile(() => this._mounted !== false),
       firstObs(),
     )
   this._unmountPromise = unmountObs.toPromise(Promise)
@@ -219,7 +218,7 @@ function defineLifeCyclePromises () {
   // destroy
   const destroyObs = intervalObs(1000 / 60)
     .pipe(
-      skipWhile(() => !this._destroyed),
+      skipWhile(() => this._destroyed !== true),
       firstObs(),
     )
   this._destroyPromise = destroyObs.toPromise(Promise)
