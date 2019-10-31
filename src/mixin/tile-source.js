@@ -182,10 +182,10 @@ export default {
 
       this.$source.setTileLoadFunction(value)
     },
-    url () {
+    urlFunc (value) {
       if (!this.$source) return
 
-      this.$source.setTileUrlFunction(this.createUrlFunc())
+      this.$source.setTileUrlFunction(value)
       this.scheduleRefresh()
     },
     ...makeWatchers([
