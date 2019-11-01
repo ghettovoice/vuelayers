@@ -180,6 +180,10 @@
           interactions: this.$interactionsCollection,
           layers: this.$layersCollection,
           overlays: this.$overlaysCollection,
+          view: new View({
+            center: [0, 0],
+            zoom: 0,
+          }),
         })
 
         setMapId(map, this.id)
