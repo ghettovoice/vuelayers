@@ -21,8 +21,7 @@
     "docs-start": "docsify serve ./docs",
     "docs-deploy": "gh-pages -t -d ./docs -r git@github.com:VueLayers/vuelayers.github.io.git -b master",
     "preversion": "npm test",
-    "version": "npm run build",
-    "postversion": "git push --tags"
+    "version": "npm run build"
   },
   "directories": {
     "lib": "./lib",
