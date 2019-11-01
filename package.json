@@ -20,7 +20,9 @@
     "lint": "eslint -f node_modules/eslint-friendly-formatter --ext .js,.vue ./",
     "lint-fix": "eslint -f node_modules/eslint-friendly-formatter --ext .js,.vue --fix ./",
     "docs-start": "docsify serve ./docs",
-    "docs-deploy": "gh-pages -t -d ./docs -r git@github.com:VueLayers/vuelayers.github.io.git -b master"
+    "docs-deploy": "gh-pages -t -d ./docs -r git@github.com:VueLayers/vuelayers.github.io.git -b master",
+    "preversion": "npm test",
+    "version": "npm run build"
   },
   "directories": {
     "lib": "./lib",
