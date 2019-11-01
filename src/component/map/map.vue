@@ -365,7 +365,10 @@
       },
     },
     created () {
-      this._view = new View()
+      this._view = new View({
+        center: [0, 0],
+        zoom: 0,
+      })
       // todo make controls handling like with interactions
       if (this.defaultControls instanceof Collection) {
         this._controlsCollection = this.defaultControls
