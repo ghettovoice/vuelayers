@@ -145,6 +145,7 @@
           wrapX: this.wrapX,
           filter: this.filter,
           layers: this.layerFilter,
+          hitTolerance: this.hitTolerance,
           style: this.createStyleFunc(),
           addCondition: this.addCondition,
           condition: this.condition,
