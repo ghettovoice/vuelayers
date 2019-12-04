@@ -44,7 +44,7 @@ module.exports = function (api) {
     ['@babel/plugin-proposal-class-properties', { loose: false }],
     '@babel/plugin-proposal-json-strings',
     // Other
-    ['@babel/plugin-transform-runtime', { corejs: 2, helpers: true, regenerator: true, useESModules: true }],
+    ['@babel/plugin-transform-runtime', { corejs: 3, helpers: true, regenerator: true, useESModules: true }],
     ['transform-imports', importTransforms],
   ]
   const env = {

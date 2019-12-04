@@ -51,7 +51,7 @@
   },
   "homepage": "https://github.com/ghettovoice/vuelayers",
   "dependencies": {
-    "@babel/runtime-corejs2": "^7.1.2",
+    "@babel/runtime-corejs3": "^7.7.4",
     "@turf/point-on-feature": "^5.1.5",
     "debounce-promise": "^3.1.0",
     "merge-descriptors": "^1.0.1",
