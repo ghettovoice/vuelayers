@@ -32,7 +32,7 @@ Loading a simple OSM base layer.
 <script>
   export default {
     data () {
-      return { 
+      return {
         zoom: 2,
         center: [0, 0],
         rotation: 0,

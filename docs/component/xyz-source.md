@@ -16,9 +16,9 @@ Vue.use(XyzSource)
 
 Example of `vl-source-xyz` loading OSM tiles (Note that if you need an OSM layer you're better off using [vl-source-osm](/docs/component/osm-source.md), this is for demonstration purposes only).
 
-<vuep template="#usage-example"></vuep>
+<vuep template="#osm-tiles"></vuep>
 
-<script v-pre type="text/x-template" id="usage-example">
+<script v-pre type="text/x-template" id="osm-tiles">
 <template>
   <vl-map data-projection="EPSG:4326" style="height: 400px">
     <vl-view :zoom.sync="zoom" :center.sync="center"></vl-view>
@@ -36,6 +36,37 @@ Example of `vl-source-xyz` loading OSM tiles (Note that if you need an OSM layer
         zoom: 2,
         center: [0, 0],
         url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      }
+    },
+  }
+</script>
+</script>
+
+Example of loading google maps satellite tiles. Notice that this is only allowed in places that are publicly available to the internet (as opposed to being behind a password for example).
+
+<vuep template="#google-tiles"></vuep>
+
+<script v-pre type="text/x-template" id="google-tiles">
+<template>
+  <vl-map data-projection="EPSG:4326" style="height: 400px">
+    <vl-view :zoom.sync="zoom" :center.sync="center"></vl-view>
+
+    <vl-layer-tile>
+      <vl-source-xyz
+        attributions='<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>'
+        url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+      >
+      </vl-source-xyz>
+    </vl-layer-tile>
+  </vl-map>
+</template>
+
+<script>
+  export default {
+    data () {
+      return { 
+        zoom: 2,
+        center: [0, 0],
       }
     },
   }
