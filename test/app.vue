@@ -5,11 +5,12 @@
         <div>
           Selected: {{ selectedFeatureIds }}
         </div>
-        <button @click="toggleMap">Toggle map</button>
-        <button @click="resetDrawFeatures">Reset draw features</button>
+        <div>
+          <button @click="onUnselectClick">Unselect</button>
+        </div>
       </div>
 
-      <vl-map v-if="mapVisible" ref="map" data-projection="EPSG:4326">
+      <vl-map ref="map" data-projection="EPSG:4326" @created="mapCreated">
         <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
                  ident="view" ref="view" />
 
@@ -25,45 +26,20 @@
           <vl-source-osm />
         </vl-layer-tile>
 
-        <!--<vl-layer-vector id="countries" render-mode="image">-->
-        <!--  <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />-->
-        <!--  <vl-style-func :factory="createCountriesStyleFunc" />-->
-        <!--</vl-layer-vector>-->
-
-        <!--<vl-layer-vector render-mode="image">-->
-        <!--<vl-source-cluster :distance="50">-->
-        <!--  <vl-source-vector :features="points" />-->
-        <!--</vl-source-cluster>-->
-        <!--<vl-style-func :factory="makeClusterStyleFunc" />-->
-        <!--  <vl-style-func :factory="makePointStyleFunc" />-->
-        <!--</vl-layer-vector>-->
-
-        <vl-layer-vector id="draw-target">
-          <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
+        <vl-layer-vector id="countries" render-mode="image">
+          <vl-source-vector ident="countries-source" ref="vectorSource" :features.sync="countries" :url="countriesUrl" />
         </vl-layer-vector>
 
-        <!--<vl-interaction-select :features.sync="selectedFeatures" />-->
-        <vl-interaction-draw v-if="drawingEnabled" source="draw-target" type="Polygon" />
-        <vl-interaction-modify source="draw-target" />
-        <vl-interaction-snap source="draw-target" />
+        <vl-interaction-select :features.sync="selectedFeatures" />
       </vl-map>
     </div>
   </div>
 </template>
 
 <script>
-  import { random, range, cloneDeep } from 'lodash'
-  import { Feature } from 'ol'
-  import { createStyle } from '../src/ol-ext'
-
-  const drawFeature = {
-    id: 1,
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [[[0, 0], [0, 30], [30, 30], [30, 0], [0, 0]]],
-    },
-  }
+  import { DragBox } from 'ol/interaction'
+  import { platformModifierKeyOnly } from 'ol/events/condition'
+  import { writeGeoJsonFeature } from '../src/ol-ext'
 
   export default {
     name: 'app',
@@ -72,101 +48,53 @@
         zoom: 2,
         center: [100, 10],
         rotation: 0,
-        mapVisible: true,
         countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
         countries: [],
         selectedFeatures: [],
-        drawFeatures: [
-          cloneDeep(drawFeature),
-        ],
-        points: range(0, 100).map(i => ({
-          type: 'Feature',
-          id: 'random-' + i,
-          geometry: {
-            type: 'Point',
-            coordinates: [
-              random(0, 50),
-              random(0, 50),
-            ],
-          },
-        })),
       }
     },
     computed: {
       selectedFeatureIds () {
         return this.selectedFeatures.map(({ id }) => id)
       },
-      drawingEnabled () {
-        return !this.drawFeatures.length
-      },
     },
     methods: {
-      createCountriesStyleFunc () {
-        return () => {
-          return createStyle({
-            fillColor: 'rgba(0, 0, 0, 0.4)',
-            strokeColor: 'blue',
+      onUnselectClick () {
+        if (this.selectedFeatureIds.length) {
+          this.unselect(this.selectedFeatureIds[0])
+        }
+      },
+      unselect (id) {
+        const mapFeatureIndex = this.selectedFeatures.findIndex((f) => f.id === id)
+
+        if (mapFeatureIndex !== -1) {
+          this.selectedFeatures.splice(mapFeatureIndex, 1)
+        }
+      },
+      mapCreated (map) {
+        const dragBox = new DragBox({
+          condition: platformModifierKeyOnly
+        })
+
+        map.$map.addInteraction(dragBox)
+
+        dragBox.on('boxend', () => {
+          // features that intersect the box are added to the collection of
+          // selected features
+          const extent = dragBox.getGeometry().getExtent()
+          /** @var {ol.source.Vector} source */
+          const source = this.$refs.vectorSource.$source
+
+          source.forEachFeatureIntersectingExtent(extent, feature => {
+            feature = writeGeoJsonFeature(feature)
+            this.selectedFeatures.push(feature)
           })
-        }
-      },
-      makeClusterStyleFunc () {
-        const cache = {}
+        })
 
-        return function __clusterStyleFunc (feature) {
-          const size = feature.get('features').length
-          let style = cache[size]
-
-          if (!style) {
-            style = createStyle({
-              imageRadius: 10,
-              strokeColor: '#ffffff',
-              fillColor: '#3399cc',
-              text: size.toString(),
-              textFillColor: '#ffffff',
-            })
-
-            cache[size] = style
-          }
-
-          return [style]
-        }
-      },
-      makePointStyleFunc () {
-        return feature => {
-          return [
-            createStyle({
-              fillColor: 'red',
-              strokeColor: 'green',
-              strokeWidth: 2,
-              imageRadius: 10,
-              textScale: 1.4,
-              text: feature.getId(),
-              textAlign: 'end',
-              textFillColor: '#fff',
-            }),
-          ]
-        }
-      },
-      toggleMap () {
-        this.drawFeatures = [
-          cloneDeep(drawFeature),
-        ]
-        this.mapVisible = !this.mapVisible
-      },
-      async resetDrawFeatures () {
-        this.drawFeatures = []
-
-        await this.$nextTick()
-
-        console.log('draw enabled', this.drawingEnabled)
-
-        this.drawFeatures = [
-          _.cloneDeep(drawFeature),
-        ]
-
-        await this.$nextTick()
-
-        console.log('draw enabled', this.drawingEnabled)
+        // clear selection when drawing a new box and when clicking on the map
+        dragBox.on('boxstart', () => {
+          this.selectedFeatures = []
+        })
       },
     },
   }

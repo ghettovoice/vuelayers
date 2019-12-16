@@ -56,11 +56,9 @@
         <div>
           Selected: {{ selectedFeatureIds }}
         </div>
-        <button @click="toggleMap">Toggle map</button>
-        <button @click="resetDrawFeatures">Reset draw features</button>
       </div>
 
-      <vl-map v-if="mapVisible" ref="map" data-projection="EPSG:4326">
+      <vl-map ref="map" data-projection="EPSG:4326">
         <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
                  ident="view" ref="view"></vl-view>
 
@@ -76,45 +74,20 @@
           <vl-source-osm></vl-source-osm>
         </vl-layer-tile>
 
-        <!--<vl-layer-vector id="countries" render-mode="image">-->
-        <!--  <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />-->
-        <!--  <vl-style-func :factory="createCountriesStyleFunc" />-->
-        <!--</vl-layer-vector>-->
-
-        <!--<vl-layer-vector render-mode="image">-->
-        <!--<vl-source-cluster :distance="50">-->
-        <!--  <vl-source-vector :features="points" />-->
-        <!--</vl-source-cluster>-->
-        <!--<vl-style-func :factory="makeClusterStyleFunc" />-->
-        <!--  <vl-style-func :factory="makePointStyleFunc" />-->
-        <!--</vl-layer-vector>-->
-
-        <vl-layer-vector id="draw-target">
-          <vl-source-vector ident="draw-target" :features.sync="drawFeatures" />
+        <vl-layer-vector id="countries" render-mode="image">
+          <vl-source-vector ident="countries-source" :features.sync="countries" :url="countriesUrl" />
         </vl-layer-vector>
 
-        <!--<vl-interaction-select :features.sync="selectedFeatures"></vl-interaction-select>-->
-        <vl-interaction-draw v-if="drawingEnabled" source="draw-target" type="Polygon"></vl-interaction-draw>
-        <vl-interaction-modify source="draw-target"></vl-interaction-modify>
-        <vl-interaction-snap source="draw-target"></vl-interaction-snap>
+        <vl-interaction-select :features.sync="selectedFeatures"></vl-interaction-select>
       </vl-map>
     </div>
   </div>
 
   <script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
-  <script src="https://unpkg.com/lodash@4.17.11/lodash.js"></script>
+  <script src="https://unpkg.com/lodash@latest/lodash.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v5.3.0/build/ol.js"></script>
   <script src="../lib/index.umd.js"></script>
   <script>
-    const drawFeature = {
-      id: 1,
-      type: 'Feature',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[[0, 0], [0, 30], [30, 30], [30, 0], [0, 0]]],
-      },
-    }
-
     /* eslint-disable no-new */
     new Vue({
       el: '#app',
@@ -122,101 +95,16 @@
         zoom: 2,
         center: [100, 10],
         rotation: 0,
-        mapVisible: true,
         countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
         countries: [],
         selectedFeatures: [],
-        drawFeatures: [
-          _.cloneDeep(drawFeature),
-        ],
-        points: _.range(0, 100).map(i => ({
-          type: 'Feature',
-          id: 'random-' + i,
-          geometry: {
-            type: 'Point',
-            coordinates: [
-              _.random(0, 50),
-              _.random(0, 50),
-            ],
-          },
-        })),
       },
       computed: {
         selectedFeatureIds () {
           return this.selectedFeatures.map(({ id }) => id)
         },
-        drawingEnabled () {
-          return !this.drawFeatures.length
-        },
       },
       methods: {
-        createCountriesStyleFunc () {
-          return () => {
-            return VueLayers.olExt.createStyle({
-              fillColor: 'rgba(0, 0, 0, 0.4)',
-              strokeColor: 'blue',
-            })
-          }
-        },
-        makeClusterStyleFunc () {
-          const cache = {}
-
-          return function __clusterStyleFunc (feature) {
-            const size = feature.get('features').length
-            let style = cache[size]
-
-            if (!style) {
-              style = VueLayers.olExt.createStyle({
-                imageRadius: 10,
-                strokeColor: '#ffffff',
-                fillColor: '#3399cc',
-                text: size.toString(),
-                textFillColor: '#ffffff',
-              })
-
-              cache[size] = style
-            }
-
-            return [style]
-          }
-        },
-        makePointStyleFunc () {
-          return feature => {
-            return [
-              VueLayers.olExt.createStyle({
-                fillColor: 'red',
-                strokeColor: 'green',
-                strokeWidth: 2,
-                imageRadius: 10,
-                textScale: 1.4,
-                text: feature.getId(),
-                textAlign: 'end',
-                textFillColor: '#fff',
-              }),
-            ]
-          }
-        },
-        toggleMap () {
-          this.drawFeatures = [
-            _.cloneDeep(drawFeature),
-          ]
-          this.mapVisible = !this.mapVisible
-        },
-        async resetDrawFeatures () {
-          this.drawFeatures = []
-
-          await this.$nextTick()
-
-          console.log('draw enabled', this.drawingEnabled)
-
-          this.drawFeatures = [
-            _.cloneDeep(drawFeature),
-          ]
-
-          await this.$nextTick()
-
-          console.log('draw enabled', this.drawingEnabled)
-        },
       },
     })
   </script>
