@@ -29,6 +29,7 @@
     * [vl-source-vector-tile](/docs/component/vector-tile-source.md)
     * [vl-source-wms](/docs/component/wms-source.md)
     * [vl-source-wmts](/docs/component/wmts-source.md)
+    * [vl-source-xyz](/docs/component/xyz-source.md)
 
   * Geometry
 
