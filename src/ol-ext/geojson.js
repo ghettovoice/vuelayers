@@ -1,4 +1,4 @@
-import { EPSG_3857, EPSG_4326 } from 'ol-ext/consts'
+import { EPSG_3857, EPSG_4326 } from './consts'
 import Feature from 'ol/Feature'
 import { get, isPlainObject } from '../util/minilo'
 import { createGeoJsonFmt } from './format'
