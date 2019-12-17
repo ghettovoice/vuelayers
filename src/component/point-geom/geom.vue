@@ -1,7 +1,7 @@
 <script>
   import Point from 'ol/geom/Point'
-  import geometry from '../../mixin/geometry'
-  import { GEOMETRY_TYPE } from '../../ol-ext/consts'
+  import { geometry } from '../../mixin'
+  import { GEOMETRY_TYPE } from '../../ol-ext'
   import { constant } from '../../util/minilo'
 
   const props = {

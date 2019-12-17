@@ -1,6 +1,7 @@
 import debounce from 'debounce-promise'
 import { interval as intervalObs } from 'rxjs/observable'
 import { first as firstObs, skipUntil, skipWhile } from 'rxjs/operators'
+import uuid from 'uuid/v4'
 import { log } from '../util/log'
 import { identity, isFunction } from '../util/minilo'
 import identMap from './ident-map'
@@ -18,14 +19,26 @@ export default {
   VM_PROP,
   INSTANCE_PROMISE_POOL,
   mixins: [identMap, rxSubs, services],
+  props: {
+    id: {
+      type: [String, Number],
+      default: () => uuid(),
+    },
+  },
   data () {
     return {
       rev: 0,
     }
   },
   computed: {
-    name () {
-      return [this.$options.name, this.id].filter(identity).join(' ')
+    cmpName () {
+      return this.$options.name
+    },
+    vmId () {
+      return [this.cmpName, this.id].filter(identity).join('-')
+    },
+    vmName () {
+      return [this.cmpName, this.id].filter(identity).join(' ')
     },
   },
   methods: {
@@ -185,8 +198,8 @@ function defineLifeCyclePromises () {
   const makeEventEmitter = event => () => {
     this.$emit(event, this)
 
-    if (process.env.NODE_ENV !== 'production') {
-      log(event, this.name)
+    if (process.env.VUELAYERS_DEBUG) {
+      log(event, this.vmName)
     }
 
     return this
@@ -248,7 +261,7 @@ function defineLifeCyclePromises () {
 }
 
 function defineDebouncedHelpers () {
-  const t = 1000 / 60
+  const t = 1000 / 10
   // bind debounced functions at runtime
   // for each instance to avoid interfering between
   // different instances

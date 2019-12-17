@@ -1,8 +1,7 @@
 <script>
-  import Vue from 'vue'
   import Circle from 'ol/style/Circle'
-  import imageStyle from '../../mixin/image-style'
-  import withFillStrokeStyle from '../../mixin/with-fill-stroke-style'
+  import Vue from 'vue'
+  import { imageStyle, withFillStrokeStyle } from '../../mixin'
   import { isEqual } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 

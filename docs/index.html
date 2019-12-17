@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="//unpkg.com/docsify@4.6.10/lib/themes/vue.css">
 
   <link rel="stylesheet" href="//unpkg.com/vuep@0.8.0/dist/vuep.min.css">
-  <link rel="stylesheet" href="//unpkg.com/vuelayers@0.10.7/lib/style.min.css">
+  <link rel="stylesheet" href="//unpkg.com/vuelayers@latest/lib/style.css">
 
   <style>
     .cover-main pre {
@@ -32,9 +32,8 @@
       margin: 1.2em 0;
       overflow: auto;
       padding: 0 1.4rem;
-      position: relative;
       word-wrap: normal;
-      ackground-color: #f8f8f8;
+      background-color: #f8f8f8;
       font-family: Roboto Mono,Monaco,courier,monospace;
     }
 
@@ -84,11 +83,11 @@
     Please wait...
   </div>
 
-  <script src="//unpkg.com/openlayers@4.6.5/dist/ol.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.0.1/build/ol.js"></script>
   <script src="//unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
-  <script src="//unpkg.com/vue@2.5.16/dist/vue.min.js"></script>
+  <script src="//unpkg.com/vue@2/dist/vue.min.js"></script>
   <script src="//unpkg.com/vuep@0.8.0/dist/vuep.min.js"></script>
-  <script src="//unpkg.com/vuelayers@0.10.7/lib/index.umd.min.js"></script>
+  <script src="//unpkg.com/vuelayers@latest/lib/index.umd.js"></script>
   <script src="//unpkg.com/fakerator@0.3.0/dist/fakerator.js"></script>
 
   <script src="//unpkg.com/docsify-edit-on-github@1.0.1/index.js"></script>
@@ -100,8 +99,6 @@
     }
 
     window.fakerator = new Fakerator()
-
-    Vue.use(VueLayers)
 
     window.$docsify = {
       el: '#app',

@@ -1,6 +1,7 @@
 import { first as firstObs } from 'rxjs/operators'
-import mergeDescriptors from '../util/multi-merge-descriptors'
+import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
+import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
 import useMapCmp from './use-map-cmp'
 
@@ -14,8 +15,12 @@ export default {
      * @return {OlStyle|Promise<OlStyle>}
      * @protected
      */
-    createOlObject () {
-      return this.createStyle()
+    async createOlObject () {
+      const style = await this.createStyle()
+
+      initializeStyle(style)
+
+      return style
     },
     /**
      * @return {OlStyle|Promise<OlStyle>}
@@ -72,11 +77,20 @@ export default {
   },
   stubVNode: {
     empty () {
-      return this.$options.name
+      return this.vmId
     },
   },
   created () {
     this::defineServices()
+  },
+  watch: {
+    id (value) {
+      if (!this.$style || value === getStyleId(this.$style)) {
+        return
+      }
+
+      setStyleId(this.$style, value)
+    },
   },
 }
 

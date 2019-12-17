@@ -7,10 +7,10 @@
 [![License](https://img.shields.io/github/license/ghettovoice/vuelayers.svg)](https://github.com/ghettovoice/vuelayers/blob/master/LICENSE)
 
 <iframe src="https://ghbtns.com/github-btn.html?user=ghettovoice&amp;repo=vuelayers&amp;type=star&amp;count=true&amp;size=large" 
-    frameborder="0" scrolling="0" class="github-button vld-github-btn" width="130px" height="30px"></iframe>
+    frameborder="0" scrolling="0" class="github-button vld-github-btn" width="140px" height="30px"></iframe>
 
 <iframe src="https://ghbtns.com/github-btn.html?user=ghettovoice&amp;repo=vuelayers&amp;type=fork&amp;count=true&amp;size=large" 
-    frameborder="0" scrolling="0" class="github-button vld-github-btn" width="130px" height="30px"></iframe>
+    frameborder="0" scrolling="0" class="github-button vld-github-btn" width="140px" height="30px"></iframe>
 
 ## Overview
 
@@ -21,11 +21,11 @@ See the [Quick start](quickstart.md "Quick start guide") for more details how to
 
 ## Versions
 
-| Vuelayers           | Branch                                                           | Vue     | OpenLayers |
-| :------------------ | :--------------------------------------------------------------- | :------ | :--------- |
-| Current **0.11.x**  | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **2.3** | **5.x**    |
-| Next **0.12.x**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)   | **2.3** | **5.x**    |
-| Previous **0.10.x** | [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/v0.10.x) | **2.3** | **4.x**    |
+| VueLayers         | Branch                                                           | Vue      | OpenLayers | NPM tag   |
+|:------------------|:-----------------------------------------------------------------|:---------|:-----------|:----------|
+| Current **0.12**  | [v0.12.x](https://github.com/ghettovoice/vuelayers/tree/master)  | **^2.3** | **^6.0**   | `latest`  |
+| Previous **0.11** | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **^2.3** | **^5.0**   | `v0.11.x` |
+| Previous **0.10** | [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/v0.10.x) | **^2.0** | **^4.0**   | `v0.10.x` |
 
 ## Features
 
@@ -37,7 +37,7 @@ See the [Quick start](quickstart.md "Quick start guide") for more details how to
 ## Requirements
 
 - [Vue](https://vuejs.org/) version **^2.3**
-- [OpenLayers](https://openlayers.org/) version **^5.0**
+- [OpenLayers](https://openlayers.org/) version **^6.0**
 
 ## Live demo
 
@@ -45,5 +45,5 @@ Check out [VueLayers Demo application](demo.md "VueLayers Demo application") to 
 
 ## License
 
-Licensed under the **MIT** (c) 2017-2018, [Vladimir Vershinin](https://ghettovoice.github.io/)  
+Licensed under the **MIT** (c) 2017-2019, [Vladimir Vershinin](https://ghettovoice.github.io/)  
 Based on [Vue](https://vuejs.org/ "Vue.js Homepage") and [OpenLayers](https://openlayers.org/ "OpenLayers Homepage")

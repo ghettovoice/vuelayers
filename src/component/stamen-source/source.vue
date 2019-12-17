@@ -1,6 +1,6 @@
 <script>
   import StamenSource from 'ol/source/Stamen'
-  import xyzSource from '../../mixin/xyz-source'
+  import { xyzSource } from '../../mixin'
 
   const props = {
     /**

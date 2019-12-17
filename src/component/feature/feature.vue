@@ -1,17 +1,16 @@
 <template>
-  <i :id="[$options.name, id].join('-')" :class="[$options.name]" style="display: none !important;">
-    <slot :id="id" :properties="properties" :geometry="geometry" :point="point"/>
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
+    <slot :id="id" :properties="properties" :geometry="geometry" :point="point" />
   </i>
 </template>
 
 <script>
   import Feature from 'ol/Feature'
-  import uuid from 'uuid/v4'
   import { Observable } from 'rxjs'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs, mergeAll } from 'rxjs/operators'
   import { geometryContainer, olCmp, projTransforms, stylesContainer, useMapCmp } from '../../mixin'
-  import { findPointOnSurface, initializeFeature } from '../../ol-ext'
+  import { findPointOnSurface, getFeatureId, initializeFeature, setFeatureId } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasFeature, hasMap } from '../../util/assert'
   import { isEqual, plainProps } from '../../util/minilo'
@@ -25,15 +24,6 @@
     name: 'vl-feature',
     mixins: [olCmp, useMapCmp, geometryContainer, stylesContainer, projTransforms],
     props: {
-      /**
-       * Feature identifier.
-       * @type {string|number}
-       * @default UUID
-       */
-      id: {
-        type: [String, Number],
-        default: () => uuid(),
-      },
       /**
        * All feature properties.
        * @type {Object}
@@ -164,8 +154,8 @@
        * @param {string|number} value
        */
       id (value) {
-        if (this.$feature && value !== this.$feature.getId()) {
-          this.$feature.setId(value)
+        if (this.$feature && value !== getFeatureId(this.$feature)) {
+          setFeatureId(this.$feature, value)
         }
       },
       /**
@@ -188,6 +178,10 @@
       $feature: {
         enumerable: true,
         get: () => this.$olObject,
+      },
+      $geometry: {
+        enumerable: true,
+        get: this.getGeometry,
       },
       $layer: {
         enumerable: true,
@@ -243,11 +237,13 @@
     this.subscribeTo(allChanges, ({ prop, value }) => {
       ++this.rev
 
-      if (prop === 'id') {
-        this.$emit(`update:${prop}`, value)
-      } else if (prop !== this.$feature.getGeometryName()) {
-        this.$emit('update:properties', { ...this.properties, [prop]: value })
-      }
+      this.$nextTick(() => {
+        if (prop === 'id') {
+          this.$emit(`update:${prop}`, value)
+        } else if (prop !== this.$feature.getGeometryName()) {
+          this.$emit('update:properties', { ...this.properties, [prop]: value })
+        }
+      })
     })
   }
 </script>

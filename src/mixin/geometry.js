@@ -1,5 +1,12 @@
 import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
-import { boundingExtent, findPointOnSurface, transforms } from '../ol-ext'
+import {
+  boundingExtent,
+  findPointOnSurface,
+  getGeometryId,
+  initializeGeometry,
+  setGeometryId,
+  transforms,
+} from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
 import { hasGeometry } from '../util/assert'
 import { isEqual } from '../util/minilo'
@@ -76,8 +83,12 @@ export default {
      * @return {module:ol/geom/Geometry~Geometry|Promise<module:ol/geom/Geometry~Geometry>}
      * @protected
      */
-    createOlObject () {
-      return this.createGeometry()
+    async createOlObject () {
+      const geometry = await this.createGeometry()
+
+      initializeGeometry(geometry, this.id)
+
+      return geometry
     },
     /**
      * @return {module:ol/geom/Geometry~Geometry|Promise<module:ol/geom/Geometry~Geometry>}
@@ -183,6 +194,13 @@ export default {
     },
   },
   watch: {
+    id (value) {
+      if (!this.$geometry || value === getGeometryId(this.$geometry)) {
+        return
+      }
+
+      setGeometryId(this.$geometry, value)
+    },
     coordinates (value) {
       if (!this.$geometry || !this.$view) return
 
@@ -208,7 +226,7 @@ export default {
   },
   stubVNode: {
     empty () {
-      return this.$options.name
+      return this.vmId
     },
   },
   created () {
@@ -256,7 +274,7 @@ function defineServices () {
 function subscribeToGeomChanges () {
   hasGeometry(this)
 
-  const ft = 100
+  const ft = 1000 / 60
   const changes = observableFromOlEvent(
     this.$geometry,
     'change',
@@ -275,7 +293,10 @@ function subscribeToGeomChanges () {
 
   this.subscribeTo(changes, ({ prop, value }) => {
     ++this.rev
-    this.$emit(`update:${prop}`, value)
+
+    this.$nextTick(() => {
+      this.$emit(`update:${prop}`, value)
+    })
   })
 }
 

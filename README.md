@@ -23,13 +23,14 @@ It can display maps with tiled, raster or vector layers loaded from different so
 
 ## Versions
 
-**NOTE**: you are reading README for the next version **v0.12.x**.  
+**NOTE: you are looking for README file for the upcoming v0.12 version. To see README file for the current v0.11
+version switch to the [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) branch.**
 
-| Vuelayers           | Branch                                                           | Vue     | OpenLayers |
-| :------------------ | :--------------------------------------------------------------- | :------ | :--------- |
-| Current **0.11.x**  | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **2.3** | **5.x**    |
-| Next **0.12.x**     | [master](https://github.com/ghettovoice/vuelayers/tree/master)   | **2.3** | **5.x**    |
-| Previous **0.10.x** | [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/v0.10.x) | **2.3** | **4.x**    |
+| VueLayers         | Branch                                                           | Vue      | OpenLayers | NPM tag   |
+|:------------------|:-----------------------------------------------------------------|:---------|:-----------|:----------|
+| Current **0.12**  | [v0.12.x](https://github.com/ghettovoice/vuelayers/tree/master)  | **^2.3** | **^6.0**   | `latest`  |
+| Previous **0.11** | [v0.11.x](https://github.com/ghettovoice/vuelayers/tree/v0.11.x) | **^2.3** | **^5.0**   | `v0.11.x` |
+| Previous **0.10** | [v0.10.x](https://github.com/ghettovoice/vuelayers/tree/v0.10.x) | **^2.0** | **^4.0**   | `v0.10.x` |
 
 ## Links
 
@@ -40,7 +41,7 @@ It can display maps with tiled, raster or vector layers loaded from different so
 ## Requirements
 
 - [Vue](https://vuejs.org/) version **^2.3**
-- [OpenLayers](https://openlayers.org/) version **^5.0**
+- [OpenLayers](https://openlayers.org/) version **^6.0**
 
 ## Install
 
@@ -57,7 +58,7 @@ npm install vuelayers@next
 
 ## Build Setup
 
-**NOTE**: Node **v8+** is required.
+**NOTE**: Node **v10+** is required.
 
 ``` bash
 git clone --recursive -j8 https://github.com/ghettovoice/vuelayers.git
@@ -84,5 +85,5 @@ npm test
 
 ## License
 
-**MIT** (c) 2017-2018, Vladimir Vershinin  
+**MIT** (c) 2017-2019, Vladimir Vershinin  
 Based on [Vue](https://vuejs.org/) and [OpenLayers](https://openlayers.org/)

@@ -1,5 +1,5 @@
 <template>
-  <i :class="[$options.name]" style="display: none !important;">
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
     <slot :accuracy="accuracy" :altitude="altitude" :altitude-accuracy="altitudeAccuracy"
           :heading="heading" :position="position" :speed="speed">
     </slot>
@@ -27,7 +27,6 @@
        * @type {string}
        */
       projection: String,
-      // todo add autoCenter, bindToPosition
     },
     computed: {
       accuracy () {
@@ -61,7 +60,7 @@
         }
       },
       positionViewProj () {
-        if (this.position && this.resolvedDataProjection) {
+        if (this.position && this.viewProjection) {
           return this.pointToViewProj(this.position)
         }
       },
@@ -72,11 +71,15 @@
        * @private
        */
       createOlObject () {
-        return new Geolocation({
+        const geoloc = new Geolocation({
           tracking: this.tracking,
           trackingOptions: this.trackingOptions,
           projection: this.resolvedDataProjection,
         })
+
+        geoloc.set('id', this.id)
+
+        return geoloc
       },
       /**
        * @return {void}
@@ -104,6 +107,13 @@
       },
     },
     watch: {
+      id (value) {
+        if (!this.$geolocation || value === this.geolocation.get('id')) {
+          return
+        }
+
+        this.$geolocation.set('id', value)
+      },
       /**
        * @param {boolean} value
        */
@@ -127,7 +137,7 @@
     },
     stubVNode: {
       empty () {
-        return this.$options.name
+        return this.vmId
       },
     },
     created () {
@@ -166,7 +176,7 @@
   function subscribeToGeolocation () {
     hasGeolocation(this)
 
-    const ft = 100
+    const ft = 1000 / 60
     const changes = merge(
       observableFromOlChangeEvent(
         this.$geolocation,
@@ -185,13 +195,15 @@
         'position',
         true,
         ft,
-        () => this.position,
       ),
     )
 
     this.subscribeTo(changes, ({ prop, value }) => {
       ++this.rev
-      this.$emit(`update:${prop}`, value)
+
+      this.$nextTick(() => {
+        this.$emit(`update:${prop}`, value)
+      })
     })
   }
 </script>

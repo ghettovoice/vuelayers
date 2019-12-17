@@ -1,4 +1,3 @@
-import uuid from 'uuid/v4'
 import Vue from 'vue'
 import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
 import { hasLayer, hasMap } from '../util/assert'
@@ -13,10 +12,6 @@ import useMapCmp from './use-map-cmp'
 export default {
   mixins: [cmp, useMapCmp, sourceContainer],
   props: {
-    id: {
-      type: [String, Number],
-      default: () => uuid(),
-    },
     /**
      * The bounding extent for layer rendering defined in the map view projection.
      * The layer will not be rendered outside of this extent.
@@ -230,17 +225,15 @@ export default {
     },
     ...makeWatchers([
       'overlay',
-    ], () => function (value, prevValue) {
-      if (isEqual(value, prevValue)) return
-
+    ], () => function () {
       this.scheduleRecreate()
     }),
   },
   stubVNode: {
     attrs () {
       return {
-        id: [this.$options.name, this.id].join('-'),
-        class: this.$options.name,
+        id: this.vmId,
+        class: this.cmpName,
       }
     },
   },
@@ -254,6 +247,10 @@ function defineServices () {
     $layer: {
       enumerable: true,
       get: () => this.$olObject,
+    },
+    $source: {
+      enumerable: true,
+      get: this.getSource,
     },
     $map: {
       enumerable: true,
@@ -279,5 +276,11 @@ function subscribeToLayerEvents () {
     'render',
   ])
 
-  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
+  this.subscribeTo(events, evt => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(evt.type, evt)
+    })
+  })
 }

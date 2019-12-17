@@ -3,6 +3,7 @@
   import { layer, layersContainer } from '../../mixin'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
+  // todo add computed property layerIds - ids of child layers
   export default {
     name: 'vl-layer-group',
     mixins: [layer, layersContainer],
@@ -16,6 +17,7 @@
           visible: this.visible,
           extent: this.extent,
           zIndex: this.zIndex,
+          layers: this._layersCollection,
         })
       },
       getServices () {

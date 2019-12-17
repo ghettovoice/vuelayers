@@ -314,3 +314,7 @@ export function camelCase (str) {
 
   return str.replace(regExp, matches => matches[1].toUpperCase())
 }
+
+export function arrayLengthValidator (len) {
+  return len => value => isArray(value) && value.length === len
+}

@@ -1,7 +1,6 @@
+import { EPSG_3857 } from '../ol-ext'
 import { observableFromOlEvent } from '../rx-ext'
-import { EPSG_3857 } from '../ol-ext/consts'
 import { hasSource } from '../util/assert'
-import { isEqual } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
 
@@ -51,9 +50,7 @@ export default {
   watch: {
     ...makeWatchers([
       'crossOrigin',
-    ], () => function (value, prevValue) {
-      if (isEqual(value, prevValue)) return
-
+    ], () => function () {
       this.scheduleRecreate()
     }),
   },
@@ -68,5 +65,11 @@ function subscribeToSourceEvents () {
     'imageloadstart',
   ])
 
-  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
+  this.subscribeTo(events, evt => {
+    ++this.rev
+
+    this.$nextTick(() => {
+      this.$emit(evt.type, evt)
+    })
+  })
 }

@@ -1,3 +1,4 @@
+import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import { isArray, isEqual, isString } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import cmp from './ol-virt-cmp'
@@ -34,8 +35,12 @@ export default {
      * @return {module:ol/source/Source~Source|Promise<module:ol/source/Source~Source>}
      * @protected
      */
-    createOlObject () {
-      return this.createSource()
+    async createOlObject () {
+      const source = await this.createSource()
+
+      initializeSource(source, this.id)
+
+      return source
     },
     /**
      * @return {module:ol/source/Source~Source|Promise<module:ol/source/Source~Source>}
@@ -127,6 +132,13 @@ export default {
     },
   },
   watch: {
+    id (value) {
+      if (!this.$source || value === getSourceId(this.$source)) {
+        return
+      }
+
+      setSourceId(this.$source, value)
+    },
     attributions (value) {
       if (!this.$source || isEqual(value, this.$source.getAttributions())) {
         return
@@ -161,7 +173,7 @@ export default {
   },
   stubVNode: {
     empty () {
-      return this.$options.name
+      return this.vmId
     },
   },
   created () {

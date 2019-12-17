@@ -1,6 +1,6 @@
 <template>
-  <i :class="[$options.name]" style="display: none !important;">
-    <slot :center="viewCenter" :zoom="viewZoom" :resolution="viewResolution" :rotation="viewRotation"/>
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
+    <slot :center="currentCenter" :zoom="currentZoom" :resolution="currentResolution" :rotation="currentRotation"/>
   </i>
 </template>
 
@@ -13,7 +13,7 @@
   import { EPSG_3857, MAX_ZOOM, MIN_ZOOM, ZOOM_FACTOR } from '../../ol-ext'
   import { observableFromOlChangeEvent } from '../../rx-ext'
   import { hasView } from '../../util/assert'
-  import { coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
+  import { arrayLengthValidator, coalesce, isEqual, isFunction, isPlainObject, noop } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**
@@ -32,7 +32,7 @@
       center: {
         type: Array,
         default: () => [0, 0],
-        validator: value => value.length === 2,
+        validator: arrayLengthValidator(2),
       },
       constrainRotation: {
         type: [Boolean, Number],
@@ -49,7 +49,7 @@
        */
       extent: {
         type: Array,
-        validator: value => value.length === 4,
+        validator: arrayLengthValidator(4),
       },
       maxResolution: Number,
       minResolution: Number,
@@ -105,33 +105,33 @@
       },
     },
     computed: {
-      viewZoom () {
+      currentZoom () {
         if (this.rev && this.$view) {
-          return Math.round(this.$view.getZoom())
+          return this.$view.getZoom()
         }
 
         return this.zoom
       },
-      viewRotation () {
+      currentRotation () {
         if (this.rev && this.$view) {
           return this.$view.getRotation()
         }
 
         return this.rotation
       },
-      viewResolution () {
+      currentResolution () {
         if (this.rev && this.$view) {
           return this.$view.getResolution()
         }
 
         return this.resolution
       },
-      viewCenter () {
+      currentCenter () {
         if (this.rev && this.$view) {
           return this.pointToDataProj(this.$view.getCenter())
         }
       },
-      viewCenterViewProj () {
+      currentCenterViewProj () {
         if (this.rev && this.$view) {
           return this.$view.getCenter()
         }
@@ -180,7 +180,7 @@
        * @protected
        */
       createOlObject () {
-        return new View({
+        const view = new View({
           center: this.pointToViewProj(this.center),
           constrainRotation: this.constrainRotation,
           enableRotation: this.enableRotation,
@@ -196,6 +196,10 @@
           zoom: this.zoom,
           zoomFactor: this.zoomFactor,
         })
+
+        view.set('id', this.id)
+
+        return view
       },
       /**
        * @see {@link https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#fit}
@@ -250,33 +254,39 @@
       },
     },
     watch: {
+      id (value) {
+        if (!this.$view || value === this.$view.get('id')) {
+          return
+        }
+
+        this.$view.set('id', value)
+      },
       center (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
         value = this.pointToViewProj(value)
-        if (!isEqual(value, this.viewCenterViewProj)) {
+        if (!isEqual(value, this.currentCenterViewProj)) {
           this.$view.setCenter(value)
         }
       },
       resolution (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
-        if (value !== this.viewResolution) {
+        if (value !== this.currentResolution) {
           this.$view.setResolution(value)
         }
       },
       zoom (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
-        value = Math.round(value)
-        if (value !== this.viewZoom) {
+        if (value !== this.currentZoom) {
           this.$view.setZoom(value)
         }
       },
       rotation (value) {
         if (!this.$view || this.$view.getAnimating()) return
 
-        if (value !== this.viewRotation) {
+        if (value !== this.currentRotation) {
           this.$view.setRotation(value)
         }
       },
@@ -294,12 +304,8 @@
           this.$view.setMaxZoom(value)
         }
       },
-      resolvedDataProjection () {
-        if (!this.$view) return
-
-        this.$view.setCenter(this.pointToViewProj(this.center))
-      },
       ...makeWatchers([
+        'resolvedDataProjection',
         'constrainRotation',
         'enableRotation',
         'extent',
@@ -314,7 +320,7 @@
     },
     stubVNode: {
       empty () {
-        return this.$options.name
+        return this.vmId
       },
     },
     created () {
@@ -351,7 +357,7 @@
     const zoom = resolution.pipe(
       mapObs(() => ({
         prop: 'zoom',
-        value: Math.round(this.$view.getZoom()),
+        value: this.$view.getZoom(),
       })),
       distinctUntilKeyChanged('value'),
     )
@@ -365,7 +371,10 @@
 
     this.subscribeTo(changes, ({ prop, value }) => {
       ++this.rev
-      this.$emit(`update:${prop}`, value)
+
+      this.$nextTick(() => {
+        this.$emit(`update:${prop}`, value)
+      })
     })
   }
 </script>

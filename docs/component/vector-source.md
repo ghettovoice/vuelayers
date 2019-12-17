@@ -5,9 +5,13 @@
 `vl-source-vector` can be used together with [`vl-layer-vector`](/docs/component/vector-layer.md) to
 draw any vector data on the map.
 
-# Versions
+## ES6 Module
 
-- **ES6**: https://unpkg.com/vuelayers/lib/vector-source/
+```javascript
+import { VectorSource } from 'vuelayers'
+
+Vue.use(VectorSource)
+```
 
 ## Usage
 

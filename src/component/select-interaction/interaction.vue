@@ -1,18 +1,19 @@
 <template>
-  <i :class="[$options.name]" style="display: none !important;">
+  <i :id="vmId" :class="cmpName" style="display: none !important;">
     <slot :features="featuresDataProj"/>
   </i>
 </template>
 
 <script>
+  import debounce from 'debounce-promise'
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
   import Vue from 'vue'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { map as mapOp, debounceTime } from 'rxjs/operators'
+  import { map as mapOp } from 'rxjs/operators'
   import { interaction, projTransforms, stylesContainer, featuresContainer } from '../../mixin'
-  import { getFeatureId, createStyle, defaultEditStyle, getLayerId } from '../../ol-ext'
+  import { getFeatureId, createStyle, defaultEditStyle, getLayerId, initializeFeature } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasInteraction, hasMap } from '../../util/assert'
   import { constant, difference, forEach, isEqual, isFunction, mapValues, stubArray } from '../../util/minilo'
@@ -22,6 +23,15 @@
   export default {
     name: 'vl-interaction-select',
     mixins: [interaction, featuresContainer, stylesContainer, projTransforms],
+    stubVNode: {
+      empty: false,
+      attrs () {
+        return {
+          id: this.vmId,
+          class: this.cmpName,
+        }
+      },
+    },
     props: {
       /**
        * A function that takes an `ol.Feature` and an `ol.layer.Layer` and returns `true` if the feature may be selected or `false` otherwise.
@@ -130,7 +140,7 @@
        */
       createInteraction () {
         return new SelectInteraction({
-          features: this._featuresCollection,
+          features: this.$featuresCollection,
           multi: this.multi,
           wrapX: this.wrapX,
           filter: this.filter,
@@ -262,22 +272,21 @@
     watch: {
       features: {
         deep: true,
-        handler (value) {
-          if (!this.$interaction) return
+        handler (features) {
+          if (!this.$interaction || isEqual(features, this.featuresDataProj)) return
 
-          this.addFeatures(value)
+          features = features.slice().map(feature => initializeFeature({ ...feature }))
+          this.addFeatures(features)
 
-          let forUnselect = difference(this.getFeatures(), value, (a, b) => getFeatureId(a) === getFeatureId(b))
+          let forUnselect = difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
           this.removeFeatures(forUnselect)
         },
       },
       featuresDataProj: {
         deep: true,
-        handler (value, prev) {
-          if (!isEqual(value, prev)) {
-            this.$emit('update:features', value)
-          }
-        },
+        handler: debounce(function (features) {
+          this.$emit('update:features', features)
+        }, 1000 / 60),
       },
       ...makeWatchers([
         'filter',
@@ -292,14 +301,6 @@
         this.scheduleRecreate()
       }),
     },
-    stubVNode: {
-      empty: false,
-      attrs () {
-        return {
-          class: this.$options.name,
-        }
-      },
-    },
   }
 
   /**
@@ -309,20 +310,20 @@
   function subscribeToInteractionChanges () {
     hasInteraction(this)
 
-    const select = observableFromOlEvent(this._featuresCollection, 'add')
+    const select = observableFromOlEvent(this.$featuresCollection, 'add')
       .pipe(
         mapOp(({ element }) => ({ type: 'select', feature: element }))
       )
-    const unselect = observableFromOlEvent(this._featuresCollection, 'remove')
+    const unselect = observableFromOlEvent(this.$featuresCollection, 'remove')
       .pipe(
         mapOp(({ element }) => ({ type: 'unselect', feature: element }))
       )
     const events = mergeObs(select, unselect)
 
-    this.subscribeTo(events, evt => this.$emit(evt.type, evt.feature))
-    // emit event to allow `sync` modifier
-    this.subscribeTo(events.pipe(debounceTime(1000 / 60)), () => {
-      this.$emit('update:features', this.featuresDataProj)
+    this.subscribeTo(events, evt => {
+      this.$nextTick(() => {
+        this.$emit(evt.type, evt.feature)
+      })
     })
   }
 </script>

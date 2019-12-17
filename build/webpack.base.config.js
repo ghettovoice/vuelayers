@@ -46,9 +46,7 @@ module.exports = {
       // UglifyJs do not support ES6+, you can also use babel-minify for better treeshaking: https://github.com/babel/minify
       new UglifyJsPlugin({
         uglifyOptions: {
-          compress: {
-            warnings: false,
-          },
+          warnings: false,
         },
         cache: true,
         sourceMap: true,
@@ -112,6 +110,7 @@ module.exports = {
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin(Object.assign({}, config.replaces, {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+      'process.env.VUELAYERS_DEBUG': process.env.NODE_ENV !== 'production',
     })),
     new webpack.BannerPlugin({
       banner: config.banner,
@@ -131,7 +130,7 @@ module.exports = {
     chunkModules: false,
   },
   devServer: {
-    open: true,
+    open: false,
     hot: true,
     contentBase: config.outputPath,
     clientLogLevel: 'info',

@@ -1,6 +1,6 @@
 <script>
   import ImageLayer from 'ol/layer/Image'
-  import layer from '../../mixin/layer'
+  import { layer } from '../../mixin'
 
   /**
    * @vueProps
