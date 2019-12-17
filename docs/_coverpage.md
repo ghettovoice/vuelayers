@@ -2,7 +2,7 @@
 
 <img class="logo" src="/_media/logo.svg" data-origin="_media/logo.svg" alt="VueLayers Logo" />
 
-# VueLayers <small>v0.11.17</small>
+# VueLayers <small>v0.11.20</small>
 
 > Web map [Vue](https://vuejs.org/ "Vue Homepage") components with the power of [OpenLayers](https://openlayers.org/ "OpenLayers Homepage")
 
