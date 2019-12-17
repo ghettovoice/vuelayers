@@ -21,15 +21,23 @@ Vue.use(DrawInteraction)
   <vl-map style="height: 400px">
     <vl-view :zoom.sync="zoom" :center.sync="center"></vl-view>
 
-    <vl-interaction-draw>
+    <vl-layer-vector z-index="1">
+      <vl-source-vector :features.sync="features" ident="the-source"></vl-source-vector>
+
+      <vl-style-box>
+        <vl-style-stroke color="green"></vl-style-stroke>
+        <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+      </vl-style-box>
+    </vl-layer-vector>
+
+    <vl-interaction-draw type="Polygon" source="the-source">
       <vl-style-box>
         <vl-style-stroke color="blue"></vl-style-stroke>
         <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
-        <vl-style-text text="I'm polygon"></vl-style-text>
       </vl-style-box>
     </vl-interaction-draw>
 
-    <vl-layer-tile>
+    <vl-layer-tile z-index="0">
       <vl-source-osm></vl-source-osm>
     </vl-layer-tile>
   </vl-map>
@@ -41,6 +49,7 @@ Vue.use(DrawInteraction)
       return {
         zoom: 2,
         center: [0, 0],
+        features: [],
       }
     },
   }
@@ -48,6 +57,20 @@ Vue.use(DrawInteraction)
 </script>
 
 ## Properties
+
+### source
+
+- **Type**: `string`
+- **Required**: `true`
+
+Target source or collection. Must be registered via the `ident` attribute (see usage).
+
+### type
+
+- **Type**: `string`
+- **Required**: `true`
+
+Drawing type (`Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`, `MultiPolygon` or `Circle`).
 
 ### active
 
@@ -59,13 +82,6 @@ Vue.use(DrawInteraction)
 - **Default**: `0`
 
 Priority of interactions in the event handling stream. The higher the value, the sooner it will handle map event.
-
-### source
-
-- **Type**: `string`
-- **Required**: `true`
-
-Target source or collection identifier from IdentityMap.
 
 ### click-tolerance
 
@@ -80,13 +96,6 @@ The maximum distance in pixels between "down" and "up" for a "up" event to be co
 - **Default**: `12`
 
 Pixel distance for snapping to the drawing finish.
-
-### type
-
-- **Type**: `string`
-- **Required**: `true`
-
-Drawing type (`Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`, `MultiPolygon` or `Circle`).
 
 ### stop-click
 
@@ -153,3 +162,8 @@ Condition that activates freehand drawing for lines and polygons. This function 
 - **Default**: `false`
 
 Wrap the world horizontally on the sketch overlay.
+
+## Events
+
+- `drawstart`
+- `drawend`
