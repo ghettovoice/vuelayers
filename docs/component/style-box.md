@@ -2,7 +2,7 @@
 
 > A container for a collection of styles
 
-Use it inside [`vl-feature`](/docs/component/feature.md) or [`vl-layer-vector`](/docs/component/vector-layer.md) to give custom styles to vector features.
+Use it inside [`vl-feature`](/docs/component/feature.md), [`vl-layer-vector`](/docs/component/vector-layer.md) or [`vl-interaction-draw`](/docs/component/draw-interaction.md) to give custom styles to vector features.
 
 ## ES6 Module
 
