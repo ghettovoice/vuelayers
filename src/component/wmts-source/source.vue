@@ -31,6 +31,9 @@
         type: String,
         required: true,
       },
+      matrixIds: {
+        type: Array,
+      },
       requestEncoding: {
         type: String,
         default: WMTS_REQUEST_ENCODING,
@@ -88,7 +91,7 @@
         let extent = createExtentFromProjection(this.projection)
         let resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
         let origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
-        let matrixIds = Array.from(range(this.minZoom, resolutions.length))
+        let matrixIds = this.matrixIds || Array.from(range(this.minZoom, resolutions.length))
 
         return new WMTSTileGrid({
           extent,
