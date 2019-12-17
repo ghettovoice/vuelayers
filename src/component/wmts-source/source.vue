@@ -44,6 +44,9 @@
     resolutions: {
       type: Array,
     },
+    matrixIds: {
+      type: Array,
+    },
   }
 
   const methods = {
@@ -93,7 +96,7 @@
         resolutions: resolutions,
         tileSize: this.tileSize,
         minZoom: this.minZoom,
-        matrixIds: Array.from(range(this.minZoom, resolutions.length)),
+        matrixIds: this.matrixIds || Array.from(range(this.minZoom, resolutions.length)),
       })
     },
   }
