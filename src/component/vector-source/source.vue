@@ -151,12 +151,17 @@
         deep: true,
         handler (features) {
           if (!this.$source || isEqual(features, this.featuresDataProj)) return
-
-          features = features.map(feature => initializeFeature({ ...feature }))
-          this.addFeatures(features)
-
-          const forRemove = difference(this.featuresDataProj, features, (a, b) => getFeatureId(a) === getFeatureId(b))
-          this.removeFeatures(forRemove)
+          // add new features
+          features.forEach(feature => {
+            feature = initializeFeature({ ...feature })
+            this.addFeature(feature)
+          })
+          // remove non-matched features
+          difference(
+            this.getFeatures(),
+            features,
+            (a, b) => getFeatureId(a) === getFeatureId(b)
+          ).forEach(::this.removeFeature)
         },
       },
       ...makeWatchers([

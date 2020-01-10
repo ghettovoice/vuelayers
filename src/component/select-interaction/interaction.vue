@@ -1,6 +1,6 @@
 <template>
   <i :id="vmId" :class="cmpName" style="display: none !important;">
-    <slot :features="featuresDataProj"/>
+    <slot :features="featuresDataProj" />
   </i>
 </template>
 
@@ -9,11 +9,11 @@
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
-  import Vue from 'vue'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapOp } from 'rxjs/operators'
-  import { interaction, projTransforms, stylesContainer, featuresContainer } from '../../mixin'
-  import { getFeatureId, createStyle, defaultEditStyle, getLayerId, initializeFeature } from '../../ol-ext'
+  import Vue from 'vue'
+  import { featuresContainer, interaction, projTransforms, stylesContainer } from '../../mixin'
+  import { createStyle, defaultEditStyle, getFeatureId, getLayerId, initializeFeature } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasInteraction, hasMap } from '../../util/assert'
   import { constant, difference, forEach, isEqual, isFunction, mapValues, stubArray } from '../../util/minilo'
@@ -257,28 +257,30 @@
           feature = feature.$feature
         }
 
-        if (!(feature instanceof Feature)) {
-          const featureId = getFeatureId(feature)
-          if (!featureId) {
-            throw new Error('Undefined feature id')
-          }
-
-          feature = undefined
-          forEach(this.$map.getLayers().getArray(), layer => {
-            if (this.layerFilter && !this.layerFilter(layer)) {
-              return false
-            }
-
-            const source = layer.getSource()
-            if (source && isFunction(source.getFeatureById)) {
-              feature = source.getFeatureById(featureId)
-            }
-
-            return !feature
-          })
-
+        if (feature instanceof Feature) {
           return feature
         }
+
+        const featureId = getFeatureId(feature)
+        if (!featureId) {
+          throw new Error('Undefined feature id')
+        }
+
+        feature = undefined
+        forEach(this.$map.getLayers().getArray(), layer => {
+          if (this.layerFilter && !this.layerFilter(layer)) {
+            return false
+          }
+
+          const source = layer.getSource()
+          if (source && isFunction(source.getFeatureById)) {
+            feature = source.getFeatureById(featureId)
+          }
+
+          return !feature
+        })
+
+        return feature
       },
     },
     watch: {
@@ -292,11 +294,11 @@
             this.select(feature)
           })
           // unselect non-matched features
-          difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
-            .forEach(feature => {
-              feature = initializeFeature(feature)
-              this.unselect(feature)
-            })
+          difference(
+            this.getFeatures(),
+            features,
+            (a, b) => getFeatureId(a) === getFeatureId(b),
+          ).forEach(::this.unselect)
         },
       },
       featuresDataProj: {
@@ -329,11 +331,11 @@
 
     const select = observableFromOlEvent(this.$featuresCollection, 'add')
       .pipe(
-        mapOp(({ element }) => ({ type: 'select', feature: element }))
+        mapOp(({ element }) => ({ type: 'select', feature: element })),
       )
     const unselect = observableFromOlEvent(this.$featuresCollection, 'remove')
       .pipe(
-        mapOp(({ element }) => ({ type: 'unselect', feature: element }))
+        mapOp(({ element }) => ({ type: 'unselect', feature: element })),
       )
     const events = mergeObs(select, unselect)
 
