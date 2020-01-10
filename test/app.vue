@@ -18,6 +18,13 @@
           <template slot-scope="geoloc">
             <vl-feature v-if="geoloc.position" id="position-feature">
               <vl-geom-point :coordinates="geoloc.position" />
+              <vl-style-box>
+                <vl-style-text text="My location" font="20px sans-serif" :padding="[10, 10, 10, 10]">
+                  <vl-style-fill color="black" />
+                  <vl-style-stroke color="white" :width="2" />
+                  <vl-style-fill slot="background" color="blue" />
+                </vl-style-text>
+              </vl-style-box>
             </vl-feature>
           </template>
         </vl-geoloc>
