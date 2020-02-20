@@ -360,7 +360,7 @@
         if (isFunction(view.resolveOlObject)) {
           view = await view.resolveOlObject()
         }
-        view || (view = new View())
+        view || (view = new View({ center: [0, 0], zoom: 0 }))
 
         const map = await this.resolveMap()
         if (view !== map.getView()) {
