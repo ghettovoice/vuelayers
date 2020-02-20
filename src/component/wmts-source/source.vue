@@ -28,6 +28,9 @@
         type: String,
         required: true,
       },
+      matrixIds: {
+        type: Array,
+      },
       requestEncoding: {
         type: String,
         default: 'KVP',
@@ -104,7 +107,7 @@
         const extent = createExtentFromProjection(this.projection)
         const resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
         const origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
-        const matrixIds = Array.from(range(this.minZoom, resolutions.length))
+        const matrixIds = this.matrixIds || Array.from(range(this.minZoom, resolutions.length))
         /**
          * @type {module:ol/Tile~UrlFunction}
          * @protected

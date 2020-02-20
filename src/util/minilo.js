@@ -1,5 +1,5 @@
-import { interval as intervalObs } from 'rxjs/Observable'
 import { Collection } from 'ol'
+import { interval as intervalObs } from 'rxjs/Observable'
 import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
 
 /**
@@ -49,6 +49,22 @@ export function identity (value) {
 export function negate (func) {
   return function (...args) {
     return !func(...args)
+  }
+}
+
+export function or (...funcs) {
+  return function (...args) {
+    return reduce(funcs, (result, fn) => {
+      return result || fn(...args)
+    }, false)
+  }
+}
+
+export function and (...funcs) {
+  return function (...args) {
+    return reduce(funcs, (result, fn) => {
+      return result && fn(...args)
+    }, true)
   }
 }
 

@@ -102,12 +102,6 @@ export default {
     }
   },
   computed: {
-    mappedFeatures () {
-      return this.features.map(feature => ({
-        ...feature,
-        id: feature.id || null,
-      }))
-    },
     /**
      * @returns {function|undefined}
      */
@@ -142,19 +136,18 @@ export default {
     },
   },
   watch: {
-    mappedFeatures: {
+    features: {
       deep: true,
       async handler (features) {
         if (!this.$source || isEqual(features, this.featuresDataProj)) return
-
-        this.addFeatures(features)
-
-        const forRemove = difference(
-          this.featuresDataProj,
+        // add new features
+        features.forEach(feature => this.addFeature({ ...feature }))
+        // remove non-matched features
+        difference(
+          this.getFeatures(),
           features,
-          (a, b) => getFeatureId(a) === getFeatureId(b),
-        )
-        await this.removeFeatures(forRemove)
+          (a, b) => getFeatureId(a) === getFeatureId(b)
+        ).forEach(::this.removeFeature)
       },
     },
     featuresDataProj: {
@@ -417,8 +410,8 @@ export default {
      * @protected
      */
     async init () {
-      await this::source.mount()
-      await this.addFeatures(this.mappedFeatures)
+      await this::source.methods.init()
+      await this.addFeatures(this.features)
     },
     /**
      * @return {Object}

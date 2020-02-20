@@ -12,14 +12,25 @@
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
-  import Vue from 'vue'
   import { merge as mergeObs } from 'rxjs/observable'
   import { map as mapOp } from 'rxjs/operators'
-  import { interaction, projTransforms, stylesContainer, featuresContainer } from '../../mixin'
-  import { getFeatureId, createStyle, defaultEditStyle, getLayerId, initializeFeature } from '../../ol-ext'
+  import Vue from 'vue'
+  import { featuresContainer, interaction, projTransforms, stylesContainer } from '../../mixin'
+  import { createStyle, defaultEditStyle, getFeatureId, getLayerId, isGeoJSONFeature } from '../../ol-ext'
   import { obsFromOlEvent } from '../../rx-ext'
   import { hasInteraction, hasMap } from '../../util/assert'
-  import { constant, difference, forEach, isEqual, isFunction, mapValues, stubArray } from '../../util/minilo'
+  import {
+    constant,
+    difference,
+    forEach,
+    isEqual,
+    isFunction,
+    isNumber,
+    isString,
+    mapValues,
+    or,
+    stubArray,
+  } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -77,6 +88,7 @@
       features: {
         type: Array,
         default: stubArray,
+        validator: value => value.every(or(isString, isNumber, isGeoJSONFeature)),
       },
       /**
        * Wrap the world horizontally on the selection overlay.
@@ -142,10 +154,7 @@
         handler (features) {
           if (!this.$interaction || isEqual(features, this.featuresDataProj)) return
           // select new features
-          features.forEach(feature => {
-            feature = initializeFeature({ ...feature })
-            this.select(feature)
-          })
+          features.forEach(::this.select)
           // unselect non-matched features
           difference(
             this.getFeatures(),
