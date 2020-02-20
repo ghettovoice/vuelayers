@@ -141,18 +141,23 @@
         deep: true,
         handler (features) {
           if (!this.$interaction || isEqual(features, this.featuresDataProj)) return
-
-          features = features.slice().map(feature => initializeFeature({ ...feature }))
-          this.addFeatures(features)
-
-          const forUnselect = difference(this.getFeatures(), features, (a, b) => getFeatureId(a) === getFeatureId(b))
-          this.removeFeatures(forUnselect)
+          // select new features
+          features.forEach(feature => {
+            feature = initializeFeature({ ...feature })
+            this.select(feature)
+          })
+          // unselect non-matched features
+          difference(
+            this.getFeatures(),
+            features,
+            (a, b) => getFeatureId(a) === getFeatureId(b),
+          ).forEach(::this.unselect)
         },
       },
       featuresDataProj: {
         deep: true,
         handler: debounce(function (features) {
-          this.$emit('update:features', features)
+          this.$emit('update:features', features.slice())
         }, 1000 / 60),
       },
       ...makeWatchers([
@@ -240,33 +245,7 @@
        * @throws {Error}
        */
       select (feature) {
-        hasMap(this)
-
-        if (feature instanceof Vue) {
-          feature = feature.$feature
-        }
-
-        if (!(feature instanceof Feature)) {
-          const featureId = getFeatureId(feature)
-          if (!featureId) {
-            throw new Error('Undefined feature id')
-          }
-
-          feature = undefined
-          forEach(this.$map.getLayers().getArray(), layer => {
-            if (this.layerFilter && !this.layerFilter(layer)) {
-              return false
-            }
-
-            const source = layer.getSource()
-            if (source && isFunction(source.getFeatureById)) {
-              feature = source.getFeatureById(featureId)
-            }
-
-            return !feature
-          })
-        }
-
+        feature = this.resolveFeature(feature)
         if (!feature) return
 
         this.addFeature(feature)
@@ -276,6 +255,9 @@
        * @return {void}
        */
       unselect (feature) {
+        feature = this.resolveFeature(feature)
+        if (!feature) return
+
         this.removeFeature(feature)
       },
       /**
@@ -303,6 +285,42 @@
       subscribeAll () {
         this::interaction.methods.subscribeAll()
         this::subscribeToInteractionChanges()
+      },
+      /**
+       * @param {Object|Vue|Feature|string|number} feature
+       * @return {Feature}
+       */
+      resolveFeature (feature) {
+        hasMap(this)
+
+        if (feature instanceof Vue) {
+          feature = feature.$feature
+        }
+
+        if (feature instanceof Feature) {
+          return feature
+        }
+
+        const featureId = getFeatureId(feature)
+        if (!featureId) {
+          throw new Error('Undefined feature id')
+        }
+
+        feature = undefined
+        forEach(this.$map.getLayers().getArray(), layer => {
+          if (this.layerFilter && !this.layerFilter(layer)) {
+            return false
+          }
+
+          const source = layer.getSource()
+          if (source && isFunction(source.getFeatureById)) {
+            feature = source.getFeatureById(featureId)
+          }
+
+          return !feature
+        })
+
+        return feature
       },
     },
   }

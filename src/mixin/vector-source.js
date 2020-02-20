@@ -160,7 +160,7 @@ export default {
     featuresDataProj: {
       deep: true,
       handler: debounce(function (features) {
-        this.$emit('update:features', features)
+        this.$emit('update:features', features.slice())
       }, 1000 / 60),
     },
     async urlFunc (value) {
