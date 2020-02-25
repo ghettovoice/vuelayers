@@ -1,7 +1,9 @@
 import { createTileUrlFunction, createTileUrlFunctionFromTemplates } from 'ol-tilecache'
 import { obsFromOlEvent } from '../rx-ext'
-import { isEmpty, isEqual, isFunction, isString, pick } from '../util/minilo'
+import { and, isEmpty, isEqual, isFunction, isString, negate, pick } from '../util/minilo'
 import tileSource from './tile-source'
+
+const isNotEmptyString = and(isString, negate(isEmpty))
 
 export default {
   mixins: [
@@ -22,14 +24,14 @@ export default {
      */
     url: {
       type: String,
-      validator: value => isString(value) && !isEmpty(value),
+      validator: isNotEmptyString,
     },
     /**
      * @type {string[]|undefined}
      */
     urls: {
       type: Array,
-      validator: value => value.every(url => isString(url) && !isEmpty(url)),
+      validator: value => value.every(isNotEmptyString),
     },
   },
   computed: {

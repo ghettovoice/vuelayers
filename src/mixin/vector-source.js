@@ -2,6 +2,7 @@ import debounce from 'debounce-promise'
 import { all as loadAll } from 'ol/loadingstrategy'
 import { createGeoJsonFmt, getFeatureId, isGeoJSONFeature, transform } from '../ol-ext'
 import {
+  and,
   constant,
   difference,
   isArray,
@@ -9,6 +10,7 @@ import {
   isEqual,
   isFunction,
   isString,
+  negate,
   pick,
   sealFactory,
   stubArray,
@@ -18,6 +20,8 @@ import { makeWatchers } from '../util/vue-helpers'
 import featuresContainer from './features-container'
 import projTransforms from './proj-transforms'
 import source from './source'
+
+const isNotEmptyString = and(isString, negate(isEmpty))
 
 /**
  * Basic vector source mixin.
@@ -76,7 +80,7 @@ export default {
      */
     url: {
       type: [String, Function],
-      validator: value => isFunction(value) || (isString(value) && !isEmpty(value)),
+      validator: value => isFunction(value) || isNotEmptyString(value),
     },
     /**
      * @type {boolean}

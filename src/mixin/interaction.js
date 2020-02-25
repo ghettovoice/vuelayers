@@ -62,9 +62,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      const interaction = await this.createInteraction()
-
-      initializeInteraction(interaction, this.id, this.priority)
+      const interaction = initializeInteraction(await this.createInteraction(), this.id, this.priority)
       interaction.setActive(this.active)
 
       return interaction

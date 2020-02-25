@@ -101,11 +101,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      const source = await this.createSource()
-
-      initializeSource(source, this.id)
-
-      return source
+      return initializeSource(await this.createSource(), this.id)
     },
     /**
      * @return {module:ol/source/Source~Source|Promise<module:ol/source/Source~Source>}

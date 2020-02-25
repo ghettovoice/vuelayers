@@ -73,10 +73,16 @@ export default {
     /**
      * @returns {function|undefined}
      */
+    derivedTileGridFactory () {
+      return this.tileGridFactory
+    },
+    /**
+     * @returns {function|undefined}
+     */
     sealTileGridFactory () {
-      if (!isFunction(this.tileGridFactory)) return
+      if (!isFunction(this.derivedTileGridFactory)) return
 
-      return sealFactory(::this.tileGridFactory)
+      return sealFactory(::this.derivedTileGridFactory)
     },
   },
   watch: {

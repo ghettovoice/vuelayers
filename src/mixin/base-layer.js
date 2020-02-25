@@ -112,11 +112,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      const layer = await this.createLayer()
-
-      initializeLayer(layer, this.id)
-
-      return layer
+      return initializeLayer(await this.createLayer(), this.id)
     },
     /**
      * @return {module:ol/layer/Base~BaseLayer|Promise<module:ol/layer/Base~BaseLayer>}

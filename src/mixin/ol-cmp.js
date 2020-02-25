@@ -163,9 +163,7 @@ export default {
      * @protected
      */
     async remount () {
-      const state = await this.resolveOlObjectState()
-
-      if (state === STATE_MOUNTED) {
+      if (this.$olObjectState === STATE_MOUNTED) {
         await this.unmount()
       }
 
@@ -178,9 +176,7 @@ export default {
      * @protected
      */
     async recreate () {
-      const state = await this.resolveOlObjectState()
-
-      if (state === STATE_MOUNTED) {
+      if (this.$olObjectState === STATE_MOUNTED) {
         await this.unmount()
         await this.deinit()
       }
@@ -201,26 +197,24 @@ export default {
 
       return this.$olObject || throw new Error('OpenLayers object is undefined')
     },
-    /**
-     * @returns {Promise<number>}
-     * @protected
-     */
-    resolveOlObjectState () {
-      return Promise.race([
-        this.$createPromise.then(() => STATE_CREATED),
-        this.$mountPromise.then(() => STATE_MOUNTED),
-        this.$unmountPromise.then(() => STATE_CREATED),
-        this.$destroyPromise.then(() => STATE_UNDEF),
-      ])
-    },
   },
   created () {
+    /**
+     * @type {number}
+     * @private
+     */
+    this._olObjectState = STATE_UNDEF
     /**
      * @type {module:ol/Object~BaseObject}
      * @private
      */
     this._olObject = undefined
+
     Object.defineProperties(this, {
+      $olObjectState: {
+        enumerable: true,
+        get: () => this._olObjectState,
+      },
       $olObject: {
         enumerable: true,
         get: () => this._olObject,
@@ -248,7 +242,9 @@ export default {
 }
 
 function defineLifeCyclePromises () {
-  const makeEventEmitter = event => () => {
+  const makeHandler = (event, state) => () => {
+    this._olObjectState = state
+
     this.$emit(event, this)
 
     if (process.env.VUELAYERS_DEBUG) {
@@ -259,7 +255,7 @@ function defineLifeCyclePromises () {
   }
   // create
   this._createPromise = Promise.resolve(this.init())
-    .then(makeEventEmitter('created'))
+    .then(makeHandler('created', STATE_CREATED))
 
   const t = 1000 / 60
   // mount
@@ -270,7 +266,7 @@ function defineLifeCyclePromises () {
     )
   this._mountPromise = mountObs.toPromise(Promise)
     .then(::this.mount)
-    .then(makeEventEmitter('mounted'))
+    .then(makeHandler('mounted', STATE_MOUNTED))
 
   // unmount
   const unmountObs = intervalObs(t)
@@ -280,7 +276,7 @@ function defineLifeCyclePromises () {
     )
   this._unmountPromise = unmountObs.toPromise(Promise)
     .then(::this.unmount)
-    .then(makeEventEmitter('unmounted'))
+    .then(makeHandler('unmounted', STATE_CREATED))
 
   // destroy
   const destroyObs = intervalObs(t)
@@ -290,7 +286,7 @@ function defineLifeCyclePromises () {
     )
   this._destroyPromise = destroyObs.toPromise(Promise)
     .then(::this.deinit)
-    .then(makeEventEmitter('destroyed'))
+    .then(makeHandler('destroyed', STATE_UNDEF))
 
   Object.defineProperties(this, {
     $createPromise: {

@@ -76,11 +76,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      const geometry = await this.createGeometry()
-
-      initializeGeometry(geometry, this.id)
-
-      return geometry
+      return initializeGeometry(await this.createGeometry(), this.id)
     },
     /**
      * @return {module:ol/geom/Geometry~Geometry|Promise<module:ol/geom/Geometry~Geometry>}

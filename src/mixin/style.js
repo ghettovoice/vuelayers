@@ -31,11 +31,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      const style = await this.createStyle()
-
-      initializeStyle(style)
-
-      return style
+      return initializeStyle(await this.createStyle())
     },
     /**
      * @return {OlStyle|Promise<OlStyle>}
