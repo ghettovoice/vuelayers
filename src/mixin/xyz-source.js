@@ -1,5 +1,6 @@
 import { XYZ as XYZSource } from 'ol/source'
-import { pick } from '../util/minilo'
+import { createXYZ, extentFromProjection } from 'ol/tilegrid'
+import { isArray, isFunction, isNumber, pick } from '../util/minilo'
 import tileImageSource from './tile-image-source'
 
 /**
@@ -9,6 +10,43 @@ export default {
   mixins: [
     tileImageSource,
   ],
+  props: {
+    // ol/source/XYZ
+    maxZoom: {
+      type: Number,
+      default: 18,
+    },
+    minZoom: {
+      type: Number,
+      default: 0,
+    },
+    tileSize: {
+      type: [Number, Array],
+      default: [256, 256],
+      validator: value => isNumber(value) || (isArray(value) && value.length === 2 && value.every(isNumber())),
+    },
+  },
+  computed: {
+    derivedTileGridFactory () {
+      if (isFunction(this.tileGridFactory)) {
+        return this.tileGridFactory
+      }
+
+      const projection = this.projection
+      const maxZoom = this.maxZoom
+      const minZoom = this.minZoom
+      const tileSize = this.tileSize
+
+      return function () {
+        return createXYZ({
+          extent: extentFromProjection(projection),
+          maxZoom: maxZoom,
+          minZoom: minZoom,
+          tileSize: tileSize,
+        })
+      }
+    },
+  },
   methods: {
     /**
      * @return {module:ol/source/XYZ~XYZSource}

@@ -3,6 +3,8 @@
 
   export default {
     name: 'VlSourceXyz',
-    mixins: [xyzSource],
+    mixins: [
+      xyzSource,
+    ],
   }
 </script>
