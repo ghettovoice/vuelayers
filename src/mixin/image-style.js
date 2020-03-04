@@ -49,14 +49,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getStyleOpacity () {
+    async getOpacity () {
       return (await this.resolveStyle()).getOpacity()
     },
     /**
      * @param {number} opacity
      * @returns {Promise<void>}
      */
-    async setStyleOpacity (opacity) {
+    async setOpacity (opacity) {
       const style = await this.resolveStyle()
 
       if (opacity === style.getOpacity()) return
@@ -67,14 +67,14 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getStyleRotateWithView () {
+    async getRotateWithView () {
       return (await this.resolveStyle()).getRotateWithView()
     },
     /**
      * @param {boolean} rotateWithView
      * @returns {Promise<void>}
      */
-    async setStyleRotateWithView (rotateWithView) {
+    async setRotateWithView (rotateWithView) {
       const style = await this.resolveStyle()
 
       if (rotateWithView === style.getRotateWithView()) return
@@ -84,14 +84,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getStyleRotation () {
+    async getRotation () {
       return (await this.resolveStyle()).getRotation()
     },
     /**
      * @param {number} rotation
      * @returns {Promise<void>}
      */
-    async setStyleRotation (rotation) {
+    async setRotation (rotation) {
       const style = await this.resolveStyle()
 
       if (rotation === style.getRotation()) return

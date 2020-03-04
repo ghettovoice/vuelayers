@@ -1,4 +1,5 @@
 import { createTileUrlFunction, createTileUrlFunctionFromTemplates } from 'ol-tilecache'
+import { expandUrl } from 'ol/tileurlfunction'
 import { obsFromOlEvent } from '../rx-ext'
 import { and, isEmpty, isEqual, isFunction, isString, negate, pick } from '../util/minilo'
 import tileSource from './tile-source'
@@ -53,24 +54,24 @@ export default {
   },
   watch: {
     async tileLoadFunction (value) {
-      await this.setSourceTileLoadFunction(value)
+      await this.setTileLoadFunction(value)
     },
     async urlFunc (value) {
-      await this.setSourceTileUrlFunction(value)
+      await this.setTileUrlFunction(value)
     },
   },
   methods: {
     /**
      * @returns {Promise<module:ol/Tile.LoadFunction>}
      */
-    async getSourceTileLoadFunction () {
+    async getTileLoadFunction () {
       return (await this.resolveSource()).getTileLoadFunction()
     },
     /**
      * @param {module:ol/Tile.LoadFunction} tileLoadFunction
      * @returns {Promise<void>}
      */
-    async setSourceTileLoadFunction (tileLoadFunction) {
+    async setTileLoadFunction (tileLoadFunction) {
       const source = await this.resolveSource()
 
       if (tileLoadFunction === source.getTileLoadFunction()) return
@@ -80,7 +81,7 @@ export default {
     /**
      * @returns {Promise<module:ol/Tile.UrlFunction>}
      */
-    async getSourceTileUrlFunction () {
+    async getTileUrlFunction () {
       return (await this.resolveSource()).getTileUrlFunction()
     },
     /**
@@ -88,7 +89,7 @@ export default {
      * @param {number} [tileKey]
      * @returns {Promise<void>}
      */
-    async setSourceTileUrlFunction (tileUrlFunction, tileKey) {
+    async setTileUrlFunction (tileUrlFunction, tileKey) {
       const source = await this.resolveSource()
 
       if (tileUrlFunction === source.getTileUrlFunction()) return
@@ -98,14 +99,14 @@ export default {
     /**
      * @returns {Promise<string[]|undefined>}
      */
-    async getSourceUrls () {
+    async getUrls () {
       return (await this.resolveSource()).getUrls()
     },
     /**
      * @param {string[]} urls
      * @returns {Promise<void>}
      */
-    async setSourceUrls (urls) {
+    async setUrls (urls) {
       const source = await this.resolveSource()
 
       if (isEqual(urls, source.getUrls())) return
@@ -116,12 +117,8 @@ export default {
      * @param {string} url
      * @returns {Promise<void>}
      */
-    async setSourceUrl (url) {
-      const source = await this.resolveSource()
-
-      if (url === source.getUrl()) return
-
-      source.setUrl(url)
+    async setUrl (url) {
+      return this.setUrls(expandUrl(url))
     },
     /**
      * @returns {Promise<void>}

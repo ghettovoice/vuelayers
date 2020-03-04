@@ -161,13 +161,13 @@ export default {
   },
   watch: {
     async allParams (value) {
-      await this.updateSourceParams(value)
+      await this.updateParams(value)
     },
     async layersStr (value) {
-      await this.updateSourceParam('layers', value)
+      await this.updateParam('layers', value)
     },
     async timeStr (value) {
-      await this.updateSourceParam('time', value)
+      await this.updateParam('time', value)
     },
     ...makeWatchers([
       'format',
@@ -185,7 +185,7 @@ export default {
       'layerParameterValues',
       'historicMoment',
     ], prop => async function (value) {
-      await this.updateSourceParam(prop, serialize(value))
+      await this.updateParam(prop, serialize(value))
     }),
   },
   methods: {
@@ -199,7 +199,7 @@ export default {
      * @param {Object} params
      * @returns {Promise<void>}
      */
-    async updateSourceParams (params) {
+    async updateParams (params) {
       params = { ...this.allParams, ...params }
       const source = await this.resolveSource()
 
@@ -212,8 +212,8 @@ export default {
      * @param {*} value
      * @returns {Promise<void>}
      */
-    async updateSourceParam (param, value) {
-      await this.updateSourceParam({ [param.toUpperCase()]: value })
+    async updateParam (param, value) {
+      await this.updateParams({ [param.toUpperCase()]: value })
     },
   },
 }

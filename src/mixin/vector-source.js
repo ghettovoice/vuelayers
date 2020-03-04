@@ -161,10 +161,10 @@ export default {
       }, 1000 / 60),
     },
     async urlFunc (value) {
-      await this.setSourceUrlInternal(value)
+      await this.setUrlInternal(value)
     },
     async loaderFunc (value) {
-      await this.setSourceLoaderInternal(value)
+      await this.setLoaderInternal(value)
     },
     dataFormatIdent (value, prevValue) {
       if (value && prevValue) {
@@ -205,7 +205,7 @@ export default {
      * @param {function} callback
      * @returns {Promise<void>}
      */
-    async forEachSourceFeature (callback) {
+    async forEachFeature (callback) {
       (await this.resolveSource()).forEachFeature(callback)
     },
     /**
@@ -213,7 +213,7 @@ export default {
      * @param {function} callback
      * @returns {Promise<*|T>}
      */
-    async forEachSourceFeatureInExtent (extent, callback) {
+    async forEachFeatureInExtent (extent, callback) {
       extent = this.extentToViewProj(extent)
 
       return (await this.resolveSource()).forEachFeatureInExtent(extent, callback)
@@ -223,7 +223,7 @@ export default {
      * @param {function} callback
      * @returns {Promise<T>}
      */
-    async forEachSourceFeatureIntersectingExtent (extent, callback) {
+    async forEachFeatureIntersectingExtent (extent, callback) {
       extent = this.extentToViewProj(extent)
 
       return (await this.resolveSource()).forEachFeatureInExtent(extent, callback)
@@ -232,7 +232,7 @@ export default {
      * @param {number[]} coordinate
      * @returns {Promise<Array<module:ol/Feature~Feature>>}
      */
-    async getSourceFeaturesAtCoordinate (coordinate) {
+    async getFeaturesAtCoordinate (coordinate) {
       coordinate = this.pointToViewProj(coordinate)
 
       return (await this.resolveSource()).getFeaturesAtCoordinate(coordinate)
@@ -241,7 +241,7 @@ export default {
      * @param {number[]} extent
      * @returns {Promise<Array<module:ol/Feature~Feature>>}
      */
-    async getSourceFeaturesInExtent (extent) {
+    async getFeaturesInExtent (extent) {
       extent = this.extentToViewProj(extent)
 
       return (await this.resolveSource()).getFeaturesInExtent(extent)
@@ -251,7 +251,7 @@ export default {
      * @param {function} [filter]
      * @returns {Promise<module:ol/Feature~Feature>}
      */
-    async getClosestSourceFeatureToCoordinate (coordinate, filter) {
+    async getClosestFeatureToCoordinate (coordinate, filter) {
       coordinate = this.pointToViewProj(coordinate)
 
       return (await this.resolveSource()).getClosestFeatureToCoordinate(coordinate, filter)
@@ -260,7 +260,7 @@ export default {
      * @param {number[]} [extent]
      * @returns {Promise<number[]>}
      */
-    async getSourceExtent (extent) {
+    async getExtent (extent) {
       extent = this.extentToViewProj(extent)
 
       return (await this.resolveSource()).getExtent(extent)
@@ -268,34 +268,34 @@ export default {
     /**
      * @returns {Promise<module:ol/format/Feature~FeatureFormat|undefined>}
      */
-    async getSourceFormat () {
+    async getFormat () {
       return (await this.resolveSource()).getFormat()
     },
     /**
      * @returns {Promise<boolean>}
      */
-    async getSourceOverlaps () {
+    async getOverlaps () {
       return (await this.resolveSource()).getOverlaps()
     },
     /**
      * @returns {Promise<string|function|undefined>}
      */
-    async getSourceUrl () {
+    async getUrl () {
       return (await this.resolveSource()).getUrl()
     },
     /**
      * @param {string|function} url
      * @returns {Promise<void>}
      */
-    async setSourceUrl (url) {
-      await this.setSourceUrlInternal(this.createUrlFunc(url))
+    async setUrl (url) {
+      await this.setUrlInternal(this.createUrlFunc(url))
     },
     /**
      * @param {string|function} url
      * @returns {Promise<void>}
      * @protected
      */
-    async setSourceUrlInternal (url) {
+    async setUrlInternal (url) {
       (await this.resolveSource()).setUrl(url)
       await this.reload()
     },
@@ -303,15 +303,15 @@ export default {
      * @param {function} loader
      * @returns {Promise<void>}
      */
-    async setSourceLoader (loader) {
-      await this.setSourceLoaderInternal(this.wrapLoaderFunc(loader))
+    async setLoader (loader) {
+      await this.setLoaderInternal(this.wrapLoaderFunc(loader))
     },
     /**
      * @param {function} loader
      * @returns {Promise<void>}
      * @protected
      */
-    async setSourceLoaderInternal (loader) {
+    async setLoaderInternal (loader) {
       (await this.resolveSource()).setLoader(loader)
       await this.reload()
     },
@@ -319,7 +319,7 @@ export default {
      * @param {number[]} extent
      * @returns {Promise<void>}
      */
-    async removeSourceLoadedExtent (extent) {
+    async removeLoadedExtent (extent) {
       (await this.resolveSource()).removeLoadedExtent(this.extentToViewProj(extent))
     },
     /**
@@ -378,26 +378,6 @@ export default {
           this.addFeatures(features)
         }
       }
-    },
-    addFeaturesToSource: featuresContainer.methods.addFeatures,
-    addFeatureToSource: featuresContainer.methods.addFeature,
-    removeFeaturesFromSource: featuresContainer.methods.removeFeatures,
-    removeFeatureFromSource: featuresContainer.methods.removeFeature,
-    getSourceFeatures: featuresContainer.methods.getFeatures,
-    getSourceFeaturesCollection: featuresContainer.methods.getFeaturesCollection,
-    getSourceFeatureById: featuresContainer.methods.getFeatureById,
-    /**
-     * @param {module:ol/Feature~Feature} feature
-     * @returns {Promise<boolean>}
-     */
-    async sourceHasFeature (feature) {
-      return (await this.resolveSource()).hasFeature(feature)
-    },
-    /**
-     * @returns {Promise<boolean>}
-     */
-    async isSourceEmpty () {
-      return (await this.resolveSource()).isEmpty()
     },
     /**
      * @param {*} data

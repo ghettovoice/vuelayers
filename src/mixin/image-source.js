@@ -40,7 +40,7 @@ export default {
      * @param {module:ol/proj~ProjectionLike} projection
      * @returns {Promise<module:ol/ImageBase~ImageBase>}
      */
-    async getSourceImage (extent, resolution, pixelRatio, projection) {
+    async getImage (extent, resolution, pixelRatio, projection) {
       if (isString(projection)) {
         projection = getProj(projection)
       }

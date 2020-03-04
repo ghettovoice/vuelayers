@@ -70,24 +70,24 @@ export default {
   },
   watch: {
     async id (value) {
-      await this.setSourceId(value)
+      await this.setId(value)
     },
     async attributions (value) {
-      await this.setSourceAttributions(value)
+      await this.setAttributions(value)
     },
     async attributionsCollapsible (value) {
-      if (value === await this.getSourceAttributionsCollapsible()) return
+      if (value === await this.getAttributionsCollapsible()) return
 
       await this.scheduleRecreate()
     },
     async projection (value) {
-      const projection = await this.getSourceProjection()
+      const projection = await this.getProjection()
       if (value === projection?.getCode()) return
 
       await this.scheduleRecreate()
     },
     async wrapX (value) {
-      if (value === await this.getSourceWrapX()) return
+      if (value === await this.getWrapX()) return
 
       await this.scheduleRecreate()
     },
@@ -114,14 +114,14 @@ export default {
     /**
      * @returns {Promise<string|number>}
      */
-    async getSourceId () {
+    async getId () {
       return (await this.resolveSource()).getId()
     },
     /**
      * @param {string|number} id
      * @returns {Promise<void>}
      */
-    async setSourceId (id) {
+    async setId (id) {
       const source = await this.resolveSource()
 
       if (id === getSourceId(source)) return
@@ -131,14 +131,14 @@ export default {
     /**
      * @returns {Promise<string>}
      */
-    async getSourceAttributions () {
+    async getAttributions () {
       return (await this.resolveSource()).getAttributions()
     },
     /**
      * @param {string} attributions
      * @returns {Promise<void>}
      */
-    async setSourceAttributions (attributions) {
+    async setAttributions (attributions) {
       const source = await this.resolveSource()
 
       if (isEqual(attributions, source.getAttributions())) return
@@ -148,43 +148,43 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getSourceAttributionsCollapsible () {
+    async getAttributionsCollapsible () {
       return (await this.resolveSource()).getAttributionsCollapsible()
     },
     /**
      * @returns {Promise<module:ol/proj/Projection~Projection>}
      */
-    async getSourceProjection () {
+    async getProjection () {
       return (await this.resolveSource()).getProjection()
     },
     /**
      * @returns {Promise<string>}
      */
-    async getSourceState () {
+    async getState () {
       return (await this.resolveSource()).getState()
     },
     /**
      * @returns {Promise<boolean>}
      */
-    async getSourceWrapX () {
+    async getWrapX () {
       return (await this.resolveSource()).getWrapX()
     },
     /**
      * @returns {Promise<number[]>}
      */
-    async getSourceResolutions () {
+    async getResolutions () {
       return (await this.resolveSource()).getResolutions()
     },
     /**
      * @returns {Promise<void>}
      */
-    async reloadSource () {
+    async reload () {
       (await this.resolveSource()).refresh()
     },
     /**
      * @return {Promise<void>}
      */
-    async clearSource () {
+    async clear () {
       (await this.resolveSource()).clear()
     },
     /**

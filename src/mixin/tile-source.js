@@ -87,17 +87,17 @@ export default {
   },
   watch: {
     async opaque (value) {
-      if (value === await this.getSourceOpaque()) return
+      if (value === await this.getOpaque()) return
 
       await this.scheduleRecreate()
     },
     async tilePixelRatio (value) {
-      if (value === await this.getSourceTilePixelRatio(value)) return
+      if (value === await this.getTilePixelRatio(value)) return
 
       await this.scheduleRecreate()
     },
     async tileKey (value) {
-      await this.setSourceTileKey(value)
+      await this.setTileKey(value)
     },
     tileGridIdent (value, prevValue) {
       if (value && prevValue) {
@@ -140,7 +140,7 @@ export default {
      * @param {function} callback
      * @returns {Promise<boolean>}
      */
-    async forEachLoadedSourceTile (projection, z, tileRange, callback) {
+    async forEachLoadedTile (projection, z, tileRange, callback) {
       if (isString(projection)) {
         projection = getProj(projection)
       }
@@ -151,7 +151,7 @@ export default {
      * @param {module:ol/proj.ProjectionLike} projection
      * @returns {Promise<number>}
      */
-    async getSourceGutterForProjection (projection) {
+    async getGutterForProjection (projection) {
       if (isString(projection)) {
         projection = getProj(projection)
       }
@@ -161,14 +161,14 @@ export default {
     /**
      * @returns {Promise<string|undefined>}
      */
-    async getSourceTileKey () {
+    async getTileKey () {
       return (await this.resolveSource()).getKey()
     },
     /**
      * @param {string|undefined} key
      * @returns {Promise<void>}
      */
-    async setSourceTileKey (key) {
+    async setTileKey (key) {
       const source = await this.resolveSource()
 
       if (key === source.getKey(key)) return
@@ -178,7 +178,7 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getSourceOpaque () {
+    async getOpaque () {
       return (await this.resolveSource()).getOpaque()
     },
     /**
@@ -189,7 +189,7 @@ export default {
      * @param {module:ol/proj.ProjectionLike} projection
      * @returns {Promise<module:ol/Tile~Tile>}
      */
-    async getSourceTile (z, x, y, pixelRatio, projection) {
+    async getTile (z, x, y, pixelRatio, projection) {
       if (isString(projection)) {
         projection = getProj(projection)
       }
@@ -199,14 +199,14 @@ export default {
     /**
      * @returns {Promise<module:ol/tilegrid/TileGrid~TileGrid>}
      */
-    async getSourceTileGrid () {
+    async getTileGrid () {
       return (await this.resolveSource()).getTileGrid()
     },
     /**
      * @param {module:ol/proj.ProjectionLike} projection
      * @returns {Promise<module:ol/tilegrid/TileGrid~TileGrid>}
      */
-    async getSourceTileGridForProjection (projection) {
+    async getTileGridForProjection (projection) {
       if (isString(projection)) {
         projection = getProj(projection)
       }
@@ -217,7 +217,7 @@ export default {
      * @param {module:ol/proj.ProjectionLike} projection
      * @returns {Promise<module:ol/TileCache~TileCache>}
      */
-    async getSourceTileCacheForProjection (projection) {
+    async getTileCacheForProjection (projection) {
       if (isString(projection)) {
         projection = getProj(projection)
       }
@@ -228,7 +228,7 @@ export default {
      * @param {number} pixelRatio
      * @returns {Promise<number>}
      */
-    async getSourceTilePixelRatio (pixelRatio) {
+    async getTilePixelRatio (pixelRatio) {
       return (await this.resolveSource()).getTilePixelRatio(pixelRatio)
     },
     /**
@@ -237,7 +237,7 @@ export default {
      * @param {module:ol/proj.ProjectionLike} projection
      * @returns {Promise<number[]>}
      */
-    async getSourceTilePixelSize (z, pixelRatio, projection) {
+    async getTilePixelSize (z, pixelRatio, projection) {
       if (isString(projection)) {
         projection = getProj(projection)
       }
@@ -249,7 +249,7 @@ export default {
      * @param {module:ol/proj.ProjectionLike} projection
      * @returns {Promise<number[]>}
      */
-    async getSourceTileCoordForTileUrlFunction (tileCoord, projection) {
+    async getTileCoordForTileUrlFunction (tileCoord, projection) {
       if (isString(projection)) {
         projection = getProj(projection)
       }

@@ -44,13 +44,13 @@ export default {
   },
   watch: {
     async id (value) {
-      await this.setInteractionId(value)
+      await this.setId(value)
     },
     async active (value) {
-      await this.setInteractionActive(value)
+      await this.setActive(value)
     },
     async priority (value) {
-      await this.setInteractionPriority(value)
+      await this.setPriority(value)
     },
   },
   created () {
@@ -78,14 +78,14 @@ export default {
     /**
      * @returns {Promise<string|number>}
      */
-    async getInteractionId () {
+    async getId () {
       return getInteractionId(await this.resolveInteraction())
     },
     /**
      * @param {string|number} id
      * @returns {Promise<void>}
      */
-    async setInteractionId (id) {
+    async setId (id) {
       const interaction = await this.resolveInteraction()
 
       if (id === getInteractionId(interaction)) return
@@ -95,14 +95,14 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getInteractionActive () {
+    async getActive () {
       return (await this.resolveInteraction()).getActive()
     },
     /**
      * @param {boolean} active
      * @returns {Promise<void>}
      */
-    async setInteractionActive (active) {
+    async setActive (active) {
       const interaction = await this.resolveInteraction()
 
       if (active === interaction.getActive()) return
@@ -112,14 +112,14 @@ export default {
     /**
      * @returns {Promise<number>}
      */
-    async getInteractionPriority () {
+    async getPriority () {
       return getInteractionPriority(await this.resolveInteraction())
     },
     /**
      * @param {number} priority
      * @returns {Promise<void>}
      */
-    async setInteractionPriority (priority) {
+    async setPriority (priority) {
       const interaction = await this.resolveInteraction()
 
       if (priority === getInteractionPriority(interaction)) return

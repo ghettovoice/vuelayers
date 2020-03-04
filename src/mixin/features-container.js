@@ -65,7 +65,7 @@ export default {
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
       }
-    }
+    },
   },
   created () {
     /**
@@ -100,7 +100,7 @@ export default {
       }
 
       instanceOf(feature, Feature)
-
+      // todo add hash {featureId => featureIdx, ....}
       const foundFeature = this.getFeatureById(getFeatureId(feature))
       if (foundFeature == null) {
         this.$featuresCollection.push(feature)
@@ -156,6 +156,19 @@ export default {
      */
     getFeaturesCollection () {
       return this._featuresCollection
+    },
+    /**
+     * @param {module:ol/Collection~Collection<module:ol/Feature~Feature>} feature
+     * @return {boolean}
+     */
+    hasFeature (feature) {
+      return this.getFeatureById(getFeatureId(feature)) != null
+    },
+    /**
+     * @returns {boolean}
+     */
+    isEmpty () {
+      return this.getFeatures().length === 0
     },
     /**
      * @returns {{readonly featuresContainer: Object}}

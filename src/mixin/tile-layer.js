@@ -28,24 +28,24 @@ export default {
   },
   watch: {
     async preload (value) {
-      await this.setLayerPreload(value)
+      await this.setPreload(value)
     },
     async useInterimTilesOnError (value) {
-      await this.setLayerUseInterimTilesOnError(value)
+      await this.setUseInterimTilesOnError(value)
     },
   },
   methods: {
     /**
      * @returns {Promise<number>}
      */
-    async getLayerPreload () {
+    async getPreload () {
       return (await this.resolveLayer()).getPreload()
     },
     /**
      * @param {number} preload
      * @returns {Promise<void>}
      */
-    async setLayerPreload (preload) {
+    async setPreload (preload) {
       const layer = await this.resolveLayer()
 
       if (preload === layer.getPreload()) return
@@ -55,14 +55,14 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getLayerUseInterimTilesOnError () {
+    async getUseInterimTilesOnError () {
       return (await this.resolveLayer()).getUseInterimTilesOnError()
     },
     /**
      * @param {boolean} useInterimTilesOnError
      * @returns {Promise<void>}
      */
-    async setLayerUseInterimTilesOnError (useInterimTilesOnError) {
+    async setUseInterimTilesOnError (useInterimTilesOnError) {
       const layer = await this.resolveLayer()
 
       if (useInterimTilesOnError === layer.getUseInterimTilesOnError()) return

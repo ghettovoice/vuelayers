@@ -39,25 +39,25 @@ export default {
   },
   watch: {
     async renderOrder (value) {
-      await this.setLayerRenderOrder(value)
+      await this.setRenderOrder(value)
     },
     async renderBuffer (value) {
-      if (value === await this.getLayerRenderBuffer()) return
+      if (value === await this.getRenderBuffer()) return
 
       await this.scheduleRecreate()
     },
     async declutter (value) {
-      if (value === await this.getLayerDeclutter()) return
+      if (value === await this.getDeclutter()) return
 
       await this.scheduleRecreate()
     },
     async updateWhileAnimating (value) {
-      if (value === await this.getLayerUpdateWhileAnimating()) return
+      if (value === await this.getUpdateWhileAnimating()) return
 
       await this.scheduleRecreate()
     },
     async updateWhileInteracting (value) {
-      if (value === await this.getLayerUpdateWhileInteracting()) return
+      if (value === await this.getUpdateWhileInteracting()) return
 
       await this.scheduleRecreate()
     },
@@ -66,26 +66,26 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getLayerDeclutter () {
+    async getDeclutter () {
       return (await this.resolveLayer()).getDeclutter()
     },
     /**
      * @returns {Promise<number>}
      */
-    async getLayerRenderBuffer () {
+    async getRenderBuffer () {
       return (await this.resolveLayer()).getRenderBuffer()
     },
     /**
      * @returns {Promise<function>}
      */
-    async getLayerRenderOrder () {
+    async getRenderOrder () {
       return (await this.resolveLayer()).getRenderOrder()
     },
     /**
      * @param {function} renderOrder
      * @returns {Promise<void>}
      */
-    async setLayerRenderOrder (renderOrder) {
+    async setRenderOrder (renderOrder) {
       const layer = await this.resolveLayer()
 
       if (renderOrder === layer.getRenderOrder()) return
@@ -95,28 +95,19 @@ export default {
     /**
      * @returns {Promise<boolean>}
      */
-    async getLayerUpdateWhileAnimating () {
+    async getUpdateWhileAnimating () {
       return (await this.resolveLayer()).getUpdateWhileAnimating()
     },
     /**
      * @returns {Promise<boolean>}
      */
-    async getLayerUpdateWhileInteracting () {
+    async getUpdateWhileInteracting () {
       return (await this.resolveLayer()).getUpdateWhileInteracting()
     },
     /**
      * @return {Promise<StyleTarget|undefined>}
      */
     getStyleTarget: layer.methods.resolveLayer,
-    /**
-     * @return {Promise<StyleLike|undefined>}
-     */
-    getLayerStyle: styleContainer.methods.getStyle,
-    /**
-     * @param {StyleLike} styles
-     * @return {Promise<void>}
-     */
-    setLayerStyle: styleContainer.methods.setStyle,
     /**
      * @returns {Object}
      * @protected

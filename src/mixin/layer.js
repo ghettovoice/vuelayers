@@ -41,14 +41,14 @@ export default {
     /**
      * @returns {Promise<module:ol/renderer/Layer~LayerRenderer>}
      */
-    async getLayerRenderer () {
+    async getRenderer () {
       return (await this.resolveLayer()).getRenderer()
     },
     /**
      * @param {module:ol/Map~Map|Object|undefined} map
      * @return {Promise<void>}
      */
-    async setLayerMap (map) {
+    async setMap (map) {
       if (isFunction(map.resolveOlObject)) {
         map = await map.resolveOlObject()
       }
@@ -61,21 +61,12 @@ export default {
      */
     getSourceTarget: baseLayer.methods.resolveOlObject,
     /**
-     * @returns {Promise<module:ol/source/Source~Source|undefined>}
-     */
-    getLayerSource: sourceContainer.methods.getSource,
-    /**
-     * @param {module:ol/source/Source~Source|undefined} source
-     * @returns {Promise<void>}
-     */
-    setLayerSource: sourceContainer.methods.setSource,
-    /**
      * @return {Promise<void>}
      * @protected
      */
     async mount () {
       if (this.overlay && this.$mapVm) {
-        await this.setLayerMap(this.$mapVm)
+        await this.setMap(this.$mapVm)
       } else if (this.$layersContainer) {
         await this.$layersContainer.addLayer(this)
       }
@@ -88,7 +79,7 @@ export default {
      */
     async unmount () {
       if (this.overlay) {
-        await this.setLayerMap(null)
+        await this.setMap(null)
       } else if (this.$layersContainer) {
         await this.$layersContainer.removeLayer(this)
       }

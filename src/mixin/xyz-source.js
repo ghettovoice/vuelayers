@@ -37,14 +37,12 @@ export default {
       const minZoom = this.minZoom
       const tileSize = this.tileSize
 
-      return function () {
-        return createXYZ({
-          extent: extentFromProjection(projection),
-          maxZoom: maxZoom,
-          minZoom: minZoom,
-          tileSize: tileSize,
-        })
-      }
+      return () => createXYZ({
+        extent: extentFromProjection(projection),
+        maxZoom: maxZoom,
+        minZoom: minZoom,
+        tileSize: tileSize,
+      })
     },
   },
   methods: {

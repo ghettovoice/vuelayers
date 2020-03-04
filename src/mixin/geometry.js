@@ -64,7 +64,7 @@ export default {
   },
   watch: {
     async id (value) {
-      await this.setGeometryId(value)
+      await this.setId(value)
     },
   },
   created () {
@@ -89,14 +89,14 @@ export default {
     /**
      * @returns {Promise<string|number>}
      */
-    async getGeometryId () {
+    async getId () {
       return getGeometryId(await this.resolveGeometry())
     },
     /**
      * @param {string|number} id
      * @returns {Promise<void>}
      */
-    async setGeometryId (id) {
+    async setId (id) {
       const geometry = await this.resolveGeometry()
 
       if (id === getGeometryId(geometry)) return
@@ -106,14 +106,14 @@ export default {
     /**
      * @returns {Promise<string>}
      */
-    async getGeometryType () {
+    async getType () {
       return (await this.resolveGeometry()).getType()
     },
     /**
      * @param {number[]} [extent]
      * @returns {Promise<number[]>}
      */
-    async getGeometryExtent (extent) {
+    async getExtent (extent) {
       extent = extent != null ? this.extentToViewProj(extent) : undefined
 
       return (await this.resolveGeometry()).getExtent(extent)
@@ -123,7 +123,7 @@ export default {
      * @param {number[]} [closestPoint]
      * @returns {Promise<number[]>}
      */
-    async getGeometryClosestPoint (point, closestPoint) {
+    async getClosestPoint (point, closestPoint) {
       point = this.pointToViewProj(point)
       closestPoint = closestPoint != null ? this.pointToViewProj(closestPoint) : undefined
 
@@ -133,7 +133,7 @@ export default {
      * @param {number[]} coordinate
      * @returns {Promise<boolean>}
      */
-    async geometryIntersectsCoordinate (coordinate) {
+    async isIntersectsCoordinate (coordinate) {
       coordinate = this.pointToViewProj(coordinate)
 
       return (await this.resolveGeometry()).intersectsCoordinate(coordinate)
@@ -142,7 +142,7 @@ export default {
      * @param {number[]} extent
      * @returns {Promise<boolean>}
      */
-    async geometryIntersectsExtent (extent) {
+    async isIntersectsExtent (extent) {
       extent = this.extentToViewProj(extent)
 
       return (await this.resolveGeometry()).intersectsExtent(extent)
@@ -152,7 +152,7 @@ export default {
      * @param {number[]} anchor
      * @returns {Promise<void>}
      */
-    async rotateGeometry (angle, anchor) {
+    async rotate (angle, anchor) {
       const geom = await this.resolveGeometry()
       anchor = this.pointToViewProj(anchor)
 
@@ -164,7 +164,7 @@ export default {
      * @param {number[]} [anchor]
      * @returns {Promise<void>}
      */
-    async scaleGeometry (sx, sy, anchor) {
+    async scale (sx, sy, anchor) {
       const geom = await this.resolveGeometry()
       anchor = anchor != null ? this.pointToViewProj(anchor) : undefined
 
@@ -174,7 +174,7 @@ export default {
      * @param {number} tolerance
      * @returns {Promise<module:ol/geom/Geometry~Geometry>}
      */
-    async simplifyGeometry (tolerance) {
+    async simplify (tolerance) {
       return (await this.resolveGeometry()).simplify(tolerance)
     },
     /**
@@ -182,7 +182,7 @@ export default {
      * @param dy
      * @returns {Promise<*>}
      */
-    async translateGeometry (dx, dy) {
+    async translate (dx, dy) {
       return (await this.resolveGeometry()).translate(dx, dy)
     },
     /**

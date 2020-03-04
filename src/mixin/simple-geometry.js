@@ -46,10 +46,10 @@ export default {
   },
   watch: {
     async coordinates (value) {
-      await this.setGeometryCoordinates(value)
+      await this.setCoordinates(value)
     },
     async resolvedDataProjection () {
-      await this.setGeometryCoordinates(this.coordinates)
+      await this.setCoordinates(this.coordinates)
     },
     // ...makeWatchers([
     //   'layoutUpCase',
@@ -59,7 +59,7 @@ export default {
     /**
      * @return {Promise<number[]>}
      */
-    async getGeometryCoordinates () {
+    async getCoordinates () {
       const coordinates = (await this.resolveGeometry()).getCoordinates()
 
       return this.coordinatesToDataProj(coordinates)
@@ -67,13 +67,13 @@ export default {
     /**
      * @param {number[]} coordinates
      */
-    async setGeometryCoordinates (coordinates) {
+    async setCoordinates (coordinates) {
       // compares in data projection
       const isEq = isEqualGeom({
         coordinates,
         extent: boundingExtent(coordinates),
       }, {
-        coordinates: await this.getGeometryCoordinates(),
+        coordinates: await this.getCoordinates(),
         extent: this.extent,
       })
 
@@ -87,7 +87,7 @@ export default {
     /**
      * @returns {number[]>}
      */
-    async getGeometryFirstCoordinate () {
+    async getFirstCoordinate () {
       const coordinate = (await this.resolveGeometry()).getFirstCoordinate()
 
       return this.pointToDataProj(coordinate)
@@ -95,7 +95,7 @@ export default {
     /**
      * @returns {Promise<number[]>}
      */
-    async getGeometryLastCoordinate () {
+    async getLastCoordinate () {
       const coordinate = (await this.resolveGeometry()).getLastCoordinate()
 
       return this.pointToDataProj(coordinate)
@@ -103,7 +103,7 @@ export default {
     /**
      * @returns {Promise<string>}
      */
-    async getGeometryCoordinatesLayout () {
+    async getCoordinatesLayout () {
       return (await this.resolveGeometry()).getLayout()
     },
     /**

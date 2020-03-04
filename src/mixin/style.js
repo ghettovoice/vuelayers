@@ -19,7 +19,7 @@ export default {
   },
   watch: {
     async id (value) {
-      await this.setStyleId(value)
+      await this.setId(value)
     },
   },
   created () {
@@ -44,14 +44,14 @@ export default {
     /**
      * @returns {Promise<string|number|undefined>}
      */
-    async getStyleId () {
+    async getId () {
       return getStyleId(await this.resolveStyle())
     },
     /**
      * @param {string|number|undefined} id
      * @returns {Promise<void>}
      */
-    async setStyleId (id) {
+    async setId (id) {
       const style = await this.resolveStyle()
 
       if (id === getStyleId(style)) return
