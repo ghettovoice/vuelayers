@@ -16,7 +16,6 @@
   import { get as getProj } from 'ol/proj'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
-  import Vue from 'vue'
   import { olCmp, projTransforms } from '../../mixin'
   import { EPSG_3857, getViewId, initializeView, setViewId } from '../../ol-ext'
   import { obsFromOlChangeEvent } from '../../rx-ext'
@@ -233,33 +232,33 @@
     },
     watch: {
       async id (value) {
-        await this.setViewId(value)
+        await this.setId(value)
       },
       async center (value) {
-        if (await this.getViewAnimating()) return
+        if (await this.getAnimating()) return
 
-        await this.setViewCenter(value)
+        await this.setCenter(value)
       },
       async rotation (value) {
-        if (await this.getViewAnimating()) return
+        if (await this.getAnimating()) return
 
-        await this.setViewRotation(value)
+        await this.setRotation(value)
       },
       async resolution (value) {
-        if (await this.getViewAnimating()) return
+        if (await this.getAnimating()) return
 
-        await this.setViewResolution(value)
+        await this.setResolution(value)
       },
       async zoom (value) {
-        if (await this.getViewAnimating()) return
+        if (await this.getAnimating()) return
 
-        await this.setViewZoom(value)
+        await this.setZoom(value)
       },
       async minZoom (value) {
-        await this.setViewMinZoom(value)
+        await this.setMinZoom(value)
       },
       async maxZoom (value) {
-        await this.setViewMaxZoom(value)
+        await this.setMaxZoom(value)
       },
       ...makeWatchers([
         'constrainOnlyCenter',
@@ -308,7 +307,6 @@
           multiWorld: this.multiWorld,
           projection: this.projection,
         })
-
         initializeView(view, this.id)
 
         return view
@@ -316,14 +314,14 @@
       /**
        * @return {Promise<string|number|undefined>}
        */
-      async getViewId () {
+      async getId () {
         return getViewId(await this.resolveView())
       },
       /**
        * @param {number|string|undefined} id
        * @return {Promise<void>}
        */
-      async setViewId (id) {
+      async setId (id) {
         const view = await this.resolveView()
 
         if (id === getViewId(view)) return
@@ -335,7 +333,7 @@
        * @param {...(module:ol/View~AnimationOptions|function(boolean))} args
        * @return {Promise<boolean>} Resolves when animation completes
        */
-      async animateView (...args) {
+      async animate (...args) {
         let cb = noop
         if (isFunction(args[args.length - 1])) {
           cb = args[args.length - 1]
@@ -361,7 +359,7 @@
        * @param {module:ol/View~FitOptions} [options]
        * @return {Promise<boolean>} Resolves when view changes
        */
-      async fitView (geometryOrExtent, options = {}) {
+      async fit (geometryOrExtent, options = {}) {
         // transform from GeoJSON, vl-feature to ol.Feature
         if (isPlainObject(geometryOrExtent)) {
           geometryOrExtent = this.readGeometryInDataProj(geometryOrExtent)
@@ -386,38 +384,38 @@
       /**
        * @return {Promise<boolean>}
        */
-      async getViewAnimating () {
+      async getAnimating () {
         return (await this.resolveView()).getAnimating()
       },
       /**
        * @return {Promise<void>}
        */
-      async cancelViewAnimations () {
+      async cancelAnimations () {
         return (await this.resolveView()).cancelAnimations()
       },
       /**
        * @return {Promise<void>}
        */
-      async beginViewInteraction () {
+      async beginInteraction () {
         (await this.resolveView()).beginInteraction()
       },
       /**
        * @return {Promise<void>}
        */
-      async endViewInteraction (duration, resolutionDirection, anchor) {
+      async endInteraction (duration, resolutionDirection, anchor) {
         (await this.resolveView()).endInteraction(duration, resolutionDirection, anchor)
       },
       /**
        * @return {Promise<boolean>}
        */
-      async getViewInteracting () {
+      async getInteracting () {
         return (await this.resolveView()).getInteracting()
       },
       /**
        * @param {number[]|undefined} [size]
        * @return {Promise<number[]>}
        */
-      async calculateViewExtent (size) {
+      async calculateExtent (size) {
         return this.extentToDataProj((await this.resolveView()).calculateExtent(size))
       },
       /**
@@ -426,20 +424,20 @@
        * @param {number[]} position
        * @return {Promise<void>}
        */
-      async viewCenterOn (coordinate, size, position) {
+      async centerOn (coordinate, size, position) {
         (await this.resolveView()).centerOn(this.pointToViewProj(coordinate), size, position)
       },
       /**
        * @return {Promise<number[]>}
        */
-      async getViewCenter () {
+      async getCenter () {
         return this.pointToDataProj((await this.resolveView()).getCenter())
       },
       /**
        * @param {number[]} center
        * @return {Promise<void>}
        */
-      async setViewCenter (center) {
+      async setCenter (center) {
         center = this.pointToViewProj(center)
         const view = await this.resolveView()
 
@@ -450,14 +448,14 @@
       /**
        * @return {Promise<number>}
        */
-      async getViewResolution () {
+      async getResolution () {
         return (await this.resolveView()).getResolution()
       },
       /**
        * @param {number} resolution
        * @return {Promise<void>}
        */
-      async setViewResolution (resolution) {
+      async setResolution (resolution) {
         const view = await this.resolveView()
 
         if (resolution === view.getResolution()) return
@@ -469,45 +467,45 @@
        * @param {number[]} size
        * @return {Promise<number>}
        */
-      async getViewResolutionForExtent (extent, size) {
+      async getResolutionForExtent (extent, size) {
         return (await this.resolveView()).getResolutionForExtent(this.extentToViewProj(extent), size)
       },
       /**
        * @param {number} zoom
        * @return {Promise<number>}
        */
-      async getViewResolutionForZoom (zoom) {
+      async getResolutionForZoom (zoom) {
         return (await this.resolveView()).getResolutionForZoom(zoom)
       },
       /**
        * @return {Promise<number[]|undefined>}
        */
-      async getViewResolutions () {
+      async getResolutions () {
         return (await this.resolveView()).getResolutions()
       },
       /**
        * @return {Promise<number|undefined>}
        */
-      async getViewMaxResolution () {
+      async getMaxResolution () {
         return (await this.resolveView()).getMaxResolution()
       },
       /**
        * @return {Promise<number|undefined>}
        */
-      async getViewMinResolution () {
+      async getMinResolution () {
         return (await this.resolveView()).getMinResolution()
       },
       /**
        * @return {Promise<number|undefined>}
        */
-      async getViewZoom () {
+      async getZoom () {
         return (await this.resolveView()).getZoom()
       },
       /**
        * @param {number} zoom
        * @return {Promise<void>}
        */
-      async setViewZoom (zoom) {
+      async setZoom (zoom) {
         const view = await this.resolveView()
 
         if (zoom === view.getZoom()) return
@@ -518,20 +516,20 @@
        * @param {number} resolution
        * @return {Promise<number|undefined>}
        */
-      async getViewZoomForResolution (resolution) {
+      async getZoomForResolution (resolution) {
         return (await this.resolveView()).getZoomForResolution(resolution)
       },
       /**
        * @return {Promise<number|undefined>}
        */
-      async getViewMaxZoom () {
+      async getMaxZoom () {
         return (await this.resolveView()).getMaxZoom()
       },
       /**
        * @param {number} zoom
        * @return {Promise<void>}
        */
-      async setViewMaxZoom (zoom) {
+      async setMaxZoom (zoom) {
         const view = await this.resolveView()
 
         if (zoom === view.getMaxZoom()) return
@@ -541,14 +539,14 @@
       /**
        * @return {Promise<number|undefined>}
        */
-      async getViewMinZoom () {
+      async getMinZoom () {
         return (await this.resolveView()).getMinZoom()
       },
       /**
        * @param {number} zoom
        * @return {Promise<void>}
        */
-      async setViewMinZoom (zoom) {
+      async setMinZoom (zoom) {
         const view = await this.resolveView()
 
         if (zoom === view.getMinZoom()) return
@@ -558,20 +556,20 @@
       /**
        * @return {Promise<module:ol/proj/Projection>}
        */
-      async getViewProjection () {
+      async getProjection () {
         return (await this.resolveView()).getProjection()
       },
       /**
        * @return {Promise<number|undefined>}
        */
-      async getViewRotation () {
+      async getRotation () {
         return (await this.resolveView()).getRotation()
       },
       /**
        * @param {number} rotation
        * @return {Promise<void>}
        */
-      async setViewRotation (rotation) {
+      async setRotation (rotation) {
         const view = await this.resolveView()
 
         if (rotation === view.getRotation()) return
