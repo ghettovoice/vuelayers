@@ -65,7 +65,7 @@ Then in the `nuxt.config.js` file, fill in the plugins and modules section prope
 
 ```
 plugins: [{
-		src: '@/plugins/vueLayers',
+		src: '@/plugins/vuelayers.js',
 		ssr: false
 	}, { ... }],
 modules: [
