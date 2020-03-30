@@ -109,12 +109,14 @@
         this::withFillStrokeStyle.methods.setFill(fill)
       }
 
-      const isBg = this.$slots.background.find(vnode => {
+      const isBg = (this.$slots.background || []).find(vnode => {
         return vnode.componentInstance && vnode.componentInstance === fill
       })
 
       if (!isBg) {
         this::withFillStrokeStyle.methods.setFill(fill)
+
+        return
       }
 
       fill = fill.$style
@@ -134,12 +136,14 @@
         this::withFillStrokeStyle.methods.setStroke(stroke)
       }
 
-      const isBg = this.$slots.background.find(vnode => {
+      const isBg = (this.$slots.background || []).find(vnode => {
         return vnode.componentInstance && vnode.componentInstance === stroke
       })
 
       if (!isBg) {
         this::withFillStrokeStyle.methods.setStroke(stroke)
+
+        return
       }
 
       stroke = stroke.$style
