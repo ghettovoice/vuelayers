@@ -1,4 +1,4 @@
-# vl-image-static-source
+# vl-source-image-static
 
 ## ES6 Module
 
