@@ -1,4 +1,4 @@
-# vl-image-wms-source
+# vl-source-image-wms
 
 ## ES6 Module
 
