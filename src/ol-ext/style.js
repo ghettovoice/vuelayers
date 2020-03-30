@@ -9,7 +9,7 @@ import Text from 'ol/style/Text'
 import parseColor from 'parse-color'
 import uuid from 'uuid/v4'
 import Vue from 'vue'
-import { isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
+import { isFunction, isNumeric, isNumber, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
 import { GEOMETRY_TYPE } from './consts'
 import * as geomHelper from './geom'
 
@@ -321,7 +321,6 @@ export function createImageStyle (vlStyle) {
  * @returns {Text|undefined}
  */
 export function createTextStyle (vlStyle) {
-  // noinspection JSValidateTypes
   if (vlStyle.text == null) return
   if (vlStyle.text instanceof Text) return vlStyle.text
 
@@ -329,8 +328,12 @@ export function createTextStyle (vlStyle) {
     text: vlStyle.text,
   }
 
-  let fontSize = vlStyle.textFontSize ? vlStyle.textFontSize + 'px' : undefined
-  let font = ['normal', fontSize, vlStyle.textFont].filter(x => !!x).join(' ')
+  let fontSize = '10px'
+  if (vlStyle.textFontSize) {
+    fontSize = isNumber(vlStyle.textFontSize) ? vlStyle.textFontSize + 'px' : vlStyle.textFontSize
+  }
+  let fontName = vlStyle.textFont || 'sans-serif'
+  const font = [vlStyle.textFontWeight, fontSize, fontName].filter(x => !!x).join(' ')
 
   Object.assign(
     textStyle,
@@ -396,7 +399,8 @@ export function createGeomStyle (vlStyle) {
  * Text only
  * @property {string|Text|undefined} text
  * @property {string|undefined} textFont
- * @property {number|undefined} textFontSize
+ * @property {number|string|undefined} textFontSize
+ * @property {string|undefined} textFontWeight
  * @property {string|number[]|undefined} textFillColor
  * @property {string|number[]|undefined} textStrokeColor
  * @property {number|undefined} textStrokeWidth
