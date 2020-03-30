@@ -340,6 +340,8 @@
     const events = mergeObs(select, unselect)
 
     this.subscribeTo(events, evt => {
+      ++this.rev
+
       this.$nextTick(() => {
         this.$emit(evt.type, evt.feature)
       })
