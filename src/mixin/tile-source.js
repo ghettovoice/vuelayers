@@ -212,10 +212,6 @@ function subscribeToSourceEvents () {
   ])
 
   this.subscribeTo(events, evt => {
-    ++this.rev
-
-    this.$nextTick(() => {
-      this.$emit(evt.type, evt)
-    })
+    this.$emit(evt.type, evt)
   })
 }

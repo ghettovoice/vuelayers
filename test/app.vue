@@ -1,51 +1,54 @@
 <template>
   <div id="app">
-    <div style="height: 100%">
-      <div class="panel">
-        <div>
-          Selected: {{ selectedFeatureIds }}
-        </div>
-        <div>
-          <button @click="onUnselectClick">Unselect</button>
-        </div>
+    <div class="panel">
+      <div>
+        Selected: {{ selectedFeatureIds }}
       </div>
-
-      <vl-map ref="map" data-projection="EPSG:4326" @created="mapCreated">
-        <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
-                 ident="view" ref="view" />
-
-        <vl-geoloc>
-          <template slot-scope="geoloc">
-            <vl-feature v-if="geoloc.position" id="position-feature">
-              <vl-geom-point :coordinates="geoloc.position" />
-              <vl-style-box>
-                <vl-style-text text="My location" font="20px sans-serif" :padding="[10, 10, 10, 10]">
-                  <vl-style-fill color="black" />
-                  <vl-style-stroke color="white" :width="2" />
-                  <vl-style-fill slot="background" color="blue" />
-                </vl-style-text>
-              </vl-style-box>
-            </vl-feature>
-          </template>
-        </vl-geoloc>
-
-        <vl-layer-tile>
-          <vl-source-osm />
-        </vl-layer-tile>
-
-        <vl-layer-vector id="countries" render-mode="image">
-          <vl-source-vector ident="countries-source" ref="vectorSource" :features.sync="countries" :url="countriesUrl" />
-        </vl-layer-vector>
-
-        <vl-interaction-select :features.sync="selectedFeatures" />
-      </vl-map>
+      <div>
+        <button @click="onUnselectClick">Unselect</button>
+      </div>
     </div>
+
+    <input id="swipe" type="range" v-model="swipe" />
+    <vl-map ref="map" data-projection="EPSG:4326" @created="mapCreated">
+      <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
+               ident="view" ref="view" />
+
+      <vl-geoloc>
+        <template slot-scope="geoloc">
+          <vl-feature v-if="geoloc.position" id="position-feature">
+            <vl-geom-point :coordinates="geoloc.position" />
+            <vl-style-box>
+              <vl-style-text text="My location" font="20px sans-serif" :padding="[10, 10, 10, 10]">
+                <vl-style-fill color="black" />
+                <vl-style-stroke color="white" :width="2" />
+                <vl-style-fill slot="background" color="blue" />
+              </vl-style-text>
+            </vl-style-box>
+          </vl-feature>
+        </template>
+      </vl-geoloc>
+
+      <vl-layer-tile id="osm" ref="osmLayer">
+        <vl-source-osm />
+      </vl-layer-tile>
+
+      <vl-layer-tile id="stamen" ref="stamenLayer" @precompose="onRightPrecompose" @postcompose="onRightPostcompose">
+        <vl-source-stamen layer="watercolor" />
+      </vl-layer-tile>
+
+      <vl-layer-vector id="countries" render-mode="image">
+        <vl-source-vector ident="countries-source" ref="vectorSource" :features.sync="countries" :url="countriesUrl" />
+      </vl-layer-vector>
+
+      <vl-interaction-select :features.sync="selectedFeatures" />
+    </vl-map>
   </div>
 </template>
 
 <script>
-  import { DragBox } from 'ol/interaction'
   import { platformModifierKeyOnly } from 'ol/events/condition'
+  import { DragBox } from 'ol/interaction'
   import { writeGeoJsonFeature } from '../src/ol-ext'
 
   export default {
@@ -58,11 +61,17 @@
         countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
         countries: [],
         selectedFeatures: [],
+        swipe: 50,
       }
     },
     computed: {
       selectedFeatureIds () {
         return this.selectedFeatures.map(({ id }) => id)
+      },
+    },
+    watch: {
+      swipe () {
+        this.$refs.map.render()
       },
     },
     methods: {
@@ -80,7 +89,7 @@
       },
       mapCreated (map) {
         const dragBox = new DragBox({
-          condition: platformModifierKeyOnly
+          condition: platformModifierKeyOnly,
         })
 
         map.$map.addInteraction(dragBox)
@@ -102,6 +111,19 @@
         dragBox.on('boxstart', () => {
           this.selectedFeatures = []
         })
+      },
+      onRightPrecompose (evt) {
+        const ctx = evt.context
+        const width = ctx.canvas.width * (this.swipe / 100)
+
+        ctx.save()
+        ctx.beginPath()
+        ctx.rect(width, 0, ctx.canvas.width - width, ctx.canvas.height)
+        ctx.clip()
+      },
+      onRightPostcompose (evt) {
+        const ctx = evt.context
+        ctx.restore()
       },
     },
   }
@@ -140,5 +162,9 @@
       padding: 5px 10px;
       text-transform: uppercase;
     }
+  }
+
+  #swipe {
+    width: 100%;
   }
 </style>
