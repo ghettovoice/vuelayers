@@ -30,6 +30,7 @@
     url: {
       type: String,
       default: MAPBOX_URL_TEMPLATE,
+      required: false,
     },
   }
 

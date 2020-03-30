@@ -18,6 +18,7 @@
     url: {
       type: String,
       default: OSM_URL_TEMPLATE,
+      required: false,
     },
   }
 
