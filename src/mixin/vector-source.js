@@ -56,7 +56,6 @@ export default {
      * @protected
      */
     unmount () {
-      this.clear()
       return this::source.methods.unmount()
     },
     /**

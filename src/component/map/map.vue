@@ -10,6 +10,7 @@
   import { defaults as createDefaultInteractions } from 'ol/interaction'
   import VectorLayer from 'ol/layer/Vector'
   import Map from 'ol/Map'
+  import WebGLMap from 'ol/WebGLMap'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
@@ -129,6 +130,11 @@
         type: Boolean,
         default: true,
       },
+      renderer: {
+        type: String,
+        default: 'canvas',
+        validator: val => ['canvas', 'webgl'].includes(val),
+      },
     },
     methods: {
       /**
@@ -136,7 +142,17 @@
        * @protected
        */
       createOlObject () {
-        const map = new Map({
+        let Ctor
+        switch (this.renderer) {
+          case 'webgl':
+            Ctor = WebGLMap
+            break
+          case 'canvas':
+          default:
+            Ctor = Map
+        }
+
+        const map = new Ctor({
           loadTilesWhileAnimating: this.loadTilesWhileAnimating,
           loadTilesWhileInteracting: this.loadTilesWhileInteracting,
           pixelRatio: this.pixelRatio,
@@ -283,11 +299,6 @@
        */
       unmount () {
         hasMap(this)
-
-        this.clearFeatures()
-        this.clearLayers()
-        this.clearInteractions()
-        this.clearOverlays()
 
         this.unsubscribeAll()
         this.$map.setTarget(null)
