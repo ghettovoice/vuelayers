@@ -120,6 +120,8 @@
         type: Boolean,
         default: true,
       },
+      updateWhileAnimating: Boolean,
+      updateWhileInteracting: Boolean,
     },
     computed: {
       /**
@@ -156,7 +158,7 @@
     },
     created () {
       // prepare default overlay
-      this._featuresOverlay = this.instanceFactoryCall(this.featuresOverlayIdent, this::createFeaturesOverlay)
+      this._featuresOverlay = this.instanceFactoryCall(this.featuresOverlayIdent, ::this.createFeaturesOverlay)
 
       this::defineServices()
     },
@@ -398,7 +400,7 @@
 
         if (wrapX === this.$featuresOverlaySource.getWrapX()) return
 
-        const layer = this::createFeaturesOverlay({ wrapX })
+        const layer = this.createFeaturesOverlay({ wrapX })
         this.$featuresOverlay.setSource(layer.getSource())
       },
       /**
@@ -465,6 +467,23 @@
             get viewContainer () { return vm },
           },
         )
+      },
+      /**
+       * @param {module:ol/layer/BaseVector~Options} sourceOptions
+       * @return {VectorLayer<VectorSource>}
+       */
+      createFeaturesOverlay (sourceOptions = {}) {
+        sourceOptions = {
+          features: this.$featuresCollection,
+          wrapX: this.wrapX,
+          ...sourceOptions,
+        }
+
+        return new VectorLayer({
+          source: new VectorSource(sourceOptions),
+          updateWhileAnimating: this.updateWhileAnimating,
+          updateWhileInteracting: this.updateWhileInteracting,
+        })
       },
       /**
        * @return {Promise<module:ol/Map~Map>}
@@ -552,21 +571,6 @@
 
     this.subscribeTo(events, evt => {
       this.$emit(evt.type, evt)
-    })
-  }
-
-  /**
-   * @returns {module:ol/layer/Vector~Vector}
-   */
-  function createFeaturesOverlay (sourceOptions = {}) {
-    sourceOptions = {
-      features: this.$featuresCollection,
-      wrapX: this.wrapX,
-      ...sourceOptions,
-    }
-
-    return new VectorLayer({
-      source: new VectorSource(sourceOptions),
     })
   }
 </script>
