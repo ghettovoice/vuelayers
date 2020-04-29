@@ -1,11 +1,11 @@
 import { Control } from 'ol/control'
 import { v4 as uuid } from 'uuid'
-import { hasProp } from '../util/minilo'
+import Vue from 'vue'
 
 export function getControlId (control) {
   if (control instanceof Control) {
     return control.get('id')
-  } else if (hasProp(control, 'id')) {
+  } else if (control instanceof Vue) {
     return control.id
   }
 
@@ -17,7 +17,7 @@ export function setControlId (control, controlId) {
     control.set('id', controlId)
 
     return control
-  } else if (hasProp(control, 'id')) {
+  } else if (control instanceof Vue) {
     control.id = controlId
 
     return control

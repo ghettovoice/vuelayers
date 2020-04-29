@@ -1,11 +1,11 @@
 import { Source } from 'ol/source'
 import { v4 as uuid } from 'uuid'
-import { hasProp } from '../util/minilo'
+import Vue from 'vue'
 
 export function getSourceId (source) {
   if (source instanceof Source) {
     return source.get('id')
-  } else if (hasProp(source, 'id')) {
+  } else if (source instanceof Vue) {
     return source.id
   }
 
@@ -17,7 +17,7 @@ export function setSourceId (source, sourceId) {
     source.set('id', sourceId)
 
     return source
-  } else if (hasProp(source, 'id')) {
+  } else if (source instanceof Vue) {
     source.id = sourceId
 
     return source

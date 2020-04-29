@@ -1,11 +1,11 @@
 import BaseLayer from 'ol/layer/Base'
 import { v4 as uuid } from 'uuid'
-import { hasProp } from '../util/minilo'
+import Vue from 'vue'
 
 export function getLayerId (layer) {
   if (layer instanceof BaseLayer) {
     return layer.get('id')
-  } else if (hasProp(layer, 'id')) {
+  } else if (layer instanceof Vue) {
     return layer.id
   }
 
@@ -17,7 +17,7 @@ export function setLayerId (layer, layerId) {
     layer.set('id', layerId)
 
     return layer
-  } else if (hasProp(layer, 'id')) {
+  } else if (layer instanceof Vue) {
     layer.id = layerId
 
     return layer

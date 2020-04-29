@@ -442,3 +442,7 @@ export function waitFor (condition) {
     mapObs(() => true),
   ).toPromise(Promise)
 }
+
+export function clonePlainObject (obj) {
+  return JSON.parse(JSON.stringify(obj))
+}

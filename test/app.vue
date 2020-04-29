@@ -12,6 +12,12 @@
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
+
+      <VlLayerVector>
+        <VlSourceVector
+          :features.sync="features"
+          url="https://openlayers.org/en/latest/examples/data/geojson/countries.geojson" />
+      </VlLayerVector>
     </VlMap>
   </div>
 </template>
@@ -24,6 +30,7 @@
         zoom: 3,
         center: [0, 0],
         rotation: 0,
+        features: [],
       }
     },
   }

@@ -1,11 +1,11 @@
 import { View } from 'ol'
 import { v4 as uuid } from 'uuid'
-import { hasProp } from '../util/minilo'
+import Vue from 'vue'
 
 export function getViewId (view) {
   if (view instanceof View) {
     return view.get('id')
-  } else if (hasProp(view, 'id')) {
+  } else if (view instanceof Vue) {
     return view.id
   }
 
@@ -17,7 +17,7 @@ export function setViewId (view, viewId) {
     view.set('id', viewId)
 
     return view
-  } else if (hasProp(view, 'id')) {
+  } else if (view instanceof Vue) {
     view.id = viewId
 
     return view

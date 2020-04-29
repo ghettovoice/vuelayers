@@ -1,11 +1,11 @@
 import { Overlay } from 'ol'
 import { v4 as uuid } from 'uuid'
-import { hasProp } from '../util/minilo'
+import Vue from 'vue'
 
 export function getOverlayId (overlay) {
   if (overlay instanceof Overlay) {
     return overlay.get('id')
-  } else if (hasProp(overlay, 'id')) {
+  } else if (overlay instanceof Vue) {
     return overlay.id
   }
 
@@ -17,7 +17,7 @@ export function setOverlayId (overlay, overlayId) {
     overlay.set('id', overlayId)
 
     return overlay
-  } else if (hasProp(overlay, 'id')) {
+  } else if (overlay instanceof Vue) {
     overlay.id = overlayId
 
     return overlay

@@ -111,19 +111,20 @@ export default {
     this._olObject = undefined
 
     this::defineServices()
-    await this.init()
+
+    await this::execInit()
   },
   async mounted () {
     await this.$createPromise
-    await this.mount()
+    await this::execMount()
   },
   async beforeDestroy () {
     await this.$mountPromise
-    await this.unmount()
+    await this::execUnmount()
   },
   async destroyed () {
     await this.$unmountPromise
-    await this.deinit()
+    await this::execDeinit()
   },
   methods: {
     /**
@@ -131,33 +132,15 @@ export default {
      * @protected
      */
     async init () {
-      try {
-        this._olObject = await this.instanceFactoryCall(this.olObjIdent, ::this.createOlObject)
-        this._olObject[VM_PROP] || (this._olObject[VM_PROP] = [])
+      this._olObject = await this.instanceFactoryCall(this.olObjIdent, ::this.createOlObject)
+      this._olObject[VM_PROP] || (this._olObject[VM_PROP] = [])
 
-        // for loaded from IdentityMap
-        if (!this._olObject[VM_PROP].includes(this)) {
-          this._olObject[VM_PROP].push(this)
-        }
-
-        ++this.rev
-
-        this._olObjectState = STATE_CREATED
-
-        this.$emit(EVENT_CREATED, this)
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`ol object ${EVENT_CREATED}`)
-        }
-      } catch (err) {
-        this.$emit(EVENT_CREATE_ERROR, this)
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.error(`ol object ${EVENT_CREATE_ERROR}`, err)
-        }
-
-        throw err
+      // for loaded from IdentityMap
+      if (!this._olObject[VM_PROP].includes(this)) {
+        this._olObject[VM_PROP].push(this)
       }
+
+      ++this.rev
     },
     /**
      * @return {module:ol/Object~BaseObject|Promise<module:ol/Object~BaseObject>}
@@ -172,29 +155,11 @@ export default {
      * @protected
      */
     deinit () {
-      try {
-        this._olObjectState = STATE_UNDEF
+      this.unsetInstances()
 
-        this.unsetInstances()
-
-        if (this._olObject) {
-          this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
-          this._olObject = undefined
-        }
-
-        this.$emit(EVENT_DESTROYED, this)
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`ol object ${EVENT_DESTROYED}`)
-        }
-      } catch (err) {
-        this.$emit(EVENT_DESTROY_ERROR, this)
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.error(`ol object ${EVENT_DESTROY_ERROR}`, err)
-        }
-
-        throw err
+      if (this._olObject) {
+        this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
+        this._olObject = undefined
       }
     },
     /**
@@ -210,50 +175,14 @@ export default {
      * @protected
      */
     async mount () {
-      try {
-        await this.subscribeAll()
-
-        this._olObjectState = STATE_MOUNTED
-
-        this.$emit(EVENT_MOUNTED, this)
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`ol object ${EVENT_MOUNTED}`)
-        }
-      } catch (err) {
-        this.$emit(EVENT_MOUNT_ERROR, this)
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.error(`ol object ${EVENT_MOUNT_ERROR}`, err)
-        }
-
-        throw err
-      }
+      await this.subscribeAll()
     },
     /**
      * @return {void|Promise<void>}
      * @protected
      */
     async unmount () {
-      try {
-        this._olObjectState = STATE_CREATED
-
-        await this.unsubscribeAll()
-
-        this.$emit(EVENT_UNMOUNTED, this)
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`ol object ${EVENT_UNMOUNTED}`)
-        }
-      } catch (err) {
-        this.$emit(EVENT_UNMOUNT_ERROR, this)
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.error(`ol object ${EVENT_UNMOUNT_ERROR}`, err)
-        }
-
-        throw err
-      }
+      await this.unsubscribeAll()
     },
     /**
      * Refresh internal ol objects
@@ -284,10 +213,10 @@ export default {
      */
     async remount () {
       if (this.$olObjectState === STATE_MOUNTED) {
-        await this.unmount()
+        await this::execUnmount()
       }
 
-      await this.mount()
+      await this::execMount()
     },
     /**
      * @return {Promise<void>}
@@ -303,12 +232,12 @@ export default {
      */
     async recreate () {
       if (this.$olObjectState === STATE_MOUNTED) {
-        await this.unmount()
-        await this.deinit()
+        await this::execUnmount()
+        await this::execDeinit()
       }
 
-      await this.init()
-      await this.mount()
+      await this::execInit()
+      await this::execMount()
     },
     /**
      * @return {Promise<void>}
@@ -412,4 +341,108 @@ function defineServices () {
       },
     },
   })
+}
+
+/**
+ * @returns {Promise<void>}
+ * @private
+ */
+async function execInit () {
+  try {
+    await this.init()
+
+    this._olObjectState = STATE_CREATED
+
+    this.$emit(EVENT_CREATED, this)
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.log(`ol object ${EVENT_CREATED}`)
+    }
+  } catch (err) {
+    this.$emit(EVENT_CREATE_ERROR, this)
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.error(`ol object ${EVENT_CREATE_ERROR}`, err)
+    }
+
+    throw err
+  }
+}
+
+/**
+ * @returns {Promise<void>}
+ * @private
+ */
+async function execDeinit () {
+  try {
+    this._olObjectState = STATE_UNDEF
+
+    await this.deinit()
+
+    this.$emit(EVENT_DESTROYED, this)
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.log(`ol object ${EVENT_DESTROYED}`)
+    }
+  } catch (err) {
+    this.$emit(EVENT_DESTROY_ERROR, this)
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.error(`ol object ${EVENT_DESTROY_ERROR}`, err)
+    }
+
+    throw err
+  }
+}
+
+/**
+ * @return {Promise<void>}
+ * @private
+ */
+async function execMount () {
+  try {
+    await this.mount()
+
+    this._olObjectState = STATE_MOUNTED
+
+    this.$emit(EVENT_MOUNTED, this)
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.log(`ol object ${EVENT_MOUNTED}`)
+    }
+  } catch (err) {
+    this.$emit(EVENT_MOUNT_ERROR, this)
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.error(`ol object ${EVENT_MOUNT_ERROR}`, err)
+    }
+
+    throw err
+  }
+}
+
+/**
+ * @return {void|Promise<void>}
+ * @protected
+ */
+async function execUnmount () {
+  try {
+    this._olObjectState = STATE_CREATED
+
+    await this.unmount()
+
+    this.$emit(EVENT_UNMOUNTED, this)
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.log(`ol object ${EVENT_UNMOUNTED}`)
+    }
+  } catch (err) {
+    this.$emit(EVENT_UNMOUNT_ERROR, this)
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.error(`ol object ${EVENT_UNMOUNT_ERROR}`, err)
+    }
+
+    throw err
+  }
 }

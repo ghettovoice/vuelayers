@@ -138,10 +138,10 @@ export default {
      * @returns {Promise<void>}
      */
     async subscribeAll () {
-      await Promise.all(
+      await Promise.all([
         this::layer.methods.subscribeAll(),
         this::subscribeToLayerEvents(),
-      )
+      ])
     },
     ...pick(layer.methods, [
       'init',
@@ -170,6 +170,8 @@ async function subscribeToLayerEvents () {
   this.subscribeTo(changes, ({ prop, value }) => {
     ++this.rev
 
-    this.$emit(`update:${prop}`, value)
+    this.$nextTick(() => {
+      this.$emit(`update:${prop}`, value)
+    })
   })
 }

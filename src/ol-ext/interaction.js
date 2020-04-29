@@ -1,6 +1,6 @@
 import { Interaction } from 'ol/interaction'
 import { v4 as uuid } from 'uuid'
-import { hasProp } from '../util/minilo'
+import Vue from 'vue'
 
 /**
  * @param {module:ol/interaction/Interaction~Interaction|Object} interaction
@@ -9,7 +9,7 @@ import { hasProp } from '../util/minilo'
 export function getInteractionId (interaction) {
   if (interaction instanceof Interaction) {
     return interaction.get('id')
-  } else if (hasProp(interaction, 'id')) {
+  } else if (interaction instanceof Vue) {
     return interaction.id
   }
 
@@ -26,7 +26,7 @@ export function setInteractionId (interaction, interactionId) {
     interaction.set('id', interactionId)
 
     return interaction
-  } else if (hasProp(interaction, 'id')) {
+  } else if (interaction instanceof Vue) {
     interaction.id = interactionId
 
     return interaction
@@ -38,7 +38,7 @@ export function setInteractionId (interaction, interactionId) {
 export function getInteractionPriority (interaction) {
   if (interaction instanceof Interaction) {
     return interaction.get('priority')
-  } else if (hasProp(interaction, 'id')) {
+  } else if (interaction instanceof Vue) {
     return interaction.priority
   }
 
@@ -50,7 +50,7 @@ export function setInteractionPriority (interaction, priority) {
     interaction.set('priority', priority)
 
     return interaction
-  } else if (hasProp(interaction, 'id')) {
+  } else if (interaction instanceof Vue) {
     interaction.id = priority
 
     return interaction

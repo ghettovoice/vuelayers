@@ -14,10 +14,12 @@
        */
       createSource () {
         return new VectorSource({
+          // ol/source/Source
           attributions: this.attributions,
           attributionsCollapsible: this.attributionsCollapsible,
           projection: this.resolvedDataProjection,
           wrapX: this.wrapX,
+          // ol/source/Vector
           features: this.$featuresCollection,
           format: this.dataFormat,
           loader: this.loaderFunc,

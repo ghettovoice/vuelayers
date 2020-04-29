@@ -1,6 +1,7 @@
 import { Feature } from 'ol'
 import { v4 as uuid } from 'uuid'
-import { hasProp, isNumber, isString } from '../util/minilo'
+import Vue from 'vue'
+import { isNumber, isPlainObject, isString } from '../util/minilo'
 
 /**
  * @param {Object|module:ol/Feature~Feature|string|number} feature
@@ -10,7 +11,7 @@ import { hasProp, isNumber, isString } from '../util/minilo'
 export function getFeatureId (feature) {
   if (feature instanceof Feature) {
     return feature.getId()
-  } else if (hasProp(feature, 'id')) {
+  } else if (isPlainObject(feature) || feature instanceof Vue) {
     return feature.id
   } else if (isString(feature) || isNumber(feature)) {
     return feature
@@ -29,7 +30,7 @@ export function setFeatureId (feature, featureId) {
     feature.setId(featureId)
 
     return feature
-  } else if (hasProp(feature, 'id')) {
+  } else if (isPlainObject(feature) || feature instanceof Vue) {
     feature.id = featureId
 
     return feature

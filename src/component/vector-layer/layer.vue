@@ -17,8 +17,7 @@
        */
       createLayer () {
         return new VectorLayer({
-          // layer props
-          id: this.id,
+          // ol/layer/Base
           className: this.className,
           opacity: this.opacity,
           visible: this.visible,
@@ -28,8 +27,9 @@
           maxResolution: this.maxResolution,
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
+          // ol/layer/Layer
           render: this.render,
-          // vector layer props
+          // ol/layer/BaseVector
           renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,

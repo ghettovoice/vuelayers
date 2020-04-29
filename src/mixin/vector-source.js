@@ -3,6 +3,7 @@ import { all as loadAll } from 'ol/loadingstrategy'
 import { createGeoJsonFmt, getFeatureId, isGeoJSONFeature, transform } from '../ol-ext'
 import {
   and,
+  clonePlainObject,
   constant,
   difference,
   isArray,
@@ -157,7 +158,7 @@ export default {
     featuresDataProj: {
       deep: true,
       handler: debounce(function (features) {
-        this.$emit('update:features', features.slice())
+        this.$emit('update:features', clonePlainObject(features))
       }, 1000 / 60),
     },
     async urlFunc (value) {

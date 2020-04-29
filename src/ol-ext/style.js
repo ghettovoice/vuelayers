@@ -2,10 +2,11 @@ import GeometryType from 'ol/geom/GeometryType'
 import { Circle, Fill, Icon, Image as ImageStyle, RegularShape, Stroke, Style, Text } from 'ol/style'
 import parseColor from 'parse-color'
 import { v4 as uuid } from 'uuid'
-import { hasProp, isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
+import Vue from 'vue'
+import { isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
 
 export function getStyleId (style) {
-  if (hasProp(style, 'id')) {
+  if (style instanceof Style || style instanceof Vue) {
     return style.id
   }
 
@@ -13,7 +14,7 @@ export function getStyleId (style) {
 }
 
 export function setStyleId (style, styleId) {
-  if (hasProp(style, 'id')) {
+  if (style instanceof Style || style instanceof Vue) {
     style.id = styleId
 
     return style

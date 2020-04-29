@@ -1,10 +1,10 @@
+import Vue from 'vue'
 import { PluggableMap } from 'ol'
-import { hasProp } from '../util/minilo'
 
 export function getMapId (map) {
   if (map instanceof PluggableMap) {
     return map.get('id')
-  } else if (hasProp(map, 'id')) {
+  } else if (map instanceof Vue) {
     return map.id
   }
 
@@ -16,7 +16,7 @@ export function setMapId (map, mapId) {
     map.set('id', mapId)
 
     return map
-  } else if (hasProp(map, 'id')) {
+  } else if (map instanceof Vue) {
     map.id = mapId
 
     return map
@@ -28,7 +28,7 @@ export function setMapId (map, mapId) {
 export function getMapDataProjection (map) {
   if (map instanceof PluggableMap) {
     return map.get('dataProjection')
-  } else if (hasProp(map, 'id')) {
+  } else if (map instanceof Vue) {
     return map.dataProjection
   }
 
@@ -40,7 +40,7 @@ export function setMapDataProjection (map, dataProjection) {
     map.set('dataProjection', dataProjection)
 
     return map
-  } else if (hasProp(map, 'id')) {
+  } else if (map instanceof Vue) {
     map.dataProjection = dataProjection
 
     return map
