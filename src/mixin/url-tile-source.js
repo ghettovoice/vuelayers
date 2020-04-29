@@ -1,7 +1,7 @@
-import { createTileUrlFunction, createTileUrlFunctionFromTemplates } from 'ol-tilecache'
+import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
 import { expandUrl } from 'ol/tileurlfunction'
 import { obsFromOlEvent } from '../rx-ext'
-import { and, isEmpty, isEqual, isFunction, isString, negate, pick } from '../util/minilo'
+import { and, isEmpty, isEqual, isFunction, isString, negate, pick, replaceTokens } from '../util/minilo'
 import tileSource from './tile-source'
 
 const isNotEmptyString = and(isString, negate(isEmpty))
@@ -36,20 +36,37 @@ export default {
     },
   },
   computed: {
+    urlTokens () {
+      return []
+    },
+    parsedUrl () {
+      if (!this.url) return []
+
+      return replaceTokens(this.url, pick(this, this.urlTokens))
+    },
+    parsedUrls () {
+      const urls = []
+
+      if (this.url) {
+        urls.push(this.url)
+      }
+      if (this.urls && this.urls.length > 0) {
+        urls.push(...this.urls)
+      }
+
+      const tokens = pick(this, this.urlTokens)
+
+      return urls.map(url => replaceTokens(url, tokens))
+    },
+    expandedUrls () {
+      return this.parsedUrls.reduce((urls, url) => urls.concat(...expandUrl(url)), [])
+    },
     urlFunc () {
       if (isFunction(this.tileUrlFunction)) {
         return this.tileUrlFunction
       }
 
-      let urlFunc
-
-      if (this.urls) {
-        urlFunc = createTileUrlFunctionFromTemplates(this.urls, this.tileGrid)
-      } else if (this.url) {
-        urlFunc = createTileUrlFunction(this.url, this.tileGrid)
-      }
-
-      return urlFunc
+      return createTileUrlFunctionFromTemplates(this.expandedUrls, this.tileGrid)
     },
   },
   watch: {

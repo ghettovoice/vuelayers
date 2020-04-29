@@ -12,24 +12,26 @@
       xyzSource,
     ],
     props: {
+      // ol/source/Source
       attributions: {
         type: [String, Array],
         default: OSM_ATTRIBUTIONS,
       },
-      maxZoom: {
-        type: Number,
-        default: OSM_MAX_ZOOM,
-      },
+      // ol/source/UrlTile
       url: {
         type: String,
         default: OSM_URL_TEMPLATE,
+      },
+      // ol/source/XYZ
+      maxZoom: {
+        type: Number,
+        default: OSM_MAX_ZOOM,
       },
     },
     methods: {
       createSource () {
         // always EPSG:3857, size: 256x256, format png
         return new OSMSource({
-          maxZoom: this.maxZoom,
           // ol/source/Source
           attributions: this.attributions,
           wrapX: this.wrapX,
@@ -38,10 +40,13 @@
           opaque: this.opaque,
           transition: this.transition,
           // ol/source/UrlTile
-          tileUrlFunction: this.urlFunc,
+          tileLoadFunction: this.tileLoadFunction,
+          url: this.parsedUrl,
           // ol/source/TileImage
           crossOrigin: this.crossOrigin,
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+          // ol/source/XYZ
+          maxZoom: this.maxZoom,
         })
       },
     },

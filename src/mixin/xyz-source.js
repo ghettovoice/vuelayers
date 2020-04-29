@@ -14,12 +14,13 @@ export default {
     // ol/source/XYZ
     maxZoom: {
       type: Number,
-      default: 18,
+      default: 42,
     },
     minZoom: {
       type: Number,
       default: 0,
     },
+    maxResolution: Number,
     tileSize: {
       type: [Number, Array],
       default: () => [256, 256],
@@ -36,12 +37,14 @@ export default {
       const projection = this.projection
       const maxZoom = this.maxZoom
       const minZoom = this.minZoom
+      const maxResolution = this.maxResolution
       const tileSize = this.tileSize
 
       return () => createXYZ({
         extent: extentFromProjection(projection),
         maxZoom: maxZoom,
         minZoom: minZoom,
+        maxResolution: maxResolution,
         tileSize: tileSize,
       })
     },

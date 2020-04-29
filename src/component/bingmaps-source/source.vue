@@ -1,21 +1,20 @@
 <script>
-  import { BingMaps as BingMapsLayer } from 'ol/source'
+  import { BingMaps as BingMapsSource } from 'ol/source'
   import { tileSource } from '../../mixin'
   import { makeWatchers } from '../../util/vue-helpers'
-  import { omit } from '../../util/minilo'
-
-  const BINGMAPS_MAX_ZOOM = 21
-  const BINGMAPS_CULTURE = 'en-us'
 
   export default {
     name: 'VlSourceBingmaps',
     mixins: [
-      {
-        ...tileSource,
-        props: omit(tileSource, ['url']),
-      },
+      tileSource,
     ],
     props: {
+      // ol/source/XYZ
+      maxZoom: {
+        type: Number,
+        default: 21,
+      },
+      // ol/source/BingMaps
       /**
        * Enables hidpi tiles.
        * @type {boolean}
@@ -30,7 +29,7 @@
        */
       culture: {
         type: String,
-        default: BINGMAPS_CULTURE,
+        default: 'en-us',
       },
       /**
        * Bing Maps API key.
@@ -48,17 +47,17 @@
         type: String,
         required: true,
       },
-      maxZoom: {
-        type: Number,
-        default: BINGMAPS_MAX_ZOOM,
-      },
     },
     watch: {
       ...makeWatchers([
         'apiKey',
         'imagerySet',
-      ], () => function () {
-        this.scheduleRecreate()
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
       }),
     },
     methods: {
@@ -67,17 +66,25 @@
        * @protected
        */
       createSource () {
-        return new BingMapsLayer({
+        return new BingMapsSource({
+          // ol/source/Source
+          wrapX: this.wrapX,
+          // ol/source/Tile
           cacheSize: this.cacheSize,
+          opaque: this.opaque,
+          transition: this.transition,
+          // ol/source/UrlTile
+          tileLoadFunction: this.tileLoadFunction,
+          // ol/source/TileImage
+          crossOrigin: this.crossOrigin,
+          reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+          // ol/source/XYZ
+          maxZoom: this.maxZoom,
+          // ol/source/BingMaps
           hidpi: this.hidpi,
           culture: this.culture,
           key: this.apiKey,
           imagerySet: this.imagerySet,
-          maxZoom: this.maxZoom,
-          reprojectionErrorThreshold: this.reprojectionErrorThreshold,
-          wrapX: this.wrapX,
-          transition: this.transition,
-          tileLoadFunction: this.tileLoadFunction,
         })
       },
     },
