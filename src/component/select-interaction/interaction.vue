@@ -12,7 +12,7 @@
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import Feature from 'ol/Feature'
   import SelectInteraction from 'ol/interaction/Select'
-  import { merge as mergeObs } from 'rxjs/observable'
+  import { merge as mergeObs } from 'rxjs'
   import { map as mapOp } from 'rxjs/operators'
   import Vue from 'vue'
   import { featuresContainer, interaction, projTransforms, stylesContainer } from '../../mixin'
@@ -343,11 +343,11 @@
 
     const select = obsFromOlEvent(this.$featuresCollection, 'add')
       .pipe(
-        mapOp(({ element }) => ({ type: 'select', feature: element }))
+        mapOp(({ element }) => ({ type: 'select', feature: element })),
       )
     const unselect = obsFromOlEvent(this.$featuresCollection, 'remove')
       .pipe(
-        mapOp(({ element }) => ({ type: 'unselect', feature: element }))
+        mapOp(({ element }) => ({ type: 'unselect', feature: element })),
       )
     const events = mergeObs(select, unselect)
 

@@ -12,7 +12,7 @@ import {
 } from 'ol/geom'
 import GeometryType from 'ol/geom/GeometryType'
 import { circular as circularPolygon } from 'ol/geom/Polygon'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { hasProp } from '../util/minilo'
 
 /**

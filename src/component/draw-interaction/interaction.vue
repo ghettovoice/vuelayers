@@ -2,7 +2,7 @@
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import { merge as mergeObs } from 'rxjs/observable'
+  import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
   import { interaction, stylesContainer } from '../../mixin'
   import { createStyle, defaultEditStyle, GEOMETRY_TYPE, initializeFeature } from '../../ol-ext'

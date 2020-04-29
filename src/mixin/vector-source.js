@@ -150,7 +150,7 @@ export default {
         difference(
           this.getFeatures(),
           features,
-          (a, b) => getFeatureId(a) === getFeatureId(b)
+          (a, b) => getFeatureId(a) === getFeatureId(b),
         ).forEach(::this.removeFeature)
       },
     },

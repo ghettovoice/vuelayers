@@ -14,7 +14,7 @@
 <script>
   import { View } from 'ol'
   import { get as getProj } from 'ol/proj'
-  import { merge as mergeObs } from 'rxjs/observable'
+  import { merge as mergeObs } from 'rxjs'
   import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
   import { olCmp, projTransforms } from '../../mixin'
   import { EPSG_3857, getViewId, initializeView, setViewId } from '../../ol-ext'
@@ -160,7 +160,7 @@
       /**
        * @type {number}
        */
-      viewZoom () {
+      currentZoom () {
         if (this.rev && this.$view) {
           return this.$view.getZoom()
         }
@@ -170,7 +170,7 @@
       /**
        * @type {number}
        */
-      viewRotation () {
+      currentRotation () {
         if (this.rev && this.$view) {
           return this.$view.getRotation()
         }
@@ -180,7 +180,7 @@
       /**
        * @type {number}
        */
-      viewResolution () {
+      currentResolution () {
         if (this.rev && this.$view) {
           return this.$view.getResolution()
         }
@@ -190,29 +190,27 @@
       /**
        * @type {number[]}
        */
-      centerViewProj () {
-        return this.pointToViewProj(this.center)
+      currentCenter () {
+        if (this.rev && this.$view) {
+          return this.pointToDataProj(this.$view.getCenter())
+        }
+
+        return this.center
       },
       /**
        * @type {number[]}
        */
-      viewCenterViewProj () {
+      currentCenterViewProj () {
         if (this.rev && this.$view) {
           return this.$view.getCenter()
         }
 
-        return this.centerViewProj
-      },
-      /**
-       * @type {number[]}
-       */
-      viewCenterDataProj () {
-        return this.pointToDataProj(this.viewCenterViewProj)
+        return this.pointToViewProj(this.center)
       },
       /**
        * @type {number[]|undefined}
        */
-      extentViewProj () {
+      currentExtentViewProj () {
         if (!isArray(this.extent)) return
 
         return this.extentToViewProj(this.extent)
@@ -275,7 +273,13 @@
         'multiWorld',
         'resolvedDataProjection',
         'projection',
-      ], () => olCmp.methods.scheduleRecreate),
+      ], prop => function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`watcher for ${prop} triggered`)
+        }
+
+        return this.scheduleRecreate()
+      }),
     },
     created () {
       this::defineServices()
@@ -287,9 +291,9 @@
        */
       createOlObject () {
         const view = new View({
-          center: this.centerViewProj,
+          center: this.currentCenterViewProj,
           constrainOnlyCenter: this.constrainOnlyCenter,
-          extent: this.extentViewProj,
+          extent: this.currentExtentViewProj,
           smoothExtentConstraint: this.smoothExtentConstraint,
           rotation: this.rotation,
           enableRotation: this.enableRotation,

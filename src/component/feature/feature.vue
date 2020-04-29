@@ -13,8 +13,7 @@
 
 <script>
   import { Feature } from 'ol'
-  import { Observable } from 'rxjs'
-  import { merge as mergeObs } from 'rxjs/observable'
+  import { merge as mergeObs, Observable } from 'rxjs'
   import { distinctUntilChanged, map as mapObs, mergeAll } from 'rxjs/operators'
   import { geometryContainer, olCmp, projTransforms, stylesContainer, waitForMap } from '../../mixin'
   import { findPointOnSurface, getFeatureId, initializeFeature, setFeatureId } from '../../ol-ext'

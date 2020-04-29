@@ -1,6 +1,6 @@
 import { Collection } from 'ol'
 import BaseLayer from 'ol/layer/Base'
-import { merge as mergeObs } from 'rxjs/observable'
+import { merge as mergeObs } from 'rxjs'
 import { getLayerId, initializeLayer } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'

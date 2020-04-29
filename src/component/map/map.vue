@@ -12,7 +12,7 @@
   import { Vector as VectorLayer } from 'ol/layer'
   import { get as getProj } from 'ol/proj'
   import { Vector as VectorSource } from 'ol/source'
-  import { merge as mergeObs } from 'rxjs/observable'
+  import { merge as mergeObs } from 'rxjs'
   import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
   import {
     controlsContainer,
@@ -40,12 +40,12 @@
   export default {
     name: 'VlMap',
     mixins: [
+      projTransforms,
       layersContainer,
       controlsContainer,
       interactionsContainer,
       overlaysContainer,
       featuresContainer,
-      projTransforms,
       olCmp,
     ],
     props: {
@@ -154,12 +154,15 @@
         'moveTolerance',
         'pixelRatio',
         'maxTilesLoading',
-      ], () => olCmp.methods.scheduleRecreate),
+      ], prop => function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`watcher for ${prop} triggered`)
+        }
+
+        return this.scheduleRecreate()
+      }),
     },
     created () {
-      // prepare default overlay
-      this._featuresOverlay = this.instanceFactoryCall(this.featuresOverlayIdent, ::this.createFeaturesOverlay)
-
       this::defineServices()
     },
     methods: {
@@ -168,7 +171,9 @@
        * @protected
        */
       createOlObject () {
-        // todo make controls handling like with interactions
+        // prepare default overlay
+        this._featuresOverlay = this.instanceFactoryCall(this.featuresOverlayIdent, ::this.createFeaturesOverlay)
+        // todo wrap controls into components and provide vl-control-default
         this.initDefaultControls(this.defaultControls)
         // todo initialize without interactions and provide vl-interaction-default component
         this.initDefaultInteractions(this.defaultInteractions)
@@ -190,7 +195,7 @@
         setMapId(map, this.id)
         setMapDataProjection(map, this.dataProjection)
 
-        this.$featuresOverlay.setMap(map)
+        this._featuresOverlay.setMap(map)
 
         return map
       },
@@ -353,7 +358,7 @@
        * @return {Promise<void>}
        */
       async setView (view) {
-        if (isFunction(view.resolveOlObject)) {
+        if (view && isFunction(view.resolveOlObject)) {
           view = await view.resolveOlObject()
         }
         view || (view = new View({ center: [0, 0], zoom: 0 }))

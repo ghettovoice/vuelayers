@@ -1,5 +1,5 @@
 import Cluster from 'ol/source/Cluster'
-import { interval } from 'rxjs/observable'
+import { interval } from 'rxjs'
 import { first, map, skipWhile } from 'rxjs/operators'
 import { ok } from '../../util/assert'
 

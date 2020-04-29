@@ -12,7 +12,7 @@
 
 <script>
   import Overlay from 'ol/Overlay'
-  import { merge as mergeObs } from 'rxjs/observable'
+  import { merge as mergeObs } from 'rxjs'
   import { olCmp, projTransforms } from '../../mixin'
   import { getOverlayId, initializeOverlay, setOverlayId } from '../../ol-ext'
   import { obsFromOlChangeEvent } from '../../rx-ext'
@@ -185,7 +185,6 @@
     mixins: [
       projTransforms,
       olCmp,
-      waitForMap,
     ],
     props,
     data () {

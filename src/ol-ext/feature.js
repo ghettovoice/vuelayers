@@ -1,5 +1,5 @@
 import { Feature } from 'ol'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { hasProp, isNumber, isString } from '../util/minilo'
 
 /**

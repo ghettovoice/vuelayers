@@ -1,7 +1,7 @@
 import GeometryType from 'ol/geom/GeometryType'
 import { Circle, Fill, Icon, Image as ImageStyle, RegularShape, Stroke, Style, Text } from 'ol/style'
 import parseColor from 'parse-color'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { hasProp, isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
 
 export function getStyleId (style) {

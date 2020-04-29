@@ -1,5 +1,5 @@
 import { Control } from 'ol/control'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { hasProp } from '../util/minilo'
 
 export function getControlId (control) {

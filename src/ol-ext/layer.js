@@ -1,5 +1,5 @@
 import BaseLayer from 'ol/layer/Base'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { hasProp } from '../util/minilo'
 
 export function getLayerId (layer) {

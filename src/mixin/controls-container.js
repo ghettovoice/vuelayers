@@ -1,6 +1,6 @@
 import { Collection } from 'ol'
 import { Control, defaults as createDefaultControls } from 'ol/control'
-import { merge as mergeObs } from 'rxjs/observable'
+import { merge as mergeObs } from 'rxjs'
 import { getControlId, initializeControl } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'

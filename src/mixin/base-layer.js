@@ -1,4 +1,4 @@
-import { merge as mergeObs } from 'rxjs/observable'
+import { merge as mergeObs } from 'rxjs'
 import { getLayerId, initializeLayer, setLayerId } from '../ol-ext'
 import { obsFromOlChangeEvent, obsFromOlEvent } from '../rx-ext'
 import { isEqual, isNumber, pick, waitFor } from '../util/minilo'

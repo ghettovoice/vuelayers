@@ -1,5 +1,5 @@
 import { Collection } from 'ol'
-import { interval as intervalObs } from 'rxjs/Observable'
+import { interval as intervalObs } from 'rxjs'
 import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
 
 /**

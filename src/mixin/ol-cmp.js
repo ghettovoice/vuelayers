@@ -1,8 +1,9 @@
 import debounce from 'debounce-promise'
-import { interval as intervalObs } from 'rxjs/observable'
-import { first as firstObs, skipWhile } from 'rxjs/operators'
-import uuid from 'uuid/v4'
-import { log } from '../util/log'
+import { concat as concatObs, from as fromObs } from 'rxjs'
+import { first as firstObs } from 'rxjs/operators'
+import { v4 as uuid } from 'uuid'
+import { obsFromVueEvent } from '../rx-ext'
+import { newLogger } from '../util/log'
 import { identity, isFunction, kebabCase } from '../util/minilo'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
@@ -13,6 +14,15 @@ const VM_PROP = 'vm'
 const STATE_UNDEF = 0
 const STATE_CREATED = 1
 const STATE_MOUNTED = 2
+
+const EVENT_CREATED = 'created'
+const EVENT_CREATE_ERROR = 'createerror'
+const EVENT_MOUNTED = 'mounted'
+const EVENT_MOUNT_ERROR = 'mounterror'
+const EVENT_UNMOUNTED = 'unmounted'
+const EVENT_UNMOUNT_ERROR = 'unmounterror'
+const EVENT_DESTROYED = 'destroyed'
+const EVENT_DESTROY_ERROR = 'destroyerror'
 
 /**
  * Basic ol component mixin.
@@ -61,7 +71,7 @@ export default {
      * @type {string}
      */
     vmName () {
-      return [this.$options.name, this.id].filter(identity).join(' ')
+      return [this.$options.name, this.id].filter(identity).join('.')
     },
     /**
      * @type {string|undefined}
@@ -83,21 +93,150 @@ export default {
       }
     },
   },
+  async created () {
+    /**
+     * @type {{warn: (function(...[*]): void), log: (function(...[*]): void), error: (function(...[*]): void)}}
+     * @private
+     */
+    this._logger = newLogger(this.vmName)
+    /**
+     * @type {number}
+     * @private
+     */
+    this._olObjectState = STATE_UNDEF
+    /**
+     * @type {module:ol/Object~BaseObject}
+     * @private
+     */
+    this._olObject = undefined
+
+    Object.defineProperties(this, {
+      /**
+       * @type {{warn: (function(...[*]): void), log: (function(...[*]): void), error: (function(...[*]): void)}}
+       */
+      $logger: {
+        enumerable: true,
+        get: () => this._logger,
+      },
+      /**
+       * @type {string}
+       */
+      $olObjectState: {
+        enumerable: true,
+        get: () => this._olObjectState,
+      },
+      /**
+       * @type {module:ol/Object~BaseObject|undefined}
+       */
+      $olObject: {
+        enumerable: true,
+        get: () => this._olObject,
+      },
+      /**
+       * @type {Promise<void>}
+       */
+      $createPromise: {
+        enumerable: true,
+        get: () => {
+          if ([STATE_CREATED, STATE_MOUNTED].includes(this._olObjectState)) {
+            return Promise.resolve()
+          }
+
+          return obsFromVueEvent(this, [EVENT_CREATED, EVENT_CREATE_ERROR])
+            .pipe(firstObs())
+            .toPromise(Promise)
+        },
+      },
+      /**
+       * @type {Promise<void>}
+       */
+      $mountPromise: {
+        enumerable: true,
+        get: () => {
+          if ([STATE_MOUNTED].includes(this._olObjectState)) {
+            return Promise.resolve()
+          }
+
+          return obsFromVueEvent(this, [EVENT_MOUNTED, EVENT_MOUNT_ERROR])
+            .pipe(firstObs())
+            .toPromise(Promise)
+        },
+      },
+      /**
+       * @type {Promise<void>}
+       */
+      $unmountPromise: {
+        enumerable: true,
+        get: () => {
+          return concatObs(
+            fromObs(this.$mountPromise),
+            obsFromVueEvent(this, [EVENT_UNMOUNTED, EVENT_UNMOUNT_ERROR])
+              .pipe(firstObs()),
+          ).toPromise(Promise)
+        },
+      },
+      /**
+       * @type {Promise<void>}
+       */
+      $destroyPromise: {
+        enumerable: true,
+        get: () => {
+          return concatObs(
+            fromObs(this.$unmountPromise),
+            obsFromVueEvent(this, [EVENT_DESTROYED, EVENT_DESTROY_ERROR])
+              .pipe(firstObs()),
+          ).toPromise(Promise)
+        },
+      },
+    })
+
+    await this.init()
+  },
+  async mounted () {
+    await this.$createPromise
+    await this.mount()
+  },
+  async beforeDestroy () {
+    await this.$mountPromise
+    await this.unmount()
+  },
+  async destroyed () {
+    await this.$unmountPromise
+    await this.deinit()
+  },
   methods: {
     /**
      * @return {Promise<void>} Resolves when initialization completes
      * @protected
      */
     async init () {
-      this._olObject = await this.instanceFactoryCall(this.olObjIdent, ::this.createOlObject)
-      this._olObject[VM_PROP] || (this._olObject[VM_PROP] = [])
+      try {
+        this._olObject = await this.instanceFactoryCall(this.olObjIdent, ::this.createOlObject)
+        this._olObject[VM_PROP] || (this._olObject[VM_PROP] = [])
 
-      // for loaded from IdentityMap
-      if (!this._olObject[VM_PROP].includes(this)) {
-        this._olObject[VM_PROP].push(this)
+        // for loaded from IdentityMap
+        if (!this._olObject[VM_PROP].includes(this)) {
+          this._olObject[VM_PROP].push(this)
+        }
+
+        ++this.rev
+
+        this._olObjectState = STATE_CREATED
+
+        this.$emit(EVENT_CREATED, this)
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`ol object ${EVENT_CREATED}`)
+        }
+      } catch (err) {
+        this.$emit(EVENT_CREATE_ERROR, this)
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.error(`ol object ${EVENT_CREATE_ERROR}`, err)
+        }
+
+        throw err
       }
-
-      ++this.rev
     },
     /**
      * @return {module:ol/Object~BaseObject|Promise<module:ol/Object~BaseObject>}
@@ -112,11 +251,29 @@ export default {
      * @protected
      */
     deinit () {
-      this.unsetInstances()
+      try {
+        this._olObjectState = STATE_UNDEF
 
-      if (this._olObject) {
-        this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
-        this._olObject = undefined
+        this.unsetInstances()
+
+        if (this._olObject) {
+          this._olObject[VM_PROP] = this._olObject[VM_PROP].filter(vm => vm !== this)
+          this._olObject = undefined
+        }
+
+        this.$emit(EVENT_DESTROYED, this)
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`ol object ${EVENT_DESTROYED}`)
+        }
+      } catch (err) {
+        this.$emit(EVENT_DESTROY_ERROR, this)
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.error(`ol object ${EVENT_DESTROY_ERROR}`, err)
+        }
+
+        throw err
       }
     },
     /**
@@ -128,18 +285,54 @@ export default {
       return this::services.methods.getServices()
     },
     /**
-     * @return {void|Promise<void>}
+     * @return {Promise<void>}
      * @protected
      */
-    mount () {
-      return this.subscribeAll()
+    async mount () {
+      try {
+        await this.subscribeAll()
+
+        this._olObjectState = STATE_MOUNTED
+
+        this.$emit(EVENT_MOUNTED, this)
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`ol object ${EVENT_MOUNTED}`)
+        }
+      } catch (err) {
+        this.$emit(EVENT_MOUNT_ERROR, this)
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.error(`ol object ${EVENT_MOUNT_ERROR}`, err)
+        }
+
+        throw err
+      }
     },
     /**
      * @return {void|Promise<void>}
      * @protected
      */
-    unmount () {
-      return this.unsubscribeAll()
+    async unmount () {
+      try {
+        this._olObjectState = STATE_CREATED
+
+        await this.unsubscribeAll()
+
+        this.$emit(EVENT_UNMOUNTED, this)
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`ol object ${EVENT_UNMOUNTED}`)
+        }
+      } catch (err) {
+        this.$emit(EVENT_UNMOUNT_ERROR, this)
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.error(`ol object ${EVENT_UNMOUNT_ERROR}`, err)
+        }
+
+        throw err
+      }
     },
     /**
      * Refresh internal ol objects
@@ -158,6 +351,12 @@ export default {
       })
     },
     /**
+     * @return {Promise<void>}
+     */
+    scheduleRefresh: debounce(function () {
+      return this.refresh()
+    }, 1000 / 60),
+    /**
      * Internal usage only in components that doesn't support refreshing.
      * @return {Promise<void>}
      * @protected
@@ -169,6 +368,12 @@ export default {
 
       await this.mount()
     },
+    /**
+     * @return {Promise<void>}
+     */
+    scheduleRemount: debounce(function () {
+      return this.remount()
+    }, 1000 / 60),
     /**
      * Only for internal purpose to support watching for properties
      * for which OpenLayers doesn't provide setters.
@@ -185,6 +390,12 @@ export default {
       await this.mount()
     },
     /**
+     * @return {Promise<void>}
+     */
+    scheduleRecreate: debounce(function () {
+      return this.recreate()
+    }, 1000 / 60),
+    /**
      * @return {void|Promise<void>}
      */
     subscribeAll () {},
@@ -198,122 +409,4 @@ export default {
       return this.$olObject || throw new Error('OpenLayers object is undefined')
     },
   },
-  created () {
-    /**
-     * @type {number}
-     * @private
-     */
-    this._olObjectState = STATE_UNDEF
-    /**
-     * @type {module:ol/Object~BaseObject}
-     * @private
-     */
-    this._olObject = undefined
-
-    Object.defineProperties(this, {
-      $olObjectState: {
-        enumerable: true,
-        get: () => this._olObjectState,
-      },
-      $olObject: {
-        enumerable: true,
-        get: () => this._olObject,
-      },
-    })
-
-    this::defineLifeCyclePromises()
-    this::defineDebouncedHelpers()
-  },
-  async mounted () {
-    await this.$createPromise
-
-    this._mounted = true
-  },
-  async beforeDestroy () {
-    await this.$mountPromise
-
-    this._mounted = false
-  },
-  async destroyed () {
-    await this.$unmountPromise
-
-    this._destroyed = true
-  },
-}
-
-function defineLifeCyclePromises () {
-  const makeHandler = (event, state) => () => {
-    this._olObjectState = state
-
-    this.$emit(event, this)
-
-    if (process.env.VUELAYERS_DEBUG) {
-      log(event, this.vmName)
-    }
-
-    return this
-  }
-  // create
-  this._createPromise = Promise.resolve(this.init())
-    .then(makeHandler('created', STATE_CREATED))
-
-  const t = 1000 / 60
-  // mount
-  const mountObs = intervalObs(t)
-    .pipe(
-      skipWhile(() => this._mounted !== true),
-      firstObs(),
-    )
-  this._mountPromise = mountObs.toPromise(Promise)
-    .then(::this.mount)
-    .then(makeHandler('mounted', STATE_MOUNTED))
-
-  // unmount
-  const unmountObs = intervalObs(t)
-    .pipe(
-      skipWhile(() => this._mounted !== false),
-      firstObs(),
-    )
-  this._unmountPromise = unmountObs.toPromise(Promise)
-    .then(::this.unmount)
-    .then(makeHandler('unmounted', STATE_CREATED))
-
-  // destroy
-  const destroyObs = intervalObs(t)
-    .pipe(
-      skipWhile(() => this._destroyed !== true),
-      firstObs(),
-    )
-  this._destroyPromise = destroyObs.toPromise(Promise)
-    .then(::this.deinit)
-    .then(makeHandler('destroyed', STATE_UNDEF))
-
-  Object.defineProperties(this, {
-    $createPromise: {
-      enumerable: true,
-      get: () => this._createPromise,
-    },
-    $mountPromise: {
-      enumerable: true,
-      get: () => this._mountPromise,
-    },
-    $unmountPromise: {
-      enumerable: true,
-      get: () => this._unmountPromise,
-    },
-    $destroyPromise: {
-      enumerable: true,
-      get: () => this._destroyPromise,
-    },
-  })
-}
-
-function defineDebouncedHelpers () {
-  const t = 1000 / 10
-  // bind debounced functions at runtime
-  // for each instance to avoid interfering between
-  // different instances
-  this.scheduleRefresh = debounce(::this.refresh, t)
-  this.scheduleRemount = debounce(::this.remount, t)
-  this.scheduleRecreate = debounce(::this.recreate, t)
 }

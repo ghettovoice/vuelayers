@@ -1,6 +1,6 @@
 import { Collection } from 'ol'
 import { defaults as createDefaultInteractions, Interaction } from 'ol/interaction'
-import { merge as mergeObs } from 'rxjs/observable'
+import { merge as mergeObs } from 'rxjs'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'

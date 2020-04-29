@@ -1,5 +1,5 @@
 import { Collection, Feature, getUid as getObjectUid } from 'ol'
-import { merge as mergeObs } from 'rxjs/observable'
+import { merge as mergeObs } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
 import { getFeatureId, initializeFeature, mergeFeatures } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'

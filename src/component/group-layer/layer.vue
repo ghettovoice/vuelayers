@@ -29,7 +29,7 @@
       getServices () {
         return mergeDescriptors(
           this::layer.methods.getServices(),
-          this::layersContainer.methods.getServices()
+          this::layersContainer.methods.getServices(),
         )
       },
     },

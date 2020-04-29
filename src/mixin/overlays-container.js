@@ -1,5 +1,5 @@
 import { Collection, Overlay } from 'ol'
-import { merge as mergeObs } from 'rxjs/observable'
+import { merge as mergeObs } from 'rxjs'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
 import { obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
@@ -46,7 +46,7 @@ export default {
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
       }
-    }
+    },
   },
   created () {
     /**

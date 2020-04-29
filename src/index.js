@@ -7,7 +7,7 @@ import * as DrawInteraction from './component/draw-interaction'
 import * as Feature from './component/feature'
 import * as FillStyle from './component/fill-style'
 import * as Geoloc from './component/geoloc'
-// import * as Graticule from './component/graticule'
+import * as Graticule from './component/graticule'
 import * as GroupLayer from './component/group-layer'
 import * as HeatmapLayer from './component/heatmap-layer'
 import * as IconStyle from './component/icon-style'
@@ -70,7 +70,7 @@ function plugin (Vue, options = {}) {
   Vue.use(Feature, options)
   Vue.use(FillStyle, options)
   Vue.use(Geoloc, options)
-  // Vue.use(Graticule, options)
+  Vue.use(Graticule, options)
   Vue.use(GroupLayer, options)
   Vue.use(HeatmapLayer, options)
   Vue.use(IconStyle, options)
@@ -122,7 +122,7 @@ export {
   Feature,
   FillStyle,
   Geoloc,
-  // Graticule,
+  Graticule,
   GroupLayer,
   HeatmapLayer,
   IconStyle,
