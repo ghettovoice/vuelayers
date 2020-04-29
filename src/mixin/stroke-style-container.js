@@ -29,7 +29,7 @@ export default {
      * @returns {Promise<void>}
      */
     async setStroke (stroke) {
-      if (isFunction(stroke.resolveOlObject)) {
+      if (stroke && isFunction(stroke.resolveOlObject)) {
         stroke = await stroke.resolveOlObject()
       }
 

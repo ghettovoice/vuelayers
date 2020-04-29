@@ -32,7 +32,7 @@ export default {
      * @returns {Promise<void>}
      */
     async setText (text) {
-      if (isFunction(text.resolveOlObject)) {
+      if (text && isFunction(text.resolveOlObject)) {
         text = await text.resolveOlObject()
       }
 

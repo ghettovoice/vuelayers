@@ -32,7 +32,7 @@ export default {
      * @returns {Promise<void>}
      */
     async setImage (image) {
-      if (isFunction(image.resolveOlObject)) {
+      if (image && isFunction(image.resolveOlObject)) {
         image = await image.resolveOlObject()
       }
 

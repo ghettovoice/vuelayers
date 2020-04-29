@@ -29,7 +29,7 @@ export default {
      * @returns {Promise<void>}
      */
     async setFill (fill) {
-      if (isFunction(fill.resolveOlObject)) {
+      if (fill && isFunction(fill.resolveOlObject)) {
         fill = await fill.resolveOlObject()
       }
 

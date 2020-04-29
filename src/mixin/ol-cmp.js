@@ -65,7 +65,7 @@ export default {
      * @type {string}
      */
     vmId () {
-      return [this.vmClass, this.id].filter(identity).join('-')
+      return [this.vmClass, this.id].filter(identity).join('.')
     },
     /**
      * @type {string}

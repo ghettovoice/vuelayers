@@ -36,7 +36,7 @@ export default {
      * @return {Promise<void>}
      */
     async setGeometry (geom) {
-      if (isFunction(geom.resolveOlObject)) {
+      if (geom && isFunction(geom.resolveOlObject)) {
         geom = await geom.resolveOlObject()
       } else if (isPlainObject(geom)) {
         geom = this.readGeometryInDataProj(geom)

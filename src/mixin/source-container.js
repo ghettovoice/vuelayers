@@ -32,7 +32,7 @@ export default {
      * @return {void}
      */
     async setSource (source) {
-      if (isFunction(source.resolveOlObject)) {
+      if (source && isFunction(source.resolveOlObject)) {
         source = await source.resolveOlObject()
       }
 
