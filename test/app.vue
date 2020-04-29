@@ -8,6 +8,10 @@
         :center.sync="center"
         :rotation.sync="rotation"
         :zoom.sync="zoom" />
+
+      <VlLayerTile>
+        <VlSourceOsm />
+      </VlLayerTile>
     </VlMap>
   </div>
 </template>

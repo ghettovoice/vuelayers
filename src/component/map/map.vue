@@ -154,12 +154,12 @@
         'moveTolerance',
         'pixelRatio',
         'maxTilesLoading',
-      ], prop => function () {
+      ], prop => async function () {
         if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`watcher for ${prop} triggered`)
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
         }
 
-        return this.scheduleRecreate()
+        await this.scheduleRecreate()
       }),
     },
     created () {

@@ -19,8 +19,7 @@
        */
       createLayer () {
         return new TileLayer({
-          // layer props
-          id: this.id,
+          // ol/layer/Base
           className: this.className,
           opacity: this.opacity,
           visible: this.visible,
@@ -30,8 +29,9 @@
           maxResolution: this.maxResolution,
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
+          // ol/layer/Layer
           render: this.render,
-          // tile layer props
+          // ol/layer/BaseTile
           preload: this.preload,
           useInterimTilesOnError: this.useInterimTilesOnError,
         })

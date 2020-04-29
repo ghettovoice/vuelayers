@@ -6,42 +6,44 @@
   const OSM_URL_TEMPLATE = 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   const OSM_MAX_ZOOM = 19
 
-  const props = {
-    attributions: {
-      type: [String, Array],
-      default: OSM_ATTRIBUTIONS,
-    },
-    maxZoom: {
-      type: Number,
-      default: OSM_MAX_ZOOM,
-    },
-    url: {
-      type: String,
-      default: OSM_URL_TEMPLATE,
-    },
-  }
-
-  const methods = {
-    createSource () {
-      // always EPSG:3857, size: 256x256, format png
-      return new OSMSource({
-        url: this.urlTmpl,
-        attributions: this.attributions,
-        crossOrigin: this.crossOrigin,
-        maxZoom: this.maxZoom,
-        cacheSize: this.cacheSize,
-        opaque: this.opaque,
-        reprojectionErrorThreshold: this.reprojectionErrorThreshold,
-        wrapX: this.wrapX,
-        transition: this.transition,
-      })
-    },
-  }
-
   export default {
     name: 'VlSourceOsm',
-    mixins: [xyzSource],
-    props,
-    methods,
+    mixins: [
+      xyzSource,
+    ],
+    props: {
+      attributions: {
+        type: [String, Array],
+        default: OSM_ATTRIBUTIONS,
+      },
+      maxZoom: {
+        type: Number,
+        default: OSM_MAX_ZOOM,
+      },
+      url: {
+        type: String,
+        default: OSM_URL_TEMPLATE,
+      },
+    },
+    methods: {
+      createSource () {
+        // always EPSG:3857, size: 256x256, format png
+        return new OSMSource({
+          maxZoom: this.maxZoom,
+          // ol/source/Source
+          attributions: this.attributions,
+          wrapX: this.wrapX,
+          // ol/source/Tile
+          cacheSize: this.cacheSize,
+          opaque: this.opaque,
+          transition: this.transition,
+          // ol/source/UrlTile
+          tileUrlFunction: this.urlFunc,
+          // ol/source/TileImage
+          crossOrigin: this.crossOrigin,
+          reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+        })
+      },
+    },
   }
 </script>
