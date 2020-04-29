@@ -26,7 +26,8 @@ export default {
      */
     attributions: {
       type: [String, Array],
-      validator: value => isString(value) || (isArray(value) && value.every(isString)),
+      validator: value => isString(value) ||
+        (isArray(value) && value.every(isString)),
     },
     /**
      * @type {boolean}
@@ -78,16 +79,28 @@ export default {
     async attributionsCollapsible (value) {
       if (value === await this.getAttributionsCollapsible()) return
 
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('attributionsCollapsible changed, scheduling recreate...')
+      }
+
       await this.scheduleRecreate()
     },
     async projection (value) {
       const projection = await this.getProjection()
       if (value === projection?.getCode()) return
 
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('projection changed, scheduling recreate...')
+      }
+
       await this.scheduleRecreate()
     },
     async wrapX (value) {
       if (value === await this.getWrapX()) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('wrapX changed, scheduling recreate...')
+      }
 
       await this.scheduleRecreate()
     },
@@ -236,10 +249,10 @@ export default {
      * @returns {Promise<void>}
      */
     async subscribeAll () {
-      await Promise.all(
+      await Promise.all([
         this::olCmp.methods.subscribeAll(),
         this::subscribeToSourceEvents(),
-      )
+      ])
     },
     /**
      * @return {Promise<module:ol/source/Source~Source>}
@@ -253,6 +266,7 @@ export default {
       'scheduleRemount',
       'recreate',
       'scheduleRecreate',
+      'resolveOlObject',
     ]),
   },
 }

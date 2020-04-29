@@ -110,86 +110,7 @@ export default {
      */
     this._olObject = undefined
 
-    Object.defineProperties(this, {
-      /**
-       * @type {{warn: (function(...[*]): void), log: (function(...[*]): void), error: (function(...[*]): void)}}
-       */
-      $logger: {
-        enumerable: true,
-        get: () => this._logger,
-      },
-      /**
-       * @type {string}
-       */
-      $olObjectState: {
-        enumerable: true,
-        get: () => this._olObjectState,
-      },
-      /**
-       * @type {module:ol/Object~BaseObject|undefined}
-       */
-      $olObject: {
-        enumerable: true,
-        get: () => this._olObject,
-      },
-      /**
-       * @type {Promise<void>}
-       */
-      $createPromise: {
-        enumerable: true,
-        get: () => {
-          if ([STATE_CREATED, STATE_MOUNTED].includes(this._olObjectState)) {
-            return Promise.resolve()
-          }
-
-          return obsFromVueEvent(this, [EVENT_CREATED, EVENT_CREATE_ERROR])
-            .pipe(firstObs())
-            .toPromise(Promise)
-        },
-      },
-      /**
-       * @type {Promise<void>}
-       */
-      $mountPromise: {
-        enumerable: true,
-        get: () => {
-          if ([STATE_MOUNTED].includes(this._olObjectState)) {
-            return Promise.resolve()
-          }
-
-          return obsFromVueEvent(this, [EVENT_MOUNTED, EVENT_MOUNT_ERROR])
-            .pipe(firstObs())
-            .toPromise(Promise)
-        },
-      },
-      /**
-       * @type {Promise<void>}
-       */
-      $unmountPromise: {
-        enumerable: true,
-        get: () => {
-          return concatObs(
-            fromObs(this.$mountPromise),
-            obsFromVueEvent(this, [EVENT_UNMOUNTED, EVENT_UNMOUNT_ERROR])
-              .pipe(firstObs()),
-          ).toPromise(Promise)
-        },
-      },
-      /**
-       * @type {Promise<void>}
-       */
-      $destroyPromise: {
-        enumerable: true,
-        get: () => {
-          return concatObs(
-            fromObs(this.$unmountPromise),
-            obsFromVueEvent(this, [EVENT_DESTROYED, EVENT_DESTROY_ERROR])
-              .pipe(firstObs()),
-          ).toPromise(Promise)
-        },
-      },
-    })
-
+    this::defineServices()
     await this.init()
   },
   async mounted () {
@@ -409,4 +330,86 @@ export default {
       return this.$olObject || throw new Error('OpenLayers object is undefined')
     },
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    /**
+     * @type {{warn: (function(...[*]): void), log: (function(...[*]): void), error: (function(...[*]): void)}}
+     */
+    $logger: {
+      enumerable: true,
+      get: () => this._logger,
+    },
+    /**
+     * @type {string}
+     */
+    $olObjectState: {
+      enumerable: true,
+      get: () => this._olObjectState,
+    },
+    /**
+     * @type {module:ol/Object~BaseObject|undefined}
+     */
+    $olObject: {
+      enumerable: true,
+      get: () => this._olObject,
+    },
+    /**
+     * @type {Promise<void>}
+     */
+    $createPromise: {
+      enumerable: true,
+      get: () => {
+        if ([STATE_CREATED, STATE_MOUNTED].includes(this._olObjectState)) {
+          return Promise.resolve()
+        }
+
+        return obsFromVueEvent(this, [EVENT_CREATED, EVENT_CREATE_ERROR])
+          .pipe(firstObs())
+          .toPromise(Promise)
+      },
+    },
+    /**
+     * @type {Promise<void>}
+     */
+    $mountPromise: {
+      enumerable: true,
+      get: () => {
+        if ([STATE_MOUNTED].includes(this._olObjectState)) {
+          return Promise.resolve()
+        }
+
+        return obsFromVueEvent(this, [EVENT_MOUNTED, EVENT_MOUNT_ERROR])
+          .pipe(firstObs())
+          .toPromise(Promise)
+      },
+    },
+    /**
+     * @type {Promise<void>}
+     */
+    $unmountPromise: {
+      enumerable: true,
+      get: () => {
+        return concatObs(
+          fromObs(this.$mountPromise),
+          obsFromVueEvent(this, [EVENT_UNMOUNTED, EVENT_UNMOUNT_ERROR])
+            .pipe(firstObs()),
+        ).toPromise(Promise)
+      },
+    },
+    /**
+     * @type {Promise<void>}
+     */
+    $destroyPromise: {
+      enumerable: true,
+      get: () => {
+        return concatObs(
+          fromObs(this.$unmountPromise),
+          obsFromVueEvent(this, [EVENT_DESTROYED, EVENT_DESTROY_ERROR])
+            .pipe(firstObs()),
+        ).toPromise(Promise)
+      },
+    },
+  })
 }

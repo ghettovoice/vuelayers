@@ -28,9 +28,9 @@ const isNotEmptyString = and(isString, negate(isEmpty))
  */
 export default {
   mixins: [
-    source,
-    featuresContainer,
     projTransforms,
+    featuresContainer,
+    source,
   ],
   stubVNode: {
     empty: false,
@@ -186,6 +186,10 @@ export default {
         this.dataFormat = undefined
       }
 
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('sealDataFormatFactory changed, scheduling recreate...')
+      }
+
       await this.scheduleRecreate()
     },
     ...makeWatchers([
@@ -193,7 +197,13 @@ export default {
       'dataFormat',
       'overlaps',
       'useSpatialIndex',
-    ], () => source.methods.scheduleRecreate()),
+    ], prop => async function () {
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`${prop} changed, scheduling recreate...`)
+      }
+
+      await this.scheduleRecreate()
+    }),
   },
   created () {
     if (isFunction(this.sealDataFormatFactory)) {
@@ -375,7 +385,7 @@ export default {
           features = this.readSourceData(features)
         }
         if (isArray(features)) {
-          this.addFeatures(features)
+          await this.addFeatures(features)
         }
       }
     },
@@ -418,6 +428,8 @@ export default {
       'recreate',
       'scheduleRecreate',
       'subscribeAll',
+      'resolveOlObject',
+      'resolveSource',
     ]),
   },
 }

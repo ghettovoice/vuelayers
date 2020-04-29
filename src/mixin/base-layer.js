@@ -354,6 +354,7 @@ export default {
       'scheduleRemount',
       'recreate',
       'scheduleRecreate',
+      'resolveOlObject',
     ]),
   },
 }
@@ -425,8 +426,6 @@ async function subscribeToLayerEvents () {
   this.subscribeTo(events, evt => {
     ++this.rev
 
-    this.$nextTick(() => {
-      this.$emit(evt.type, evt)
-    })
+    this.$emit(evt.type, evt)
   })
 }

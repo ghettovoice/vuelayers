@@ -105,6 +105,7 @@ export default {
       'recreate',
       'scheduleRecreate',
       'subscribeAll',
+      'resolveOlObject',
     ]),
   },
 }

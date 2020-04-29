@@ -32,7 +32,13 @@ export default {
     ...makeWatchers([
       'render',
       'overlay',
-    ], () => baseLayer.methods.scheduleRecreate),
+    ], prop => async function () {
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`${prop} changed, scheduling recreate...`)
+      }
+
+      await this.scheduleRecreate()
+    }),
   },
   created () {
     this::defineServices()
@@ -106,6 +112,8 @@ export default {
       'recreate',
       'scheduleRecreate',
       'subscribeAll',
+      'resolveOlObject',
+      'resolveLayer',
     ]),
   },
 }

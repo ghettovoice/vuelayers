@@ -277,6 +277,7 @@ export default {
       'scheduleRemount',
       'recreate',
       'scheduleRecreate',
+      'resolveOlObject',
     ]),
   },
 }

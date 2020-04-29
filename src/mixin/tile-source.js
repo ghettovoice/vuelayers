@@ -56,7 +56,7 @@ export default {
   data () {
     return {
       /**
-       * @type {module:ol/tilegrid/TileGrid|undefined}
+       * @type {module:ol/tilegrid/TileGrid~TileGrid|undefined}
        */
       tileGrid: undefined,
     }
@@ -89,10 +89,18 @@ export default {
     async opaque (value) {
       if (value === await this.getOpaque()) return
 
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('opaque changed, scheduling recreate...')
+      }
+
       await this.scheduleRecreate()
     },
     async tilePixelRatio (value) {
       if (value === await this.getTilePixelRatio(value)) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('tilePixelRatio changed, scheduling recreate...')
+      }
 
       await this.scheduleRecreate()
     },
@@ -119,13 +127,23 @@ export default {
         this.tileGrid = undefined
       }
 
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('sealTileGridFactory changed, scheduling recreate...')
+      }
+
       await this.scheduleRecreate()
     },
     ...makeWatchers([
       'cacheSize',
       'transition',
       'zDirection',
-    ], () => source.methods.scheduleRecreate),
+    ], prop => async function () {
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`${prop} changed, scheduling recreate...`)
+      }
+
+      await this.scheduleRecreate()
+    }),
   },
   created () {
     if (isFunction(this.sealTileGridFactory)) {
@@ -269,6 +287,8 @@ export default {
       'scheduleRecreate',
       'getServices',
       'subscribeAll',
+      'resolveOlObject',
+      'resolveSource',
     ]),
   },
 }

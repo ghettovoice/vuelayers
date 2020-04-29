@@ -44,20 +44,36 @@ export default {
     async renderBuffer (value) {
       if (value === await this.getRenderBuffer()) return
 
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('renderBuffer changed, scheduling recreate...')
+      }
+
       await this.scheduleRecreate()
     },
     async declutter (value) {
       if (value === await this.getDeclutter()) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('declutter changed, scheduling recreate...')
+      }
 
       await this.scheduleRecreate()
     },
     async updateWhileAnimating (value) {
       if (value === await this.getUpdateWhileAnimating()) return
 
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('updateWhileAnimating changed, scheduling recreate...')
+      }
+
       await this.scheduleRecreate()
     },
     async updateWhileInteracting (value) {
       if (value === await this.getUpdateWhileInteracting()) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('updateWhileInteracting changed, scheduling recreate...')
+      }
 
       await this.scheduleRecreate()
     },
@@ -138,6 +154,8 @@ export default {
       'scheduleRemount',
       'recreate',
       'scheduleRecreate',
+      'resolveOlObject',
+      'resolveLayer',
     ]),
   },
 }

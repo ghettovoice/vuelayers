@@ -128,6 +128,8 @@ export default {
       'recreate',
       'scheduleRecreate',
       'getServices',
+      'resolveOlObject',
+      'resolveGeometry',
     ]),
   },
 }

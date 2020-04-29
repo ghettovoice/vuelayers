@@ -22,8 +22,9 @@ export default {
     },
     tileSize: {
       type: [Number, Array],
-      default: [256, 256],
-      validator: value => isNumber(value) || (isArray(value) && value.length === 2 && value.every(isNumber())),
+      default: () => [256, 256],
+      validator: value => isNumber(value) ||
+        (isArray(value) && value.length === 2 && value.every(isNumber)),
     },
   },
   computed: {
@@ -87,6 +88,8 @@ export default {
       'scheduleRecreate',
       'getServices',
       'subscribeAll',
+      'resolveSource',
+      'resolveOlObject',
     ]),
   },
 }

@@ -41,7 +41,6 @@ export default {
       default: 1,
     },
   },
-  watch: {},
   created () {
     this::defineServices()
   },
@@ -148,6 +147,8 @@ export default {
       'scheduleRecreate',
       'getServices',
       'subscribeAll',
+      'resolveOlObject',
+      'resolveStyle',
     ]),
   },
 }

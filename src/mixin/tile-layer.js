@@ -90,6 +90,8 @@ export default {
       'remount',
       'scheduleRecreate',
       'getServices',
+      'resolveOlObject',
+      'resolveLayer',
     ]),
   },
 }

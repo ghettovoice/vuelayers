@@ -29,7 +29,13 @@ export default {
       'crossOrigin',
       'reprojectionErrorThreshold',
       'tileClass',
-    ], () => urlTileSource.methods.scheduleRecreate),
+    ], prop => async function () {
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`${prop} changed, scheduling recreate...`)
+      }
+
+      await this.scheduleRecreate()
+    }),
   },
   methods: {
     ...pick(urlTileSource.methods, [
@@ -45,6 +51,8 @@ export default {
       'scheduleRecreate',
       'getServices',
       'subscribeAll',
+      'resolveSource',
+      'resolveOlObject',
     ]),
   },
 }

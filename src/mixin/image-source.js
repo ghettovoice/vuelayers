@@ -30,7 +30,13 @@ export default {
   watch: {
     ...makeWatchers([
       'resolutions',
-    ], () => source.methods.scheduleRecreate),
+    ], prop => async function () {
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`${prop} changed, scheduling recreate...`)
+      }
+
+      await this.scheduleRecreate()
+    }),
   },
   methods: {
     /**
@@ -69,6 +75,8 @@ export default {
       'recreate',
       'scheduleRecreate',
       'getServices',
+      'resolveOlObject',
+      'resolveSource',
     ]),
   },
 }
@@ -85,8 +93,6 @@ async function subscribeToSourceEvents () {
   this.subscribeTo(events, evt => {
     ++this.rev
 
-    this.$nextTick(() => {
-      this.$emit(evt.type, evt)
-    })
+    this.$emit(evt.type, evt)
   })
 }
