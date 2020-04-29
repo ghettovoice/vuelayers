@@ -1,21 +1,3 @@
-const importTransforms = {
-  'rxjs/operators': {
-    transform: 'rxjs/_esm5/internal/operators/${member}',
-    preventFullImport: true,
-    skipDefaultConversion: true,
-  },
-  'rxjs/observable': {
-    transform: 'rxjs/_esm5/internal/observable/${member}',
-    preventFullImport: true,
-    skipDefaultConversion: true,
-  },
-  'rxjs': {
-    transform: 'rxjs/_esm5/internal/${member}',
-    preventFullImport: true,
-    skipDefaultConversion: true,
-  },
-}
-
 module.exports = function (api) {
   api.cache(true)
 
@@ -45,7 +27,6 @@ module.exports = function (api) {
     '@babel/plugin-proposal-json-strings',
     // Other
     ['@babel/plugin-transform-runtime', { corejs: 3, helpers: true, regenerator: true, useESModules: true }],
-    ['transform-imports', importTransforms],
   ]
   const env = {
     test: {

@@ -155,22 +155,6 @@
     <XML>
       <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="true" />
     </XML>
-    <codeStyleSettings language="CFML">
-      <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
-    </codeStyleSettings>
-    <codeStyleSettings language="CoffeeScript">
-      <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
-      <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
-      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
-      <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="false" />
-      <option name="METHOD_PARAMETERS_WRAP" value="5" />
-      <option name="METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
-      <option name="METHOD_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
-      <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
-      <option name="ARRAY_INITIALIZER_WRAP" value="5" />
-      <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
-      <option name="ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE" value="true" />
-    </codeStyleSettings>
     <codeStyleSettings language="ECMA Script Level 4">
       <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
       <option name="KEEP_SIMPLE_BLOCKS_IN_ONE_LINE" value="true" />

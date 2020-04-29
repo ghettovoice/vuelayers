@@ -29,12 +29,9 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.json', '.md'],
     modules: [
-      // utils.resolve('src'),
+      utils.resolve('src'),
       'node_modules',
     ],
-    alias: {
-      '@': utils.resolve('src'),
-    },
   },
   resolveLoader: {
     modules: [
