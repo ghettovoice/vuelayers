@@ -11,9 +11,11 @@ import services from './services'
 
 const VM_PROP = 'vm'
 
-const STATE_UNDEF = 0
-const STATE_CREATED = 1
-const STATE_MOUNTED = 2
+const STATE_UNDEF = 'undef'
+const STATE_CREATING = 'creating'
+const STATE_CREATED = 'created'
+const STATE_MOUNTING = 'mounting'
+const STATE_MOUNTED = 'mounted'
 
 const EVENT_CREATED = 'created'
 const EVENT_CREATE_ERROR = 'createerror'
@@ -110,6 +112,7 @@ export default {
      */
     this._olObject = undefined
 
+    this::defineDebounceMethods()
     this::defineServices()
 
     await this::execInit()
@@ -193,9 +196,13 @@ export default {
 
       return new Promise(resolve => {
         if (isFunction(olObj.changed)) {
-          olObj.once('change', () => resolve())
+          olObj.once('change', () => {
+            ++this.rev
+            resolve()
+          })
           olObj.changed()
         } else {
+          ++this.rev
           resolve()
         }
       })
@@ -203,9 +210,9 @@ export default {
     /**
      * @return {Promise<void>}
      */
-    scheduleRefresh: debounce(function () {
-      return this.refresh()
-    }, 1000 / 60),
+    async scheduleRefresh () {
+      await this.debounceRefresh()
+    },
     /**
      * Internal usage only in components that doesn't support refreshing.
      * @return {Promise<void>}
@@ -213,17 +220,33 @@ export default {
      */
     async remount () {
       if (this.$olObjectState === STATE_MOUNTED) {
-        await this::execUnmount()
-      }
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('remounting...')
+        }
 
-      await this::execMount()
+        await this::execUnmount()
+        await this::execMount()
+      } else {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('remount discarded')
+        }
+      }
     },
     /**
      * @return {Promise<void>}
      */
-    scheduleRemount: debounce(function () {
-      return this.remount()
-    }, 1000 / 60),
+    async scheduleRemount () {
+      if ([
+        STATE_MOUNTING,
+        STATE_MOUNTED,
+      ].includes(this.$olObjectState)) {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('remount scheduled')
+        }
+
+        await this.debounceRemount()
+      }
+    },
     /**
      * Only for internal purpose to support watching for properties
      * for which OpenLayers doesn't provide setters.
@@ -231,20 +254,49 @@ export default {
      * @protected
      */
     async recreate () {
-      if (this.$olObjectState === STATE_MOUNTED) {
-        await this::execUnmount()
-        await this::execDeinit()
-      }
+      if ([
+        STATE_CREATED,
+        STATE_MOUNTING,
+        STATE_MOUNTED,
+      ].includes(this.$olObjectState)) {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('recreating...')
+        }
 
-      await this::execInit()
-      await this::execMount()
+        const mounted = this.$olObjectState === STATE_MOUNTED
+        if (mounted) {
+          await this::execUnmount()
+        }
+
+        await this::execDeinit()
+        await this::execInit()
+
+        if (mounted) {
+          await this::execMount()
+        }
+      } else {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('recreate discarded')
+        }
+      }
     },
     /**
      * @return {Promise<void>}
      */
-    scheduleRecreate: debounce(function () {
-      return this.recreate()
-    }, 1000 / 60),
+    async scheduleRecreate () {
+      if ([
+        STATE_CREATING,
+        STATE_CREATED,
+        STATE_MOUNTING,
+        STATE_MOUNTED,
+      ].includes(this.$olObjectState)) {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('recreate scheduled')
+        }
+
+        await this.debounceRecreate()
+      }
+    },
     /**
      * @return {void|Promise<void>}
      */
@@ -259,6 +311,22 @@ export default {
       return this.$olObject || throw new Error('OpenLayers object is undefined')
     },
   },
+}
+
+function defineDebounceMethods () {
+  const t = 1000 / 60
+
+  this.debounceRefresh = debounce(function () {
+    return this.refresh()
+  }, t)
+
+  this.debounceRemount = debounce(function () {
+    return this.remount()
+  }, t)
+
+  this.debounceRecreate = debounce(function () {
+    return this.recreate()
+  }, t)
 }
 
 function defineServices () {
@@ -290,7 +358,11 @@ function defineServices () {
     $createPromise: {
       enumerable: true,
       get: () => {
-        if ([STATE_CREATED, STATE_MOUNTED].includes(this._olObjectState)) {
+        if ([
+          STATE_CREATED,
+          STATE_MOUNTING,
+          STATE_MOUNTED,
+        ].includes(this._olObjectState)) {
           return Promise.resolve()
         }
 
@@ -349,6 +421,8 @@ function defineServices () {
  */
 async function execInit () {
   try {
+    this._olObjectState = STATE_CREATING
+
     await this.init()
 
     this._olObjectState = STATE_CREATED
@@ -359,6 +433,8 @@ async function execInit () {
       this.$logger.log(`ol object ${EVENT_CREATED}`)
     }
   } catch (err) {
+    this._olObjectState = STATE_UNDEF
+
     this.$emit(EVENT_CREATE_ERROR, this)
 
     if (process.env.VUELAYERS_DEBUG) {
@@ -401,6 +477,8 @@ async function execDeinit () {
  */
 async function execMount () {
   try {
+    this._olObjectState = STATE_MOUNTING
+
     await this.mount()
 
     this._olObjectState = STATE_MOUNTED
@@ -411,6 +489,8 @@ async function execMount () {
       this.$logger.log(`ol object ${EVENT_MOUNTED}`)
     }
   } catch (err) {
+    this._olObjectState = STATE_CREATED
+
     this.$emit(EVENT_MOUNT_ERROR, this)
 
     if (process.env.VUELAYERS_DEBUG) {

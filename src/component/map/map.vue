@@ -3,7 +3,9 @@
     :id="vmId"
     :class="vmClass"
     :tabindex="tabindex">
-    <slot />
+    <slot>
+      <VlView />
+    </slot>
   </div>
 </template>
 
@@ -26,7 +28,7 @@
   import { getMapDataProjection, getMapId, setMapDataProjection, setMapId } from '../../ol-ext'
   import { obsFromOlEvent } from '../../rx-ext'
   import { assert } from '../../util/assert'
-  import { isEqual, isFunction } from '../../util/minilo'
+  import { isEqual, isFunction, waitFor } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -163,20 +165,34 @@
       }),
     },
     created () {
+      /**
+       * @type {module:ol/View~View}
+       * @private
+       */
+      this._view = new View()
+      /**
+       * @type {Object|undefined}
+       */
+      this._viewVm = undefined
+      /**
+       * @type {module:ol/layer/Vector~VectorLayer}
+       * @private
+       */
+      this._featuresOverlay = this.instanceFactoryCall(this.featuresOverlayIdent, ::this.createFeaturesOverlay)
+      // todo wrap controls into components and provide vl-control-default
+      this.initDefaultControls(this.defaultControls)
+      // todo initialize without interactions and provide vl-interaction-default component
+      this.initDefaultInteractions(this.defaultInteractions)
+
       this::defineServices()
     },
     methods: {
       /**
-       * @return {module:ol/Map~Map}
+       * @return {Promise<module:ol/Map~Map>}
        * @protected
        */
-      createOlObject () {
-        // prepare default overlay
-        this._featuresOverlay = this.instanceFactoryCall(this.featuresOverlayIdent, ::this.createFeaturesOverlay)
-        // todo wrap controls into components and provide vl-control-default
-        this.initDefaultControls(this.defaultControls)
-        // todo initialize without interactions and provide vl-interaction-default component
-        this.initDefaultInteractions(this.defaultInteractions)
+      async createOlObject () {
+        await waitFor(() => this.$view && this.$featuresOverlay)
 
         const map = new Map({
           pixelRatio: this.pixelRatio,
@@ -187,15 +203,12 @@
           interactions: this.$interactionsCollection,
           layers: this.$layersCollection,
           overlays: this.$overlaysCollection,
-          view: new View({
-            center: [0, 0],
-            zoom: 0,
-          }),
+          view: this.$view,
         })
         setMapId(map, this.id)
         setMapDataProjection(map, this.dataProjection)
 
-        this._featuresOverlay.setMap(map)
+        this.$featuresOverlay.setMap(map)
 
         return map
       },
@@ -350,22 +363,26 @@
       /**
        * @return {module:ol/View~View}
        */
-      async getView () {
-        return (await this.resolveMap()).getView()
+      getView () {
+        return this._view
       },
       /**
        * @param {module:ol/View~View|Vue|undefined} view
        * @return {Promise<void>}
        */
       async setView (view) {
+        let viewVm
         if (view && isFunction(view.resolveOlObject)) {
+          viewVm = view
           view = await view.resolveOlObject()
         }
-        view || (view = new View({ center: [0, 0], zoom: 0 }))
+        view || (view = new View())
 
         const map = await this.resolveMap()
         if (view !== map.getView()) {
           map.setView(view)
+          this._view = view
+          this._viewVm = viewVm || (view.vm && view.vm[0])
         }
       },
       /**
@@ -386,6 +403,7 @@
         if (projection === getMapDataProjection(map)) return
 
         setMapDataProjection(map, projection)
+
         await this.scheduleRefresh()
       },
       /**
@@ -430,6 +448,8 @@
        * @protected
        */
       async mount () {
+        await waitFor(() => this.$viewVm != null)
+
         await this.setTarget(this.$el)
         this.$nextTick(::this.updateSize)
 
@@ -469,6 +489,7 @@
           this::featuresContainer.methods.getServices(),
           {
             get mapVm () { return vm },
+            get viewVm () { return vm.$viewVm },
             get viewContainer () { return vm },
           },
         )
@@ -512,7 +533,14 @@
        */
       $view: {
         enumerable: true,
-        get: () => this.$map?.getView(),
+        get: this.getView,
+      },
+      /**
+       * @type {Object|undefined}
+       */
+      $viewVm: {
+        enumerable: true,
+        get: () => this._viewVm,
       },
       /**
        * @type {module:ol/layer/Vector~VectorLayer|undefined}

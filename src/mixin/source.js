@@ -292,11 +292,11 @@ function defineServices () {
       get: () => this.$services?.mapVm,
     },
     /**
-     * @type {module:ol/View~View|undefined}
+     * @type {Object|undefined}
      */
-    $view: {
+    $viewVm: {
       enumerable: true,
-      get: () => this.$mapVm?.$view,
+      get: () => this.$services?.$viewVm,
     },
     /**
      * @type {Object|undefined}

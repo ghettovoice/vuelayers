@@ -19,7 +19,7 @@
   import { olCmp, projTransforms } from '../../mixin'
   import { EPSG_3857, getViewId, initializeView, setViewId } from '../../ol-ext'
   import { obsFromOlChangeEvent } from '../../rx-ext'
-  import { coalesce, isArray, isEqual, isFunction, isNumber, isPlainObject, noop } from '../../util/minilo'
+  import { coalesce, isArray, isEqual, isFunction, isNumber, isPlainObject, noop, waitFor } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**
@@ -579,6 +579,15 @@
         if (rotation === view.getRotation()) return
 
         view.setRotation(rotation)
+      },
+      /**
+       * @returns {Promise<void>}
+       * @protected
+       */
+      async init () {
+        await waitFor(() => this.$mapVm != null)
+
+        return this::olCmp.methods.init()
       },
       /**
        * @return {Promise<void>}

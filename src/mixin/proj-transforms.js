@@ -24,8 +24,8 @@ export default {
      * @return {module:ol/proj~ProjectionLike}
      */
     viewProjection () {
-      if (this.rev && this.$mapVm?.$view) {
-        return this.$mapVm?.$view.getProjection().getCode()
+      if (this.rev && this.$viewVm) {
+        return this.$viewVm.projection
       }
       return this.projection || EPSG_3857
     },

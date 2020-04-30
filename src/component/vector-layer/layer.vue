@@ -17,15 +17,19 @@
        */
       renderMode: String,
     },
-    watch: {
-      renderMode: {
-        immediate: true,
-        handler () {
-          if (process.env.VUELAYERS_DEBUG) {
-            this.$logger.error("'renderMode' is deprecated. Use 'vl-layer-vector-image' to render vector layer as image")
-          }
-        },
-      },
+    created () {
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.renderMode) {
+          this.$logger.warn("'renderMode' is deprecated. Use vlLayerVectorImage to render vector layer as image")
+        }
+      }
+    },
+    updated () {
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.renderMode) {
+          this.$logger.warn("'renderMode' is deprecated. Use vlLayerVectorImage to render vector layer as image")
+        }
+      }
     },
     methods: {
       /**

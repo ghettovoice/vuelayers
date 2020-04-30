@@ -129,10 +129,6 @@ export default {
     loaderFunc () {
       let loader = this.loader
       if (!loader && this.loaderFactory) {
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.warn("'loaderFactory' prop is deprecated. Use 'loader' prop instead.")
-        }
-
         loader = this.loaderFactory()
       }
 
@@ -158,10 +154,6 @@ export default {
     loadingStrategyFunc () {
       let loadingStrategy = this.loadingStrategy
       if (this.strategyFactory) {
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.warn("'strategyFactory' prop is deprecated. Use 'loadingStrategy' prop instead.")
-        }
-
         loadingStrategy = this.strategyFactory()
       }
 
@@ -223,7 +215,6 @@ export default {
     },
     ...makeWatchers([
       'loadingStrategyFunc',
-      'format',
       'overlaps',
       'useSpatialIndex',
     ], prop => async function () {
@@ -235,8 +226,34 @@ export default {
     }),
   },
   created () {
+    if (process.env.NODE_ENV !== 'production') {
+      if (this.loaderFactory) {
+        this.$logger.warn("'loaderFactory' prop is deprecated. Use 'loader' prop instead.")
+      }
+      if (this.strategyFactory) {
+        this.$logger.warn("'strategyFactory' prop is deprecated. Use 'loadingStrategy' prop instead.")
+      }
+    }
+
     if (isFunction(this.sealFormatFactory)) {
       this.format = this.instanceFactoryCall(this.formatIdent, ::this.sealFormatFactory)
+      // this.$watch('format', async () => {
+      //   if (process.env.VUELAYERS_DEBUG) {
+      //     this.$logger.log('format changed, scheduling recreate...')
+      //   }
+      //
+      //   await this.scheduleRecreate()
+      // })
+    }
+  },
+  updated () {
+    if (process.env.NODE_ENV !== 'production') {
+      if (this.loaderFactory) {
+        this.$logger.warn("'loaderFactory' prop is deprecated. Use 'loader' prop instead.")
+      }
+      if (this.strategyFactory) {
+        this.$logger.warn("'strategyFactory' prop is deprecated. Use 'loadingStrategy' prop instead.")
+      }
     }
   },
   methods: {

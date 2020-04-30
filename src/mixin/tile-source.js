@@ -148,6 +148,13 @@ export default {
   created () {
     if (isFunction(this.sealTileGridFactory)) {
       this.tileGrid = this.instanceFactoryCall(this.tileGridIdent, ::this.sealTileGridFactory)
+      // this.$watch('tileGrid', async () => {
+      //   if (process.env.VUELAYERS_DEBUG) {
+      //     this.$logger.log(`tilegrid changed, scheduling recreate...`)
+      //   }
+      //
+      //   await this.scheduleRecreate()
+      // })
     }
   },
   methods: {

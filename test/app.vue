@@ -15,23 +15,55 @@
 
       <VlLayerVector>
         <VlSourceVector
+          ref="vectorSource"
           :features.sync="features"
-          url="https://openlayers.org/en/latest/examples/data/geojson/countries.geojson" />
+          :format-factory="formatFactory"
+          :loading-strategy="loadingStrategy"
+          :loader="loader" />
       </VlLayerVector>
     </VlMap>
   </div>
 </template>
 
 <script>
+  import OSMXML from 'ol/format/OSMXML'
+  import { bbox as bboxStrategy } from 'ol/loadingstrategy'
+  import { transformExtent } from 'ol/proj'
+
   export default {
     name: 'App',
     data () {
       return {
-        zoom: 3,
-        center: [0, 0],
+        zoom: 18,
+        center: [6.6405083, 46.7791258],
         rotation: 0,
         features: [],
       }
+    },
+    methods: {
+      formatFactory () {
+        return new OSMXML()
+      },
+      loadingStrategy: bboxStrategy,
+      loader (extent, resolution, projection) {
+        const epsg4326Extent = transformExtent(extent, projection, 'EPSG:4326')
+        const client = new XMLHttpRequest()
+        client.open('POST', 'https://overpass-api.de/api/interpreter')
+        client.addEventListener('load', () => {
+          const features = new OSMXML().readFeatures(client.responseText, {
+            featureProjection: this.$refs.view.$view.getProjection(),
+          })
+          this.$refs.vectorSource.$source.addFeatures(features)
+        })
+        const query = '(node(' +
+          epsg4326Extent[1] + ',' + Math.max(epsg4326Extent[0], -180) + ',' +
+          epsg4326Extent[3] + ',' + Math.min(epsg4326Extent[2], 180) +
+          ');rel(bn)->.foo;way(bn);node(w)->.foo;rel(bw););out meta;'
+        client.send(query)
+      },
+      loaderFactory () {
+        return this.loader
+      },
     },
   }
 </script>

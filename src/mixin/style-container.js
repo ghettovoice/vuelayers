@@ -1,6 +1,5 @@
 import { Style } from 'ol/style'
-import { warn } from '../util/log'
-import { isFunction, reduce, isArray, constant } from '../util/minilo'
+import { constant, isArray, isFunction, reduce } from '../util/minilo'
 
 /**
  * @typedef {
@@ -61,14 +60,14 @@ export default {
 
       if (isFunction(olStyle)) {
         if (process.env.NODE_ENV !== 'production' && currentStyle) {
-          warn('Component already has style components among it\'s descendants. ' +
+          this.$logger.warn('Component already has style components among it\'s descendants. ' +
             'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level.')
         }
         currentStyle = style
       } else {
         if (!isArray(currentStyle)) {
           if (process.env.NODE_ENV !== 'production' && currentStyle) {
-            warn('Component already has style components among it\'s descendants. ' +
+            this.$logger.warn('Component already has style components among it\'s descendants. ' +
               'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level.')
           }
           currentStyle = []
