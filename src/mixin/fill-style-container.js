@@ -36,7 +36,6 @@ export default {
       const fillTarget = await this.getFillStyleTarget()
       if (fillTarget && fill !== fillTarget.getFill()) {
         fillTarget.setFill(fill)
-        await this.scheduleRefresh()
       }
     },
     /**

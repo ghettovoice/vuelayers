@@ -17,8 +17,7 @@
        */
       createLayer () {
         return new ImageLayer({
-          // layer props
-          id: this.id,
+          // ol/layer/Base
           className: this.className,
           opacity: this.opacity,
           visible: this.visible,
@@ -28,6 +27,8 @@
           maxResolution: this.maxResolution,
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
+          source: this.$source,
+          // ol/layer/Layer
           render: this.render,
         })
       },

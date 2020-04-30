@@ -1,5 +1,7 @@
 <script>
   import { VectorTile as VectorTileLayer } from 'ol/layer'
+  import RenderType from 'ol/layer/VectorTileRenderType'
+  import { makeWatchers } from 'util/vue-helpers'
   import { tileLayer, vectorLayer } from '../../mixin'
 
   export default {
@@ -11,22 +13,29 @@
     props: {
       renderMode: {
         type: String,
-        default: 'hybrid',
-        validator: val => [
-          'image',
-          'hybrid',
-        ].includes(val),
+        default: RenderType.HYBRID,
+        validator: val => Object.values(RenderType).includes(val),
       },
+    },
+    watch: {
+      ...makeWatchers([
+        'renderMode',
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
+      }),
     },
     methods: {
       /**
-       * @return {module:ol/layer/VectorTile~VectorTileLayer}
+       * @return {VectorTileLayer}
        * @protected
        */
       createLayer () {
         return new VectorTileLayer({
-          // layer props
-          id: this.id,
+          // ol/layer/Base
           className: this.className,
           opacity: this.opacity,
           visible: this.visible,
@@ -36,13 +45,16 @@
           maxResolution: this.maxResolution,
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
+          source: this.$source,
+          // ol/layer/Layer
           render: this.render,
-          // vector layer props
+          // ol/layer/BaseVector
           renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          // ol/layer/VectorTile
           // tile layer props
           preload: this.preload,
           useInterimTilesOnError: this.useInterimTilesOnError,

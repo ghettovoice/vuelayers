@@ -21,9 +21,9 @@
           wrapX: this.wrapX,
           // ol/source/Vector
           features: this.$featuresCollection,
-          format: this.dataFormat,
+          format: this.format,
           loader: this.loaderFunc,
-          strategy: this.loadingStrategy,
+          strategy: this.loadingStrategyFunc,
           url: this.urlFunc,
           overlaps: this.overlaps,
           useSpatialIndex: this.useSpatialIndex,

@@ -66,7 +66,11 @@ export default {
     resolutions () {
       if (!(this.rev && this.$source)) return
 
-      return this.$source.getResolutions() || []
+      try {
+        return this.$source.getResolutions()
+      } catch (err) {
+        return []
+      }
     },
   },
   watch: {

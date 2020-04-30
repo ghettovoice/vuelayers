@@ -41,6 +41,12 @@ export default {
     }),
   },
   created () {
+    /**
+     * @type {module:ol/source/Source~Source|undefined}
+     * @private
+     */
+    this._source = undefined
+
     this::defineServices()
   },
   methods: {
@@ -66,6 +72,12 @@ export default {
      * @protected
      */
     getSourceTarget: baseLayer.methods.resolveOlObject,
+    /**
+     * @returns {module:ol/source/Source~Source|undefined}
+     */
+    getSource () {
+      return this._source
+    },
     /**
      * @return {Promise<void>}
      * @protected
@@ -125,7 +137,7 @@ function defineServices () {
      */
     $source: {
       enumerable: true,
-      get: () => this.$layer?.getSource(),
+      get: this.getSource,
     },
   })
 }

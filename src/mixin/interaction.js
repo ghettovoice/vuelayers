@@ -177,10 +177,10 @@ export default {
      * @returns {Promise<void>}
      */
     async subscribeAll () {
-      await Promise.all(
+      await Promise.all([
         this::olCmp.methods.subscribeAll(),
         this::subscribeToInteractionEvents(),
-      )
+      ])
     },
     /**
      * @return {Promise<module:ol/interaction/Interaction~Interaction>}

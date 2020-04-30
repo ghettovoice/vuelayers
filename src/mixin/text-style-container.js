@@ -39,7 +39,6 @@ export default {
       const textTarget = await this.getTextStyleTarget()
       if (textTarget && text !== textTarget.getText()) {
         textTarget.setText(text)
-        await this.scheduleRefresh()
       }
     },
     /**

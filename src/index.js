@@ -35,6 +35,7 @@ import * as StyleBox from './component/style-box'
 import * as StyleFunc from './component/style-func'
 import * as TextStyle from './component/text-style'
 import * as TileLayer from './component/tile-layer'
+import * as VectorImageLayer from './component/vector-image-layer'
 import * as VectorLayer from './component/vector-layer'
 import * as VectorSource from './component/vector-source'
 import * as VectorTileLayer from './component/vector-tile-layer'
@@ -98,6 +99,7 @@ function plugin (Vue, options = {}) {
   Vue.use(StyleFunc, options)
   Vue.use(TextStyle, options)
   Vue.use(TileLayer, options)
+  Vue.use(VectorImageLayer, options)
   Vue.use(VectorLayer, options)
   Vue.use(VectorSource, options)
   Vue.use(VectorTileLayer, options)
@@ -150,6 +152,7 @@ export {
   StyleFunc,
   TextStyle,
   TileLayer,
+  VectorImageLayer,
   VectorLayer,
   VectorSource,
   VectorTileLayer,

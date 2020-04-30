@@ -36,7 +36,6 @@ export default {
       const strokeTarget = await this.getStrokeStyleTarget()
       if (strokeTarget && stroke !== strokeTarget.getStroke()) {
         strokeTarget.setStroke(stroke)
-        await this.scheduleRefresh()
       }
     },
     /**

@@ -50,6 +50,8 @@
     },
     watch: {
       ...makeWatchers([
+        'hidpi',
+        'culture',
         'apiKey',
         'imagerySet',
       ], prop => async function () {

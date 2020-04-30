@@ -39,7 +39,6 @@ export default {
       const imageTarget = await this.getImageStyleTarget()
       if (imageTarget && image !== imageTarget.getImage()) {
         imageTarget.setImage(image)
-        await this.scheduleRefresh()
       }
     },
     /**

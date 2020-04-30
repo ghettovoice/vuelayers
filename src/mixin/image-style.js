@@ -41,6 +41,20 @@ export default {
       default: 1,
     },
   },
+  watch: {
+    async opacity (value) {
+      await this.setOpacity(value)
+    },
+    async rotateWithView (value) {
+      await this.setRotateWithView(value)
+    },
+    async rotation (value) {
+      await this.setRotation(value)
+    },
+    async scale (value) {
+      await this.setScale(value)
+    },
+  },
   created () {
     this::defineServices()
   },
@@ -61,6 +75,11 @@ export default {
       if (opacity === style.getOpacity()) return
 
       style.setOpacity(opacity)
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('opacity changed, scheduling recreate...')
+      }
+
       await this.scheduleRefresh()
     },
     /**
@@ -79,6 +98,12 @@ export default {
       if (rotateWithView === style.getRotateWithView()) return
 
       style.setRotateWithView(rotateWithView)
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('rotateWithView changed, scheduling recreate...')
+      }
+
+      await this.scheduleRefresh()
     },
     /**
      * @returns {Promise<number>}
@@ -96,6 +121,12 @@ export default {
       if (rotation === style.getRotation()) return
 
       style.setRotation(rotation)
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('rotation changed, scheduling recreate...')
+      }
+
+      await this.scheduleRefresh()
     },
     /**
      * @returns {Promise<number>}
@@ -113,6 +144,12 @@ export default {
       if (scale === style.getScale()) return
 
       style.setScale(scale)
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('scale changed, scheduling recreate...')
+      }
+
+      await this.scheduleRefresh()
     },
     /**
      * @return {Promise<void>}

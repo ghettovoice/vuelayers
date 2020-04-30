@@ -1,58 +1,59 @@
 <script>
   import { xyzSource } from '../../mixin'
-  import { EPSG_3857, TILE_FORMAT } from '../../ol-ext'
+  import { EPSG_3857 } from '../../ol-ext'
   import { coalesce } from '../../util/minilo'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/" target="_blank">MapBox</a>, ' + (new Date().getFullYear())
 
-  const props = {
-    accessToken: {
-      type: String,
-      required: true,
-    },
-    attributions: {
-      type: [String, Array],
-      default: MAPBOX_ATTRIBUTIONS,
-    },
-    mapId: {
-      type: String,
-      required: true,
-    },
-    projection: {
-      type: String,
-      default: EPSG_3857,
-    },
-    tileFormat: {
-      type: String,
-      default: TILE_FORMAT,
-    },
-    url: {
-      type: String,
-      default: MAPBOX_URL_TEMPLATE,
-    },
-  }
-
-  const computed = {
-    /**
-     * @type {string}
-     */
-    tileNameSuffix () {
-      return tileNameSuffix(this.tilePixelRatio)
-    },
-    /**
-     * @type {string[]}
-     */
-    urlTokens () {
-      return ['mapId', 'accessToken', 'tileNameSuffix', 'tileFormat']
-    },
-  }
-
   export default {
     name: 'VlSourceMapbox',
-    mixins: [xyzSource],
-    props,
-    computed,
+    mixins: [
+      xyzSource,
+    ],
+    props: {
+      // ol/source/Source
+      attributions: {
+        type: [String, Array],
+        default: MAPBOX_ATTRIBUTIONS,
+      },
+      // ol/source/UrlTile
+      url: {
+        type: String,
+        default: MAPBOX_URL_TEMPLATE,
+      },
+      // custom
+      accessToken: {
+        type: String,
+        required: true,
+      },
+      mapId: {
+        type: String,
+        required: true,
+      },
+      projection: {
+        type: String,
+        default: EPSG_3857,
+      },
+      tileFormat: {
+        type: String,
+        default: 'png',
+      },
+    },
+    computed: {
+      /**
+       * @type {string}
+       */
+      tileNameSuffix () {
+        return tileNameSuffix(this.tilePixelRatio)
+      },
+      /**
+       * @type {string[]}
+       */
+      urlTokens () {
+        return ['mapId', 'accessToken', 'tileNameSuffix', 'tileFormat']
+      },
+    },
   }
 
   /**

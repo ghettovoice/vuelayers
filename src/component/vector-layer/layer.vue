@@ -10,6 +10,23 @@
     mixins: [
       vectorLayer,
     ],
+    props: {
+      /**
+       * @deprecated Use `vl-layer-vector-image` to render vector layer as image
+       * @todo remove in v0.13.x
+       */
+      renderMode: String,
+    },
+    watch: {
+      renderMode: {
+        immediate: true,
+        handler () {
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.error("'renderMode' is deprecated. Use 'vl-layer-vector-image' to render vector layer as image")
+          }
+        },
+      },
+    },
     methods: {
       /**
        * @return {module:ol/layer/Vector~VectorLayer}
@@ -27,6 +44,7 @@
           maxResolution: this.maxResolution,
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
+          source: this.$source,
           // ol/layer/Layer
           render: this.render,
           // ol/layer/BaseVector
@@ -35,6 +53,8 @@
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          // ol/layer/VectorImage
+          imageRatio: this.imageRatio,
         })
       },
     },

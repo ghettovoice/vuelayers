@@ -29,6 +29,7 @@
           maxResolution: this.maxResolution,
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
+          source: this.$source,
           // ol/layer/Layer
           render: this.render,
           // ol/layer/BaseTile

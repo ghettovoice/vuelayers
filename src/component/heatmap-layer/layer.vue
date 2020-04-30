@@ -40,27 +40,32 @@
       },
     },
     watch: {
-      blur (value) {
-        this.setBlur(value)
+      async blur (value) {
+        await this.setBlur(value)
       },
-      gradient (value) {
-        this.setGradient(value)
+      async gradient (value) {
+        await this.setGradient(value)
       },
-      radius (value) {
-        this.setRadius(value)
+      async radius (value) {
+        await this.setRadius(value)
       },
       ...makeWatchers([
         'weight',
-      ], () => vectorLayer.methods.scheduleRecreate),
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
+      }),
     },
     methods: {
       /**
-       * @returns {module:ol/layer/Heatmap~Heatmap}
+       * @returns {HeatmapLayer}
        */
       createLayer () {
         return new HeatmapLayer({
-          // layer props
-          id: this.id,
+          // ol/layer/Base
           className: this.className,
           opacity: this.opacity,
           visible: this.visible,
@@ -70,44 +75,46 @@
           maxResolution: this.maxResolution,
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
+          source: this.$source,
+          // ol/layer/Layer
           render: this.render,
-          // vector layer props
+          // ol/layer/BaseVector
           renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
-          // self props
+          // ol/layer/Heatmap
           blur: this.blur,
           gradient: this.gradient,
           radius: this.radius,
           weight: this.weight,
         })
       },
-      async getLayerBlur () {
+      async getBlur () {
         return (await this.resolveLayer()).getBlur()
       },
-      async setLayerBlur (blur) {
+      async setBlur (blur) {
         const layer = await this.resolveLayer()
 
         if (blur === layer.getBlur()) return
 
         layer.setBlur(blur)
       },
-      async getLayerGradient () {
+      async getGradient () {
         return (await this.resolveLayer()).getGradient()
       },
-      async setLayerGradient (gradient) {
+      async setGradient (gradient) {
         const layer = await this.resolveLayer()
 
         if (isEqual(gradient, layer.getGradient())) return
 
         layer.setGradient(gradient)
       },
-      async getLayerRadius () {
+      async getRadius () {
         return (await this.resolveLayer()).getRadius()
       },
-      async setLayerRadius (radius) {
+      async setRadius (radius) {
         const layer = await this.resolveLayer()
 
         if (radius === layer.getRadius()) return

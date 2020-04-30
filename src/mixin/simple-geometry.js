@@ -111,10 +111,10 @@ export default {
      * @protected
      */
     subscribeAll () {
-      return Promise.all(
+      return Promise.all([
         this::geometry.methods.subscribeAll(),
         this::subscribeToGeomChanges(),
-      )
+      ])
     },
     ...pick(geometry.methods, [
       'init',

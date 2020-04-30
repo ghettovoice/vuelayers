@@ -45,7 +45,6 @@ export default {
       const geomTarget = await this.getGeometryTarget()
       if (geomTarget && geom !== geomTarget.getGeometry()) {
         geomTarget.setGeometry(geom)
-        await this.scheduleRefresh()
       }
     },
     /**

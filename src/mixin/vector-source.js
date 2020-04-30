@@ -67,14 +67,24 @@ export default {
      */
     loader: Function,
     /**
+     * @deprecated Use `loader` prop instead
+     * @todo remove in v0.13.x
+     */
+    loaderFactory: Function,
+    /**
      * Loading strategy factory.
      * Extent here in map view projection.
      * @type {function} strategyFactory
      */
-    strategyFactory: {
+    loadingStrategy: {
       type: Function,
-      default: () => loadAll,
+      default: loadAll,
     },
+    /**
+     * @deprecated Use `loadingStrategy` prop instead
+     * @todo remove in v0.13.x
+     */
+    strategyFactory: Function,
     /**
      * String or url factory
      * @type {string|function} url
@@ -103,7 +113,7 @@ export default {
       /**
        * @returns {module:ol/format/Feature~FeatureFormat|undefined}
        */
-      dataFormat: undefined,
+      format: undefined,
     }
   },
   computed: {
@@ -117,27 +127,45 @@ export default {
      * @type {function|undefined}
      */
     loaderFunc () {
-      return this.createLoaderFunc(this.loader)
-    },
-    /**
-     * @returns {function}
-     */
-    loadingStrategy () {
-      return this.strategyFactory()
+      let loader = this.loader
+      if (!loader && this.loaderFactory) {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.warn("'loaderFactory' prop is deprecated. Use 'loader' prop instead.")
+        }
+
+        loader = this.loaderFactory()
+      }
+
+      return this.createLoaderFunc(loader)
     },
     /**
      * @returns {string|undefined}
      */
-    dataFormatIdent () {
+    formatIdent () {
       if (!this.olObjIdent) return
 
-      return this.makeIdent(this.olObjIdent, 'data_format')
+      return this.makeIdent(this.olObjIdent, 'format')
     },
     /**
      * @returns {function}
      */
-    sealDataFormatFactory () {
+    sealFormatFactory () {
       return sealFactory(::this.formatFactory)
+    },
+    /**
+     * @returns {function}
+     */
+    loadingStrategyFunc () {
+      let loadingStrategy = this.loadingStrategy
+      if (this.strategyFactory) {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.warn("'strategyFactory' prop is deprecated. Use 'loadingStrategy' prop instead.")
+        }
+
+        loadingStrategy = this.strategyFactory()
+      }
+
+      return loadingStrategy
     },
   },
   watch: {
@@ -146,13 +174,13 @@ export default {
       async handler (features) {
         if (!this.$source || isEqual(features, this.featuresDataProj)) return
         // add new features
-        features.forEach(feature => this.addFeature({ ...feature }))
+        await Promise.all(features.map(feature => this.addFeature({ ...feature })))
         // remove non-matched features
-        difference(
+        await Promise.all(difference(
           this.getFeatures(),
           features,
           (a, b) => getFeatureId(a) === getFeatureId(b),
-        ).forEach(::this.removeFeature)
+        ).map(::this.removeFeature))
       },
     },
     featuresDataProj: {
@@ -167,24 +195,24 @@ export default {
     async loaderFunc (value) {
       await this.setLoaderInternal(value)
     },
-    dataFormatIdent (value, prevValue) {
+    formatIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
-      } else if (value && !prevValue && this.dataFormat) {
-        this.setInstance(value, this.dataFormat)
+      } else if (value && !prevValue && this.format) {
+        this.setInstance(value, this.format)
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
       }
     },
-    async sealDataFormatFactory (value) {
-      while (this.hasInstance(this.dataFormatIdent)) {
-        this.unsetInstance(this.dataFormatIdent)
+    async sealFormatFactory (value) {
+      while (this.hasInstance(this.formatIdent)) {
+        this.unsetInstance(this.formatIdent)
       }
 
       if (isFunction(value)) {
-        this.dataFormat = this.instanceFactoryCall(this.dataFormatIdent, this::value)
+        this.format = this.instanceFactoryCall(this.formatIdent, this::value)
       } else {
-        this.dataFormat = undefined
+        this.format = undefined
       }
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -194,8 +222,8 @@ export default {
       await this.scheduleRecreate()
     },
     ...makeWatchers([
-      'loadingStrategy',
-      'dataFormat',
+      'loadingStrategyFunc',
+      'format',
       'overlaps',
       'useSpatialIndex',
     ], prop => async function () {
@@ -207,8 +235,8 @@ export default {
     }),
   },
   created () {
-    if (isFunction(this.sealDataFormatFactory)) {
-      this.dataFormat = this.instanceFactoryCall(this.dataFormatIdent, ::this.sealDataFormatFactory)
+    if (isFunction(this.sealFormatFactory)) {
+      this.format = this.instanceFactoryCall(this.formatIdent, ::this.sealFormatFactory)
     }
   },
   methods: {
@@ -383,7 +411,7 @@ export default {
           this.resolvedDataProjection,
         )
         if (!isArray(features)) {
-          features = this.readSourceData(features)
+          features = this.readSource(features)
         }
         if (isArray(features)) {
           await this.addFeatures(features)
@@ -394,8 +422,8 @@ export default {
      * @param {*} data
      * @returns {Array<module:ol/Feature~Feature>}
      */
-    readSourceData (data) {
-      return this.dataFormat.readFeatures(data, {
+    readSource (data) {
+      return this.format.readFeatures(data, {
         featureProjection: this.viewProjection,
         dataProjection: this.resolvedDataProjection,
       })

@@ -12,7 +12,7 @@
     methods: {
       createLayer () {
         return new GroupLayer({
-          id: this.id,
+          // ol/layer/Base
           className: this.className,
           opacity: this.opacity,
           visible: this.visible,
@@ -22,7 +22,9 @@
           maxResolution: this.maxResolution,
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
+          // ol/layer/Layer
           render: this.render,
+          // ol/layer/Group
           layers: this.$layersCollection,
         })
       },
