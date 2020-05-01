@@ -4,8 +4,8 @@
     :class="vmClass"
     style="display: none !important;">
     <slot>
-      <VlStyleFill color="#222" />
-      <VlStyleStroke color="#eee" />
+      <FillStyle color="#222" />
+      <StrokeStyle color="#eee" />
     </slot>
     <BackgroundStyle>
       <slot name="background" />
@@ -19,11 +19,15 @@
   import { isEqual, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import BackgroundStyle from './background.vue'
+  import FillStyle from './fill'
+  import StrokeStyle from './stroke'
 
   export default {
     name: 'VlStyleText',
     components: {
       BackgroundStyle,
+      FillStyle,
+      StrokeStyle,
     },
     mixins: [
       fillStyleContainer,

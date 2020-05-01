@@ -4,8 +4,8 @@
     :class="vmClass"
     style="display: none !important;">
     <slot>
-      <VlStyleFill />
-      <VlStyleStroke />
+      <FillStyle />
+      <StrokeStyle />
     </slot>
   </i>
 </template>
@@ -14,14 +14,14 @@
   import { Circle as CircleStyle } from 'ol/style'
   import { regShapeStyle } from '../../mixin'
   import { omit } from '../../util/minilo'
-  import { Style as VlStyleFill } from '../fill-style'
-  import { Style as VlStyleStroke } from '../stroke-style'
+  import FillStyle from './fill.vue'
+  import StrokeStyle from './stroke.vue'
 
   export default {
     name: 'VlStyleCircle',
     components: {
-      VlStyleFill,
-      VlStyleStroke,
+      FillStyle,
+      StrokeStyle,
     },
     mixins: [
       {

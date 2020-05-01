@@ -1,16 +1,13 @@
 import * as ArcgisRestSource from './component/arcgis-rest-source'
 import * as BingmapsSource from './component/bingmaps-source'
 import * as CircleGeom from './component/circle-geom'
-import * as CircleStyle from './component/circle-style'
 import * as ClusterSource from './component/cluster-source'
 import * as DrawInteraction from './component/draw-interaction'
 import * as Feature from './component/feature'
-import * as FillStyle from './component/fill-style'
 import * as Geoloc from './component/geoloc'
 import * as Graticule from './component/graticule'
 import * as GroupLayer from './component/group-layer'
 import * as HeatmapLayer from './component/heatmap-layer'
-import * as IconStyle from './component/icon-style'
 import * as ImageLayer from './component/image-layer'
 import * as ImageStaticSource from './component/image-static-source'
 import * as ImageWmsSource from './component/image-wms-source'
@@ -25,15 +22,12 @@ import * as OsmSource from './component/osm-source'
 import * as Overlay from './component/overlay'
 import * as PointGeom from './component/point-geom'
 import * as PolygonGeom from './component/polygon-geom'
-import * as RegShapeStyle from './component/reg-shape-style'
 import * as SelectInteraction from './component/select-interaction'
 import * as SnapInteraction from './component/snap-interaction'
 import * as SputnikSource from './component/sputnik-source'
 import * as StamenSource from './component/stamen-source'
-import * as StrokeStyle from './component/stroke-style'
-import * as StyleBox from './component/style-box'
+import * as Style from './component/style'
 import * as StyleFunc from './component/style-func'
-import * as TextStyle from './component/text-style'
 import * as TileLayer from './component/tile-layer'
 import * as VectorImageLayer from './component/vector-image-layer'
 import * as VectorLayer from './component/vector-layer'
@@ -65,16 +59,13 @@ function plugin (Vue, options = {}) {
   Vue.use(ArcgisRestSource, options)
   Vue.use(BingmapsSource, options)
   Vue.use(CircleGeom, options)
-  Vue.use(CircleStyle, options)
   Vue.use(ClusterSource, options)
   Vue.use(DrawInteraction, options)
   Vue.use(Feature, options)
-  Vue.use(FillStyle, options)
   Vue.use(Geoloc, options)
   Vue.use(Graticule, options)
   Vue.use(GroupLayer, options)
   Vue.use(HeatmapLayer, options)
-  Vue.use(IconStyle, options)
   Vue.use(ImageLayer, options)
   Vue.use(ImageStaticSource, options)
   Vue.use(ImageWmsSource, options)
@@ -89,15 +80,12 @@ function plugin (Vue, options = {}) {
   Vue.use(Overlay, options)
   Vue.use(PointGeom, options)
   Vue.use(PolygonGeom, options)
-  Vue.use(RegShapeStyle, options)
   Vue.use(SelectInteraction, options)
   Vue.use(SnapInteraction, options)
   Vue.use(SputnikSource, options)
   Vue.use(StamenSource, options)
-  Vue.use(StrokeStyle, options)
-  Vue.use(StyleBox, options)
+  Vue.use(Style, options)
   Vue.use(StyleFunc, options)
-  Vue.use(TextStyle, options)
   Vue.use(TileLayer, options)
   Vue.use(VectorImageLayer, options)
   Vue.use(VectorLayer, options)
@@ -118,16 +106,13 @@ export {
   ArcgisRestSource,
   BingmapsSource,
   CircleGeom,
-  CircleStyle,
   ClusterSource,
   DrawInteraction,
   Feature,
-  FillStyle,
   Geoloc,
   Graticule,
   GroupLayer,
   HeatmapLayer,
-  IconStyle,
   ImageLayer,
   ImageStaticSource,
   ImageWmsSource,
@@ -142,15 +127,12 @@ export {
   Overlay,
   PointGeom,
   PolygonGeom,
-  RegShapeStyle,
   SelectInteraction,
   SnapInteraction,
   SputnikSource,
   StamenSource,
-  StrokeStyle,
-  StyleBox,
+  Style,
   StyleFunc,
-  TextStyle,
   TileLayer,
   VectorImageLayer,
   VectorLayer,

@@ -11,6 +11,7 @@ Vue.use(VueLayers, {
 })
 console.log(process.env.NODE_ENV)
 console.dir(VueLayers)
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

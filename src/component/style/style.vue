@@ -4,9 +4,9 @@
     :class="vmClass"
     style="display: none">
     <slot>
-      <VlStyleCircle />
-      <VlStyleFill />
-      <VlStyleStroke />
+      <CircleStyle />
+      <FillStyle />
+      <StrokeStyle />
     </slot>
   </i>
 </template>
@@ -23,9 +23,9 @@
   } from '../../mixin'
   import { constant, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { Style as VlStyleCircle } from '../circle-style'
-  import { Style as VlStyleFill } from '../fill-style'
-  import { Style as VlStyleStroke } from '../stroke-style'
+  import CircleStyle from './circle.vue'
+  import FillStyle from './fill.vue'
+  import StrokeStyle from './stroke.vue'
 
   /**
    * Style box component.
@@ -33,11 +33,11 @@
    * and acts as a box for inner style components (vl-style-fill, vl-style-stroke, icon ...)
    */
   export default {
-    name: 'VlStyleBox',
+    name: 'VlStyle',
     components: {
-      VlStyleCircle,
-      VlStyleFill,
-      VlStyleStroke,
+      CircleStyle,
+      FillStyle,
+      StrokeStyle,
     },
     mixins: [
       fillStyleContainer,
