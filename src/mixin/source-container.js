@@ -13,6 +13,20 @@ import { isFunction } from '../util/minilo'
  * Source container mixin.
  */
 export default {
+  created () {
+    /**
+     * @type {module:ol/source/Source~Source|undefined}
+     * @private
+     */
+    this._source = undefined
+    /**
+     * @type {Object|undefined}
+     * @private
+     */
+    this._sourceVm = undefined
+
+    this::defineServices()
+  },
   methods: {
     /**
      * @return {Promise<SourceTarget|undefined>}
@@ -22,23 +36,27 @@ export default {
       throw new Error('Not implemented method: getSourceTarget')
     },
     /**
-     * @return {Promise<module:ol/source/Source~Source|undefined>}
+     * @return {module:ol/source/Source~Source|undefined}
      */
-    async getSource () {
-      return (await this.getSourceTarget()).getSource()
+    getSource () {
+      return this._source
     },
     /**
      * @param {SourceLike|undefined} source
      * @return {void}
      */
     async setSource (source) {
+      let sourceVm
       if (source && isFunction(source.resolveOlObject)) {
+        sourceVm = source
         source = await source.resolveOlObject()
       }
 
       const sourceTarget = await this.getSourceTarget()
       if (sourceTarget && source !== sourceTarget.getSource()) {
         sourceTarget.setSource(source)
+        this._source = source
+        this._sourceVm = sourceVm || (source?.vm && source.vm[0])
       }
     },
     /**
@@ -53,4 +71,20 @@ export default {
       }
     },
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    /**
+     * @type {module:ol/source/Source~Source|undefined}
+     */
+    $source: {
+      enumerable: true,
+      get: this.getSource,
+    },
+    $sourceVm: {
+      enumerable: true,
+      get: () => this._sourceVm,
+    },
+  })
 }

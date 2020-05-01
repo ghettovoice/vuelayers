@@ -1,4 +1,4 @@
-import { pick } from '../util/minilo'
+import { isEqual, pick } from '../util/minilo'
 import style from './style'
 
 export default {
@@ -15,6 +15,7 @@ export default {
     },
   },
   props: {
+    // ol/style/Image
     /**
      * @type {number}
      */
@@ -40,6 +41,10 @@ export default {
       type: Number,
       default: 1,
     },
+    displacement: {
+      type: Array,
+      default: () => [0, 0],
+    },
   },
   watch: {
     async opacity (value) {
@@ -53,6 +58,15 @@ export default {
     },
     async scale (value) {
       await this.setScale(value)
+    },
+    async displacement (value) {
+      if (isEqual(value, await this.getDisplacement())) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('displacement changed, scheduling recreate...')
+      }
+
+      await this.scheduleRecreate()
     },
   },
   created () {
@@ -76,11 +90,7 @@ export default {
 
       style.setOpacity(opacity)
 
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('opacity changed, scheduling recreate...')
-      }
-
-      await this.scheduleRefresh()
+      await this.scheduleRemount()
     },
     /**
      * @returns {Promise<boolean>}
@@ -99,11 +109,7 @@ export default {
 
       style.setRotateWithView(rotateWithView)
 
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('rotateWithView changed, scheduling recreate...')
-      }
-
-      await this.scheduleRefresh()
+      await this.scheduleRemount()
     },
     /**
      * @returns {Promise<number>}
@@ -122,11 +128,7 @@ export default {
 
       style.setRotation(rotation)
 
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('rotation changed, scheduling recreate...')
-      }
-
-      await this.scheduleRefresh()
+      await this.scheduleRemount()
     },
     /**
      * @returns {Promise<number>}
@@ -145,11 +147,10 @@ export default {
 
       style.setScale(scale)
 
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('scale changed, scheduling recreate...')
-      }
-
-      await this.scheduleRefresh()
+      await this.scheduleRemount()
+    },
+    async getDisplacement () {
+      return (await this.resolveStyle()).getDisplacement()
     },
     /**
      * @return {Promise<void>}

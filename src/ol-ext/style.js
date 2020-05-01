@@ -5,8 +5,17 @@ import { v4 as uuid } from 'uuid'
 import Vue from 'vue'
 import { isFunction, isNumeric, lowerFirst, pick, reduce, upperFirst } from '../util/minilo'
 
+function isStyle (style) {
+  return style instanceof Style ||
+    style instanceof ImageStyle ||
+    style instanceof Fill ||
+    style instanceof Stroke ||
+    style instanceof Text ||
+    style instanceof Vue
+}
+
 export function getStyleId (style) {
-  if (style instanceof Style || style instanceof Vue) {
+  if (isStyle(style)) {
     return style.id
   }
 
@@ -14,7 +23,7 @@ export function getStyleId (style) {
 }
 
 export function setStyleId (style, styleId) {
-  if (style instanceof Style || style instanceof Vue) {
+  if (isStyle(style)) {
     style.id = styleId
 
     return style

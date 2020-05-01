@@ -1,4 +1,5 @@
 import debounce from 'debounce-promise'
+import { Feature } from 'ol'
 import { all as loadAll } from 'ol/loadingstrategy'
 import { createGeoJsonFmt, getFeatureId, isGeoJSONFeature, transform } from '../ol-ext'
 import {
@@ -427,7 +428,7 @@ export default {
           resolution,
           this.resolvedDataProjection,
         )
-        if (!isArray(features)) {
+        if (!(isArray(features) && features[0] instanceof Feature)) {
           features = this.readSource(features)
         }
         if (isArray(features)) {

@@ -14,28 +14,38 @@ import { isFunction } from '../util/minilo'
  * Fill style container.
  */
 export default {
+  created () {
+    this._fill = undefined
+    this._fillVm = undefined
+
+    this::defineServices()
+  },
   methods: {
     getFillStyleTarget () {
       throw new Error('Not implemented method: getFillStyleTarget')
     },
     /**
-     * @returns {Promise<module:ol/style/Fill~Fill|undefined>}
+     * @returns {module:ol/style/Fill~Fill|undefined}
      */
-    async getFill () {
-      return (await this.getFillStyleTarget()).getFill()
+    getFill () {
+      return this._fill
     },
     /**
      * @param {module:ol/style/Fill~Fill|undefined} fill
      * @returns {Promise<void>}
      */
     async setFill (fill) {
+      let fillVm
       if (fill && isFunction(fill.resolveOlObject)) {
+        fillVm = fill
         fill = await fill.resolveOlObject()
       }
 
       const fillTarget = await this.getFillStyleTarget()
       if (fillTarget && fill !== fillTarget.getFill()) {
         fillTarget.setFill(fill)
+        this._fill = fill
+        this._fillVm = fillVm || (fill?.vm && fill.vm[0])
       }
     },
     /**
@@ -49,4 +59,17 @@ export default {
       }
     },
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    $fill: {
+      enumerable: true,
+      get: this.getFill,
+    },
+    $fillVm: {
+      enumerable: true,
+      get: () => this._fillVm,
+    },
+  })
 }

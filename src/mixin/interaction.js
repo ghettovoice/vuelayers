@@ -220,7 +220,7 @@ function defineServices () {
      */
     $viewVm: {
       enumerable: true,
-      get: () => this.$services?.$viewVm,
+      get: () => this.$services?.viewVm,
     },
     /**
      * @type {Object|undefined}

@@ -31,7 +31,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      return initializeStyle(await this.createStyle())
+      return initializeStyle(await this.createStyle(), this.id)
     },
     /**
      * @return {OlStyle|Promise<OlStyle>}
@@ -70,8 +70,8 @@ export default {
     /**
      * @return {Promise<void>}
      */
-    async refresh () {
-      await this.remount()
+    async remount () {
+      await this::olCmp.methods.remount()
 
       if (this.$mapVm) {
         await this.$mapVm.render()
@@ -99,8 +99,8 @@ export default {
       'deinit',
       'mount',
       'unmount',
+      'refresh',
       'scheduleRefresh',
-      'remount',
       'scheduleRemount',
       'recreate',
       'scheduleRecreate',
@@ -131,14 +131,7 @@ function defineServices () {
      */
     $viewVm: {
       enumerable: true,
-      get: () => this.$services?.$viewVm,
-    },
-    /**
-     * @type {Object|undefined}
-     */
-    $styleContainer: {
-      enumerable: true,
-      get: () => this.$services?.styleContainer,
+      get: () => this.$services?.viewVm,
     },
   })
 }

@@ -263,7 +263,7 @@ export default {
           this.$logger.log('recreating...')
         }
 
-        const mounted = this.$olObjectState === STATE_MOUNTED
+        const mounted = [STATE_MOUNTING, STATE_MOUNTED].includes(this.$olObjectState)
         if (mounted) {
           await this::execUnmount()
         }

@@ -20,6 +20,11 @@ import { constant, isArray, isFunction, reduce } from '../util/minilo'
  * Style container mixin.
  */
 export default {
+  created () {
+    this._style = undefined
+
+    this::defineServices()
+  },
   methods: {
     /**
      * Default style factory
@@ -37,17 +42,19 @@ export default {
       throw new Error('Not implemented method: getStyleTarget')
     },
     /**
-     * @return {Promise<StyleLike|undefined>}
+     * @return {StyleLike|undefined}
      */
-    async getStyle () {
-      return (await this.getStyleTarget()).getStyle()
+    getStyle () {
+      return this._style
     },
     /**
      * @param {StyleLike} style
      * @return {Promise<void>}
      */
     async addStyle (style) {
-      let currentStyle = await this.getStyle()
+      if (!style) return
+
+      let currentStyle = this.getStyle()
 
       let olStyle
       if (isFunction(style.resolveOlObject)) {
@@ -114,17 +121,21 @@ export default {
      * @return {void}
      */
     async setStyle (style) {
-      if (isFunction(style.resolveOlObject)) {
+      if (style && isFunction(style.resolveOlObject)) {
         style = await style.resolveOlObject()
       }
+
+      if (style === this.getStyle()) return
 
       const styleTarget = await this.getStyleTarget()
       if (!styleTarget) return
 
       if (style) {
-        styleTarget.setStyle(this.createStyleFunc(style, this.getDefaultStyle()))
+        await styleTarget.setStyle(this.createStyleFunc(style, this.getDefaultStyle()))
+        this._style = style
       } else {
-        styleTarget.setStyle(null)
+        await styleTarget.setStyle(null)
+        this._style = null
       }
     },
     /**
@@ -182,4 +193,13 @@ export default {
       }
     },
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    $style: {
+      enumerable: true,
+      get: this.getStyle,
+    },
+  })
 }

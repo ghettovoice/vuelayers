@@ -1,52 +1,87 @@
 <script>
-  import Fill from 'ol/style/Fill'
+  import { Fill as FillStyle } from 'ol/style'
   import { style } from '../../mixin'
+  import { normalizeColor } from '../../ol-ext'
   import { isEqual } from '../../util/minilo'
-
-  const props = {
-    color: [String, Array],
-  }
-
-  const methods = {
-    /**
-     * @return {Fill}
-     * @protected
-     */
-    createStyle () {
-      return new Fill({
-        color: this.color,
-      })
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    mount () {
-      this.$stylesContainer && this.$stylesContainer.setFill(this)
-    },
-    /**
-     * @return {void}
-     * @protected
-     */
-    unmount () {
-      this.$stylesContainer && this.$stylesContainer.setFill(undefined)
-    },
-  }
-
-  const watch = {
-    color (value) {
-      if (this.$style && !isEqual(value, this.$style.getColor())) {
-        this.$style.setColor(value)
-        this.scheduleRefresh()
-      }
-    },
-  }
 
   export default {
     name: 'VlStyleFill',
-    mixins: [style],
-    props,
-    watch,
-    methods,
+    mixins: [
+      style,
+    ],
+    props: {
+      color: {
+        type: [String, Array],
+        default: () => [255, 255, 255, 0.4],
+      },
+    },
+    computed: {
+      parsedColor () {
+        return normalizeColor(this.color)
+      },
+    },
+    watch: {
+      async color (value) {
+        await this.setStyle(value)
+      },
+    },
+    created () {
+      this::defineServices()
+    },
+    methods: {
+      /**
+       * @return {FillStyle}
+       * @protected
+       */
+      createStyle () {
+        return new FillStyle({
+          color: this.parsedColor,
+        })
+      },
+      async getColor () {
+        return (await this.resolveStyle()).getColor()
+      },
+      async setColor (color) {
+        const style = await this.resolveStyle()
+        color = normalizeColor(color)
+
+        if (isEqual(color, style.getColor())) return
+
+        style.setColor(color)
+
+        await this.scheduleRemount()
+      },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async mount () {
+        if (this.$fillStyleContainer) {
+          await this.$fillStyleContainer.setFill(this)
+        }
+
+        return this::style.methods.mount()
+      },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async unmount () {
+        if (this.$fillStyleContainer) {
+          await this.$fillStyleContainer.setFill(undefined)
+        }
+
+        return this::style.methods.unmount()
+      },
+    },
+  }
+
+  function defineServices () {
+    Object.defineProperties(this, {
+      $fillStyleContainer: {
+        enumerable: true,
+        get: () => this.$services?.fillStyleContainer,
+      },
+    })
   }
 </script>

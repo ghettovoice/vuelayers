@@ -31,6 +31,7 @@
   import { isEqual, isFunction, waitFor } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
+  import VlView from './view'
 
   /**
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
@@ -41,6 +42,9 @@
    */
   export default {
     name: 'VlMap',
+    components: {
+      VlView,
+    },
     mixins: [
       projTransforms,
       layersContainer,

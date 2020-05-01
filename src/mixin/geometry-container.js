@@ -17,6 +17,12 @@ export default {
   mixins: [
     projTransforms,
   ],
+  created () {
+    this._geometry = undefined
+    this._geometryVm = undefined
+
+    this::defineService()
+  },
   methods: {
     /**
      * @return {Promise<GeometryTarget|undefined>}
@@ -26,17 +32,19 @@ export default {
       throw new Error('Not implemented method: getGeometryTarget')
     },
     /**
-     * @return {Promise<module:ol/geom/Geometry~Geometry|undefined>}
+     * @return {module:ol/geom/Geometry~Geometry|undefined}
      */
-    async getGeometry () {
-      return (await this.getGeometryTarget()).getGeometry()
+    getGeometry () {
+      return this._geometry
     },
     /**
      * @param {GeometryLike|undefined} geom
      * @return {Promise<void>}
      */
     async setGeometry (geom) {
+      let geomVm
       if (geom && isFunction(geom.resolveOlObject)) {
+        geomVm = geom
         geom = await geom.resolveOlObject()
       } else if (isPlainObject(geom)) {
         geom = this.readGeometryInDataProj(geom)
@@ -45,6 +53,8 @@ export default {
       const geomTarget = await this.getGeometryTarget()
       if (geomTarget && geom !== geomTarget.getGeometry()) {
         geomTarget.setGeometry(geom)
+        this._geometry = geom
+        this._geometryVm = geomVm || (geom?.vm && geom.vm[0])
       }
     },
     /**
@@ -59,4 +69,17 @@ export default {
       }
     },
   },
+}
+
+function defineService () {
+  Object.defineProperties(this, {
+    $geometry: {
+      enumerable: true,
+      get: this.getGeometry,
+    },
+    $geometryVm: {
+      enumerable: true,
+      get: () => this._geometryVm,
+    },
+  })
 }

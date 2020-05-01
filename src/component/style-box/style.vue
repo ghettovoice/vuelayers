@@ -1,3 +1,16 @@
+<template>
+  <i
+    :id="vmId"
+    :class="vmClass"
+    style="display: none">
+    <slot>
+      <VlStyleCircle />
+      <VlStyleFill />
+      <VlStyleStroke />
+    </slot>
+  </i>
+</template>
+
 <script>
   import { Style } from 'ol/style'
   import {
@@ -5,12 +18,14 @@
     geometryContainer,
     imageStyleContainer,
     strokeStyleContainer,
-    textStyleContainer,
     style,
+    textStyleContainer,
   } from '../../mixin'
-  import { constant, isEqual, isFunction } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { constant, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { Style as VlStyleCircle } from '../circle-style'
+  import { Style as VlStyleFill } from '../fill-style'
+  import { Style as VlStyleStroke } from '../stroke-style'
 
   /**
    * Style box component.
@@ -19,6 +34,11 @@
    */
   export default {
     name: 'VlStyleBox',
+    components: {
+      VlStyleCircle,
+      VlStyleFill,
+      VlStyleStroke,
+    },
     mixins: [
       fillStyleContainer,
       strokeStyleContainer,
@@ -45,6 +65,10 @@
         default: 0,
       },
       /**
+       * @type {function}
+       */
+      renderer: Function,
+      /**
        * This condition will be resolved at the style compile time.
        * @type {function|boolean}
        */
@@ -62,15 +86,18 @@
       },
     },
     watch: {
-      zIndex (value) {
-        if (this.$style && !isEqual(value, this.$style.getZIndex())) {
-          this.$style.setZIndex(value)
-          this.scheduleRefresh()
-        }
+      async zIndex (value) {
+        await this.setZIndex(value)
       },
-      ...makeWatchers([
-        'condition',
-      ], () => style.methods.scheduleRecreate),
+      async renderer (value) {
+        await this.setRenderer(value)
+      },
+      async conditionFunc (value) {
+        await this.scheduleRemount()
+      },
+    },
+    created () {
+      this::defineServices()
     },
     methods: {
       /**
@@ -80,53 +107,121 @@
       createStyle () {
         return new Style({
           zIndex: this.zIndex,
+          renderer: this.renderer,
+          fill: this.$fill,
+          stroke: this.$stroke,
+          image: this.$image,
+          text: this.$text,
+          geometry: this.$geometry,
         })
       },
-      /**
-       * @returns {Promise<module:ol/style/Fill~Fill|undefined>}
-       */
-      getStyleFill: fillStyleContainer.methods.getFill,
-      /**
-       * @param {module:ol/style/Fill~Fill|undefined} fill
-       * @returns {Promise<void>}
-       */
-      setStyleFill: fillStyleContainer.methods.setFill,
-      /**
-       * @returns {Promise<module:ol/style/Stroke~Stroke|undefined>}
-       */
-      getStyleStroke: strokeStyleContainer.methods.getStroke,
-      /**
-       * @param {module:ol/style/Stroke~Stroke|undefined} stroke
-       * @returns {Promise<void>}
-       */
-      setStyleStroke: strokeStyleContainer.methods.setStroke,
-      /**
-       * @returns {Promise<module:ol/style/Text~Text|undefined>}
-       */
-      getStyleText: textStyleContainer.methods.getText,
-      /**
-       * @param {module:ol/style/Text~Text|undefined} text
-       * @returns {Promise<void>}
-       */
-      setStyleText: textStyleContainer.methods.setText,
-      /**
-       * @returns {Promise<module:ol/style/Image~ImageStyle|undefined>}
-       */
-      getStyleImage: imageStyleContainer.methods.getImage,
-      /**
-       * @param {module:ol/style/Image~ImageStyle|undefined} image
-       * @returns {Promise<void>}
-       */
-      setStyleImage: imageStyleContainer.methods.setImage,
-      /**
-       * @return {Promise<module:ol/geom/Geometry~Geometry|undefined>}
-       */
-      getStyleGeometry: geometryContainer.methods.getGeometry,
-      /**
-       * @param {GeometryLike|undefined} geom
-       * @return {Promise<void>}
-       */
-      setStyleGeometry: geometryContainer.methods.setGeometry,
+      async getZIndex () {
+        return (await this.resolveStyle()).getZIndex()
+      },
+      async setZIndex (zIndex) {
+        const style = await this.resolveStyle()
+
+        if (zIndex === style.getZIndex()) return
+
+        style.setZIndex(zIndex)
+
+        await this.scheduleRemount()
+      },
+      async getRenderer () {
+        return (await this.resolveStyle()).getRenderer()
+      },
+      async setRenderer (renderer) {
+        const style = await this.resolveStyle()
+
+        if (renderer === style.getRenderer()) return
+
+        style.setRenderer(renderer)
+
+        await this.scheduleRemount()
+      },
+      async getGeometryFunction () {
+        return (await this.resolveStyle()).getGeometryFunction()
+      },
+      async getFillStyleTarget () {
+        const style = await this.resolveStyle()
+
+        return {
+          getFill: ::style.getFill,
+          setFill: async fill => {
+            style.setFill(fill)
+
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('fill changed, scheduling remount...')
+            }
+
+            await this.scheduleRemount()
+          },
+        }
+      },
+      async getStrokeStyleTarget () {
+        const style = await this.resolveStyle()
+
+        return {
+          getStroke: ::style.getStroke,
+          setStroke: async stroke => {
+            style.setStroke(stroke)
+
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('stroke changed, scheduling remount...')
+            }
+
+            await this.scheduleRemount()
+          },
+        }
+      },
+      async getTextStyleTarget () {
+        const style = await this.resolveStyle()
+
+        return {
+          getText: ::style.getText,
+          setText: async text => {
+            style.setText(text)
+
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('text changed, scheduling remount...')
+            }
+
+            await this.scheduleRemount()
+          },
+        }
+      },
+      async getImageStyleTarget () {
+        const style = await this.resolveStyle()
+
+        return {
+          getImage: ::style.getImage,
+          setImage: async image => {
+            style.setImage(image)
+
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('image changed, scheduling remount...')
+            }
+
+            await this.scheduleRemount()
+          },
+        }
+      },
+      async geometryContainer () {
+        const style = await this.resolveStyle()
+
+        return {
+          getGeometry: ::style.getGeometry,
+          setGeometry: async geometry => {
+            style.setGeometry(geometry)
+
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('geometry changed, scheduling remount...')
+            }
+
+            await this.scheduleRemount()
+          },
+        }
+      },
       /**
        * @return {Promise<void>}
        * @protected
@@ -135,6 +230,8 @@
         if (this.$styleContainer) {
           await this.$styleContainer.addStyle(this)
         }
+
+        return this::style.methods.mount()
       },
       /**
        * @return {Promise<void>}
@@ -144,6 +241,8 @@
         if (this.$styleContainer) {
           await this.$styleContainer.removeStyle(this)
         }
+
+        return this::style.methods.unmount()
       },
       /**
        * @returns {Object}
@@ -151,14 +250,27 @@
        */
       getServices () {
         return mergeDescriptors(
+          this::style.methods.getServices(),
           this::fillStyleContainer.methods.getServices(),
           this::strokeStyleContainer.methods.getServices(),
           this::textStyleContainer.methods.getServices(),
           this::imageStyleContainer.methods.getServices(),
           this::geometryContainer.methods.getServices(),
-          this::style.methods.getServices(),
         )
       },
     },
+  }
+
+  function defineServices () {
+    Object.defineProperties(this, {
+
+      /**
+       * @type {Object|undefined}
+       */
+      $styleContainer: {
+        enumerable: true,
+        get: () => this.$services?.styleContainer,
+      },
+    })
   }
 </script>

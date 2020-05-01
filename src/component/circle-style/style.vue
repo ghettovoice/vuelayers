@@ -1,79 +1,67 @@
+<template>
+  <i
+    :id="vmId"
+    :class="vmClass"
+    style="display: none !important;">
+    <slot>
+      <VlStyleFill />
+      <VlStyleStroke />
+    </slot>
+  </i>
+</template>
+
 <script>
-  import Circle from 'ol/style/Circle'
-  import Vue from 'vue'
-  import { imageStyle, withFillStrokeStyle } from '../../mixin'
-  import { isEqual } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
-
-  const props = {
-    radius: {
-      type: Number,
-      default: 5,
-    },
-  }
-
-  const methods = {
-    /**
-     * @return {ol.style.Circle}
-     * @protected
-     */
-    createStyle () {
-      return new Circle({
-        radius: this.radius,
-        fill: this._fill,
-        stroke: this._stroke,
-      })
-    },
-    /**
-     * @returns {Object}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return mergeDescriptors(this::imageStyle.methods.getServices(), {
-        get stylesContainer () { return vm },
-      })
-    },
-    /**
-     * @param {ol.style.Fill|Vue|undefined} fill
-     * @return {void}
-     */
-    setFill (fill) {
-      fill = fill instanceof Vue ? fill.$style : fill
-
-      if (fill !== this._fill) {
-        this._fill = fill
-        this.scheduleRefresh()
-      }
-    },
-    /**
-     * @param {ol.style.Stroke|Vue|undefined} stroke
-     * @return {void}
-     */
-    setStroke (stroke) {
-      stroke = stroke instanceof Vue ? stroke.$style : stroke
-
-      if (stroke !== this._stroke) {
-        this._stroke = stroke
-        this.scheduleRefresh()
-      }
-    },
-  }
-
-  const watch = {
-    radius (value) {
-      if (this.$style && !isEqual(value, this.$style.getRadius())) {
-        this.scheduleRefresh()
-      }
-    },
-  }
+  import { Circle as CircleStyle } from 'ol/style'
+  import { regShapeStyle } from '../../mixin'
+  import { omit } from '../../util/minilo'
+  import { Style as VlStyleFill } from '../fill-style'
+  import { Style as VlStyleStroke } from '../stroke-style'
 
   export default {
     name: 'VlStyleCircle',
-    mixins: [imageStyle, withFillStrokeStyle],
-    props,
-    watch,
-    methods,
+    components: {
+      VlStyleFill,
+      VlStyleStroke,
+    },
+    mixins: [
+      {
+        ...regShapeStyle,
+        watch: omit(regShapeStyle.watch, ['radius']),
+      },
+    ],
+    props: {
+      radius: {
+        type: Number,
+        default: 5,
+      },
+    },
+    watch: {
+      async radius (value) {
+        await this.setRadius(value)
+      },
+    },
+    methods: {
+      /**
+       * @return {CircleStyle}
+       * @protected
+       */
+      createStyle () {
+        return new CircleStyle({
+          radius: this.radius,
+          displacement: this.displacement,
+          fill: this.$fill,
+          stroke: this.$stroke,
+        })
+      },
+      async setRadius (radius) {
+        const style = await this.resolveStyle()
+
+        if (radius === style.getRadius()) return
+
+        style.setRadius(radius)
+
+        await this.scheduleRemount()
+      },
+    },
   }
 </script>

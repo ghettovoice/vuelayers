@@ -40,15 +40,6 @@ export default {
       await this.scheduleRecreate()
     }),
   },
-  created () {
-    /**
-     * @type {module:ol/source/Source~Source|undefined}
-     * @private
-     */
-    this._source = undefined
-
-    this::defineServices()
-  },
   methods: {
     /**
      * @returns {Promise<module:ol/renderer/Layer~LayerRenderer>}
@@ -72,12 +63,6 @@ export default {
      * @protected
      */
     getSourceTarget: baseLayer.methods.resolveOlObject,
-    /**
-     * @returns {module:ol/source/Source~Source|undefined}
-     */
-    getSource () {
-      return this._source
-    },
     /**
      * @return {Promise<void>}
      * @protected
@@ -128,16 +113,4 @@ export default {
       'resolveLayer',
     ]),
   },
-}
-
-function defineServices () {
-  Object.defineProperties(this, {
-    /**
-     * @type {module:ol/source/Source~Source|undefined}
-     */
-    $source: {
-      enumerable: true,
-      get: this.getSource,
-    },
-  })
 }

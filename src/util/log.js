@@ -1,14 +1,8 @@
-export function log (...args) {
-  console.log('[C_PKG_FULLNAME]', ...args)
-}
+export const log = console.log.bind(console, '[C_PKG_FULLNAME]')
 
-export function warn (msg, ...args) {
-  console.warn(`[C_PKG_FULLNAME] WARNING: ${msg}`, ...args)
-}
+export const warn = console.warn.bind(console, '[C_PKG_FULLNAME] WARN')
 
-export function error (msg, ...args) {
-  console.error(`[C_PKG_FULLNAME] ERROR: ${msg}`, ...args)
-}
+export const error = console.error.bind(console, '[C_PKG_FULLNAME] ERR')
 
 export function encode (val) {
   return JSON.stringify(val)
@@ -16,8 +10,8 @@ export function encode (val) {
 
 export function newLogger (prefix = '') {
   return {
-    log: (...args) => log(prefix, ...args),
-    warn: (...args) => warn(prefix, ...args),
-    error: (...args) => error(prefix, ...args),
+    log: log.bind(log, prefix),
+    warn: warn.bind(warn, prefix),
+    error: error.bind(error, prefix),
   }
 }

@@ -14,6 +14,12 @@ import { isFunction } from '../util/minilo'
  * Text style container.
  */
 export default {
+  created () {
+    this._text = undefined
+    this._textVm = undefined
+
+    this::defineServices()
+  },
   methods: {
     /**
      * @return {Promise<module:ol/style/Text~Text|undefined>}
@@ -22,23 +28,27 @@ export default {
       throw new Error('Not implemented method: getTextStyleTarget')
     },
     /**
-     * @returns {Promise<module:ol/style/Text~Text|undefined>}
+     * @returns {module:ol/style/Text~Text|undefined}
      */
-    async getText () {
-      return (await this.getTextStyleTarget()).getText()
+    getText () {
+      return this._text
     },
     /**
      * @param {module:ol/style/Text~Text|undefined} text
      * @returns {Promise<void>}
      */
     async setText (text) {
+      let textVm
       if (text && isFunction(text.resolveOlObject)) {
+        textVm = text
         text = await text.resolveOlObject()
       }
 
       const textTarget = await this.getTextStyleTarget()
       if (textTarget && text !== textTarget.getText()) {
         textTarget.setText(text)
+        this._text = text
+        this._textVm = textVm || (text?.vm && text.vm[0])
       }
     },
     /**
@@ -52,4 +62,17 @@ export default {
       }
     },
   },
+}
+
+function defineServices () {
+  Object.defineProperties(this, {
+    $text: {
+      enumerable: true,
+      get: this.getStroke,
+    },
+    $textVm: {
+      enumerable: true,
+      get: () => this._textVm,
+    },
+  })
 }
