@@ -96,9 +96,6 @@
         await this.scheduleRemount()
       },
     },
-    created () {
-      this::defineServices()
-    },
     methods: {
       /**
        * @return {module:ol/style/Style~Style}
@@ -259,18 +256,5 @@
         )
       },
     },
-  }
-
-  function defineServices () {
-    Object.defineProperties(this, {
-
-      /**
-       * @type {Object|undefined}
-       */
-      $styleContainer: {
-        enumerable: true,
-        get: () => this.$services?.styleContainer,
-      },
-    })
   }
 </script>

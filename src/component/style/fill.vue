@@ -22,7 +22,7 @@
     },
     watch: {
       async color (value) {
-        await this.setStyle(value)
+        await this.setColor(value)
       },
     },
     created () {

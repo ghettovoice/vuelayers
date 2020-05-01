@@ -133,5 +133,12 @@ function defineServices () {
       enumerable: true,
       get: () => this.$services?.viewVm,
     },
+    /**
+     * @type {Object|undefined}
+     */
+    $styleContainer: {
+      enumerable: true,
+      get: () => this.$services?.styleContainer,
+    },
   })
 }

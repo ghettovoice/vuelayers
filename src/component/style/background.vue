@@ -1,20 +1,22 @@
 <script>
-  import { fillStyleContainer, strokeStyleContainer, style } from '../../mixin'
+  import { fillStyleContainer, olCmp, strokeStyleContainer, stubVNode } from '../../mixin'
   import { stubObject } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   export default {
+    name: 'VlStyleBackground',
     mixins: [
+      stubVNode,
       fillStyleContainer,
       strokeStyleContainer,
-      style,
+      olCmp,
     ],
     stubVNode: {
       empty: false,
       attrs () {
         return {
-          id: this.$parent.vmId,
-          class: this.$parent.vmClass,
+          id: this.vmId,
+          class: this.vmClass,
         }
       },
     },
@@ -44,7 +46,7 @@
       },
       getServices () {
         return mergeDescriptors(
-          this::style.methods.getServices(),
+          this::olCmp.methods.getServices(),
           this::fillStyleContainer.methods.getServices(),
           this::strokeStyleContainer.methods.getServices(),
         )

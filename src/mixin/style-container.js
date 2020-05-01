@@ -1,5 +1,5 @@
 import { Style } from 'ol/style'
-import { constant, isArray, isFunction, reduce } from '../util/minilo'
+import { constant, isArray, isEqual, isFunction, reduce } from '../util/minilo'
 
 /**
  * @typedef {
@@ -125,16 +125,16 @@ export default {
         style = await style.resolveOlObject()
       }
 
-      if (style === this.getStyle()) return
+      if (isEqual(style, this.getStyle())) return
 
       const styleTarget = await this.getStyleTarget()
       if (!styleTarget) return
 
       if (style) {
-        await styleTarget.setStyle(this.createStyleFunc(style, this.getDefaultStyle()))
+        styleTarget.setStyle(this.createStyleFunc(style, this.getDefaultStyle()))
         this._style = style
       } else {
-        await styleTarget.setStyle(null)
+        styleTarget.setStyle(null)
         this._style = null
       }
     },
@@ -149,16 +149,17 @@ export default {
       return function __styleTargetStyleFunc (feature, resolution) {
         if (!feature.getGeometry()) return
 
+        let compiledStyle
         if (style && isFunction(style)) {
           // style - custom ol/style/Style~StyleFunction
-          style = style(feature, resolution)
+          compiledStyle = style(feature, resolution)
         } else if (isArray(style)) {
           // style - array of ol/style/Style objects
-          style = reduce(style, (newStyle, curStyle) => {
+          compiledStyle = reduce(style, (newStyle, curStyle) => {
             if (
-              newStyle.condition == null ||
-              (newStyle.condition === true) ||
-              (isFunction(newStyle.condition) && newStyle.condition(feature, resolution))
+              curStyle.condition == null ||
+              (curStyle.condition === true) ||
+              (isFunction(curStyle.condition) && curStyle.condition(feature, resolution))
             ) {
               newStyle.push(curStyle)
             }
@@ -167,11 +168,11 @@ export default {
         }
         // not empty or null style
         if (
-          style === null ||
-          (isArray(style) && style.length) ||
-          style instanceof Style
+          compiledStyle === null ||
+          (isArray(compiledStyle) && compiledStyle.length) ||
+          compiledStyle instanceof Style
         ) {
-          return style
+          return compiledStyle
         }
         // fallback to default style
         if (defaultStyle) {

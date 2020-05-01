@@ -1,8 +1,6 @@
 <script>
   import { Style } from 'ol/style'
-  import { style, stylesContainer } from '../../mixin'
-  import { hasMap } from '../../util/assert'
-  import { warn } from '../../util/log'
+  import { olCmp, styleContainer, stubVNode } from '../../mixin'
   import { isFunction, noop } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
@@ -13,7 +11,11 @@
    */
   export default {
     name: 'VlStyleFunc',
-    mixins: [style, stylesContainer],
+    mixins: [
+      stubVNode,
+      styleContainer,
+      olCmp,
+    ],
     stubVNode: {
       empty: false,
       attrs () {
@@ -27,17 +29,25 @@
       /**
        * @type {function(): function(feature: Feature): Style}
        */
-      factory: {
+      func: {
         type: Function,
-        required: true,
+        // required: true,
       },
+      /**
+       * @deprecated Use `func` prop instead.
+       * @todo remove in v0.13.x
+       */
+      factory: Function,
     },
     computed: {
       styleFunc () {
-        let func = this.factory()
+        let func = this.func
+        if (!func && this.factory) {
+          func = this.factory()
+        }
         if (!isFunction(func)) {
           if (process.env.NODE_ENV !== 'production') {
-            warn('Factory returned a value not of Function type, fallback style will be used')
+            this.$logger.warn('Factory returned a value not of Function type, fallback style will be used')
           }
           func = noop
         }
@@ -46,80 +56,106 @@
       },
     },
     watch: {
-      factory () {
-        this.scheduleRefresh()
+      async styleFunc () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('styleFunc changed, scheduling recreate...')
+        }
+
+        await this.scheduleRecreate()
       },
+    },
+    created () {
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.factory) {
+          this.$logger.warn("'factory' prop is deprecated. Use 'func' prop instead.")
+        }
+      }
+
+      this::defineServices()
     },
     methods: {
       /**
        * @return {function(feature: Feature): Style}
        * @protected
        */
-      createStyle () {
-        hasMap(this)
+      createOlObject () {
         // user provided style function
         const providedStyleFunc = this.styleFunc
         // fallback style function made from inner style containers
-        const fallbackStyleFunc = this.createStyleFunc()
+        const fallbackStyleFunc = this.createStyleFunc(this.$style, this.getDefaultStyle())
 
         return function __styleFunc (feature, resolution) {
-          const styles = providedStyleFunc(feature, resolution)
+          const style = providedStyleFunc(feature, resolution)
           // not empty or null style
           if (
-            styles === null ||
-            (Array.isArray(styles) && styles.length) ||
-            styles instanceof Style
+            style === null ||
+            (Array.isArray(style) && style.length) ||
+            style instanceof Style
           ) {
-            return styles
+            return style
           }
           return fallbackStyleFunc(feature, resolution)
         }
       },
-      /**
-       * @return {void}
-       * @protected
-       */
-      mount () {
-        this.$stylesContainer && this.$stylesContainer.addStyle(this)
+      async getStyleTarget () {
+        return {
+          setStyle: async () => {
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('style changed, scheduling recreate...')
+            }
+
+            await this.scheduleRecreate()
+          },
+        }
       },
       /**
-       * @return {void}
+       * @return {Promise<void>}
        * @protected
        */
-      unmount () {
-        this.$stylesContainer && this.$stylesContainer.removeStyle(this)
+      async mount () {
+        if (this.$styleContainer) {
+          await this.$styleContainer.addStyle(this)
+        }
+
+        return this::olCmp.methods.mount()
+      },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async unmount () {
+        if (this.$styleContainer) {
+          await this.$styleContainer.removeStyle(this)
+        }
+
+        return this::olCmp.methods.unmount()
       },
       /**
        * @returns {Object}
        * @protected
        */
       getServices () {
-        const vm = this
-
-        return mergeDescriptors(this::style.methods.getServices(), {
-          get stylesContainer () { return vm },
-        })
-      },
-      /**
-       * Overrides styleContainer `setStyle` method
-       * @param {Array<{ style: Style, condition: (function|boolean|undefined) }>|function(feature: Feature): Style|Vue|undefined} styles
-       * @return {void}
-       */
-      setStyle (styles) {
-        if (styles !== this._styles) {
-          // simply save all inner styles and
-          // use them later in style function as fallback
-          this._styles = styles
-          this.scheduleRefresh()
-        }
-      },
-      /**
-       * @return {Promise}
-       */
-      refresh () {
-        // recreate style
-        return this.recreate()
+        return mergeDescriptors(
+          this::olCmp.methods.getServices(),
+          this::styleContainer.methods.getServices(),
+        )
       },
     },
+  }
+
+  function defineServices () {
+    Object.defineProperties(this, {
+      $styleFunc: {
+        enumerable: true,
+        get: () => this.$olObject,
+      },
+      /**
+       * @type {Object|undefined}
+       */
+      $styleContainer: {
+        enumerable: true,
+        get: () => this.$services?.styleContainer,
+      },
+    })
   }
 </script>

@@ -11,6 +11,7 @@ function isStyle (style) {
     style instanceof Fill ||
     style instanceof Stroke ||
     style instanceof Text ||
+    style instanceof Function ||
     style instanceof Vue
 }
 

@@ -1,7 +1,7 @@
 import { GeoJSON as BaseGeoJSON, MVT, TopoJSON } from 'ol/format'
 import { LineString } from 'ol/geom'
 import { getLength } from 'ol/sphere'
-import { isEmpty } from '../util/minilo'
+import { isEmpty } from 'ol/obj'
 import { createCircularPolygon } from './geom'
 import { EPSG_4326, transformPoint } from './proj'
 import { isCircle } from './util'
