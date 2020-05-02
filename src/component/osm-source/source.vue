@@ -33,14 +33,14 @@
         // always EPSG:3857, size: 256x256, format png
         return new OSMSource({
           // ol/source/Source
-          attributions: this.attributions,
+          attributions: this.currentAttributions,
           wrapX: this.wrapX,
           // ol/source/Tile
           cacheSize: this.cacheSize,
           opaque: this.opaque,
           transition: this.transition,
           // ol/source/UrlTile
-          tileLoadFunction: this.tileLoadFunction,
+          tileLoadFunction: this.resolvedTileLoadFunc,
           url: this.parsedUrl,
           // ol/source/TileImage
           crossOrigin: this.crossOrigin,

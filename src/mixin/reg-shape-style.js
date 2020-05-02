@@ -1,4 +1,4 @@
-import { pick } from '../util/minilo'
+import { pick, upperFirst, isFunction } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import fillStyleContainer from './fill-style-container'
@@ -29,7 +29,12 @@ export default {
       'radius1',
       'radius2',
       'angle',
-    ], prop => async function () {
+    ], prop => async function (value, prev) {
+      const handler = this[`on${upperFirst(prop)}Changed`]
+      if (isFunction(handler)) {
+        return handler(value, prev)
+      }
+
       if (process.env.VUELAYERS_DEBUG) {
         this.$logger.log(`${prop} changed, scheduling recreate...`)
       }
@@ -38,58 +43,6 @@ export default {
     }),
   },
   methods: {
-    async getAnchor () {
-      return (await this.resolveStyle()).getAnchor()
-    },
-    async getAngle () {
-      return (await this.resolveStyle()).getAngle()
-    },
-    async getImage () {
-      return (await this.resolveStyle()).getImage()
-    },
-    async getOrigin () {
-      return (await this.resolveStyle()).getOrigin()
-    },
-    async getPoints () {
-      return (await this.resolveStyle()).getPoints()
-    },
-    async getRadius () {
-      return (await this.resolveStyle()).getRadius()
-    },
-    async getRadius2 () {
-      return (await this.resolveStyle()).getRadius2()
-    },
-    async getSize () {
-      return (await this.resolveStyle()).getSize()
-    },
-    async getFillStyleTarget () {
-      const style = await this.resolveStyle()
-
-      return {
-        getFill: ::style.getFill,
-        setFill: async () => {
-          if (process.env.VUELAYERS_DEBUG) {
-            this.$logger.log('fill changed, scheduling recreate...')
-          }
-
-          await this.scheduleRecreate()
-        },
-      }
-    },
-    async getStrokeStyleTarget () {
-      const style = await this.resolveStyle()
-
-      return {
-        getStroke: ::style.getStroke,
-        setStroke: async () => {
-          if (process.env.VUELAYERS_DEBUG) {
-            this.$logger.log('stroke changed, scheduling recreate...')
-          }
-
-          await this.scheduleRecreate()
-        },
-      }
-    },
     /**
      * @returns {Object}
      * @protected
@@ -116,5 +69,55 @@ export default {
       'resolveOlObject',
       'resolveStyle',
     ]),
+    async getFillStyleTarget () {
+      return {
+        setFill: async () => {
+          ++this.rev
+
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.log('fill changed, scheduling recreate...')
+          }
+
+          await this.scheduleRecreate()
+        },
+      }
+    },
+    async getStrokeStyleTarget () {
+      return {
+        setStroke: async () => {
+          ++this.rev
+
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.log('stroke changed, scheduling recreate...')
+          }
+
+          await this.scheduleRecreate()
+        },
+      }
+    },
+    async getAnchor () {
+      return (await this.resolveStyle()).getAnchor()
+    },
+    async getAngle () {
+      return (await this.resolveStyle()).getAngle()
+    },
+    async getImage () {
+      return (await this.resolveStyle()).getImage()
+    },
+    async getOrigin () {
+      return (await this.resolveStyle()).getOrigin()
+    },
+    async getPoints () {
+      return (await this.resolveStyle()).getPoints()
+    },
+    async getRadius () {
+      return (await this.resolveStyle()).getRadius()
+    },
+    async getRadius2 () {
+      return (await this.resolveStyle()).getRadius2()
+    },
+    async getSize () {
+      return (await this.resolveStyle()).getSize()
+    },
   },
 }

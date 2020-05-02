@@ -1,7 +1,7 @@
 <script>
   import ImageWMS from 'ol/source/ImageWMS'
   import WMSServerType from 'ol/source/WMSServerType'
-  import { imageSource, withUrl, wmsSource } from '../../mixin'
+  import { imageSource, wmsSource } from '../../mixin'
 
   const props = {
     hidpi: {
@@ -44,7 +44,7 @@
 
   export default {
     name: 'VlSourceImageWms',
-    mixins: [imageSource, withUrl, wmsSource],
+    mixins: [imageSource, wmsSource],
     props,
     methods,
   }

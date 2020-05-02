@@ -1,7 +1,10 @@
-import { obsFromOlChangeEvent } from '../rx-ext'
-import { pick } from '../util/minilo'
+import debounce from 'debounce-promise'
+import { skipWhile } from 'rxjs/operators'
+import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
+import { addPrefix, isEqual, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import layer from './layer'
+import { FRAME_TIME } from './ol-cmp'
 import styleContainer from './style-container'
 
 export default {
@@ -37,10 +40,24 @@ export default {
      */
     updateWhileInteracting: Boolean,
   },
+  computed: {
+    currentRenderOrder () {
+      if (this.rev && this.$layer) {
+        return this.$layer.getRenderOrder()
+      }
+
+      return this.renderOrder
+    },
+  },
   watch: {
     async renderOrder (value) {
       await this.setRenderOrder(value)
     },
+    currentRenderOrder: debounce(function (value) {
+      if (value === this.renderOrder) return
+
+      this.$emit('update:renderOrder', value)
+    }, FRAME_TIME),
     async renderBuffer (value) {
       if (value === await this.getRenderBuffer()) return
 
@@ -79,6 +96,43 @@ export default {
     },
   },
   methods: {
+    /**
+     * @returns {Object}
+     * @protected
+     */
+    getServices () {
+      return mergeDescriptors(
+        this::layer.methods.getServices(),
+        this::styleContainer.methods.getServices(),
+      )
+    },
+    /**
+     * @returns {void}
+     */
+    subscribeAll () {
+      this::layer.methods.subscribeAll()
+      this::subscribeToLayerEvents()
+    },
+    ...pick(layer.methods, [
+      'beforeInit',
+      'init',
+      'deinit',
+      'beforeMount',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'resolveOlObject',
+      'resolveLayer',
+    ]),
+    /**
+     * @return {Promise<StyleTarget|undefined>}
+     */
+    getStyleTarget: layer.methods.resolveLayer,
     /**
      * @returns {Promise<boolean>}
      */
@@ -120,58 +174,20 @@ export default {
     async getUpdateWhileInteracting () {
       return (await this.resolveLayer()).getUpdateWhileInteracting()
     },
-    /**
-     * @return {Promise<StyleTarget|undefined>}
-     */
-    getStyleTarget: layer.methods.resolveLayer,
-    /**
-     * @returns {Object}
-     * @protected
-     */
-    getServices () {
-      return mergeDescriptors(
-        this::layer.methods.getServices(),
-        this::styleContainer.methods.getServices(),
-      )
-    },
-    /**
-     * @returns {Promise<void>}
-     */
-    async subscribeAll () {
-      await Promise.all([
-        this::layer.methods.subscribeAll(),
-        this::subscribeToLayerEvents(),
-      ])
-    },
-    ...pick(layer.methods, [
-      'init',
-      'deinit',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'resolveOlObject',
-      'resolveLayer',
-    ]),
   },
 }
 
 async function subscribeToLayerEvents () {
-  const layer = await this.resolveLayer()
-
-  const changes = obsFromOlChangeEvent(layer, [
+  const prefixKey = addPrefix('current')
+  const propChanges = obsFromOlChangeEvent(this.$layer, [
     'renderOrder',
-  ], true, 1000 / 60)
-
-  this.subscribeTo(changes, ({ prop, value }) => {
+  ], true, evt => ({
+    ...evt,
+    compareWith: this[prefixKey(evt.prop)],
+  })).pipe(
+    skipWhile(({ compareWith, value }) => isEqual(value, compareWith)),
+  )
+  this.subscribeTo(propChanges, () => {
     ++this.rev
-
-    this.$nextTick(() => {
-      this.$emit(`update:${prop}`, value)
-    })
   })
 }

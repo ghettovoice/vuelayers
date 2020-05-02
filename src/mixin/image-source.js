@@ -1,9 +1,10 @@
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
-import { obsFromOlEvent } from '../rx-ext'
+import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { isString, pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
+import { ImageSourceEventType } from 'ol/source/Image'
 
 /**
  * Base image source mixin.
@@ -40,6 +41,31 @@ export default {
   },
   methods: {
     /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::source.methods.subscribeAll()
+      this::subscribeToSourceEvents()
+    },
+    ...pick(source.methods, [
+      'beforeInit',
+      'init',
+      'deinit',
+      'beforeMount',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'getServices',
+      'resolveOlObject',
+      'resolveSource',
+    ]),
+    /**
      * @param {number[]} extent
      * @param {number} resolution
      * @param {number} pixelRatio
@@ -53,46 +79,15 @@ export default {
 
       return (await this.resolveSource()).getImage(extent, resolution, pixelRatio, projection)
     },
-    /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    async subscribeAll () {
-      await Promise.all([
-        this::source.methods.subscribeAll(),
-        this::subscribeToSourceEvents(),
-      ])
-    },
-    ...pick(source.methods, [
-      'init',
-      'deinit',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'getServices',
-      'resolveOlObject',
-      'resolveSource',
-    ]),
   },
 }
 
 async function subscribeToSourceEvents () {
-  const source = await this.resolveSource()
-
-  const events = obsFromOlEvent(source, [
-    'imageloadend',
-    'imageloaderror',
-    'imageloadstart',
+  const events = obsFromOlEvent(this.$source, [
+    ImageSourceEventType.IMAGELOADSTART,
+    ImageSourceEventType.IMAGELOADEND,
+    ImageSourceEventType.IMAGELOADERROR,
   ])
 
-  this.subscribeTo(events, evt => {
-    ++this.rev
-
-    this.$emit(evt.type, evt)
-  })
+  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

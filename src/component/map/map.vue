@@ -4,34 +4,57 @@
     :class="vmClass"
     :tabindex="tabindex">
     <slot>
-      <VlView />
+      <ViewCmp />
     </slot>
+    <VectorLayerCmp
+      id="vl-features-overlay"
+      ref="featuresOverlay"
+      :overlay="true"
+      :update-while-animating="updateWhileAnimating"
+      :update-while-interacting="updateWhileInteracting">
+      <VectorSourceCmp
+        id="vl-features-overlay-source"
+        ref="featuresOverlaySource"
+        :wrap-x="wrapX"
+        @created="onFeaturesOverlaySourceCreated">
+        <slot name="overlay" />
+      </VectorSourceCmp>
+    </VectorLayerCmp>
   </div>
 </template>
 
 <script>
   import { Collection, Map, View } from 'ol'
-  import { Vector as VectorLayer } from 'ol/layer'
+  import MapBrowserEventType from 'ol/MapBrowserEventType'
+  import MapEventType from 'ol/MapEventType'
   import { get as getProj } from 'ol/proj'
-  import { Vector as VectorSource } from 'ol/source'
+  import RenderEventType from 'ol/render/EventType'
   import { merge as mergeObs } from 'rxjs'
-  import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
+  import { distinctUntilChanged, map as mapObs, skipWhile } from 'rxjs/operators'
   import {
     controlsContainer,
     featuresContainer,
     interactionsContainer,
     layersContainer,
     olCmp,
+    OlObjectEvent,
     overlaysContainer,
     projTransforms,
   } from '../../mixin'
   import { getMapDataProjection, getMapId, setMapDataProjection, setMapId } from '../../ol-ext'
-  import { obsFromOlEvent } from '../../rx-ext'
+  import {
+    fromOlChangeEvent as obsFromOlChangeEvent,
+    fromOlEvent as obsFromOlEvent,
+    fromVueEvent as obsFromVueEvent,
+  } from '../../rx-ext'
   import { assert } from '../../util/assert'
-  import { isEqual, isFunction, waitFor } from '../../util/minilo'
+  import { addPrefix, hasProp, isEqual, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
-  import VlView from './view'
+  import waitFor from '../../util/wait-for'
+  import { Layer as VectorLayerCmp } from '../vector-layer'
+  import { Source as VectorSourceCmp } from '../vector-source'
+  import ViewCmp from './view.vue'
 
   /**
    * Container for **layers**, **interactions**, **controls** and **overlays**. It responsible for viewport
@@ -43,7 +66,9 @@
   export default {
     name: 'VlMap',
     components: {
-      VlView,
+      ViewCmp,
+      VectorLayerCmp,
+      VectorSourceCmp,
     },
     mixins: [
       projTransforms,
@@ -130,27 +155,20 @@
       updateWhileInteracting: Boolean,
     },
     computed: {
-      /**
-       * @return {string|undefined}
-       */
-      featuresOverlayIdent () {
-        if (!this.olObjIdent) return
+      currentId () {
+        if (this.rev && this.$map) {
+          return getMapId(this.$map)
+        }
 
-        return this.makeIdent(this.olObjIdent, 'features_overlay')
+        return this.id
       },
     },
     watch: {
-      async id (value) {
-        await this.setId(value)
-      },
       async defaultControls (value) {
         await this.initDefaultControls(value)
       },
       async defaultInteractions (value) {
         await this.initDefaultInteractions(value)
-      },
-      wrapX (value) {
-        this.setWrapX(value)
       },
       async dataProjection (value) {
         await this.setDataProjection(value)
@@ -178,11 +196,6 @@
        * @type {Object|undefined}
        */
       this._viewVm = undefined
-      /**
-       * @type {module:ol/layer/Vector~VectorLayer}
-       * @private
-       */
-      this._featuresOverlay = this.instanceFactoryCall(this.featuresOverlayIdent, ::this.createFeaturesOverlay)
       // todo wrap controls into components and provide vl-control-default
       this.initDefaultControls(this.defaultControls)
       // todo initialize without interactions and provide vl-interaction-default component
@@ -196,8 +209,6 @@
        * @protected
        */
       async createOlObject () {
-        await waitFor(() => this.$view && this.$featuresOverlay)
-
         const map = new Map({
           pixelRatio: this.pixelRatio,
           moveTolerance: this.moveTolerance,
@@ -209,13 +220,86 @@
           overlays: this.$overlaysCollection,
           view: this.$view,
         })
-        setMapId(map, this.id)
+        setMapId(map, this.currentId)
         setMapDataProjection(map, this.dataProjection)
-
-        this.$featuresOverlay.setMap(map)
 
         return map
       },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async beforeMount () {
+        try {
+          await waitFor(
+            () => this.$viewVm != null,
+            obsFromVueEvent(this.$eventBus, [
+              OlObjectEvent.CREATE_ERROR,
+              OlObjectEvent.MOUNT_ERROR,
+            ]).pipe(
+              mapObs(([vm]) => hasProp(vm, '$view') && vm.$vq?.closest(this)),
+            ),
+            1000,
+          )
+
+          return this::olCmp.methods.beforeMount()
+        } catch (err) {
+          err.message = 'Wait for $viewVm failed: ' + err.message
+          throw err
+        }
+      },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async mount () {
+        await this.setTarget(this.$el)
+        this.$nextTick(::this.updateSize)
+
+        return this::olCmp.methods.mount()
+      },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async unmount () {
+        await this.setTarget(null)
+
+        return this::olCmp.methods.unmount()
+      },
+      /**
+       * @return {void}
+       * @protected
+       */
+      subscribeAll () {
+        this::olCmp.methods.subscribeAll()
+        this::subscribeToEvents()
+      },
+      /**
+       * @returns {Object}
+       * @protected
+       */
+      getServices () {
+        const vm = this
+
+        return mergeDescriptors(
+          this::olCmp.methods.getServices(),
+          this::layersContainer.methods.getServices(),
+          this::controlsContainer.methods.getServices(),
+          this::interactionsContainer.methods.getServices(),
+          this::overlaysContainer.methods.getServices(),
+          this::featuresContainer.methods.getServices(),
+          {
+            get mapVm () { return vm },
+            get viewVm () { return vm.$viewVm },
+            get viewContainer () { return vm },
+          },
+        )
+      },
+      /**
+       * @return {Promise<module:ol/Map~Map>}
+       */
+      resolveMap: olCmp.methods.resolveOlObject,
       /**
        * @return {Promise<string|number>}
        */
@@ -411,24 +495,37 @@
         await this.scheduleRefresh()
       },
       /**
-       * @return {boolean}
+       * @return {Promise<boolean>}
        */
       getWrapX () {
-        if (!this.$featuresOverlaySource) return false
+        if (!this.$featuresOverlaySourceVm) return false
 
-        return this.$featuresOverlaySource.getWrapX()
+        return this.$featuresOverlaySourceVm.getWrapX()
       },
       /**
        * @param {boolean} wrapX
-       * @return {void}
+       * @return {Promise<void>}
        */
-      setWrapX (wrapX) {
-        if (this.$featuresOverlaySource == null) return
+      async setWrapX (wrapX) {
+        if (!this.$featuresOverlaySourceVm) return
 
-        if (wrapX === this.$featuresOverlaySource.getWrapX()) return
+        await this.$featuresOverlaySourceVm.setWrapX(wrapX)
+      },
+      /**
+       * @return {Promise<boolean>}
+       */
+      getUpdateWhileAnimating () {
+        if (!this.$featuresOverlayVm) return false
 
-        const layer = this.createFeaturesOverlay({ wrapX })
-        this.$featuresOverlay.setSource(layer.getSource())
+        return this.$featuresOverlayVm.getUpdateWhileAnimating()
+      },
+      /**
+       * @returns {Promise<boolean>}
+       */
+      async getUpdateWhileInteracting () {
+        if (!this.$featuresOverlayVm) return false
+
+        return this.$featuresOverlayVm.getUpdateWhileInteracting()
       },
       /**
        * Triggers focus on map container.
@@ -447,78 +544,17 @@
 
         return this::olCmp.methods.refresh()
       },
-      /**
-       * @return {void}
-       * @protected
-       */
-      async mount () {
-        await waitFor(() => this.$viewVm != null)
-
-        await this.setTarget(this.$el)
-        this.$nextTick(::this.updateSize)
-
-        return this::olCmp.methods.mount()
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async unmount () {
-        await this.setTarget(null)
-
-        return this::olCmp.methods.unmount()
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async subscribeAll () {
-        await Promise.all([
-          this::olCmp.methods.subscribeAll(),
-          this::subscribeToEvents(),
-        ])
-      },
-      /**
-       * @returns {Object}
-       * @protected
-       */
-      getServices () {
-        const vm = this
-
-        return mergeDescriptors(
-          this::olCmp.methods.getServices(),
-          this::layersContainer.methods.getServices(),
-          this::interactionsContainer.methods.getServices(),
-          this::overlaysContainer.methods.getServices(),
-          this::featuresContainer.methods.getServices(),
-          {
-            get mapVm () { return vm },
-            get viewVm () { return vm.$viewVm },
-            get viewContainer () { return vm },
-          },
-        )
-      },
-      /**
-       * @param {module:ol/layer/BaseVector~Options} sourceOptions
-       * @return {VectorLayer<VectorSource>}
-       */
-      createFeaturesOverlay (sourceOptions = {}) {
-        sourceOptions = {
-          features: this.$featuresCollection,
-          wrapX: this.wrapX,
-          ...sourceOptions,
+      async onFeaturesOverlaySourceCreated (sourceVm) {
+        if (!this.getFeatures().length) {
+          await Promise.all(this.getFeatures().map(::sourceVm.addFeature))
         }
 
-        return new VectorLayer({
-          source: new VectorSource(sourceOptions),
-          updateWhileAnimating: this.updateWhileAnimating,
-          updateWhileInteracting: this.updateWhileInteracting,
-        })
+        const adds = obsFromVueEvent(this, 'addfeature')
+        this.subscribeTo(adds, ([feature]) => sourceVm.addFeature(feature))
+
+        const removes = obsFromVueEvent(this, 'removefeature')
+        this.subscribeTo(removes, ([feature]) => sourceVm.removeFeature(feature))
       },
-      /**
-       * @return {Promise<module:ol/Map~Map>}
-       */
-      resolveMap: olCmp.methods.resolveOlObject,
     },
   }
 
@@ -546,19 +582,13 @@
         enumerable: true,
         get: () => this._viewVm,
       },
-      /**
-       * @type {module:ol/layer/Vector~VectorLayer|undefined}
-       */
-      $featuresOverlay: {
+      $featuresOverlayVm: {
         enumerable: true,
-        get: () => this._featuresOverlay,
+        get: () => this.$refs?.featuresOverlay,
       },
-      /**
-       * @type {module:ol/source/Vector~VectorSource|undefined}
-       */
-      $featuresOverlaySource: {
+      $featuresOverlaySourceVm: {
         enumerable: true,
-        get: () => this.$featuresOverlay?.getSource(),
+        get: () => this.$refs?.featuresOverlaySource,
       },
     })
   }
@@ -570,43 +600,61 @@
    * @private
    */
   async function subscribeToEvents () {
-    const map = await this.resolveMap()
+    const prefixKey = addPrefix('current')
+    const propChanges = mergeObs(
+      obsFromOlChangeEvent(this.$map, [
+        'id',
+      ], true, evt => ({
+        ...evt,
+        compareWith: this[prefixKey(evt.prop)],
+      })),
+    ).pipe(
+      skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
+    )
+    this.subscribeTo(propChanges, () => {
+      ++this.rev
+    })
 
-    const ft = 1000 / 60
+    const otherChanges = obsFromOlChangeEvent(this.$map, [
+      'layerGroup',
+      'size',
+      'target',
+      'view',
+    ], true)
+    this.subscribeTo(otherChanges, ({ prop, value }) => {
+      ++this.rev
+      this.$nextTick(() => this.$emit(`update:${prop}`, value))
+    })
+
     // pointer
     const pointerEvents = mergeObs(
-      obsFromOlEvent(map, [
-        'click',
-        'dblclick',
-        'singleclick',
+      obsFromOlEvent(this.$map, [
+        MapBrowserEventType.CLICK,
+        MapBrowserEventType.DBLCLICK,
+        MapBrowserEventType.SINGLECLICK,
       ]),
-      obsFromOlEvent(map, [
-        'pointerdrag',
-        'pointermove',
+      obsFromOlEvent(this.$map, [
+        MapBrowserEventType.POINTERDRAG,
+        MapBrowserEventType.POINTERMOVE,
       ]).pipe(
-        throttleTime(ft),
         distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
       ),
     ).pipe(
-      mapObs(evt => {
-        evt.coordinate = this.pointToDataProj(evt.coordinate)
-        return evt
-      }),
+      mapObs(evt => ({
+        ...evt,
+        coordinate: this.pointToDataProj(evt.coordinate),
+      })),
     )
     // other
-    const otherEvents = obsFromOlEvent(map, [
-      'movestart',
-      'moveend',
-      'postrender',
-      'rendercomplete',
-      'precompose',
-      'postcompose',
-      'rendercomplete',
+    const otherEvents = obsFromOlEvent(this.$map, [
+      MapEventType.MOVESTART,
+      MapEventType.MOVEEND,
+      MapEventType.POSTRENDER,
+      RenderEventType.PRECOMPOSE,
+      RenderEventType.POSTCOMPOSE,
+      RenderEventType.RENDERCOMPLETE,
     ])
-
-    const events = mergeObs(pointerEvents, otherEvents)
-
-    this.subscribeTo(events, evt => {
+    this.subscribeTo(mergeObs(pointerEvents, otherEvents), evt => {
       this.$emit(evt.type, evt)
     })
   }

@@ -20,6 +20,6 @@ function plugin (Vue, options = {}) {
 export default plugin
 
 export {
-  Source,
   plugin as install,
+  Source,
 }

@@ -16,6 +16,6 @@ function plugin (Vue, options = {}) {
 export default plugin
 
 export {
-  Layer,
   plugin as install,
+  Layer,
 }

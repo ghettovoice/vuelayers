@@ -39,8 +39,10 @@ export default {
   },
   methods: {
     ...pick(urlTileSource.methods, [
+      'beforeInit',
       'init',
       'deinit',
+      'beforeMount',
       'mount',
       'unmount',
       'refresh',

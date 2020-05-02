@@ -6,7 +6,7 @@ const baseWebpackConfig = require('./webpack.base.config')
 const utils = require('./utils')
 
 const webpackConfig = merge(baseWebpackConfig, {
-  devtool: '#cheap-module-eval-source-map',
+  // devtool: '#cheap-module-eval-source-map',
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     // https://github.com/ampedandwired/html-webpack-plugin

@@ -1,11 +1,15 @@
+import debounce from 'debounce-promise'
 import { Collection } from 'ol'
+import CollectionEventType from 'ol/CollectionEventType'
 import { Control, defaults as createDefaultControls } from 'ol/control'
-import { merge as mergeObs } from 'rxjs'
+import { from as fromObs, merge as mergeObs } from 'rxjs'
+import { map as mapObs, mergeMap } from 'rxjs/operators'
 import { getControlId, initializeControl } from '../ol-ext'
-import { obsFromOlEvent } from '../rx-ext'
+import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isArray, isFunction, isPlainObject, map } from '../util/minilo'
+import { isArray, isFunction, isPlainObject, map, find, forEach, isEqual } from '../util/minilo'
 import identMap from './ident-map'
+import { FRAME_TIME } from './ol-cmp'
 import rxSubs from './rx-subs'
 
 /**
@@ -24,10 +28,10 @@ export default {
     /**
      * @returns {string[]}
      */
-    controlIds () {
+    currentControls () {
       if (!this.rev) return []
 
-      return this.getControls().map(getControlId)
+      return map(this.getControls(), getControlId)
     },
     /**
      * @type {string|undefined}
@@ -39,6 +43,11 @@ export default {
     },
   },
   watch: {
+    currentControls: debounce(function (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:controls', value.slice())
+    }, FRAME_TIME),
     controlsCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
@@ -60,6 +69,17 @@ export default {
     this::subscribeToCollectionEvents()
   },
   methods: {
+    /**
+     * @returns {{readonly controlsContainer: Object}}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return {
+        get controlsContainer () { return vm },
+      }
+    },
     /**
      * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} defaultControls
      * @returns {Promise<void>}
@@ -83,20 +103,14 @@ export default {
     },
     /**
      * @param {ControlLike} control
-     * @returns {Promise<void>}
+     * @return {Promise<Control>}
      */
-    async addControl (control) {
-      initializeControl(control)
-
+    async initializeControl (control) {
       if (isFunction(control.resolveOlObject)) {
         control = await control.resolveOlObject()
       }
 
-      instanceOf(control, Control)
-
-      if (this.getControlById(getControlId(control)) == null) {
-        this.$controlsCollection.push(control)
-      }
+      return initializeControl(control)
     },
     /**
      * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} controls
@@ -104,6 +118,25 @@ export default {
      */
     async addControls (controls) {
       await Promise.all(map(controls, ::this.addControl))
+    },
+    /**
+     * @param {ControlLike} control
+     * @returns {Promise<void>}
+     */
+    async addControl (control) {
+      control = await this.initializeControl(control)
+      instanceOf(control, Control)
+
+      if (!this.getControlById(getControlId(control))) {
+        this.$controlsCollection.push(control)
+      }
+    },
+    /**
+     * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} controls
+     * @returns {Promise<void>}
+     */
+    async removeControls (controls) {
+      await Promise.all(map(controls, ::this.removeControl))
     },
     /**
      * @param {ControlLike} control
@@ -120,11 +153,10 @@ export default {
       this.$controlsCollection.remove(control)
     },
     /**
-     * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} controls
-     * @returns {Promise<void>}
+     * @return {void}
      */
-    async removeControls (controls) {
-      await Promise.all(map(controls, ::this.removeControl))
+    clearControls () {
+      this.$controlsCollection.clear()
     },
     /**
      * @returns {Array<module:ol/control/Control~Control>}
@@ -143,26 +175,9 @@ export default {
      * @returns {ControlLike}
      */
     getControlById (controlId) {
-      return this.getControls().find(control => {
+      return find(this.getControls(), control => {
         return getControlId(control) === controlId
       })
-    },
-    /**
-     * @return {void}
-     */
-    clearControls () {
-      this.$controlsCollection.clear()
-    },
-    /**
-     * @returns {{readonly controlsContainer: Object}}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return {
-        get controlsContainer () { return vm },
-      }
     },
   },
 }
@@ -177,14 +192,24 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = obsFromOlEvent(this.$controlsCollection, 'add')
-  const removes = obsFromOlEvent(this.$controlsCollection, 'remove')
-
-  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+  const adds = obsFromOlEvent(this.$controlsCollection, CollectionEventType.ADD).pipe(
+    mergeMap(({ type, element }) => fromObs(this.initializeControl(element)).pipe(
+      mapObs(element => ({ type, element })),
+    )),
+  )
+  const removes = obsFromOlEvent(this.$controlsCollection, CollectionEventType.REMOVE)
+  const events = mergeObs(adds, removes).pipe(
+    bufferDebounceTime(FRAME_TIME),
+  )
+  this.subscribeTo(events, events => {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit(type + 'control', element)
+      forEach(events, ({ type, element }) => {
+        this.$emit(type + 'control', element)
+        // todo remove in v0.13.x
+        this.$emit(type + ':control', element)
+      })
     })
   })
 }

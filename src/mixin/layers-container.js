@@ -1,11 +1,15 @@
+import debounce from 'debounce-promise'
 import { Collection } from 'ol'
+import CollectionEventType from 'ol/CollectionEventType'
 import BaseLayer from 'ol/layer/Base'
-import { merge as mergeObs } from 'rxjs'
+import { from as fromObs, merge as mergeObs } from 'rxjs'
+import { map as mapObs, mergeMap } from 'rxjs/operators'
 import { getLayerId, initializeLayer } from '../ol-ext'
-import { obsFromOlEvent } from '../rx-ext'
+import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isFunction, map } from '../util/minilo'
+import { isFunction, map, forEach, find, isEqual } from '../util/minilo'
 import identMap from './ident-map'
+import { FRAME_TIME } from './ol-cmp'
 import rxSubs from './rx-subs'
 
 /**
@@ -24,10 +28,10 @@ export default {
     /**
      * @returns {string[]}
      */
-    layerIds () {
+    currentLayers () {
       if (!this.rev) return []
 
-      return this.getLayers().map(getLayerId)
+      return map(this.getLayers(), getLayerId)
     },
     /**
      * @returns {string|undefined}
@@ -39,6 +43,11 @@ export default {
     },
   },
   watch: {
+    currentLayers: debounce(function (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:layers', value.slice())
+    }, FRAME_TIME),
     layersCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
@@ -61,16 +70,40 @@ export default {
   },
   methods: {
     /**
-     * @param {LayerLike} layer
-     * @return {Promise<void>}
+     * @returns {{readonly layersContainer: Object}}
+     * @protected
      */
-    async addLayer (layer) {
-      initializeLayer(layer)
+    getServices () {
+      const vm = this
 
+      return {
+        get layersContainer () { return vm },
+      }
+    },
+    /**
+     * @param {LayerLike} layer
+     * @return {Promise<BaseLayer>}
+     */
+    async initializeLayer (layer) {
       if (isFunction(layer.resolveOlObject)) {
         layer = await layer.resolveOlObject()
       }
 
+      return initializeLayer(layer)
+    },
+    /**
+     * @param {LayerLike[]|module:ol/Collection~Collection<LayerLike>} layers
+     * @returns {Promise<void>}
+     */
+    async addLayers (layers) {
+      await Promise.all(map(layers, ::this.addLayer))
+    },
+    /**
+     * @param {LayerLike} layer
+     * @return {Promise<void>}
+     */
+    async addLayer (layer) {
+      layer = await this.initializeLayer(layer)
       instanceOf(layer, BaseLayer)
 
       if (this.getLayerById(getLayerId(layer)) == null) {
@@ -81,8 +114,8 @@ export default {
      * @param {LayerLike[]|module:ol/Collection~Collection<LayerLike>} layers
      * @returns {Promise<void>}
      */
-    async addLayers (layers) {
-      await Promise.all(map(layers, ::this.addLayer))
+    async removeLayers (layers) {
+      await Promise.all(map(layers, ::this.removeLayer))
     },
     /**
      * @param {LayerLike} layer
@@ -99,11 +132,10 @@ export default {
       this.$layersCollection.remove(layer)
     },
     /**
-     * @param {LayerLike[]|module:ol/Collection~Collection<LayerLike>} layers
-     * @returns {Promise<void>}
+     * @return {void}
      */
-    async removeLayers (layers) {
-      await Promise.all(map(layers, ::this.removeLayer))
+    clearLayers () {
+      this.$layersCollection.clear()
     },
     /**
      * @return {Array<module:ol/layer/Base~BaseLayer>}
@@ -122,26 +154,9 @@ export default {
      * @return {module:ol/layer/Base~BaseLayer|undefined}
      */
     getLayerById (layerId) {
-      return this.getLayers().find(layer => {
+      return find(this.getLayers(), layer => {
         return getLayerId(layer) === layerId
       })
-    },
-    /**
-     * @return {void}
-     */
-    clearLayers () {
-      this.$layersCollection.clear()
-    },
-    /**
-     * @returns {{readonly layersContainer: Object}}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return {
-        get layersContainer () { return vm },
-      }
     },
   },
 }
@@ -156,14 +171,24 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = obsFromOlEvent(this.$layersCollection, 'add')
-  const removes = obsFromOlEvent(this.$layersCollection, 'remove')
-
-  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+  const adds = obsFromOlEvent(this.$layersCollection, CollectionEventType.ADD).pipe(
+    mergeMap(({ type, element }) => fromObs(this.initializeLayer(element)).pipe(
+      mapObs(element => ({ type, element })),
+    )),
+  )
+  const removes = obsFromOlEvent(this.$layersCollection, CollectionEventType.REMOVE)
+  const events = mergeObs(adds, removes).pipe(
+    bufferDebounceTime(FRAME_TIME),
+  )
+  this.subscribeTo(events, events => {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit(type + 'layer', element)
+      forEach(events, ({ type, element }) => {
+        this.$emit(type + 'layer', element)
+        // todo remove in v0.13.x
+        this.$emit(type + ':layer', element)
+      })
     })
   })
 }

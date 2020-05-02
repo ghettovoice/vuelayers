@@ -15,7 +15,7 @@
   import { merge as mergeObs } from 'rxjs'
   import { olCmp, projTransforms } from '../../mixin'
   import { getOverlayId, initializeOverlay, setOverlayId } from '../../ol-ext'
-  import { obsFromOlChangeEvent } from '../../rx-ext'
+  import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
   import { hasOverlay } from '../../util/assert'
   import { identity, isEqual } from '../../util/minilo'
 
@@ -127,7 +127,6 @@
         this.$overlay.setPosition(this.positionViewProj.slice())
         this.visible = true
       })
-      this.subscribeAll()
     },
     /**
      * @return {void}
@@ -136,7 +135,6 @@
     unmount () {
       hasOverlay(this)
 
-      this.unsubscribeAll()
       this.$overlay.setElement(undefined)
       this.$overlaysContainer && this.$overlaysContainer.removeOverlay(this.$overlay)
 
@@ -203,13 +201,13 @@
           enumerable: true,
           get: () => this.$olObject,
         },
-        $map: {
+        $mapVm: {
           enumerable: true,
-          get: () => this.$services && this.$services.map,
+          get: () => this.$services?.mapVm,
         },
-        $view: {
+        $viewVm: {
           enumerable: true,
-          get: () => this.$services && this.$services.view,
+          get: () => this.$services?.viewVm,
         },
         $overlaysContainer: {
           enumerable: true,
@@ -228,7 +226,7 @@
     hasOverlay(this)
 
     const changes = mergeObs(
-      obsFromOlChangeEvent(this.$overlay, 'position', true, undefined, () => this.pointToDataProj(this.$overlay.getPosition())),
+      obsFromOlChangeEvent(this.$overlay, 'position', true, () => this.pointToDataProj(this.$overlay.getPosition())),
       obsFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',

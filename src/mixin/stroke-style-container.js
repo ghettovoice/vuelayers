@@ -1,4 +1,7 @@
-import { isFunction } from '../util/minilo'
+import debounce from 'debounce-promise'
+import { dumpStrokeStyle } from '../ol-ext'
+import { clonePlainObject, isEqual, isFunction } from '../util/minilo'
+import { FRAME_TIME } from './ol-cmp'
 
 /**
  * @typedef {module:ol/style/Stroke~Stroke|Object|undefined} StrokeStyleLike
@@ -14,40 +17,30 @@ import { isFunction } from '../util/minilo'
  * Stroke style container.
  */
 export default {
+  computed: {
+    currentStroke () {
+      if (!(this.rev && this.$stroke)) return
+
+      return dumpStrokeStyle(this.$stroke)
+    },
+  },
+  watch: {
+    currentStroke: {
+      deep: true,
+      handler: debounce(function (value, prev) {
+        if (isEqual(value, prev)) return
+
+        this.$emit('update:stroke', value && clonePlainObject(value))
+      }, FRAME_TIME),
+    },
+  },
   created () {
-    this._stroke = undefined
-    this._strokeVm = undefined
+    this._stroke = null
+    this._strokeVm = null
 
     this::defineServices()
   },
   methods: {
-    getStrokeStyleTarget () {
-      throw new Error('Not implemented method: getStrokeStyleTarget')
-    },
-    /**
-     * @returns {module:ol/style/Stroke~Stroke|undefined}
-     */
-    getStroke () {
-      return this._stroke
-    },
-    /**
-     * @param {module:ol/style/Stroke~Stroke|undefined} stroke
-     * @returns {Promise<void>}
-     */
-    async setStroke (stroke) {
-      let strokeVm
-      if (stroke && isFunction(stroke.resolveOlObject)) {
-        strokeVm = stroke
-        stroke = await stroke.resolveOlObject()
-      }
-
-      const strokeTarget = await this.getStrokeStyleTarget()
-      if (strokeTarget && stroke !== strokeTarget.getStroke()) {
-        strokeTarget.setStroke(stroke)
-        this._stroke = stroke
-        this._strokeVm = strokeVm || (stroke?.vm && stroke.vm[0])
-      }
-    },
     /**
      * @returns {{readonly strokeStyleContainer: Object}}
      */
@@ -57,6 +50,34 @@ export default {
       return {
         get strokeStyleContainer () { return vm },
       }
+    },
+    getStrokeStyleTarget () {
+      throw new Error('Not implemented method: getStrokeStyleTarget')
+    },
+    /**
+     * @returns {module:ol/style/Stroke~Stroke|null}
+     */
+    getStroke () {
+      return this._stroke
+    },
+    /**
+     * @param {module:ol/style/Stroke~Stroke|undefined} stroke
+     * @returns {Promise<void>}
+     */
+    async setStroke (stroke) {
+      if (isFunction(stroke?.resolveOlObject)) {
+        stroke = await stroke.resolveOlObject()
+      }
+      stroke || (stroke = null)
+
+      if (stroke === this._stroke) return
+
+      const strokeTarget = await this.getStrokeStyleTarget()
+      if (!strokeTarget) return
+
+      this._stroke = stroke
+      this._strokeVm = stroke?.vm && stroke.vm[0]
+      await strokeTarget.setStroke(stroke)
     },
   },
 }

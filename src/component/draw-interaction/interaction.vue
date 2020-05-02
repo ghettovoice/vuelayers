@@ -2,11 +2,12 @@
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
+  import GeometryType from 'ol/geom/GeometryType'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
-  import { interaction, stylesContainer } from '../../mixin'
-  import { createStyle, defaultEditStyle, GEOMETRY_TYPE, initializeFeature } from '../../ol-ext'
-  import { obsFromOlEvent } from '../../rx-ext'
+  import { interaction, styleContainer } from '../../mixin'
+  import { createStyle, defaultEditStyle, initializeFeature } from '../../ol-ext'
+  import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { hasInteraction, instanceOf } from '../../util/assert'
   import { camelCase, mapValues, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -18,7 +19,7 @@
     name: 'VlInteractionDraw',
     mixins: [
       interaction,
-      stylesContainer,
+      styleContainer,
     ],
     stubVNode: {
       empty: false,
@@ -63,7 +64,7 @@
       type: {
         type: String,
         required: true,
-        validator: value => Object.values(GEOMETRY_TYPE).includes(transformType(value)),
+        validator: value => Object.values(GeometryType).includes(transformType(value)),
       },
       /**
        * Stop click, singleclick, and doubleclick events from firing during drawing.
@@ -204,7 +205,7 @@
       getServices () {
         return mergeDescriptors(
           this::interaction.methods.getServices(),
-          this::stylesContainer.methods.getServices(),
+          this::styleContainer.methods.getServices(),
         )
       },
       /**

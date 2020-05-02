@@ -132,7 +132,7 @@ describe('minilo lib', () => {
       expect(lo.isEqual({ q: 1, w: 2, e: 3 }, { q: 1, w: 2, e: 3 })).to.be.true
       expect(lo.isEqual(
         { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: {} } },
-        { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: {} } }
+        { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: {} } },
       )).to.be.true
       expect(lo.isEqual(true, true)).to.be.true
     })
@@ -144,7 +144,7 @@ describe('minilo lib', () => {
       expect(lo.isEqual({ q: 1, w: 2, e: 3 }, { q: 1, w: 2, e: 3, r: 123 })).to.be.false
       expect(lo.isEqual(
         { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: [1, 2, 3] } },
-        { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: {} } }
+        { q: 1, w: 2, e: 3, arr: [1, 2, 3], obj: { q: 'q', w: 'w', o: {} } },
       )).to.be.false
       expect(lo.isEqual(true, false)).to.be.false
     })

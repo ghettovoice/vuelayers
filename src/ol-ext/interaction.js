@@ -1,6 +1,5 @@
 import { Interaction } from 'ol/interaction'
 import { v4 as uuid } from 'uuid'
-import Vue from 'vue'
 
 /**
  * @param {module:ol/interaction/Interaction~Interaction|Object} interaction
@@ -9,8 +8,6 @@ import Vue from 'vue'
 export function getInteractionId (interaction) {
   if (interaction instanceof Interaction) {
     return interaction.get('id')
-  } else if (interaction instanceof Vue) {
-    return interaction.id
   }
 
   throw new Error('Illegal interaction argument')
@@ -26,10 +23,6 @@ export function setInteractionId (interaction, interactionId) {
     interaction.set('id', interactionId)
 
     return interaction
-  } else if (interaction instanceof Vue) {
-    interaction.id = interactionId
-
-    return interaction
   }
 
   throw new Error('Illegal interaction argument')
@@ -38,8 +31,6 @@ export function setInteractionId (interaction, interactionId) {
 export function getInteractionPriority (interaction) {
   if (interaction instanceof Interaction) {
     return interaction.get('priority')
-  } else if (interaction instanceof Vue) {
-    return interaction.priority
   }
 
   throw new Error('Illegal interaction argument')
@@ -48,10 +39,6 @@ export function getInteractionPriority (interaction) {
 export function setInteractionPriority (interaction, priority) {
   if (interaction instanceof Interaction) {
     interaction.set('priority', priority)
-
-    return interaction
-  } else if (interaction instanceof Vue) {
-    interaction.id = priority
 
     return interaction
   }

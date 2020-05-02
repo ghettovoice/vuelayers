@@ -73,6 +73,13 @@
 
       this::defineServices()
     },
+    updated () {
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.factory) {
+          this.$logger.warn("'factory' prop is deprecated. Use 'func' prop instead.")
+        }
+      }
+    },
     methods: {
       /**
        * @return {function(feature: Feature): Style}
@@ -88,7 +95,7 @@
           const style = providedStyleFunc(feature, resolution)
           // not empty or null style
           if (
-            style === null ||
+            style == null ||
             (Array.isArray(style) && style.length) ||
             style instanceof Style
           ) {
@@ -96,39 +103,6 @@
           }
           return fallbackStyleFunc(feature, resolution)
         }
-      },
-      async getStyleTarget () {
-        return {
-          setStyle: async () => {
-            if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('style changed, scheduling recreate...')
-            }
-
-            await this.scheduleRecreate()
-          },
-        }
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async mount () {
-        if (this.$styleContainer) {
-          await this.$styleContainer.addStyle(this)
-        }
-
-        return this::olCmp.methods.mount()
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async unmount () {
-        if (this.$styleContainer) {
-          await this.$styleContainer.removeStyle(this)
-        }
-
-        return this::olCmp.methods.unmount()
       },
       /**
        * @returns {Object}
@@ -139,6 +113,41 @@
           this::olCmp.methods.getServices(),
           this::styleContainer.methods.getServices(),
         )
+      },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async mount () {
+        if (this.$styleContainer) {
+          await this.$styleContainer.setStyle(this)
+        }
+
+        return this::olCmp.methods.mount()
+      },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async unmount () {
+        if (this.$styleContainer) {
+          await this.$styleContainer.setStyle(this)
+        }
+
+        return this::olCmp.methods.unmount()
+      },
+      async getStyleTarget () {
+        return {
+          setStyle: async () => {
+            ++this.rev
+
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('style changed, scheduling recreate...')
+            }
+
+            await this.scheduleRecreate()
+          },
+        }
       },
     },
   }

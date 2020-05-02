@@ -1,132 +1,123 @@
 <script>
-  import { hasSource } from '../../util/assert'
-  import { makeWatchers } from '../../util/vue-helpers'
-  import { sourceContainer, vectorSource } from '../../mixin'
+  import debounce from 'debounce-promise'
+  import { Cluster as ClusterSource } from 'ol/source'
+  import { FRAME_TIME, createSourceContainer, vectorSource } from '../../mixin'
   import { createPointGeom, findPointOnSurface } from '../../ol-ext'
-  import { obsFromOlEvent } from '../../rx-ext'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import SourceBuilder from './builder'
+  import { makeWatchers } from '../../util/vue-helpers'
+
+  const sourceContainer = createSourceContainer({
+    propName: 'innerSource',
+  })
 
   export default {
     name: 'VlSourceCluster',
-    mixins: [vectorSource, sourceContainer],
+    mixins: [
+      sourceContainer,
+      vectorSource,
+    ],
     props: {
       distance: {
         type: Number,
         default: 20,
       },
-      /**
-       * Geometry function factory
-       * @type {function(): (function(f: ol.Feature): ol.geom.SimpleGeometry|undefined)} geomFuncFactory
-       */
-      geomFuncFactory: {
+      geomFunc: {
         type: Function,
-        default: defaultGeomFuncFactory,
+        // default: defaultGeomFunc,
       },
+      /**
+       * @deprecated Use geomFunc prop instead.
+       * @todo remove in v0.13.x
+       */
+      geomFuncFactory: Function,
     },
     computed: {
-      geomFunc () {
-        return this.geomFuncFactory()
+      resolvedGeomFunc () {
+        let geomFunc = this.geomFunc
+        if (!geomFunc && this.geomFuncFactory) {
+          geomFunc = this.geomFuncFactory()
+        }
+
+        return geomFunc || defaultGeomFunc
+      },
+      currentDistance () {
+        if (this.rev && this.$source) {
+          return this.$source.getDistance()
+        }
+
+        return this.distance
       },
     },
     watch: {
-      distance (value) {
-        if (this.$source && value !== this.$source.getDistance()) {
-          this.$source.setDistance(value)
-        }
+      async distance (value) {
+        await this.setDistance(value)
       },
-      ...makeWatchers(['geomFunc'], () => function () {
-        this.scheduleRecreate()
+      currentDistance: debounce(function (value) {
+        if (value === this.distance) return
+
+        this.$emit('update:distance', value)
+      }, FRAME_TIME),
+      ...makeWatchers([
+        'resolvedGeomFunc',
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
       }),
     },
     created () {
-      /**
-       * @type {SourceBuilder}
-       * @private
-       */
-      this._sourceBuilder = new SourceBuilder()
-
-      Object.defineProperties(this, {
-        $innerSource: {
-          enumerable: true,
-          get: this.getSource,
-        },
-      })
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.geomFuncFactory) {
+          this.$logger.warn("'geomFuncFactory' prop is deprecated. Use 'geomFunc' prop instead.")
+        }
+      }
+    },
+    updated () {
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.geomFuncFactory) {
+          this.$logger.warn("'geomFuncFactory' prop is deprecated. Use 'geomFunc' prop instead.")
+        }
+      }
     },
     methods: {
-      /**
-       * @return {Promise<ol.source.Cluster>}
-       * @protected
-       */
       createSource () {
-        // partial setup of ol.source.Cluster with the help of SourceBuilder class
-        /**
-         * @type {SourceBuilder}
-         * @private
-         */
-        this._sourceBuilder
-          .setAttributions(this.attributions)
-          .setDistance(this.distance)
-          .setGeometryFunction(this.geomFunc)
-          .setLogo(this.logo)
-          .setProjection(this.projection)
-          .setWrapX(this.wrapX)
-
-        return this._sourceBuilder.promise()
+        return new ClusterSource({
+          // ol/source/Source
+          attributions: this.currentAttributions,
+          wrapX: this.wrapX,
+          // ol/source/Cluster
+          source: this.$innerSource,
+          distance: this.currentDistance,
+          geometryFunction: this.resolvedGeomFunc,
+        })
       },
-      /**
-       * @return {Object}
-       * @protected
-       */
       getServices () {
         return mergeDescriptors(
           this::vectorSource.methods.getServices(),
           this::sourceContainer.methods.getServices(),
         )
       },
-      /**
-       * @return {{
-       *     setSource: function(ol.source.Source): void,
-       *     getSource: function(): ol.source.Source
-       *   }|undefined}
-       * @protected
-       */
-      getSourceTarget () {
-        return this._sourceBuilder
+      getSourceTarget: vectorSource.methods.resolveOlObject,
+      async getDistance () {
+        return (await this.resolveSource()).getDistance()
       },
-      subscribeAll () {
-        this::vectorSource.methods.subscribeAll()
-        this::subscribeToSourceChanges()
+      async setDistance (distance) {
+        if (distance === await this.getDistance()) return
+
+        (await this.resolveSource()).setDistance(distance)
       },
     },
   }
 
-  /**
-   * @returns {function(f: ol.Feature): ol.geom.SimpleGeometry|undefined}
-   */
-  function defaultGeomFuncFactory () {
-    return function (feature) {
-      const geometry = feature.getGeometry()
-      if (!geometry) return
+  function defaultGeomFunc (feature) {
+    const geometry = feature.getGeometry()
+    if (!geometry) return
 
-      const coordinate = findPointOnSurface(geometry)
-      if (coordinate) {
-        return createPointGeom(coordinate)
-      }
+    const coordinate = findPointOnSurface(geometry)
+    if (coordinate) {
+      return createPointGeom(coordinate)
     }
-  }
-
-  function subscribeToSourceChanges () {
-    hasSource(this)
-
-    const adds = obsFromOlEvent(this.$source, 'addfeature')
-    this.subscribeTo(adds, ({ feature }) => {
-      this.addFeature(feature)
-    })
-
-    const removes = obsFromOlEvent(this.$source, 'removefeature')
-    this.subscribeTo(removes, ({ feature }) => {
-      this.removeFeature(feature)
-    })
   }
 </script>

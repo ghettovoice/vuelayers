@@ -29,18 +29,6 @@
       })
     },
     methods: {
-      getFill () {
-        return this.$bgStyleContainer.getBackgroundFill()
-      },
-      async setFill (fill) {
-        await this.$bgStyleContainer.setBackgroundFill(fill)
-      },
-      getStroke () {
-        return this.$bgStyleContainer.getBackgroundStroke()
-      },
-      async setStroke (stroke) {
-        await this.$bgStyleContainer.setBackgroundStroke(stroke)
-      },
       createOlObject () {
         return stubObject()
       },
@@ -50,6 +38,22 @@
           this::fillStyleContainer.methods.getServices(),
           this::strokeStyleContainer.methods.getServices(),
         )
+      },
+      getFillStyleTarget () {
+        return {
+          setFill: async style => {
+            await this.$bgStyleContainer.setBackgroundFill(style)
+            ++this.rev
+          },
+        }
+      },
+      getStrokeStyleTarget () {
+        return {
+          setStroke: async style => {
+            await this.$bgStyleContainer.setBackgroundStroke(style)
+            ++this.rev
+          },
+        }
       },
     },
   }

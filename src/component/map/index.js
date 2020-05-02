@@ -19,7 +19,7 @@ function plugin (Vue, options = {}) {
 export default plugin
 
 export {
+  plugin as install,
   Map,
   View,
-  plugin as install,
 }

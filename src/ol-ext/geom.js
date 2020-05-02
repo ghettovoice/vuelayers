@@ -13,7 +13,8 @@ import {
 import GeometryType from 'ol/geom/GeometryType'
 import { circular as circularPolygon } from 'ol/geom/Polygon'
 import { v4 as uuid } from 'uuid'
-import Vue from 'vue'
+import { isPlainObject } from '../util/minilo'
+import { COORD_PRECISION, roundCoords } from './coord'
 
 /**
  * @param {number|number[]} lonOrCoordinates
@@ -109,6 +110,8 @@ export function isMultiGeom (geom) {
 export function toSimpleGeom (geom) {
   if (geom instanceof Circle) {
     geom = createPointGeom(geom.getCenter())
+  } else if (geom.type === GeometryType.CIRCLE) {
+    geom = { ...geom, type: GeometryType.POINT }
   }
 
   const type = geom.type || geom.getType()
@@ -125,24 +128,28 @@ export function toSimpleGeom (geom) {
 
 /**
  * @param {Geometry|Object} geom
+ * @param {number} [precision=COORD_PRECISION]
  * @return {Coordinate|undefined}
  */
-export function findPointOnSurface (geom) {
+export function findPointOnSurface (geom, precision = COORD_PRECISION) {
   const simpleGeom = toSimpleGeom(geom)
   const pointFeature = pointOnFeature({
     type: simpleGeom.type || simpleGeom.getType(),
     coordinates: simpleGeom.coordinates || simpleGeom.getCoordinates(),
   })
-
-  if (pointFeature && pointFeature.geometry) {
-    return pointFeature.geometry.coordinates
+  if (pointFeature?.geometry) {
+    return roundCoords(
+      pointFeature.geometry.type,
+      pointFeature.geometry.coordinates,
+      precision,
+    )
   }
 }
 
 export function getGeometryId (geometry) {
   if (geometry instanceof Geometry) {
     return geometry.get('id')
-  } else if (geometry instanceof Vue) {
+  } else if (isPlainObject(geometry)) {
     return geometry.id
   }
 
@@ -154,7 +161,7 @@ export function setGeometryId (geometry, geometryId) {
     geometry.set('id', geometryId)
 
     return geometry
-  } else if (geometry instanceof Vue) {
+  } else if (isPlainObject(geometry)) {
     geometry.id = geometryId
 
     return geometry
@@ -169,4 +176,31 @@ export function initializeGeometry (geometry, defaultGeometryId) {
   }
 
   return geometry
+}
+
+/**
+ * @param value
+ * @return {boolean}
+ */
+export function isCircleGeom (value) {
+  return getGeomType(value) === GeometryType.CIRCLE
+}
+
+export function getGeomCoords (geom) {
+  if (!geom) return
+
+  const type = getGeomType(geom)
+  switch (type) {
+    case GeometryType.CIRCLE:
+      return roundCoords(type, geom.coordinates || geom.getCenter())
+    default:
+      return roundCoords(type, geom.coordinates || geom.getCoordinates())
+  }
+}
+
+export function getGeomType (geom) {
+  if (geom instanceof Geometry) {
+    return geom.getType()
+  }
+  return geom?.type
 }

@@ -1,6 +1,4 @@
 import { Collection } from 'ol'
-import { interval as intervalObs } from 'rxjs'
-import { first as firstObs, map as mapObs, skipWhile } from 'rxjs/operators'
 
 /**
  * Mini Lodash.
@@ -130,6 +128,13 @@ export function isPlainObject (value) {
     Ctor::funcToString() === objectCtorString
 }
 
+export function round (number, precision = 0) {
+  if (!globIsFinite(number)) return number
+  if (precision < 0) return Number(number)
+
+  return Number(Number(number).toFixed(precision))
+}
+
 /**
  * @param {...*} [args]
  *
@@ -172,7 +177,7 @@ export function isEqual (value, other) {
   if (value === other) {
     return true
   }
-  if (value == null || other == null || (!isObjectLike(value) && !isObjectLike(other))) {
+  if (value == null || other == null || !(isObjectLike(value) && isObjectLike(other))) {
     // eslint-disable-next-line no-self-compare
     return value !== value && other !== other
   }
@@ -182,6 +187,8 @@ export function isEqual (value, other) {
   if (valueProps.length !== otherProps.length) {
     return false
   }
+
+  // if (serialize(value) === serialize(other)) return
 
   const checked = []
   const traverse = (valueProps, otherProps) => {
@@ -297,6 +304,12 @@ export function filter (collection, iteratee = negate(isEmpty)) {
   }, isArrayLike(collection) || isCollection(collection) ? [] : {})
 }
 
+export function find (collection, iteratee = identity) {
+  const res = filter(collection, iteratee)
+  if (isArray(res)) return res[0]
+  return res[keys(res)[0]]
+}
+
 export function map (collection, iteratee = identity) {
   return reduce(collection, (newCollection, value, key) => {
     newCollection[key] = iteratee(value, key)
@@ -312,7 +325,19 @@ export function mapKeys (object, iteratee = identity) {
   return reduce(object, (newObject, value, key) => {
     newObject[iteratee(value, key)] = value
     return newObject
-  }, {})
+  }, isArrayLike(object) || isCollection(object) ? [] : {})
+}
+
+export function every (collection, iteratee = identity) {
+  return reduce(collection, (result, value, key) => {
+    return result && iteratee(value, key)
+  }, true)
+}
+
+export function some (collection, iteratee = identity) {
+  return reduce(collection, (result, value, key) => {
+    return result || iteratee(value, key)
+  }, false)
 }
 
 export function firstEl (object) {
@@ -370,10 +395,14 @@ export function lowerFirst (string) {
   return string[0].toLowerCase() + string.slice(1)
 }
 
-export function* range (start, end, step = 1) {
+export function* rangeIterator (start, end, step = 1) {
   for (let i = start; i < end; i += step) {
     yield i
   }
+}
+
+export function range (start, end, step = 1) {
+  return Array.from(rangeIterator(start, end, step))
 }
 
 /**
@@ -431,18 +460,19 @@ export function kebabCase (str) {
     .join('-')
 }
 
-/**
- * @param {function} condition
- * @returns {Promise<boolean>}
- */
-export function waitFor (condition) {
-  return intervalObs(1000 / 60).pipe(
-    skipWhile(negate(condition)),
-    firstObs(),
-    mapObs(() => true),
-  ).toPromise(Promise)
+export function serialize (value) {
+  return JSON.stringify(value)
+}
+
+export function unserialize (value) {
+  if (!isString(value)) return
+  return JSON.parse(value)
 }
 
 export function clonePlainObject (obj) {
-  return JSON.parse(JSON.stringify(obj))
+  return unserialize(serialize(obj))
+}
+
+export function addPrefix (prefix) {
+  return str => prefix + (prefix ? upperFirst(str) : str)
 }

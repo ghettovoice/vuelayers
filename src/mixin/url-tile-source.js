@@ -1,8 +1,9 @@
 import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
 import { expandUrl } from 'ol/tileurlfunction'
-import { obsFromOlEvent } from '../rx-ext'
+import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { and, isEmpty, isEqual, isFunction, isString, negate, pick, replaceTokens } from '../util/minilo'
 import tileSource from './tile-source'
+import TileEventType from 'ol/source/TileEventType'
 
 const isNotEmptyString = and(isString, negate(isEmpty))
 
@@ -15,11 +16,16 @@ export default {
     /**
      * @type {function|undefined}
      */
+    tileLoadFunc: Function,
+    /**
+     * @deprecated Use `tileLoadFunc` instead.
+     * @todo remove in v0.13.x
+     */
     tileLoadFunction: Function,
     /**
      * @type {function|undefined}
      */
-    tileUrlFunction: Function,
+    tileUrlFunc: Function,
     /**
      * @type {string|undefined}
      */
@@ -40,7 +46,7 @@ export default {
       return []
     },
     parsedUrl () {
-      if (!this.url) return []
+      if (!this.url) return
 
       return replaceTokens(this.url, pick(this, this.urlTokens))
     },
@@ -62,22 +68,66 @@ export default {
       return this.parsedUrls.reduce((urls, url) => urls.concat(...expandUrl(url)), [])
     },
     urlFunc () {
-      if (isFunction(this.tileUrlFunction)) {
-        return this.tileUrlFunction
+      if (isFunction(this.tileUrlFunc)) {
+        return this.tileUrlFunc
       }
+      if (this.expandedUrls.length === 0) return
 
       return createTileUrlFunctionFromTemplates(this.expandedUrls, this.tileGrid)
     },
+    resolvedTileLoadFunc () {
+      return this.tileLoadFunc || this.tileLoadFunction
+    },
   },
   watch: {
-    async tileLoadFunction (value) {
+    async resolvedTileLoadFunc (value) {
       await this.setTileLoadFunction(value)
     },
     async urlFunc (value) {
-      await this.setTileUrlFunction(value)
+      if (value) {
+        await this.setTileUrlFunction(value)
+      }
     },
   },
+  created () {
+    if (process.env.NODE_ENV !== 'production') {
+      if (this.tileLoadFunction) {
+        this.$logger.warn("'tileLoadFunction' prop is deprecated. Use 'tileLoadFunc' prop instead.")
+      }
+    }
+  },
+  updated () {
+    if (process.env.NODE_ENV !== 'production') {
+      if (this.tileLoadFunction) {
+        this.$logger.warn("'tileLoadFunction' prop is deprecated. Use 'tileLoadFunc' prop instead.")
+      }
+    }
+  },
   methods: {
+    /**
+     * @returns {void}
+     */
+    subscribeAll () {
+      this::tileSource.methods.subscribeAll()
+      this::subscribeToSourceEvents()
+    },
+    ...pick(tileSource.methods, [
+      'beforeInit',
+      'init',
+      'deinit',
+      'beforeMount',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'getServices',
+      'resolveSource',
+      'resolveOlObject',
+    ]),
     /**
      * @returns {Promise<module:ol/Tile.LoadFunction>}
      */
@@ -89,11 +139,10 @@ export default {
      * @returns {Promise<void>}
      */
     async setTileLoadFunction (tileLoadFunction) {
-      const source = await this.resolveSource()
+      if (!tileLoadFunction) return
+      if (tileLoadFunction === await this.getTileLoadFunction()) return
 
-      if (tileLoadFunction === source.getTileLoadFunction()) return
-
-      source.setTileLoadFunction(tileLoadFunction)
+      (await this.resolveSource()).setTileLoadFunction(tileLoadFunction)
     },
     /**
      * @returns {Promise<module:ol/Tile.UrlFunction>}
@@ -107,11 +156,10 @@ export default {
      * @returns {Promise<void>}
      */
     async setTileUrlFunction (tileUrlFunction, tileKey) {
-      const source = await this.resolveSource()
+      if (!tileUrlFunction) return
+      if (tileUrlFunction === await this.getTileUrlFunction()) return
 
-      if (tileUrlFunction === source.getTileUrlFunction()) return
-
-      source.setTileUrlFunction(tileUrlFunction, tileKey)
+      (await this.resolveSource()).setTileUrlFunction(tileUrlFunction, tileKey)
     },
     /**
      * @returns {Promise<string[]|undefined>}
@@ -124,11 +172,9 @@ export default {
      * @returns {Promise<void>}
      */
     async setUrls (urls) {
-      const source = await this.resolveSource()
+      if (isEqual(urls, await this.getUrls())) return
 
-      if (isEqual(urls, source.getUrls())) return
-
-      source.setUrls(urls)
+      (await this.resolveSource()).setUrls(urls)
     },
     /**
      * @param {string} url
@@ -137,45 +183,14 @@ export default {
     async setUrl (url) {
       return this.setUrls(expandUrl(url))
     },
-    /**
-     * @returns {Promise<void>}
-     */
-    async subscribeAll () {
-      await Promise.all([
-        this::tileSource.methods.subscribeAll(),
-        this::subscribeToSourceEvents(),
-      ])
-    },
-    ...pick(tileSource.methods, [
-      'init',
-      'deinit',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'getServices',
-      'resolveSource',
-      'resolveOlObject',
-    ]),
   },
 }
 
 async function subscribeToSourceEvents () {
-  const source = await this.resolveSource()
-
-  const events = obsFromOlEvent(source, [
-    'tileloadstart',
-    'tileloadend',
-    'tileloaderror',
+  const events = obsFromOlEvent(this.$source, [
+    TileEventType.TILELOADSTART,
+    TileEventType.TILELOADEND,
+    TileEventType.TILELOADERROR,
   ])
-
-  this.subscribeTo(events, evt => {
-    ++this.rev
-
-    this.$emit(evt.type, evt)
-  })
+  this.subscribeTo(events, evt => this.$emit(evt.type, evt))
 }

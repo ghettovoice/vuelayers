@@ -38,19 +38,6 @@
           color: this.parsedColor,
         })
       },
-      async getColor () {
-        return (await this.resolveStyle()).getColor()
-      },
-      async setColor (color) {
-        const style = await this.resolveStyle()
-        color = normalizeColor(color)
-
-        if (isEqual(color, style.getColor())) return
-
-        style.setColor(color)
-
-        await this.scheduleRemount()
-      },
       /**
        * @return {Promise<void>}
        * @protected
@@ -72,6 +59,18 @@
         }
 
         return this::style.methods.unmount()
+      },
+      async getColor () {
+        return normalizeColor((await this.resolveStyle()).getColor())
+      },
+      async setColor (color) {
+        color = normalizeColor(color)
+
+        if (isEqual(color, await this.getColor())) return
+
+        (await this.resolveStyle()).setColor(color)
+
+        await this.scheduleRemount()
       },
     },
   }

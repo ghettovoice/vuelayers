@@ -1,3 +1,5 @@
+import debounce from 'debounce-promise'
+import { map as mapObs, skipWhile } from 'rxjs/operators'
 import {
   getInteractionId,
   getInteractionPriority,
@@ -5,10 +7,11 @@ import {
   setInteractionId,
   setInteractionPriority,
 } from '../ol-ext'
-import { obsFromOlChangeEvent } from '../rx-ext'
-import { pick, waitFor } from '../util/minilo'
+import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import { addPrefix, hasProp, isEqual, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import olCmp from './ol-cmp'
+import waitFor from '../util/wait-for'
+import olCmp, { FRAME_TIME, OlObjectEvent } from './ol-cmp'
 import stubVNode from './stub-vnode'
 
 /**
@@ -42,21 +45,73 @@ export default {
       default: 0,
     },
   },
-  watch: {
-    async id (value) {
-      await this.setId(value)
+  data () {
+    return {
+      dataProjection: null,
+    }
+  },
+  computed: {
+    currentActive () {
+      if (this.rev && this.$interaction) {
+        return this.$interaction.getActive()
+      }
+
+      return this.active
     },
+    currentPriority () {
+      if (this.rev && this.$interaction) {
+        return getInteractionPriority(this.$interaction)
+      }
+
+      return this.priority
+    },
+  },
+  watch: {
     async active (value) {
       await this.setActive(value)
     },
+    currentActive: debounce(function (value) {
+      if (value === this.active) return
+
+      this.$emit('update:active', value)
+    }, FRAME_TIME),
     async priority (value) {
       await this.setPriority(value)
     },
+    currentPriority: debounce(function (value) {
+      if (value === this.priority) return
+
+      this.$emit('update:priority', value)
+    }, FRAME_TIME),
   },
   created () {
     this::defineServices()
   },
   methods: {
+    /**
+     * @returns {Promise<void>}
+     * @protected
+     */
+    async beforeInit () {
+      try {
+        await waitFor(
+          () => this.$mapVm != null,
+          obsFromVueEvent(this.$eventBus, [
+            OlObjectEvent.CREATE_ERROR,
+          ]).pipe(
+            mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+          ),
+          1000,
+        )
+        this.dataProjection = this.$mapVm.resolvedDataProjection
+        await this.$nextTickPromise()
+
+        return this::olCmp.methods.beforeInit()
+      } catch (err) {
+        err.message = 'Wait for $mapVm injection: ' + err.message
+        throw err
+      }
+    },
     /**
      * @return {Promise<module:ol/interaction/Interaction~Interaction>}
      * @protected
@@ -74,68 +129,6 @@ export default {
      */
     createInteraction () {
       throw new Error('Not implemented method: createInteraction')
-    },
-    /**
-     * @returns {Promise<string|number>}
-     */
-    async getId () {
-      return getInteractionId(await this.resolveInteraction())
-    },
-    /**
-     * @param {string|number} id
-     * @returns {Promise<void>}
-     */
-    async setId (id) {
-      const interaction = await this.resolveInteraction()
-
-      if (id === getInteractionId(interaction)) return
-
-      setInteractionId(interaction, id)
-    },
-    /**
-     * @returns {Promise<boolean>}
-     */
-    async getActive () {
-      return (await this.resolveInteraction()).getActive()
-    },
-    /**
-     * @param {boolean} active
-     * @returns {Promise<void>}
-     */
-    async setActive (active) {
-      const interaction = await this.resolveInteraction()
-
-      if (active === interaction.getActive()) return
-
-      interaction.setActive(active)
-    },
-    /**
-     * @returns {Promise<number>}
-     */
-    async getPriority () {
-      return getInteractionPriority(await this.resolveInteraction())
-    },
-    /**
-     * @param {number} priority
-     * @returns {Promise<void>}
-     */
-    async setPriority (priority) {
-      const interaction = await this.resolveInteraction()
-
-      if (priority === getInteractionPriority(interaction)) return
-
-      setInteractionPriority(interaction, priority)
-      // eslint-disable-next-line no-unused-expressions
-      this.$interactionsContainer?.sortInteractions()
-    },
-    /**
-     * @returns {Promise<void>}
-     * @protected
-     */
-    async init () {
-      await waitFor(() => this.$mapVm != null)
-
-      return this::olCmp.methods.init()
     },
     /**
      * @return {void}
@@ -174,20 +167,20 @@ export default {
       )
     },
     /**
-     * @returns {Promise<void>}
+     * @returns {void}
      */
-    async subscribeAll () {
-      await Promise.all([
-        this::olCmp.methods.subscribeAll(),
-        this::subscribeToInteractionEvents(),
-      ])
+    subscribeAll () {
+      this::olCmp.methods.subscribeAll()
+      this::subscribeToInteractionEvents()
     },
     /**
      * @return {Promise<module:ol/interaction/Interaction~Interaction>}
      */
     resolveInteraction: olCmp.methods.resolveOlObject,
     ...pick(olCmp.methods, [
+      'init',
       'deinit',
+      'beforeMount',
       'refresh',
       'scheduleRefresh',
       'recreate',
@@ -196,6 +189,53 @@ export default {
       'scheduleRemount',
       'resolveOlObject',
     ]),
+    /**
+     * @returns {Promise<string|number>}
+     */
+    async getId () {
+      return getInteractionId(await this.resolveInteraction())
+    },
+    /**
+     * @param {string|number} id
+     * @returns {Promise<void>}
+     */
+    async setId (id) {
+      if (id === await this.getId()) return
+
+      setInteractionId(await this.resolveInteraction(), id)
+    },
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async getActive () {
+      return (await this.resolveInteraction()).getActive()
+    },
+    /**
+     * @param {boolean} active
+     * @returns {Promise<void>}
+     */
+    async setActive (active) {
+      if (active === await this.getActive()) return
+
+      (await this.resolveInteraction()).setActive(active)
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getPriority () {
+      return getInteractionPriority(await this.resolveInteraction())
+    },
+    /**
+     * @param {number} priority
+     * @returns {Promise<void>}
+     */
+    async setPriority (priority) {
+      if (priority === await this.getPriority()) return
+
+      setInteractionPriority(await this.resolveInteraction(), priority)
+      // eslint-disable-next-line no-unused-expressions
+      this.$interactionsContainer?.sortInteractions()
+    },
   },
 }
 
@@ -233,19 +273,18 @@ function defineServices () {
 }
 
 async function subscribeToInteractionEvents () {
-  const interaction = await this.resolveInteraction()
-
-  const changes = obsFromOlChangeEvent(interaction, [
+  const prefixKey = addPrefix('current')
+  const propChanges = obsFromOlChangeEvent(this.$interaction, [
     'id',
     'active',
     'priority',
-  ], true, 1000 / 60)
-
-  this.subscribeTo(changes, ({ prop, value }) => {
+  ], true, evt => ({
+    ...evt,
+    compareWith: this[prefixKey(evt.prop)],
+  })).pipe(
+    skipWhile(({ compareWith, value }) => isEqual(value, compareWith)),
+  )
+  this.subscribeTo(propChanges, () => {
     ++this.rev
-
-    this.$nextTick(() => {
-      this.$emit(`update:${prop}`, value)
-    })
   })
 }

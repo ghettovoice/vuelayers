@@ -12,7 +12,7 @@
     "rollup": "node build/rollup.js",
     "clean": "rimraf lib/*",
     "build": "npm run clean && npm run lint && npm run rollup -- --format=es,umd",
-    "unit": "cross-env NODE_ENV=test karma start test/unit/karma.conf.js --single-run",
+    "unit": "karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "lint": "eslint -f node_modules/eslint-friendly-formatter --ext .js,.vue ./",
@@ -53,12 +53,14 @@
     "@babel/runtime-corejs3": "^7.9.2",
     "@turf/point-on-feature": "^5.1.5",
     "debounce-promise": "^3.1.2",
+    "lru-cache": "^5.1.1",
     "merge-descriptors": "^1.0.1",
     "ol": "^6.3.1",
     "ol-tilecache": "^6.0.0",
     "parse-color": "^1.0.0",
     "rxjs": "^6.5.5",
-    "uuid": "^7.0.3"
+    "uuid": "^7.0.3",
+    "vuequery": "^1.0.0"
   },
   "peerDependencies": {
     "vue": "^2.3"
@@ -96,7 +98,6 @@
     "clone-regexp": "^2.2.0",
     "connect-history-api-fallback": "^1.6.0",
     "coveralls": "^3.1.0",
-    "cross-env": "^7.0.2",
     "cross-spawn": "^7.0.2",
     "css-loader": "^3.5.3",
     "cssnano": "^4.1.10",

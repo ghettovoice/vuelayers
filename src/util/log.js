@@ -1,8 +1,10 @@
+/* eslint-disable no-console */
 export const log = console.log.bind(console, '[C_PKG_FULLNAME]')
 
 export const warn = console.warn.bind(console, '[C_PKG_FULLNAME] WARN')
 
 export const error = console.error.bind(console, '[C_PKG_FULLNAME] ERR')
+/* eslint-enable no-console */
 
 export function encode (val) {
   return JSON.stringify(val)

@@ -1,4 +1,5 @@
-import { error as logError } from '../util/log'
+import { retry } from 'rxjs/operators'
+import { newLogger } from '../util/log'
 import { noop } from '../util/minilo'
 
 /**
@@ -28,14 +29,20 @@ export default {
      * @protected
      */
     subscribeTo (observable, next = noop, error = noop, complete = noop) {
-      error = err => {
+      const errorWrap = err => {
         if (process.env.NODE_ENV !== 'production') {
-          logError(err.stack)
+          if (this.$logger) {
+            this.$logger.error(err.stack)
+          } else {
+            newLogger(this.vmName).error(err.stack)
+          }
         }
         error(err)
       }
 
-      const subs = observable.subscribe(next, error, complete)
+      const subs = observable.pipe(
+        retry(3),
+      ).subscribe(next, errorWrap, complete)
       this._rxSubs.push(subs)
 
       return subs

@@ -1,7 +1,9 @@
+import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
-import { isFunction, isString, pick, sealFactory } from '../util/minilo'
+import { clonePlainObject, isFunction, isString, pick, sealFactory } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
+import { FRAME_TIME } from './ol-cmp'
 import source from './source'
 
 export default {
@@ -84,29 +86,34 @@ export default {
 
       return sealFactory(::this.derivedTileGridFactory)
     },
+    currentTileKey () {
+      if (this.rev && this.$source) {
+        return this.getTileKeySync()
+      }
+
+      return this.tileKey
+    },
+    /**
+     * @returns {number[]|undefined}
+     */
+    currentResolutions () {
+      if (!(this.rev && this.$source)) return
+
+      return this.$source.getResolutions()
+    },
   },
   watch: {
-    async opaque (value) {
-      if (value === await this.getOpaque()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('opaque changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    },
-    async tilePixelRatio (value) {
-      if (value === await this.getTilePixelRatio(value)) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('tilePixelRatio changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    },
     async tileKey (value) {
       await this.setTileKey(value)
     },
+    currentTileKey: debounce(function (value) {
+      if (value === this.tileKey) return
+
+      this.$emit('update:tileKey', value)
+    }, FRAME_TIME),
+    currentResolutions: debounce(function (value) {
+      this.$emit('update:resolutions', clonePlainObject(value))
+    }, FRAME_TIME),
     tileGridIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
@@ -129,6 +136,24 @@ export default {
 
       if (process.env.VUELAYERS_DEBUG) {
         this.$logger.log('sealTileGridFactory changed, scheduling recreate...')
+      }
+
+      await this.scheduleRecreate()
+    },
+    async opaque (value) {
+      if (value === await this.getOpaque()) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('opaque changed, scheduling recreate...')
+      }
+
+      await this.scheduleRecreate()
+    },
+    async tilePixelRatio (value) {
+      if (value === await this.getTilePixelRatio(value)) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('tilePixelRatio changed, scheduling recreate...')
       }
 
       await this.scheduleRecreate()
@@ -158,6 +183,24 @@ export default {
     }
   },
   methods: {
+    ...pick(source.methods, [
+      'beforeInit',
+      'init',
+      'deinit',
+      'beforeMount',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'getServices',
+      'subscribeAll',
+      'resolveOlObject',
+      'resolveSource',
+    ]),
     /**
      * @param {module:ol/proj.ProjectionLike} projection
      * @param {number} z
@@ -187,18 +230,26 @@ export default {
      * @returns {Promise<string|undefined>}
      */
     async getTileKey () {
-      return (await this.resolveSource()).getKey()
+      await this.resolveSource()
+
+      return this.getTileKeySync()
+    },
+    getTileKeySync () {
+      return this.$source.getKey()
     },
     /**
      * @param {string|undefined} key
      * @returns {Promise<void>}
      */
     async setTileKey (key) {
-      const source = await this.resolveSource()
+      await this.resolveSource()
 
-      if (key === source.getKey(key)) return
+      this.setTileKeySync(key)
+    },
+    setTileKeySync (key) {
+      if (key === this.getTileKeySync()) return
 
-      source.setKey(key)
+      this.$source.setKey(key)
     },
     /**
      * @returns {Promise<boolean>}
@@ -281,21 +332,5 @@ export default {
 
       return (await this.resolveSource()).getTileCoordForTileUrlFunction(tileCoord, projection)
     },
-    ...pick(source.methods, [
-      'init',
-      'deinit',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'getServices',
-      'subscribeAll',
-      'resolveOlObject',
-      'resolveSource',
-    ]),
   },
 }

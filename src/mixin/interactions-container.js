@@ -1,11 +1,15 @@
+import debounce from 'debounce-promise'
 import { Collection } from 'ol'
+import CollectionEventType from 'ol/CollectionEventType'
 import { defaults as createDefaultInteractions, Interaction } from 'ol/interaction'
-import { merge as mergeObs } from 'rxjs'
+import { from as fromObs, merge as mergeObs } from 'rxjs'
+import { map as mapObs, mergeMap } from 'rxjs/operators'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
-import { obsFromOlEvent } from '../rx-ext'
+import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isArray, isFunction, isPlainObject, map } from '../util/minilo'
+import { isArray, isFunction, isPlainObject, map, find, forEach, isEqual } from '../util/minilo'
 import identMap from './ident-map'
+import { FRAME_TIME } from './ol-cmp'
 import rxSubs from './rx-subs'
 
 /**
@@ -24,10 +28,10 @@ export default {
     /**
      * @returns {string[]}
      */
-    interactionIds () {
+    currentInteractions () {
       if (!this.rev) return []
 
-      return this.getInteractions().map(getInteractionId)
+      return map(this.getInteractions(), getInteractionId)
     },
     /**
      * @returns {string|undefined}
@@ -39,6 +43,11 @@ export default {
     },
   },
   watch: {
+    currentInteractions: debounce(function (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:interactions', value.slice())
+    }, FRAME_TIME),
     interactionsCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
@@ -60,6 +69,17 @@ export default {
     this::subscribeToCollectionEvents()
   },
   methods: {
+    /**
+     * @returns {{readonly interactionsContainer: Object}}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return {
+        get interactionsContainer () { return vm },
+      }
+    },
     /**
      * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} defaultInteractions
      * @returns {Promise<void>}
@@ -83,18 +103,31 @@ export default {
     },
     /**
      * @param {InteractionLike} interaction
-     * @return {void}
+     * @return {Promise<Interaction>}
      */
-    async addInteraction (interaction) {
-      initializeInteraction(interaction)
-
+    async initializeInteraction (interaction) {
       if (isFunction(interaction.resolveOlObject)) {
         interaction = await interaction.resolveOlObject()
       }
 
+      return initializeInteraction(interaction)
+    },
+    /**
+     * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} interactions
+     * @returns {Promise<void>}
+     */
+    async addInteractions (interactions) {
+      await Promise.all(map(interactions, ::this.addInteraction))
+    },
+    /**
+     * @param {InteractionLike} interaction
+     * @return {void}
+     */
+    async addInteraction (interaction) {
+      interaction = await this.initializeInteraction(interaction)
       instanceOf(interaction, Interaction)
 
-      if (this.getInteractionById(getInteractionId(interaction)) == null) {
+      if (!this.getInteractionById(getInteractionId(interaction))) {
         this.$interactionsCollection.push(interaction)
         this.sortInteractions()
       }
@@ -103,8 +136,8 @@ export default {
      * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} interactions
      * @returns {Promise<void>}
      */
-    async addInteractions (interactions) {
-      await Promise.all(map(interactions, ::this.addInteraction))
+    async removeInteractions (interactions) {
+      await Promise.all(map(interactions, ::this.removeInteraction))
     },
     /**
      * @param {InteractionLike} interaction
@@ -122,11 +155,10 @@ export default {
       this.sortInteractions()
     },
     /**
-     * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} interactions
-     * @returns {Promise<void>}
+     * @return {void}
      */
-    async removeInteractions (interactions) {
-      await Promise.all(map(interactions, ::this.removeInteraction))
+    clearInteractions () {
+      this.$interactionsCollection.clear()
     },
     /**
      * @return {module:ol/interaction/Interaction~Interaction[]}
@@ -145,7 +177,7 @@ export default {
      * @return {module:ol/interaction/Interaction~Interaction|undefined}
      */
     getInteractionById (interactionId) {
-      return this.$interactionsCollection.getArray().find(interaction => {
+      return find(this.getInteractions(), interaction => {
         return getInteractionId(interaction) === interactionId
       })
     },
@@ -170,23 +202,6 @@ export default {
         return ap === bp ? 0 : ap - bp
       }
     },
-    /**
-     * @return {void}
-     */
-    clearInteractions () {
-      this.$interactionsCollection.clear()
-    },
-    /**
-     * @returns {{readonly interactionsContainer: Object}}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return {
-        get interactionsContainer () { return vm },
-      }
-    },
   },
 }
 
@@ -200,14 +215,24 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = obsFromOlEvent(this.$interactionsCollection, 'add')
-  const removes = obsFromOlEvent(this.$interactionsCollection, 'remove')
-
-  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+  const adds = obsFromOlEvent(this.$interactionsCollection, CollectionEventType.ADD).pipe(
+    mergeMap(({ type, element }) => fromObs(this.initializeInteraction(element)).pipe(
+      mapObs(element => ({ type, element })),
+    )),
+  )
+  const removes = obsFromOlEvent(this.$interactionsCollection, CollectionEventType.REMOVE)
+  const events = mergeObs(adds, removes).pipe(
+    bufferDebounceTime(FRAME_TIME),
+  )
+  this.subscribeTo(events, events => {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit(type + 'interaction', element)
+      forEach(events, ({ type, element }) => {
+        this.$emit(type + 'interaction', element)
+        // todo remove in v0.13.x
+        this.$emit(type + ':interaction', element)
+      })
     })
   })
 }

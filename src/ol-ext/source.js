@@ -1,12 +1,10 @@
 import { Source } from 'ol/source'
 import { v4 as uuid } from 'uuid'
-import Vue from 'vue'
+import { reduce } from '../util/minilo'
 
 export function getSourceId (source) {
   if (source instanceof Source) {
     return source.get('id')
-  } else if (source instanceof Vue) {
-    return source.id
   }
 
   throw new Error('Illegal source argument')
@@ -15,10 +13,6 @@ export function getSourceId (source) {
 export function setSourceId (source, sourceId) {
   if (source instanceof Source) {
     source.set('id', sourceId)
-
-    return source
-  } else if (source instanceof Vue) {
-    source.id = sourceId
 
     return source
   }
@@ -32,4 +26,17 @@ export function initializeSource (source, defaultSourceId) {
   }
 
   return source
+}
+
+export function cleanSourceParams (params, filterKeys) {
+  return reduce(params, (params, value, key) => {
+    key = key.toUpperCase()
+    if (filterKeys.includes(key)) {
+      return params
+    }
+
+    params[key] = value
+
+    return params
+  }, {})
 }

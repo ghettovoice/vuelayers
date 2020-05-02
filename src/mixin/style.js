@@ -1,7 +1,10 @@
+import { map as mapObs } from 'rxjs/operators'
 import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
-import { pick, waitFor } from '../util/minilo'
+import { fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import { hasProp, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
-import olCmp from './ol-cmp'
+import waitFor from '../util/wait-for'
+import olCmp, { OlObjectEvent } from './ol-cmp'
 import stubVNode from './stub-vnode'
 
 /**
@@ -17,15 +20,32 @@ export default {
       return this.vmId
     },
   },
-  watch: {
-    async id (value) {
-      await this.setId(value)
-    },
-  },
   created () {
     this::defineServices()
   },
   methods: {
+    /**
+     * @returns {Promise<void>}
+     * @protected
+     */
+    async beforeInit () {
+      try {
+        await waitFor(
+          () => this.$mapVm != null,
+          obsFromVueEvent(this.$eventBus, [
+            OlObjectEvent.CREATE_ERROR,
+          ]).pipe(
+            mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+          ),
+          1000,
+        )
+
+        return this::olCmp.methods.beforeInit()
+      } catch (err) {
+        err.message = 'Wait for $mapVm injection: ' + err.message
+        throw err
+      }
+    },
     /**
      * @return {OlStyle|Promise<OlStyle>}
      * @protected
@@ -42,35 +62,10 @@ export default {
       throw new Error('Not implemented method: createStyle')
     },
     /**
-     * @returns {Promise<string|number|undefined>}
-     */
-    async getId () {
-      return getStyleId(await this.resolveStyle())
-    },
-    /**
-     * @param {string|number|undefined} id
-     * @returns {Promise<void>}
-     */
-    async setId (id) {
-      const style = await this.resolveStyle()
-
-      if (id === getStyleId(style)) return
-
-      setStyleId(style, id)
-    },
-    /**
-     * @returns {Promise<void>}
-     * @protected
-     */
-    async init () {
-      await waitFor(() => this.$mapVm != null)
-
-      return this::olCmp.methods.init()
-    },
-    /**
      * @return {Promise<void>}
      */
     async remount () {
+      await this.refresh()
       await this::olCmp.methods.remount()
 
       if (this.$mapVm) {
@@ -96,7 +91,9 @@ export default {
      */
     resolveStyle: olCmp.methods.resolveOlObject,
     ...pick(olCmp.methods, [
+      'init',
       'deinit',
+      'beforeMount',
       'mount',
       'unmount',
       'refresh',
@@ -107,6 +104,21 @@ export default {
       'subscribeAll',
       'resolveOlObject',
     ]),
+    /**
+     * @returns {Promise<string|number|undefined>}
+     */
+    async getId () {
+      return getStyleId(await this.resolveStyle())
+    },
+    /**
+     * @param {string|number|undefined} id
+     * @returns {Promise<void>}
+     */
+    async setId (id) {
+      if (id === await this.getId()) return
+
+      setStyleId(await this.resolveStyle(), id)
+    },
   },
 }
 

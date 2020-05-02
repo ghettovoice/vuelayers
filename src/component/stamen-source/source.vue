@@ -36,8 +36,9 @@
           // ol/source/Tile
           cacheSize: this.cacheSize,
           opaque: this.opaque,
+          transition: this.transition,
           // ol/source/UrlTile
-          tileLoadFunction: this.tileLoadFunction,
+          tileLoadFunction: this.resolvedTileLoadFunc,
           url: this.parsedUrl,
           // ol/source/TileImage
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,

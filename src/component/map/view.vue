@@ -4,7 +4,7 @@
     :class="vmClass"
     style="display: none !important;">
     <slot
-      :center="currentCenter"
+      :center="currentCenterDataProj"
       :zoom="currentZoom"
       :resolution="currentResolution"
       :rotation="currentRotation" />
@@ -12,15 +12,28 @@
 </template>
 
 <script>
+  import debounce from 'debounce-promise'
   import { View } from 'ol'
+  import GeometryType from 'ol/geom/GeometryType'
   import { get as getProj } from 'ol/proj'
-  import { merge as mergeObs } from 'rxjs'
-  import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
-  import { olCmp, projTransforms } from '../../mixin'
-  import { EPSG_3857, getViewId, initializeView, setViewId } from '../../ol-ext'
-  import { obsFromOlChangeEvent } from '../../rx-ext'
-  import { coalesce, isArray, isEqual, isFunction, isNumber, isPlainObject, noop, waitFor } from '../../util/minilo'
+  import { from as fromObs, merge as mergeObs } from 'rxjs'
+  import { distinctUntilKeyChanged, map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
+  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixin'
+  import { EPSG_3857, getViewId, initializeView, roundCoords, roundExtent, setViewId } from '../../ol-ext'
+  import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
+  import {
+    addPrefix,
+    coalesce,
+    hasProp,
+    isArray,
+    isEqual,
+    isFunction,
+    isNumber,
+    isPlainObject,
+    noop,
+  } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
+  import waitFor from '../../util/wait-for'
 
   /**
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
@@ -155,8 +168,33 @@
         default: EPSG_3857,
         validator: value => getProj(value) != null,
       },
+      showFullExtent: Boolean,
+    },
+    data () {
+      return {
+        dataProjection: null,
+      }
     },
     computed: {
+      centerDataProj () {
+        return roundCoords(GeometryType.POINT, this.center)
+      },
+      centerViewProj () {
+        return this.pointToViewProj(this.center)
+      },
+      extentDataProj () {
+        return this.extent && roundExtent(this.extent)
+      },
+      extentViewProj () {
+        return this.extent && this.extentToViewProj(this.extent)
+      },
+      currentId () {
+        if (this.rev && this.$view) {
+          return getViewId(this.$view)
+        }
+
+        return this.id
+      },
       /**
        * @type {number}
        */
@@ -190,12 +228,12 @@
       /**
        * @type {number[]}
        */
-      currentCenter () {
+      currentCenterDataProj () {
         if (this.rev && this.$view) {
           return this.pointToDataProj(this.$view.getCenter())
         }
 
-        return this.center
+        return this.centerDataProj
       },
       /**
        * @type {number[]}
@@ -205,15 +243,7 @@
           return this.$view.getCenter()
         }
 
-        return this.pointToViewProj(this.center)
-      },
-      /**
-       * @type {number[]|undefined}
-       */
-      currentExtentViewProj () {
-        if (!isArray(this.extent)) return
-
-        return this.extentToViewProj(this.extent)
+        return this.centerViewProj
       },
       /**
        * @return {module:ol/proj~ProjectionLike}
@@ -222,6 +252,7 @@
         // exclude this.projection from lookup to allow view rendering in projection
         // that differs from data projection
         return coalesce(
+          this.dataProjection,
           this.$mapVm?.resolvedDataProjection,
           this.$options?.dataProjection,
           this.viewProjection,
@@ -229,29 +260,49 @@
       },
     },
     watch: {
-      async id (value) {
-        await this.setId(value)
-      },
-      async center (value) {
+      async centerDataProj (value) {
         if (await this.getAnimating()) return
 
         await this.setCenter(value)
+      },
+      currentCenterDataProj: {
+        deep: true,
+        handler: debounce(function (value) {
+          if (isEqual(value, this.centerDataProj)) return
+
+          this.$emit('update:center', value.slice())
+        }, FRAME_TIME),
       },
       async rotation (value) {
         if (await this.getAnimating()) return
 
         await this.setRotation(value)
       },
+      currentRotation: debounce(function (value) {
+        if (value === this.rotation) return
+
+        this.$emit('update:rotation', value)
+      }, FRAME_TIME),
       async resolution (value) {
         if (await this.getAnimating()) return
 
         await this.setResolution(value)
       },
+      currentResolution: debounce(function (value) {
+        if (value === this.resolution) return
+
+        this.$emit('update:resolution', value)
+      }, FRAME_TIME),
       async zoom (value) {
         if (await this.getAnimating()) return
 
         await this.setZoom(value)
       },
+      currentZoom: debounce(function (value) {
+        if (value === this.zoom) return
+
+        this.$emit('update:zoom', value)
+      }, FRAME_TIME),
       async minZoom (value) {
         await this.setMinZoom(value)
       },
@@ -260,7 +311,7 @@
       },
       ...makeWatchers([
         'constrainOnlyCenter',
-        'extent',
+        'extentDataProj',
         'smoothExtentConstraint',
         'enableRotation',
         'constrainRotation',
@@ -286,6 +337,30 @@
     },
     methods: {
       /**
+       * @returns {Promise<void>}
+       * @protected
+       */
+      async beforeInit () {
+        try {
+          await waitFor(
+            () => this.$mapVm != null,
+            obsFromVueEvent(this.$eventBus, [
+              OlObjectEvent.CREATE_ERROR,
+            ]).pipe(
+              mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+            ),
+            1000,
+          )
+          this.dataProjection = this.$mapVm.resolvedDataProjection
+          await this.$nextTickPromise()
+
+          return this::olCmp.methods.beforeInit()
+        } catch (err) {
+          err.message = 'Wait for $mapVm injection: ' + err.message
+          throw err
+        }
+      },
+      /**
        * @return {module:ol/View~View}
        * @protected
        */
@@ -293,28 +368,63 @@
         const view = new View({
           center: this.currentCenterViewProj,
           constrainOnlyCenter: this.constrainOnlyCenter,
-          extent: this.currentExtentViewProj,
+          extent: this.extentViewProj,
           smoothExtentConstraint: this.smoothExtentConstraint,
-          rotation: this.rotation,
+          rotation: this.currentRotation,
           enableRotation: this.enableRotation,
           constrainRotation: this.constrainRotation,
-          resolution: this.resolution,
+          resolution: this.currentResolution,
           resolutions: this.resolutions,
           maxResolution: this.maxResolution,
           minResolution: this.minResolution,
           constrainResolution: this.constrainResolution,
           smoothResolutionConstraint: this.smoothResolutionConstraint,
-          zoom: this.zoom,
+          zoom: this.currentZoom,
           zoomFactor: this.zoomFactor,
           maxZoom: this.maxZoom,
           minZoom: this.minZoom,
           multiWorld: this.multiWorld,
           projection: this.projection,
+          showFullExtent: this.showFullExtent,
         })
-        initializeView(view, this.id)
+        initializeView(view, this.currentId)
 
         return view
       },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async mount () {
+        if (this.$viewContainer) {
+          await this.$viewContainer.setView(this)
+        }
+
+        return this::olCmp.methods.mount()
+      },
+      /**
+       * @return {void}
+       * @protected
+       */
+      async unmount () {
+        if (this.$viewContainer) {
+          await this.$viewContainer.setView(null)
+        }
+
+        return this::olCmp.methods.unmount()
+      },
+      /**
+       * @return {void}
+       * @protected
+       */
+      subscribeAll () {
+        this::olCmp.methods.subscribeAll()
+        this::subscribeToEvents()
+      },
+      /**
+       * @return {Promise<module:ol/View~View>}
+       */
+      resolveView: olCmp.methods.resolveOlObject,
       /**
        * @return {Promise<string|number|undefined>}
        */
@@ -326,11 +436,9 @@
        * @return {Promise<void>}
        */
       async setId (id) {
-        const view = await this.resolveView()
+        if (id === getViewId(await this.resolveView())) return
 
-        if (id === getViewId(view)) return
-
-        setViewId(view, id)
+        setViewId(await this.resolveView(), id)
       },
       /**
        * @see {@link https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#animate}
@@ -442,12 +550,9 @@
        * @return {Promise<void>}
        */
       async setCenter (center) {
-        center = this.pointToViewProj(center)
-        const view = await this.resolveView()
+        if (isEqual(center, await this.getCenter())) return
 
-        if (isEqual(center, view.getCenter())) return
-
-        return view.setCenter(center)
+        (await this.resolveView()).setCenter(this.pointToViewProj(center))
       },
       /**
        * @return {Promise<number>}
@@ -460,11 +565,9 @@
        * @return {Promise<void>}
        */
       async setResolution (resolution) {
-        const view = await this.resolveView()
+        if (resolution === (await this.resolveView()).getResolution()) return
 
-        if (resolution === view.getResolution()) return
-
-        view.setResolution(resolution)
+        (await this.resolveView()).setResolution(resolution)
       },
       /**
        * @param {number[]} extent
@@ -510,11 +613,9 @@
        * @return {Promise<void>}
        */
       async setZoom (zoom) {
-        const view = await this.resolveView()
+        if (zoom === (await this.resolveView()).getZoom()) return
 
-        if (zoom === view.getZoom()) return
-
-        view.setZoom(zoom)
+        (await this.resolveView()).setZoom(zoom)
       },
       /**
        * @param {number} resolution
@@ -534,11 +635,9 @@
        * @return {Promise<void>}
        */
       async setMaxZoom (zoom) {
-        const view = await this.resolveView()
+        if (zoom === (await this.resolveView()).getMaxZoom()) return
 
-        if (zoom === view.getMaxZoom()) return
-
-        view.setMaxZoom(zoom)
+        (await this.resolveView()).setMaxZoom(zoom)
       },
       /**
        * @return {Promise<number|undefined>}
@@ -551,11 +650,9 @@
        * @return {Promise<void>}
        */
       async setMinZoom (zoom) {
-        const view = await this.resolveView()
+        if (zoom === (await this.resolveView()).getMinZoom()) return
 
-        if (zoom === view.getMinZoom()) return
-
-        return view.setMinZoom(zoom)
+        (await this.resolveView()).setMinZoom(zoom)
       },
       /**
        * @return {Promise<module:ol/proj/Projection>}
@@ -574,57 +671,10 @@
        * @return {Promise<void>}
        */
       async setRotation (rotation) {
-        const view = await this.resolveView()
+        if (rotation === (await this.resolveView()).getRotation()) return
 
-        if (rotation === view.getRotation()) return
-
-        view.setRotation(rotation)
+        (await this.resolveView()).setRotation(rotation)
       },
-      /**
-       * @returns {Promise<void>}
-       * @protected
-       */
-      async init () {
-        await waitFor(() => this.$mapVm != null)
-
-        return this::olCmp.methods.init()
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async mount () {
-        if (this.$viewContainer) {
-          await this.$viewContainer.setView(this)
-        }
-
-        return this::olCmp.methods.mount()
-      },
-      /**
-       * @return {void}
-       * @protected
-       */
-      async unmount () {
-        if (this.$viewContainer) {
-          await this.$viewContainer.setView(null)
-        }
-
-        return this::olCmp.methods.unmount()
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async subscribeAll () {
-        await Promise.all([
-          this::olCmp.methods.subscribeAll(),
-          this::subscribeToEvents(),
-        ])
-      },
-      /**
-       * @return {Promise<module:ol/View~View>}
-       */
-      resolveView: olCmp.methods.resolveOlObject,
     },
   }
 
@@ -660,31 +710,46 @@
    * @private
    */
   async function subscribeToEvents () {
-    const view = await this.resolveView()
-
-    const ft = 1000 / 60
-    const resolution = obsFromOlChangeEvent(view, 'resolution', true, ft)
-    const zoom = resolution.pipe(
-      mapObs(() => ({
-        prop: 'zoom',
-        value: view.getZoom(),
-      })),
+    const prefixKey = addPrefix('current')
+    const resolutionChanges = obsFromOlChangeEvent(this.$view, 'resolution', true, evt => ({
+      ...evt,
+      compareWith: this.currentResolution,
+    }))
+    const zoomChanges = resolutionChanges.pipe(
+      mergeMap(() => fromObs(this.getZoom()).pipe(
+        mapObs(zoom => ({
+          prop: 'zoom',
+          value: zoom,
+          compareWith: this.currentZoom,
+        })),
+      )),
       distinctUntilKeyChanged('value'),
     )
-
-    const changes = mergeObs(
-      obsFromOlChangeEvent(view, 'center', true, ft, () => this.pointToDataProj(view.getCenter())),
-      obsFromOlChangeEvent(view, 'rotation', true, ft),
-      resolution,
-      zoom,
+    const centerChanges = obsFromOlChangeEvent(this.$view, 'center', true).pipe(
+      mergeMap(({ prop }) => fromObs(this.getCenter()).pipe(
+        mapObs(center => ({
+          prop,
+          value: center,
+          compareWith: this.currentCenterDataProj,
+        })),
+      )),
     )
-
-    this.subscribeTo(changes, ({ prop, value }) => {
+    const propChanges = mergeObs(
+      obsFromOlChangeEvent(this.$view, [
+        'id',
+        'rotation',
+      ], true, evt => ({
+        ...evt,
+        compareWith: this[prefixKey(evt.prop)],
+      })),
+      resolutionChanges,
+      zoomChanges,
+      centerChanges,
+    ).pipe(
+      skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
+    )
+    this.subscribeTo(propChanges, () => {
       ++this.rev
-
-      this.$nextTick(() => {
-        this.$emit(`update:${prop}`, value)
-      })
     })
   }
 </script>

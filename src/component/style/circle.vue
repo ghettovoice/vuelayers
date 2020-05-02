@@ -13,7 +13,6 @@
 <script>
   import { Circle as CircleStyle } from 'ol/style'
   import { regShapeStyle } from '../../mixin'
-  import { omit } from '../../util/minilo'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'
 
@@ -24,20 +23,12 @@
       StrokeStyle,
     },
     mixins: [
-      {
-        ...regShapeStyle,
-        watch: omit(regShapeStyle.watch, ['radius']),
-      },
+      regShapeStyle,
     ],
     props: {
       radius: {
         type: Number,
         default: 5,
-      },
-    },
-    watch: {
-      async radius (value) {
-        await this.setRadius(value)
       },
     },
     methods: {
@@ -54,13 +45,14 @@
         })
       },
       async setRadius (radius) {
-        const style = await this.resolveStyle()
+        if (radius === await this.getRadius()) return
 
-        if (radius === style.getRadius()) return
-
-        style.setRadius(radius)
+        (await this.resolveStyle()).setRadius(radius)
 
         await this.scheduleRemount()
+      },
+      async onRadiusChanged (radius) {
+        await this.setRadius(radius)
       },
     },
   }

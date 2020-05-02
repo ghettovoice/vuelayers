@@ -5,11 +5,7 @@ const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
 const baseWebpackConfig = require('./webpack.base.config')
 const utils = require('./utils')
 
-const isProduction = process.env.NODE_ENV === 'production'
-
-if (!isProduction) {
-  process.env.BABEL_ENV = 'production'
-}
+process.env.NODE_ENV = 'production'
 
 const webpackConfig = merge(baseWebpackConfig, {
   optimization: {
@@ -43,8 +39,6 @@ const webpackConfig = merge(baseWebpackConfig, {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
       },
-      // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-      chunksSortMode: 'dependency',
     }),
   ],
 })

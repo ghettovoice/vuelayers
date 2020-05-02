@@ -19,6 +19,7 @@ export default {
     minZoom: {
       type: Number,
       default: 0,
+      validator: value => value >= 0,
     },
     maxResolution: Number,
     tileSize: {
@@ -29,6 +30,9 @@ export default {
     },
   },
   computed: {
+    tileSizeArr () {
+      return isArray(this.tileSize) ? this.tileSize : [this.tileSize]
+    },
     derivedTileGridFactory () {
       if (isFunction(this.tileGridFactory)) {
         return this.tileGridFactory
@@ -38,7 +42,7 @@ export default {
       const maxZoom = this.maxZoom
       const minZoom = this.minZoom
       const maxResolution = this.maxResolution
-      const tileSize = this.tileSize
+      const tileSize = this.tileSizeArr
 
       return () => createXYZ({
         extent: extentFromProjection(projection),
@@ -57,7 +61,7 @@ export default {
     createSource () {
       return new XYZSource({
         // ol/source/Source
-        attributions: this.attributions,
+        attributions: this.currentAttributions,
         attributionsCollapsible: this.attributionsCollapsible,
         projection: this.projection,
         wrapX: this.wrapX,
@@ -65,12 +69,11 @@ export default {
         cacheSize: this.cacheSize,
         opaque: this.opaque,
         tilePixelRatio: this.tilePixelRatio,
-        tileKey: this.tileKey,
         transition: this.transition,
         zDirection: this.zDirection,
         tileGrid: this.tileGrid,
         // ol/source/UrlTile
-        tileLoadFunction: this.tileLoadFunction,
+        tileLoadFunction: this.resolvedTileLoadFunc,
         tileUrlFunction: this.urlFunc,
         // ol/source/TileImage
         crossOrigin: this.crossOrigin,
@@ -79,8 +82,10 @@ export default {
       })
     },
     ...pick(tileImageSource.methods, [
+      'beforeInit',
       'init',
       'deinit',
+      'beforeMount',
       'mount',
       'unmount',
       'refresh',

@@ -1,11 +1,17 @@
-import { Collection, Feature, getUid as getObjectUid } from 'ol'
-import { merge as mergeObs } from 'rxjs'
-import { debounceTime } from 'rxjs/operators'
-import { getFeatureId, initializeFeature, mergeFeatures } from '../ol-ext'
-import { obsFromOlEvent } from '../rx-ext'
+import debounce from 'debounce-promise'
+import { Collection, Feature, getUid } from 'ol'
+import CollectionEventType from 'ol/CollectionEventType'
+import EventType from 'ol/events/EventType'
+import ObjectEventType from 'ol/ObjectEventType'
+import { from as fromObs, merge as mergeObs } from 'rxjs'
+import { debounceTime, map as mapObs, mergeMap, tap } from 'rxjs/operators'
+import { getFeatureId } from '../ol-ext'
+import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isFunction, isPlainObject, map } from '../util/minilo'
+import { clonePlainObject, forEach, isEqual, isFunction, map, find } from '../util/minilo'
+import featureHelper from './feature-helper'
 import identMap from './ident-map'
+import { FRAME_TIME } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import rxSubs from './rx-subs'
 
@@ -21,31 +27,24 @@ export default {
     identMap,
     rxSubs,
     projTransforms,
+    featureHelper,
   ],
   computed: {
     /**
-     * @type {Array<string|number>}
+     * @type {Object[]}
      */
-    featureIds () {
+    currentFeaturesDataProj () {
       if (!this.rev) return []
 
-      return this.getFeatures().map(getFeatureId)
+      return map(this.getFeatures(), feature => this.writeFeatureInDataProj(feature))
     },
     /**
      * @type {Object[]}
      */
-    featuresViewProj () {
+    currentFeaturesViewProj () {
       if (!this.rev) return []
 
-      return this.getFeatures().map(::this.writeFeatureInViewProj)
-    },
-    /**
-     * @type {Object[]}
-     */
-    featuresDataProj () {
-      if (!this.rev) return []
-
-      return this.getFeatures().map(::this.writeFeatureInDataProj)
+      return map(this.getFeatures(), feature => this.writeFeatureInViewProj(feature))
     },
     /**
      * @returns {string|undefined}
@@ -57,6 +56,17 @@ export default {
     },
   },
   watch: {
+    currentFeaturesDataProj: {
+      deep: true,
+      handler: debounce(async function (value, prev) {
+        if (isEqual(value, prev)) return
+
+        this.$emit('update:features', clonePlainObject(value))
+      }, FRAME_TIME),
+    },
+    async resolvedDataProjection () {
+      await this.addFeatures(this.currentFeaturesDataProj)
+    },
     featuresCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
@@ -80,6 +90,17 @@ export default {
   },
   methods: {
     /**
+     * @returns {{readonly featuresContainer: Object}}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return {
+        get featuresContainer () { return vm },
+      }
+    },
+    /**
      * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features
      * @return {Promise<void>}
      */
@@ -91,21 +112,14 @@ export default {
      * @return {Promise<void>}
      */
     async addFeature (feature) {
-      initializeFeature(feature)
-
-      if (isFunction(feature.resolveOlObject)) {
-        feature = await feature.resolveOlObject()
-      } else if (isPlainObject(feature)) {
-        feature = this.readFeatureInDataProj(feature)
-      }
-
+      feature = await this.initializeFeature(feature)
       instanceOf(feature, Feature)
       // todo add hash {featureId => featureIdx, ....}
       const foundFeature = this.getFeatureById(getFeatureId(feature))
       if (foundFeature == null) {
         this.$featuresCollection.push(feature)
       } else {
-        mergeFeatures(foundFeature, feature)
+        this.updateFeature(foundFeature, feature)
       }
     },
     /**
@@ -141,7 +155,7 @@ export default {
      */
     getFeatureById (featureId) {
       // todo add hash {featureId => featureIdx, ....}
-      return this.$featuresCollection.getArray().find(feature => {
+      return find(this.getFeatures(), feature => {
         return getFeatureId(feature) === featureId
       })
     },
@@ -157,30 +171,6 @@ export default {
     getFeaturesCollection () {
       return this._featuresCollection
     },
-    /**
-     * @param {module:ol/Collection~Collection<module:ol/Feature~Feature>} feature
-     * @return {boolean}
-     */
-    hasFeature (feature) {
-      return this.getFeatureById(getFeatureId(feature)) != null
-    },
-    /**
-     * @returns {boolean}
-     */
-    isEmpty () {
-      return this.getFeatures().length === 0
-    },
-    /**
-     * @returns {{readonly featuresContainer: Object}}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return {
-        get featuresContainer () { return vm },
-      }
-    },
   },
 }
 
@@ -194,38 +184,46 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = obsFromOlEvent(this.$featuresCollection, 'add')
-  this.subscribeTo(adds, ({ element }) => {
-    const elementUid = getObjectUid(element)
-    const propChanges = obsFromOlEvent(element, 'propertychange')
-    const otherChanges = obsFromOlEvent(element, 'change')
-    const featureChanges = mergeObs(propChanges, otherChanges).pipe(
-      debounceTime(1000 / 60),
-    )
-
-    this._featureSubs[elementUid] = this.subscribeTo(featureChanges, () => {
-      ++this.rev
-    })
-
+  const adds = obsFromOlEvent(this.$featuresCollection, CollectionEventType.ADD).pipe(
+    mergeMap(({ type, element }) => fromObs(this.initializeFeature(element)).pipe(
+      mapObs(element => ({ type, element })),
+    )),
+    tap(({ type, element }) => {
+      const uid = getUid(element)
+      const propChanges = obsFromOlEvent(element, ObjectEventType.PROPERTYCHANGE)
+      const changes = obsFromOlEvent(element, EventType.CHANGE)
+      const events = mergeObs(
+        propChanges,
+        changes,
+      ).pipe(
+        debounceTime(FRAME_TIME),
+      )
+      this._featureSubs[uid] = this.subscribeTo(events, () => {
+        ++this.rev
+      })
+    }),
+  )
+  const removes = obsFromOlEvent(this.$featuresCollection, CollectionEventType.REMOVE).pipe(
+    tap(({ type, element }) => {
+      const uid = getUid(element)
+      if (this._featureSubs[uid]) {
+        this.unsubscribe(this._featureSubs[uid])
+        delete this._featureSubs[uid]
+      }
+    }),
+  )
+  const events = mergeObs(adds, removes).pipe(
+    bufferDebounceTime(FRAME_TIME),
+  )
+  this.subscribeTo(events, events => {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit('addfeature', element)
-    })
-  })
-
-  const removes = obsFromOlEvent(this.$featuresCollection, 'remove')
-  this.subscribeTo(removes, ({ element }) => {
-    const elementUid = getObjectUid(element)
-    if (this._featureSubs[elementUid]) {
-      this.unsubscribe(this._featureSubs[elementUid])
-      delete this._featureSubs[elementUid]
-    }
-
-    ++this.rev
-
-    this.$nextTick(() => {
-      this.$emit('removefeature', element)
+      forEach(events, ({ type, element }) => {
+        this.$emit(type + 'feature', element, this.writeFeatureInDataProj(element))
+        // todo remove in v0.13.x
+        this.$emit(type + ':feature', element)
+      })
     })
   })
 }

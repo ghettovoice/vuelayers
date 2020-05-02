@@ -2,9 +2,9 @@
   import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
   import { Modify as ModifyInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import { interaction, stylesContainer } from '../../mixin'
+  import { interaction, styleContainer } from '../../mixin'
   import { createStyle, defaultEditStyle } from '../../ol-ext'
-  import { obsFromOlEvent } from '../../rx-ext'
+  import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { hasInteraction, instanceOf } from '../../util/assert'
   import { mapValues } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
@@ -14,7 +14,7 @@
     name: 'VlInteractionModify',
     mixins: [
       interaction,
-      stylesContainer,
+      styleContainer,
     ],
     stubVNode: {
       empty: false,
@@ -126,7 +126,7 @@
       getServices () {
         return mergeDescriptors(
           this::interaction.methods.getServices(),
-          this::stylesContainer.methods.getServices(),
+          this::styleContainer.methods.getServices(),
         )
       },
       /**

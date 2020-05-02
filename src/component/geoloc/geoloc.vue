@@ -15,10 +15,8 @@
 
 <script>
   import { Geolocation } from 'ol'
-  import { olCmp, projTransforms, waitForMap } from '../../mixin'
-  import { isEqProj } from '../../ol-ext'
-  import { obsFromOlChangeEvent } from '../../rx-ext'
-  import { hasGeolocation } from '../../util/assert'
+  import { olCmp, projTransforms } from '../../mixin'
+  import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
   import { isEqual } from '../../util/minilo'
 
   export default {
@@ -26,7 +24,7 @@
     mixins: [
       projTransforms,
       olCmp,
-      waitForMap,
+      // waitForMap,
     ],
     stubVNode: {
       empty () {
@@ -177,7 +175,7 @@
       async setProjection (projection) {
         const geoloc = await this.resolveGeolocation()
 
-        if (isEqProj(projection, geoloc.getProjection())) return
+        // if (isEqProj(projection, geoloc.getProjection())) return
 
         geoloc.setProjection(projection)
       },
@@ -240,14 +238,12 @@
         return this::olCmp.methods.unmount()
       },
       /**
-       * @return {Promise<void>}
+       * @return {void}
        * @protected
        */
       subscribeAll () {
-        return Promise.all([
-          this::olCmp.methods.subscribeAll(),
-          this::subscribeToGeolocation(),
-        ])
+        this::olCmp.methods.subscribeAll()
+        this::subscribeToGeolocation()
       },
       resolveGeolocation: olCmp.methods.resolveOlObject,
     },
@@ -262,17 +258,13 @@
         enumerable: true,
         get: () => this.$olObject,
       },
-      $map: {
+      $mapVm: {
         enumerable: true,
-        get: () => this.$services && this.$services.map,
+        get: () => this.$services?.mapVm,
       },
-      /**
-       * Reference to `ol.View` instance.
-       * @type {module:ol/View~View|undefined}
-       */
-      $view: {
+      $viewVm: {
         enumerable: true,
-        get: () => this.$services && this.$services.view,
+        get: () => this.$services?.viewVm,
       },
     })
   }
@@ -282,22 +274,14 @@
    * @private
    */
   function subscribeToGeolocation () {
-    hasGeolocation(this)
-
-    const ft = 1000 / 60
-    const changes = obsFromOlChangeEvent(
-      this.$geolocation,
-      [
-        'accuracy',
-        'altitude',
-        'altitudeaccuracy',
-        'heading',
-        'speed',
-        'position',
-      ],
-      true,
-      ft,
-    )
+    const changes = obsFromOlChangeEvent(this.$geolocation, [
+      'accuracy',
+      'altitude',
+      'altitudeaccuracy',
+      'heading',
+      'speed',
+      'position',
+    ], true)
 
     this.subscribeTo(changes, ({ prop, value }) => {
       ++this.rev

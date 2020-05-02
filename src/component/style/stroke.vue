@@ -83,6 +83,28 @@
           width: this.width,
         })
       },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async mount () {
+        if (this.$strokeStyleContainer) {
+          await this.$strokeStyleContainer.setStroke(this)
+        }
+
+        return this::style.methods.mount()
+      },
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async unmount () {
+        if (this.$strokeStyleContainer) {
+          await this.$strokeStyleContainer.setStroke(undefined)
+        }
+
+        return this::style.methods.unmount()
+      },
       async getColor () {
         return (await this.resolveStyle()).getColor()
       },
@@ -167,28 +189,6 @@
         style.setWidth(width)
 
         await this.scheduleRemount()
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async mount () {
-        if (this.$strokeStyleContainer) {
-          await this.$strokeStyleContainer.setStroke(this)
-        }
-
-        return this::style.methods.mount()
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async unmount () {
-        if (this.$strokeStyleContainer) {
-          await this.$strokeStyleContainer.setStroke(undefined)
-        }
-
-        return this::style.methods.unmount()
       },
     },
   }

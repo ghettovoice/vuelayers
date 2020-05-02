@@ -1,6 +1,5 @@
 <script>
   import { xyzSource } from '../../mixin'
-  import { EPSG_3857 } from '../../ol-ext'
   import { coalesce } from '../../util/minilo'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
@@ -30,10 +29,6 @@
       mapId: {
         type: String,
         required: true,
-      },
-      projection: {
-        type: String,
-        default: EPSG_3857,
       },
       tileFormat: {
         type: String,

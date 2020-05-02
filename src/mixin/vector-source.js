@@ -1,17 +1,25 @@
 import debounce from 'debounce-promise'
 import { Feature } from 'ol'
 import { all as loadAll } from 'ol/loadingstrategy'
-import { createGeoJsonFmt, getFeatureId, isGeoJSONFeature, transform } from '../ol-ext'
+import VectorEventType from 'ol/source/VectorEventType'
+import { from as fromObs, merge as mergeObs } from 'rxjs'
+import { map as mapObs, mergeMap } from 'rxjs/operators'
+import { getFeatureId, getGeoJsonFmt, initializeFeature, isGeoJSONFeature, transform, transforms } from '../ol-ext'
+import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
+import { instanceOf } from '../util/assert'
 import {
   and,
   clonePlainObject,
   constant,
   difference,
+  every,
+  forEach,
   isArray,
   isEmpty,
   isEqual,
   isFunction,
   isString,
+  map,
   negate,
   pick,
   sealFactory,
@@ -19,8 +27,8 @@ import {
 } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
-import featuresContainer from './features-container'
-import projTransforms from './proj-transforms'
+import featureHelper from './feature-helper'
+import { FRAME_TIME } from './ol-cmp'
 import source from './source'
 
 const isNotEmptyString = and(isString, negate(isEmpty))
@@ -30,8 +38,7 @@ const isNotEmptyString = and(isString, negate(isEmpty))
  */
 export default {
   mixins: [
-    projTransforms,
-    featuresContainer,
+    featureHelper,
     source,
   ],
   stubVNode: {
@@ -51,7 +58,7 @@ export default {
     features: {
       type: Array,
       default: stubArray,
-      validator: value => value.every(isGeoJSONFeature),
+      validator: value => every(value, isGeoJSONFeature),
     },
     /**
      * Source format factory
@@ -59,7 +66,7 @@ export default {
      */
     formatFactory: {
       type: Function,
-      default: createGeoJsonFmt,
+      default: getGeoJsonFmt,
     },
     /**
      * Feature loader.
@@ -79,7 +86,7 @@ export default {
      */
     loadingStrategy: {
       type: Function,
-      default: loadAll,
+      // default: loadAll,
     },
     /**
      * @deprecated Use `loadingStrategy` prop instead
@@ -112,21 +119,41 @@ export default {
   data () {
     return {
       /**
-       * @returns {module:ol/format/Feature~FeatureFormat|undefined}
+       * @returns {module:ol/format/Feature~FeatureFormat|null}
        */
-      format: undefined,
+      format: null,
     }
   },
   computed: {
-    /**
-     * @returns {function|undefined}
-     */
+    featuresDataProj () {
+      return map(this.features, feature => initializeFeature(clonePlainObject(feature)))
+    },
+    featuresViewProj () {
+      return map(this.featuresDataProj, feature => ({
+        ...feature,
+        geometry: {
+          ...feature.geometry,
+          coordinates: transforms[feature.geometry.type].transform(
+            feature.geometry.coordinates,
+            this.resolvedDataProjection,
+            this.viewProjection,
+          ),
+        },
+      }))
+    },
+    currentFeaturesDataProj () {
+      if (!(this.rev && this.$source)) return []
+
+      return map(this.getFeaturesSync(), feature => this.writeFeatureInDataProj(feature))
+    },
+    currentFeaturesViewProj () {
+      if (!(this.rev && this.$source)) return []
+
+      return map(this.getFeaturesSync(), feature => this.writeFeatureInViewProj(feature))
+    },
     urlFunc () {
       return this.createUrlFunc(this.url)
     },
-    /**
-     * @type {function|undefined}
-     */
     loaderFunc () {
       let loader = this.loader
       if (!loader && this.loaderFactory) {
@@ -135,52 +162,49 @@ export default {
 
       return this.createLoaderFunc(loader)
     },
-    /**
-     * @returns {string|undefined}
-     */
     formatIdent () {
       if (!this.olObjIdent) return
 
       return this.makeIdent(this.olObjIdent, 'format')
     },
-    /**
-     * @returns {function}
-     */
     sealFormatFactory () {
       return sealFactory(::this.formatFactory)
     },
-    /**
-     * @returns {function}
-     */
     loadingStrategyFunc () {
       let loadingStrategy = this.loadingStrategy
-      if (this.strategyFactory) {
+      if (!loadingStrategy && this.strategyFactory) {
         loadingStrategy = this.strategyFactory()
       }
 
-      return loadingStrategy
+      return loadingStrategy || loadAll
     },
   },
   watch: {
-    features: {
-      deep: true,
-      async handler (features) {
-        if (!this.$source || isEqual(features, this.featuresDataProj)) return
-        // add new features
-        await Promise.all(features.map(feature => this.addFeature({ ...feature })))
-        // remove non-matched features
-        await Promise.all(difference(
-          this.getFeatures(),
-          features,
-          (a, b) => getFeatureId(a) === getFeatureId(b),
-        ).map(::this.removeFeature))
-      },
-    },
     featuresDataProj: {
       deep: true,
-      handler: debounce(function (features) {
-        this.$emit('update:features', clonePlainObject(features))
-      }, 1000 / 60),
+      handler: debounce(async function (features) {
+        if (isEqual(features, this.currentFeaturesDataProj)) return
+        // add new features
+        await this.addFeatures(features)
+        // remove non-matched features
+        const removed = difference(
+          this.currentFeaturesDataProj,
+          features,
+          (a, b) => getFeatureId(a) === getFeatureId(b),
+        )
+        await this.removeFeatures(removed)
+      }, FRAME_TIME),
+    },
+    currentFeaturesDataProj: {
+      deep: true,
+      handler: debounce(function (value) {
+        if (isEqual(value, this.featuresDataProj)) return
+
+        this.$emit('update:features', clonePlainObject(value))
+      }, FRAME_TIME),
+    },
+    async resolvedDataProjection () {
+      await this.addFeatures(this.currentFeaturesDataProj)
     },
     async urlFunc (value) {
       await this.setUrlInternal(value)
@@ -214,9 +238,17 @@ export default {
 
       await this.scheduleRecreate()
     },
+    async overlaps (value) {
+      if (value === await this.getOverlaps()) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('overlaps changed, scheduling recreate...')
+      }
+
+      await this.scheduleRecreate()
+    },
     ...makeWatchers([
       'loadingStrategyFunc',
-      'overlaps',
       'useSpatialIndex',
     ], prop => async function () {
       if (process.env.VUELAYERS_DEBUG) {
@@ -258,6 +290,102 @@ export default {
     }
   },
   methods: {
+    async mount () {
+      await this.addFeatures(this.featuresDataProj)
+      await this::source.methods.mount()
+    },
+    getServices () {
+      const vm = this
+
+      return mergeDescriptors(
+        this::source.methods.getServices(),
+        {
+          get featuresContainer () { return vm },
+        },
+      )
+    },
+    subscribeAll () {
+      this::source.methods.subscribeAll()
+      this::subscribeToSourceEvents()
+    },
+    ...pick(source.methods, [
+      'beforeInit',
+      'init',
+      'deinit',
+      'beforeMount',
+      'unmount',
+      'scheduleRefresh',
+      'remount',
+      'scheduleRemount',
+      'recreate',
+      'scheduleRecreate',
+      'resolveOlObject',
+      'resolveSource',
+    ]),
+    async addFeatures (features) {
+      const newFeatures = []
+      await Promise.all(map(features || [], async feature => {
+        feature = await this.initializeFeature(feature)
+        instanceOf(feature, Feature)
+
+        const foundFeature = await this.getFeatureById(getFeatureId(feature))
+        if (foundFeature) {
+          this.updateFeature(foundFeature, feature)
+        } else {
+          newFeatures.push(feature)
+        }
+      }))
+
+      const source = await this.resolveSource()
+      source.addFeatures(newFeatures)
+    },
+    async addFeature (feature) {
+      await this.addFeatures([feature])
+    },
+    async removeFeatures (features) {
+      const removedFeatures = []
+      await Promise.all(map(features || [], async feature => {
+        if (isFunction(feature.resolveOlObject)) {
+          feature = await feature.resolveOlObject()
+        }
+
+        feature = await this.getFeatureById(getFeatureId(feature))
+        if (!feature) return
+
+        removedFeatures.push(feature)
+      }))
+
+      const source = await this.resolveSource()
+      source.removeFeatures(removedFeatures)
+    },
+    async removeFeature (feature) {
+      await this.removeFeatures([feature])
+    },
+    async getFeatureById (featureId) {
+      return (await this.resolveSource()).getFeatureById(featureId)
+    },
+    async getFeatures () {
+      await this.resolveSource()
+
+      return this.getFeaturesSync()
+    },
+    getFeaturesSync () {
+      return this.$source.getFeatures()
+    },
+    async getFeaturesCollection () {
+      return (await this.resolveSource()).getFeaturesCollection()
+    },
+    async clear () {
+      const source = await this.resolveSource()
+
+      return new Promise(resolve => {
+        source.once('change', () => resolve())
+        source.clear()
+      })
+    },
+    async isEmpty () {
+      return (await this.resolveSource()).isEmpty()
+    },
     /**
      * @param {function} callback
      * @returns {Promise<void>}
@@ -271,9 +399,7 @@ export default {
      * @returns {Promise<*|T>}
      */
     async forEachFeatureInExtent (extent, callback) {
-      extent = this.extentToViewProj(extent)
-
-      return (await this.resolveSource()).forEachFeatureInExtent(extent, callback)
+      return (await this.resolveSource()).forEachFeatureInExtent(this.extentToViewProj(extent), callback)
     },
     /**
      * @param {number[]} extent
@@ -281,27 +407,21 @@ export default {
      * @returns {Promise<T>}
      */
     async forEachFeatureIntersectingExtent (extent, callback) {
-      extent = this.extentToViewProj(extent)
-
-      return (await this.resolveSource()).forEachFeatureInExtent(extent, callback)
+      return (await this.resolveSource()).forEachFeatureInExtent(this.extentToViewProj(extent), callback)
     },
     /**
      * @param {number[]} coordinate
      * @returns {Promise<Array<module:ol/Feature~Feature>>}
      */
     async getFeaturesAtCoordinate (coordinate) {
-      coordinate = this.pointToViewProj(coordinate)
-
-      return (await this.resolveSource()).getFeaturesAtCoordinate(coordinate)
+      return (await this.resolveSource()).getFeaturesAtCoordinate(this.pointToViewProj(coordinate))
     },
     /**
      * @param {number[]} extent
      * @returns {Promise<Array<module:ol/Feature~Feature>>}
      */
     async getFeaturesInExtent (extent) {
-      extent = this.extentToViewProj(extent)
-
-      return (await this.resolveSource()).getFeaturesInExtent(extent)
+      return (await this.resolveSource()).getFeaturesInExtent(this.extentToViewProj(extent))
     },
     /**
      * @param {number[]} coordinate
@@ -309,18 +429,14 @@ export default {
      * @returns {Promise<module:ol/Feature~Feature>}
      */
     async getClosestFeatureToCoordinate (coordinate, filter) {
-      coordinate = this.pointToViewProj(coordinate)
-
-      return (await this.resolveSource()).getClosestFeatureToCoordinate(coordinate, filter)
+      return (await this.resolveSource()).getClosestFeatureToCoordinate(this.pointToViewProj(coordinate), filter)
     },
     /**
      * @param {number[]} [extent]
      * @returns {Promise<number[]>}
      */
     async getExtent (extent) {
-      extent = this.extentToViewProj(extent)
-
-      return (await this.resolveSource()).getExtent(extent)
+      return this.extentToDataProj((await this.resolveSource()).getExtent(this.extentToViewProj(extent)))
     },
     /**
      * @returns {Promise<module:ol/format/Feature~FeatureFormat|undefined>}
@@ -354,7 +470,7 @@ export default {
      */
     async setUrlInternal (url) {
       (await this.resolveSource()).setUrl(url)
-      await this.reload()
+      await this.refresh()
     },
     /**
      * @param {function} loader
@@ -370,7 +486,7 @@ export default {
      */
     async setLoaderInternal (loader) {
       (await this.resolveSource()).setLoader(loader)
-      await this.reload()
+      await this.refresh()
     },
     /**
      * @param {number[]} extent
@@ -446,39 +562,30 @@ export default {
         dataProjection: this.resolvedDataProjection,
       })
     },
-    /**
-     * @returns {Promise<void>}
-     * @protected
-     */
-    async init () {
-      await this::source.methods.init()
-      await this.addFeatures(this.features)
-    },
-    /**
-     * @return {Object}
-     * @protected
-     */
-    getServices () {
-      return mergeDescriptors(
-        this::source.methods.getServices(),
-        this::featuresContainer.methods.getServices(),
-      )
-    },
-    ...pick(source.methods, [
-      'deinit',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'subscribeAll',
-      'resolveOlObject',
-      'resolveSource',
-    ]),
   },
+}
+
+function subscribeToSourceEvents () {
+  const adds = obsFromOlEvent(this.$source, VectorEventType.ADDFEATURE).pipe(
+    mergeMap(({ type, feature }) => fromObs(this.initializeFeature(feature)).pipe(
+      mapObs(feature => ({ type, feature, oldType: 'add:feature' })),
+    )),
+  )
+  const removes = obsFromOlEvent(this.$source, VectorEventType.REMOVEFEATURE).pipe(
+    mapObs(evt => ({ ...evt, oldType: 'remove:feature' })),
+  )
+  const events = mergeObs(adds, removes).pipe(
+    bufferDebounceTime(FRAME_TIME),
+  )
+  this.subscribeTo(events, events => {
+    this.$nextTick(() => {
+      forEach(events, ({ type, oldType, feature }) => {
+        this.$emit(type, feature, this.writeFeatureInDataProj(feature))
+        // todo remove in v0.13.x
+        this.$emit(oldType, feature)
+      })
+    })
+  })
 }
 
 function transformExtent (extent, sourceProj, destProj) {

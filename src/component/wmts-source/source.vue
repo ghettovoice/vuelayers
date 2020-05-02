@@ -1,14 +1,8 @@
 <script>
   import WMTSSource from 'ol/source/WMTS'
-  import WMTSTileGrid from 'ol/tilegrid/WMTS'
+  // import WMTSTileGrid from 'ol/tilegrid/WMTS'
   import { tileSource } from '../../mixin'
-  import {
-    createExtentFromProjection,
-    EXTENT_CORNER,
-    getExtentCorner,
-    resolutionsFromExtent,
-  } from '../../ol-ext'
-  import { range } from '../../util/minilo'
+  // import { range } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
@@ -96,7 +90,7 @@
           url: this.urlTmpl,
           wrapX: this.wrapX,
           transition: this.transition,
-          tileLoadFunction: this.tileLoadFunction,
+          tileLoadFunction: this.resolvedTileLoadFunc,
         })
       },
       /**
@@ -104,22 +98,22 @@
        * @protected
        */
       init () {
-        const extent = createExtentFromProjection(this.projection)
-        const resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
-        const origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
-        const matrixIds = this.matrixIds || Array.from(range(this.minZoom, resolutions.length))
+        // const extent = createExtentFromProjection(this.projection)
+        // const resolutions = this.resolutions ? this.resolutions : resolutionsFromExtent(extent, this.maxZoom, this.tileSize)
+        // const origin = this.origin ? this.origin : getExtentCorner(extent, EXTENT_CORNER.TOP_LEFT)
+        // const matrixIds = this.matrixIds || Array.from(range(this.minZoom, resolutions.length))
         /**
          * @type {module:ol/Tile~UrlFunction}
          * @protected
          */
-        this._tileGrid = new WMTSTileGrid({
-          extent,
-          origin,
-          resolutions,
-          tileSize: this.tileSize,
-          minZoom: this.minZoom,
-          matrixIds,
-        })
+        // this._tileGrid = new WMTSTileGrid({
+        //   extent,
+        //   origin,
+        //   resolutions,
+        //   tileSize: this.tileSize,
+        //   minZoom: this.minZoom,
+        //   matrixIds,
+        // })
 
         return this::tileSource.methods.init()
       },

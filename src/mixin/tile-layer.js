@@ -1,6 +1,9 @@
-import { obsFromOlChangeEvent } from '../rx-ext'
-import { pick } from '../util/minilo'
+import debounce from 'debounce-promise'
+import { skipWhile } from 'rxjs/operators'
+import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
+import { addPrefix, isEqual, pick } from '../util/minilo'
 import layer from './layer'
+import { FRAME_TIME } from './ol-cmp'
 
 /**
  * Base tile layer mixin.
@@ -26,15 +29,65 @@ export default {
       default: true,
     },
   },
+  computed: {
+    currentPreload () {
+      if (this.rev && this.$layer) {
+        return this.$layer.getPreload()
+      }
+
+      return this.preload
+    },
+    currentUseInterimTilesOnError () {
+      if (this.rev && this.$layer) {
+        return this.$layer.getUseInterimTilesOnError()
+      }
+
+      return this.useInterimTilesOnError
+    },
+  },
   watch: {
     async preload (value) {
       await this.setPreload(value)
     },
+    currentPreload: debounce(function (value) {
+      if (value === this.preload) return
+
+      this.$emit('update:preload', value)
+    }, FRAME_TIME),
     async useInterimTilesOnError (value) {
       await this.setUseInterimTilesOnError(value)
     },
+    currentUseInterimTilesOnError: debounce(function (value) {
+      if (value === this.useInterimTilesOnError) return
+
+      this.$emit('update:useInterimTilesOnError', value)
+    }, FRAME_TIME),
   },
   methods: {
+    /**
+     * @returns {void}
+     */
+    subscribeAll () {
+      this::layer.methods.subscribeAll()
+      this::subscribeToLayerEvents()
+    },
+    ...pick(layer.methods, [
+      'beforeInit',
+      'init',
+      'deinit',
+      'beforeMount',
+      'mount',
+      'unmount',
+      'refresh',
+      'scheduleRefresh',
+      'recreate',
+      'scheduleRecreate',
+      'remount',
+      'scheduleRemount',
+      'getServices',
+      'resolveOlObject',
+      'resolveLayer',
+    ]),
     /**
      * @returns {Promise<number>}
      */
@@ -46,11 +99,9 @@ export default {
      * @returns {Promise<void>}
      */
     async setPreload (preload) {
-      const layer = await this.resolveLayer()
+      if (preload === await this.getPreload()) return
 
-      if (preload === layer.getPreload()) return
-
-      layer.setPreload(preload)
+      (await this.resolveLayer()).setPreload(preload)
     },
     /**
      * @returns {Promise<boolean>}
@@ -63,53 +114,25 @@ export default {
      * @returns {Promise<void>}
      */
     async setUseInterimTilesOnError (useInterimTilesOnError) {
-      const layer = await this.resolveLayer()
+      if (useInterimTilesOnError === await this.getUseInterimTilesOnError()) return
 
-      if (useInterimTilesOnError === layer.getUseInterimTilesOnError()) return
-
-      layer.setUseInterimTilesOnError(useInterimTilesOnError)
+      (await this.resolveLayer()).setUseInterimTilesOnError(useInterimTilesOnError)
     },
-    /**
-     * @returns {Promise<void>}
-     */
-    subscribeAll () {
-      return Promise.all([
-        this::layer.methods.subscribeAll(),
-        this::subscribeToLayerEvents(),
-      ])
-    },
-    ...pick(layer.methods, [
-      'init',
-      'deinit',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'recreate',
-      'scheduleRecreate',
-      'remount',
-      'scheduleRecreate',
-      'getServices',
-      'resolveOlObject',
-      'resolveLayer',
-    ]),
   },
 }
 
 async function subscribeToLayerEvents () {
-  const layer = await this.resolveLayer()
-
-  const t = 1000 / 60
-  const changes = obsFromOlChangeEvent(layer, [
+  const prefixKey = addPrefix('current')
+  const propChanges = obsFromOlChangeEvent(this.$layer, [
     'preload',
     'useInterimTilesOnError',
-  ], true, t)
-
-  this.subscribeTo(changes, ({ prop, value }) => {
+  ], true, evt => ({
+    ...evt,
+    compareWith: this[prefixKey(evt.prop)],
+  })).pipe(
+    skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
+  )
+  this.subscribeTo(propChanges, () => {
     ++this.rev
-
-    this.$nextTick(() => {
-      this.$emit(`update:${prop}`, value)
-    })
   })
 }

@@ -15,11 +15,12 @@
   import { merge as mergeObs } from 'rxjs'
   import { map as mapOp } from 'rxjs/operators'
   import Vue from 'vue'
-  import { featuresContainer, interaction, projTransforms, stylesContainer } from '../../mixin'
+  import { featuresContainer, interaction, projTransforms, styleContainer } from '../../mixin'
   import { createStyle, defaultEditStyle, getFeatureId, getLayerId, isGeoJSONFeature } from '../../ol-ext'
-  import { obsFromOlEvent } from '../../rx-ext'
+  import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { hasInteraction, hasMap } from '../../util/assert'
   import {
+    clonePlainObject,
     constant,
     difference,
     forEach,
@@ -36,7 +37,7 @@
 
   export default {
     name: 'VlInteractionSelect',
-    mixins: [interaction, featuresContainer, stylesContainer, projTransforms],
+    mixins: [interaction, featuresContainer, styleContainer, projTransforms],
     stubVNode: {
       empty: false,
       attrs () {
@@ -166,7 +167,7 @@
       featuresDataProj: {
         deep: true,
         handler: debounce(function (features) {
-          this.$emit('update:features', features.slice())
+          this.$emit('update:features', clonePlainObject(features))
         }, 1000 / 60),
       },
       ...makeWatchers([
@@ -222,7 +223,7 @@
       getServices () {
         return mergeDescriptors(
           this::interaction.methods.getServices(),
-          this::stylesContainer.methods.getServices(),
+          this::styleContainer.methods.getServices(),
         )
       },
       /**

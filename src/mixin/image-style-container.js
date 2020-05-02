@@ -1,4 +1,7 @@
-import { isFunction } from '../util/minilo'
+import debounce from 'debounce-promise'
+import { dumpImageStyle } from '../ol-ext'
+import { clonePlainObject, isEqual, isFunction } from '../util/minilo'
+import { FRAME_TIME } from './ol-cmp'
 
 /**
  * @typedef {module:ol/style/Image~ImageStyle|Object|undefined} ImageStyleLike
@@ -14,6 +17,23 @@ import { isFunction } from '../util/minilo'
  * Image style container.
  */
 export default {
+  computed: {
+    currentImage () {
+      if (!(this.rev && this.$image)) return
+
+      return dumpImageStyle(this.$image)
+    },
+  },
+  watch: {
+    currentImage: {
+      deep: true,
+      handler: debounce(function (value, prev) {
+        if (isEqual(value, prev)) return
+
+        this.$emit('update:image', value && clonePlainObject(value))
+      }, FRAME_TIME),
+    },
+  },
   created () {
     this._image = undefined
     this._imageVm = undefined
@@ -21,6 +41,16 @@ export default {
     this::defineServices()
   },
   methods: {
+    /**
+     * @returns {{readonly imageStyleContainer: Object}}
+     */
+    getServices () {
+      const vm = this
+
+      return {
+        get imageStyleContainer () { return vm },
+      }
+    },
     /**
      * @return {ImageStyleTarget}
      */
@@ -38,28 +68,19 @@ export default {
      * @returns {Promise<void>}
      */
     async setImage (image) {
-      let imageVm
-      if (image && isFunction(image.resolveOlObject)) {
-        imageVm = image
+      if (isFunction(image?.resolveOlObject)) {
         image = await image.resolveOlObject()
       }
+      image || (image = null)
+
+      if (image === this._image) return
 
       const imageTarget = await this.getImageStyleTarget()
-      if (imageTarget && image !== imageTarget.getImage()) {
-        imageTarget.setImage(image)
-        this._image = image
-        this._imageVm = imageVm || (image?.vm && image.vm[0])
-      }
-    },
-    /**
-     * @returns {{readonly imageStyleContainer: Object}}
-     */
-    getServices () {
-      const vm = this
+      if (!imageTarget) return
 
-      return {
-        get imageStyleContainer () { return vm },
-      }
+      this._image = image
+      this._imageVm = image?.vm && image.vm[0]
+      await imageTarget.setImage(image)
     },
   },
 }
@@ -68,7 +89,7 @@ function defineServices () {
   Object.defineProperties(this, {
     $image: {
       enumerable: true,
-      get: this.getStroke,
+      get: this.getImage,
     },
     $imageVm: {
       enumerable: true,

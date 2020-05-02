@@ -1,5 +1,8 @@
+import debounce from 'debounce-promise'
 import { Style } from 'ol/style'
-import { constant, isArray, isEqual, isFunction, reduce } from '../util/minilo'
+import { dumpStyle } from '../ol-ext'
+import { clonePlainObject, isArray, isEqual, isFunction } from '../util/minilo'
+import { FRAME_TIME } from './ol-cmp'
 
 /**
  * @typedef {
@@ -20,12 +23,46 @@ import { constant, isArray, isEqual, isFunction, reduce } from '../util/minilo'
  * Style container mixin.
  */
 export default {
+  computed: {
+    currentStyle () {
+      if (!(this.rev && this.$style)) return
+
+      let style = this.$style
+      if (isFunction(style)) return style
+      if (!style) return
+
+      isArray(style) || (style = [style])
+
+      return style.map(style => dumpStyle(style, geom => this.writeGeometryInDataProj(geom)))
+    },
+  },
+  watch: {
+    currentStyle: {
+      deep: true,
+      handler: debounce(function (value, prev) {
+        if (isEqual(value, prev)) return
+
+        this.$emit('update:style', value && clonePlainObject(value))
+      }, FRAME_TIME),
+    },
+  },
   created () {
-    this._style = undefined
+    this._style = null
 
     this::defineServices()
   },
   methods: {
+    /**
+     * @returns {{readonly styleContainer: Object}}
+     * @protected
+     */
+    getServices () {
+      const vm = this
+
+      return {
+        get styleContainer () { return vm },
+      }
+    },
     /**
      * Default style factory
      * @return {OlStyleLike|undefined}
@@ -42,7 +79,7 @@ export default {
       throw new Error('Not implemented method: getStyleTarget')
     },
     /**
-     * @return {StyleLike|undefined}
+     * @return {StyleLike|null}
      */
     getStyle () {
       return this._style
@@ -54,41 +91,35 @@ export default {
     async addStyle (style) {
       if (!style) return
 
-      let currentStyle = this.getStyle()
-
       let olStyle
       if (isFunction(style.resolveOlObject)) {
         olStyle = await style.resolveOlObject()
-        olStyle.condition = style.conditionFunc
       } else {
         olStyle = style
-        olStyle.condition = constant(true)
       }
 
+      let currentStyle = this.$style
+
       if (isFunction(olStyle)) {
-        if (process.env.NODE_ENV !== 'production' && currentStyle) {
-          this.$logger.warn('Component already has style components among it\'s descendants. ' +
+        if (currentStyle && process.env.NODE_ENV !== 'production') {
+          this.$logger.warn('Component already has style components among its descendants. ' +
             'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level.')
         }
+
         currentStyle = style
       } else {
         if (!isArray(currentStyle)) {
-          if (process.env.NODE_ENV !== 'production' && currentStyle) {
-            this.$logger.warn('Component already has style components among it\'s descendants. ' +
+          if (currentStyle && process.env.NODE_ENV !== 'production') {
+            this.$logger.warn('Component already has style components among its descendants. ' +
               'Avoid use of multiple vl-style-func or combining vl-style-func with vl-style-box on the same level.')
           }
+
           currentStyle = []
         }
 
-        if (!isArray(olStyle)) {
-          olStyle = [olStyle]
+        if (!currentStyle.includes(olStyle)) {
+          currentStyle.push(olStyle)
         }
-
-        olStyle.forEach(style => {
-          if (!currentStyle.includes(style)) {
-            currentStyle.push(style)
-          }
-        })
       }
 
       await this.setStyle(currentStyle)
@@ -98,12 +129,13 @@ export default {
      * @return {Promise<void>}
      */
     async removeStyle (style) {
-      let currentStyle = await this.getStyle()
+      if (!style) return
 
       if (isFunction(style.resolveOlObject)) {
         style = await style.resolveOlObject()
       }
 
+      let currentStyle = this.$style
       if (currentStyle === style) {
         currentStyle = null
       } else if (isArray(currentStyle)) {
@@ -121,22 +153,38 @@ export default {
      * @return {void}
      */
     async setStyle (style) {
-      if (style && isFunction(style.resolveOlObject)) {
-        style = await style.resolveOlObject()
+      if (style) {
+        if (isFunction(style.resolveOlObject)) {
+          style = await style.resolveOlObject()
+        } else if (isArray(style)) {
+          style = await Promise.all(style.map(async style => {
+            if (isFunction(style.resolveOlObject)) {
+              return style.resolveOlObject()
+            }
+            return style
+          }))
+        }
       }
+      style || (style = null)
 
-      if (isEqual(style, this.getStyle())) return
+      if (isEqual(style, this._style)) return
 
       const styleTarget = await this.getStyleTarget()
       if (!styleTarget) return
 
       if (style) {
-        styleTarget.setStyle(this.createStyleFunc(style, this.getDefaultStyle()))
-        this._style = style
+        if (isFunction(style)) {
+          style = this.createStyleFunc(style, this.getDefaultStyle())
+        } else {
+          isArray(style) || (style = [style])
+          style.length > 0 || (style = null)
+        }
       } else {
-        styleTarget.setStyle(null)
-        this._style = null
+        style = null
       }
+
+      this._style = style
+      await styleTarget.setStyle(style)
     },
     /**
      * Style function factory
@@ -146,7 +194,7 @@ export default {
      * @protected
      */
     createStyleFunc (style, defaultStyle) {
-      return function __styleTargetStyleFunc (feature, resolution) {
+      return function __styleFunc (feature, resolution) {
         if (!feature.getGeometry()) return
 
         let compiledStyle
@@ -155,20 +203,11 @@ export default {
           compiledStyle = style(feature, resolution)
         } else if (isArray(style)) {
           // style - array of ol/style/Style objects
-          compiledStyle = reduce(style, (newStyle, curStyle) => {
-            if (
-              curStyle.condition == null ||
-              (curStyle.condition === true) ||
-              (isFunction(curStyle.condition) && curStyle.condition(feature, resolution))
-            ) {
-              newStyle.push(curStyle)
-            }
-            return newStyle
-          }, [])
+          compiledStyle = style.slice()
         }
         // not empty or null style
         if (
-          compiledStyle === null ||
+          compiledStyle == null ||
           (isArray(compiledStyle) && compiledStyle.length) ||
           compiledStyle instanceof Style
         ) {
@@ -180,17 +219,6 @@ export default {
         }
 
         return null
-      }
-    },
-    /**
-     * @returns {{readonly styleContainer: Object}}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return {
-        get styleContainer () { return vm },
       }
     },
   },

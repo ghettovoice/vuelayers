@@ -57,22 +57,34 @@
       },
     },
     watch: {
+      async anchor (value) {
+        await this.setAnchor(value)
+      },
       async src (value) {
         if (!isEqual(value, await this.getSrc())) {
-          await this.scheduleRemount()
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.log('src changed, scheduling recreate...')
+          }
+
+          await this.scheduleRecreate()
         }
       },
       async size (value) {
         if (!isEqual(value, await this.getSize())) {
-          await this.scheduleRemount()
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.log('size changed, scheduling recreate...')
+          }
+
+          await this.scheduleRecreate()
         }
-      },
-      async anchor (value) {
-        await this.setAnchor(value)
       },
       async color (value) {
         if (!isEqual(value, await this.getColor())) {
-          await this.scheduleRemount()
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.log('color changed, scheduling recreate...')
+          }
+
+          await this.scheduleRecreate()
         }
       },
       ...makeWatchers([
@@ -84,8 +96,12 @@
         'offsetOrigin',
         'img',
         'imgSize',
-      ], () => function () {
-        this.scheduleRefresh()
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
       }),
     },
     methods: {
@@ -96,11 +112,11 @@
       createStyle () {
         assert(
           (this.src && !this.img) || (!this.src && this.img),
-          'vl-style-icon one of \'image\' or \'src\' prop must be provided.',
+          "vl-style-icon one of 'image' or 'src' prop must be provided.'",
         )
         assert(
           !this.img || (this.img && !isEmpty(this.imgSize)),
-          'vl-style-icon \'imgSize\' must be set when image is provided.',
+          "vl-style-icon 'imgSize' must be set when image is provided.",
         )
 
         return new IconStyle({

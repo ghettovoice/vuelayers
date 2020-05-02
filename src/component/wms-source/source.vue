@@ -28,8 +28,12 @@
         'gutter',
         'hidpi',
         'serverType',
-      ], () => function () {
-        this.scheduleRecreate()
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
       }),
     },
     methods: {
@@ -53,7 +57,7 @@
           wrapX: this.wrapX,
           url: this.urlTmpl,
           transition: this.transition,
-          tileLoadFunction: this.tileLoadFunction,
+          tileLoadFunction: this.resolvedTileLoadFunc,
         })
       },
     },

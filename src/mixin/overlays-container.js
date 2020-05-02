@@ -1,10 +1,14 @@
+import debounce from 'debounce-promise'
 import { Collection, Overlay } from 'ol'
-import { merge as mergeObs } from 'rxjs'
+import CollectionEventType from 'ol/CollectionEventType'
+import { from as fromObs, merge as mergeObs } from 'rxjs'
+import { map as mapObs, mergeMap } from 'rxjs/operators'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
-import { obsFromOlEvent } from '../rx-ext'
+import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { instanceOf } from '../util/assert'
-import { isFunction, map } from '../util/minilo'
+import { isFunction, map, forEach, find, isEqual } from '../util/minilo'
 import identMap from './ident-map'
+import { FRAME_TIME } from './ol-cmp'
 import rxSubs from './rx-subs'
 
 /**
@@ -23,10 +27,10 @@ export default {
     /**
      * @returns {string[]}
      */
-    overlayIds () {
+    currentOverlays () {
       if (!this.rev) return []
 
-      return this.getOverlays().map(getOverlayId)
+      return map(this.getOverlays(), getOverlayId)
     },
     /**
      * @returns {string|undefined}
@@ -38,6 +42,11 @@ export default {
     },
   },
   watch: {
+    currentOverlays: debounce(function (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:overlays', value.slice())
+    }, FRAME_TIME),
     overlaysCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
@@ -60,21 +69,26 @@ export default {
   },
   methods: {
     /**
-     * @param {OverlayLike} overlay
-     * @return {void}
+     * @returns {readonly overlaysContainer: Object}}
+     * @protected
      */
-    async addOverlay (overlay) {
-      initializeOverlay(overlay)
+    getServices () {
+      const vm = this
 
+      return {
+        get overlaysContainer () { return vm },
+      }
+    },
+    /**
+     * @param {OverlayLike} overlay
+     * @return {Promise<Overlay>}
+     */
+    async initializeOverlay (overlay) {
       if (isFunction(overlay.resolveOlObject)) {
         overlay = await overlay.resolveOlObject()
       }
 
-      instanceOf(overlay, Overlay)
-
-      if (this.getOverlayById(getOverlayId(overlay)) == null) {
-        this.$overlaysCollection.push(overlay)
-      }
+      return initializeOverlay(overlay)
     },
     /**
      * @param {OverlayLike[]|module:ol/Collection~Collection<OverlayLike>} overlays
@@ -82,6 +96,25 @@ export default {
      */
     async addOverlays (overlays) {
       await Promise.all(map(overlays, ::this.addOverlay))
+    },
+    /**
+     * @param {OverlayLike} overlay
+     * @return {void}
+     */
+    async addOverlay (overlay) {
+      overlay = await this.initializeOverlay(overlay)
+      instanceOf(overlay, Overlay)
+
+      if (!this.getOverlayById(getOverlayId(overlay))) {
+        this.$overlaysCollection.push(overlay)
+      }
+    },
+    /**
+     * @param {OverlayLike[]|module:ol/Collection~Collection<OverlayLike>} overlays
+     * @returns {Promise<void>}
+     */
+    async removeOverlays (overlays) {
+      await Promise.all(map(overlays, ::this.removeOverlay))
     },
     /**
      * @param {OverlayLike} overlay
@@ -98,11 +131,10 @@ export default {
       this.$overlaysCollection.remove(overlay)
     },
     /**
-     * @param {OverlayLike[]|module:ol/Collection~Collection<OverlayLike>} overlays
-     * @returns {Promise<void>}
+     * @return {void}
      */
-    async removeOverlays (overlays) {
-      await Promise.all(map(overlays, ::this.removeOverlay))
+    clearOverlays () {
+      this.$overlaysCollection.clear()
     },
     /**
      * @return {Array<module:ol/Overlay~Overlay>}
@@ -121,26 +153,9 @@ export default {
      * @return {module:ol/Overlay~Overlay|undefined}
      */
     getOverlayById (overlayId) {
-      return this.getOverlays().find(overlay => {
+      return find(this.getOverlays(), overlay => {
         return getOverlayId(overlay) === overlayId
       })
-    },
-    /**
-     * @return {void}
-     */
-    clearOverlays () {
-      this.$overlaysCollection.clear()
-    },
-    /**
-     * @returns {readonly overlaysContainer: Object}}
-     * @protected
-     */
-    getServices () {
-      const vm = this
-
-      return {
-        get overlaysContainer () { return vm },
-      }
     },
   },
 }
@@ -155,14 +170,24 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const adds = obsFromOlEvent(this.$overlaysCollection, 'add')
-  const removes = obsFromOlEvent(this.$overlaysCollection, 'remove')
-
-  this.subscribeTo(mergeObs(adds, removes), ({ type, element }) => {
+  const adds = obsFromOlEvent(this.$overlaysCollection, CollectionEventType.ADD).pipe(
+    mergeMap(({ type, element }) => fromObs(this.initializeOverlay(element)).pipe(
+      mapObs(element => ({ type, element })),
+    )),
+  )
+  const removes = obsFromOlEvent(this.$overlaysCollection, CollectionEventType.REMOVE)
+  const events = mergeObs(adds, removes).pipe(
+    bufferDebounceTime(FRAME_TIME),
+  )
+  this.subscribeTo(events, events => {
     ++this.rev
 
     this.$nextTick(() => {
-      this.$emit(type + 'overlay', element)
+      forEach(events, ({ type, element }) => {
+        this.$emit(type + 'overlay', element)
+        // todo remove in v0.13.x
+        this.$emit(type + ':overlay', element)
+      })
     })
   })
 }

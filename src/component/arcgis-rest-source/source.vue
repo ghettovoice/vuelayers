@@ -4,7 +4,10 @@
 
   export default {
     name: 'VlSourceArcgisRest',
-    mixins: [tileSource, arcgisSource],
+    mixins: [
+      tileSource,
+      arcgisSource,
+    ],
     props: {
       url: {
         type: String,
@@ -19,10 +22,10 @@
           cacheSize: this.cacheSize,
           crossOrigin: this.crossOrigin,
           params: this.allParams,
-          tileGrid: this._tileGrid,
+          tileGrid: this.tileGrid,
           projection: this.projection,
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,
-          tileLoadFunction: this.tileLoadFunction,
+          tileLoadFunction: this.resolvedTileLoadFunc,
           url: this.urlTmpl,
           wrapX: this.wrapX,
           transition: this.transition,

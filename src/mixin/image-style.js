@@ -74,85 +74,6 @@ export default {
   },
   methods: {
     /**
-     * @returns {Promise<number>}
-     */
-    async getOpacity () {
-      return (await this.resolveStyle()).getOpacity()
-    },
-    /**
-     * @param {number} opacity
-     * @returns {Promise<void>}
-     */
-    async setOpacity (opacity) {
-      const style = await this.resolveStyle()
-
-      if (opacity === style.getOpacity()) return
-
-      style.setOpacity(opacity)
-
-      await this.scheduleRemount()
-    },
-    /**
-     * @returns {Promise<boolean>}
-     */
-    async getRotateWithView () {
-      return (await this.resolveStyle()).getRotateWithView()
-    },
-    /**
-     * @param {boolean} rotateWithView
-     * @returns {Promise<void>}
-     */
-    async setRotateWithView (rotateWithView) {
-      const style = await this.resolveStyle()
-
-      if (rotateWithView === style.getRotateWithView()) return
-
-      style.setRotateWithView(rotateWithView)
-
-      await this.scheduleRemount()
-    },
-    /**
-     * @returns {Promise<number>}
-     */
-    async getRotation () {
-      return (await this.resolveStyle()).getRotation()
-    },
-    /**
-     * @param {number} rotation
-     * @returns {Promise<void>}
-     */
-    async setRotation (rotation) {
-      const style = await this.resolveStyle()
-
-      if (rotation === style.getRotation()) return
-
-      style.setRotation(rotation)
-
-      await this.scheduleRemount()
-    },
-    /**
-     * @returns {Promise<number>}
-     */
-    async getScale () {
-      return (await this.resolveStyle()).getScale()
-    },
-    /**
-     * @param {number} scale
-     * @returns {Promise<void>}
-     */
-    async setScale (scale) {
-      const style = await this.resolveStyle()
-
-      if (scale === style.getScale()) return
-
-      style.setScale(scale)
-
-      await this.scheduleRemount()
-    },
-    async getDisplacement () {
-      return (await this.resolveStyle()).getDisplacement()
-    },
-    /**
      * @return {Promise<void>}
      * @protected
      */
@@ -175,8 +96,10 @@ export default {
       return this::style.methods.unmount()
     },
     ...pick(style.methods, [
+      'beforeInit',
       'init',
       'deinit',
+      'beforeMount',
       'refresh',
       'scheduleRefresh',
       'remount',
@@ -188,6 +111,77 @@ export default {
       'resolveOlObject',
       'resolveStyle',
     ]),
+    /**
+     * @returns {Promise<number>}
+     */
+    async getOpacity () {
+      return (await this.resolveStyle()).getOpacity()
+    },
+    /**
+     * @param {number} opacity
+     * @returns {Promise<void>}
+     */
+    async setOpacity (opacity) {
+      if (opacity === await this.getOpacity()) return
+
+      (await this.resolveStyle()).setOpacity(opacity)
+
+      await this.scheduleRemount()
+    },
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async getRotateWithView () {
+      return (await this.resolveStyle()).getRotateWithView()
+    },
+    /**
+     * @param {boolean} rotateWithView
+     * @returns {Promise<void>}
+     */
+    async setRotateWithView (rotateWithView) {
+      if (rotateWithView === await this.getRotateWithView()) return
+
+      (await this.resolveStyle()).setRotateWithView(rotateWithView)
+
+      await this.scheduleRemount()
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getRotation () {
+      return (await this.resolveStyle()).getRotation()
+    },
+    /**
+     * @param {number} rotation
+     * @returns {Promise<void>}
+     */
+    async setRotation (rotation) {
+      if (rotation === await this.getRotation()) return
+
+      (await this.resolveStyle()).setRotation(rotation)
+
+      await this.scheduleRemount()
+    },
+    /**
+     * @returns {Promise<number>}
+     */
+    async getScale () {
+      return (await this.resolveStyle()).getScale()
+    },
+    /**
+     * @param {number} scale
+     * @returns {Promise<void>}
+     */
+    async setScale (scale) {
+      if (scale === await this.getScale()) return
+
+      (await this.resolveStyle()).setScale(scale)
+
+      await this.scheduleRemount()
+    },
+    async getDisplacement () {
+      return (await this.resolveStyle()).getDisplacement()
+    },
   },
 }
 

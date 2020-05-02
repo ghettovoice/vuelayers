@@ -1,19 +1,14 @@
 <script>
   import { BingMaps as BingMapsSource } from 'ol/source'
-  import { tileSource } from '../../mixin'
+  import { tileImageSource } from '../../mixin'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
     name: 'VlSourceBingmaps',
     mixins: [
-      tileSource,
+      tileImageSource,
     ],
     props: {
-      // ol/source/XYZ
-      maxZoom: {
-        type: Number,
-        default: 21,
-      },
       // ol/source/BingMaps
       /**
        * Enables hidpi tiles.
@@ -47,12 +42,33 @@
         type: String,
         required: true,
       },
+      maxZoom: {
+        type: Number,
+        default: 21,
+      },
     },
     watch: {
+      async apiKey (value) {
+        if (value === await this.getApiKey()) return
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('apiKey changed, scheduling recreate...')
+        }
+
+        await this.scheduleRecreate()
+      },
+      async imagerySet (value) {
+        if (value === await this.getImagerySet()) return
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('imagerySet changed, scheduling recreate...')
+        }
+
+        await this.scheduleRecreate()
+      },
       ...makeWatchers([
         'hidpi',
         'culture',
-        'apiKey',
         'imagerySet',
       ], prop => async function () {
         if (process.env.VUELAYERS_DEBUG) {
@@ -76,18 +92,22 @@
           opaque: this.opaque,
           transition: this.transition,
           // ol/source/UrlTile
-          tileLoadFunction: this.tileLoadFunction,
+          tileLoadFunction: this.resolvedTileLoadFunc,
           // ol/source/TileImage
-          crossOrigin: this.crossOrigin,
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,
-          // ol/source/XYZ
-          maxZoom: this.maxZoom,
           // ol/source/BingMaps
           hidpi: this.hidpi,
           culture: this.culture,
           key: this.apiKey,
           imagerySet: this.imagerySet,
+          maxZoom: this.maxZoom,
         })
+      },
+      async getApiKey () {
+        return (await this.resolveSource()).getApiKey()
+      },
+      async getImagerySet () {
+        return (await this.resolveSource()).getImagerySet()
       },
     },
   }

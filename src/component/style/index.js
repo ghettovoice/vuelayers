@@ -1,11 +1,11 @@
 import { pick } from '../../util/minilo'
-import Circle from './circle.vue'
-import Fill from './fill.vue'
-import Icon from './icon.vue'
-import RegShape from './reg-shape.vue'
-import Stroke from './stroke.vue'
+import CircleStyle from './circle.vue'
+import FillStyle from './fill.vue'
+import IconStyle from './icon.vue'
+import RegShapeStyle from './reg-shape.vue'
+import StrokeStyle from './stroke.vue'
 import Style from './style.vue'
-import Text from './text.vue'
+import TextStyle from './text.vue'
 
 function plugin (Vue, options = {}) {
   if (plugin.installed) {
@@ -14,32 +14,43 @@ function plugin (Vue, options = {}) {
   plugin.installed = true
 
   options = pick(options, 'dataProjection')
-  Object.assign(Circle, options)
-  Object.assign(Fill, options)
-  Object.assign(Icon, options)
-  Object.assign(RegShape, options)
-  Object.assign(Stroke, options)
+  Object.assign(CircleStyle, options)
+  Object.assign(FillStyle, options)
+  Object.assign(IconStyle, options)
+  Object.assign(RegShapeStyle, options)
+  Object.assign(StrokeStyle, options)
   Object.assign(Style, options)
-  Object.assign(Text, options)
+  Object.assign(TextStyle, options)
 
-  Vue.component(Circle.name, Circle)
-  Vue.component(Fill.name, Fill)
-  Vue.component(Icon.name, Icon)
-  Vue.component(RegShape.name, RegShape)
-  Vue.component(Stroke.name, Stroke)
+  Vue.component(CircleStyle.name, CircleStyle)
+  Vue.component(FillStyle.name, FillStyle)
+  Vue.component(IconStyle.name, IconStyle)
+  Vue.component(RegShapeStyle.name, RegShapeStyle)
+  Vue.component(StrokeStyle.name, StrokeStyle)
   Vue.component(Style.name, Style)
-  Vue.component(Text.name, Text)
+  Vue.component(TextStyle.name, TextStyle)
+
+  // todo remove in v0.13.x
+  Vue.component('VlStyleBox', {
+    name: 'VlStyleBox',
+    extends: Style,
+    created () {
+      if (process.env.NODE_ENV !== 'production') {
+        this.$logger.warn('VlStyleBox component is deprecated. Use VlStyle component instead.')
+      }
+    },
+  })
 }
 
 export default plugin
 
 export {
-  Circle,
-  Fill,
-  Icon,
-  RegShape,
-  Stroke,
-  Style,
-  Text,
   plugin as install,
+  CircleStyle,
+  FillStyle,
+  IconStyle,
+  RegShapeStyle,
+  StrokeStyle,
+  Style,
+  TextStyle,
 }

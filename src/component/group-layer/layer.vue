@@ -1,36 +1,34 @@
 <script>
   import { Group as GroupLayer } from 'ol/layer'
-  import { layer, layersContainer } from '../../mixin'
+  import { baseLayer, layersContainer } from '../../mixin'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
 
   export default {
     name: 'VlLayerGroup',
     mixins: [
       layersContainer,
-      layer,
+      baseLayer,
     ],
     methods: {
       createLayer () {
         return new GroupLayer({
           // ol/layer/Base
           className: this.className,
-          opacity: this.opacity,
-          visible: this.visible,
-          extent: this.extent,
-          zIndex: this.zIndex,
-          minResolution: this.minResolution,
-          maxResolution: this.maxResolution,
-          minZoom: this.minZoom,
-          maxZoom: this.maxZoom,
-          // ol/layer/Layer
-          render: this.render,
+          opacity: this.currentOpacity,
+          visible: this.currentVisible,
+          extent: this.currentExtentViewProj,
+          zIndex: this.currentZIndex,
+          minResolution: this.currentMinResolution,
+          maxResolution: this.currentMaxResolution,
+          minZoom: this.currentMinZoom,
+          maxZoom: this.currentMaxZoom,
           // ol/layer/Group
           layers: this.$layersCollection,
         })
       },
       getServices () {
         return mergeDescriptors(
-          this::layer.methods.getServices(),
+          this::baseLayer.methods.getServices(),
           this::layersContainer.methods.getServices(),
         )
       },
