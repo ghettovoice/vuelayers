@@ -4,27 +4,34 @@
     :class="vmClass"
     style="display: none !important;">
     <slot
-      :accuracy="accuracy"
-      :altitude="altitude"
-      :altitude-accuracy="altitudeAccuracy"
-      :heading="heading"
-      :position="position"
-      :speed="speed" />
+      :accuracy="currentAccuracy"
+      :accuracy-geometry="currentAccuracyGeometryDataProj"
+      :altitude="currentAltitude"
+      :altitude-accuracy="currentAltitudeAccuracy"
+      :heading="currentHeading"
+      :position="currentPositionDataProj"
+      :speed="currentSpeed" />
   </i>
 </template>
 
 <script>
+  import debounce from 'debounce-promise'
   import { Geolocation } from 'ol'
-  import { olCmp, projTransforms } from '../../mixin'
-  import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { isEqual } from '../../util/minilo'
+  import { equivalent as isEqProj, get as getProj } from 'ol/proj'
+  import { from as fromObs, merge as mergeObs } from 'rxjs'
+  import { mergeMap, skipWhile, map as mapObs } from 'rxjs/operators'
+  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixin'
+  import { getMapDataProjection, writeGeoJsonGeometry } from '../../ol-ext'
+  import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
+  import { assert } from '../../util/assert'
+  import { addPrefix, clonePlainObject, coalesce, hasProp, isEqual } from '../../util/minilo'
+  import waitFor from '../../util/wait-for'
 
   export default {
     name: 'VlGeoloc',
     mixins: [
       projTransforms,
       olCmp,
-      // waitForMap,
     ],
     stubVNode: {
       empty () {
@@ -37,63 +44,195 @@
         default: true,
       },
       trackingOptions: Object,
-      projection: String,
+      projection: {
+        type: String,
+        validator: value => getProj(value) != null,
+      },
+    },
+    data () {
+      return {
+        dataProjection: null,
+      }
     },
     computed: {
-      accuracy () {
+      currentTracking () {
+        if (this.rev && this.$geolocation) {
+          return this.getTrackingSync()
+        }
+
+        return this.tracking
+      },
+      currentTrackingOptions () {
+        if (this.rev && this.$geolocation) {
+          return this.getTrackingOptionsSync()
+        }
+
+        return this.trackingOptions
+      },
+      currentProjection () {
+        if (this.rev && this.$geolocation) {
+          return getProj(this.getProjectionSync()).getCode()
+        }
+
+        return this.projection
+      },
+      resolvedDataProjection () {
+        return coalesce(
+          this.currentProjection, // may or may not be present
+          this.dataProjection, // may or may not be present
+          this.$mapVm?.resolvedDataProjection,
+          this.$map && getMapDataProjection(this.$map),
+          this.$options?.dataProjection,
+          this.viewProjection,
+        )
+      },
+      currentAccuracy () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.$geolocation.getAccuracy()
+        return this.getAccuracySync()
       },
-      altitude () {
+      currentAccuracyGeometryDataProj () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.$geolocation.getAltitude()
+        return writeGeoJsonGeometry(
+          this.getAccuracyGeometrySync(),
+          this.currentProjection || this.resolvedDataProjection,
+          this.resolvedDataProjection,
+        )
       },
-      altitudeAccuracy () {
+      currentAccuracyGeometryViewProj () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.$geolocation.getAltitudeAccuracy()
+        return writeGeoJsonGeometry(
+          this.getAccuracyGeometrySync(),
+          this.currentProjection || this.resolvedDataProjection,
+          this.viewProjection,
+        )
       },
-      heading () {
+      currentAltitude () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.$geolocation.getHeading()
+        return this.getAltitudeSync()
       },
-      speed () {
+      currentAltitudeAccuracy () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.$geolocation.getSpeed()
+        return this.getAltitudeAccuracySync()
       },
-      position () {
+      currentHeading () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.$geolocation.getPosition()
+        return this.getHeadingSync()
       },
-      positionViewProj () {
-        if (!(this.position && this.viewProjection)) return
+      currentSpeed () {
+        if (!(this.rev && this.$geolocation)) return
 
-        return this.pointToViewProj(this.position)
+        return this.getSpeedSync()
+      },
+      currentPositionDataProj () {
+        if (!(this.rev && this.$geolocation)) return
+
+        return this.getPositionSync()
+      },
+      currentPositionViewProj () {
+        if (!(this.rev && this.$geolocation)) return
+
+        return this.pointToViewProj(this.getPositionSync())
       },
     },
     watch: {
-      id (value) {
-        this.setId(value)
+      async tracking (value) {
+        await this.setTracking(value)
       },
-      tracking (value) {
-        this.setTracking(value)
+      currentTracking: debounce(function (value) {
+        if (value === this.tracking) return
+
+        this.$emit('update:tracking', value)
+      }, FRAME_TIME),
+      async tracingOptions (value) {
+        await this.setTrackingOptions(value)
       },
-      tracingOptions (value) {
-        this.setTrackingOptions(value)
+      currentTrackingOptions: {
+        deep: true,
+        handler: debounce(function (value) {
+          if (isEqual(value, this.trackingOptions)) return
+
+          value && (value = clonePlainObject(value))
+          this.$emit('update:tracingOptions', value)
+        }, FRAME_TIME),
       },
-      resolvedDataProjection (value) {
-        this.setProjection(value)
+      async resolvedDataProjection (value) {
+        await this.setProjection(value)
       },
+      currentProjection: debounce(function (value) {
+        if (value === this.projection) return
+
+        this.$emit('update:projection', value)
+      }, FRAME_TIME),
+      currentAccuracy: debounce(function (value, prev) {
+        if (value === prev) return
+
+        this.$emit('update:accuracy', value)
+      }, FRAME_TIME),
+      currentAccuracyGeometryDataProj: debounce(function (value, prev) {
+        if (isEqual(value, prev)) return
+
+        this.$emit('update:accuracyGeometry', value)
+      }, FRAME_TIME),
+      currentAltitude: debounce(function (value, prev) {
+        if (value === prev) return
+
+        this.$emit('update:altitude', value)
+      }, FRAME_TIME),
+      currentAltitudeAccuracy: debounce(function (value, prev) {
+        if (value === prev) return
+
+        this.$emit('update:altitudeAccuracy', value)
+      }, FRAME_TIME),
+      currentHeading: debounce(function (value, prev) {
+        if (value === prev) return
+
+        this.$emit('update:heading', value)
+      }, FRAME_TIME),
+      currentSpeed: debounce(function (value, prev) {
+        if (value === prev) return
+
+        this.$emit('update:speed', value)
+      }, FRAME_TIME),
+      currentPositionDataProj: debounce(function (value, prev) {
+        if (isEqual(value, prev)) return
+
+        this.$emit('update:position', value)
+      }, FRAME_TIME),
     },
     created () {
       this::defineServices()
     },
     methods: {
+      /**
+       * @returns {Promise<void>}
+       * @protected
+       */
+      async beforeInit () {
+        try {
+          await waitFor(
+            () => this.$mapVm != null,
+            obsFromVueEvent(this.$eventBus, [
+              OlObjectEvent.CREATE_ERROR,
+            ]).pipe(
+              mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+            ),
+            1000,
+          )
+          this.dataProjection = this.$mapVm.resolvedDataProjection
+          await this.$nextTickPromise()
+
+          return this::olCmp.methods.beforeInit()
+        } catch (err) {
+          err.message = 'Wait for $mapVm injection: ' + err.message
+          throw err
+        }
+      },
       /**
        * @return {module:ol/Geolocation~Geolocation}
        * @private
@@ -104,120 +243,9 @@
           trackingOptions: this.trackingOptions,
           projection: this.resolvedDataProjection,
         })
-
-        geoloc.set('id', this.id)
+        geoloc.set('id', this.currentId)
 
         return geoloc
-      },
-      /**
-       * @return {Promise<number|string>}
-       */
-      async getId () {
-        return (await this.resolveGeolocation()).get('id')
-      },
-      /**
-       * @param {string|number} id
-       * @return {Promise<void>}
-       */
-      async setId (id) {
-        const geoloc = await this.resolveGeolocation()
-
-        if (id === geoloc.get('id')) return
-
-        geoloc.set('id', id)
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getAccuracy () {
-        return (await this.resolveGeolocation()).getAccuracy()
-      },
-      /**
-       * @return {Promise<module:/ol/geom/Geometry~Geometry|undefined>}
-       */
-      async getAccuracyGeometry () {
-        return (await this.resolveGeolocation()).getAccuracyGeometry()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getAltitude () {
-        return (await this.resolveGeolocation()).getAltitude()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getAltitudeAccuracy () {
-        return (await this.resolveGeolocation()).getAltitudeAccuracy()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getHeading () {
-        return (await this.resolveGeolocation()).getHeading()
-      },
-      /**
-       * @return {Promise<number[]|undefined>}
-       */
-      async getPosition () {
-        return (await this.resolveGeolocation()).getPosition()
-      },
-      /**
-       * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
-       */
-      async getProjection () {
-        return (await this.resolveGeolocation()).getProjection()
-      },
-      /**
-       * @param {module:ol/proj~ProjectionLike} projection
-       * @return {Promise<void>}
-       */
-      async setProjection (projection) {
-        const geoloc = await this.resolveGeolocation()
-
-        // if (isEqProj(projection, geoloc.getProjection())) return
-
-        geoloc.setProjection(projection)
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getSpeed () {
-        return (await this.resolveGeolocation()).getSpeed()
-      },
-      /**
-       * @return {Promise<boolean|undefined>}
-       */
-      async getTracking () {
-        return (await this.resolveGeolocation()).getTracking()
-      },
-      /**
-       * @param {Promise<number|undefined>} tracking
-       * @return {Promise<void>}
-       */
-      async setTracking (tracking) {
-        const geoloc = await this.resolveGeolocation()
-
-        if (tracking === geoloc.getTracking()) return
-
-        geoloc.setTracking(tracking)
-      },
-      /**
-       * @return {Promise<Object|undefined>}
-       */
-      async getTrackingOptions () {
-        return (await this.resolveGeolocation()).getTrackingOptions()
-      },
-      /**
-       * @param {Promise<Object|undefined>} options
-       * @return {Promise<void>}
-       */
-      async setTrackingOptions (options) {
-        const geoloc = await this.resolveGeolocation()
-
-        if (isEqual(options, geoloc.getTrackingOptions())) return
-
-        geoloc.setTrackingOptions(options)
       },
       /**
        * @return {Promise<void>}
@@ -246,14 +274,167 @@
         this::subscribeToGeolocation()
       },
       resolveGeolocation: olCmp.methods.resolveOlObject,
+      /**
+       * @return {number|string}
+       */
+      getIdSync () {
+        return this.$geolocation.get('id')
+      },
+      /**
+       * @param {string|number} id
+       * @return {void}
+       */
+      setIdSync (id) {
+        assert(id != null && id !== '', 'Invalid geolocation id')
+
+        if (id === this.getIdSync()) return
+
+        this.$geolocation.set('id', id)
+      },
+      /**
+       * @return {Promise<number|undefined>}
+       */
+      async getAccuracy () {
+        await this.resolveGeolocation()
+
+        return this.getAccuracySync()
+      },
+      getAccuracySync () {
+        return this.$geolocation.getAccuracy()
+      },
+      /**
+       * @return {Promise<module:/ol/geom/Geometry~Geometry|undefined>}
+       */
+      async getAccuracyGeometry () {
+        await this.resolveGeolocation()
+
+        return this.getAccuracyGeometrySync()
+      },
+      getAccuracyGeometrySync () {
+        return this.$geolocation.getAccuracyGeometry()
+      },
+      /**
+       * @return {Promise<number|undefined>}
+       */
+      async getAltitude () {
+        await this.resolveGeolocation()
+
+        return this.getAltitudeSync()
+      },
+      getAltitudeSync () {
+        return this.$geolocation.getAltitude()
+      },
+      /**
+       * @return {Promise<number|undefined>}
+       */
+      async getAltitudeAccuracy () {
+        await this.resolveGeolocation()
+
+        return this.getAltitudeAccuracySync()
+      },
+      getAltitudeAccuracySync () {
+        return this.$geolocation.getAltitudeAccuracy()
+      },
+      /**
+       * @return {Promise<number|undefined>}
+       */
+      async getHeading () {
+        await this.resolveGeolocation()
+
+        return this.getHeadingSync()
+      },
+      getHeadingSync () {
+        return this.$geolocation.getHeading()
+      },
+      /**
+       * @return {Promise<number[]|undefined>}
+       */
+      async getPosition () {
+        await this.resolveGeolocation()
+
+        return this.getPositionSync()
+      },
+      getPositionSync () {
+        return this.$geolocation.getPosition()
+      },
+      /**
+       * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
+       */
+      async getProjection () {
+        await this.resolveGeolocation()
+
+        return this.getProjectionSync()
+      },
+      getProjectionSync () {
+        return this.$geolocation.getProjection()
+      },
+      /**
+       * @param {module:ol/proj~ProjectionLike} projection
+       * @return {Promise<void>}
+       */
+      async setProjection (projection) {
+        projection = getProj(projection)
+
+        if (isEqProj(projection, await this.getProjection())) return
+
+        (await this.resolveGeolocation()).setProjection(projection)
+      },
+      /**
+       * @return {Promise<number|undefined>}
+       */
+      async getSpeed () {
+        await this.resolveGeolocation()
+
+        return this.getSpeedSync()
+      },
+      getSpeedSync () {
+        return this.$geolocation.getSpeed()
+      },
+      /**
+       * @return {Promise<boolean>}
+       */
+      async getTracking () {
+        await this.resolveGeolocation()
+
+        return this.getTrackingSync()
+      },
+      getTrackingSync () {
+        return this.$geolocation.getTracking()
+      },
+      /**
+       * @param {boolean} tracking
+       * @return {Promise<void>}
+       */
+      async setTracking (tracking) {
+        if (tracking === await this.getTracking()) return
+
+        (await this.resolveGeolocation()).setTracking(tracking)
+      },
+      /**
+       * @return {Promise<Object|undefined>}
+       */
+      async getTrackingOptions () {
+        await this.resolveGeolocation()
+
+        return this.getTrackingOptionsSync()
+      },
+      getTrackingOptionsSync () {
+        return this.$geolocation.getTrackingOptions()
+      },
+      /**
+       * @param {Promise<Object|undefined>} options
+       * @return {Promise<void>}
+       */
+      async setTrackingOptions (options) {
+        if (isEqual(options, await this.getTrackingOptions())) return
+
+        (await this.resolveGeolocation()).setTrackingOptions(options)
+      },
     },
   }
 
   function defineServices () {
     Object.defineProperties(this, {
-      /**
-       * @type {ol/Geolocation~Geolocation|undefined}
-       */
       $geolocation: {
         enumerable: true,
         get: () => this.$olObject,
@@ -274,21 +455,43 @@
    * @private
    */
   function subscribeToGeolocation () {
-    const changes = obsFromOlChangeEvent(this.$geolocation, [
-      'accuracy',
-      'altitude',
-      'altitudeaccuracy',
-      'heading',
-      'speed',
-      'position',
-    ], true)
+    const prefixKey = addPrefix('current')
+    const geomChanges = obsFromOlChangeEvent(this.$geolocation, 'accuracyGeometry', true).pipe(
+      mergeMap(({ prop }) => fromObs(this.getAccuracyGeometry()).pipe(
+        mapObs(geometry => ({
+          prop,
+          value: this.writeGeometryInDataProj(geometry),
+          compareWith: this.currentAccuracyGeometryDataProj,
+        })),
+      )),
+    )
+    const projChanges = obsFromOlChangeEvent(this.$geolocation, 'projection', true, evt => ({
+      ...evt,
+      value: getProj(evt.value).getCode(),
+      compareWith: this.currentProjection,
+    }))
+    const propsChanges = mergeObs(
+      geomChanges,
+      projChanges,
+      obsFromOlChangeEvent(this.$geolocation, [
+        'accuracy',
+        'altitude',
+        'altitudeaccuracy',
+        'heading',
+        'speed',
+        'position',
+        'tracking',
+        'trackingOptions',
+      ], true, evt => ({
+        ...evt,
+        compareWith: this[prefixKey(evt.prop)],
+      })),
+    ).pipe(
+      skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
+    )
 
-    this.subscribeTo(changes, ({ prop, value }) => {
+    this.subscribeTo(propsChanges, () => {
       ++this.rev
-
-      this.$nextTick(() => {
-        this.$emit(`update:${prop}`, value)
-      })
     })
   }
 </script>

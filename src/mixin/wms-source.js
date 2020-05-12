@@ -131,6 +131,16 @@ export default {
     ], prop => async function (value) {
       await this.updateParam(prop, value)
     }),
+    ...makeWatchers([
+      'hidpi',
+      'serverType',
+    ], prop => async function () {
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`${prop} changed, scheduling recreate...`)
+      }
+
+      await this.scheduleRecreate()
+    }),
   },
   methods: {
     /**
@@ -145,14 +155,11 @@ export default {
     async getFeatureInfoUrl (coordinate, resolution, projection, params = {}) {
       resolution || (resolution = this.$view && this.$view.getResolution())
       projection || (projection = this.projection)
-      params = { ...this.allParams, ...params }
 
-      return (await this.resolveSource()).getFeatureInfoUrl(
-        coordinate,
-        resolution,
-        projection,
-        params,
-      )
+      return (await this.resolveSource()).getFeatureInfoUrl(coordinate, resolution, projection, params)
+    },
+    async getLegendUrl (resolution, params = {}) {
+      return (await this.resolveSource()).getLegendUrl(resolution, params)
     },
     /**
      * @returns {Promise<Object>}

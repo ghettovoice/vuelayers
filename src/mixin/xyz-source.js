@@ -1,3 +1,4 @@
+import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
 import { XYZ as XYZSource } from 'ol/source'
 import { createXYZ, extentFromProjection } from 'ol/tilegrid'
 import { isArray, isFunction, isNumber, pick } from '../util/minilo'
@@ -31,7 +32,7 @@ export default {
   },
   computed: {
     tileSizeArr () {
-      return isArray(this.tileSize) ? this.tileSize : [this.tileSize]
+      return isArray(this.tileSize) ? this.tileSize : [this.tileSize, this.tileSize]
     },
     derivedTileGridFactory () {
       if (isFunction(this.tileGridFactory)) {
@@ -51,6 +52,14 @@ export default {
         maxResolution: maxResolution,
         tileSize: tileSize,
       })
+    },
+    resolvedTileUrlFunc () {
+      if (isFunction(this.tileUrlFunc)) {
+        return this.tileUrlFunc
+      }
+      if (this.expandedUrls.length === 0) return
+
+      return createTileUrlFunctionFromTemplates(this.expandedUrls, this.tileGrid)
     },
   },
   methods: {
@@ -74,7 +83,7 @@ export default {
         tileGrid: this.tileGrid,
         // ol/source/UrlTile
         tileLoadFunction: this.resolvedTileLoadFunc,
-        tileUrlFunction: this.urlFunc,
+        tileUrlFunction: this.resolvedTileUrlFunc,
         // ol/source/TileImage
         crossOrigin: this.crossOrigin,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,

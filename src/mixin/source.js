@@ -1,8 +1,9 @@
 import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { map as mapObs, skipWhile } from 'rxjs/operators'
-import { initializeSource, setSourceId } from '../ol-ext'
+import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import { assert } from '../util/assert'
 import { addPrefix, hasProp, isArray, isEqual, isString, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import waitFor from '../util/wait-for'
@@ -68,14 +69,14 @@ export default {
   computed: {
     currentAttributions () {
       if (this.rev && this.$source) {
-        return this.$source.getAttributions()
+        return this.getAttributionsSync()
       }
 
       return this.attributions
     },
     currentState () {
       if (this.rev && this.$source) {
-        return this.$source.getState()
+        return this.getStateSync()
       }
 
       return this.state
@@ -158,7 +159,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      return initializeSource(await this.createSource(), this.id)
+      return initializeSource(await this.createSource(), this.currentId)
     },
     /**
      * @return {module:ol/source/Source~Source|Promise<module:ol/source/Source~Source>}
@@ -239,25 +240,32 @@ export default {
      */
     resolveSource: olCmp.methods.resolveOlObject,
     /**
-     * @returns {Promise<string|number>}
+     * @returns {string|number}
      */
-    async getId () {
-      return (await this.resolveSource()).getId()
+    getIdSync () {
+      return getSourceId(this.$source)
     },
     /**
      * @param {string|number} id
-     * @returns {Promise<void>}
+     * @returns {void}
      */
-    async setId (id) {
-      if (id === await this.getId()) return
+    setIdSync (id) {
+      assert(id != null && id !== '', 'Invalid source id')
 
-      setSourceId(await this.resolveSource(), id)
+      if (id === this.getIdSync()) return
+
+      setSourceId(this.$source, id)
     },
     /**
      * @returns {Promise<string>}
      */
     async getAttributions () {
-      return (await this.resolveSource()).getAttributions()
+      await this.resolveSource()
+
+      return this.getAttributionsSync()
+    },
+    getAttributionsSync () {
+      return this.$source.getAttributions()
     },
     /**
      * @param {string} attributions
@@ -272,19 +280,34 @@ export default {
      * @returns {Promise<boolean>}
      */
     async getAttributionsCollapsible () {
-      return (await this.resolveSource()).getAttributionsCollapsible()
+      await this.resolveSource()
+
+      return this.getAttributionsCollapsibleSync()
+    },
+    getAttributionsCollapsibleSync () {
+      return this.$source.getAttributionsCollapsible()
     },
     /**
      * @returns {Promise<module:ol/proj/Projection~Projection>}
      */
     async getProjection () {
-      return (await this.resolveSource()).getProjection()
+      await this.resolveSource()
+
+      return this.getProjectionSync()
+    },
+    getProjectionSync () {
+      return this.$source.getProjection()
     },
     /**
      * @returns {Promise<string>}
      */
     async getState () {
-      return (await this.resolveSource()).getState()
+      await this.resolveSource()
+
+      return this.getStateSync()
+    },
+    getStateSync () {
+      return this.$source.getState()
     },
     /**
      * @param {string} state

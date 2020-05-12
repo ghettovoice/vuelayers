@@ -1,6 +1,7 @@
 <script>
   import ImageStaticSource from 'ol/source/ImageStatic'
   import { imageSource } from '../../mixin'
+  import { negate, isEmpty } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   /**
@@ -64,7 +65,7 @@
       url: {
         type: String,
         required: true,
-        validator: value => !!value.length,
+        validator: negate(isEmpty),
       },
     },
     computed: {

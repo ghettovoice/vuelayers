@@ -13,25 +13,9 @@
         <VlSourceOsm />
       </VlLayerTile>
 
-      <VlLayerGraticule :show-labels="true">
-        <VlStyleStroke
-          slot="stroke"
-          color="rgba(255,120,0,0.9)"
-          :width="2"
-          :line-dash="[0.5, 4]" />
-      </VlLayerGraticule>
-
-      <VlFeature>
-        <VlGeomPoint :coordinates="[0, 0]" />
-        <VlStyle>
-          <VlStyleCircle />
-          <VlStyleText text="qwerty">
-            <VlStyleFill
-              slot="background"
-              color="cyan" />
-          </VlStyleText>
-        </VlStyle>
-      </VlFeature>
+      <VlLayerVector>
+        <VlSourceVector url="https://gist.githubusercontent.com/ghettovoice/37ef37dd571ed39b0985c16560b157d3/raw/3499326b779d6c2c2e28ec49c9e492be3bbf8f0f/map.geojson" />
+      </VlLayerVector>
     </VlMap>
   </div>
 </template>

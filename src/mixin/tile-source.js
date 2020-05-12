@@ -97,7 +97,7 @@ export default {
      * @returns {number[]|undefined}
      */
     currentResolutions () {
-      if (!(this.rev && this.$source)) return
+      if (!(this.rev && this.$source && this.$source.getTileGrid())) return
 
       return this.$source.getResolutions()
     },

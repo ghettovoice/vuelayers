@@ -59,7 +59,7 @@
     },
     computed: {
       tileSizeArr () {
-        return isArray(this.tileSize) ? this.tileSize : [this.tileSize]
+        return isArray(this.tileSize) ? this.tileSize : [this.tileSize, this.tileSize]
       },
       derivedTileGridFactory () {
         if (isFunction(this.tileGridFactory)) {
@@ -173,7 +173,7 @@
           zDirection: this.zDirection,
           // ol/source/UrlTile
           tileLoadFunction: this.resolvedTileLoadFunc,
-          tileUrlFunction: this.urlFunc,
+          tileUrlFunction: this.resolvedTileUrlFunc,
           // ol/source/VectorTile
           format: this.format,
           extent: this.extentViewProj,

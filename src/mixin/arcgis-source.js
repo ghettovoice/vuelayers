@@ -187,6 +187,15 @@ export default {
     ], prop => async function (value) {
       await this.updateParam(prop, serialize(value))
     }),
+    ...makeWatchers([
+      'hidpi',
+    ], prop => async function () {
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`${prop} changed, scheduling recreate...`)
+      }
+
+      await this.scheduleRecreate()
+    }),
   },
   methods: {
     /**

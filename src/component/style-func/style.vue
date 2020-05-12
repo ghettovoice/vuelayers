@@ -91,7 +91,7 @@
         // fallback style function made from inner style containers
         const fallbackStyleFunc = this.createStyleFunc(this.$style, this.getDefaultStyle())
 
-        return function __styleFunc (feature, resolution) {
+        const func = function __styleFunc (feature, resolution) {
           const style = providedStyleFunc(feature, resolution)
           // not empty or null style
           if (
@@ -103,6 +103,9 @@
           }
           return fallbackStyleFunc(feature, resolution)
         }
+        func.id = this.currentId
+
+        return func
       },
       /**
        * @returns {Object}
@@ -139,8 +142,6 @@
       async getStyleTarget () {
         return {
           setStyle: async () => {
-            ++this.rev
-
             if (process.env.VUELAYERS_DEBUG) {
               this.$logger.log('style changed, scheduling recreate...')
             }

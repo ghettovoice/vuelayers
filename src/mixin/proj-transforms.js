@@ -97,6 +97,8 @@ export default {
     },
 
     writeGeometryInDataProj (geometry, precision = COORD_PRECISION) {
+      if (!geometry) return
+
       const key = this.makeGeometryKey(geometry, this.resolvedDataProjection, precision)
       let geometryJson = this._projTransformCache.get(key)
       if (geometryJson) {
@@ -107,6 +109,8 @@ export default {
       return geometryJson
     },
     writeGeometryInViewProj (geometry, precision = COORD_PRECISION) {
+      if (!geometry) return
+
       const key = this.makeGeometryKey(geometry, this.viewProjection, precision)
       let geometryJson = this._projTransformCache.get(key)
       if (geometryJson) {
@@ -117,10 +121,19 @@ export default {
       return geometryJson
     },
     readGeometryInDataProj (geometry, precision = COORD_PRECISION) {
+      if (!geometry) return
+
       return readGeoJsonGeometry(geometry, this.viewProjection, this.resolvedDataProjection, precision)
+    },
+    readGeometryInViewProj (geometry, precision = COORD_PRECISION) {
+      if (!geometry) return
+
+      return readGeoJsonGeometry(geometry, this.viewProjection, this.viewProjection, precision)
     },
 
     writeFeatureInDataProj (feature, precision = COORD_PRECISION) {
+      if (!feature) return
+
       const key = this.makeFeatureKey(feature, this.resolvedDataProjection, precision)
       let featureJson = this._projTransformCache.get(key)
       if (featureJson) {
@@ -131,6 +144,8 @@ export default {
       return featureJson
     },
     writeFeatureInViewProj (feature, precision = COORD_PRECISION) {
+      if (!feature) return
+
       const key = this.makeFeatureKey(feature, this.viewProjection, precision)
       let featureJson = this._projTransformCache.get(key)
       if (featureJson) {
@@ -141,7 +156,14 @@ export default {
       return featureJson
     },
     readFeatureInDataProj (feature, precision = COORD_PRECISION) {
+      if (!feature) return
+
       return readGeoJsonFeature(feature, this.viewProjection, this.resolvedDataProjection, precision)
+    },
+    readFeatureInViewProj (feature, precision = COORD_PRECISION) {
+      if (!feature) return
+
+      return readGeoJsonFeature(feature, this.viewProjection, this.viewProjection, precision)
     },
 
     makeKey (object, projection, precision) {

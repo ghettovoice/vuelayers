@@ -1,6 +1,7 @@
 import { map as mapObs } from 'rxjs/operators'
 import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
 import { fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import { assert } from '../util/assert'
 import { hasProp, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import waitFor from '../util/wait-for'
@@ -51,7 +52,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      return initializeStyle(await this.createStyle(), this.id)
+      return initializeStyle(await this.createStyle(), this.currentId)
     },
     /**
      * @return {OlStyle|Promise<OlStyle>}
@@ -105,19 +106,21 @@ export default {
       'resolveOlObject',
     ]),
     /**
-     * @returns {Promise<string|number|undefined>}
+     * @returns {string|number}
      */
-    async getId () {
-      return getStyleId(await this.resolveStyle())
+    getIdSync () {
+      return getStyleId(this.$style)
     },
     /**
-     * @param {string|number|undefined} id
-     * @returns {Promise<void>}
+     * @param {string|number} id
+     * @returns {void}
      */
-    async setId (id) {
-      if (id === await this.getId()) return
+    setIdSync (id) {
+      assert(id != null && id !== '', 'Invalid style id')
 
-      setStyleId(await this.resolveStyle(), id)
+      if (id === this.getIdSync()) return
+
+      setStyleId(this.$style, id)
     },
   },
 }

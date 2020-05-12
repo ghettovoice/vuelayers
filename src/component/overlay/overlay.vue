@@ -108,8 +108,7 @@
         autoPanAnimation: this.autoPanAnimation,
         className: this.className,
       })
-
-      initializeOverlay(overlay, this.id)
+      initializeOverlay(overlay, this.currentId)
 
       return overlay
     },

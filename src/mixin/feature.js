@@ -5,7 +5,7 @@ import { map as mapObs, skipWhile } from 'rxjs/operators'
 import { getFeatureId, getFeatureProperties, initializeFeature, setFeatureId, setFeatureProperties } from '../ol-ext'
 import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
 import { assert } from '../util/assert'
-import { clonePlainObject, hasProp, isEqual, isFunction, omit, pick, stubObject } from '../util/minilo'
+import { clonePlainObject, hasProp, isEqual, isFunction, pick, stubObject } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import waitFor from '../util/wait-for'
 import geometryContainer from './geometry-container'
@@ -49,9 +49,7 @@ export default {
   computed: {
     currentProperties () {
       if (this.rev && this.$feature) {
-        return omit(this.$feature.getProperties(), [
-          this.$feature.getGeometryName(),
-        ])
+        return this.getPropertiesSync()
       }
 
       return this.properties
@@ -108,7 +106,7 @@ export default {
      * @protected
      */
     createOlObject () {
-      const feature = initializeFeature(this.createFeature(), this.id)
+      const feature = initializeFeature(this.createFeature(), this.currentId)
       feature.setGeometry(this.$geometry)
 
       return feature
@@ -207,21 +205,21 @@ export default {
     getGeometryTarget: olCmp.methods.resolveOlObject,
     getStyleTarget: olCmp.methods.resolveOlObject,
     /**
-     * @return {Promise<string|number>}
+     * @return {string|number}
      */
-    async getId () {
-      return getFeatureId(await this.resolveFeature())
+    getIdSync () {
+      return getFeatureId(this.$feature)
     },
     /**
      * @param {string|number} id
-     * @return {Promise<void>}
+     * @return {void}
      */
-    async setId (id) {
-      assert(!!id, 'Invalid feature id')
+    setIdSync (id) {
+      assert(id != null && id !== '', 'Invalid feature id')
 
-      if (id === await this.getId()) return
+      if (id === this.getIdSync()) return
 
-      setFeatureId(await this.resolveFeature(), id)
+      setFeatureId(this.$feature, id)
     },
     /**
      * @return {Promise<string>}
@@ -242,7 +240,12 @@ export default {
      * @return {Promise<Object>}
      */
     async getProperties () {
-      return getFeatureProperties(await this.resolveFeature())
+      await this.resolveFeature()
+
+      return this.getPropertiesSync()
+    },
+    getPropertiesSync () {
+      return getFeatureProperties(this.$feature)
     },
     /**
      * @param {Object} properties
@@ -319,7 +322,7 @@ async function subscribeToEvents () {
         case this.$feature.getGeometryName():
           return {
             prop: 'geometry',
-            value: this.getGeometry() && this.writeGeometryInDataProj(this.getGeometry()),
+            value: this.writeGeometryInDataProj(this.getGeometry()),
             compareWith: this.currentGeometryDataProj,
           }
         default:

@@ -1,12 +1,12 @@
 <script>
-  import { ImageWMS as ImageWMSSource } from 'ol/source'
-  import { imageSource, wmsSource } from '../../mixin'
+  import { ImageArcGISRest as ImageArcGISRestSource } from 'ol/source'
+  import { imageSource, arcgisSource } from '../../mixin'
   import { negate, isEmpty } from '../../util/minilo'
 
   export default {
-    name: 'VlSourceImageWms',
+    name: 'VlSourceImageArcgisRest',
     mixins: [
-      wmsSource,
+      arcgisSource,
       imageSource,
     ],
     props: {
@@ -25,16 +25,15 @@
     },
     methods: {
       createSource () {
-        return new ImageWMSSource({
+        return new ImageArcGISRestSource({
           // ol/source/Source
           attributions: this.currentAttributions,
           projection: this.projection,
           // ol/source/Image
           resolutions: this.resolutions,
-          // ol/source/ImageWMS
+          // ol/source/ImageArcGISRest
           crossOrigin: this.crossOrigin,
           hidpi: this.hidpi,
-          serverType: this.serverType,
           imageLoadFunction: this.imageLoadFunc,
           params: this.allParams,
           ratio: this.ratio,

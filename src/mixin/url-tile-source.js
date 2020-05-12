@@ -1,9 +1,8 @@
-import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
+import TileEventType from 'ol/source/TileEventType'
 import { expandUrl } from 'ol/tileurlfunction'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { and, isEmpty, isEqual, isFunction, isString, negate, pick, replaceTokens } from '../util/minilo'
+import { and, isEmpty, isEqual, isString, negate, pick, replaceTokens } from '../util/minilo'
 import tileSource from './tile-source'
-import TileEventType from 'ol/source/TileEventType'
 
 const isNotEmptyString = and(isString, negate(isEmpty))
 
@@ -67,13 +66,8 @@ export default {
     expandedUrls () {
       return this.parsedUrls.reduce((urls, url) => urls.concat(...expandUrl(url)), [])
     },
-    urlFunc () {
-      if (isFunction(this.tileUrlFunc)) {
-        return this.tileUrlFunc
-      }
-      if (this.expandedUrls.length === 0) return
-
-      return createTileUrlFunctionFromTemplates(this.expandedUrls, this.tileGrid)
+    resolvedTileUrlFunc () {
+      return this.tileUrlFunc
     },
     resolvedTileLoadFunc () {
       return this.tileLoadFunc || this.tileLoadFunction
@@ -81,12 +75,10 @@ export default {
   },
   watch: {
     async resolvedTileLoadFunc (value) {
-      await this.setTileLoadFunction(value)
+      await this.onTileLoadFuncChanged(value)
     },
-    async urlFunc (value) {
-      if (value) {
-        await this.setTileUrlFunction(value)
-      }
+    async resolvedTileUrlFunc (value) {
+      await this.onTileUrlFuncChanged(value)
     },
   },
   created () {
@@ -182,6 +174,12 @@ export default {
      */
     async setUrl (url) {
       return this.setUrls(expandUrl(url))
+    },
+    async onTileLoadFuncChanged (tileLoadFunc) {
+      await this.setTileLoadFunction(tileLoadFunc)
+    },
+    async onTileUrlFuncChanged (tileUrlFunc) {
+      await this.setTileUrlFunction(tileUrlFunc)
     },
   },
 }

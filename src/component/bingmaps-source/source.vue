@@ -109,6 +109,7 @@
       async getImagerySet () {
         return (await this.resolveSource()).getImagerySet()
       },
+      async onTileUrlFuncChanged (tileUrlFunc) {},
     },
   }
 </script>

@@ -137,42 +137,70 @@ export default {
      * @returns {Promise<boolean>}
      */
     async getDeclutter () {
-      return (await this.resolveLayer()).getDeclutter()
+      await this.resolveLayer()
+
+      return this.getDeclutterSync()
+    },
+    getDeclutterSync () {
+      return this.$layer.getDeclutter()
     },
     /**
      * @returns {Promise<number>}
      */
     async getRenderBuffer () {
-      return (await this.resolveLayer()).getRenderBuffer()
+      await this.resolveLayer()
+
+      return this.getRenderBufferSync()
+    },
+    getRenderBufferSync () {
+      return this.$layer.getRenderBuffer()
     },
     /**
      * @returns {Promise<function>}
      */
     async getRenderOrder () {
-      return (await this.resolveLayer()).getRenderOrder()
+      await this.resolveLayer()
+
+      return this.getRenderOrderSync()
+    },
+    getRenderOrderSync () {
+      return this.$layer.getRenderOrder()
     },
     /**
      * @param {function} renderOrder
      * @returns {Promise<void>}
      */
     async setRenderOrder (renderOrder) {
-      const layer = await this.resolveLayer()
+      await this.resolveLayer()
 
-      if (renderOrder === layer.getRenderOrder()) return
+      this.setRenderOrderSync(renderOrder)
+    },
+    setRenderOrderSync (renderOrder) {
+      if (renderOrder === this.getRenderOrderSync()) return
 
-      layer.setRenderOrder(renderOrder)
+      this.$layer.setRenderOrder(renderOrder)
     },
     /**
      * @returns {Promise<boolean>}
      */
     async getUpdateWhileAnimating () {
-      return (await this.resolveLayer()).getUpdateWhileAnimating()
+      await this.resolveLayer()
+
+      return this.getUpdateWhileAnimatingSync()
+    },
+    getUpdateWhileAnimatingSync () {
+      return this.$layer.getUpdateWhileAnimating()
     },
     /**
      * @returns {Promise<boolean>}
      */
     async getUpdateWhileInteracting () {
-      return (await this.resolveLayer()).getUpdateWhileInteracting()
+      await this.resolveLayer()
+
+      return this.getUpdateWhileInteractingSync()
+    },
+    getUpdateWhileInteractingSync () {
+      return this.$layer.getUpdateWhileInteracting()
     },
   },
 }

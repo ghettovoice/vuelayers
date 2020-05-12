@@ -8,45 +8,25 @@
 </template>
 
 <script>
-  import debounce from 'debounce-promise'
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import Feature from 'ol/Feature'
-  import SelectInteraction from 'ol/interaction/Select'
+  import { Select as SelectInteraction } from 'ol/interaction'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapOp } from 'rxjs/operators'
-  import Vue from 'vue'
-  import { featuresContainer, interaction, projTransforms, styleContainer } from '../../mixin'
-  import { createStyle, defaultEditStyle, getFeatureId, getLayerId, isGeoJSONFeature } from '../../ol-ext'
+  import { featuresContainer, interaction, styleContainer } from '../../mixin'
+  import { getFeatureId, getLayerId, isGeoJSONFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { hasInteraction, hasMap } from '../../util/assert'
-  import {
-    clonePlainObject,
-    constant,
-    difference,
-    forEach,
-    isEqual,
-    isFunction,
-    isNumber,
-    isString,
-    mapValues,
-    or,
-    stubArray,
-  } from '../../util/minilo'
+  import { constant, forEach, isFunction, isNumber, isString, or, stubArray } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
     name: 'VlInteractionSelect',
-    mixins: [interaction, featuresContainer, styleContainer, projTransforms],
-    stubVNode: {
-      empty: false,
-      attrs () {
-        return {
-          id: this.vmId,
-          class: this.vmClass,
-        }
-      },
-    },
+    mixins: [
+      featuresContainer,
+      styleContainer,
+      interaction,
+    ],
     props: {
       /**
        * A function that takes an `ol.Feature` and an `ol.layer.Layer` and returns `true` if the feature may be selected or `false` otherwise.
@@ -90,14 +70,6 @@
         type: Array,
         default: stubArray,
         validator: value => value.every(or(isString, isNumber, isGeoJSONFeature)),
-      },
-      /**
-       * Wrap the world horizontally on the selection overlay.
-       * @type {boolean}
-       */
-      wrapX: {
-        type: Boolean,
-        default: true,
       },
       /**
        * A function that takes an `ol.MapBrowserEvent` and returns a boolean to indicate whether that event should
@@ -150,26 +122,6 @@
       },
     },
     watch: {
-      features: {
-        deep: true,
-        handler (features) {
-          if (!this.$interaction || isEqual(features, this.featuresDataProj)) return
-          // select new features
-          features.forEach(::this.select)
-          // unselect non-matched features
-          difference(
-            this.getFeatures(),
-            features,
-            (a, b) => getFeatureId(a) === getFeatureId(b),
-          ).forEach(::this.unselect)
-        },
-      },
-      featuresDataProj: {
-        deep: true,
-        handler: debounce(function (features) {
-          this.$emit('update:features', clonePlainObject(features))
-        }, 1000 / 60),
-      },
       ...makeWatchers([
         'filter',
         'hitTolerance',
@@ -179,8 +131,12 @@
         'condition',
         'removeCondition',
         'toggleCondition',
-      ], () => function () {
-        this.scheduleRecreate()
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
       }),
     },
     methods: {
@@ -190,31 +146,17 @@
        */
       createInteraction () {
         return new SelectInteraction({
-          features: this.$featuresCollection,
           multi: this.multi,
-          wrapX: this.wrapX,
           filter: this.filter,
           layers: this.layerFilter,
           hitTolerance: this.hitTolerance,
-          style: this.createStyleFunc(),
           addCondition: this.addCondition,
           condition: this.condition,
           removeCondition: this.removeCondition,
           toggleCondition: this.toggleCondition,
+          style: this.$style,
+          features: this.$featuresCollection,
         })
-      },
-      /**
-       * @return {function(feature: Feature): Style}
-       * @protected
-       */
-      getDefaultStyles () {
-        const defaultStyles = mapValues(defaultEditStyle(), styles => styles.map(createStyle))
-
-        return function __selectDefaultStyleFunc (feature) {
-          if (feature.getGeometry()) {
-            return defaultStyles[feature.getGeometry().getType()]
-          }
-        }
       },
       /**
        * @returns {Object}
@@ -223,70 +165,9 @@
       getServices () {
         return mergeDescriptors(
           this::interaction.methods.getServices(),
+          this::featuresContainer.methods.getServices(),
           this::styleContainer.methods.getServices(),
         )
-      },
-      /**
-       * @return {Interaction|undefined}
-       * @protected
-       */
-      getStyleTarget () {
-        return this.$interaction
-      },
-      /**
-       * @return {void}
-       * @protected
-       */
-      mount () {
-        this::interaction.methods.mount()
-        this.features.forEach(this.select)
-      },
-      /**
-       * @return {void}
-       * @protected
-       */
-      unmount () {
-        this.unselectAll()
-        this::interaction.methods.unmount()
-      },
-      /**
-       * @param {Object|Vue|Feature|string|number} feature
-       * @return {void}
-       * @throws {Error}
-       */
-      select (feature) {
-        feature = this.resolveFeature(feature)
-        if (!feature) return
-
-        this.addFeature(feature)
-      },
-      /**
-       * @param {Object|Vue|Feature|string|number} feature
-       * @return {void}
-       */
-      unselect (feature) {
-        feature = this.resolveFeature(feature)
-        if (!feature) return
-
-        this.removeFeature(feature)
-      },
-      /**
-       * Removes all features from selection.
-       * @return {void}
-       */
-      unselectAll () {
-        this.clearFeatures()
-      },
-      /**
-       * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|function(feature: Feature): Style|Vue|undefined} styles
-       * @return {void}
-       * @protected
-       */
-      setStyle (styles) {
-        if (styles !== this._styles) {
-          this._styles = styles
-          this.scheduleRefresh()
-        }
       },
       /**
        * @return {void}
@@ -296,34 +177,44 @@
         this::interaction.methods.subscribeAll()
         this::subscribeToInteractionChanges()
       },
+      getStyleTarget () {
+        return {
+          setStyle: async style => {
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('style changed, scheduling recreate...')
+            }
+
+            await this.scheduleRecreate()
+          },
+        }
+      },
       /**
        * @param {Object|Vue|Feature|string|number} feature
-       * @return {Feature}
+       * @return {Promise<Feature|undefined>}
+       * @protected
        */
-      resolveFeature (feature) {
-        hasMap(this)
-
-        if (feature instanceof Vue) {
-          feature = feature.$feature
+      async resolveFeature (feature) {
+        if (!feature) return
+        if (isFunction(feature.resolveOlObject)) {
+          feature = await feature.resolveOlObject()
         }
-
         if (feature instanceof Feature) {
           return feature
         }
 
-        const featureId = getFeatureId(feature)
+        const featureId = isString(feature) || isNumber(feature) ? feature : getFeatureId(feature)
         if (!featureId) {
           throw new Error('Undefined feature id')
         }
 
-        feature = undefined
-        forEach(this.$map.getLayers().getArray(), layer => {
+        feature = null
+        forEach(this.$mapVm.getLayers(), layer => {
           if (this.layerFilter && !this.layerFilter(layer)) {
-            return false
+            return
           }
 
           const source = layer.getSource()
-          if (source && isFunction(source.getFeatureById)) {
+          if (isFunction(source?.getFeatureById)) {
             feature = source.getFeatureById(featureId)
           }
 
@@ -340,8 +231,6 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    hasInteraction(this)
-
     const select = obsFromOlEvent(this.$featuresCollection, 'add')
       .pipe(
         mapOp(({ element }) => ({ type: 'select', feature: element })),

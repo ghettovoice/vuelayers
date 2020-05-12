@@ -1,11 +1,10 @@
+import RenderEventType from 'ol/render/EventType'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { isFunction, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import { makeWatchers } from '../util/vue-helpers'
 import baseLayer from './base-layer'
-import olCmp from './ol-cmp'
 import sourceContainer from './source-container'
-import RenderEventType from 'ol/render/EventType'
 
 /**
  * Base simple layer mixin.
@@ -50,11 +49,10 @@ export default {
     async mount () {
       if (this.overlay && this.$mapVm) {
         await this.setMap(this.$mapVm)
-      } else if (this.$layersContainer) {
-        await this.$layersContainer.addLayer(this)
+        return
       }
 
-      return this::olCmp.methods.mount()
+      return this::baseLayer.methods.mount()
     },
     /**
      * @return {Promise<void>}
@@ -63,11 +61,10 @@ export default {
     async unmount () {
       if (this.overlay) {
         await this.setMap(null)
-      } else if (this.$layersContainer) {
-        await this.$layersContainer.removeLayer(this)
+        return
       }
 
-      return this::olCmp.methods.unmount()
+      return this::baseLayer.methods.unmount()
     },
     /**
      * @returns {Object}

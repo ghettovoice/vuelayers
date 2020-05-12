@@ -1,4 +1,3 @@
-import * as ArcgisRestSource from './component/arcgis-rest-source'
 import * as BingmapsSource from './component/bingmaps-source'
 import * as ClusterSource from './component/cluster-source'
 import * as DrawInteraction from './component/draw-interaction'
@@ -7,6 +6,7 @@ import * as Geoloc from './component/geoloc'
 import * as GraticuleLayer from './component/graticule-layer'
 import * as GroupLayer from './component/group-layer'
 import * as HeatmapLayer from './component/heatmap-layer'
+import * as ImageArcgisRestSource from './component/image-arcgis-rest-source'
 import * as ImageLayer from './component/image-layer'
 import * as ImageStaticSource from './component/image-static-source'
 import * as ImageWmsSource from './component/image-wms-source'
@@ -21,13 +21,14 @@ import * as SputnikSource from './component/sputnik-source'
 import * as StamenSource from './component/stamen-source'
 import * as Style from './component/style'
 import * as StyleFunc from './component/style-func'
+import * as TileArcgisRestSource from './component/tile-arcgis-rest-source'
 import * as TileLayer from './component/tile-layer'
+import * as TileWmsSource from './component/tile-wms-source'
 import * as VectorImageLayer from './component/vector-image-layer'
 import * as VectorLayer from './component/vector-layer'
 import * as VectorSource from './component/vector-source'
 import * as VectorTileLayer from './component/vector-tile-layer'
 import * as VectorTileSource from './component/vector-tile-source'
-import * as WmsSource from './component/wms-source'
 import * as WmtsSource from './component/wmts-source'
 import * as XyzSource from './component/xyz-source'
 import './styles/main.scss'
@@ -49,7 +50,6 @@ function plugin (Vue, options = {}) {
   plugin.installed = true
 
   // install components
-  Vue.use(ArcgisRestSource, options)
   Vue.use(BingmapsSource, options)
   Vue.use(ClusterSource, options)
   Vue.use(DrawInteraction, options)
@@ -58,6 +58,7 @@ function plugin (Vue, options = {}) {
   Vue.use(GraticuleLayer, options)
   Vue.use(GroupLayer, options)
   Vue.use(HeatmapLayer, options)
+  Vue.use(ImageArcgisRestSource, options)
   Vue.use(ImageLayer, options)
   Vue.use(ImageStaticSource, options)
   Vue.use(ImageWmsSource, options)
@@ -72,13 +73,14 @@ function plugin (Vue, options = {}) {
   Vue.use(StamenSource, options)
   Vue.use(Style, options)
   Vue.use(StyleFunc, options)
+  Vue.use(TileArcgisRestSource, options)
   Vue.use(TileLayer, options)
+  Vue.use(TileWmsSource, options)
   Vue.use(VectorImageLayer, options)
   Vue.use(VectorLayer, options)
   Vue.use(VectorSource, options)
   Vue.use(VectorTileLayer, options)
   Vue.use(VectorTileSource, options)
-  Vue.use(WmsSource, options)
   Vue.use(WmtsSource, options)
   Vue.use(XyzSource, options)
 }
@@ -89,7 +91,6 @@ export {
   VERSION,
   plugin as install,
   // components
-  ArcgisRestSource,
   BingmapsSource,
   ClusterSource,
   DrawInteraction,
@@ -98,6 +99,7 @@ export {
   GraticuleLayer,
   GroupLayer,
   HeatmapLayer,
+  ImageArcgisRestSource,
   ImageLayer,
   ImageStaticSource,
   ImageWmsSource,
@@ -112,13 +114,14 @@ export {
   StamenSource,
   Style,
   StyleFunc,
+  TileArcgisRestSource,
   TileLayer,
+  TileWmsSource,
   VectorImageLayer,
   VectorLayer,
   VectorSource,
   VectorTileLayer,
   VectorTileSource,
-  WmsSource,
   WmtsSource,
   XyzSource,
 }

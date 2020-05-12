@@ -32,6 +32,8 @@ export function writeGeoJsonFeature (
   dataProjection = EPSG_4326,
   decimals = COORD_PRECISION,
 ) {
+  if (!feature) return
+
   const geoJsonFeature = getGeoJsonFmt().writeFeatureObject(feature, {
     featureProjection,
     dataProjection,
@@ -63,6 +65,8 @@ export function readGeoJsonFeature (
   dataProjection = EPSG_4326,
   decimals = COORD_PRECISION,
 ) {
+  if (!geoJsonFeature) return
+
   const feature = getGeoJsonFmt().readFeature(geoJsonFeature, {
     featureProjection,
     dataProjection,
@@ -94,6 +98,8 @@ export function writeGeoJsonGeometry (
   dataProjection = EPSG_4326,
   decimals = COORD_PRECISION,
 ) {
+  if (!geometry) return
+
   return getGeoJsonFmt().writeGeometryObject(geometry, {
     featureProjection: geometryProjection,
     dataProjection,
@@ -114,6 +120,8 @@ export function readGeoJsonGeometry (
   dataProjection = EPSG_4326,
   decimals = COORD_PRECISION,
 ) {
+  if (!geoJsonGeometry) return
+
   dataProjection = readProjection(geoJsonGeometry, dataProjection)
 
   return getGeoJsonFmt().readGeometry(geoJsonGeometry, {

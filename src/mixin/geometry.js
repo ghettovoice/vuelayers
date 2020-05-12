@@ -1,6 +1,7 @@
 import { map as mapObs, skipWhile } from 'rxjs/operators'
 import { getGeometryId, initializeGeometry, roundExtent, setGeometryId } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import { assert } from '../util/assert'
 import { addPrefix, hasProp, isEqual, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import waitFor from '../util/wait-for'
@@ -77,7 +78,7 @@ export default {
      * @protected
      */
     async createOlObject () {
-      return initializeGeometry(await this.createGeometry(), this.id)
+      return initializeGeometry(await this.createGeometry(), this.currentId)
     },
     /**
      * @return {module:ol/geom/Geometry~Geometry|Promise<module:ol/geom/Geometry~Geometry>}
@@ -147,19 +148,21 @@ export default {
       'resolveOlObject',
     ]),
     /**
-     * @returns {Promise<string|number>}
+     * @returns {string|number}
      */
-    async getId () {
-      return getGeometryId(await this.resolveGeometry())
+    getIdSync () {
+      return getGeometryId(this.$geometry)
     },
     /**
      * @param {string|number} id
-     * @returns {Promise<void>}
+     * @returns {void}
      */
-    async setId (id) {
-      if (id === await this.getId()) return
+    setIdSync (id) {
+      assert(id != null && id !== '', 'Invalid geometry id')
 
-      setGeometryId(await this.resolveGeometry(), id)
+      if (id === this.getIdSync()) return
+
+      setGeometryId(this.$geometry, id)
     },
     /**
      * @returns {Promise<string>}

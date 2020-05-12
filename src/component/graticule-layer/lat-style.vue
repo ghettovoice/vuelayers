@@ -29,7 +29,10 @@
     },
     methods: {
       createOlObject () {
-        return stubObject()
+        const obj = stubObject()
+        obj.id = this.currentId
+
+        return obj
       },
       getServices () {
         return mergeDescriptors(

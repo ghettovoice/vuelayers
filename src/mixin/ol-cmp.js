@@ -7,7 +7,8 @@ import { v4 as uuid } from 'uuid'
 import VueQuery from 'vuequery'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
 import { newLogger } from '../util/log'
-import { identity, isEmpty, isFunction, kebabCase, negate } from '../util/minilo'
+import { identity, isFunction, kebabCase } from '../util/minilo'
+import { assert } from '../util/assert'
 import eventBus from './event-bus'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
@@ -53,7 +54,7 @@ export default {
     id: {
       type: [String, Number],
       default: uuid,
-      validator: negate(isEmpty),
+      validator: value => value != null && value !== '',
     },
     /**
      * Unique key for saving to identity map
@@ -68,6 +69,10 @@ export default {
   },
   computed: {
     currentId () {
+      if (this.rev && this.$olObject) {
+        return this.getIdSync()
+      }
+
       return this.id
     },
     /**
@@ -358,12 +363,41 @@ export default {
     /**
      * @return {Promise<string|number>}
      */
-    getId () {},
+    async getId () {
+      await this.resolveOlObject()
+
+      return this.getIdSync()
+    },
+    getIdSync () {
+      if (isFunction(this.$olObject.get)) {
+        return this.$olObject.get('id')
+      }
+
+      return this.$olObject.id
+    },
     /**
      * @param {string|number} id
      * @return {Promise<void>}
      */
-    setId (id) {},
+    async setId (id) {
+      await this.resolveOlObject()
+
+      this.setIdSync(id)
+    },
+    setIdSync (id) {
+      assert(id != null && id !== '', 'Invalid id')
+
+      if (id === this.getIdSync()) return
+
+      if (isFunction(this.$olObject.set)) {
+        this.$olObject.set('id', id)
+
+        return
+      }
+
+      this.$olObject.id = id
+      ++this.rev
+    },
   },
 }
 

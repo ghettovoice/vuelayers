@@ -8,10 +8,12 @@ import {
   setInteractionPriority,
 } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import { assert } from '../util/assert'
 import { addPrefix, hasProp, isEqual, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import waitFor from '../util/wait-for'
 import olCmp, { FRAME_TIME, OlObjectEvent } from './ol-cmp'
+import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 
 /**
@@ -20,6 +22,7 @@ import stubVNode from './stub-vnode'
 export default {
   mixins: [
     stubVNode,
+    projTransforms,
     olCmp,
   ],
   stubVNode: {
@@ -53,14 +56,14 @@ export default {
   computed: {
     currentActive () {
       if (this.rev && this.$interaction) {
-        return this.$interaction.getActive()
+        return this.getActiveSync()
       }
 
       return this.active
     },
     currentPriority () {
       if (this.rev && this.$interaction) {
-        return getInteractionPriority(this.$interaction)
+        return this.getPrioritySync()
       }
 
       return this.priority
@@ -117,7 +120,11 @@ export default {
      * @protected
      */
     async createOlObject () {
-      const interaction = initializeInteraction(await this.createInteraction(), this.id, this.priority)
+      const interaction = initializeInteraction(
+        await this.createInteraction(),
+        this.currentId,
+        this.currentPriority,
+      )
       interaction.setActive(this.active)
 
       return interaction
@@ -190,25 +197,32 @@ export default {
       'resolveOlObject',
     ]),
     /**
-     * @returns {Promise<string|number>}
+     * @returns {string|number}
      */
-    async getId () {
-      return getInteractionId(await this.resolveInteraction())
+    getIdSync () {
+      return getInteractionId(this.$interaction)
     },
     /**
      * @param {string|number} id
-     * @returns {Promise<void>}
+     * @returns {void}
      */
-    async setId (id) {
-      if (id === await this.getId()) return
+    setIdSync (id) {
+      assert(id != null && id !== '', 'Invalid interaction id')
 
-      setInteractionId(await this.resolveInteraction(), id)
+      if (id === this.getIdSync()) return
+
+      setInteractionId(this.$interaction, id)
     },
     /**
      * @returns {Promise<boolean>}
      */
     async getActive () {
-      return (await this.resolveInteraction()).getActive()
+      await this.resolveInteraction()
+
+      return this.getActiveSync()
+    },
+    getActiveSync () {
+      return this.$interaction.getActive()
     },
     /**
      * @param {boolean} active
@@ -223,7 +237,12 @@ export default {
      * @returns {Promise<number>}
      */
     async getPriority () {
-      return getInteractionPriority(await this.resolveInteraction())
+      await this.resolveInteraction()
+
+      return this.getPrioritySync()
+    },
+    getPrioritySync () {
+      return getInteractionPriority(this.$interaction)
     },
     /**
      * @param {number} priority

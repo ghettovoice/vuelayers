@@ -9,23 +9,51 @@ export function roundExtent (extent, precision = COORD_PRECISION) {
   return extent.map(x => round(x, precision))
 }
 
-export function roundCoords (geomType, coordinates, precision = COORD_PRECISION) {
-  const pointMapper = x => round(x, precision)
-  const lineMapper = point => point.map(pointMapper)
-  const polygonMapper = line => line.map(lineMapper)
+export function roundPointCoords (coordinates, precision = COORD_PRECISION) {
+  if (!coordinates) return
 
+  return coordinates.map(x => round(x, precision))
+}
+
+export function roundLineCoords (coordinates, precision = COORD_PRECISION) {
+  if (!coordinates) return
+
+  return coordinates.map(point => roundPointCoords(point, precision))
+}
+
+export function roundPolygonCoords (coordinates, precision = COORD_PRECISION) {
+  if (!coordinates) return
+
+  return coordinates.map(line => roundLineCoords(line, precision))
+}
+
+export function roundMultiPointCoords (coordinates, precision = COORD_PRECISION) {
+  return roundLineCoords(coordinates, precision)
+}
+
+export function roundMultiLineCoords (coordinates, precision = COORD_PRECISION) {
+  return roundPolygonCoords(coordinates, precision)
+}
+
+export function roundMultiPolygonCoords (coordinates, precision = COORD_PRECISION) {
+  if (!coordinates) return
+
+  return coordinates.map(polygon => roundPolygonCoords(polygon, precision))
+}
+
+export function roundCoords (geomType, coordinates, precision = COORD_PRECISION) {
   switch (geomType) {
     case GeometryType.POINT:
     case GeometryType.CIRCLE:
-      return coordinates.map(pointMapper)
+      return roundPointCoords(coordinates, precision)
     case GeometryType.LINE_STRING:
     case GeometryType.MULTI_POINT:
-      return coordinates.map(lineMapper)
+      return roundLineCoords(coordinates, precision)
     case GeometryType.POLYGON:
     case GeometryType.MULTI_LINE_STRING:
-      return coordinates.map(polygonMapper)
+      return roundPolygonCoords(coordinates, precision)
     case GeometryType.MULTI_POLYGON:
-      return coordinates.map(polygon => polygon.map(polygonMapper))
+      return roundMultiPolygonCoords(coordinates, precision)
   }
 }
 
