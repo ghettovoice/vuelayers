@@ -53,6 +53,9 @@
       },
     },
     computed: {
+      initializedFeatures () {
+        return this.features.map(feature => initializeFeature({ ...feature }))
+      },
       urlFunc () {
         if (!this.url) return
 
@@ -147,21 +150,18 @@
       },
     },
     watch: {
-      features: {
+      initializedFeatures: {
         deep: true,
         handler (features) {
           if (!this.$source || isEqual(features, this.featuresDataProj)) return
           // add new features
-          features.forEach(feature => {
-            feature = initializeFeature({ ...feature })
-            this.addFeature(feature)
-          })
+          this.addFeatures(features)
           // remove non-matched features
-          difference(
+          this.removeFeatures(difference(
             this.getFeatures(),
             features,
             (a, b) => getFeatureId(a) === getFeatureId(b)
-          ).forEach(::this.removeFeature)
+          ))
         },
       },
       ...makeWatchers([

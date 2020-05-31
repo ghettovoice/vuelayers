@@ -127,6 +127,9 @@
       },
     },
     computed: {
+      initializedFeature () {
+        return this.features.map(feature => initializeFeature({ ...feature }))
+      },
       layerFilter () {
         return Array.isArray(this.layers)
           ? layer => this.layers.includes(getLayerId(layer))
@@ -284,15 +287,12 @@
       },
     },
     watch: {
-      features: {
+      initializedFeature: {
         deep: true,
         handler (features) {
           if (!this.$interaction || isEqual(features, this.featuresDataProj)) return
           // select new features
-          features.forEach(feature => {
-            feature = initializeFeature({ ...feature })
-            this.select(feature)
-          })
+          features.forEach(::this.select)
           // unselect non-matched features
           difference(
             this.getFeatures(),

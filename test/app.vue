@@ -1,44 +1,19 @@
 <template>
   <div id="app">
     <div class="panel">
-      <div>
-        Selected: {{ selectedFeatureIds }}
-      </div>
-      <div>
-        <button @click="onUnselectClick">Unselect</button>
-      </div>
     </div>
 
-    <input id="swipe" type="range" v-model="swipe" />
-    <vl-map ref="map" data-projection="EPSG:4326" @created="mapCreated">
+    <vl-map ref="map" data-projection="EPSG:4326">
       <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
                ident="view" ref="view" />
 
-      <vl-geoloc>
-        <template slot-scope="geoloc">
-          <vl-feature v-if="geoloc.position" id="position-feature">
-            <vl-geom-point :coordinates="geoloc.position" />
-            <vl-style-box>
-              <vl-style-text text="My location" font="20px sans-serif" :padding="[10, 10, 10, 10]">
-                <vl-style-fill color="black" />
-                <vl-style-stroke color="white" :width="2" />
-                <vl-style-fill slot="background" color="blue" />
-              </vl-style-text>
-            </vl-style-box>
-          </vl-feature>
-        </template>
-      </vl-geoloc>
-
-      <vl-layer-tile id="osm" ref="osmLayer">
+      <vl-layer-tile id="osm">
         <vl-source-osm />
       </vl-layer-tile>
 
-      <vl-layer-tile id="stamen" ref="stamenLayer" @precompose="onRightPrecompose" @postcompose="onRightPostcompose">
-        <vl-source-stamen layer="watercolor" />
-      </vl-layer-tile>
-
-      <vl-layer-vector id="countries" render-mode="image">
-        <vl-source-vector ident="countries-source" ref="vectorSource" :features.sync="countries" :url="countriesUrl" />
+      <vl-layer-vector>
+        <vl-source-vector :features.sync="features"></vl-source-vector>
+        <vl-style-func :factory="styleFactory" />
       </vl-layer-vector>
 
       <vl-interaction-select :features.sync="selectedFeatures" />
@@ -47,21 +22,17 @@
 </template>
 
 <script>
-  import { platformModifierKeyOnly } from 'ol/events/condition'
-  import { DragBox } from 'ol/interaction'
-  import { writeGeoJsonFeature } from '../src/ol-ext'
+  import { createStyle } from '../src/ol-ext'
 
   export default {
     name: 'app',
     data () {
       return {
         zoom: 2,
-        center: [100, 10],
+        center: [0, 0],
         rotation: 0,
-        countriesUrl: 'https://openlayers.org/en/latest/examples/data/geojson/countries.geojson',
-        countries: [],
+        features: [],
         selectedFeatures: [],
-        swipe: 50,
       }
     },
     computed: {
@@ -69,61 +40,127 @@
         return this.selectedFeatures.map(({ id }) => id)
       },
     },
-    watch: {
-      swipe () {
-        this.$refs.map.render()
-      },
+    mounted () {
+      this.loadFeatures().then(features => {
+        this.features = features.map(Object.freeze)
+      })
     },
     methods: {
-      onUnselectClick () {
-        if (this.selectedFeatureIds.length) {
-          this.unselect(this.selectedFeatureIds[0])
+      loadFeatures() {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            // generate GeoJSON random features
+            resolve([{
+              type: "Feature",
+              geometry: {
+                type: 'Point',
+                coordinates: [5.44921875, 26.745610382199022],
+              },
+              properties: {
+                active: false,
+              },
+            },
+              {
+                type: "Feature",
+                geometry: {
+                  type: 'Polygon',
+                  coordinates: [
+                    [
+                      [
+                        -23.37890625,
+                        45.336701909968134,
+                      ],
+                      [
+                        -49.39453125,
+                        33.137551192346145,
+                      ],
+                      [
+                        -47.4609375,
+                        3.6888551431470478,
+                      ],
+                      [
+                        -20.390625,
+                        -8.059229627200192,
+                      ],
+                      [
+                        -13.0078125,
+                        20.138470312451155,
+                      ],
+                      [
+                        -23.37890625,
+                        45.336701909968134,
+                      ],
+                    ],
+                  ],
+                },
+                properties: {
+                  active: true,
+                },
+              },
+              {
+                type: "Feature",
+                geometry: {
+                  type: "LineString",
+                  coordinates: [
+                    [
+                      44.47265625,
+                      -1.7575368113083125,
+                    ],
+                    [
+                      23.5546875,
+                      9.795677582829743,
+                    ],
+                    [
+                      47.109375,
+                      23.241346102386135,
+                    ],
+                    [
+                      22.8515625,
+                      33.137551192346145,
+                    ],
+                    [
+                      48.33984375,
+                      42.032974332441405,
+                    ],
+                    [
+                      19.86328125,
+                      48.574789910928864,
+                    ],
+                    [
+                      47.8125,
+                      56.65622649350222,
+                    ],
+                  ],
+                },
+                properties: {
+                  active: false,
+                },
+              },
+            ])
+          }, 3000)
+        })
+      },
+      styleFactory() {
+        const defStyle = createStyle({
+          fillColor: 'white',
+          strokeColor: 'blue',
+          imageRadius: 5,
+          imageFillColor: 'white',
+          imageStrokeColor: 'blue',
+        })
+        const activeStyle = createStyle({
+          fillColor: 'white',
+          strokeColor: 'red',
+          imageRadius: 5,
+          imageFillColor: 'white',
+          imageStrokeColor: 'red',
+        })
+        return feature => {
+          if (feature.get('active')) {
+            return [activeStyle]
+          }
+          return [defStyle]
         }
-      },
-      unselect (id) {
-        const mapFeatureIndex = this.selectedFeatures.findIndex((f) => f.id === id)
-
-        if (mapFeatureIndex !== -1) {
-          this.selectedFeatures.splice(mapFeatureIndex, 1)
-        }
-      },
-      mapCreated (map) {
-        const dragBox = new DragBox({
-          condition: platformModifierKeyOnly,
-        })
-
-        map.$map.addInteraction(dragBox)
-
-        dragBox.on('boxend', () => {
-          // features that intersect the box are added to the collection of
-          // selected features
-          const extent = dragBox.getGeometry().getExtent()
-          /** @var {ol.source.Vector} source */
-          const source = this.$refs.vectorSource.$source
-
-          source.forEachFeatureIntersectingExtent(extent, feature => {
-            feature = writeGeoJsonFeature(feature)
-            this.selectedFeatures.push(feature)
-          })
-        })
-
-        // clear selection when drawing a new box and when clicking on the map
-        dragBox.on('boxstart', () => {
-          this.selectedFeatures = []
-        })
-      },
-      onRightPrecompose (evt) {
-        const ctx = evt.context
-        const width = ctx.canvas.width * (this.swipe / 100)
-
-        ctx.save()
-        ctx.beginPath()
-        ctx.rect(width, 0, ctx.canvas.width - width, ctx.canvas.height)
-        ctx.clip()
-      },
-      onRightPostcompose (evt) {
-        const ctx = evt.context
-        ctx.restore()
       },
     },
   }
@@ -162,9 +199,5 @@
       padding: 5px 10px;
       text-transform: uppercase;
     }
-  }
-
-  #swipe {
-    width: 100%;
   }
 </style>
