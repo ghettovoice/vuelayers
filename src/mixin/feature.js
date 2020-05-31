@@ -5,7 +5,7 @@ import { map as mapObs, skipWhile } from 'rxjs/operators'
 import { getFeatureId, getFeatureProperties, initializeFeature, setFeatureId, setFeatureProperties } from '../ol-ext'
 import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
 import { assert } from '../util/assert'
-import { clonePlainObject, hasProp, isEqual, isFunction, pick, stubObject } from '../util/minilo'
+import { clonePlainObject, hasProp, isEqual, pick, stubObject } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
 import waitFor from '../util/wait-for'
 import geometryContainer from './geometry-container'
@@ -49,10 +49,15 @@ export default {
   computed: {
     currentProperties () {
       if (this.rev && this.$feature) {
-        return this.getPropertiesSync()
+        return this.getPropertiesInternal()
       }
 
       return this.properties
+    },
+    currentGeometryName () {
+      if (!(this.rev && this.$feature)) return
+
+      return this.getGeometryNameInternal()
     },
   },
   watch: {
@@ -70,6 +75,11 @@ export default {
         this.$emit('update:properties', clonePlainObject(value))
       }, FRAME_TIME),
     },
+    currentGeometryName: debounce(function (value, prev) {
+      if (value === prev) return
+
+      this.$emit('update:geometryName', value)
+    }, FRAME_TIME),
   },
   created () {
     this::defineServices()
@@ -207,17 +217,17 @@ export default {
     /**
      * @return {string|number}
      */
-    getIdSync () {
+    getIdInternal () {
       return getFeatureId(this.$feature)
     },
     /**
      * @param {string|number} id
      * @return {void}
      */
-    setIdSync (id) {
+    setIdInternal (id) {
       assert(id != null && id !== '', 'Invalid feature id')
 
-      if (id === this.getIdSync()) return
+      if (id === this.getIdInternal()) return
 
       setFeatureId(this.$feature, id)
     },
@@ -225,7 +235,16 @@ export default {
      * @return {Promise<string>}
      */
     async getGeometryName () {
-      return (await this.resolveFeature()).getGeometryName()
+      await this.resolveFeature()
+
+      return this.getGeometryNameInternal()
+    },
+    /**
+     * @return {string}
+     * @protected
+     */
+    getGeometryNameInternal () {
+      return this.$feature.getGeometryName()
     },
     /**
      * @param {string} geometryName
@@ -242,9 +261,9 @@ export default {
     async getProperties () {
       await this.resolveFeature()
 
-      return this.getPropertiesSync()
+      return this.getPropertiesInternal()
     },
-    getPropertiesSync () {
+    getPropertiesInternal () {
       return getFeatureProperties(this.$feature)
     },
     /**
@@ -253,7 +272,6 @@ export default {
      */
     async setProperties (properties) {
       properties = getFeatureProperties({ properties })
-
       if (isEqual(properties, await this.getProperties())) return
 
       setFeatureProperties(await this.resolveFeature(), properties)
@@ -272,22 +290,6 @@ export default {
       }
 
       return this.$mapVm.forEachFeatureAtPixel(pixel, feature => feature === selfFeature, { layerFilter })
-    },
-    /**
-     * @param {FeatureLike} feature
-     * @return {Promise<void>}
-     * @protected
-     */
-    async mergeWith (feature) {
-      if (!feature) return
-      if (isFunction(feature.resolveOlObject)) {
-        feature = await feature.resolveOlObject()
-      }
-      if (feature === await this.resolveFeature()) return
-
-      await this.setProperties({ ...feature.getProperties() })
-      await this.mergeGeometryWith(feature.getGeometry())
-      await this.mergeStyleWith(feature.getStyle())
     },
   },
 }

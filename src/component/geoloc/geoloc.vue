@@ -57,21 +57,21 @@
     computed: {
       currentTracking () {
         if (this.rev && this.$geolocation) {
-          return this.getTrackingSync()
+          return this.getTrackingInternal()
         }
 
         return this.tracking
       },
       currentTrackingOptions () {
         if (this.rev && this.$geolocation) {
-          return this.getTrackingOptionsSync()
+          return this.getTrackingOptionsInternal()
         }
 
         return this.trackingOptions
       },
       currentProjection () {
         if (this.rev && this.$geolocation) {
-          return getProj(this.getProjectionSync()).getCode()
+          return getProj(this.getProjectionInternal()).getCode()
         }
 
         return this.projection
@@ -89,13 +89,13 @@
       currentAccuracy () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.getAccuracySync()
+        return this.getAccuracyInternal()
       },
       currentAccuracyGeometryDataProj () {
         if (!(this.rev && this.$geolocation)) return
 
         return writeGeoJsonGeometry(
-          this.getAccuracyGeometrySync(),
+          this.getAccuracyGeometryInternal(),
           this.currentProjection || this.resolvedDataProjection,
           this.resolvedDataProjection,
         )
@@ -104,7 +104,7 @@
         if (!(this.rev && this.$geolocation)) return
 
         return writeGeoJsonGeometry(
-          this.getAccuracyGeometrySync(),
+          this.getAccuracyGeometryInternal(),
           this.currentProjection || this.resolvedDataProjection,
           this.viewProjection,
         )
@@ -112,32 +112,32 @@
       currentAltitude () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.getAltitudeSync()
+        return this.getAltitudeInternal()
       },
       currentAltitudeAccuracy () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.getAltitudeAccuracySync()
+        return this.getAltitudeAccuracyInternal()
       },
       currentHeading () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.getHeadingSync()
+        return this.getHeadingInternal()
       },
       currentSpeed () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.getSpeedSync()
+        return this.getSpeedInternal()
       },
       currentPositionDataProj () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.getPositionSync()
+        return this.getPositionInternal()
       },
       currentPositionViewProj () {
         if (!(this.rev && this.$geolocation)) return
 
-        return this.pointToViewProj(this.getPositionSync())
+        return this.pointToViewProj(this.getPositionInternal())
       },
     },
     watch: {
@@ -277,17 +277,17 @@
       /**
        * @return {number|string}
        */
-      getIdSync () {
+      getIdInternal () {
         return this.$geolocation.get('id')
       },
       /**
        * @param {string|number} id
        * @return {void}
        */
-      setIdSync (id) {
+      setIdInternal (id) {
         assert(id != null && id !== '', 'Invalid geolocation id')
 
-        if (id === this.getIdSync()) return
+        if (id === this.getIdInternal()) return
 
         this.$geolocation.set('id', id)
       },
@@ -297,9 +297,13 @@
       async getAccuracy () {
         await this.resolveGeolocation()
 
-        return this.getAccuracySync()
+        return this.getAccuracyInternal()
       },
-      getAccuracySync () {
+      /**
+       * @return {number}
+       * @protected
+       */
+      getAccuracyInternal () {
         return this.$geolocation.getAccuracy()
       },
       /**
@@ -308,9 +312,13 @@
       async getAccuracyGeometry () {
         await this.resolveGeolocation()
 
-        return this.getAccuracyGeometrySync()
+        return this.getAccuracyGeometryInternal()
       },
-      getAccuracyGeometrySync () {
+      /**
+       * @return {module:/ol/geom/Geometry~Geometry|undefined}
+       * @protected
+       */
+      getAccuracyGeometryInternal () {
         return this.$geolocation.getAccuracyGeometry()
       },
       /**
@@ -319,9 +327,13 @@
       async getAltitude () {
         await this.resolveGeolocation()
 
-        return this.getAltitudeSync()
+        return this.getAltitudeInternal()
       },
-      getAltitudeSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getAltitudeInternal () {
         return this.$geolocation.getAltitude()
       },
       /**
@@ -330,9 +342,13 @@
       async getAltitudeAccuracy () {
         await this.resolveGeolocation()
 
-        return this.getAltitudeAccuracySync()
+        return this.getAltitudeAccuracyInternal()
       },
-      getAltitudeAccuracySync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getAltitudeAccuracyInternal () {
         return this.$geolocation.getAltitudeAccuracy()
       },
       /**
@@ -341,9 +357,13 @@
       async getHeading () {
         await this.resolveGeolocation()
 
-        return this.getHeadingSync()
+        return this.getHeadingInternal()
       },
-      getHeadingSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getHeadingInternal () {
         return this.$geolocation.getHeading()
       },
       /**
@@ -352,9 +372,13 @@
       async getPosition () {
         await this.resolveGeolocation()
 
-        return this.getPositionSync()
+        return this.getPositionInternal()
       },
-      getPositionSync () {
+      /**
+       * @return {number[]|undefined}
+       * @protected
+       */
+      getPositionInternal () {
         return this.$geolocation.getPosition()
       },
       /**
@@ -363,9 +387,13 @@
       async getProjection () {
         await this.resolveGeolocation()
 
-        return this.getProjectionSync()
+        return this.getProjectionInternal()
       },
-      getProjectionSync () {
+      /**
+       * @return {module:ol/proj~ProjectionLike|undefined}
+       * @protected
+       */
+      getProjectionInternal () {
         return this.$geolocation.getProjection()
       },
       /**
@@ -374,7 +402,6 @@
        */
       async setProjection (projection) {
         projection = getProj(projection)
-
         if (isEqProj(projection, await this.getProjection())) return
 
         (await this.resolveGeolocation()).setProjection(projection)
@@ -385,9 +412,13 @@
       async getSpeed () {
         await this.resolveGeolocation()
 
-        return this.getSpeedSync()
+        return this.getSpeedInternal()
       },
-      getSpeedSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getSpeedInternal () {
         return this.$geolocation.getSpeed()
       },
       /**
@@ -396,9 +427,13 @@
       async getTracking () {
         await this.resolveGeolocation()
 
-        return this.getTrackingSync()
+        return this.getTrackingInternal()
       },
-      getTrackingSync () {
+      /**
+       * @return {boolean}
+       * @protected
+       */
+      getTrackingInternal () {
         return this.$geolocation.getTracking()
       },
       /**
@@ -416,9 +451,13 @@
       async getTrackingOptions () {
         await this.resolveGeolocation()
 
-        return this.getTrackingOptionsSync()
+        return this.getTrackingOptionsInternal()
       },
-      getTrackingOptionsSync () {
+      /**
+       * @return {Object|undefined}
+       * @protected
+       */
+      getTrackingOptionsInternal () {
         return this.$geolocation.getTrackingOptions()
       },
       /**

@@ -6,7 +6,7 @@
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
-  const sourceContainer = createSourceContainer({
+  const sourceContainer = /*#__PURE__*/ createSourceContainer({
     propName: 'innerSource',
   })
 
@@ -32,6 +32,13 @@
       geomFuncFactory: Function,
     },
     computed: {
+      currentDistance () {
+        if (this.rev && this.$source) {
+          return this.getDistanceInternal()
+        }
+
+        return this.distance
+      },
       resolvedGeomFunc () {
         let geomFunc = this.geomFunc
         if (!geomFunc && this.geomFuncFactory) {
@@ -39,13 +46,6 @@
         }
 
         return geomFunc || defaultGeomFunc
-      },
-      currentDistance () {
-        if (this.rev && this.$source) {
-          return this.$source.getDistance()
-        }
-
-        return this.distance
       },
     },
     watch: {
@@ -101,7 +101,12 @@
       },
       getSourceTarget: vectorSource.methods.resolveOlObject,
       async getDistance () {
-        return (await this.resolveSource()).getDistance()
+        await this.resolveSource()
+
+        return this.getDistanceInternal()
+      },
+      getDistanceInternal () {
+        return this.$source.getDistance()
       },
       async setDistance (distance) {
         if (distance === await this.getDistance()) return

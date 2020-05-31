@@ -48,9 +48,13 @@
         if (radius === await this.getRadius()) return
 
         (await this.resolveStyle()).setRadius(radius)
-
         await this.scheduleRemount()
       },
+      /**
+       * @param {number} radius
+       * @return {Promise<void>}
+       * @protected
+       */
       async onRadiusChanged (radius) {
         await this.setRadius(radius)
       },

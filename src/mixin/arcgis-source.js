@@ -210,11 +210,9 @@ export default {
      */
     async updateParams (params) {
       params = { ...this.allParams, ...params }
-      const source = await this.resolveSource()
+      if (isEqual(params, await this.getParams())) return
 
-      if (isEqual(params, source.getParams())) return
-
-      source.updateParams(params)
+      (await this.resolveSource()).updateParams(params)
     },
     /**
      * @param {string} param

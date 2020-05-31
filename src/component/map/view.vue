@@ -183,45 +183,42 @@
         return this.pointToViewProj(this.center)
       },
       extentDataProj () {
-        return this.extent && roundExtent(this.extent)
+        return roundExtent(this.extent)
       },
       extentViewProj () {
-        return this.extent && this.extentToViewProj(this.extent)
+        return this.extentToViewProj(this.extent)
       },
       currentZoom () {
         if (this.rev && this.$view) {
-          return this.getZoomSync()
+          return this.getZoomInternal()
         }
 
         return this.zoom
       },
       currentRotation () {
         if (this.rev && this.$view) {
-          return this.getRotationSync()
+          return this.getRotationInternal()
         }
 
         return this.rotation
       },
       currentResolution () {
         if (this.rev && this.$view) {
-          return this.getResolutionSync()
+          return this.getResolutionInternal()
         }
 
         return this.resolution
       },
       currentCenterDataProj () {
         if (this.rev && this.$view) {
-          return this.getCenterSync()
+          return this.getCenterInternal()
         }
 
         return this.centerDataProj
       },
-      /**
-       * @type {number[]}
-       */
       currentCenterViewProj () {
         if (this.rev && this.$view) {
-          return this.getCenterSync(true)
+          return this.getCenterInternal(true)
         }
 
         return this.centerViewProj
@@ -229,37 +226,37 @@
       currentAnimating () {
         if (!(this.rev && this.$view)) return false
 
-        return this.getAnimatingSync()
+        return this.getAnimatingInternal()
       },
       currentInteracting () {
         if (!(this.rev && this.$view)) return false
 
-        return this.getInteractingSync()
+        return this.getInteractingInteraction()
       },
       currentResolutions () {
         if (!(this.rev && this.$view)) return false
 
-        return this.getResolutionsSync()
+        return this.getResolutionsInternal()
       },
       currentMaxResolution () {
         if (!(this.rev && this.$view)) return false
 
-        return this.getMaxResolutionSync()
+        return this.getMaxResolutionInternal()
       },
       currentMinResolution () {
         if (!(this.rev && this.$view)) return false
 
-        return this.getMinResolutionSync()
+        return this.getMinResolutionInternal()
       },
       currentMaxZoom () {
         if (!(this.rev && this.$view)) return false
 
-        return this.getMaxZoomSync()
+        return this.getMaxZoomInternal()
       },
       currentMinZoom () {
         if (!(this.rev && this.$view)) return false
 
-        return this.getMinZoomSync()
+        return this.getMinZoomInternal()
       },
       /**
        * @return {module:ol/proj~ProjectionLike}
@@ -479,17 +476,17 @@
       /**
        * @return {Promise<string|number|undefined>}
        */
-      getIdSync () {
+      getIdInternal () {
         return getViewId(this.$view)
       },
       /**
        * @param {number|string|undefined} id
        * @return {Promise<void>}
        */
-      setIdSync (id) {
+      setIdInternal (id) {
         assert(id != null && id !== '', 'Invalid view id')
 
-        if (id === this.getIdSync()) return
+        if (id === this.getIdInternal()) return
 
         setViewId(this.$view, id)
       },
@@ -506,7 +503,7 @@
         }
         args.forEach(opts => {
           if (!isArray(opts.center)) return
-          if (!opts.viewproj) {
+          if (!opts.viewProj) {
             opts.center = this.pointToViewProj(opts.center)
           }
         })
@@ -557,43 +554,40 @@
       async getAnimating () {
         await this.resolveView()
 
-        return this.getAnimatingSync()
+        return this.getAnimatingInternal()
       },
-      getAnimatingSync () {
+      /**
+       * @return {boolean}
+       * @protected
+       */
+      getAnimatingInternal () {
         return this.$view.getAnimating()
       },
       /**
        * @return {Promise<void>}
        */
       async cancelAnimations () {
-        await this.resolveView()
-
-        return this.cancelAnimationsSync()
-      },
-      cancelAnimationsSync () {
-        this.$view.cancelAnimations()
+        (await this.resolveView()).cancelAnimations()
       },
       /**
        * @return {Promise<void>}
        */
       async beginInteraction () {
-        await this.resolveView()
-
-        this.beginInteractionSync()
-      },
-      beginInteractionSync () {
-        this.$view.beginInteraction()
+        (await this.resolveView()).beginInteraction()
       },
       /**
+       * @param {number} [duration]
+       * @param {number} [resolutionDirection]
+       * @param {number[]} [anchor]
+       * @param {boolean} [viewProj=false]
        * @return {Promise<void>}
        */
-      async endInteraction (duration, resolutionDirection, anchor) {
-        await this.resolveView()
+      async endInteraction (duration, resolutionDirection, anchor, viewProj = false) {
+        if (!viewProj) {
+          anchor = this.pointToViewProj(anchor)
+        }
 
-        this.endInteractionSync(duration, resolutionDirection, anchor)
-      },
-      endInteractionSync (duration, resolutionDirection, anchor) {
-        this.$view.endInteraction(duration, resolutionDirection, anchor)
+        (await this.resolveView()).endInteraction(duration, resolutionDirection, anchor)
       },
       /**
        * @return {Promise<boolean>}
@@ -601,9 +595,13 @@
       async getInteracting () {
         await this.resolveView()
 
-        return this.getInteractingSync()
+        return this.getInteractingInteraction()
       },
-      getInteractingSync () {
+      /**
+       * @return {boolean}
+       * @protected
+       */
+      getInteractingInteraction () {
         return this.$view.getInteracting()
       },
       /**
@@ -612,12 +610,7 @@
        * @return {Promise<number[]>}
        */
       async calculateExtent (size, viewProj = false) {
-        await this.resolveView()
-
-        return this.calculateExtentSync(size, viewProj)
-      },
-      calculateExtentSync (size, viewProj = false) {
-        const extent = this.$view.calculateExtent(size)
+        const extent = (await this.resolveView()).calculateExtent(size)
         if (viewProj) {
           return roundExtent(extent)
         }
@@ -632,25 +625,26 @@
        * @return {Promise<void>}
        */
       async centerOn (coordinate, size, position, viewProj = false) {
-        await this.resolveView()
-
-        this.centerOnSync(coordinate, size, position, viewProj)
-      },
-      centerOnSync (coordinate, size, position, viewProj = false) {
         if (!viewProj) {
           coordinate = this.pointToViewProj(coordinate)
         }
-        this.$view.centerOn(coordinate, size, position)
+
+        (await this.resolveView()).centerOn(coordinate, size, position)
       },
       /**
+       * @param {boolean} [viewProj=false]
        * @return {Promise<number[]>}
        */
       async getCenter (viewProj = false) {
         await this.resolveView()
 
-        return this.getCenterSync(viewProj)
+        return this.getCenterInternal(viewProj)
       },
-      getCenterSync (viewProj = false) {
+      /**
+       * @param {boolean} [viewProj=false]
+       * @return {number[]}
+       */
+      getCenterInternal (viewProj = false) {
         if (viewProj) {
           return roundCoords(this.$view.getCenter())
         }
@@ -663,18 +657,13 @@
        * @return {Promise<void>}
        */
       async setCenter (center, viewProj = false) {
-        await this.resolveView()
-
-        this.setCenterSync(center, viewProj)
-      },
-      setCenterSync (center, viewProj = false) {
         center = roundPointCoords(center)
-        if (isEqual(center, this.getCenterSync(viewProj))) return
-
+        if (isEqual(center, await this.getCenter(viewProj))) return
         if (!viewProj) {
           center = this.pointToViewProj(center)
         }
-        this.$view.setCenter(center)
+
+        (await this.resolveView()).setCenter(center)
       },
       /**
        * @return {Promise<number>}
@@ -682,9 +671,12 @@
       async getResolution () {
         await this.resolveView()
 
-        return this.getResolutionSync()
+        return this.getResolutionInternal()
       },
-      getResolutionSync () {
+      /**
+       * @return {number}
+       */
+      getResolutionInternal () {
         return this.$view.getResolution()
       },
       /**
@@ -692,14 +684,9 @@
        * @return {Promise<void>}
        */
       async setResolution (resolution) {
-        await this.resolveView()
+        if (resolution === await this.getResolution()) return
 
-        this.setResolutionSync(resolution)
-      },
-      setResolutionSync (resolution) {
-        if (resolution === this.getResolutionSync()) return
-
-        this.$view.setResolution(resolution)
+        (await this.resolveView()).setResolution(resolution)
       },
       /**
        * @param {number[]} extent
@@ -708,28 +695,18 @@
        * @return {Promise<number>}
        */
       async getResolutionForExtent (extent, size, viewProj = false) {
-        await this.resolveView()
-
-        return this.getResolutionForExtentSync(extent, size, viewProj)
-      },
-      getResolutionForExtentSync (extent, size, viewProj = false) {
         if (!viewProj) {
           extent = this.extentToViewProj(extent)
         }
 
-        return this.$view.getResolutionForExtent(extent, size)
+        return (await this.resolveView()).getResolutionForExtent(extent, size)
       },
       /**
        * @param {number} zoom
        * @return {Promise<number>}
        */
       async getResolutionForZoom (zoom) {
-        await this.resolveView()
-
-        return this.getResolutionForZoomSync(zoom)
-      },
-      getResolutionForZoomSync (zoom) {
-        return this.$view.getResolutionForZoom(zoom)
+        return (await this.resolveView()).getResolutionForZoom(zoom)
       },
       /**
        * @return {Promise<number[]|undefined>}
@@ -737,9 +714,13 @@
       async getResolutions () {
         await this.resolveView()
 
-        return this.getResolutionsSync()
+        return this.getResolutionsInternal()
       },
-      getResolutionsSync () {
+      /**
+       * @return {number[]|undefined}
+       * @protected
+       */
+      getResolutionsInternal () {
         return this.$view.getResolutions()
       },
       /**
@@ -748,9 +729,13 @@
       async getMaxResolution () {
         await this.resolveView()
 
-        return this.getMaxResolutionSync()
+        return this.getMaxResolutionInternal()
       },
-      getMaxResolutionSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getMaxResolutionInternal () {
         return this.$view.getMaxResolution()
       },
       /**
@@ -759,9 +744,13 @@
       async getMinResolution () {
         await this.resolveView()
 
-        return this.getMinResolutionSync()
+        return this.getMinResolutionInternal()
       },
-      getMinResolutionSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getMinResolutionInternal () {
         this.$view.getMinResolution()
       },
       /**
@@ -770,9 +759,13 @@
       async getZoom () {
         await this.resolveView()
 
-        return this.getZoomSync()
+        return this.getZoomInternal()
       },
-      getZoomSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getZoomInternal () {
         return this.$view.getZoom()
       },
       /**
@@ -780,26 +773,16 @@
        * @return {Promise<void>}
        */
       async setZoom (zoom) {
-        await this.resolveView()
+        if (zoom === await this.getZoom()) return
 
-        this.setZoomSync(zoom)
-      },
-      setZoomSync (zoom) {
-        if (zoom === this.getZoomSync()) return
-
-        this.$view.setZoom(zoom)
+        (await this.resolveView()).setZoom(zoom)
       },
       /**
        * @param {number} resolution
        * @return {Promise<number|undefined>}
        */
       async getZoomForResolution (resolution) {
-        await this.resolveView()
-
-        return this.getZoomForResolutionSync(resolution)
-      },
-      getZoomForResolutionSync (resolution) {
-        return this.$view.getZoomForResolution(resolution)
+        return (await this.resolveView()).getZoomForResolution(resolution)
       },
       /**
        * @return {Promise<number|undefined>}
@@ -807,9 +790,13 @@
       async getMaxZoom () {
         await this.resolveView()
 
-        return this.getMaxZoomSync()
+        return this.getMaxZoomInternal()
       },
-      getMaxZoomSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getMaxZoomInternal () {
         return this.$view.getMaxZoom()
       },
       /**
@@ -817,14 +804,9 @@
        * @return {Promise<void>}
        */
       async setMaxZoom (zoom) {
-        await this.resolveView()
+        if (zoom === await this.getMaxZoom()) return
 
-        this.setMaxZoomSync(zoom)
-      },
-      setMaxZoomSync (zoom) {
-        if (zoom === this.getMaxZoomSync()) return
-
-        this.$view.setMaxZoom(zoom)
+        (await this.resolveView()).setMaxZoom(zoom)
       },
       /**
        * @return {Promise<number|undefined>}
@@ -832,9 +814,13 @@
       async getMinZoom () {
         await this.resolveView()
 
-        return this.getMinZoomSync()
+        return this.getMinZoomInternal()
       },
-      getMinZoomSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getMinZoomInternal () {
         return this.$view.getMinZoom()
       },
       /**
@@ -842,25 +828,15 @@
        * @return {Promise<void>}
        */
       async setMinZoom (zoom) {
-        await this.resolveView()
+        if (zoom === await this.getMinZoom()) return
 
-        this.setMinZoomSync(zoom)
-      },
-      setMinZoomSync (zoom) {
-        if (zoom === this.getMinZoomSync()) return
-
-        this.$view.setMinZoom(zoom)
+        (await this.resolveView()).setMinZoom(zoom)
       },
       /**
        * @return {Promise<module:ol/proj/Projection>}
        */
       async getProjection () {
-        await this.resolveView()
-
-        return this.getProjectionSync()
-      },
-      getProjectionSync () {
-        return this.$view.getProjection()
+        return (await this.resolveView()).getProjection()
       },
       /**
        * @return {Promise<number|undefined>}
@@ -868,9 +844,13 @@
       async getRotation () {
         await this.resolveView()
 
-        return this.getRotationSync()
+        return this.getRotationInternal()
       },
-      getRotationSync () {
+      /**
+       * @return {number|undefined}
+       * @protected
+       */
+      getRotationInternal () {
         return this.$view.getRotation()
       },
       /**
@@ -878,14 +858,9 @@
        * @return {Promise<void>}
        */
       async setRotation (rotation) {
-        await this.resolveView()
+        if (rotation === await this.getRotation()) return
 
-        this.setRotationSync(rotation)
-      },
-      setRotationSync (rotation) {
-        if (rotation === this.getRotationSync()) return
-
-        this.$view.setRotation(rotation)
+        (await this.resolveView()).setRotation(rotation)
       },
     },
   }

@@ -127,9 +127,9 @@ export default {
       control = await this.initializeControl(control)
       instanceOf(control, Control)
 
-      if (!this.getControlById(getControlId(control))) {
-        this.$controlsCollection.push(control)
-      }
+      if (this.getControlById(getControlId(control))) return
+
+      this.$controlsCollection.push(control)
     },
     /**
      * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} controls
@@ -175,9 +175,7 @@ export default {
      * @returns {ControlLike}
      */
     getControlById (controlId) {
-      return find(this.getControls(), control => {
-        return getControlId(control) === controlId
-      })
+      return find(this.getControls(), control => getControlId(control) === controlId)
     },
   },
 }

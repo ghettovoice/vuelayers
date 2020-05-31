@@ -151,6 +151,16 @@ export default {
 
       return map(this.getFeaturesSync(), feature => this.writeFeatureInViewProj(feature))
     },
+    currentExtentDataProj () {
+      if (!(this.rev && this.$source)) return
+
+      return this.getExtentInternal()
+    },
+    currentExtentViewProj () {
+      if (!(this.rev && this.$source)) return
+
+      return this.getExtentInternal(null, true)
+    },
     urlFunc () {
       return this.createUrlFunc(this.url)
     },
@@ -187,12 +197,11 @@ export default {
         // add new features
         await this.addFeatures(features)
         // remove non-matched features
-        const removed = difference(
+        await this.removeFeatures(difference(
           this.currentFeaturesDataProj,
           features,
           (a, b) => getFeatureId(a) === getFeatureId(b),
-        )
-        await this.removeFeatures(removed)
+        ))
       }, FRAME_TIME),
     },
     currentFeaturesDataProj: {
@@ -334,10 +343,9 @@ export default {
         } else {
           newFeatures.push(feature)
         }
-      }))
+      }));
 
-      const source = await this.resolveSource()
-      source.addFeatures(newFeatures)
+      (await this.resolveSource()).addFeatures(newFeatures)
     },
     async addFeature (feature) {
       await this.addFeatures([feature])
@@ -353,10 +361,9 @@ export default {
         if (!feature) return
 
         removedFeatures.push(feature)
-      }))
+      }));
 
-      const source = await this.resolveSource()
-      source.removeFeatures(removedFeatures)
+      (await this.resolveSource()).removeFeatures(removedFeatures)
     },
     async removeFeature (feature) {
       await this.removeFeatures([feature])
@@ -373,7 +380,12 @@ export default {
       return this.$source.getFeatures()
     },
     async getFeaturesCollection () {
-      return (await this.resolveSource()).getFeaturesCollection()
+      await this.resolveSource()
+
+      return this.getFeaturesCollectionSync()
+    },
+    getFeaturesCollectionSync () {
+      return this.$source.getFeaturesCollection()
     },
     async clear () {
       const source = await this.resolveSource()
@@ -388,61 +400,96 @@ export default {
     },
     /**
      * @param {function} callback
-     * @returns {Promise<void>}
+     * @returns {Promise<*>}
      */
     async forEachFeature (callback) {
-      (await this.resolveSource()).forEachFeature(callback)
+      return (await this.resolveSource()).forEachFeature(callback)
     },
     /**
      * @param {number[]} extent
      * @param {function} callback
-     * @returns {Promise<*|T>}
+     * @param {boolean} [viewProj=false]
+     * @returns {Promise<*>}
      */
-    async forEachFeatureInExtent (extent, callback) {
-      return (await this.resolveSource()).forEachFeatureInExtent(this.extentToViewProj(extent), callback)
+    async forEachFeatureInExtent (extent, callback, viewProj = false) {
+      if (!viewProj) {
+        extent = this.extentToViewProj(extent)
+      }
+
+      return (await this.resolveSource()).forEachFeatureInExtent(extent, callback)
     },
     /**
      * @param {number[]} extent
      * @param {function} callback
-     * @returns {Promise<T>}
+     * @param {boolean} [viewProj=false]
+     * @returns {Promise<*>}
      */
-    async forEachFeatureIntersectingExtent (extent, callback) {
-      return (await this.resolveSource()).forEachFeatureInExtent(this.extentToViewProj(extent), callback)
+    async forEachFeatureIntersectingExtent (extent, callback, viewProj = false) {
+      if (!viewProj) {
+        extent = this.extentToViewProj(extent)
+      }
+
+      return (await this.resolveSource()).forEachFeatureIntersectingExtent(extent, callback)
     },
     /**
      * @param {number[]} coordinate
+     * @param {boolean} [viewProj=false]
      * @returns {Promise<Array<module:ol/Feature~Feature>>}
      */
-    async getFeaturesAtCoordinate (coordinate) {
-      return (await this.resolveSource()).getFeaturesAtCoordinate(this.pointToViewProj(coordinate))
+    async getFeaturesAtCoordinate (coordinate, viewProj = false) {
+      if (!viewProj) {
+        coordinate = this.pointToViewProj(coordinate)
+      }
+
+      return (await this.resolveSource()).getFeaturesAtCoordinate(coordinate)
     },
     /**
      * @param {number[]} extent
+     * @param {boolean} [viewProj=false]
      * @returns {Promise<Array<module:ol/Feature~Feature>>}
      */
-    async getFeaturesInExtent (extent) {
-      return (await this.resolveSource()).getFeaturesInExtent(this.extentToViewProj(extent))
+    async getFeaturesInExtent (extent, viewProj = false) {
+      if (!viewProj) {
+        extent = this.extentToViewProj(extent)
+      }
+
+      return (await this.resolveSource()).getFeaturesInExtent(extent)
     },
     /**
      * @param {number[]} coordinate
      * @param {function} [filter]
+     * @param {boolean} [viewProj=false]
      * @returns {Promise<module:ol/Feature~Feature>}
      */
-    async getClosestFeatureToCoordinate (coordinate, filter) {
-      return (await this.resolveSource()).getClosestFeatureToCoordinate(this.pointToViewProj(coordinate), filter)
+    async getClosestFeatureToCoordinate (coordinate, filter, viewProj = false) {
+      if (!viewProj) {
+        coordinate = this.pointToViewProj(coordinate)
+      }
+
+      return (await this.resolveSource()).getClosestFeatureToCoordinate(coordinate, filter)
     },
     /**
      * @param {number[]} [extent]
+     * @param {boolean} [viewProj=false]
      * @returns {Promise<number[]>}
      */
-    async getExtent (extent) {
-      return this.extentToDataProj((await this.resolveSource()).getExtent(this.extentToViewProj(extent)))
+    async getExtent (extent, viewProj = false) {
+      await this.resolveSource()
+
+      return this.getExtentInternal(extent, viewProj)
+    },
+    getExtentInternal (extent, viewProj = false) {
+      if (viewProj) {
+        return this.$source.getExtent(extent)
+      }
+
+      return this.extentToDataProj(this.$source.getExtent(this.extentToViewProj(extent)))
     },
     /**
-     * @returns {Promise<module:ol/format/Feature~FeatureFormat|undefined>}
+     * @returns {module:ol/format/Feature~FeatureFormat|undefined}
      */
-    async getFormat () {
-      return (await this.resolveSource()).getFormat()
+    getFormat () {
+      return this.format
     },
     /**
      * @returns {Promise<boolean>}
@@ -490,10 +537,15 @@ export default {
     },
     /**
      * @param {number[]} extent
+     * @param {boolean} [viewProj=false]
      * @returns {Promise<void>}
      */
-    async removeLoadedExtent (extent) {
-      (await this.resolveSource()).removeLoadedExtent(this.extentToViewProj(extent))
+    async removeLoadedExtent (extent, viewProj = false) {
+      if (!viewProj) {
+        extent = this.extentToViewProj(extent)
+      }
+
+      (await this.resolveSource()).removeLoadedExtent(extent)
     },
     /**
      * @param {string|function|undefined} url

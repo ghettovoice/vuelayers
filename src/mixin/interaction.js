@@ -56,14 +56,14 @@ export default {
   computed: {
     currentActive () {
       if (this.rev && this.$interaction) {
-        return this.getActiveSync()
+        return this.getActiveInternal()
       }
 
       return this.active
     },
     currentPriority () {
       if (this.rev && this.$interaction) {
-        return this.getPrioritySync()
+        return this.getPriorityInternal()
       }
 
       return this.priority
@@ -199,17 +199,17 @@ export default {
     /**
      * @returns {string|number}
      */
-    getIdSync () {
+    getIdInternal () {
       return getInteractionId(this.$interaction)
     },
     /**
      * @param {string|number} id
      * @returns {void}
      */
-    setIdSync (id) {
+    setIdInternal (id) {
       assert(id != null && id !== '', 'Invalid interaction id')
 
-      if (id === this.getIdSync()) return
+      if (id === this.getIdInternal()) return
 
       setInteractionId(this.$interaction, id)
     },
@@ -219,9 +219,13 @@ export default {
     async getActive () {
       await this.resolveInteraction()
 
-      return this.getActiveSync()
+      return this.getActiveInternal()
     },
-    getActiveSync () {
+    /**
+     * @return {boolean}
+     * @protected
+     */
+    getActiveInternal () {
       return this.$interaction.getActive()
     },
     /**
@@ -239,9 +243,9 @@ export default {
     async getPriority () {
       await this.resolveInteraction()
 
-      return this.getPrioritySync()
+      return this.getPriorityInternal()
     },
-    getPrioritySync () {
+    getPriorityInternal () {
       return getInteractionPriority(this.$interaction)
     },
     /**

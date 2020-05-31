@@ -70,7 +70,7 @@ export default {
   computed: {
     currentId () {
       if (this.rev && this.$olObject) {
-        return this.getIdSync()
+        return this.getIdInternal()
       }
 
       return this.id
@@ -208,14 +208,12 @@ export default {
      * @return {Promise<void>}
      * @protected
      */
-    async mount () {
-    },
+    async mount () {},
     /**
      * @return {void|Promise<void>}
      * @protected
      */
-    async unmount () {
-    },
+    async unmount () {},
     /**
      * Refresh internal ol objects
      * @return {Promise<void>}
@@ -366,9 +364,13 @@ export default {
     async getId () {
       await this.resolveOlObject()
 
-      return this.getIdSync()
+      return this.getIdInternal()
     },
-    getIdSync () {
+    /**
+     * @return {string|number}
+     * @protected
+     */
+    getIdInternal () {
       if (isFunction(this.$olObject.get)) {
         return this.$olObject.get('id')
       }
@@ -382,12 +384,16 @@ export default {
     async setId (id) {
       await this.resolveOlObject()
 
-      this.setIdSync(id)
+      this.setIdInternal(id)
     },
-    setIdSync (id) {
+    /**
+     * @param {string|number} id
+     * @protected
+     */
+    setIdInternal (id) {
       assert(id != null && id !== '', 'Invalid id')
 
-      if (id === this.getIdSync()) return
+      if (id === this.getIdInternal()) return
 
       if (isFunction(this.$olObject.set)) {
         this.$olObject.set('id', id)

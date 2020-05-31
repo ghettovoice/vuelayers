@@ -154,7 +154,6 @@
         if (zIndex === await this.getZIndex()) return
 
         (await this.resolveStyle()).setZIndex(zIndex)
-
         await this.scheduleRemount()
       },
       async getRenderer () {
@@ -164,7 +163,6 @@
         if (renderer === await this.getRenderer()) return
 
         (await this.resolveStyle()).setRenderer(renderer)
-
         await this.scheduleRemount()
       },
       async getGeometryFunction () {

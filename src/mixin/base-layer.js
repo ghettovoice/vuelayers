@@ -102,63 +102,63 @@ export default {
     },
     currentExtentDataProj () {
       if (this.rev && this.$layer) {
-        return this.getExtentSync()
+        return this.getExtentInternal()
       }
 
       return this.extentDataProj
     },
     currentExtentViewProj () {
       if (this.rev && this.$layer) {
-        return this.getExtentSync(true)
+        return this.getExtentInternal(true)
       }
 
       return this.extentViewProj
     },
     currentMaxResolution () {
       if (this.rev && this.$layer) {
-        return this.getMaxResolutionSync()
+        return this.getMaxResolutionInternal()
       }
 
       return this.maxResolution
     },
     currentMinResolution () {
       if (this.rev && this.$layer) {
-        return this.getMinResolutionSync()
+        return this.getMinResolutionInternal()
       }
 
       return this.minResolution
     },
     currentMaxZoom () {
       if (this.rev && this.$layer) {
-        return this.getMaxZoomSync()
+        return this.getMaxZoomInternal()
       }
 
       return this.maxZoom
     },
     currentMinZoom () {
       if (this.rev && this.$layer) {
-        return this.getMinZoomSync()
+        return this.getMinZoomInternal()
       }
 
       return this.minZoom
     },
     currentOpacity () {
       if (this.rev && this.$layer) {
-        return this.getOpacitySync()
+        return this.getOpacityInternal()
       }
 
       return this.opacity
     },
     currentVisible () {
       if (this.rev && this.$layer) {
-        return this.getVisibleSync()
+        return this.getVisibleInternal()
       }
 
       return this.visible
     },
     currentZIndex () {
       if (this.rev && this.$layer) {
-        return this.getZIndexSync()
+        return this.getZIndexInternal()
       }
 
       return this.zIndex
@@ -338,60 +338,69 @@ export default {
     ]),
     /**
      * @returns {string|number}
+     * @protected
      */
-    getIdSync () {
+    getIdInternal () {
       return getLayerId(this.$layer)
     },
     /**
      * @param {string|number} id
      * @returns {void}
+     * @protected
      */
-    setIdSync (id) {
+    setIdInternal (id) {
       assert(id != null && id !== '', 'Invalid layer id')
 
-      if (id === this.getIdSync()) return
+      if (id === this.getIdInternal()) return
 
       setLayerId(this.$layer, id)
     },
     /**
+     * @param {boolean} [viewProj=false]
      * @returns {Promise<number[]|undefined>}
      */
-    async getExtent () {
+    async getExtent (viewProj = false) {
       await this.resolveLayer()
 
-      return this.getExtentSync()
+      return this.getExtentInternal(viewProj)
     },
-    getExtentSync (viewProj = false) {
-      const extent = this.$layer.getExtent()
-      if (viewProj) {
-        return roundExtent(extent)
-      }
+    /**
+     * @param {boolean} [viewProj=false]
+     * @return {number[]|undefined}
+     * @protected
+     */
+    getExtentInternal (viewProj = false) {
+      if (viewProj) return roundExtent(this.$layer.getExtent())
 
-      return transformExtent(extent, this.viewProjection, this.resolvedExtentProjection)
+      return transformExtent(this.$layer.getExtent(), this.viewProjection, this.resolvedExtentProjection)
     },
     /**
      * @param {number[]} extent
+     * @param {boolean} [viewProj=false]
      * @returns {Promise<void>}
      */
-    async setExtent (extent) {
-      await this.resolveLayer()
+    async setExtent (extent, viewProj = false) {
+      extent = roundExtent(extent)
+      if (isEqual(extent, await this.getExtent(viewProj))) return
+      if (!viewProj) {
+        extent = transformExtent(extent, this.resolvedExtentProjection, this.resolvedDataProjection)
+      }
 
-      this.setExtentSync(extent)
-    },
-    setExtentSync (extent) {
-      if (isEqual(roundExtent(extent), this.getExtentSync())) return
-
-      this.$layer.setExtent(transformExtent(extent, this.resolvedExtentProjection, this.resolvedDataProjection))
+      (await this.resolveLayer()).setExtent(extent)
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {Promise<number|undefined>}
      */
     async getMaxResolution () {
       await this.resolveLayer()
 
-      return this.getMaxResolutionSync()
+      return this.getMaxResolutionInternal()
     },
-    getMaxResolutionSync () {
+    /**
+     * @return {number|undefined}
+     * @protected
+     */
+    getMaxResolutionInternal () {
       return this.$layer.getMaxResolution()
     },
     /**
@@ -404,14 +413,18 @@ export default {
       (await this.resolveLayer()).setMaxResolution(resolution)
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {Promise<number|undefined>}
      */
     async getMinResolution () {
       await this.resolveLayer()
 
-      return this.getMinResolutionSync()
+      return this.getMinResolutionInternal()
     },
-    getMinResolutionSync () {
+    /**
+     * @return {number|undefined}
+     * @protected
+     */
+    getMinResolutionInternal () {
       return this.$layer.getMinResolution()
     },
     /**
@@ -429,9 +442,13 @@ export default {
     async getMaxZoom () {
       await this.resolveLayer()
 
-      return this.getMaxZoomSync()
+      return this.getMaxZoomInternal()
     },
-    getMaxZoomSync () {
+    /**
+     * @return {number}
+     * @protected
+     */
+    getMaxZoomInternal () {
       return this.$layer.getMaxZoom()
     },
     /**
@@ -449,9 +466,13 @@ export default {
     async getMinZoom () {
       await this.resolveLayer()
 
-      return this.getMinZoomSync()
+      return this.getMinZoomInternal()
     },
-    getMinZoomSync () {
+    /**
+     * @return {number}
+     * @protected
+     */
+    getMinZoomInternal () {
       return this.$layer.getMinZoom()
     },
     /**
@@ -459,14 +480,9 @@ export default {
      * @returns {Promise<void>}
      */
     async setMinZoom (zoom) {
-      await this.resolveLayer()
+      if (zoom === await this.getMinZoom()) return
 
-      this.setMinZoomSync(zoom)
-    },
-    setMinZoomSync (zoom) {
-      if (zoom === this.getMinZoomSync()) return
-
-      this.$layer.setMinZoom(zoom)
+      (await this.resolveLayer()).setMinZoom(zoom)
     },
     /**
      * @returns {Promise<number>}
@@ -474,9 +490,13 @@ export default {
     async getOpacity () {
       await this.resolveLayer()
 
-      return this.getOpacitySync()
+      return this.getOpacityInternal()
     },
-    getOpacitySync () {
+    /**
+     * @return {number}
+     * @protected
+     */
+    getOpacityInternal () {
       return this.$layer.getOpacity()
     },
     /**
@@ -484,14 +504,9 @@ export default {
      * @returns {Promise<void>}
      */
     async setOpacity (opacity) {
-      await this.resolveLayer()
+      if (opacity === await this.getOpacity()) return
 
-      this.setOpacitySync(opacity)
-    },
-    setOpacitySync (opacity) {
-      if (opacity === this.getOpacitySync()) return
-
-      this.$layer.setOpacity(opacity)
+      (await this.resolveLayer()).setOpacity(opacity)
     },
     /**
      * @returns {Promise<boolean>}
@@ -499,9 +514,13 @@ export default {
     async getVisible () {
       await this.resolveLayer()
 
-      return this.getVisibleSync()
+      return this.getVisibleInternal()
     },
-    getVisibleSync () {
+    /**
+     * @return {boolean}
+     * @protected
+     */
+    getVisibleInternal () {
       return this.$layer.getVisible()
     },
     /**
@@ -509,14 +528,9 @@ export default {
      * @returns {Promise<void>}
      */
     async setVisible (visible) {
-      await this.resolveLayer()
+      if (visible === await this.getVisible()) return
 
-      this.setVisibleSync(visible)
-    },
-    setVisibleSync (visible) {
-      if (visible === this.getVisibleSync()) return
-
-      this.$layer.setVisible(visible)
+      (await this.resolveLayer()).setVisible(visible)
     },
     /**
      * @returns {Promise<number>}
@@ -524,9 +538,13 @@ export default {
     async getZIndex () {
       await this.resolveLayer()
 
-      return this.getZIndexSync()
+      return this.getZIndexInternal()
     },
-    getZIndexSync () {
+    /**
+     * @return {number}
+     * @protected
+     */
+    getZIndexInternal () {
       return this.$layer.getZIndex()
     },
     /**
@@ -534,26 +552,18 @@ export default {
      * @returns {Promise<void>}
      */
     async setZIndex (zIndex) {
-      await this.resolveLayer()
+      if (zIndex === await this.getZIndex()) return
 
-      this.setZIndexSync(zIndex)
-    },
-    setZIndexSync (zIndex) {
-      if (zIndex === this.getZIndexSync()) return
-
-      this.$layer.setZIndex(zIndex)
+      (await this.resolveLayer()).setZIndex(zIndex)
     },
     /**
      * @param {number[]} pixel
      * @return {boolean}
      */
     async isAtPixel (pixel) {
-      await Promise.all([this.resolveLayer(), this.$mapVm.resolveMap()])
+      const layer = await this.resolveLayer()
 
-      return this.isAtPixelSync(pixel)
-    },
-    isAtPixelSync (pixel) {
-      return this.$mapVm.forEachLayerAtPixelSync(pixel, mapLayer => mapLayer === this.$layer)
+      return this.$mapVm.forEachLayerAtPixel(pixel, mapLayer => mapLayer === layer)
     },
   },
 }

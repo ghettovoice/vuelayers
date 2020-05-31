@@ -147,17 +147,22 @@ export default {
      * @param {number[]} coordinate
      * @param {number} [resolution]
      * @param {string} [projection]
-     * @param {Object} [params] GetFeatureInfo params. `info_format` at least should be provided.
+     * @param {Object|undefined} [params] GetFeatureInfo params. `info_format` at least should be provided.
      *                          If `query_layers` is not provided then the layers specified in the `layers` prop will be used.
      *                          `version` should not be specified here (value from `version` prop will be used).
-     * @return {string|undefined}
+     * @return {Promise<string|undefined>}
      */
     async getFeatureInfoUrl (coordinate, resolution, projection, params = {}) {
-      resolution || (resolution = this.$view && this.$view.getResolution())
+      resolution || (resolution = await this.$viewVm.getResolution())
       projection || (projection = this.projection)
 
       return (await this.resolveSource()).getFeatureInfoUrl(coordinate, resolution, projection, params)
     },
+    /**
+     * @param {number} resolution
+     * @param {Object|undefined} [params]
+     * @return {Promise<string|undefined>}
+     */
     async getLegendUrl (resolution, params = {}) {
       return (await this.resolveSource()).getLegendUrl(resolution, params)
     },
@@ -173,11 +178,9 @@ export default {
      */
     async updateParams (params) {
       params = { ...this.allParams, ...params }
-      const source = await this.resolveSource()
+      if (isEqual(params, await this.getParams())) return
 
-      if (isEqual(params, source.getParams())) return
-
-      source.updateParams(params)
+      (await this.resolveSource()).updateParams(params)
     },
     /**
      * @param {string} param

@@ -66,19 +66,13 @@
           return this.tileGridFactory
         }
 
-        const projection = this.projection
+        const extent = this.extentDataProj || extentFromProjection(this.projection)
         const maxZoom = this.maxZoom
         const minZoom = this.minZoom
         const maxResolution = this.maxResolution
         const tileSize = this.tileSizeArr
 
-        return () => createXYZ({
-          extent: extentFromProjection(projection),
-          maxZoom: maxZoom,
-          minZoom: minZoom,
-          maxResolution: maxResolution,
-          tileSize: tileSize,
-        })
+        return () => createXYZ({ extent, maxZoom, minZoom, maxResolution, tileSize })
       },
       extentDataProj () {
         return roundExtent(this.extent)
@@ -181,8 +175,12 @@
           tileClass: this.tileClass,
         })
       },
-      async getFeaturesInExtent (extent) {
-        return (await this.resolveSource()).getFeaturesInExtent(this.extentToViewProj(extent))
+      async getFeaturesInExtent (extent, viewProj = false) {
+        if (!viewProj) {
+          extent = this.extentToViewProj(extent)
+        }
+
+        return (await this.resolveSource()).getFeaturesInExtent(extent)
       },
       async getOverlaps () {
         return (await this.resolveSource()).getOverlaps()

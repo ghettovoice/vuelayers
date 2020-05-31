@@ -32,14 +32,14 @@ export default {
   computed: {
     currentPreload () {
       if (this.rev && this.$layer) {
-        return this.$layer.getPreload()
+        return this.getPreloadInternal()
       }
 
       return this.preload
     },
     currentUseInterimTilesOnError () {
       if (this.rev && this.$layer) {
-        return this.$layer.getUseInterimTilesOnError()
+        return this.getUseInterimTilesOnErrorInternal()
       }
 
       return this.useInterimTilesOnError
@@ -92,7 +92,16 @@ export default {
      * @returns {Promise<number>}
      */
     async getPreload () {
-      return (await this.resolveLayer()).getPreload()
+      await this.resolveLayer()
+
+      return this.getPreloadInternal()
+    },
+    /**
+     * @return {number}
+     * @protected
+     */
+    getPreloadInternal () {
+      return this.$layer.getPreload()
     },
     /**
      * @param {number} preload
@@ -107,7 +116,16 @@ export default {
      * @returns {Promise<boolean>}
      */
     async getUseInterimTilesOnError () {
-      return (await this.resolveLayer()).getUseInterimTilesOnError()
+      await this.resolveLayer()
+
+      return this.getUseInterimTilesOnErrorInternal()
+    },
+    /**
+     * @return {boolean}
+     * @protected
+     */
+    getUseInterimTilesOnErrorInternal () {
+      return this.$layer.getUseInterimTilesOnError()
     },
     /**
      * @param {boolean} useInterimTilesOnError

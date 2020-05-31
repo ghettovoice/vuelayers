@@ -1,10 +1,10 @@
 import { get as getProj } from 'ol/proj'
+import { ImageSourceEventType } from 'ol/source/Image'
 import { EPSG_3857 } from '../ol-ext'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { isString, pick } from '../util/minilo'
+import { pick } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import source from './source'
-import { ImageSourceEventType } from 'ol/source/Image'
 
 /**
  * Base image source mixin.
@@ -65,20 +65,6 @@ export default {
       'resolveOlObject',
       'resolveSource',
     ]),
-    /**
-     * @param {number[]} extent
-     * @param {number} resolution
-     * @param {number} pixelRatio
-     * @param {module:ol/proj~ProjectionLike} projection
-     * @returns {Promise<module:ol/ImageBase~ImageBase>}
-     */
-    async getImage (extent, resolution, pixelRatio, projection) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).getImage(extent, resolution, pixelRatio, projection)
-    },
   },
 }
 

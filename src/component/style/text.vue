@@ -230,7 +230,6 @@
         if (font === await this.getFont()) return
 
         (await this.resolveStyle()).setFont(font)
-
         await this.scheduleRemount()
       },
       async getMaxAngle () {
@@ -240,7 +239,6 @@
         if (maxAngle === await this.getMaxAngle()) return
 
         (await this.resolveStyle()).setMaxAngle(maxAngle)
-
         await this.scheduleRemount()
       },
       async getOffsetX () {
@@ -250,7 +248,6 @@
         if (offsetX === await this.getOffsetX()) return
 
         (await this.resolveStyle()).setOffsetX(offsetX)
-
         await this.scheduleRemount()
       },
       async getOffsetY () {
@@ -260,7 +257,6 @@
         if (offsetY === await this.getOffsetY()) return
 
         (await this.resolveStyle()).setOffsetY(offsetY)
-
         await this.scheduleRemount()
       },
       async getOverflow () {
@@ -270,7 +266,6 @@
         if (overflow === await this.getOverflow()) return
 
         (await this.resolveStyle()).setOverflow(overflow)
-
         await this.scheduleRemount()
       },
       async getPadding () {
@@ -280,7 +275,6 @@
         if (isEqual(padding, await this.getPadding())) return
 
         (await this.resolveStyle()).setPadding(padding)
-
         await this.scheduleRemount()
       },
       async getPlacement () {
@@ -290,7 +284,6 @@
         if (placement === await this.getPlacement()) return
 
         (await this.resolveStyle()).setPlacement(placement)
-
         await this.scheduleRemount()
       },
       async getRotateWithView () {
@@ -300,7 +293,6 @@
         if (rotateWithView === await this.getRotateWithView()) return
 
         (await this.resolveStyle()).setRotateWithView(rotateWithView)
-
         await this.scheduleRemount()
       },
       async getRotation () {
@@ -310,7 +302,6 @@
         if (rotation === await this.getRotation()) return
 
         (await this.resolveStyle()).setRotation(rotation)
-
         await this.scheduleRemount()
       },
       async getScale () {
@@ -320,7 +311,6 @@
         if (scale === await this.getScale()) return
 
         (await this.resolveStyle()).setScale(scale)
-
         await this.scheduleRemount()
       },
       async getText () {
@@ -330,7 +320,6 @@
         if (text === await this.getText()) return
 
         (await this.resolveStyle()).setText(text)
-
         await this.scheduleRemount()
       },
       async getTextAlign () {
@@ -340,7 +329,6 @@
         if (textAlign === await this.getTextAlign()) return
 
         (await this.resolveStyle()).setTextAlign(textAlign)
-
         await this.scheduleRemount()
       },
       async getTextBaseline () {
@@ -350,7 +338,6 @@
         if (textBaseline === await this.getTextBaseline()) return
 
         (await this.resolveStyle()).setTextBaseline(textBaseline)
-
         await this.scheduleRemount()
       },
       async getFillStyleTarget () {

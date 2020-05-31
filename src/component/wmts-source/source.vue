@@ -7,6 +7,7 @@
   import { DEFAULT_MAX_ZOOM, DEFAULT_TILE_SIZE } from 'ol/tilegrid/common'
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
   import { tileImageSource } from '../../mixin'
+  import { roundExtent, roundPointCoords } from '../../ol-ext'
   import { isArray, isEqual, isFunction, isNumber, range } from '../../util/minilo'
 
   export default {
@@ -72,8 +73,17 @@
       },
     },
     computed: {
+      extentDataProj () {
+        return roundExtent(this.extent)
+      },
       extentViewProj () {
         return this.extentToViewProj(this.extent)
+      },
+      originDataProj () {
+        return roundPointCoords(this.origin)
+      },
+      originViewProj () {
+        return this.pointToViewProj(this.origin)
       },
       tileSizeArr () {
         return isArray(this.tileSize) ? this.tileSize : [this.tileSize, this.tileSize]
@@ -83,19 +93,14 @@
           return this.tileGridFactory
         }
 
-        const extent = this.extent || extentFromProjection(this.projection)
+        const extent = this.extentDataProj || extentFromProjection(this.projection)
         const resolutions = this.resolutions || resolutionsFromExtent(extent, this.maxZoom, this.tileSizeArr)
-        const origin = this.origin || getExtentCorner(extent, ExtentCorner.TOP_LEFT)
+        const origin = this.originViewProj || getExtentCorner(extent, ExtentCorner.TOP_LEFT)
         const matrixIds = this.matrixIds || range(this.minZoom, resolutions.length)
+        const tileSize = this.tileSizeArr
+        const minZoom = this.minZoom
 
-        return () => (new WMTSTileGrid({
-          extent,
-          origin,
-          resolutions,
-          matrixIds,
-          tileSize: this.tileSizeArr,
-          minZoom: this.minZoom,
-        }))
+        return () => (new WMTSTileGrid({ extent, origin, resolutions, minZoom, matrixIds, tileSize }))
       },
     },
     watch: {

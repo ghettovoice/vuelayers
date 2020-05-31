@@ -61,12 +61,6 @@
           imageRatio: this.imageRatio,
         })
       },
-      /**
-       * @returns {Promise<number>}
-       */
-      async getImageRatio () {
-        return (await this.resolveLayer()).getImageRatio()
-      },
     },
   }
 </script>

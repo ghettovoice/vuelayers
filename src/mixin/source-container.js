@@ -122,4 +122,5 @@ export function createSourceContainer (options = {}) {
 /**
  * Source container mixin.
  */
-export default createSourceContainer()
+const sourceContainer = /*#__PURE__*/ createSourceContainer()
+export default sourceContainer

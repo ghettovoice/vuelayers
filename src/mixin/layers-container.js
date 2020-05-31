@@ -106,9 +106,9 @@ export default {
       layer = await this.initializeLayer(layer)
       instanceOf(layer, BaseLayer)
 
-      if (this.getLayerById(getLayerId(layer)) == null) {
-        this.$layersCollection.push(layer)
-      }
+      if (this.getLayerById(getLayerId(layer))) return
+
+      this.$layersCollection.push(layer)
     },
     /**
      * @param {LayerLike[]|module:ol/Collection~Collection<LayerLike>} layers
@@ -154,9 +154,7 @@ export default {
      * @return {module:ol/layer/Base~BaseLayer|undefined}
      */
     getLayerById (layerId) {
-      return find(this.getLayers(), layer => {
-        return getLayerId(layer) === layerId
-      })
+      return find(this.getLayers(), layer => getLayerId(layer) === layerId)
     },
   },
 }

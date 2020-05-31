@@ -127,10 +127,10 @@ export default {
       interaction = await this.initializeInteraction(interaction)
       instanceOf(interaction, Interaction)
 
-      if (!this.getInteractionById(getInteractionId(interaction))) {
-        this.$interactionsCollection.push(interaction)
-        this.sortInteractions()
-      }
+      if (this.getInteractionById(getInteractionId(interaction))) return
+
+      this.$interactionsCollection.push(interaction)
+      this.sortInteractions()
     },
     /**
      * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} interactions
@@ -177,9 +177,7 @@ export default {
      * @return {module:ol/interaction/Interaction~Interaction|undefined}
      */
     getInteractionById (interactionId) {
-      return find(this.getInteractions(), interaction => {
-        return getInteractionId(interaction) === interactionId
-      })
+      return find(this.getInteractions(), interaction => getInteractionId(interaction) === interactionId)
     },
     /**
      * @return {void}

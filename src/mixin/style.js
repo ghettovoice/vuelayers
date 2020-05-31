@@ -108,17 +108,17 @@ export default {
     /**
      * @returns {string|number}
      */
-    getIdSync () {
+    getIdInternal () {
       return getStyleId(this.$style)
     },
     /**
      * @param {string|number} id
      * @returns {void}
      */
-    setIdSync (id) {
+    setIdInternal (id) {
       assert(id != null && id !== '', 'Invalid style id')
 
-      if (id === this.getIdSync()) return
+      if (id === this.getIdInternal()) return
 
       setStyleId(this.$style, id)
     },

@@ -9,6 +9,13 @@
     mixins: [
       simpleGeometry,
     ],
+    props: {
+      coordinates: {
+        type: Array,
+        required: true,
+        // validator: value => every(value, point => isArray(point) && point.length >= 2),
+      },
+    },
     computed: {
       type: constant(GeometryType.LINE_STRING),
     },

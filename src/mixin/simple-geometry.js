@@ -1,6 +1,6 @@
 import debounce from 'debounce-promise'
 import { boundingExtent } from 'ol/extent'
-import { findPointOnSurface, flatCoords, isEqualCoord, roundCoords, transforms } from '../ol-ext'
+import { findPointOnSurface, flatCoords, isEqualCoord, roundCoords, roundPointCoords, transforms } from '../ol-ext'
 import { clonePlainObject, isEmpty, negate, pick } from '../util/minilo'
 // import { makeWatchers } from '../util/vue-helpers'
 import geometry from './geometry'
@@ -48,14 +48,14 @@ export default {
     },
     currentCoordinatesDataProj () {
       if (this.rev && this.$geometry) {
-        return this.getCoordinatesSync()
+        return this.getCoordinatesInternal()
       }
 
       return this.coordinatesDataProj
     },
     currentCoordinatesViewProj () {
       if (this.rev && this.$geometry) {
-        return this.getCoordinatesSync(true)
+        return this.getCoordinatesInternal(true)
       }
 
       return this.coordinatesViewProj
@@ -63,12 +63,12 @@ export default {
     currentPointDataProj () {
       if (!(this.rev && this.$geometry)) return
 
-      return this.findPointOnSurfaceSync()
+      return this.findPointOnSurfaceInternal()
     },
     currentPointViewProj () {
       if (!(this.rev && this.$geometry)) return
 
-      return this.findPointOnSurfaceSync(true)
+      return this.findPointOnSurfaceInternal(true)
     },
     // layoutUpCase () {
     //   return this.layout.toUpperCase()
@@ -146,75 +146,106 @@ export default {
       return transform(coordinates, this.resolvedDataProjection, this.viewProjection)
     },
     /**
+     * @param {boolean} [viewProj=false]
      * @return {Promise<number[]>}
      */
-    async getCoordinates () {
+    async getCoordinates (viewProj = false) {
       await this.resolveGeometry()
 
-      return this.getCoordinatesSync()
+      return this.getCoordinatesInternal(viewProj)
     },
-    getCoordinatesSync (viewProj = false) {
+    /**
+     * @param {boolean} [viewProj=false]
+     * @return {number[]}
+     * @protected
+     */
+    getCoordinatesInternal (viewProj = false) {
       if (viewProj) {
-        return roundCoords(this.$geometry.getType(), this.$geometry.getCoordinates())
+        return roundCoords(this.getTypeInternal(), this.$geometry.getCoordinates())
       }
 
       return this.coordinatesToDataProj(this.$geometry.getCoordinates())
     },
     /**
      * @param {number[]} coordinates
+     * @param {boolean} [viewProj=false]
      */
-    async setCoordinates (coordinates) {
+    async setCoordinates (coordinates, viewProj = false) {
       await this.resolveGeometry()
 
-      this.setCoordinatesSync(coordinates)
+      this.setCoordinatesInternal(coordinates, viewProj)
     },
-    setCoordinatesSync (coordinates) {
-      coordinates = roundCoords(this.type, coordinates)
-      const currentCoordinates = this.getCoordinatesSync()
+    /**
+     * @param {number[]} coordinates
+     * @param {boolean} [viewProj=false]
+     * @protected
+     */
+    setCoordinatesInternal (coordinates, viewProj = false) {
+      coordinates = roundCoords(this.getTypeInternal(), coordinates)
+      const currentCoordinates = this.getCoordinatesInternal(viewProj)
 
       if (isEqualCoord({
         coordinates,
-        extent: boundingExtent(flatCoords(this.type, coordinates)),
+        extent: boundingExtent(flatCoords(this.getTypeInternal(), coordinates)),
       }, {
         coordinates: currentCoordinates,
-        extent: boundingExtent(flatCoords(this.type, currentCoordinates)),
+        extent: boundingExtent(flatCoords(this.getTypeInternal(), currentCoordinates)),
       })) return
 
-      this.$geometry.setCoordinates(this.coordinatesToViewProj(coordinates))
+      if (!viewProj) {
+        coordinates = this.coordinatesToViewProj(coordinates)
+      }
+
+      this.$geometry.setCoordinates(coordinates)
     },
     /**
+     * @param {boolean} [viewProj=false]
      * @returns {number[]>}
      */
-    async getFirstCoordinate () {
+    async getFirstCoordinate (viewProj = false) {
       const coordinate = (await this.resolveGeometry()).getFirstCoordinate()
-      if (!coordinate) return
+      if (viewProj) {
+        return roundPointCoords(coordinate)
+      }
 
       return this.pointToDataProj(coordinate)
     },
     /**
+     * @param {boolean} [viewProj=false]
      * @returns {Promise<number[]>}
      */
-    async getLastCoordinate () {
+    async getLastCoordinate (viewProj = false) {
       const coordinate = (await this.resolveGeometry()).getLastCoordinate()
-      if (!coordinate) return
+      if (viewProj) {
+        return roundPointCoords(coordinate)
+      }
 
       return this.pointToDataProj(coordinate)
     },
     /**
      * @returns {Promise<string>}
      */
-    async getCoordinatesLayout () {
+    async getLayout () {
       return (await this.resolveGeometry()).getLayout()
     },
-    async findPointOnSurface () {
+    /**
+     * @param {boolean} [viewProj=false]
+     * @return {Promise<number[]|undefined>}
+     */
+    async findPointOnSurface (viewProj = false) {
       await this.resolveGeometry()
 
-      return this.findPointOnSurfaceSync()
+      return this.findPointOnSurfaceInternal(viewProj)
     },
-    findPointOnSurfaceSync (viewProj = false) {
+    /**
+     * @param {boolean} [viewProj=false]
+     * @return {number[]|undefined}
+     * @protected
+     */
+    findPointOnSurfaceInternal (viewProj = false) {
       return findPointOnSurface({
         type: this.$geometry.getType(),
-        coordinates: this.getCoordinatesSync(viewProj),
+        coordinates: this.getCoordinatesInternal(viewProj),
       })
     },
   },

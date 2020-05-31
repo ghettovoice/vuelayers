@@ -1,7 +1,7 @@
 import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
-import { clonePlainObject, isFunction, isString, pick, sealFactory } from '../util/minilo'
+import { clonePlainObject, isFunction, pick, sealFactory } from '../util/minilo'
 import { makeWatchers } from '../util/vue-helpers'
 import { FRAME_TIME } from './ol-cmp'
 import source from './source'
@@ -86,9 +86,12 @@ export default {
 
       return sealFactory(::this.derivedTileGridFactory)
     },
+    /**
+     * @return {string|undefined}
+     */
     currentTileKey () {
       if (this.rev && this.$source) {
-        return this.getTileKeySync()
+        return this.getTileKeyInternal()
       }
 
       return this.tileKey
@@ -202,39 +205,18 @@ export default {
       'resolveSource',
     ]),
     /**
-     * @param {module:ol/proj.ProjectionLike} projection
-     * @param {number} z
-     * @param {module:ol/TileRange~TileRange} tileRange
-     * @param {function} callback
-     * @returns {Promise<boolean>}
-     */
-    async forEachLoadedTile (projection, z, tileRange, callback) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).forEachLoadedTile(projection, z, tileRange, callback)
-    },
-    /**
-     * @param {module:ol/proj.ProjectionLike} projection
-     * @returns {Promise<number>}
-     */
-    async getGutterForProjection (projection) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).getGutterForProjection(projection)
-    },
-    /**
      * @returns {Promise<string|undefined>}
      */
     async getTileKey () {
       await this.resolveSource()
 
-      return this.getTileKeySync()
+      return this.getTileKeyInternal()
     },
-    getTileKeySync () {
+    /**
+     * @return {string|undefined}
+     * @protected
+     */
+    getTileKeyInternal () {
       return this.$source.getKey()
     },
     /**
@@ -242,14 +224,9 @@ export default {
      * @returns {Promise<void>}
      */
     async setTileKey (key) {
-      await this.resolveSource()
+      if (key === await this.getTileKey()) return
 
-      this.setTileKeySync(key)
-    },
-    setTileKeySync (key) {
-      if (key === this.getTileKeySync()) return
-
-      this.$source.setKey(key)
+      (await this.resolveSource()).setKey(key)
     },
     /**
      * @returns {Promise<boolean>}
@@ -258,79 +235,10 @@ export default {
       return (await this.resolveSource()).getOpaque()
     },
     /**
-     * @param {number} z
-     * @param {number} x
-     * @param {number} y
-     * @param {number} pixelRatio
-     * @param {module:ol/proj.ProjectionLike} projection
-     * @returns {Promise<module:ol/Tile~Tile>}
+     * @returns {module:ol/tilegrid/TileGrid~TileGrid|undefined}
      */
-    async getTile (z, x, y, pixelRatio, projection) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).getTile(z, x, y, pixelRatio, projection)
-    },
-    /**
-     * @returns {Promise<module:ol/tilegrid/TileGrid~TileGrid>}
-     */
-    async getTileGrid () {
-      return (await this.resolveSource()).getTileGrid()
-    },
-    /**
-     * @param {module:ol/proj.ProjectionLike} projection
-     * @returns {Promise<module:ol/tilegrid/TileGrid~TileGrid>}
-     */
-    async getTileGridForProjection (projection) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).getTileGridForProjection(projection)
-    },
-    /**
-     * @param {module:ol/proj.ProjectionLike} projection
-     * @returns {Promise<module:ol/TileCache~TileCache>}
-     */
-    async getTileCacheForProjection (projection) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).getTileCacheForProjection(projection)
-    },
-    /**
-     * @param {number} pixelRatio
-     * @returns {Promise<number>}
-     */
-    async getTilePixelRatio (pixelRatio) {
-      return (await this.resolveSource()).getTilePixelRatio(pixelRatio)
-    },
-    /**
-     * @param {number} z
-     * @param {number} pixelRatio
-     * @param {module:ol/proj.ProjectionLike} projection
-     * @returns {Promise<number[]>}
-     */
-    async getTilePixelSize (z, pixelRatio, projection) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).getTilePixelSize(z, pixelRatio, projection)
-    },
-    /**
-     * @param {number[]} tileCoord
-     * @param {module:ol/proj.ProjectionLike} projection
-     * @returns {Promise<number[]>}
-     */
-    async getTileCoordForTileUrlFunction (tileCoord, projection) {
-      if (isString(projection)) {
-        projection = getProj(projection)
-      }
-
-      return (await this.resolveSource()).getTileCoordForTileUrlFunction(tileCoord, projection)
+    getTileGrid () {
+      return this.tileGrid
     },
   },
 }

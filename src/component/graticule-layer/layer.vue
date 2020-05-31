@@ -98,12 +98,12 @@
       currentMeridians () {
         if (!(this.rev && this.$layer)) return []
 
-        return map(this.getMeridiansSync(), geom => this.writeGeometryInDataProj(geom))
+        return map(this.getMeridiansInternal(), geom => this.writeGeometryInDataProj(geom))
       },
       currentParallels () {
         if (!(this.rev && this.$layer)) return []
 
-        return map(this.getParallelsSync(), geom => this.writeGeometryInDataProj(geom))
+        return map(this.getParallelsInternal(), geom => this.writeGeometryInDataProj(geom))
       },
       currentLonLabelStyle () {
         if (!(this.rev && this.$lonLabelStyle)) return
@@ -258,17 +258,17 @@
       async getMeridians () {
         await this.resolveLayer()
 
-        return this.getMeridiansSync()
+        return this.getMeridiansInternal()
       },
-      getMeridiansSync () {
+      getMeridiansInternal () {
         return this.$layer.getMeridians()
       },
       async getParallels () {
         await this.resolveLayer()
 
-        return this.getParallelsSync()
+        return this.getParallelsInternal()
       },
-      getParallelsSync () {
+      getParallelsInternal () {
         return this.$layer.getParallels()
       },
       getLonLabelStyle () {

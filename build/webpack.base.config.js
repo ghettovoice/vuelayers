@@ -2,7 +2,7 @@ const webpack = require('webpack')
 const StringReplacePlugin = require('string-replace-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const utils = require('./utils')
 const config = require('./config')
 
@@ -41,15 +41,7 @@ module.exports = {
   },
   optimization: {
     minimizer: [
-      // UglifyJs do not support ES6+, you can also use babel-minify for better treeshaking: https://github.com/babel/minify
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          warnings: false,
-        },
-        cache: true,
-        sourceMap: true,
-        parallel: true,
-      }),
+      new TerserPlugin(),
       // Compress extracted CSS. We are using this plugin so that possible
       // duplicated CSS from different components can be deduped.
       new OptimizeCSSPlugin({

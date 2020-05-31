@@ -125,7 +125,6 @@ export default {
       if (opacity === await this.getOpacity()) return
 
       (await this.resolveStyle()).setOpacity(opacity)
-
       await this.scheduleRemount()
     },
     /**
@@ -142,7 +141,6 @@ export default {
       if (rotateWithView === await this.getRotateWithView()) return
 
       (await this.resolveStyle()).setRotateWithView(rotateWithView)
-
       await this.scheduleRemount()
     },
     /**
@@ -159,7 +157,6 @@ export default {
       if (rotation === await this.getRotation()) return
 
       (await this.resolveStyle()).setRotation(rotation)
-
       await this.scheduleRemount()
     },
     /**
@@ -176,7 +173,6 @@ export default {
       if (scale === await this.getScale()) return
 
       (await this.resolveStyle()).setScale(scale)
-
       await this.scheduleRemount()
     },
     async getDisplacement () {

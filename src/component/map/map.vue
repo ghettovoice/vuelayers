@@ -294,17 +294,17 @@
       /**
        * @return {number|string}
        */
-      getIdSync () {
+      getIdInternal () {
         return getMapId(this.$map)
       },
       /**
        * @param {string|number} id
        * @return {Promise<void>}
        */
-      setIdSync (id) {
+      setIdInternal (id) {
         assert(id != null && id !== '', 'Invalid map id')
 
-        if (id === this.getIdSync()) return
+        if (id === this.getIdInternal()) return
 
         setMapId(this.$map, id)
       },
@@ -315,12 +315,7 @@
        * @return {Promise}
        */
       async forEachFeatureAtPixel (pixel, callback, opts = {}) {
-        await this.resolveMap()
-
-        return this.forEachFeatureAtPixelSync(pixel, callback, opts)
-      },
-      forEachFeatureAtPixelSync (pixel, callback, opts = {}) {
-        return this.$map.forEachFeatureAtPixel(pixel, callback, opts)
+        return (await this.resolveMap()).forEachFeatureAtPixel(pixel, callback, opts)
       },
       /**
        * @param {number[]} pixel
@@ -329,12 +324,7 @@
        * @return {Promise}
        */
       async forEachLayerAtPixel (pixel, callback, opts = {}) {
-        await this.resolveMap()
-
-        return this.forEachLayerAtPixelSync(pixel, callback, opts)
-      },
-      forEachLayerAtPixelSync (pixel, callback, opts = {}) {
-        return this.$map.forEachLayerAtPixel(pixel, callback, opts)
+        return (await this.resolveMap()).forEachLayerAtPixel(pixel, callback, opts)
       },
       /**
        * @param {number[]} pixel
@@ -342,12 +332,7 @@
        * @return {Promise<number[]>} Coordinates in the map view projection.
        */
       async getCoordinateFromPixel (pixel, viewProj = false) {
-        await this.resolveMap()
-
-        return this.getCoordinateFromPixelSync(pixel, viewProj)
-      },
-      getCoordinateFromPixelSync (pixel, viewProj = false) {
-        const coordinate = this.$map.getCoordinateFromPixel(pixel)
+        const coordinate = (await this.resolveMap()).getCoordinateFromPixel(pixel)
         if (viewProj) {
           return roundPointCoords(coordinate)
         }
@@ -360,12 +345,7 @@
        * @return {Promise<number[]>}
        */
       async getEventCoordinate (event, viewProj = false) {
-        await this.resolveMap()
-
-        return this.getEventCoordinateSync(event, viewProj)
-      },
-      getEventCoordinateSync (event, viewProj = false) {
-        const coordinate = this.$map.getEventCoordinate(event)
+        const coordinate = (await this.resolveMap()).getEventCoordinate(event)
         if (viewProj) {
           return roundPointCoords(coordinate)
         }
@@ -377,12 +357,7 @@
        * @return {Promise<number[]>}
        */
       async getEventPixel (event) {
-        await this.resolveMap()
-
-        return this.getEventPixelSync(event)
-      },
-      getEventPixelSync (event) {
-        return this.$map.getEventPixel(event)
+        return (await this.resolveMap()).getEventPixel(event)
       },
       /**
        * @param {number[]} pixel
@@ -390,12 +365,7 @@
        * @return {Promise}
        */
       async getFeaturesAtPixel (pixel, opts = {}) {
-        await this.resolveMap()
-
-        return this.getFeaturesAtPixelSync(pixel, opts)
-      },
-      getFeaturesAtPixelSync (pixel, opts = {}) {
-        return this.$map.getFeaturesAtPixel(pixel, opts)
+        return (await this.resolveMap()).getFeaturesAtPixel(pixel, opts)
       },
       /**
        * @param {number[]} pixel
@@ -403,12 +373,7 @@
        * @return {Promise<boolean>}
        */
       async hasFeatureAtPixel (pixel, options = {}) {
-        await this.resolveMap()
-
-        return this.hasFeatureAtPixelSync(pixel, options)
-      },
-      hasFeatureAtPixelSync (pixel, options = {}) {
-        return this.$map.hasFeatureAtPixel(pixel, options)
+        return (await this.resolveMap()).hasFeatureAtPixel(pixel, options)
       },
       /**
        * @param {number[]} coordinate Coordinates in map view projection
@@ -416,52 +381,32 @@
        * @return {Promise<number[]>}
        */
       async getPixelFromCoordinate (coordinate, viewProj = false) {
-        await this.resolveMap()
-
-        return this.getPixelFromCoordinateSync(coordinate, viewProj)
-      },
-      getPixelFromCoordinateSync (coordinate, viewProj = false) {
         if (!viewProj) {
           coordinate = this.pointToViewProj(coordinate)
         }
 
-        return this.$map.getPixelFromCoordinate(coordinate)
+        return (await this.resolveMap()).getPixelFromCoordinate(coordinate)
       },
       /**
        * @return {Promise<number[]>}
        */
       async getSize () {
-        await this.resolveMap()
-
-        return this.getSizeSync()
-      },
-      getSizeSync () {
-        return this.$map.getSize()
+        return (await this.resolveMap()).getSize()
       },
       /**
        * @return {Promise<void>}
        */
       async setSize (size) {
-        await this.resolveMap()
+        if (isEqual(size, await this.getSize())) return
 
-        this.setSizeSync(size)
-      },
-      setSizeSync (size) {
-        if (isEqual(size, this.getSizeSync())) return
-
-        this.$map.setSize(size)
+        (await this.resolveMap()).setSize(size)
       },
       /**
        * Updates map size.
        * @return {Promise<void>}
        */
       async updateSize () {
-        await this.resolveMap()
-
-        this.updateSizeSync()
-      },
-      updateSizeSync () {
-        this.$map.updateSize()
+        (await this.resolveMap()).updateSize()
       },
       /**
        * @return {Promise<void>}
@@ -475,57 +420,29 @@
         })
       },
       /**
-       * @return {Promise<void>}
-       */
-      async renderSync () {
-        (await this.resolveMap()).renderSync()
-      },
-      /**
        * @return {Promise<HTMLElement>}
        */
       async getTarget () {
-        await this.resolveMap()
-
-        return this.getTargetSync()
-      },
-      getTargetSync () {
-        return this.$map.getTarget()
+        return (await this.resolveMap()).getTarget()
       },
       /**
        * @param {HTMLElement} target
        * @return {Promise<void>}
        */
       async setTarget (target) {
-        await this.resolveMap()
-
-        this.setTargetSync(target)
-      },
-      setTargetSync (target) {
-        if (target === this.getTargetSync()) return
-
-        this.$map.setTarget(target)
+        (await this.resolveMap()).setTarget(target)
       },
       /**
        * @return {Promise<HTMLElement>}
        */
       async getTargetElement () {
-        await this.resolveMap()
-
-        return this.getTargetElementSync()
-      },
-      getTargetElementSync () {
-        return this.$map.getTargetElement()
+        return (await this.resolveMap()).getTargetElement()
       },
       /**
        * @return {Promise<HTMLElement>}
        */
       async getViewport () {
-        await this.resolveMap()
-
-        return this.getViewportSync()
-      },
-      getViewportSync () {
-        return this.$map.getViewport()
+        return (await this.resolveMap()).getViewport()
       },
       /**
        * @return {module:ol/View~View}
@@ -543,14 +460,9 @@
         }
         view || (view = new View())
 
-        await this.resolveMap()
+        if (view === await this.getView()) return
 
-        this.setViewSync(view)
-      },
-      setViewSync (view) {
-        if (view === this.getView()) return
-
-        this.$map.setView(view)
+        (await this.resolveMap()).setView(view)
         this._view = view
         this._viewVm = view.vm && view.vm[0]
       },
@@ -558,29 +470,19 @@
        * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
        */
       async getDataProjection () {
-        await this.resolveMap()
-
-        return this.getDataProjectionSync()
-      },
-      getDataProjectionSync () {
-        getMapDataProjection(this.$map)
+        return getMapDataProjection(await this.resolveMap())
       },
       /**
        * @param {module:ol/proj~ProjectionLike} projection
        * @return {Promise<void>}
        */
       async setDataProjection (projection) {
-        await this.resolveMap()
-
-        this.setDataProjectionSync(projection)
-        await this.scheduleRefresh()
-      },
-      setDataProjectionSync (projection) {
         assert(getProj(projection) != null, 'Map data projection is registered')
 
-        if (projection === this.getDataProjectionSync()) return
+        if (projection === await this.getDataProjection()) return
 
-        setMapDataProjection(this.$map, projection)
+        setMapDataProjection(await this.resolveMap(), projection)
+        await this.scheduleRefresh()
       },
       /**
        * @return {Promise<boolean>}
@@ -588,30 +490,7 @@
       async getWrapX () {
         if (!this.$featuresOverlaySourceVm) return false
 
-        await this.$featuresOverlaySourceVm.resolveSource()
-
-        return this.getWrapXSync()
-      },
-      getWrapXSync () {
-        if (!this.$featuresOverlaySourceVm) return false
-
-        return this.$featuresOverlaySourceVm.getWrapXSync()
-      },
-      /**
-       * @param {boolean} wrapX
-       * @return {Promise<void>}
-       */
-      async setWrapX (wrapX) {
-        if (!this.$featuresOverlaySourceVm) return
-
-        await this.$featuresOverlaySourceVm.resolveSource()
-
-        this.setWrapXSync(wrapX)
-      },
-      setWrapXSync (wrapX) {
-        if (!this.$featuresOverlaySourceVm) return
-
-        this.$featuresOverlaySourceVm.setWrapXSync(wrapX)
+        return this.$featuresOverlaySourceVm.getWrapX()
       },
       /**
        * @return {Promise<boolean>}
@@ -619,14 +498,7 @@
       async getUpdateWhileAnimating () {
         if (!this.$featuresOverlayVm) return false
 
-        await this.$featuresOverlayVm.resolveLayer()
-
-        return this.getUpdateWhileAnimatingSync()
-      },
-      getUpdateWhileAnimatingSync () {
-        if (!this.$featuresOverlayVm) return false
-
-        return this.$featuresOverlayVm.getUpdateWhileAnimatingSync()
+        return this.$featuresOverlayVm.getUpdateWhileAnimating()
       },
       /**
        * @returns {Promise<boolean>}
@@ -634,14 +506,7 @@
       async getUpdateWhileInteracting () {
         if (!this.$featuresOverlayVm) return false
 
-        await this.$featuresOverlayVm.resolveLayer()
-
-        return this.getUpdateWhileInteractingSync()
-      },
-      getUpdateWhileInteractingSync () {
-        if (!this.$featuresOverlayVm) return false
-
-        return this.$featuresOverlayVm.getUpdateWhileInteractingSync()
+        return this.$featuresOverlayVm.getUpdateWhileInteracting()
       },
       /**
        * Triggers focus on map container.
@@ -660,6 +525,10 @@
 
         return this::olCmp.methods.refresh()
       },
+      /**
+       * @param {Object} sourceVm
+       * @protected
+       */
       async onFeaturesOverlaySourceCreated (sourceVm) {
         if (!this.getFeatures().length) {
           await Promise.all(this.getFeatures().map(::sourceVm.addFeature))

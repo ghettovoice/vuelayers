@@ -32,8 +32,7 @@ export default {
      */
     attributions: {
       type: [String, Array],
-      validator: value => isString(value) ||
-        (isArray(value) && value.every(isString)),
+      validator: value => isString(value) || (isArray(value) && value.every(isString)),
     },
     /**
      * @type {boolean}
@@ -69,14 +68,14 @@ export default {
   computed: {
     currentAttributions () {
       if (this.rev && this.$source) {
-        return this.getAttributionsSync()
+        return this.getAttributionsInternal()
       }
 
       return this.attributions
     },
     currentState () {
       if (this.rev && this.$source) {
-        return this.getStateSync()
+        return this.getStateInternal()
       }
 
       return this.state
@@ -242,29 +241,33 @@ export default {
     /**
      * @returns {string|number}
      */
-    getIdSync () {
+    getIdInternal () {
       return getSourceId(this.$source)
     },
     /**
      * @param {string|number} id
      * @returns {void}
      */
-    setIdSync (id) {
+    setIdInternal (id) {
       assert(id != null && id !== '', 'Invalid source id')
 
-      if (id === this.getIdSync()) return
+      if (id === this.getIdInternal()) return
 
       setSourceId(this.$source, id)
     },
     /**
-     * @returns {Promise<string>}
+     * @returns {Promise<string|string[]|undefined>}
      */
     async getAttributions () {
       await this.resolveSource()
 
-      return this.getAttributionsSync()
+      return this.getAttributionsInternal()
     },
-    getAttributionsSync () {
+    /**
+     * @return {string|string[]|undefined}
+     * @protected
+     */
+    getAttributionsInternal () {
       return this.$source.getAttributions()
     },
     /**
@@ -280,23 +283,13 @@ export default {
      * @returns {Promise<boolean>}
      */
     async getAttributionsCollapsible () {
-      await this.resolveSource()
-
-      return this.getAttributionsCollapsibleSync()
-    },
-    getAttributionsCollapsibleSync () {
-      return this.$source.getAttributionsCollapsible()
+      return (await this.resolveSource()).getAttributionsCollapsible()
     },
     /**
      * @returns {Promise<module:ol/proj/Projection~Projection>}
      */
     async getProjection () {
-      await this.resolveSource()
-
-      return this.getProjectionSync()
-    },
-    getProjectionSync () {
-      return this.$source.getProjection()
+      return (await this.resolveSource()).getProjection()
     },
     /**
      * @returns {Promise<string>}
@@ -304,9 +297,13 @@ export default {
     async getState () {
       await this.resolveSource()
 
-      return this.getStateSync()
+      return this.getStateInternal()
     },
-    getStateSync () {
+    /**
+     * @return {string}
+     * @protected
+     */
+    getStateInternal () {
       return this.$source.getState()
     },
     /**

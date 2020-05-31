@@ -39,19 +39,13 @@ export default {
         return this.tileGridFactory
       }
 
-      const projection = this.projection
+      const extent = extentFromProjection(this.projection)
       const maxZoom = this.maxZoom
       const minZoom = this.minZoom
       const maxResolution = this.maxResolution
       const tileSize = this.tileSizeArr
 
-      return () => createXYZ({
-        extent: extentFromProjection(projection),
-        maxZoom: maxZoom,
-        minZoom: minZoom,
-        maxResolution: maxResolution,
-        tileSize: tileSize,
-      })
+      return () => createXYZ({ extent, maxZoom, minZoom, maxResolution, tileSize })
     },
     resolvedTileUrlFunc () {
       if (isFunction(this.tileUrlFunc)) {

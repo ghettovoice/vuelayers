@@ -109,85 +109,64 @@
         return (await this.resolveStyle()).getColor()
       },
       async setColor (color) {
-        const style = await this.resolveStyle()
         color = normalizeColor(color)
+        if (isEqual(color, await this.getColor())) return
 
-        if (isEqual(color, style.getColor())) return
-
-        style.setColor(color)
-
+        (await this.resolveStyle()).setColor(color)
         await this.scheduleRemount()
       },
       async getLineCap () {
         return (await this.resolveStyle()).getLineCap()
       },
       async setLineCap (lineCap) {
-        const style = await this.resolveStyle()
+        if (lineCap === await this.getLineCap()) return
 
-        if (lineCap === style.getLineCap()) return
-
-        style.setLineCap(lineCap)
-
+        (await this.resolveStyle()).setLineCap(lineCap)
         await this.scheduleRemount()
       },
       async getLineJoin () {
         return (await this.resolveStyle()).getLineJoin()
       },
       async setLineJoin (lineJoin) {
-        const style = await this.resolveStyle()
+        if (lineJoin === await this.getLineJoin()) return
 
-        if (lineJoin === style.getLineJoin()) return
-
-        style.setLineJoin(lineJoin)
-
+        (await this.resolveStyle()).setLineJoin(lineJoin)
         await this.scheduleRemount()
       },
       async getLineDash () {
         return (await this.resolveStyle()).getLineDash()
       },
       async setLineDash (lineDash) {
-        const style = await this.resolveStyle()
+        if (isEqual(lineDash, await this.getLineDash())) return
 
-        if (isEqual(lineDash, style.getLineDash())) return
-
-        style.setLineDash(lineDash)
-
+        (await this.resolveStyle()).setLineDash(lineDash)
         await this.scheduleRemount()
       },
       async getLineDashOffset () {
         return (await this.resolveStyle()).getLineDashOffset()
       },
       async setLineDashOffset (lineDashOffset) {
-        const style = await this.resolveStyle()
+        if (lineDashOffset === await this.getLineDashOffset()) return
 
-        if (lineDashOffset === style.getLineDashOffset()) return
-
-        style.setLineDashOffset(lineDashOffset)
-
+        (await this.resolveStyle()).setLineDashOffset(lineDashOffset)
         await this.scheduleRemount()
       },
       async getMiterLimit () {
         return (await this.resolveStyle()).getMiterLimit()
       },
       async setMiterLimit (miterLimit) {
-        const style = await this.resolveStyle()
+        if (miterLimit === await this.getMiterLimit()) return
 
-        if (miterLimit === style.getMiterLimit()) return
-
-        style.setMiterLimit(miterLimit)
-
+        (await this.resolveStyle()).setMiterLimit(miterLimit)
         await this.scheduleRemount()
       },
       async getWidth () {
         return (await this.resolveStyle()).getWidth()
       },
       async setWidth (width) {
-        const style = await this.resolveStyle()
+        if (width === await this.getWidth()) return
 
-        if (width === style.getWidth()) return
-
-        style.setWidth(width)
-
+        (await this.resolveStyle()).setWidth(width)
         await this.scheduleRemount()
       },
     },

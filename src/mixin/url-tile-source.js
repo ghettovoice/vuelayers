@@ -173,7 +173,7 @@ export default {
      * @returns {Promise<void>}
      */
     async setUrl (url) {
-      return this.setUrls(expandUrl(url))
+      await this.setUrls(expandUrl(url))
     },
     async onTileLoadFuncChanged (tileLoadFunc) {
       await this.setTileLoadFunction(tileLoadFunc)

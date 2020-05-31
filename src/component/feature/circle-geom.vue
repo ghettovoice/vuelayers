@@ -5,12 +5,7 @@
   import GeometryType from 'ol/geom/GeometryType'
   import { get as getProj } from 'ol/proj'
   import { FRAME_TIME, simpleGeometry } from '../../mixin'
-  import {
-    COORD_PRECISION,
-    roundCoords, transformDistance,
-    transformExtent,
-    transformPoint,
-  } from '../../ol-ext'
+  import { COORD_PRECISION, roundCoords, transformDistance, transformExtent, transformPoint } from '../../ol-ext'
   import { constant, isEqual, round } from '../../util/minilo'
 
   export default {
@@ -54,7 +49,11 @@
         return this.radiusToViewProj(this.radius, this.coordinatesDataProj)
       },
       extentDataProj () {
-        const center = transformPoint(this.coordinatesDataProj, this.resolvedDataProjection, this.resolvedRadiusProjection)
+        const center = transformPoint(
+          this.coordinatesDataProj,
+          this.resolvedDataProjection,
+          this.resolvedRadiusProjection,
+        )
 
         return transformExtent(boundingExtent([
           [center[0] - this.radiusDataProj, center[1] - this.radiusDataProj],
@@ -63,20 +62,24 @@
       },
       currentRadiusDataProj () {
         if (this.rev && this.$geometry) {
-          return this.getRadiusSync()
+          return this.getRadiusInternal()
         }
 
         return this.radiusDataProj
       },
       currentRadiusViewProj () {
         if (this.rev && this.$geometry) {
-          return this.getRadiusSync(true)
+          return this.getRadiusInternal(true)
         }
 
         return this.radiusViewProj
       },
       currentExtentDataProj () {
-        const center = transformPoint(this.currentCoordinatesDataProj, this.resolvedDataProjection, this.resolvedRadiusProjection)
+        const center = transformPoint(
+          this.currentCoordinatesDataProj,
+          this.resolvedDataProjection,
+          this.resolvedRadiusProjection,
+        )
 
         return transformExtent(boundingExtent([
           [center[0] - this.currentRadiusDataProj, center[1] - this.currentRadiusDataProj],
@@ -108,76 +111,119 @@
       createGeometry () {
         return new Circle(this.currentCoordinatesViewProj, this.currentRadiusViewProj)
       },
-      getCoordinatesSync () {
-        return this.getCenterSync()
+      /**
+       * @param {boolean} [viewProj=false]
+       * @return {number[]}
+       */
+      getCoordinatesInternal (viewProj = false) {
+        return this.getCenterInternal(viewProj)
       },
-      setCoordinatesSync (coordinate) {
-        this.setCenterSync(coordinate)
+      /**
+       * @param {number[]} coordinate
+       * @param {boolean} [viewProj=false]
+       * @protected
+       */
+      setCoordinatesInternal (coordinate, viewProj = false) {
+        this.setCenterInternal(coordinate, viewProj)
       },
-      async getCenter () {
+      /**
+       * @param {boolean} [viewProj=false]
+       * @return {Promise<number[]>}
+       */
+      async getCenter (viewProj = false) {
         await this.resolveGeometry()
 
-        return this.getCenterSync()
+        return this.getCenterInternal(viewProj)
       },
-      getCenterSync (viewProj = false) {
+      /**
+       * @param {boolean} viewProj
+       * @return {number[]}
+       */
+      getCenterInternal (viewProj = false) {
         if (viewProj) {
-          return roundCoords(this.$geometry.getType(), this.$geometry.getCenter())
+          return roundCoords(this.getTypeInternal(), this.$geometry.getCenter())
         }
 
         return this.pointToDataProj(this.$geometry.getCenter())
       },
-      async setCenter (center) {
+      /**
+       * @param {number[]} center
+       * @param {boolean} [viewProj=false]
+       * @return {Promise<void>}
+       */
+      async setCenter (center, viewProj = false) {
         await this.resolveGeometry()
 
-        this.setCenterSync(center)
+        this.setCenterInternal(center, viewProj)
       },
-      setCenterSync (center) {
-        if (isEqual(center, this.getCenterSync())) return
+      /**
+       * @param {number[]} center
+       * @param {boolean} [viewProj=false]
+       */
+      setCenterInternal (center, viewProj = false) {
+        if (isEqual(center, this.getCenterInternal(viewProj))) return
+        if (!viewProj) {
+          center = this.pointToViewProj(center)
+        }
 
-        this.$geometry.setCenter(this.pointToViewProj(center))
+        this.$geometry.setCenter(center)
       },
-      async getRadius () {
+      /**
+       * @param {boolean} [viewProj=false]
+       * @return {Promise<number>}
+       */
+      async getRadius (viewProj = false) {
         await this.resolveGeometry()
 
-        return this.getRadiusSync()
+        return this.getRadiusInternal(viewProj)
       },
-      getRadiusSync (viewProj = false) {
+      /**
+       * @param {boolean} [viewProj=false]
+       * @return {number}
+       */
+      getRadiusInternal (viewProj = false) {
         if (viewProj) {
           return round(this.$geometry.getRadius(), COORD_PRECISION)
         }
 
-        return this.radiusToDataProj(this.$geometry.getRadius(), this.$geometry.getCenter())
+        return this.radiusToDataProj(this.$geometry.getRadius())
       },
-      async setRadius (radius) {
-        await this.resolveGeometry()
+      /**
+       * @param {number} radius
+       * @param {boolean} [viewProj=false]
+       * @return {Promise<void>}
+       */
+      async setRadius (radius, viewProj = false) {
+        if (radius === await this.getRadius(viewProj)) return
+        if (!viewProj) {
+          radius = this.radiusToViewProj(radius)
+        }
 
-        this.setRadiusSync(radius)
+        (await this.resolveGeometry()).setRadius(radius)
       },
-      setRadiusSync (radius) {
-        if (radius === this.getRadiusSync()) return
-
-        this.$geometry.setRadius(this.radiusToViewProj(radius, this.getCenterSync()))
-      },
-      async setCenterAndRadius (center, radius) {
-        await this.resolveGeometry()
-
-        this.setCenterAndRadiusSync(center, radius)
-      },
-      setCenterAndRadiusSync (center, radius) {
+      /**
+       * @param {number[]} center
+       * @param {number} radius
+       * @param {boolean} [viewProj=false]
+       * @return {Promise<void>}
+       */
+      async setCenterAndRadius (center, radius, viewProj = false) {
         if (
-          radius === this.getRadiusSync() &&
-          isEqual(center, this.getCenterSync())
+          radius === await this.getRadius(viewProj) &&
+          isEqual(center, await this.getCenter(viewProj))
         ) return
 
-        this.$geometry.setCenterAndRadius(
-          this.pointToViewProj(center),
-          this.radiusToViewProj(radius, center),
-        )
+        if (!viewProj) {
+          center = this.pointToViewProj(center)
+          radius = this.radiusToViewProj(radius)
+        }
+
+        (await this.resolveGeometry()).setCenterAndRadius(center, radius)
       },
-      radiusToViewProj (radius, center) {
+      radiusToViewProj (radius) {
         return transformDistance(radius, this.resolvedRadiusProjection, this.viewProjection)
       },
-      radiusToDataProj (radius, center) {
+      radiusToDataProj (radius) {
         return transformDistance(radius, this.viewProjection, this.resolvedRadiusProjection)
       },
     },

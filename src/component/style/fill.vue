@@ -65,11 +65,9 @@
       },
       async setColor (color) {
         color = normalizeColor(color)
-
         if (isEqual(color, await this.getColor())) return
 
         (await this.resolveStyle()).setColor(color)
-
         await this.scheduleRemount()
       },
     },

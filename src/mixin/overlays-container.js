@@ -105,9 +105,9 @@ export default {
       overlay = await this.initializeOverlay(overlay)
       instanceOf(overlay, Overlay)
 
-      if (!this.getOverlayById(getOverlayId(overlay))) {
-        this.$overlaysCollection.push(overlay)
-      }
+      if (this.getOverlayById(getOverlayId(overlay))) return
+
+      this.$overlaysCollection.push(overlay)
     },
     /**
      * @param {OverlayLike[]|module:ol/Collection~Collection<OverlayLike>} overlays
@@ -153,9 +153,7 @@ export default {
      * @return {module:ol/Overlay~Overlay|undefined}
      */
     getOverlayById (overlayId) {
-      return find(this.getOverlays(), overlay => {
-        return getOverlayId(overlay) === overlayId
-      })
+      return find(this.getOverlays(), overlay => getOverlayId(overlay) === overlayId)
     },
   },
 }
