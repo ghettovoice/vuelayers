@@ -2,7 +2,7 @@
   import VectorSource from 'ol/source/Vector'
   import { vectorSource } from '../../mixin'
   import { createGeoJsonFmt, getFeatureId, initializeFeature, loadingAll, transform } from '../../ol-ext'
-  import { constant, difference, isEqual, isFinite, isFunction, stubArray } from '../../util/minilo'
+  import { constant, difference, isEqual, isFinite, isFunction, stubArray, isArray, isString } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
@@ -82,10 +82,10 @@
             resolution,
             this.resolvedDataProjection,
           )
-          if (!Array.isArray(features)) {
+          if (isString(features) && features !== '') {
             features = this.readSourceData(features)
           }
-          if (Array.isArray(features)) {
+          if (isArray(features)) {
             this.addFeatures(features)
           }
         }

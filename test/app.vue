@@ -12,7 +12,7 @@
       </vl-layer-tile>
 
       <vl-layer-vector>
-        <vl-source-vector :features.sync="features"></vl-source-vector>
+        <vl-source-vector ref="vectorSource" :features.sync="features" :loader-factory="loader"></vl-source-vector>
         <vl-style-func :factory="styleFactory" />
       </vl-layer-vector>
 
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import { createStyle } from '../src/ol-ext'
+  import { createStyle, readGeoJsonFeature } from '../src/ol-ext'
 
   export default {
     name: 'app',
@@ -40,17 +40,17 @@
         return this.selectedFeatures.map(({ id }) => id)
       },
     },
-    mounted () {
-      this.loadFeatures().then(features => {
-        this.features = features.map(Object.freeze)
-      })
-    },
     methods: {
+      loader () {
+        return async () => {
+          await this.loadFeatures()
+        }
+      },
       loadFeatures() {
         return new Promise(resolve => {
           setTimeout(() => {
             // generate GeoJSON random features
-            resolve([{
+            const features = [{
               type: "Feature",
               geometry: {
                 type: 'Point',
@@ -136,7 +136,12 @@
                   active: false,
                 },
               },
-            ])
+            ]
+            features.forEach(feature => {
+              feature = readGeoJsonFeature(feature)
+              this.$refs.vectorSource.addFeature(feature)
+            })
+            resolve()
           }, 3000)
         })
       },
