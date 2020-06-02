@@ -20,7 +20,7 @@
       url: {
         type: String,
         required: true,
-        validator: negate(isEmpty),
+        validator: /*#__PURE__*/negate(isEmpty),
       },
     },
     methods: {

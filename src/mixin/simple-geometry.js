@@ -103,7 +103,7 @@ export default {
     // ], () => geometry.methods.scheduleRecreate),
   },
   methods: {
-    ...pick(geometry.methods, [
+    .../*#__PURE__*/pick(geometry.methods, [
       'beforeInit',
       'init',
       'deinit',

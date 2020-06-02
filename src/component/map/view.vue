@@ -280,7 +280,7 @@
       },
       currentCenterDataProj: {
         deep: true,
-        handler: debounce(function (value) {
+        handler: /*#__PURE__*/debounce(function (value) {
           if (isEqual(value, this.centerDataProj)) return
 
           this.$emit('update:center', value.slice())
@@ -291,7 +291,7 @@
 
         await this.setRotation(value)
       },
-      currentRotation: debounce(function (value) {
+      currentRotation: /*#__PURE__*/debounce(function (value) {
         if (value === this.rotation) return
 
         this.$emit('update:rotation', value)
@@ -301,7 +301,7 @@
 
         await this.setResolution(value)
       },
-      currentResolution: debounce(function (value) {
+      currentResolution: /*#__PURE__*/debounce(function (value) {
         if (value === this.resolution) return
 
         this.$emit('update:resolution', value)
@@ -311,7 +311,7 @@
 
         await this.setZoom(value)
       },
-      currentZoom: debounce(function (value) {
+      currentZoom: /*#__PURE__*/debounce(function (value) {
         if (value === this.zoom) return
 
         this.$emit('update:zoom', value)
@@ -322,42 +322,42 @@
       async maxZoom (value) {
         await this.setMaxZoom(value)
       },
-      currentAnimating: debounce(function (value, prev) {
+      currentAnimating: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:animating', value)
       }),
-      currentInteracting: debounce(function (value, prev) {
+      currentInteracting: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:interacting', value)
       }),
-      currentResolutions: debounce(function (value, prev) {
+      currentResolutions: /*#__PURE__*/debounce(function (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:resolutions', value)
       }),
-      currentMaxResolution: debounce(function (value, prev) {
+      currentMaxResolution: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:maxResolution', value)
       }),
-      currentMinResolution: debounce(function (value, prev) {
+      currentMinResolution: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:minResolution', value)
       }),
-      currentMaxZoom: debounce(function (value, prev) {
+      currentMaxZoom: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:maxZoom', value)
       }),
-      currentMinZoom: debounce(function (value, prev) {
+      currentMinZoom: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:minZoom', value)
       }),
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'constrainOnlyCenter',
         'extentDataProj',
         'smoothExtentConstraint',

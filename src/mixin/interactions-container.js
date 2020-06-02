@@ -43,7 +43,7 @@ export default {
     },
   },
   watch: {
-    currentInteractions: debounce(function (value, prev) {
+    currentInteractions: /*#__PURE__*/debounce(function (value, prev) {
       if (isEqual(value, prev)) return
 
       this.$emit('update:interactions', value.slice())

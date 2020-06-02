@@ -164,7 +164,7 @@
       async dataProjection (value) {
         await this.setDataProjection(value)
       },
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'keyboardEventTarget',
         'moveTolerance',
         'pixelRatio',

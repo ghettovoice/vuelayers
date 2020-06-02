@@ -34,7 +34,7 @@
        */
       filter: {
         type: Function,
-        default: constant(true),
+        default: /*#__PURE__*/constant(true),
       },
       /**
        * A list of layers from which features should be selected. Alternatively, a filter function can be provided.
@@ -122,7 +122,7 @@
       },
     },
     watch: {
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'filter',
         'hitTolerance',
         'multi',

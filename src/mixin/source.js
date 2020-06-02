@@ -85,7 +85,7 @@ export default {
     async attributions (value) {
       await this.setAttributions(value)
     },
-    currentAttributions: debounce(function (value) {
+    currentAttributions: /*#__PURE__*/debounce(function (value) {
       if (isEqual(value, this.attributions)) return
 
       this.$emit('update:attributions', value)
@@ -93,7 +93,7 @@ export default {
     async state (value) {
       await this.setState(value)
     },
-    currentState: debounce(function (value) {
+    currentState: /*#__PURE__*/debounce(function (value) {
       this.$emit('update:state', value)
     }, FRAME_TIME),
     async attributionsCollapsible (value) {
@@ -222,7 +222,7 @@ export default {
       this::olCmp.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
-    ...pick(olCmp.methods, [
+    .../*#__PURE__*/pick(olCmp.methods, [
       'init',
       'deinit',
       'beforeMount',

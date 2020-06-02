@@ -327,7 +327,7 @@ export function transformMultiPolygon (
  * Transforms by geom type
  * @type {Object<string, function>}
  */
-export const transforms = {
+export const transforms = /*#__PURE__*/{
   [GeometryType.POINT]: {
     toLonLat: pointToLonLat,
     fromLonLat: pointFromLonLat,

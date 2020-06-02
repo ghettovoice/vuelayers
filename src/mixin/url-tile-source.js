@@ -103,7 +103,7 @@ export default {
       this::tileSource.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
-    ...pick(tileSource.methods, [
+    .../*#__PURE__*/pick(tileSource.methods, [
       'beforeInit',
       'init',
       'deinit',

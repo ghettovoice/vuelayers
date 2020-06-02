@@ -27,7 +27,7 @@ export default {
   watch: {
     currentFill: {
       deep: true,
-      handler: debounce(function (value, prev) {
+      handler: /*#__PURE__*/debounce(function (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:fill', value && clonePlainObject(value))

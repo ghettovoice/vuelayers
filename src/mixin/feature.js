@@ -69,13 +69,13 @@ export default {
     },
     currentProperties: {
       deep: true,
-      handler: debounce(function (value) {
+      handler: /*#__PURE__*/debounce(function (value) {
         if (isEqual(value, this.properties)) return
 
         this.$emit('update:properties', clonePlainObject(value))
       }, FRAME_TIME),
     },
-    currentGeometryName: debounce(function (value, prev) {
+    currentGeometryName: /*#__PURE__*/debounce(function (value, prev) {
       if (value === prev) return
 
       this.$emit('update:geometryName', value)
@@ -196,7 +196,7 @@ export default {
         },
       )
     },
-    ...pick(olCmp.methods, [
+    .../*#__PURE__*/pick(olCmp.methods, [
       'refresh',
       'scheduleRefresh',
       'remount',
@@ -205,10 +205,10 @@ export default {
       'scheduleRecreate',
       'resolveOlObject',
     ]),
-    ...pick(geometryContainer.methods, [
+    .../*#__PURE__*/pick(geometryContainer.methods, [
       'setGeometry',
     ]),
-    ...pick(styleContainer.methods, [
+    .../*#__PURE__*/pick(styleContainer.methods, [
       'setStyle',
     ]),
     resolveFeature: olCmp.methods.resolveOlObject,

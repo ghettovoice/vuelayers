@@ -43,7 +43,7 @@ export default {
     },
   },
   watch: {
-    currentControls: debounce(function (value, prev) {
+    currentControls: /*#__PURE__*/debounce(function (value, prev) {
       if (isEqual(value, prev)) return
 
       this.$emit('update:controls', value.slice())

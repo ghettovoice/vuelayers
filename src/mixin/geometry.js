@@ -135,7 +135,7 @@ export default {
      * @return {Promise<module:ol/geom/Geometry~Geometry>}
      */
     resolveGeometry: olCmp.methods.resolveOlObject,
-    ...pick(olCmp.methods, [
+    .../*#__PURE__*/pick(olCmp.methods, [
       'init',
       'deinit',
       'beforeMount',

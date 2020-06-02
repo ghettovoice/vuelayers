@@ -73,7 +73,7 @@ export default {
     async active (value) {
       await this.setActive(value)
     },
-    currentActive: debounce(function (value) {
+    currentActive: /*#__PURE__*/debounce(function (value) {
       if (value === this.active) return
 
       this.$emit('update:active', value)
@@ -81,7 +81,7 @@ export default {
     async priority (value) {
       await this.setPriority(value)
     },
-    currentPriority: debounce(function (value) {
+    currentPriority: /*#__PURE__*/debounce(function (value) {
       if (value === this.priority) return
 
       this.$emit('update:priority', value)
@@ -184,7 +184,7 @@ export default {
      * @return {Promise<module:ol/interaction/Interaction~Interaction>}
      */
     resolveInteraction: olCmp.methods.resolveOlObject,
-    ...pick(olCmp.methods, [
+    .../*#__PURE__*/pick(olCmp.methods, [
       'init',
       'deinit',
       'beforeMount',

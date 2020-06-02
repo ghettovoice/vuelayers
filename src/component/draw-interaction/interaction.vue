@@ -1,8 +1,8 @@
 <script>
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
+  import GeometryType from 'ol/geom/GeometryType'
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import GeometryType from 'ol/geom/GeometryType'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
   import { interaction, styleContainer } from '../../mixin'
@@ -141,7 +141,7 @@
       },
     },
     watch: {
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'source',
         'clickTolerance',
         'snapTolerance',
@@ -156,7 +156,13 @@
         'freehand',
         'freehandCondition',
         'wrapX',
-      ], () => interaction.methods.scheduleRecreate),
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
+      }),
     },
     methods: {
       /**

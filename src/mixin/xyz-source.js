@@ -84,7 +84,7 @@ export default {
         tileClass: this.tileClass,
       })
     },
-    ...pick(tileImageSource.methods, [
+    .../*#__PURE__*/pick(tileImageSource.methods, [
       'beforeInit',
       'init',
       'deinit',

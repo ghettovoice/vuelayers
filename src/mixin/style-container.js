@@ -39,7 +39,7 @@ export default {
   watch: {
     currentStyle: {
       deep: true,
-      handler: debounce(function (value, prev) {
+      handler: /*#__PURE__*/debounce(function (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:style', value && clonePlainObject(value))

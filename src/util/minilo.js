@@ -13,12 +13,12 @@ const objectToString = objectProto.toString
 const objectHasOwnProp = objectProto.hasOwnProperty
 const funcToString = funcProto.toString
 
-const objectTag = {}::objectToString()
-const numberTag = 0::objectToString()
-const stringTag = ''::objectToString()
-const booleanTag = true::objectToString()
+const objectTag = /*#__PURE__*/{}::objectToString()
+const numberTag = /*#__PURE__*/0::objectToString()
+const stringTag = /*#__PURE__*/''::objectToString()
+const booleanTag = /*#__PURE__*/true::objectToString()
 
-const objectCtorString = Object::funcToString()
+const objectCtorString = /*#__PURE__*/Object::funcToString()
 
 export function noop () {
   // do nothing

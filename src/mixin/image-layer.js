@@ -6,7 +6,7 @@ export default {
     layer,
   ],
   methods: {
-    ...pick(layer.methods, [
+    .../*#__PURE__*/pick(layer.methods, [
       'beforeInit',
       'init',
       'deinit',

@@ -124,7 +124,7 @@
     watch: {
       currentMeridians: {
         deep: true,
-        handler: debounce(function (value, prev) {
+        handler: /*#__PURE__*/debounce(function (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:meridians', clonePlainObject(value))
@@ -132,7 +132,7 @@
       },
       currentParallels: {
         deep: true,
-        handler: debounce(function (value, prev) {
+        handler: /*#__PURE__*/debounce(function (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:parallels', clonePlainObject(value))
@@ -140,7 +140,7 @@
       },
       currentLonLabelStyle: {
         deep: true,
-        handler: debounce(function (value, prev) {
+        handler: /*#__PURE__*/debounce(function (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:lonLabelStyle', clonePlainObject(value))
@@ -148,7 +148,7 @@
       },
       currentLatLabelStyle: {
         deep: true,
-        handler: debounce(function (value, prev) {
+        handler: /*#__PURE__*/debounce(function (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:latLabelStyle', clonePlainObject(value))
@@ -156,13 +156,13 @@
       },
       currentStrokeStyle: {
         deep: true,
-        handler: debounce(function (value, prev) {
+        handler: /*#__PURE__*/debounce(function (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:strokeStyle', clonePlainObject(value))
         }),
       },
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'maxLines',
         'targetSize',
         'showLabels',

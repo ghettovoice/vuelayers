@@ -27,7 +27,7 @@ export default {
   watch: {
     currentText: {
       deep: true,
-      handler: debounce(function (value, prev) {
+      handler: /*#__PURE__*/debounce(function (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:text', value && clonePlainObject(value))

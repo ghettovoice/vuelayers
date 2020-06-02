@@ -136,7 +136,7 @@
       },
       currentBackgroundFill: {
         deep: true,
-        handler: debounce(function (value, prev) {
+        handler: /*#__PURE__*/debounce(function (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:backgroundFill', value && clonePlainObject(value))
@@ -144,7 +144,7 @@
       },
       currentBackgroundStroke: {
         deep: true,
-        handler: debounce(function (value, prev) {
+        handler: /*#__PURE__*/debounce(function (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:backgroundStroke', value && clonePlainObject(value))

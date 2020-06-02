@@ -65,7 +65,7 @@
       url: {
         type: String,
         required: true,
-        validator: negate(isEmpty),
+        validator: /*#__PURE__*/negate(isEmpty),
       },
     },
     computed: {
@@ -95,7 +95,7 @@
       },
     },
     watch: {
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'crossOrigin',
         'resolvedImgExtent',
         'resolvedImgLoadFunc',

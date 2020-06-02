@@ -122,7 +122,7 @@ export default {
     async stylesStr (value) {
       await this.updateParam('styles', value)
     },
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'version',
       'transparent',
       'format',
@@ -131,7 +131,7 @@ export default {
     ], prop => async function (value) {
       await this.updateParam(prop, value)
     }),
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'hidpi',
       'serverType',
     ], prop => async function () {

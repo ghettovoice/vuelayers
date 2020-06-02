@@ -18,7 +18,7 @@
       },
     },
     watch: {
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'renderMode',
       ], prop => async function () {
         if (process.env.VUELAYERS_DEBUG) {

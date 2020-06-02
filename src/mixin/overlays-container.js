@@ -42,7 +42,7 @@ export default {
     },
   },
   watch: {
-    currentOverlays: debounce(function (value, prev) {
+    currentOverlays: /*#__PURE__*/debounce(function (value, prev) {
       if (isEqual(value, prev)) return
 
       this.$emit('update:overlays', value.slice())

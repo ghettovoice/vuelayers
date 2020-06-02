@@ -31,7 +31,7 @@ import featureHelper from './feature-helper'
 import { FRAME_TIME } from './ol-cmp'
 import source from './source'
 
-const isNotEmptyString = and(isString, negate(isEmpty))
+const isNotEmptyString = /*#__PURE__*/and(isString, negate(isEmpty))
 
 /**
  * Basic vector source mixin.
@@ -192,7 +192,7 @@ export default {
   watch: {
     featuresDataProj: {
       deep: true,
-      handler: debounce(async function (features) {
+      handler: /*#__PURE__*/debounce(async function (features) {
         if (isEqual(features, this.currentFeaturesDataProj)) return
         // add new features
         await this.addFeatures(features)
@@ -206,7 +206,7 @@ export default {
     },
     currentFeaturesDataProj: {
       deep: true,
-      handler: debounce(function (value) {
+      handler: /*#__PURE__*/debounce(function (value) {
         if (isEqual(value, this.featuresDataProj)) return
 
         this.$emit('update:features', clonePlainObject(value))
@@ -256,7 +256,7 @@ export default {
 
       await this.scheduleRecreate()
     },
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'loadingStrategyFunc',
       'useSpatialIndex',
     ], prop => async function () {
@@ -317,7 +317,7 @@ export default {
       this::source.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
-    ...pick(source.methods, [
+    .../*#__PURE__*/pick(source.methods, [
       'beforeInit',
       'init',
       'deinit',

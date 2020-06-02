@@ -91,7 +91,7 @@ export default {
      * @return {Promise<OlStyle>}
      */
     resolveStyle: olCmp.methods.resolveOlObject,
-    ...pick(olCmp.methods, [
+    .../*#__PURE__*/pick(olCmp.methods, [
       'init',
       'deinit',
       'beforeMount',

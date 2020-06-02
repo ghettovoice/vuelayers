@@ -25,7 +25,7 @@ export default {
     tileClass: String,
   },
   watch: {
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'crossOrigin',
       'reprojectionErrorThreshold',
       'tileClass',
@@ -38,7 +38,7 @@ export default {
     }),
   },
   methods: {
-    ...pick(urlTileSource.methods, [
+    .../*#__PURE__*/pick(urlTileSource.methods, [
       'beforeInit',
       'init',
       'deinit',

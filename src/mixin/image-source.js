@@ -29,7 +29,7 @@ export default {
     resolutions: Array,
   },
   watch: {
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'resolutions',
     ], prop => async function () {
       if (process.env.VUELAYERS_DEBUG) {
@@ -48,7 +48,7 @@ export default {
       this::source.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
-    ...pick(source.methods, [
+    .../*#__PURE__*/pick(source.methods, [
       'beforeInit',
       'init',
       'deinit',

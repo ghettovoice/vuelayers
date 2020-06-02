@@ -69,7 +69,7 @@
       async blur (value) {
         await this.setBlur(value)
       },
-      currentBlur: debounce(function (value) {
+      currentBlur: /*#__PURE__*/debounce(function (value) {
         if (value === this.blur) return
 
         this.$emit('update:blur', value)
@@ -79,7 +79,7 @@
       },
       currentGradient: {
         deep: true,
-        handler: debounce(function (value) {
+        handler: /*#__PURE__*/debounce(function (value) {
           if (isEqual(value, this.gradient)) return
 
           this.$emit('update:gradient', value.slice())
@@ -88,12 +88,12 @@
       async radius (value) {
         await this.setRadius(value)
       },
-      currentRadius: debounce(function (value) {
+      currentRadius: /*#__PURE__*/debounce(function (value) {
         if (value === this.radius) return
 
         this.$emit('update:radius', value)
       }, FRAME_TIME),
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'weight',
       ], prop => async function () {
         if (process.env.VUELAYERS_DEBUG) {

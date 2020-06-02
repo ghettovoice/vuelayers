@@ -58,7 +58,7 @@ export default {
   watch: {
     currentFeaturesDataProj: {
       deep: true,
-      handler: debounce(async function (value, prev) {
+      handler: /*#__PURE__*/debounce(async function (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:features', clonePlainObject(value))

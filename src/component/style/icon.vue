@@ -87,7 +87,7 @@
           await this.scheduleRecreate()
         }
       },
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'anchorOrigin',
         'anchorXUnits',
         'anchorYUnits',

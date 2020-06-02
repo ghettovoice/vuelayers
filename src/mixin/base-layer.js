@@ -168,7 +168,7 @@ export default {
     async opacity (value) {
       await this.setOpacity(value)
     },
-    currentOpacity: debounce(function (value) {
+    currentOpacity: /*#__PURE__*/debounce(function (value) {
       if (value === this.opacity) return
 
       this.$emit('update:opacity', value)
@@ -176,7 +176,7 @@ export default {
     async visible (value) {
       await this.setVisible(value)
     },
-    currentVisible: debounce(function (value) {
+    currentVisible: /*#__PURE__*/debounce(function (value) {
       if (value === this.visible) return
 
       this.$emit('update:visible', value)
@@ -184,7 +184,7 @@ export default {
     async extentDataProj (value) {
       await this.setExtent(value)
     },
-    currentExtentDataProj: debounce(function (value) {
+    currentExtentDataProj: /*#__PURE__*/debounce(function (value) {
       if (isEqual(value, this.extentDataProj)) return
 
       this.$emit('update:extent', value.slice())
@@ -195,7 +195,7 @@ export default {
     async zIndex (value) {
       await this.setZIndex(value)
     },
-    currentZIndex: debounce(function (value) {
+    currentZIndex: /*#__PURE__*/debounce(function (value) {
       if (value === this.zIndex) return
 
       this.$emit('update:zIndex', value)
@@ -203,7 +203,7 @@ export default {
     async minResolution (value) {
       await this.setMinResolution(value)
     },
-    currentMinResolution: debounce(function (value) {
+    currentMinResolution: /*#__PURE__*/debounce(function (value) {
       if (value === this.minResolution) return
 
       this.$emit('update:minResolution', value)
@@ -211,7 +211,7 @@ export default {
     async maxResolution (value) {
       await this.setMaxResolution(value)
     },
-    currentMaxResolution: debounce(function (value) {
+    currentMaxResolution: /*#__PURE__*/debounce(function (value) {
       if (value === this.maxResolution) return
 
       this.$emit('update:maxResolution', value)
@@ -219,7 +219,7 @@ export default {
     async minZoom (value) {
       await this.setMinZoom(value)
     },
-    currentMinZoom: debounce(function (value) {
+    currentMinZoom: /*#__PURE__*/debounce(function (value) {
       if (value === this.minZoom) return
 
       this.$emit('update:minZoom', value)
@@ -227,7 +227,7 @@ export default {
     async maxZoom (value) {
       await this.setMaxZoom(value)
     },
-    currentMaxZoom: debounce(function (value) {
+    currentMaxZoom: /*#__PURE__*/debounce(function (value) {
       if (value === this.maxZoom) return
 
       this.$emit('update:maxZoom', value)
@@ -324,7 +324,7 @@ export default {
      * @return {Promise<module:ol/layer/Base~BaseLayer>}
      */
     resolveLayer: olCmp.methods.resolveOlObject,
-    ...pick(olCmp.methods, [
+    .../*#__PURE__*/pick(olCmp.methods, [
       'init',
       'deinit',
       'beforeMount',

@@ -169,7 +169,7 @@ export default {
     async timeStr (value) {
       await this.updateParam('time', value)
     },
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'format',
       'layerDefs',
       'dynamicLayers',
@@ -187,7 +187,7 @@ export default {
     ], prop => async function (value) {
       await this.updateParam(prop, serialize(value))
     }),
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'hidpi',
     ], prop => async function () {
       if (process.env.VUELAYERS_DEBUG) {

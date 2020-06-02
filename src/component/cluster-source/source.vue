@@ -1,12 +1,12 @@
 <script>
   import debounce from 'debounce-promise'
   import { Cluster as ClusterSource } from 'ol/source'
-  import { FRAME_TIME, createSourceContainer, vectorSource } from '../../mixin'
+  import { createSourceContainer, FRAME_TIME, vectorSource } from '../../mixin'
   import { createPointGeom, findPointOnSurface } from '../../ol-ext'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
-  const sourceContainer = /*#__PURE__*/ createSourceContainer({
+  const sourceContainer = /*#__PURE__*/createSourceContainer({
     propName: 'innerSource',
   })
 
@@ -52,12 +52,12 @@
       async distance (value) {
         await this.setDistance(value)
       },
-      currentDistance: debounce(function (value) {
+      currentDistance: /*#__PURE__*/ debounce(function (value) {
         if (value === this.distance) return
 
         this.$emit('update:distance', value)
       }, FRAME_TIME),
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'resolvedGeomFunc',
       ], prop => async function () {
         if (process.env.VUELAYERS_DEBUG) {

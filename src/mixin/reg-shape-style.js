@@ -23,7 +23,7 @@ export default {
     },
   },
   watch: {
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'points',
       'radius',
       'radius1',
@@ -54,7 +54,7 @@ export default {
         this::strokeStyleContainer.methods.getServices(),
       )
     },
-    ...pick(imageStyle.methods, [
+    .../*#__PURE__*/pick(imageStyle.methods, [
       'init',
       'deinit',
       'mount',

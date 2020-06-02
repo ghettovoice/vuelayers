@@ -17,7 +17,7 @@
       },
     },
     computed: {
-      type: constant(GeometryType.POINT),
+      type: /*#__PURE__*/constant(GeometryType.POINT),
     },
     methods: {
       /**

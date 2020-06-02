@@ -43,7 +43,7 @@ export default {
     },
   },
   watch: {
-    currentLayers: debounce(function (value, prev) {
+    currentLayers: /*#__PURE__*/debounce(function (value, prev) {
       if (isEqual(value, prev)) return
 
       this.$emit('update:layers', value.slice())

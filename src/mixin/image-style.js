@@ -95,7 +95,7 @@ export default {
 
       return this::style.methods.unmount()
     },
-    ...pick(style.methods, [
+    .../*#__PURE__*/pick(style.methods, [
       'beforeInit',
       'init',
       'deinit',

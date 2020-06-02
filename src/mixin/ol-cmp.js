@@ -106,7 +106,7 @@ export default {
     async id (value) {
       await this.setId(value)
     },
-    currentId: debounce(function (value) {
+    currentId: /*#__PURE__*/debounce(function (value) {
       if (value === this.id) return
 
       this.$emit('update:id', value)

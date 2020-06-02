@@ -79,7 +79,7 @@
       },
     },
     watch: {
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'source',
         'condition',
         'deleteCondition',

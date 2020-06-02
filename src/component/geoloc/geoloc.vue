@@ -144,7 +144,7 @@
       async tracking (value) {
         await this.setTracking(value)
       },
-      currentTracking: debounce(function (value) {
+      currentTracking: /*#__PURE__*/debounce(function (value) {
         if (value === this.tracking) return
 
         this.$emit('update:tracking', value)
@@ -154,7 +154,7 @@
       },
       currentTrackingOptions: {
         deep: true,
-        handler: debounce(function (value) {
+        handler: /*#__PURE__*/debounce(function (value) {
           if (isEqual(value, this.trackingOptions)) return
 
           value && (value = clonePlainObject(value))
@@ -164,42 +164,42 @@
       async resolvedDataProjection (value) {
         await this.setProjection(value)
       },
-      currentProjection: debounce(function (value) {
+      currentProjection: /*#__PURE__*/debounce(function (value) {
         if (value === this.projection) return
 
         this.$emit('update:projection', value)
       }, FRAME_TIME),
-      currentAccuracy: debounce(function (value, prev) {
+      currentAccuracy: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:accuracy', value)
       }, FRAME_TIME),
-      currentAccuracyGeometryDataProj: debounce(function (value, prev) {
+      currentAccuracyGeometryDataProj: /*#__PURE__*/debounce(function (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:accuracyGeometry', value)
       }, FRAME_TIME),
-      currentAltitude: debounce(function (value, prev) {
+      currentAltitude: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:altitude', value)
       }, FRAME_TIME),
-      currentAltitudeAccuracy: debounce(function (value, prev) {
+      currentAltitudeAccuracy: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:altitudeAccuracy', value)
       }, FRAME_TIME),
-      currentHeading: debounce(function (value, prev) {
+      currentHeading: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:heading', value)
       }, FRAME_TIME),
-      currentSpeed: debounce(function (value, prev) {
+      currentSpeed: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:speed', value)
       }, FRAME_TIME),
-      currentPositionDataProj: debounce(function (value, prev) {
+      currentPositionDataProj: /*#__PURE__*/debounce(function (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:position', value)

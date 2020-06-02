@@ -30,7 +30,7 @@ export default {
     },
   },
   watch: {
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'render',
       'overlay',
     ], prop => async function () {
@@ -84,7 +84,7 @@ export default {
       this::baseLayer.methods.subscribeAll()
       this::subscribeToLayerEvents()
     },
-    ...pick(baseLayer.methods, [
+    .../*#__PURE__*/pick(baseLayer.methods, [
       'beforeInit',
       'init',
       'deinit',

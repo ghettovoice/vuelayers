@@ -53,7 +53,7 @@ export default {
     async renderOrder (value) {
       await this.setRenderOrder(value)
     },
-    currentRenderOrder: debounce(function (value) {
+    currentRenderOrder: /*#__PURE__*/debounce(function (value) {
       if (value === this.renderOrder) return
 
       this.$emit('update:renderOrder', value)
@@ -113,7 +113,7 @@ export default {
       this::layer.methods.subscribeAll()
       this::subscribeToLayerEvents()
     },
-    ...pick(layer.methods, [
+    .../*#__PURE__*/pick(layer.methods, [
       'beforeInit',
       'init',
       'deinit',

@@ -10,7 +10,7 @@
       simpleGeometry,
     ],
     computed: {
-      type: constant(GeometryType.MULTI_POLYGON),
+      type: /*#__PURE__*/constant(GeometryType.MULTI_POLYGON),
     },
     methods: {
       /**

@@ -45,7 +45,7 @@
       },
     },
     watch: {
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'source',
         'edge',
         'vertex',

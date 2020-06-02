@@ -17,7 +17,7 @@
       },
     },
     computed: {
-      type: constant(GeometryType.LINE_STRING),
+      type: /*#__PURE__*/constant(GeometryType.LINE_STRING),
     },
     methods: {
       /**

@@ -125,7 +125,7 @@
 
         await this.scheduleRecreate()
       },
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'extentViewProj',
         'tileClass',
       ], prop => async function () {

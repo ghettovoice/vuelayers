@@ -16,7 +16,7 @@
       },
     },
     watch: {
-      ...makeWatchers([
+      .../*#__PURE__*/makeWatchers([
         'gutter',
         'hidpi',
         'serverType',

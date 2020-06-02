@@ -49,7 +49,7 @@ export default {
     async preload (value) {
       await this.setPreload(value)
     },
-    currentPreload: debounce(function (value) {
+    currentPreload: /*#__PURE__*/debounce(function (value) {
       if (value === this.preload) return
 
       this.$emit('update:preload', value)
@@ -57,7 +57,7 @@ export default {
     async useInterimTilesOnError (value) {
       await this.setUseInterimTilesOnError(value)
     },
-    currentUseInterimTilesOnError: debounce(function (value) {
+    currentUseInterimTilesOnError: /*#__PURE__*/debounce(function (value) {
       if (value === this.useInterimTilesOnError) return
 
       this.$emit('update:useInterimTilesOnError', value)
@@ -71,7 +71,7 @@ export default {
       this::layer.methods.subscribeAll()
       this::subscribeToLayerEvents()
     },
-    ...pick(layer.methods, [
+    .../*#__PURE__*/pick(layer.methods, [
       'beforeInit',
       'init',
       'deinit',

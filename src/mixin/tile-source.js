@@ -109,12 +109,12 @@ export default {
     async tileKey (value) {
       await this.setTileKey(value)
     },
-    currentTileKey: debounce(function (value) {
+    currentTileKey: /*#__PURE__*/debounce(function (value) {
       if (value === this.tileKey) return
 
       this.$emit('update:tileKey', value)
     }, FRAME_TIME),
-    currentResolutions: debounce(function (value) {
+    currentResolutions: /*#__PURE__*/debounce(function (value) {
       this.$emit('update:resolutions', clonePlainObject(value))
     }, FRAME_TIME),
     tileGridIdent (value, prevValue) {
@@ -161,7 +161,7 @@ export default {
 
       await this.scheduleRecreate()
     },
-    ...makeWatchers([
+    .../*#__PURE__*/makeWatchers([
       'cacheSize',
       'transition',
       'zDirection',
@@ -186,7 +186,7 @@ export default {
     }
   },
   methods: {
-    ...pick(source.methods, [
+    .../*#__PURE__*/pick(source.methods, [
       'beforeInit',
       'init',
       'deinit',

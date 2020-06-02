@@ -38,7 +38,7 @@
       },
     },
     computed: {
-      type: constant(GeometryType.CIRCLE),
+      type: /*#__PURE__*/constant(GeometryType.CIRCLE),
       resolvedRadiusProjection () {
         return this.radiusProjection || this.resolvedDataProjection
       },
@@ -94,7 +94,7 @@
       async radiusDataProj (value) {
         await this.setRadius(value)
       },
-      currentRadiusDataProj: debounce(function (value) {
+      currentRadiusDataProj: /*#__PURE__*/debounce(function (value) {
         if (value === this.radiusDataProj) return
 
         this.$emit('update:radius', value)
