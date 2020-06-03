@@ -7,7 +7,7 @@
   import { createStyle, defaultEditStyle } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
   import { hasInteraction, instanceOf } from '../../util/assert'
-  import { mapValues } from '../../util/minilo'
+  import { mapValues, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -88,11 +88,26 @@
        */
       async createInteraction () {
         let source = await this.getInstance(this.source)
-        instanceOf(source, VectorSource, `Source "${this.source}" doesn't exists in the identity map.`)
-        instanceOf(source.getFeaturesCollection(), Collection, `Source "${this.source}" doesn't provide features collection.`)
+        let features
+        if (source instanceof VectorSource) {
+          features = source.getFeaturesCollection()
+          if (features) {
+            instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
+            source = null
+          }
+        } else {
+          if (isFunction(source.getFeaturesCollection)) {
+            features = source.getFeaturesCollection()
+          } else if (isFunction(source.getFeatures)) {
+            features = source.getFeatures()
+          }
+          instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
+          source = null
+        }
 
         return new ModifyInteraction({
-          features: source.getFeaturesCollection(),
+          source,
+          features,
           deleteCondition: this.deleteCondition,
           insertVertexCondition: this.insertVertexCondition,
           pixelTolerance: this.pixelTolerance,

@@ -12,11 +12,11 @@
       </vl-layer-tile>
 
       <vl-layer-vector>
-        <vl-source-vector ref="vectorSource" :features.sync="features" :loader-factory="loader"></vl-source-vector>
+        <vl-source-vector ident="draw" ref="vectorSource" :features.sync="features" :loader-factory="loader"></vl-source-vector>
         <vl-style-func :factory="styleFactory" />
       </vl-layer-vector>
 
-      <vl-interaction-select :features.sync="selectedFeatures" />
+      <vl-interaction-select ident="modify" :features.sync="selectedFeatures" />
     </vl-map>
   </div>
 </template>
