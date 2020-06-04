@@ -1,6 +1,5 @@
-
-# Created by https://www.gitignore.io/api/node,linux,macos,windows,jetbrains
-# Edit at https://www.gitignore.io/?templates=node,linux,macos,windows,jetbrains
+# Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,node,jetbrains
+# Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows,node,jetbrains
 
 ### JetBrains ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
@@ -36,8 +35,6 @@
 # .idea/modules.xml
 # .idea/*.iml
 # .idea/modules
-# *.iml
-# *.ipr
 
 # CMake
 cmake-build-*/
@@ -81,14 +78,7 @@ fabric.properties
 # *.ipr
 
 # Sonarlint plugin
-.idea/**/sonarlint/
-
-# SonarQube Plugin
-.idea/**/sonarIssues.xml
-
-# Markdown Navigator plugin
-.idea/**/markdown-navigator.xml
-.idea/**/markdown-navigator/
+.idea/sonarlint
 
 ### Linux ###
 *~
@@ -265,10 +255,10 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.gitignore.io/api/node,linux,macos,windows,jetbrains
+# End of https://www.toptal.com/developers/gitignore/api/linux,macos,windows,node,jetbrains
 
 ### App ###
-package-lock.json
+/package-lock.json
 /test/e2e/reports
 /test/unit/coverage
 /dist
