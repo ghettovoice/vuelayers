@@ -1,12 +1,14 @@
 <script>
+  import { Collection } from 'ol'
   import { altKeyOnly, always, primaryAction } from 'ol/events/condition'
   import { Modify as ModifyInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
+  import { merge as mergeObs } from 'rxjs'
+  import { map as mapObs, tap } from 'rxjs/operators'
   import { interaction, styleContainer } from '../../mixin'
-  import { createStyle, defaultEditStyle } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { hasInteraction, instanceOf } from '../../util/assert'
-  import { mapValues } from '../../util/minilo'
+  import { assert, instanceOf } from '../../util/assert'
+  import { isFunction, map } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -86,7 +88,13 @@
         'insertVertexCondition',
         'pixelTolerance',
         'wrapX',
-      ], () => interaction.methods.scheduleRecreate),
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
+      }),
     },
     methods: {
       /**
@@ -94,30 +102,35 @@
        * @protected
        */
       async createInteraction () {
-        const source = await this.getInstance(this.source)
-        instanceOf(source, VectorSource, `source "${this.source}" is Vector source.`)
+        let source = this._source = await this.getInstance(this.source)
+        assert(!!source, `Source "${this.source}" not found in identity map.`)
+        let features
+        if (source instanceof VectorSource) {
+          features = source.getFeaturesCollection()
+          if (features) {
+            instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
+            source = null
+          }
+        } else {
+          if (isFunction(source.getFeaturesCollection)) {
+            features = source.getFeaturesCollection()
+          } else if (isFunction(source.getFeatures)) {
+            features = source.getFeatures()
+          }
+          instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
+          source = null
+        }
 
         return new ModifyInteraction({
           source,
+          features,
+          condition: this.condition,
           deleteCondition: this.deleteCondition,
           insertVertexCondition: this.insertVertexCondition,
           pixelTolerance: this.pixelTolerance,
-          style: this.createStyleFunc(),
           wrapX: this.wrapX,
+          style: this.$style,
         })
-      },
-      /**
-       * @return {function(feature: Feature): Style}
-       * @protected
-       */
-      getDefaultStyles () {
-        const defaultStyles = mapValues(defaultEditStyle(), styles => styles.map(createStyle))
-
-        return function __selectDefaultStyleFunc (feature) {
-          if (feature.getGeometry()) {
-            return defaultStyles[feature.getGeometry().getType()]
-          }
-        }
       },
       /**
        * @returns {Object}
@@ -130,30 +143,33 @@
         )
       },
       /**
-       * @return {Interaction|undefined}
-       * @protected
-       */
-      getStyleTarget () {
-        return this.$interaction
-      },
-      /**
-       * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|function(feature: Feature): Style|Vue|undefined} styles
-       * @return {void}
-       * @protected
-       */
-      setStyle (styles) {
-        if (styles !== this._styles) {
-          this._styles = styles
-          this.scheduleRecreate()
-        }
-      },
-      /**
        * @return {void}
        * @protected
        */
       subscribeAll () {
         this::interaction.methods.subscribeAll()
         this::subscribeToInteractionChanges()
+      },
+      /**
+       * @return {StyleTarget}
+       * @protected
+       */
+      getStyleTarget () {
+        return {
+          setStyle: async () => {
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('style changed, scheduling recreate...')
+            }
+
+            await this.scheduleRecreate()
+          },
+        }
+      },
+      async getOverlay () {
+        return (await this.resolveInteraction()).getOverlay()
+      },
+      async removePoint () {
+        return (await this.resolveInteraction()).removePoint()
       },
     },
   }
@@ -162,15 +178,41 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    hasInteraction(this)
-
-    const modifyEvents = obsFromOlEvent(this.$interaction, ['modifystart', 'modifyend'])
-    this.subscribeTo(modifyEvents, evt => {
-      ++this.rev
-
-      this.$nextTick(() => {
-        this.$emit(evt.type, evt)
-      })
+    const vm = this
+    this.modifing = []
+    const start = obsFromOlEvent(this.$interaction, 'modifystart').pipe(
+      tap(evt => {
+        evt.features.forEach(feature => {
+          this.modifing[feature.getId()] = feature.getRevision()
+        })
+      }),
+    )
+    const end = obsFromOlEvent(this.$interaction, 'modifyend').pipe(
+      mapObs(evt => ({
+        ...evt,
+        modified: evt.features.getArray().reduce((modified, feature, idx) => {
+          if (this.modifing[feature.getId()] !== feature.getRevision()) {
+            modified[idx] = feature.getId()
+          }
+          return modified
+        }, {}),
+      })),
+    )
+    const events = mergeObs(start, end).pipe(
+      mapObs(({ type, features, modified }) => ({
+        type,
+        features: features instanceof Collection ? features.getArray() : features,
+        modified: modified || [],
+        get json () {
+          if (!this._json) {
+            this._json = map(this.features, feature => vm.writeFeatureInDataProj(feature))
+          }
+          return this._json
+        },
+      })),
+    )
+    this.subscribeTo(events, evt => {
+      this.$emit(evt.type, evt)
     })
   }
 </script>

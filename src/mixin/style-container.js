@@ -47,7 +47,7 @@ export default {
     },
   },
   created () {
-    this._style = null
+    this._style = undefined
 
     this::defineServices()
   },
@@ -137,12 +137,12 @@ export default {
 
       let currentStyle = this.$style
       if (currentStyle === style) {
-        currentStyle = null
+        currentStyle = undefined
       } else if (isArray(currentStyle)) {
         currentStyle = currentStyle.filter(s => s !== style)
 
         if (currentStyle.length === 0) {
-          currentStyle = null
+          currentStyle = undefined
         }
       }
 
@@ -165,7 +165,7 @@ export default {
           }))
         }
       }
-      style || (style = null)
+      style || (style = undefined)
 
       if (isEqual(style, this._style)) return
 
@@ -177,10 +177,10 @@ export default {
           style = this.createStyleFunc(style, this.getDefaultStyle())
         } else {
           isArray(style) || (style = [style])
-          style.length > 0 || (style = null)
+          style.length > 0 || (style = undefined)
         }
       } else {
-        style = null
+        style = undefined
       }
 
       this._style = style

@@ -1,15 +1,16 @@
 <script>
+  import { Collection } from 'ol'
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import GeometryType from 'ol/geom/GeometryType'
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import { merge as mergeObs } from 'rxjs'
-  import { map as mapObs } from 'rxjs/operators'
+  import { merge as mergeObs, of as obsOf } from 'rxjs'
+  import { first, map as mapObs, mapTo, mergeMap } from 'rxjs/operators'
   import { interaction, styleContainer } from '../../mixin'
-  import { createStyle, defaultEditStyle, initializeFeature } from '../../ol-ext'
-  import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { hasInteraction, instanceOf } from '../../util/assert'
-  import { camelCase, mapValues, upperFirst } from '../../util/minilo'
+  import { initializeFeature } from '../../ol-ext'
+  import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
+  import { assert, instanceOf } from '../../util/assert'
+  import { camelCase, isFunction, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -139,6 +140,14 @@
         type: Boolean,
         default: false,
       },
+      /**
+       * Delay in milliseconds after pointerdown before the current vertex can be dragged to its exact position.
+       * @type {number}
+       */
+      dragVertexDelay: {
+        type: Number,
+        default: 500,
+      },
     },
     watch: {
       .../*#__PURE__*/makeWatchers([
@@ -156,6 +165,7 @@
         'freehand',
         'freehandCondition',
         'wrapX',
+        'dragVertexDelay',
       ], prop => async function () {
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
@@ -170,11 +180,22 @@
        * @protected
        */
       async createInteraction () {
-        const source = await this.getInstance(this.source)
-        instanceOf(source, VectorSource, `source "${this.source}" is Vector source.`)
+        let source = this._source = await this.getInstance(this.source)
+        assert(!!source, `Source "${this.source}" not found in identity map.`)
+        let features
+        if (!(source instanceof VectorSource)) {
+          if (isFunction(source.getFeaturesCollection)) {
+            features = source.getFeaturesCollection()
+          } else if (isFunction(source.getFeatures)) {
+            features = source.getFeatures()
+          }
+          instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
+          source = null
+        }
 
         return new DrawInteraction({
           source,
+          features,
           clickTolerance: this.clickTolerance,
           snapTolerance: this.snapTolerance,
           type: transformType(this.type),
@@ -182,27 +203,15 @@
           maxPoints: this.maxPoints,
           minPoints: this.minPoints,
           finishCondition: this.finishCondition,
-          style: this.createStyleFunc(),
           geometryFunction: this.geometryFunction,
           geometryName: this.geometryName,
           condition: this.condition,
           freehand: this.freehand,
           freehandCondition: this.freehandCondition,
           wrapX: this.wrapX,
+          dragVertexDelay: this.dragVertexDelay,
+          style: this.$style,
         })
-      },
-      /**
-       * @return {function(feature: Feature): Style}
-       * @protected
-       */
-      getDefaultStyles () {
-        const defaultStyles = mapValues(defaultEditStyle(), styles => styles.map(createStyle))
-
-        return function __selectDefaultStyleFunc (feature) {
-          if (feature.getGeometry()) {
-            return defaultStyles[feature.getGeometry().getType()]
-          }
-        }
       },
       /**
        * @returns {Object}
@@ -215,44 +224,46 @@
         )
       },
       /**
-       * @return {Interaction|undefined}
-       * @protected
-       */
-      getStyleTarget () {
-        return this.$interaction
-      },
-      /**
-       * @return {void}
-       * @protected
-       */
-      mount () {
-        this::interaction.methods.mount()
-      },
-      /**
-       * @return {void}
-       * @protected
-       */
-      unmount () {
-        this::interaction.methods.unmount()
-      },
-      /**
-       * @param {Array<{style: Style, condition: (function|boolean|undefined)}>|function(feature: Feature): Style|Vue|undefined} styles
-       * @return {void}
-       * @protected
-       */
-      setStyle (styles) {
-        if (styles !== this._styles) {
-          this._styles = styles
-          this.scheduleRecreate()
-        }
-      },
-      /**
        * @return {void}
        * @protected
        */
       subscribeAll () {
         this::interaction.methods.subscribeAll()
         this::subscribeToInteractionChanges()
+      },
+      /**
+       * @return {StyleTarget}
+       * @protected
+       */
+      getStyleTarget () {
+        return {
+          setStyle: async () => {
+            if (process.env.VUELAYERS_DEBUG) {
+              this.$logger.log('style changed, scheduling recreate...')
+            }
+
+            await this.scheduleRecreate()
+          },
+        }
+      },
+      async getOverlay () {
+        return (await this.resolveInteraction()).getOverlay()
+      },
+      async abortDrawing () {
+        (await this.resolveInteraction()).abortDrawing()
+      },
+      async finishDrawing () {
+        (await this.resolveInteraction()).finishDrawing()
+      },
+      async appendCoordinates (coordinates, viewProj = false) {
+        if (!viewProj) {
+          coordinates = this.lineToViewProj(coordinates)
+        }
+
+        (await this.resolveInteraction()).appendCoordinates(coordinates)
+      },
+      async removeLastPoint () {
+        (await this.resolveInteraction()).removeLastPoint()
       },
     },
   }
@@ -262,24 +273,43 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    hasInteraction(this)
-
-    const drawEvents = mergeObs(
-      obsFromOlEvent(this.$interaction, 'drawstart')
-        .pipe(
-          mapObs(evt => {
-            initializeFeature(evt.feature)
-            return evt
-          }),
-        ),
-      obsFromOlEvent(this.$interaction, 'drawend'),
+    const vm = this
+    const start = obsFromOlEvent(this.$interaction, 'drawstart').pipe(
+      mapObs(evt => {
+        initializeFeature(evt.feature)
+        return evt
+      }),
     )
-    this.subscribeTo(drawEvents, evt => {
-      ++this.rev
-
-      this.$nextTick(() => {
-        this.$emit(evt.type, evt)
-      })
+    const sourceUpdObs = () => {
+      if (!this._source?.vm?.length) {
+        return obsOf(true)
+      }
+      // update:features on the source (which is feature-container)
+      // will be always after drawend with delay ~= computed property update time + FRAME_TIME
+      // so we can safely just wait first event
+      return obsFromVueEvent(this._source.vm[0], 'update:features').pipe(
+        first(),
+      )
+    }
+    const end = obsFromOlEvent(this.$interaction, 'drawend').pipe(
+      mergeMap(evt => sourceUpdObs().pipe(
+        mapTo(evt),
+      )),
+    )
+    const events = mergeObs(start, end).pipe(
+      mapObs(({ type, feature }) => ({
+        type,
+        feature,
+        get json () {
+          if (!this._json) {
+            this._json = vm.writeFeatureInDataProj(this.feature)
+          }
+          return this._json
+        },
+      })),
+    )
+    this.subscribeTo(events, evt => {
+      this.$emit(evt.type, evt)
     })
   }
 </script>

@@ -53,8 +53,8 @@ export default {
     },
   },
   created () {
-    this._geometry = null
-    this._geometryVm = null
+    this._geometry = undefined
+    this._geometryVm = undefined
 
     this::defineService()
   },
@@ -93,7 +93,7 @@ export default {
       } else if (isGeoJSONGeometry(geom)) {
         geom = this.readGeometryInDataProj(geom)
       }
-      geom || (geom = null)
+      geom || (geom = undefined)
 
       if (geom === this._geometry) return
 

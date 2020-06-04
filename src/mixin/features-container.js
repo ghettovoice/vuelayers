@@ -60,7 +60,7 @@ export default {
       deep: true,
       handler: /*#__PURE__*/debounce(async function (value, prev) {
         if (isEqual(value, prev)) return
-
+        console.log('update event', value.slice(), prev.slice())
         this.$emit('update:features', clonePlainObject(value))
       }, FRAME_TIME),
     },
@@ -184,6 +184,7 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
+  const vm = this
   const adds = obsFromOlEvent(this.$featuresCollection, CollectionEventType.ADD).pipe(
     mergeMap(({ type, element }) => fromObs(this.initializeFeature(element)).pipe(
       mapObs(element => ({ type, element })),
@@ -213,16 +214,26 @@ function subscribeToCollectionEvents () {
     }),
   )
   const events = mergeObs(adds, removes).pipe(
+    mapObs(({ type, element }) => ({
+      type,
+      feature: element,
+      get json () {
+        if (!this._json) {
+          this._json = vm.writeFeatureInDataProj(this.feature)
+        }
+        return this._json
+      },
+    })),
     bufferDebounceTime(FRAME_TIME),
   )
   this.subscribeTo(events, events => {
     ++this.rev
 
     this.$nextTick(() => {
-      forEach(events, ({ type, element }) => {
-        this.$emit(type + 'feature', element, this.writeFeatureInDataProj(element))
+      forEach(events, evt => {
+        this.$emit(evt.type + 'feature', evt)
         // todo remove in v0.13.x
-        this.$emit(type + ':feature', element)
+        this.$emit(evt.type + ':feature', evt.feature)
       })
     })
   })

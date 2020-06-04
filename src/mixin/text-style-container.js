@@ -35,8 +35,8 @@ export default {
     },
   },
   created () {
-    this._text = null
-    this._textVm = null
+    this._text = undefined
+    this._textVm = undefined
 
     this::defineServices()
   },

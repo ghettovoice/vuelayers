@@ -35,8 +35,8 @@ export default {
     },
   },
   created () {
-    this._fill = null
-    this._fillVm = null
+    this._fill = undefined
+    this._fillVm = undefined
 
     this::defineServices()
   },
@@ -68,7 +68,7 @@ export default {
       if (isFunction(fill?.resolveOlObject)) {
         fill = await fill.resolveOlObject()
       }
-      fill || (fill = null)
+      fill || (fill = undefined)
 
       if (fill === this._fill) return
 

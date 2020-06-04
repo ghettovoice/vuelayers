@@ -1,8 +1,10 @@
 <script>
+  import { Collection } from 'ol'
   import { Snap as SnapInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
   import { interaction } from '../../mixin'
-  import { instanceOf } from '../../util/assert'
+  import { assert, instanceOf } from '../../util/assert'
+  import { isFunction } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
 
   export default {
@@ -50,7 +52,13 @@
         'edge',
         'vertex',
         'pixelTolerance',
-      ], () => interaction.methods.scheduleRecreate),
+      ], prop => async function () {
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
+      }),
     },
     methods: {
       /**
@@ -58,11 +66,25 @@
        * @protected
        */
       async createInteraction () {
-        const source = await this.getInstance(this.source)
-        instanceOf(source, VectorSource, `source "${this.source}" is Vector source.`)
+        let source = await this.getInstance(this.source)
+        assert(!!source, `Source "${this.source}" not found in identity map.`)
+        let features
+        if (!(source instanceof VectorSource)) {
+          if (isFunction(source.getFeaturesCollection)) {
+            features = source.getFeaturesCollection()
+          } else if (isFunction(source.getFeatures)) {
+            features = source.getFeatures()
+          }
+          instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
+          source = null
+        }
 
         return new SnapInteraction({
           source,
+          features,
+          edge: this.edge,
+          vertex: this.vertex,
+          pixelTolerance: this.pixelTolerance,
         })
       },
     },

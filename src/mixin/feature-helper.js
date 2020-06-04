@@ -63,8 +63,9 @@ export default {
       if (currentStyle instanceof Style) {
         currentStyle = [currentStyle]
       }
-      const currentStyleJson = currentStyle ? currentStyle.map(
-        style => dumpStyle(style, geom => this.writeGeometryInDataProj(geom))) : null
+      const currentStyleJson = isArray(currentStyle)
+        ? currentStyle.map(style => dumpStyle(style, geom => this.writeGeometryInDataProj(geom)))
+        : null
       if (!style || !currentStyle || isFunction(currentStyle)) {
         if (style !== currentStyle) {
           feature.setStyle(style)

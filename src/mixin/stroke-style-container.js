@@ -35,8 +35,8 @@ export default {
     },
   },
   created () {
-    this._stroke = null
-    this._strokeVm = null
+    this._stroke = undefined
+    this._strokeVm = undefined
 
     this::defineServices()
   },
@@ -55,7 +55,7 @@ export default {
       throw new Error('Not implemented method: getStrokeStyleTarget')
     },
     /**
-     * @returns {module:ol/style/Stroke~Stroke|null}
+     * @returns {module:ol/style/Stroke~Stroke|undefined}
      */
     getStroke () {
       return this._stroke
@@ -68,7 +68,7 @@ export default {
       if (isFunction(stroke?.resolveOlObject)) {
         stroke = await stroke.resolveOlObject()
       }
-      stroke || (stroke = null)
+      stroke || (stroke = undefined)
 
       if (stroke === this._stroke) return
 

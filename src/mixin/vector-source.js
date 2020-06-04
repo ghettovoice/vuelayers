@@ -144,12 +144,12 @@ export default {
     currentFeaturesDataProj () {
       if (!(this.rev && this.$source)) return []
 
-      return map(this.getFeaturesSync(), feature => this.writeFeatureInDataProj(feature))
+      return map(this.getFeaturesInternal(), feature => this.writeFeatureInDataProj(feature))
     },
     currentFeaturesViewProj () {
       if (!(this.rev && this.$source)) return []
 
-      return map(this.getFeaturesSync(), feature => this.writeFeatureInViewProj(feature))
+      return map(this.getFeaturesInternal(), feature => this.writeFeatureInViewProj(feature))
     },
     currentExtentDataProj () {
       if (!(this.rev && this.$source)) return
@@ -192,7 +192,7 @@ export default {
   watch: {
     featuresDataProj: {
       deep: true,
-      handler: /*#__PURE__*/debounce(async function (features) {
+      handler: async function (features) {
         if (isEqual(features, this.currentFeaturesDataProj)) return
         // add new features
         await this.addFeatures(features)
@@ -202,7 +202,7 @@ export default {
           features,
           (a, b) => getFeatureId(a) === getFeatureId(b),
         ))
-      }, FRAME_TIME),
+      },
     },
     currentFeaturesDataProj: {
       deep: true,
@@ -351,22 +351,17 @@ export default {
       await this.addFeatures([feature])
     },
     async removeFeatures (features) {
-      const removedFeatures = []
-      await Promise.all(map(features || [], async feature => {
-        if (isFunction(feature.resolveOlObject)) {
-          feature = await feature.resolveOlObject()
-        }
-
-        feature = await this.getFeatureById(getFeatureId(feature))
-        if (!feature) return
-
-        removedFeatures.push(feature)
-      }));
-
-      (await this.resolveSource()).removeFeatures(removedFeatures)
+      await Promise.all(map(features, ::this.removeFeature))
     },
     async removeFeature (feature) {
-      await this.removeFeatures([feature])
+      if (isFunction(feature.resolveOlObject)) {
+        feature = await feature.resolveOlObject()
+      }
+
+      feature = await this.getFeatureById(getFeatureId(feature))
+      if (!feature) return
+
+      (await this.resolveSource()).removeFeature(feature)
     },
     async getFeatureById (featureId) {
       return (await this.resolveSource()).getFeatureById(featureId)
@@ -374,17 +369,17 @@ export default {
     async getFeatures () {
       await this.resolveSource()
 
-      return this.getFeaturesSync()
+      return this.getFeaturesInternal()
     },
-    getFeaturesSync () {
+    getFeaturesInternal () {
       return this.$source.getFeatures()
     },
     async getFeaturesCollection () {
       await this.resolveSource()
 
-      return this.getFeaturesCollectionSync()
+      return this.getFeaturesCollectionInternal()
     },
-    getFeaturesCollectionSync () {
+    getFeaturesCollectionInternal () {
       return this.$source.getFeaturesCollection()
     },
     async clear () {
@@ -618,6 +613,7 @@ export default {
 }
 
 function subscribeToSourceEvents () {
+  const vm = this
   const adds = obsFromOlEvent(this.$source, VectorEventType.ADDFEATURE).pipe(
     mergeMap(({ type, feature }) => fromObs(this.initializeFeature(feature)).pipe(
       mapObs(feature => ({ type, feature, oldType: 'add:feature' })),
@@ -627,14 +623,28 @@ function subscribeToSourceEvents () {
     mapObs(evt => ({ ...evt, oldType: 'remove:feature' })),
   )
   const events = mergeObs(adds, removes).pipe(
+    mapObs(({ type, feature, oldType }) => ({
+      type,
+      feature,
+      oldType,
+      get json () {
+        if (!this._json) {
+          this._json = vm.writeFeatureInDataProj(this.feature)
+        }
+        return this._json
+      },
+    })),
     bufferDebounceTime(FRAME_TIME),
   )
   this.subscribeTo(events, events => {
     this.$nextTick(() => {
-      forEach(events, ({ type, oldType, feature }) => {
-        this.$emit(type, feature, this.writeFeatureInDataProj(feature))
+      forEach(events, evt => {
+        const oldType = evt.oldType
+        delete evt.oldType
+
+        this.$emit(evt.type, evt)
         // todo remove in v0.13.x
-        this.$emit(oldType, feature)
+        this.$emit(oldType, evt.feature)
       })
     })
   })

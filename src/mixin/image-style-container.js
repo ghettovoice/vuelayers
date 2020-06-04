@@ -71,7 +71,7 @@ export default {
       if (isFunction(image?.resolveOlObject)) {
         image = await image.resolveOlObject()
       }
-      image || (image = null)
+      image || (image = undefined)
 
       if (image === this._image) return
 

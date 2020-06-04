@@ -46,15 +46,15 @@ export function createSourceContainer (options = {}) {
     },
     created () {
       /**
-       * @type {module:ol/source/Source~Source|null}
+       * @type {module:ol/source/Source~Source|undefined}
        * @private
        */
-      this[privateProp] = null
+      this[privateProp] = undefined
       /**
-       * @type {Object|null}
+       * @type {Object|undefined}
        * @private
        */
-      this[privateVmProp] = null
+      this[privateVmProp] = undefined
 
       this::defineServices()
     },
@@ -78,7 +78,7 @@ export function createSourceContainer (options = {}) {
         throw new Error(`Not implemented method: ${getSourceTargetMethod}`)
       },
       /**
-       * @return {module:ol/source/Source~Source|null}
+       * @return {module:ol/source/Source~Source|undefined}
        */
       [getSourceMethod] () {
         return this[privateProp]
@@ -91,7 +91,7 @@ export function createSourceContainer (options = {}) {
         if (isFunction(source?.resolveOlObject)) {
           source = await source.resolveOlObject()
         }
-        source || (source = null)
+        source || (source = undefined)
 
         if (source === this[privateProp]) return
 

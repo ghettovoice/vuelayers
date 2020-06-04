@@ -12,11 +12,22 @@
   import Feature from 'ol/Feature'
   import { Select as SelectInteraction } from 'ol/interaction'
   import { merge as mergeObs } from 'rxjs'
-  import { map as mapOp } from 'rxjs/operators'
   import { featuresContainer, interaction, styleContainer } from '../../mixin'
-  import { getFeatureId, getLayerId, isGeoJSONFeature } from '../../ol-ext'
-  import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { constant, forEach, isFunction, isNumber, isString, or, stubArray } from '../../util/minilo'
+  import { getFeatureId, getLayerId, initializeFeature, isGeoJSONFeature, transforms } from '../../ol-ext'
+  import { fromVueEvent as obsFromVueEvent } from '../../rx-ext'
+  import {
+    clonePlainObject,
+    constant,
+    forEach,
+    isEqual,
+    isFunction,
+    isNumber,
+    isObjectLike,
+    isString,
+    map,
+    or,
+    stubArray,
+  } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
 
@@ -115,13 +126,47 @@
       },
     },
     computed: {
+      featuresDataProj () {
+        return map(this.features, feature => {
+          if (isGeoJSONFeature(feature)) {
+            feature = initializeFeature(clonePlainObject(feature))
+          }
+          return feature
+        })
+      },
+      featuresViewProj () {
+        return map(this.featuresDataProj, feature => ({
+          ...feature,
+          geometry: {
+            ...feature.geometry,
+            coordinates: transforms[feature.geometry.type].transform(
+              feature.geometry.coordinates,
+              this.resolvedDataProjection,
+              this.viewProjection,
+            ),
+          },
+        }))
+      },
       layerFilter () {
         return Array.isArray(this.layers)
           ? layer => this.layers.includes(getLayerId(layer))
           : this.layers
       },
+      currentFeatureIds () {
+        return map(this.currentFeaturesDataProj, feature => getFeatureId(feature))
+      },
     },
     watch: {
+      featuresDataProj: {
+        deep: true,
+        handler: async function (features) {
+          const ids = map(features, feature => isObjectLike(feature) ? getFeatureId(feature) : feature)
+          if (isEqual(ids, this.currentFeatureIds)) return
+          console.log('input', ids, this.currentFeatureIds)
+          await this.unselectAll()
+          await Promise.all(map(features, ::this.select))
+        },
+      },
       .../*#__PURE__*/makeWatchers([
         'filter',
         'hitTolerance',
@@ -159,6 +204,13 @@
         })
       },
       /**
+       * @protected
+       */
+      async mount () {
+        await Promise.all(map(this.featuresDataProj, ::this.select))
+        await this::interaction.methods.mount()
+      },
+      /**
        * @returns {Object}
        * @protected
        */
@@ -177,9 +229,13 @@
         this::interaction.methods.subscribeAll()
         this::subscribeToInteractionChanges()
       },
+      /**
+       * @return {StyleTarget}
+       * @protected
+       */
       getStyleTarget () {
         return {
-          setStyle: async style => {
+          setStyle: async () => {
             if (process.env.VUELAYERS_DEBUG) {
               this.$logger.log('style changed, scheduling recreate...')
             }
@@ -187,6 +243,32 @@
             await this.scheduleRecreate()
           },
         }
+      },
+      /**
+       * @param {FeatureLike} feature
+       * @return {Promise<void>}
+       */
+      async select (feature) {
+        feature = await this.resolveFeature(feature)
+        if (!feature) return
+
+        await this.addFeature(feature)
+      },
+      /**
+       * @param {FeatureLike} feature
+       * @return {Promise<void>}
+       */
+      async unselect (feature) {
+        feature = await this.resolveFeature(feature)
+        if (!feature) return
+
+        await this.removeFeature(feature)
+      },
+      /**
+       * @return {void}
+       */
+      unselectAll () {
+        this.clearFeatures()
       },
       /**
        * @param {Object|Vue|Feature|string|number} feature
@@ -223,6 +305,7 @@
 
         return feature
       },
+      updateFeature (feature) { /* disable update here, because wil always work with origin feature */ },
     },
   }
 
@@ -231,20 +314,19 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    const select = obsFromOlEvent(this.$featuresCollection, 'add')
-      .pipe(
-        mapOp(({ element }) => ({ type: 'select', feature: element })),
-      )
-    const unselect = obsFromOlEvent(this.$featuresCollection, 'remove')
-      .pipe(
-        mapOp(({ element }) => ({ type: 'unselect', feature: element })),
-      )
+    const select = obsFromVueEvent(this, 'addfeature', evt => ({
+      type: 'select',
+      feature: evt.feature,
+      get json () { return evt.json },
+    }))
+    const unselect = obsFromVueEvent(this, 'removefeature', evt => ({
+      type: 'unselect',
+      feature: evt.feature,
+      get json () { return evt.json },
+    }))
     const events = mergeObs(select, unselect)
-
     this.subscribeTo(events, evt => {
-      this.$nextTick(() => {
-        this.$emit(evt.type, evt.feature)
-      })
+      this.$emit(evt.type, evt)
     })
   }
 </script>
