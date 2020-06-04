@@ -1,19 +1,14 @@
 <script>
-  import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import { Collection } from 'ol'
+  import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import { merge as mergeObs } from 'rxjs/observable'
-  import { map as mapObs } from 'rxjs/operators'
+  import { from as fromObs, merge as mergeObs } from 'rxjs/observable'
+  import { map as mapObs, mapTo, mergeMap } from 'rxjs/operators'
   import { interaction, stylesContainer } from '../../mixin'
-  import {
-    createStyle,
-    defaultEditStyle,
-    GEOMETRY_TYPE,
-    initializeFeature,
-  } from '../../ol-ext'
+  import { createStyle, defaultEditStyle, GEOMETRY_TYPE, initializeFeature } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
-  import { hasInteraction, instanceOf } from '../../util/assert'
+  import { assert, hasInteraction, instanceOf } from '../../util/assert'
   import { camelCase, isFunction, mapValues, upperFirst } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -154,6 +149,7 @@
        */
       async createInteraction () {
         let source = await this.getInstance(this.source)
+        assert(!!source, `Source "${this.source}" not found in identity map.`)
         let features
         if (!(source instanceof VectorSource)) {
           if (isFunction(source.getFeaturesCollection)) {
@@ -285,7 +281,15 @@
             return evt
           }),
         ),
-      observableFromOlEvent(this.$interaction, 'drawend'),
+      observableFromOlEvent(this.$interaction, 'drawend').pipe(
+        // FIXME blood patch, wait for vl-vector-source featuresDataProj watcher to trigger
+        mergeMap(evt => fromObs(Promise.resolve(this.getInstance(this.source))).pipe(
+          mergeMap(source => fromObs(new Promise(resolve => {
+            setTimeout(resolve, 1000 / 60)
+          }))),
+          mapTo(evt),
+        )),
+      ),
     )
     this.subscribeTo(drawEvents, evt => {
       ++this.rev

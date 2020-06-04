@@ -6,7 +6,7 @@
   import { interaction, stylesContainer } from '../../mixin'
   import { createStyle, defaultEditStyle } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
-  import { hasInteraction, instanceOf } from '../../util/assert'
+  import { assert, hasInteraction, instanceOf } from '../../util/assert'
   import { mapValues, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -88,6 +88,7 @@
        */
       async createInteraction () {
         let source = await this.getInstance(this.source)
+        assert(!!source, `Source "${this.source}" not found in identity map.`)
         let features
         if (source instanceof VectorSource) {
           features = source.getFeaturesCollection()
