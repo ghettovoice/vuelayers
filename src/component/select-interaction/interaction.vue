@@ -271,6 +271,10 @@
 
         feature = undefined
         forEach(this.$map.getLayers().getArray(), layer => {
+          if (this.layerFilter && !this.layerFilter(layer)) {
+            return
+          }
+
           const source = layer.getSource()
           if (source && isFunction(source.getFeatureById)) {
             feature = source.getFeatureById(featureId)
