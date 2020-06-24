@@ -60,7 +60,7 @@ export default {
       deep: true,
       handler: /*#__PURE__*/debounce(async function (value, prev) {
         if (isEqual(value, prev)) return
-        console.log('update event', value.slice(), prev.slice())
+
         this.$emit('update:features', clonePlainObject(value))
       }, FRAME_TIME),
     },
