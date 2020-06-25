@@ -3,7 +3,11 @@ import { get as getProj } from 'ol/proj'
 import { from as fromObs, merge as mergeObs } from 'rxjs'
 import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
 import { getLayerId, initializeLayer, roundExtent, setLayerId, transformExtent } from '../ol-ext'
-import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import {
+  fromOlChangeEvent as obsFromOlChangeEvent,
+  fromVueEvent as obsFromVueEvent,
+  fromVueWatcher as obsFromVueWatcher,
+} from '../rx-ext'
 import { assert } from '../util/assert'
 import { addPrefix, hasProp, isEqual, isNumber, pick } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
@@ -189,9 +193,6 @@ export default {
 
       this.$emit('update:extent', value.slice())
     }, FRAME_TIME),
-    async resolvedExtentProjection () {
-      await this.setExtent(this.extentDataProj)
-    },
     async zIndex (value) {
       await this.setZIndex(value)
     },
@@ -253,6 +254,8 @@ export default {
           1000,
         )
         this.dataProjection = this.$mapVm.resolvedDataProjection
+        const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
+        this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
         await this.$nextTickPromise()
 
         return this::olCmp.methods.beforeInit()

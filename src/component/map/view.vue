@@ -29,7 +29,11 @@
     roundPointCoords,
     setViewId,
   } from '../../ol-ext'
-  import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
+  import {
+    fromOlChangeEvent as obsFromOlChangeEvent,
+    fromVueEvent as obsFromVueEvent,
+    fromVueWatcher as obsFromVueWatcher,
+  } from '../../rx-ext'
   import { assert } from '../../util/assert'
   import { addPrefix, coalesce, hasProp, isArray, isEqual, isFunction, isNumber, noop } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -370,7 +374,6 @@
         'smoothResolutionConstraint',
         'zoomFactor',
         'multiWorld',
-        'resolvedDataProjection',
         'projection',
       ], prop => async function () {
         if (process.env.VUELAYERS_DEBUG) {
@@ -400,6 +403,8 @@
             1000,
           )
           this.dataProjection = this.$mapVm.resolvedDataProjection
+          const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
+          this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
           await this.$nextTickPromise()
 
           return this::olCmp.methods.beforeInit()

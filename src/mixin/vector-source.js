@@ -212,9 +212,6 @@ export default {
         this.$emit('update:features', clonePlainObject(value))
       }, FRAME_TIME),
     },
-    async resolvedDataProjection () {
-      await this.addFeatures(this.currentFeaturesDataProj)
-    },
     async urlFunc (value) {
       await this.setUrlInternal(value)
     },

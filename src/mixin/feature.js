@@ -3,7 +3,11 @@ import { Feature } from 'ol'
 import ObjectEventType from 'ol/ObjectEventType'
 import { map as mapObs, skipWhile } from 'rxjs/operators'
 import { getFeatureId, getFeatureProperties, initializeFeature, setFeatureId, setFeatureProperties } from '../ol-ext'
-import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import {
+  fromOlEvent as obsFromOlEvent,
+  fromVueEvent as obsFromVueEvent,
+  fromVueWatcher as obsFromVueWatcher,
+} from '../rx-ext'
 import { assert } from '../util/assert'
 import { clonePlainObject, hasProp, isEqual, pick, stubObject } from '../util/minilo'
 import mergeDescriptors from '../util/multi-merge-descriptors'
@@ -101,6 +105,8 @@ export default {
           1000,
         )
         this.dataProjection = this.$mapVm.resolvedDataProjection
+        const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
+        this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
         await this.$nextTickPromise()
 
         return this::olCmp.methods.beforeInit()

@@ -535,10 +535,10 @@
         }
 
         const adds = obsFromVueEvent(this, 'addfeature')
-        this.subscribeTo(adds, ([feature]) => sourceVm.addFeature(feature))
+        this.subscribeTo(adds, ({ feature }) => sourceVm.addFeature(feature))
 
         const removes = obsFromVueEvent(this, 'removefeature')
-        this.subscribeTo(removes, ([feature]) => sourceVm.removeFeature(feature))
+        this.subscribeTo(removes, ({ feature }) => sourceVm.removeFeature(feature))
       },
     },
   }

@@ -19,10 +19,14 @@
   import { Geolocation } from 'ol'
   import { equivalent as isEqProj, get as getProj } from 'ol/proj'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { mergeMap, skipWhile, map as mapObs } from 'rxjs/operators'
+  import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
   import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixin'
   import { getMapDataProjection, writeGeoJsonGeometry } from '../../ol-ext'
-  import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
+  import {
+    fromOlChangeEvent as obsFromOlChangeEvent,
+    fromVueEvent as obsFromVueEvent,
+    fromVueWatcher as obsFromVueWatcher,
+  } from '../../rx-ext'
   import { assert } from '../../util/assert'
   import { addPrefix, clonePlainObject, coalesce, hasProp, isEqual } from '../../util/minilo'
   import waitFor from '../../util/wait-for'
@@ -161,9 +165,6 @@
           this.$emit('update:tracingOptions', value)
         }, FRAME_TIME),
       },
-      async resolvedDataProjection (value) {
-        await this.setProjection(value)
-      },
       currentProjection: /*#__PURE__*/debounce(function (value) {
         if (value === this.projection) return
 
@@ -225,6 +226,8 @@
             1000,
           )
           this.dataProjection = this.$mapVm.resolvedDataProjection
+          const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
+          this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
           await this.$nextTickPromise()
 
           return this::olCmp.methods.beforeInit()

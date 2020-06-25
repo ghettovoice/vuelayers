@@ -2,7 +2,7 @@
   <div id="app">
     <VlMap
       ref="map"
-      data-projection="EPSG:4326">
+      :data-projection="dataProj">
       <VlView
         ref="view"
         :center.sync="center"
@@ -12,6 +12,10 @@
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
+
+      <VlFeature>
+        <VlGeomPoint :coordinates.sync="point" />
+      </VlFeature>
 
       <VlLayerVector>
         <VlSourceVector
@@ -53,6 +57,8 @@
         rotation: 0,
         features: [],
         selectedFeatures: [],
+        dataProj: 'EPSG:4326',
+        point: [10, 10],
       }
     },
     methods: {

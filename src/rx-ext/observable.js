@@ -1,4 +1,4 @@
-import { fromEventPattern, merge as mergeObs } from 'rxjs'
+import { fromEventPattern, merge as mergeObs, Observable } from 'rxjs'
 import { distinctUntilChanged, map as mapObs } from 'rxjs/operators'
 import { identity, isEqual, isFunction } from '../util/minilo'
 
@@ -106,4 +106,10 @@ export function fromVueEvent (target, eventName, selector) {
     handler => target.$on(eventName, handler),
     handler => target.$off(eventName, handler),
   ).pipe(mapObs(selector))
+}
+
+export function fromVueWatcher (target, exprOrFn, options = {}) {
+  return new Observable(s => {
+    return target.$watch(exprOrFn, (value, previous) => s.next({ value, previous }), options)
+  })
 }

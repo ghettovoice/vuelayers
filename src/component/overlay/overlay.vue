@@ -18,7 +18,10 @@
   import { map as mapObs } from 'rxjs/operators'
   import { olCmp, OlObjectEvent, projTransforms } from '../../mixin'
   import { getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
-  import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
+  import {
+    fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent,
+    fromVueWatcher as obsFromVueWatcher,
+  } from '../../rx-ext'
   import { assert, hasOverlay } from '../../util/assert'
   import { clonePlainObject, hasProp, identity, isEqual } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
@@ -150,9 +153,6 @@
 
         this.$emit('update:positioning', value)
       }),
-      async resolvedDataProjection () {
-        await this.setPosition(this.currentPositionDataProj)
-      },
       .../*#__PURE__*/makeWatchers([
         'stopEvent',
         'insertFirst',
@@ -189,6 +189,8 @@
             1000,
           )
           this.dataProjection = this.$mapVm.resolvedDataProjection
+          const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
+          this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
           await this.$nextTickPromise()
 
           return this::olCmp.methods.beforeInit()

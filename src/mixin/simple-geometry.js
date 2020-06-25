@@ -95,9 +95,6 @@ export default {
         this.$emit('update:coordinates', clonePlainObject(value))
       }, FRAME_TIME),
     },
-    async resolvedDataProjection () {
-      await this.setCoordinates(this.coordinatesDataProj)
-    },
     // ...makeWatchers([
     //   'layoutUpCase',
     // ], () => geometry.methods.scheduleRecreate),
