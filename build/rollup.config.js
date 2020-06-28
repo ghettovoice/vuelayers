@@ -1,10 +1,11 @@
 const { escapeRegExp } = require('lodash')
 const replace = require('rollup-plugin-re')
 const vue = require('rollup-plugin-vue')
-const nodeResolve = require('rollup-plugin-node-resolve')
-const babel = require('rollup-plugin-babel')
-const cjs = require('rollup-plugin-commonjs')
+const babel = require('@rollup/plugin-babel').babel
+const nodeResolve = require('@rollup/plugin-node-resolve').nodeResolve
+const cjs = require('@rollup/plugin-commonjs')
 const sass = require('./rollup/sass')
+const terser = require('rollup-plugin-terser').terser
 const utils = require('./utils')
 const config = require('./config')
 
@@ -39,7 +40,7 @@ const plugins = [
     postProcess: style => utils.postcssProcess(style),
   }),
   babel({
-    runtimeHelpers: true,
+    babelHelpers: 'runtime',
     sourceMap: true,
     include: [
       'src/**/*',
@@ -55,7 +56,6 @@ const plugins = [
     sourceMap: true,
   }),
 ]
-
 const baseConf = {
   external: (function () {
     const deps = config.dependencies.map(dep => escapeRegExp(dep)).join('|')
@@ -64,44 +64,68 @@ const baseConf = {
       return !!(config.dependencies.includes(id) || (!resolved && re.exec(id)))
     }
   }()),
-  input: 'src/index.js',
+  input: config.entry,
   output: {
-    file: 'dist/vuelayers.esm.js',
+    file: utils.resolve(`dist/${config.name}.esm.js`),
     format: 'es',
     banner: config.banner,
-    name: config.name,
-    amd: { id: config.fullname },
+    name: config.fullname,
+    amd: { id: config.name },
     sourcemap: true,
   },
   plugins,
 }
+const baseUmdConf = (function () {
+  const ol = {}
+  return {
+    ...baseConf,
+    external: (function () {
+      const deps = ['vue', 'ol'].map(dep => escapeRegExp(dep)).join('|')
+      const re = new RegExp(`^(?:${deps})(?:/.+)?$`, 'i')
+      return (id, parentId, resolved) => {
+        if (!resolved && /^ol(?:\/.+)?$/.test(id)) {
+          ol[id] = id.replace(/\//g, '.')
+        }
+        return !!(!resolved && re.exec(id))
+      }
+    }()),
+    input: config.umdEntry,
+    output: {
+      ...baseConf.output,
+      file: utils.resolve(`dist/${config.name}.umd.js`),
+      format: 'umd',
+      globals: id => {
+        if (id === 'vue') return 'Vue'
+        if (ol[id] != null) return ol[id]
+      },
+    },
+  }
+}())
 
 module.exports = [
+  // esm
   baseConf,
-  (function () {
-    const ol = {}
-    return {
-      ...baseConf,
-      external: (function () {
-        const deps = ['vue', 'ol'].map(dep => escapeRegExp(dep)).join('|')
-        const re = new RegExp(`^(?:${deps})(?:/.+)?$`, 'i')
-        return (id, parentId, resolved) => {
-          if (!resolved && /^ol(?:\/.+)?$/.test(id)) {
-            ol[id] = id.replace(/\//g, '.')
-          }
-          return !!(!resolved && re.exec(id))
-        }
-      }()),
-      input: 'src/index.umd.js',
-      output: {
-        ...baseConf.output,
-        file: 'dist/vuelayers.umd.js',
-        format: 'umd',
-        globals: id => {
-          if (id === 'vue') return 'Vue'
-          if (ol[id] != null) return ol[id]
+  // umd
+  baseUmdConf,
+  // umd min
+  {
+    ...baseUmdConf,
+    plugins: [
+      ...plugins,
+      terser({
+        mangle: true,
+        compress: {
+          warnings: false,
         },
-      },
-    }
-  }()),
+        output: {
+          comments: false,
+          preamble: config.banner,
+        },
+      }),
+    ],
+    output: {
+      ...baseUmdConf.output,
+      file: utils.resolve(`dist/${config.name}.umd.min.js`),
+    },
+  },
 ]

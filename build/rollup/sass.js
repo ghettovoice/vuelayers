@@ -1,6 +1,6 @@
 const path = require('path')
 const chalk = require('chalk')
-const pluginUtils = require('rollup-pluginutils')
+const pluginUtils = require('@rollup/pluginutils')
 const utils = require('../utils')
 
 // originally taken from https://github.com/differui/rollup-plugin-sass/blob/master/src/index.js
