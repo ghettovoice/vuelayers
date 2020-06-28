@@ -25,28 +25,17 @@
 
       <VlInteractionSelect
         ident="modify-target"
-        :features.sync="selectedFeatures">
-        <template slot-scope="selection">
-          <VlOverlay
-            v-for="feature in selection.features"
-            :id="feature.id + '-overlay'"
-            :key="feature.id"
-            :position="findPointOnSurface(feature.geometry)">
-            <div
-              slot-scope="overlay"
-              style="background: #fff; padding: 10px 20px;">
-              <p>Position: {{ overlay.position }}</p>
-              <p>Feature {{ feature.id }}</p>
-            </div>
-          </VlOverlay>
-        </template>
-      </VlInteractionSelect>
+        :features.sync="selectedFeatures" />
+      <VlInteractionTranslate
+        source="modify-target"
+        @translatestart="start"
+        @translateend="end"
+        @translating="progress" />
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { findPointOnSurface } from '../src/ol-ext'
 
   export default {
     name: 'App',
@@ -62,12 +51,14 @@
       }
     },
     methods: {
-      findPointOnSurface,
-      modifyStart (evt) {
+      start (evt) {
         console.log('start', evt)
       },
-      modifyEnd (evt) {
+      end (evt) {
         console.log('end', evt)
+      },
+      progress (evt) {
+        console.log('progress', evt)
       },
     },
   }

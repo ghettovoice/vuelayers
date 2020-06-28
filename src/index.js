@@ -1,36 +1,37 @@
-import * as BingmapsSource from './component/bingmaps-source'
-import * as ClusterSource from './component/cluster-source'
-import * as DrawInteraction from './component/draw-interaction'
-import * as Feature from './component/feature'
-import * as Geoloc from './component/geoloc'
-import * as GraticuleLayer from './component/graticule-layer'
-import * as GroupLayer from './component/group-layer'
-import * as HeatmapLayer from './component/heatmap-layer'
-import * as ImageArcgisRestSource from './component/image-arcgis-rest-source'
-import * as ImageLayer from './component/image-layer'
-import * as ImageStaticSource from './component/image-static-source'
-import * as ImageWmsSource from './component/image-wms-source'
-import * as Map from './component/map'
-import * as MapboxSource from './component/mapbox-source'
-import * as ModifyInteraction from './component/modify-interaction'
-import * as OsmSource from './component/osm-source'
-import * as Overlay from './component/overlay'
-import * as SelectInteraction from './component/select-interaction'
-import * as SnapInteraction from './component/snap-interaction'
-import * as SputnikSource from './component/sputnik-source'
-import * as StamenSource from './component/stamen-source'
-import * as Style from './component/style'
-import * as StyleFunc from './component/style-func'
-import * as TileArcgisRestSource from './component/tile-arcgis-rest-source'
-import * as TileLayer from './component/tile-layer'
-import * as TileWmsSource from './component/tile-wms-source'
-import * as VectorImageLayer from './component/vector-image-layer'
-import * as VectorLayer from './component/vector-layer'
-import * as VectorSource from './component/vector-source'
-import * as VectorTileLayer from './component/vector-tile-layer'
-import * as VectorTileSource from './component/vector-tile-source'
-import * as WmtsSource from './component/wmts-source'
-import * as XyzSource from './component/xyz-source'
+import * as BingmapsSource from './components/bingmaps-source'
+import * as ClusterSource from './components/cluster-source'
+import * as DrawInteraction from './components/draw-interaction'
+import * as Feature from './components/feature'
+import * as Geoloc from './components/geoloc'
+import * as GraticuleLayer from './components/graticule-layer'
+import * as GroupLayer from './components/group-layer'
+import * as HeatmapLayer from './components/heatmap-layer'
+import * as ImageArcgisRestSource from './components/image-arcgis-rest-source'
+import * as ImageLayer from './components/image-layer'
+import * as ImageStaticSource from './components/image-static-source'
+import * as ImageWmsSource from './components/image-wms-source'
+import * as Map from './components/map'
+import * as MapboxSource from './components/mapbox-source'
+import * as ModifyInteraction from './components/modify-interaction'
+import * as OsmSource from './components/osm-source'
+import * as Overlay from './components/overlay'
+import * as SelectInteraction from './components/select-interaction'
+import * as SnapInteraction from './components/snap-interaction'
+import * as SputnikSource from './components/sputnik-source'
+import * as StamenSource from './components/stamen-source'
+import * as Style from './components/style'
+import * as StyleFunc from './components/style-func'
+import * as TileArcgisRestSource from './components/tile-arcgis-rest-source'
+import * as TileLayer from './components/tile-layer'
+import * as TileWmsSource from './components/tile-wms-source'
+import * as TranslateInteraction from './components/translate-interaction'
+import * as VectorImageLayer from './components/vector-image-layer'
+import * as VectorLayer from './components/vector-layer'
+import * as VectorSource from './components/vector-source'
+import * as VectorTileLayer from './components/vector-tile-layer'
+import * as VectorTileSource from './components/vector-tile-source'
+import * as WmtsSource from './components/wmts-source'
+import * as XyzSource from './components/xyz-source'
 import './styles/main.scss'
 
 /**
@@ -76,6 +77,7 @@ function plugin (Vue, options = {}) {
   Vue.use(TileArcgisRestSource, options)
   Vue.use(TileLayer, options)
   Vue.use(TileWmsSource, options)
+  Vue.use(TranslateInteraction, options)
   Vue.use(VectorImageLayer, options)
   Vue.use(VectorLayer, options)
   Vue.use(VectorSource, options)
@@ -117,6 +119,7 @@ export {
   TileArcgisRestSource,
   TileLayer,
   TileWmsSource,
+  TranslateInteraction,
   VectorImageLayer,
   VectorLayer,
   VectorSource,
