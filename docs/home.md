@@ -45,5 +45,5 @@ Check out [VueLayers Demo application](demo.md "VueLayers Demo application") to 
 
 ## License
 
-Licensed under the **MIT** (c) 2017-2019, [Vladimir Vershinin](https://ghettovoice.github.io/)  
+Licensed under the **MIT** (c) 2017-2020, [Vladimir Vershinin](https://ghettovoice.github.io/)  
 Based on [Vue](https://vuejs.org/ "Vue.js Homepage") and [OpenLayers](https://openlayers.org/ "OpenLayers Homepage")

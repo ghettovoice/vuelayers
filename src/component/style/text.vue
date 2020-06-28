@@ -21,8 +21,8 @@
   import { clonePlainObject, isEqual, isFunction } from '../../util/minilo'
   import mergeDescriptors from '../../util/multi-merge-descriptors'
   import BackgroundStyle from './background.vue'
-  import FillStyle from './fill'
-  import StrokeStyle from './stroke'
+  import FillStyle from './fill.vue'
+  import StrokeStyle from './stroke.vue'
 
   export default {
     name: 'VlStyleText',

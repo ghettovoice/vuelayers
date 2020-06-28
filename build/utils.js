@@ -107,11 +107,10 @@ function postcssProcess (css, min) {
       return postcss(plugins)
         .process(css.code, Object.assign({}, postcssOptions, {
           from: css.id,
-          to: css.id,
+          to: css.dest,
           map: {
             inline: false,
             prev: css.map,
-            annotation: true,
           },
         }))
         .then(({ css, map }) => ({

@@ -41,24 +41,23 @@ module.exports = function sass (options) {
       const paths = [path.dirname(id), process.cwd()]
       const sassConfig = Object.assign({
         file: id,
-        outFile: id,
-        sourceMap: true,
+        outFile: dest,
+        sourceMap: options.sourceMap,
         data: code,
         indentedSyntax: path.extname(id) === '.sass',
-        omitSourceMapUrl: true,
+        omitSourceMapUrl: false,
         sourceMapContents: true,
       }, options.sass)
       sassConfig.includePaths = sassConfig.includePaths
         ? sassConfig.includePaths.concat(paths.filter(x => !sassConfig.includePaths.includes(x)))
         : paths
-
       let { css, map } = require('node-sass').renderSync(sassConfig)
       code = css.toString().trim()
       map = map.toString()
 
       if (!code) return
 
-      return Promise.resolve({ id, code, map })
+      return Promise.resolve({ id, dest, code, map })
         .then(options.postProcess)
         .then(style => {
           if (!styleMaps[id]) {
@@ -67,7 +66,8 @@ module.exports = function sass (options) {
 
           if (options.output === false) {
             return {
-              id: id,
+              id,
+              dest,
               code: `export default ${JSON.stringify(style.code)}`,
               map: style.map,
             }
@@ -76,7 +76,7 @@ module.exports = function sass (options) {
           return ''
         })
     },
-    ongenerate () {
+    generateBundle () {
       if (!styles.length || options.output === false) {
         return
       }
@@ -94,16 +94,14 @@ module.exports = function sass (options) {
           sourcesRelativeTo: id,
         })),
         dest,
-        options.banner
+        options.banner,
       )
 
       return Promise.all([
         utils.writeFile(dest, res.code),
         utils.writeFile(dest + '.map', res.map),
       ]).then(([css, map]) => {
-        console.log(css.path, chalk.gray(css.size))
-        console.log(map.path, chalk.gray(map.size))
-
+        console.log(chalk.green('created ' + css.path), chalk.gray(css.size))
         return { css, map }
       })
     },

@@ -37,4 +37,7 @@ module.exports = {
     C_PKG_REPOSITORY: packageJson.homepage,
   },
   autoOpenBrowser: true,
+  dependencies: Object.keys(packageJson.dependencies).concat(
+    ...Object.keys(packageJson.peerDependencies),
+  ),
 }

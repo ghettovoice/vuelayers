@@ -1,8 +1,8 @@
 /* global describe, it, beforeEach, afterEach */
-import sinon from 'sinon'
+import observableFromOlEvent from '@/rx-ext/from-ol-event'
 import OlObject from 'ol/Object'
 import { Observable } from 'rxjs'
-import observableFromOlEvent from '@/rx-ext/from-ol-event'
+import sinon from 'sinon'
 
 const identity = val => val
 
@@ -40,7 +40,7 @@ describe('RxJS extensions', () => {
           type => {
             expect(type).to.be.equal('click')
           },
-          done
+          done,
         )
 
       olMock.dispatchEvent({ type: 'click' })
@@ -77,7 +77,7 @@ describe('RxJS extensions', () => {
           expect(evt).to.be.an('object')
           expect(['move', 'click', 'dblclick']).to.include(evt.type)
         },
-        done
+        done,
       )
 
       olMock.dispatchEvent({ type: 'move' })
