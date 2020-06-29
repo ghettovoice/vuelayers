@@ -13,7 +13,7 @@ import {
 import GeometryType from 'ol/geom/GeometryType'
 import { circular as circularPolygon } from 'ol/geom/Polygon'
 import { v4 as uuid } from 'uuid'
-import { isPlainObject } from '../util/minilo'
+import { isPlainObject } from '../util'
 import { COORD_PRECISION, roundCoords } from './coord'
 
 /**

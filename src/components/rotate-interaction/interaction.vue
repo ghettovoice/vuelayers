@@ -9,10 +9,7 @@
   import { FRAME_TIME, interaction, styleContainer } from '../../mixin'
   import { roundPointCoords } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf } from '../../util/assert'
-  import { clonePlainObject, isEqual, isFunction, map } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { assert, instanceOf, clonePlainObject, isEqual, isFunction, map, mergeDescriptors, makeWatchers } from '../../util'
 
   export default {
     name: 'VlInteractionRotate',

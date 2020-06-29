@@ -1,6 +1,4 @@
-import { pick, upperFirst, isFunction } from '../util/minilo'
-import mergeDescriptors from '../util/multi-merge-descriptors'
-import { makeWatchers } from '../util/vue-helpers'
+import { pick, upperFirst, isFunction, mergeDescriptors, makeWatchers } from '../util'
 import fillStyleContainer from './fill-style-container'
 import imageStyle from './image-style'
 import strokeStyleContainer from './stroke-style-container'

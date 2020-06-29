@@ -34,10 +34,19 @@
     fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { assert } from '../../util/assert'
-  import { addPrefix, coalesce, hasProp, isArray, isEqual, isFunction, isNumber, noop } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
-  import waitFor from '../../util/wait-for'
+  import {
+    addPrefix,
+    assert,
+    coalesce,
+    hasProp,
+    isArray,
+    isEqual,
+    isFunction,
+    isNumber,
+    makeWatchers,
+    noop,
+    waitFor,
+  } from '../../util'
 
   /**
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,

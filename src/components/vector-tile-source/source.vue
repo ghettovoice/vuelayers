@@ -3,8 +3,7 @@
   import { createXYZ, extentFromProjection } from 'ol/tilegrid'
   import { urlTileSource } from '../../mixin'
   import { createMvtFmt, roundExtent } from '../../ol-ext'
-  import { isArray, isFunction, isNumber, sealFactory } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { isArray, isFunction, isNumber, sealFactory, makeWatchers } from '../../util'
 
   export default {
     name: 'VlSourceVectorTile',

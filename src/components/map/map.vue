@@ -47,11 +47,7 @@
     fromOlEvent as obsFromOlEvent,
     fromVueEvent as obsFromVueEvent,
   } from '../../rx-ext'
-  import { assert } from '../../util/assert'
-  import { addPrefix, hasProp, isEqual, isFunction } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { makeWatchers } from '../../util/vue-helpers'
-  import waitFor from '../../util/wait-for'
+  import { addPrefix, assert, hasProp, isEqual, isFunction, makeWatchers, mergeDescriptors, waitFor } from '../../util'
   import { Layer as VectorLayerCmp } from '../vector-layer'
   import { Source as VectorSourceCmp } from '../vector-source'
   import ViewCmp from './view.vue'

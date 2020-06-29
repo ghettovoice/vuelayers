@@ -1,6 +1,6 @@
 import debounce from 'debounce-promise'
 import { getSourceId } from '../ol-ext'
-import { isFunction, lowerFirst, upperFirst } from '../util/minilo'
+import { isFunction, lowerFirst, upperFirst } from '../util'
 import { FRAME_TIME } from './ol-cmp'
 
 /**

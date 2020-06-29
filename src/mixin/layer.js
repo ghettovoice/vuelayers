@@ -1,8 +1,6 @@
 import RenderEventType from 'ol/render/EventType'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { isFunction, pick } from '../util/minilo'
-import mergeDescriptors from '../util/multi-merge-descriptors'
-import { makeWatchers } from '../util/vue-helpers'
+import { isFunction, pick, mergeDescriptors, makeWatchers } from '../util'
 import baseLayer from './base-layer'
 import sourceContainer from './source-container'
 

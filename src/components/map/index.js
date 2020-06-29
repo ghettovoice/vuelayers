@@ -1,4 +1,4 @@
-import { pick } from '../../util/minilo'
+import { pick } from '../../util'
 import Map from './map.vue'
 import View from './view.vue'
 

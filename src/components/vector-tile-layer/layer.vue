@@ -1,7 +1,7 @@
 <script>
   import { VectorTile as VectorTileLayer } from 'ol/layer'
   import RenderType from 'ol/layer/VectorTileRenderType'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { makeWatchers } from '../../util'
   import { tileLayer, vectorLayer } from '../../mixin'
 
   export default {

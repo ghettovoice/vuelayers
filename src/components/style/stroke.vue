@@ -2,7 +2,7 @@
   import { Stroke as StrokeStyle } from 'ol/style'
   import { style } from '../../mixin'
   import { normalizeColor } from '../../ol-ext'
-  import { isEqual } from '../../util/minilo'
+  import { isEqual } from '../../util'
 
   export default {
     name: 'VlStyleStroke',

@@ -12,10 +12,7 @@ import {
   fromVueEvent as obsFromVueEvent,
   fromVueWatcher as obsFromVueWatcher,
 } from '../rx-ext'
-import { assert } from '../util/assert'
-import { addPrefix, hasProp, isEqual, pick } from '../util/minilo'
-import mergeDescriptors from '../util/multi-merge-descriptors'
-import waitFor from '../util/wait-for'
+import { assert, addPrefix, hasProp, isEqual, pick, mergeDescriptors, waitFor } from '../util'
 import olCmp, { FRAME_TIME, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'

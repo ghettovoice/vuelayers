@@ -1,7 +1,6 @@
 <script>
   import { fillStyleContainer, olCmp, strokeStyleContainer, stubVNode } from '../../mixin'
-  import { stubObject } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { stubObject, mergeDescriptors } from '../../util'
 
   export default {
     name: 'VlStyleBackground',

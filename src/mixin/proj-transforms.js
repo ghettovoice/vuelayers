@@ -15,7 +15,7 @@ import {
   writeGeoJsonFeature,
   writeGeoJsonGeometry,
 } from '../ol-ext'
-import { coalesce, serialize } from '../util/minilo'
+import { coalesce, serialize } from '../util'
 
 /**
  * Mixin with helpers for projection transforms between current view projection and global defined projection.

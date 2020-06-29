@@ -6,7 +6,7 @@
   import { get as getProj } from 'ol/proj'
   import { FRAME_TIME, simpleGeometry } from '../../mixin'
   import { COORD_PRECISION, roundCoords, transformDistance, transformExtent, transformPoint } from '../../ol-ext'
-  import { constant, isEqual, round } from '../../util/minilo'
+  import { constant, isEqual, round } from '../../util'
 
   export default {
     name: 'VlGeomCircle',

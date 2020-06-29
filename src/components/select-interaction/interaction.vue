@@ -27,9 +27,9 @@
     map,
     or,
     stubArray,
-  } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { makeWatchers } from '../../util/vue-helpers'
+    mergeDescriptors,
+    makeWatchers,
+  } from '../../util'
 
   export default {
     name: 'VlInteractionSelect',

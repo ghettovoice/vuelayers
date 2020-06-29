@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { hasProp } from '../util/minilo'
+import { hasProp } from '../util'
 
 export const EVENT_BUS_PROP = '$vlEventBus'
 

@@ -4,8 +4,7 @@
   import { skipWhile } from 'rxjs/operators'
   import { vectorLayer, FRAME_TIME } from '../../mixin'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { addPrefix, isEqual } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { addPrefix, isEqual, makeWatchers } from '../../util'
 
   export default {
     name: 'VlLayerHeatmap',

@@ -1,4 +1,4 @@
-import { pick } from '../../util/minilo'
+import { pick } from '../../util'
 import Layer from './layer.vue'
 
 function plugin (Vue, options = {}) {

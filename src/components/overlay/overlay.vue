@@ -14,18 +14,16 @@
   import debounce from 'debounce-promise'
   import { Overlay } from 'ol'
   import OverlayPositioning from 'ol/OverlayPositioning'
-  import { merge as mergeObs } from 'rxjs'
-  import { map as mapObs } from 'rxjs/operators'
+  import { from as fromObs, merge as mergeObs } from 'rxjs'
+  import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
   import { olCmp, OlObjectEvent, projTransforms } from '../../mixin'
   import { getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
   import {
-    fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent,
+    fromOlChangeEvent as obsFromOlChangeEvent,
+    fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { assert, hasOverlay } from '../../util/assert'
-  import { clonePlainObject, hasProp, identity, isEqual } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
-  import waitFor from '../../util/wait-for'
+  import { addPrefix, assert, clonePlainObject, hasProp, identity, isEqual, makeWatchers, waitFor } from '../../util'
 
   export default {
     name: 'VlOverlay',
@@ -349,22 +347,30 @@
    * @private
    */
   function subscribeToOverlayChanges () {
-    hasOverlay(this)
-
-    const changes = mergeObs(
-      obsFromOlChangeEvent(this.$overlay, 'position', true, () => this.pointToDataProj(this.$overlay.getPosition())),
+    const prefixKey = addPrefix('current')
+    const positionChanges = obsFromOlChangeEvent(this.$overlay, 'position', true).pipe(
+      mergeMap(({ prop }) => fromObs(this.getPosition()).pipe(
+        mapObs(position => ({
+          prop,
+          value: position,
+          compareWith: this.currentPositionDataProj,
+        })),
+      )),
+    )
+    const propChanges = mergeObs(
       obsFromOlChangeEvent(this.$overlay, [
         'offset',
         'positioning',
-      ], true),
+      ], true, evt => ({
+        ...evt,
+        compareWith: this[prefixKey(evt.prop)],
+      })),
+      positionChanges,
+    ).pipe(
+      skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
     )
-
-    this.subscribeTo(changes, ({ prop, value }) => {
+    this.subscribeTo(propChanges, () => {
       ++this.rev
-
-      this.$nextTick(() => {
-        this.$emit(`update:${prop}`, value)
-      })
     })
   }
 </script>

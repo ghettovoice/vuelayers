@@ -7,10 +7,7 @@
   import { map as mapObs, tap } from 'rxjs/operators'
   import { interaction, styleContainer } from '../../mixin'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf } from '../../util/assert'
-  import { isFunction, map } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { assert, instanceOf, isFunction, map, mergeDescriptors, makeWatchers } from '../../util'
 
   export default {
     name: 'VlInteractionModify',

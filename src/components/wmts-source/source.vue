@@ -8,7 +8,7 @@
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
   import { tileImageSource } from '../../mixin'
   import { roundExtent, roundPointCoords } from '../../ol-ext'
-  import { isArray, isEqual, isFunction, isNumber, range } from '../../util/minilo'
+  import { isArray, isEqual, isFunction, isNumber, range } from '../../util'
 
   export default {
     name: 'VlSourceWmts',

@@ -1,4 +1,4 @@
-import { extractChildren } from '../util/vue-helpers'
+import { extractChildren } from '../util'
 
 /**
  * Renders stub VNode for component.

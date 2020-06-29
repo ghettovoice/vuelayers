@@ -8,10 +8,7 @@ import {
   fromVueEvent as obsFromVueEvent,
   fromVueWatcher as obsFromVueWatcher,
 } from '../rx-ext'
-import { assert } from '../util/assert'
-import { clonePlainObject, hasProp, isEqual, pick, stubObject } from '../util/minilo'
-import mergeDescriptors from '../util/multi-merge-descriptors'
-import waitFor from '../util/wait-for'
+import { assert, clonePlainObject, hasProp, isEqual, pick, stubObject, mergeDescriptors, waitFor } from '../util'
 import geometryContainer from './geometry-container'
 import olCmp, { FRAME_TIME, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'

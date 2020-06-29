@@ -21,7 +21,7 @@
     style,
     textStyleContainer,
   } from '../../mixin'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { mergeDescriptors } from '../../util'
   import CircleStyle from './circle.vue'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'

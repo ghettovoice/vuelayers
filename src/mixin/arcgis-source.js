@@ -1,6 +1,5 @@
 import { cleanSourceParams } from '../ol-ext'
-import { isArray, isEqual } from '../util/minilo'
-import { makeWatchers } from '../util/vue-helpers'
+import { isArray, isEqual, makeWatchers } from '../util'
 
 const serialize = value => {
   if (value == null) return value

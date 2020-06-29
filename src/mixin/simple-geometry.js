@@ -1,8 +1,7 @@
 import debounce from 'debounce-promise'
 import { boundingExtent } from 'ol/extent'
 import { findPointOnSurface, flatCoords, isEqualCoord, roundCoords, roundPointCoords, transforms } from '../ol-ext'
-import { clonePlainObject, isEmpty, negate, pick } from '../util/minilo'
-// import { makeWatchers } from '../util/vue-helpers'
+import { clonePlainObject, isEmpty, negate, pick } from '../util'
 import geometry from './geometry'
 import { FRAME_TIME } from './ol-cmp'
 

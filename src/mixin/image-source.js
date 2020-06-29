@@ -2,8 +2,7 @@ import { get as getProj } from 'ol/proj'
 import { ImageSourceEventType } from 'ol/source/Image'
 import { EPSG_3857 } from '../ol-ext'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { pick } from '../util/minilo'
-import { makeWatchers } from '../util/vue-helpers'
+import { pick, makeWatchers } from '../util'
 import source from './source'
 
 /**

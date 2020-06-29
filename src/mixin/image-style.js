@@ -1,4 +1,4 @@
-import { isEqual, pick } from '../util/minilo'
+import { isEqual, pick } from '../util'
 import style from './style'
 
 export default {

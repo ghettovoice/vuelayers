@@ -1,6 +1,5 @@
 import { retry } from 'rxjs/operators'
-import { newLogger } from '../util/log'
-import { noop } from '../util/minilo'
+import { newLogger, noop } from '../util'
 
 /**
  * RxJS subscriptions manager.

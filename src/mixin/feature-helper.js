@@ -6,7 +6,7 @@ import {
   setFeatureId,
   setFeatureProperties, STYLE_SERIALIZE_PROP,
 } from '../ol-ext'
-import { get, isArray, isEqual, isFunction, isPlainObject } from '../util/minilo'
+import { get, isArray, isEqual, isFunction, isPlainObject } from '../util'
 
 export default {
   methods: {

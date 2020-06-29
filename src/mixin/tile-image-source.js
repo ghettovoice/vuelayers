@@ -1,5 +1,4 @@
-import { pick } from '../util/minilo'
-import { makeWatchers } from '../util/vue-helpers'
+import { makeWatchers, pick } from '../util'
 import urlTileSource from './url-tile-source'
 
 /**

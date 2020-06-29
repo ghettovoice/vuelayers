@@ -1,8 +1,7 @@
 <script>
   import ImageStaticSource from 'ol/source/ImageStatic'
   import { imageSource } from '../../mixin'
-  import { negate, isEmpty } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { negate, isEmpty, makeWatchers } from '../../util'
 
   /**
    * A layer source for displaying a single, static image.

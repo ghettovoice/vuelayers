@@ -1,8 +1,7 @@
 <script>
   import { Style } from 'ol/style'
   import { olCmp, styleContainer, stubVNode } from '../../mixin'
-  import { isFunction, noop } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
+  import { isFunction, noop, mergeDescriptors } from '../../util'
 
   /**
    * Style function component for advanced styling.

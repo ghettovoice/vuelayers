@@ -1,7 +1,6 @@
 import WMSServerType from 'ol/source/WMSServerType'
 import { cleanSourceParams } from '../ol-ext'
-import { isArray, isEqual } from '../util/minilo'
-import { makeWatchers } from '../util/vue-helpers'
+import { isArray, isEqual, makeWatchers } from '../util'
 
 /**
  * Basic WMS params and methods mixin.

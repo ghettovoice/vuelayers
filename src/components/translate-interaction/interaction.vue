@@ -8,9 +8,7 @@
   import { FRAME_TIME, interaction } from '../../mixin'
   import { getLayerId } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf } from '../../util/assert'
-  import { isFunction, isString, map } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { assert, instanceOf, isFunction, isString, map, makeWatchers } from '../../util'
 
   export default {
     name: 'VlInteractionTranslate',

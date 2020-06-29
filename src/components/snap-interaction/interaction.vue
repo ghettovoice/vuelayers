@@ -3,9 +3,7 @@
   import { Snap as SnapInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
   import { interaction } from '../../mixin'
-  import { assert, instanceOf } from '../../util/assert'
-  import { isFunction } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { assert, instanceOf, isFunction, makeWatchers } from '../../util'
 
   export default {
     name: 'VlInteractionSnap',

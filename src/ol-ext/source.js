@@ -1,6 +1,6 @@
 import { Source } from 'ol/source'
 import { v4 as uuid } from 'uuid'
-import { reduce } from '../util/minilo'
+import { reduce } from '../util'
 
 export function getSourceId (source) {
   if (source instanceof Source) {

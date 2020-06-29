@@ -9,10 +9,7 @@
   import { interaction, styleContainer } from '../../mixin'
   import { initializeFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
-  import { assert, instanceOf } from '../../util/assert'
-  import { camelCase, isFunction, upperFirst } from '../../util/minilo'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { assert, camelCase, instanceOf, isFunction, makeWatchers, mergeDescriptors, upperFirst } from '../../util'
 
   const transformType = type => upperFirst(camelCase(type))
 

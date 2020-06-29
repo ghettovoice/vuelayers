@@ -27,9 +27,7 @@
     fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { assert } from '../../util/assert'
-  import { addPrefix, clonePlainObject, coalesce, hasProp, isEqual } from '../../util/minilo'
-  import waitFor from '../../util/wait-for'
+  import { addPrefix, assert, clonePlainObject, coalesce, hasProp, isEqual, waitFor } from '../../util'
 
   export default {
     name: 'VlGeoloc',

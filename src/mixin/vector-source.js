@@ -6,7 +6,6 @@ import { from as fromObs, merge as mergeObs } from 'rxjs'
 import { map as mapObs, mergeMap } from 'rxjs/operators'
 import { getFeatureId, getGeoJsonFmt, initializeFeature, isGeoJSONFeature, transform, transforms } from '../ol-ext'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { instanceOf } from '../util/assert'
 import {
   and,
   clonePlainObject,
@@ -14,19 +13,20 @@ import {
   difference,
   every,
   forEach,
+  instanceOf,
   isArray,
   isEmpty,
   isEqual,
   isFunction,
   isString,
+  makeWatchers,
   map,
+  mergeDescriptors,
   negate,
   pick,
   sealFactory,
   stubArray,
-} from '../util/minilo'
-import mergeDescriptors from '../util/multi-merge-descriptors'
-import { makeWatchers } from '../util/vue-helpers'
+} from '../util'
 import featureHelper from './feature-helper'
 import { FRAME_TIME } from './ol-cmp'
 import source from './source'

@@ -1,10 +1,7 @@
 import { map as mapObs } from 'rxjs/operators'
 import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
 import { fromVueEvent as obsFromVueEvent } from '../rx-ext'
-import { assert } from '../util/assert'
-import { hasProp, pick } from '../util/minilo'
-import mergeDescriptors from '../util/multi-merge-descriptors'
-import waitFor from '../util/wait-for'
+import { assert, hasProp, pick, mergeDescriptors, waitFor } from '../util'
 import olCmp, { OlObjectEvent } from './ol-cmp'
 import stubVNode from './stub-vnode'
 

@@ -3,7 +3,7 @@ import GeometryType from 'ol/geom/GeometryType'
 import { Circle, Fill, Icon, Image as ImageStyle, RegularShape, Stroke, Style, Text } from 'ol/style'
 import parseColor from 'parse-color'
 import { v4 as uuid } from 'uuid'
-import { addPrefix, filter, identity, isArray, isFunction, isNumeric, reduce } from '../util/minilo'
+import { addPrefix, filter, identity, isArray, isFunction, isNumeric, reduce } from '../util'
 
 function isStyle (style) {
   return style instanceof Style ||

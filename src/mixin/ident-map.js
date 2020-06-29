@@ -1,6 +1,5 @@
 import Vue from 'vue'
-import IdentityMap from '../util/identity-map'
-import { hasProp, identity, keys, stubObject } from '../util/minilo'
+import { hasProp, identity, IdentityMap, keys, stubObject } from '../util'
 
 // global prop
 export const IDENTITY_MAP_PROP = '$vlIdentityMap'

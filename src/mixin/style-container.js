@@ -1,7 +1,7 @@
 import debounce from 'debounce-promise'
 import { Style } from 'ol/style'
 import { dumpStyle } from '../ol-ext'
-import { clonePlainObject, isArray, isEqual, isFunction } from '../util/minilo'
+import { clonePlainObject, isArray, isEqual, isFunction } from '../util'
 import { FRAME_TIME } from './ol-cmp'
 
 /**

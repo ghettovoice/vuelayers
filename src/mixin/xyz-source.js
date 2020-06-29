@@ -1,7 +1,7 @@
 import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
 import { XYZ as XYZSource } from 'ol/source'
 import { createXYZ, extentFromProjection } from 'ol/tilegrid'
-import { isArray, isFunction, isNumber, pick } from '../util/minilo'
+import { isArray, isFunction, isNumber, pick } from '../util'
 import tileImageSource from './tile-image-source'
 
 /**

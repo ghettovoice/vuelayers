@@ -1,6 +1,6 @@
 import { Feature } from 'ol'
 import GeometryType from 'ol/geom/GeometryType'
-import { get, isArray, isPlainObject } from '../util/minilo'
+import { get, isArray, isPlainObject } from '../util'
 import { COORD_PRECISION } from './coord'
 import { createGeoJsonFmt } from './format'
 import { EPSG_3857, EPSG_4326 } from './proj'

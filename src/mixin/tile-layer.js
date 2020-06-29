@@ -1,7 +1,7 @@
 import debounce from 'debounce-promise'
 import { skipWhile } from 'rxjs/operators'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
-import { addPrefix, isEqual, pick } from '../util/minilo'
+import { addPrefix, isEqual, pick } from '../util'
 import layer from './layer'
 import { FRAME_TIME } from './ol-cmp'
 

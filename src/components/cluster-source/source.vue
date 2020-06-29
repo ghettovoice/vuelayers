@@ -3,8 +3,7 @@
   import { Cluster as ClusterSource } from 'ol/source'
   import { createSourceContainer, FRAME_TIME, vectorSource } from '../../mixin'
   import { createPointGeom, findPointOnSurface } from '../../ol-ext'
-  import mergeDescriptors from '../../util/multi-merge-descriptors'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { mergeDescriptors, makeWatchers } from '../../util'
 
   const sourceContainer = /*#__PURE__*/createSourceContainer({
     propName: 'innerSource',

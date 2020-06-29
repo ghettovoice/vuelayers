@@ -1,8 +1,7 @@
 import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
-import { clonePlainObject, isFunction, pick, sealFactory } from '../util/minilo'
-import { makeWatchers } from '../util/vue-helpers'
+import { clonePlainObject, isFunction, pick, sealFactory, makeWatchers } from '../util'
 import { FRAME_TIME } from './ol-cmp'
 import source from './source'
 

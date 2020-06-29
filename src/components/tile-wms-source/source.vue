@@ -1,7 +1,7 @@
 <script>
   import { TileWMS as TileWMSSource } from 'ol/source'
   import { tileImageSource, wmsSource } from '../../mixin'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { makeWatchers } from '../../util'
 
   export default {
     name: 'VlSourceTileWms',

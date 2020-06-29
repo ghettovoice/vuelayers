@@ -2,9 +2,7 @@
   import { Icon as IconStyle } from 'ol/style'
   import { imageStyle } from '../../mixin'
   import { normalizeColor } from '../../ol-ext'
-  import { assert } from '../../util/assert'
-  import { isEmpty, isEqual } from '../../util/minilo'
-  import { makeWatchers } from '../../util/vue-helpers'
+  import { assert, isEmpty, isEqual, makeWatchers } from '../../util'
 
   export default {
     name: 'VlStyleIcon',
