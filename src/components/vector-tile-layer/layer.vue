@@ -1,8 +1,8 @@
 <script>
   import { VectorTile as VectorTileLayer } from 'ol/layer'
   import RenderType from 'ol/layer/VectorTileRenderType'
-  import { makeWatchers } from '../../util'
-  import { tileLayer, vectorLayer } from '../../mixin'
+  import { makeWatchers } from '../../utils'
+  import { tileLayer, vectorLayer } from '../../mixins'
 
   export default {
     name: 'VlLayerVectorTile',

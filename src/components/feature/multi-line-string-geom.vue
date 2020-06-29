@@ -1,8 +1,8 @@
 <script>
   import { MultiLineString } from 'ol/geom'
   import GeometryType from 'ol/geom/GeometryType'
-  import { simpleGeometry } from '../../mixin'
-  import { constant } from '../../util'
+  import { simpleGeometry } from '../../mixins'
+  import { constant } from '../../utils'
 
   export default {
     name: 'VlGeomMultiLineString',

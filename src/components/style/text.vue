@@ -20,9 +20,9 @@
 <script>
   import debounce from 'debounce-promise'
   import { Text as TextStyle } from 'ol/style'
-  import { fillStyleContainer, FRAME_TIME, strokeStyleContainer, style } from '../../mixin'
+  import { fillStyleContainer, FRAME_TIME, strokeStyleContainer, style } from '../../mixins'
   import { dumpFillStyle, dumpStrokeStyle } from '../../ol-ext'
-  import { clonePlainObject, isEqual, isFunction, mergeDescriptors } from '../../util'
+  import { clonePlainObject, isEqual, isFunction, mergeDescriptors } from '../../utils'
   import BackgroundStyle from './background.vue'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'

@@ -1,6 +1,6 @@
 <script>
   import { Image as ImageLayer } from 'ol/layer'
-  import { imageLayer } from '../../mixin'
+  import { imageLayer } from '../../mixins'
 
   /**
    * Layer for server-rendered images that are available for arbitrary extents and resolutions.

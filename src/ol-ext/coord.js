@@ -1,5 +1,5 @@
 import GeometryType from 'ol/geom/GeometryType'
-import { isEqual, round } from '../util'
+import { isEqual, round } from '../utils'
 
 export const COORD_PRECISION = -1
 

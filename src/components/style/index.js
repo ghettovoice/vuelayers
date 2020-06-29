@@ -1,4 +1,4 @@
-import { pick } from '../../util'
+import { pick } from '../../utils'
 import CircleStyle from './circle.vue'
 import FillStyle from './fill.vue'
 import IconStyle from './icon.vue'

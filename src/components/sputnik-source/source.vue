@@ -1,5 +1,5 @@
 <script>
-  import { xyzSource } from '../../mixin'
+  import { xyzSource } from '../../mixins'
 
   const SPUTNIK_URL_TEMPLATE = 'http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png?apikey={apikey}'
   const SPUTNIK_ATTRIBUTIONS = '<a href="http://maps.sputnik.ru/" target="_blank">Спутник</a> ' +

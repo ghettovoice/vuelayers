@@ -1,7 +1,7 @@
 <script>
   import { TileWMS as TileWMSSource } from 'ol/source'
-  import { tileImageSource, wmsSource } from '../../mixin'
-  import { makeWatchers } from '../../util'
+  import { tileImageSource, wmsSource } from '../../mixins'
+  import { makeWatchers } from '../../utils'
 
   export default {
     name: 'VlSourceTileWms',

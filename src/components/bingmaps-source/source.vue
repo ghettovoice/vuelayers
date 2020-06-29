@@ -1,7 +1,7 @@
 <script>
   import { BingMaps as BingMapsSource } from 'ol/source'
-  import { tileImageSource } from '../../mixin'
-  import { makeWatchers } from '../../util'
+  import { tileImageSource } from '../../mixins'
+  import { makeWatchers } from '../../utils'
 
   export default {
     name: 'VlSourceBingmaps',

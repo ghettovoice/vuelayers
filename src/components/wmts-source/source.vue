@@ -1,14 +1,13 @@
 <script>
-  import { getCorner as getExtentCorner, getHeight as getExtentHeight, getWidth as getExtentWidth } from 'ol/extent'
+  import { getHeight as getExtentHeight, getWidth as getExtentWidth } from 'ol/extent'
   import ExtentCorner from 'ol/extent/Corner'
   import { toSize } from 'ol/size'
   import { WMTS as WMTSSource } from 'ol/source'
-  import { extentFromProjection } from 'ol/tilegrid'
   import { DEFAULT_MAX_ZOOM, DEFAULT_TILE_SIZE } from 'ol/tilegrid/common'
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
-  import { tileImageSource } from '../../mixin'
-  import { roundExtent, roundPointCoords } from '../../ol-ext'
-  import { isArray, isEqual, isFunction, isNumber, range } from '../../util'
+  import { tileImageSource } from '../../mixins'
+  import { roundExtent, roundPointCoords, extentFromProjection, getCorner as getExtentCorner } from '../../ol-ext'
+  import { isArray, isEqual, isFunction, isNumber, range } from '../../utils'
 
   export default {
     name: 'VlSourceWmts',

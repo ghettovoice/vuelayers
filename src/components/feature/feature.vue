@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import { feature } from '../../mixin'
+  import { feature } from '../../mixins'
   import PointGeom from './point-geom.vue'
 
   /**

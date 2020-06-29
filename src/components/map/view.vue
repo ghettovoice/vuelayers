@@ -18,7 +18,7 @@
   import { get as getProj } from 'ol/proj'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
   import { distinctUntilKeyChanged, map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixin'
+  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
   import {
     EPSG_3857,
     getViewId,
@@ -46,7 +46,7 @@
     makeWatchers,
     noop,
     waitFor,
-  } from '../../util'
+  } from '../../utils'
 
   /**
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,

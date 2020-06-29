@@ -1,4 +1,4 @@
-import { pick } from '../../util'
+import { pick } from '../../utils'
 import Interaction from './interaction.vue'
 
 function plugin (Vue, options = {}) {

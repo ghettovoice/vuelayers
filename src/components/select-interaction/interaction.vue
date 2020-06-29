@@ -9,10 +9,10 @@
 
 <script>
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
-  import Feature from 'ol/Feature'
+  import { Feature } from 'ol'
   import { Select as SelectInteraction } from 'ol/interaction'
   import { merge as mergeObs } from 'rxjs'
-  import { featuresContainer, interaction, styleContainer } from '../../mixin'
+  import { featuresContainer, interaction, styleContainer } from '../../mixins'
   import { getFeatureId, getLayerId, initializeFeature, isGeoJSONFeature, transforms } from '../../ol-ext'
   import { fromVueEvent as obsFromVueEvent } from '../../rx-ext'
   import {
@@ -29,7 +29,7 @@
     stubArray,
     mergeDescriptors,
     makeWatchers,
-  } from '../../util'
+  } from '../../utils'
 
   export default {
     name: 'VlInteractionSelect',

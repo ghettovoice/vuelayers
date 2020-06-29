@@ -1,4 +1,4 @@
-import { pick } from '../../util'
+import { pick } from '../../utils'
 import Overlay from './overlay.vue'
 
 function plugin (Vue, options = {}) {

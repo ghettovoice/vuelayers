@@ -1,7 +1,7 @@
 <script>
   import { ImageWMS as ImageWMSSource } from 'ol/source'
-  import { imageSource, wmsSource } from '../../mixin'
-  import { negate, isEmpty } from '../../util'
+  import { imageSource, wmsSource } from '../../mixins'
+  import { negate, isEmpty } from '../../utils'
 
   export default {
     name: 'VlSourceImageWms',

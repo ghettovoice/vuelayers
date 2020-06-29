@@ -12,7 +12,7 @@
 
 <script>
   import { Circle as CircleStyle } from 'ol/style'
-  import { regShapeStyle } from '../../mixin'
+  import { regShapeStyle } from '../../mixins'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'
 

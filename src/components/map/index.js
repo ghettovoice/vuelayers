@@ -1,4 +1,4 @@
-import { pick } from '../../util'
+import { pick } from '../../utils'
 import Map from './map.vue'
 import View from './view.vue'
 

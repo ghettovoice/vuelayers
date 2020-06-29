@@ -48,9 +48,9 @@
 <script>
   import debounce from 'debounce-promise'
   import GraticuleLayer from 'ol/layer/Graticule'
-  import { vectorLayer } from '../../mixin'
+  import { vectorLayer } from '../../mixins'
   import { dumpStrokeStyle, dumpTextStyle } from '../../ol-ext'
-  import { clonePlainObject, isEqual, isFunction, makeWatchers, map, mergeDescriptors } from '../../util'
+  import { clonePlainObject, isEqual, isFunction, makeWatchers, map, mergeDescriptors } from '../../utils'
   import { FillStyle, StrokeStyle, TextStyle } from '../style'
   import LatStyle from './lat-style.vue'
   import LonStyle from './lon-style.vue'

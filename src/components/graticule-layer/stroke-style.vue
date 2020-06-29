@@ -1,6 +1,6 @@
 <script>
-  import { olCmp, stubVNode, strokeStyleContainer } from '../../mixin'
-  import { stubObject, mergeDescriptors } from '../../util'
+  import { olCmp, stubVNode, strokeStyleContainer } from '../../mixins'
+  import { stubObject, mergeDescriptors } from '../../utils'
 
   export default {
     name: 'VlLayerGraticuleStrokeStyle',

@@ -1,6 +1,6 @@
 <script>
   import { RegularShape as RegularShapeStyle } from 'ol/style'
-  import { regShapeStyle } from '../../mixin'
+  import { regShapeStyle } from '../../mixins'
 
   export default {
     name: 'VlStyleRegShape',

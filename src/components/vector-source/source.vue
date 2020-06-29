@@ -1,6 +1,6 @@
 <script>
   import { Vector as VectorSource } from 'ol/source'
-  import { vectorSource } from '../../mixin'
+  import { vectorSource } from '../../mixins'
 
   export default {
     name: 'VlSourceVector',

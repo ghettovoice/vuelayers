@@ -1,6 +1,6 @@
 <script>
   import { Tile as TileLayer } from 'ol/layer'
-  import { tileLayer } from '../../mixin'
+  import { tileLayer } from '../../mixins'
 
   /**
    * Layer that provide pre-rendered, tiled images in grid that are organized by zoom levels for

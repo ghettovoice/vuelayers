@@ -1,6 +1,6 @@
 <script>
   import { VectorImage as VectorImageLayer } from 'ol/layer'
-  import { vectorLayer } from '../../mixin'
+  import { vectorLayer } from '../../mixins'
 
   /**
    * Layer for data that is rendered client-side.

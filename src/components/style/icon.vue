@@ -1,8 +1,8 @@
 <script>
   import { Icon as IconStyle } from 'ol/style'
-  import { imageStyle } from '../../mixin'
+  import { imageStyle } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
-  import { assert, isEmpty, isEqual, makeWatchers } from '../../util'
+  import { assert, isEmpty, isEqual, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlStyleIcon',

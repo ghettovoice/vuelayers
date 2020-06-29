@@ -1,4 +1,4 @@
-import { pick } from '../../util'
+import { pick } from '../../utils'
 import CircleGeom from './circle-geom.vue'
 import Feature from './feature.vue'
 import LineStringGeom from './line-string-geom.vue'

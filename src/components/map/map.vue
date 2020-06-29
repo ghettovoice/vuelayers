@@ -40,14 +40,14 @@
     OlObjectEvent,
     overlaysContainer,
     projTransforms,
-  } from '../../mixin'
+  } from '../../mixins'
   import { getMapDataProjection, getMapId, roundPointCoords, setMapDataProjection, setMapId } from '../../ol-ext'
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromOlEvent as obsFromOlEvent,
     fromVueEvent as obsFromVueEvent,
   } from '../../rx-ext'
-  import { addPrefix, assert, hasProp, isEqual, isFunction, makeWatchers, mergeDescriptors, waitFor } from '../../util'
+  import { addPrefix, assert, hasProp, isEqual, isFunction, makeWatchers, mergeDescriptors, waitFor } from '../../utils'
   import { Layer as VectorLayerCmp } from '../vector-layer'
   import { Source as VectorSourceCmp } from '../vector-source'
   import ViewCmp from './view.vue'

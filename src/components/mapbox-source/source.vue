@@ -1,6 +1,6 @@
 <script>
-  import { xyzSource } from '../../mixin'
-  import { coalesce } from '../../util'
+  import { xyzSource } from '../../mixins'
+  import { coalesce } from '../../utils'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
   const MAPBOX_ATTRIBUTIONS = '&copy; <a href="https://www.mapbox.com/" target="_blank">MapBox</a>, ' + (new Date().getFullYear())

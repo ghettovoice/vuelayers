@@ -1,4 +1,4 @@
-import { pick } from '../../util'
+import { pick } from '../../utils'
 import Geoloc from './geoloc.vue'
 
 function plugin (Vue, options = {}) {

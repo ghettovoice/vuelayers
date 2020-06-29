@@ -1,6 +1,6 @@
 <script>
-  import { olCmp, stubVNode, textStyleContainer } from '../../mixin'
-  import { stubObject, mergeDescriptors } from '../../util'
+  import { olCmp, stubVNode, textStyleContainer } from '../../mixins'
+  import { stubObject, mergeDescriptors } from '../../utils'
 
   export default {
     name: 'VlLayerGraticuleLonStyle',

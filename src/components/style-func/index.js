@@ -1,4 +1,4 @@
-import { pick } from '../../util'
+import { pick } from '../../utils'
 import Style from './style.vue'
 
 function plugin (Vue, options = {}) {

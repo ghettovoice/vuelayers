@@ -1,9 +1,9 @@
-import Feature from 'ol/Feature'
+import { Feature } from 'ol'
 import { GeoJSON as BaseGeoJSON, MVT } from 'ol/format'
 import { Circle, LineString } from 'ol/geom'
 import { isEmpty } from 'ol/obj'
 import { getLength } from 'ol/sphere'
-import { clonePlainObject, isArray, isFunction, noop, omit } from '../util'
+import { clonePlainObject, isArray, isFunction, noop, omit } from '../utils'
 import { createCircularPolygon, isCircleGeom } from './geom'
 import { EPSG_4326, transformDistance, transformPoint } from './proj'
 

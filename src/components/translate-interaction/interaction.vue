@@ -5,10 +5,10 @@
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
-  import { FRAME_TIME, interaction } from '../../mixin'
+  import { FRAME_TIME, interaction } from '../../mixins'
   import { getLayerId } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, isFunction, isString, map, makeWatchers } from '../../util'
+  import { assert, instanceOf, isFunction, isString, map, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlInteractionTranslate',

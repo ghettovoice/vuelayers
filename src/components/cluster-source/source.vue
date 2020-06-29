@@ -1,9 +1,9 @@
 <script>
   import debounce from 'debounce-promise'
   import { Cluster as ClusterSource } from 'ol/source'
-  import { createSourceContainer, FRAME_TIME, vectorSource } from '../../mixin'
+  import { createSourceContainer, FRAME_TIME, vectorSource } from '../../mixins'
   import { createPointGeom, findPointOnSurface } from '../../ol-ext'
-  import { mergeDescriptors, makeWatchers } from '../../util'
+  import { mergeDescriptors, makeWatchers } from '../../utils'
 
   const sourceContainer = /*#__PURE__*/createSourceContainer({
     propName: 'innerSource',

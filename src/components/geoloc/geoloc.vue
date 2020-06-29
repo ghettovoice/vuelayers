@@ -20,14 +20,14 @@
   import { equivalent as isEqProj, get as getProj } from 'ol/proj'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
   import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixin'
+  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
   import { getMapDataProjection, writeGeoJsonGeometry } from '../../ol-ext'
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, coalesce, hasProp, isEqual, waitFor } from '../../util'
+  import { addPrefix, assert, clonePlainObject, coalesce, hasProp, isEqual, waitFor } from '../../utils'
 
   export default {
     name: 'VlGeoloc',

@@ -1,6 +1,6 @@
 import { Feature } from 'ol'
 import { v4 as uuid } from 'uuid'
-import { isPlainObject, omit } from '../util'
+import { isPlainObject, omit } from '../utils'
 import { CIRCLE_SERIALIZE_PROP, STYLE_SERIALIZE_PROP } from './format'
 
 /**

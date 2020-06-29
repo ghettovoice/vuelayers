@@ -1,4 +1,4 @@
-import { pick } from '../../util'
+import { pick } from '../../utils'
 import Layer from './layer.vue'
 
 function plugin (Vue, options = {}) {

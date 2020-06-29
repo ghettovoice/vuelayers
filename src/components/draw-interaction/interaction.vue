@@ -6,10 +6,10 @@
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs, of as obsOf } from 'rxjs'
   import { first, map as mapObs, mapTo, mergeMap } from 'rxjs/operators'
-  import { interaction, styleContainer } from '../../mixin'
+  import { interaction, styleContainer } from '../../mixins'
   import { initializeFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
-  import { assert, camelCase, instanceOf, isFunction, makeWatchers, mergeDescriptors, upperFirst } from '../../util'
+  import { assert, camelCase, instanceOf, isFunction, makeWatchers, mergeDescriptors, upperFirst } from '../../utils'
 
   const transformType = type => upperFirst(camelCase(type))
 

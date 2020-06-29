@@ -2,8 +2,8 @@
   import { Collection } from 'ol'
   import { Snap as SnapInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import { interaction } from '../../mixin'
-  import { assert, instanceOf, isFunction, makeWatchers } from '../../util'
+  import { interaction } from '../../mixins'
+  import { assert, instanceOf, isFunction, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlInteractionSnap',

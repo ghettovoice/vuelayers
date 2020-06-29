@@ -16,14 +16,14 @@
   import OverlayPositioning from 'ol/OverlayPositioning'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
   import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { olCmp, OlObjectEvent, projTransforms } from '../../mixin'
+  import { olCmp, OlObjectEvent, projTransforms } from '../../mixins'
   import { getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, hasProp, identity, isEqual, makeWatchers, waitFor } from '../../util'
+  import { addPrefix, assert, clonePlainObject, hasProp, identity, isEqual, makeWatchers, waitFor } from '../../utils'
 
   export default {
     name: 'VlOverlay',

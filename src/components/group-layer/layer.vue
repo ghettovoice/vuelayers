@@ -1,7 +1,7 @@
 <script>
   import { Group as GroupLayer } from 'ol/layer'
-  import { baseLayer, layersContainer } from '../../mixin'
-  import { mergeDescriptors } from '../../util'
+  import { baseLayer, layersContainer } from '../../mixins'
+  import { mergeDescriptors } from '../../utils'
 
   export default {
     name: 'VlLayerGroup',

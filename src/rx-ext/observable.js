@@ -1,6 +1,6 @@
 import { fromEventPattern, merge as mergeObs, Observable } from 'rxjs'
 import { distinctUntilChanged, map as mapObs } from 'rxjs/operators'
-import { identity, isEqual, isFunction } from '../util'
+import { identity, isEqual, isFunction } from '../utils'
 
 /**
  * Creates an Observable using OpenLayers event pattern that emits events coming from the given event target.

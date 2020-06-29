@@ -1,9 +1,9 @@
 <script>
-  import VectorTileSource from 'ol/source/VectorTile'
-  import { createXYZ, extentFromProjection } from 'ol/tilegrid'
-  import { urlTileSource } from '../../mixin'
-  import { createMvtFmt, roundExtent } from '../../ol-ext'
-  import { isArray, isFunction, isNumber, sealFactory, makeWatchers } from '../../util'
+  import { VectorTile as VectorTileSource } from 'ol/source'
+  import { createXYZ } from 'ol/tilegrid'
+  import { urlTileSource } from '../../mixins'
+  import { createMvtFmt, roundExtent, extentFromProjection } from '../../ol-ext'
+  import { isArray, isFunction, isNumber, sealFactory, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlSourceVectorTile',

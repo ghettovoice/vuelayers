@@ -1,7 +1,7 @@
 <script>
   import { ImageArcGISRest as ImageArcGISRestSource } from 'ol/source'
-  import { imageSource, arcgisSource } from '../../mixin'
-  import { negate, isEmpty } from '../../util'
+  import { imageSource, arcgisSource } from '../../mixins'
+  import { negate, isEmpty } from '../../utils'
 
   export default {
     name: 'VlSourceImageArcgisRest',

@@ -1,6 +1,6 @@
 <script>
-  import StamenSource from 'ol/source/Stamen'
-  import { xyzSource } from '../../mixin'
+  import { Stamen as StamenSource } from 'ol/source'
+  import { xyzSource } from '../../mixins'
 
   export default {
     name: 'VlSourceStamen',

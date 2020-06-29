@@ -4,9 +4,9 @@
   import { Circle } from 'ol/geom'
   import GeometryType from 'ol/geom/GeometryType'
   import { get as getProj } from 'ol/proj'
-  import { FRAME_TIME, simpleGeometry } from '../../mixin'
+  import { FRAME_TIME, simpleGeometry } from '../../mixins'
   import { COORD_PRECISION, roundCoords, transformDistance, transformExtent, transformPoint } from '../../ol-ext'
-  import { constant, isEqual, round } from '../../util'
+  import { constant, isEqual, round } from '../../utils'
 
   export default {
     name: 'VlGeomCircle',

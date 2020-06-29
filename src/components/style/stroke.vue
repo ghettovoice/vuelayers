@@ -1,8 +1,8 @@
 <script>
   import { Stroke as StrokeStyle } from 'ol/style'
-  import { style } from '../../mixin'
+  import { style } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
-  import { isEqual } from '../../util'
+  import { isEqual } from '../../utils'
 
   export default {
     name: 'VlStyleStroke',

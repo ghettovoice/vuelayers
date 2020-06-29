@@ -1,7 +1,7 @@
 <script>
-  import ImageStaticSource from 'ol/source/ImageStatic'
-  import { imageSource } from '../../mixin'
-  import { negate, isEmpty, makeWatchers } from '../../util'
+  import { ImageStatic as ImageStaticSource } from 'ol/source'
+  import { imageSource } from '../../mixins'
+  import { negate, isEmpty, makeWatchers } from '../../utils'
 
   /**
    * A layer source for displaying a single, static image.

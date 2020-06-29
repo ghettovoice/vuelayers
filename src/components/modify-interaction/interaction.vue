@@ -5,9 +5,9 @@
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs, tap } from 'rxjs/operators'
-  import { interaction, styleContainer } from '../../mixin'
+  import { interaction, styleContainer } from '../../mixins'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, isFunction, map, mergeDescriptors, makeWatchers } from '../../util'
+  import { assert, instanceOf, isFunction, map, mergeDescriptors, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlInteractionModify',

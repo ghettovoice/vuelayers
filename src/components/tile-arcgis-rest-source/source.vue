@@ -1,6 +1,6 @@
 <script>
   import { TileArcGISRest as TileArcGISRestSource } from 'ol/source'
-  import { tileImageSource, arcgisSource } from '../../mixin'
+  import { tileImageSource, arcgisSource } from '../../mixins'
 
   export default {
     name: 'VlSourceTileArcgisRest',

@@ -1,5 +1,5 @@
 <script>
-  import { xyzSource } from '../../mixin'
+  import { xyzSource } from '../../mixins'
 
   export default {
     name: 'VlSourceXyz',
