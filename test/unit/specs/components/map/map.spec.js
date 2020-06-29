@@ -1,10 +1,15 @@
-import { Map } from '@/component/map'
-import olMap from 'ol/Map'
-import olView from 'ol/View'
+import { Map } from '@/components/map'
+import { VM_PROP } from '@/mixin'
+import { Map as olMap, View as olView } from 'ol'
 import Vue from 'vue'
 
 describe('vl-map', () => {
-  const Ctor = Vue.extend(Map)
+  const Ctor = Vue.extend({
+    ...Map,
+    propsData: {
+      id: 'test',
+    },
+  })
 
   describe('created hook', () => {
     it('should export $createPromise', done => {
@@ -16,7 +21,7 @@ describe('vl-map', () => {
       vm.$createPromise.then(() => {
         expect(vm.$olObject).to.be.instanceof(olMap)
         expect(vm.$map).to.equal(vm.$olObject)
-        expect(vm.$map[vm.$options.VM_PROP].includes(vm)).to.be.true
+        expect(vm.$map[VM_PROP].includes(vm)).to.be.true
 
         vm.$destroy()
         Vue.nextTick(done)
@@ -44,7 +49,7 @@ describe('vl-map', () => {
 
       vm.$mountPromise.then(() => {
         expect(vm.$el).to.have.class('vl-map')
-        expect(vm.$el).to.contain('.ol-viewport canvas')
+        expect(vm.$el).to.contain('.ol-viewport')
 
         vm.$destroy()
         Vue.nextTick(done)
@@ -59,6 +64,7 @@ describe('vl-map', () => {
 
       const vm = new Ctor({
         propsData: {
+          id: 'test',
           tabindex: 0,
         },
       }).$mount(div)

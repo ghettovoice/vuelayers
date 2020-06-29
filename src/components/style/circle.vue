@@ -4,8 +4,8 @@
     :class="vmClass"
     style="display: none !important;">
     <slot>
-      <FillStyle />
-      <StrokeStyle />
+      <FillStyle :id="'vl-' + id + '-default-fill-style'" />
+      <StrokeStyle :id="'vl-' + id + '-default-stroke-style'" />
     </slot>
   </i>
 </template>

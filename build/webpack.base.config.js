@@ -32,6 +32,9 @@ module.exports = {
       utils.resolve('src'),
       'node_modules',
     ],
+    alias: {
+      '@': utils.resolve('src'),
+    },
   },
   resolveLoader: {
     modules: [

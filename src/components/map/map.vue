@@ -4,16 +4,16 @@
     :class="vmClass"
     :tabindex="tabindex">
     <slot>
-      <ViewCmp />
+      <ViewCmp :id="'vl-' + id + '-default-view'" />
     </slot>
     <VectorLayerCmp
-      id="vl-features-overlay"
+      :id="'vl-' + id + '-default-layer'"
       ref="featuresOverlay"
       :overlay="true"
       :update-while-animating="updateWhileAnimating"
       :update-while-interacting="updateWhileInteracting">
       <VectorSourceCmp
-        id="vl-features-overlay-source"
+        :id="'vl-' + id + '-default-source'"
         ref="featuresOverlaySource"
         :wrap-x="wrapX"
         @created="onFeaturesOverlaySourceCreated">

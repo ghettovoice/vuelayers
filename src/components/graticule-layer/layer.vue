@@ -3,33 +3,43 @@
     :id="vmId"
     :class="vmClass"
     style="display: none !important;">
-    <LonStyle>
+    <LonStyle :id="'vl-' + id + '-lon-style'">
       <slot name="lon">
         <TextStyle
+          :id="'vl-' + id + '-default-text-style'"
           font="'12px Calibri,sans-serif'"
           text-baseline="bottom">
-          <FillStyle color="rgba(0,0,0,1)" />
+          <FillStyle
+            :id="'vl-' + id + '-default-fill-style'"
+            color="rgba(0,0,0,1)" />
           <StrokeStyle
+            :id="'vl-' + id + '-default-stroke-style'"
             color="rgba(255,255,255,1)"
             :width="3" />
         </TextStyle>
       </slot>
     </LonStyle>
-    <LatStyle>
+    <LatStyle :id="'vl-' + id + '-lat-style'">
       <slot name="lat">
         <TextStyle
+          :id="'vl-' + id + '-default-text-style'"
           font="'12px Calibri,sans-serif'"
           text-baseline="bottom">
-          <FillStyle color="rgba(0,0,0,1)" />
+          <FillStyle
+            :id="'vl-' + id + '-default-fill-style'"
+            color="rgba(0,0,0,1)" />
           <StrokeStyle
+            :id="'vl-' + id + '-default-stroke-style'"
             color="rgba(255,255,255,1)"
             :width="3" />
         </TextStyle>
       </slot>
     </LatStyle>
-    <GStrokeStyle>
+    <GStrokeStyle :id="'vl-' + id + '-graticule-style'">
       <slot name="stroke">
-        <StrokeStyle color="rgba(0,0,0,0.2)" />
+        <StrokeStyle
+          :id="'vl-' + id + '-default-graticule-stroke-style'"
+          color="rgba(0,0,0,0.2)" />
       </slot>
     </GStrokeStyle>
   </i>

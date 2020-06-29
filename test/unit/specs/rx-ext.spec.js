@@ -1,5 +1,5 @@
 /* global describe, it, beforeEach, afterEach */
-import observableFromOlEvent from '@/rx-ext/from-ol-event'
+import { fromOlEvent as observableFromOlEvent } from '@/rx-ext'
 import OlObject from 'ol/Object'
 import { Observable } from 'rxjs'
 import sinon from 'sinon'

@@ -26,11 +26,6 @@
       <VlInteractionSelect
         ident="modify-target"
         :features.sync="selectedFeatures" />
-      <VlInteractionTranslate
-        source="modify-target"
-        @translatestart="start"
-        @translateend="end"
-        @translating="progress" />
     </VlMap>
   </div>
 </template>

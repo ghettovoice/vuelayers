@@ -6,7 +6,9 @@
     <slot
       :id="id"
       :properties="properties">
-      <PointGeom :coordinates="[0, 0]" />
+      <PointGeom
+        :id="'vl-' + id + '-default-geom'"
+        :coordinates="[0, 0]" />
     </slot>
   </i>
 </template>

@@ -4,10 +4,14 @@
     :class="vmClass"
     style="display: none !important;">
     <slot>
-      <FillStyle color="#222" />
-      <StrokeStyle color="#eee" />
+      <FillStyle
+        :id="'vl-' + id + '-default-fill-style'"
+        color="#222" />
+      <StrokeStyle
+        :id="'vl-' + id + '-default-stroke-style'"
+        color="#eee" />
     </slot>
-    <BackgroundStyle>
+    <BackgroundStyle :id="'vl-' + id + '-background-style'">
       <slot name="background" />
     </BackgroundStyle>
   </i>

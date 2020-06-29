@@ -15,6 +15,7 @@ import * as MapboxSource from './components/mapbox-source'
 import * as ModifyInteraction from './components/modify-interaction'
 import * as OsmSource from './components/osm-source'
 import * as Overlay from './components/overlay'
+import * as RotateInteraction from './components/rotate-interaction'
 import * as SelectInteraction from './components/select-interaction'
 import * as SnapInteraction from './components/snap-interaction'
 import * as SputnikSource from './components/sputnik-source'
@@ -68,6 +69,7 @@ function plugin (Vue, options = {}) {
   Vue.use(ModifyInteraction, options)
   Vue.use(OsmSource, options)
   Vue.use(Overlay, options)
+  Vue.use(RotateInteraction, options)
   Vue.use(SelectInteraction, options)
   Vue.use(SnapInteraction, options)
   Vue.use(SputnikSource, options)
@@ -110,6 +112,7 @@ export {
   ModifyInteraction,
   OsmSource,
   Overlay,
+  RotateInteraction,
   SelectInteraction,
   SnapInteraction,
   SputnikSource,

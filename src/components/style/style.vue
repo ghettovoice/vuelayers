@@ -4,9 +4,9 @@
     :class="vmClass"
     style="display: none !important;">
     <slot>
-      <CircleStyle />
-      <FillStyle />
-      <StrokeStyle />
+      <CircleStyle :id="'vl-' + id + '-default-circle-style'" />
+      <FillStyle :id="'vl-' + id + '-default-fill-style'" />
+      <StrokeStyle :id="'vl-' + id + '-default-stroke-style'" />
     </slot>
   </i>
 </template>

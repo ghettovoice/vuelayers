@@ -13,9 +13,6 @@ module.exports = {
       .waitForElementVisible('#app', 3000)
       .pause(1000)
       .waitForElementPresent('.vl-map', 3000)
-      // todo why nightwatch doesn't see inner ol-viewport element while it is already present
-      // .pause(1000)
-      // .waitForElementPresent('.vl-map .ol-viewport', 3000)
       .end()
   },
 }

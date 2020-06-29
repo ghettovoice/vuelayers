@@ -1,9 +1,23 @@
-import { View } from '@/component/map'
-import olView from 'ol/View'
+import { Map, View } from '@/components/map'
+import { VM_PROP } from '@/mixin'
+import { View as olView } from 'ol'
 import Vue from 'vue'
 
 describe('view component', () => {
-  const Ctor = Vue.extend(View)
+  const MapCtor = Vue.extend({
+    ...Map,
+    propsData: {
+      id: 'test',
+    },
+  })
+  const map = new MapCtor()
+  const Ctor = Vue.extend({
+    ...View,
+    parent: map,
+    propsData: {
+      id: 'test',
+    },
+  })
 
   describe('created hook', () => {
     it('should export $createPromise', done => {
@@ -15,7 +29,7 @@ describe('view component', () => {
       vm.$createPromise.then(() => {
         expect(vm.$olObject).to.be.instanceof(olView)
         expect(vm.$view).to.equal(vm.$olObject)
-        expect(vm.$view[vm.$options.VM_PROP].includes(vm)).to.be.true
+        expect(vm.$view[VM_PROP].includes(vm)).to.be.true
 
         vm.$destroy()
         Vue.nextTick(done)

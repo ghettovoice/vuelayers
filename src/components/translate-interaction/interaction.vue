@@ -5,7 +5,7 @@
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
-  import { interaction } from '../../mixin'
+  import { FRAME_TIME, interaction } from '../../mixin'
   import { getLayerId } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { assert, instanceOf } from '../../util/assert'
@@ -60,7 +60,7 @@
         if (value === this.hitTolerance) return
 
         this.$emit('update:hitTolerance', value)
-      }),
+      }, FRAME_TIME),
       .../*#__PURE__*/makeWatchers([
         'source',
         'resolvedFilter',
