@@ -468,7 +468,7 @@ function defineServices () {
             mergeMap(([_, err]) => throwErrorObs(err)),
           ),
         ).pipe(firstObs())
-          .toPromise(Promise)
+          .toPromise()
       },
     },
     /**
@@ -490,7 +490,7 @@ function defineServices () {
             mergeMap(([_, err]) => throwErrorObs(err)),
           ),
         ).pipe(firstObs())
-          .toPromise(Promise)
+          .toPromise()
       },
     },
     /**
@@ -511,7 +511,7 @@ function defineServices () {
               mergeMap(([_, err]) => throwErrorObs(err)),
             ),
           ).pipe(firstObs()),
-        ).toPromise(Promise)
+        ).toPromise()
       },
     },
     /**
@@ -533,7 +533,7 @@ function defineServices () {
               mergeMap(([_, err]) => throwErrorObs(err)),
             ),
           ).pipe(firstObs()),
-        ).toPromise(Promise)
+        ).toPromise()
       },
     },
   })

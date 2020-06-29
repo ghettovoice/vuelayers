@@ -1,60 +1,60 @@
-process.env.EFF_ABSOLUTE_PATHS = process.env.EFF_ABSOLUTE_PATHS || true
-
-// http://eslint.org/docs/user-guide/configuring
 module.exports = {
   root: true,
-  parser: 'vue-eslint-parser',
-  parserOptions: {
-    parser: 'babel-eslint',
-    sourceType: 'module',
-    ecmaVersion: 2018,
-  },
   env: {
+    node: true,
     browser: true,
     es6: true,
-    node: true,
   },
   extends: [
-    'standard',
     'plugin:vue/recommended',
+    '@vue/standard',
   ],
-  // required to lint *.vue files
-  plugins: [
-    'node',
-    'import',
-    'promise',
-    'vue',
-  ],
-  // add your custom rules here
+  parserOptions: {
+    parser: 'babel-eslint',
+  },
   rules: {
-    'vue/html-closing-bracket-newline': ['error', {
-      singleline: 'never',
-      multiline: 'never',
-    }],
+    'vue/html-closing-bracket-newline': [
+      'error', {
+        singleline: 'never',
+        multiline: 'never',
+      },
+    ],
     'vue/require-default-prop': 'off',
-    'vue/no-async-in-computed-properties': 'off',
-    // allow paren-less arrow functions
-    'arrow-parens': ['error', 'as-needed'],
-    // allow async-await
-    'generator-star-spacing': ['error', {
-      before: false,
-      after: true,
-    }],
-    // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-console': process.env.NODE_ENV === 'production' ? ['error', { allow: ['error', 'warn'] }] : 'off',
+    'generator-star-spacing': [
+      'error', {
+        before: false,
+        after: true,
+      },
+    ],
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'comma-dangle': ['error', 'always-multiline'],
-    'spaced-comment': 'off',
+    'spaced-comment': 'off', // to allow PURE annotation
   },
   overrides: [
     {
-      files: ['*.vue'],
+      files: [
+        '*.vue',
+      ],
       rules: {
         indent: 'off',
-        'vue/script-indent': ['error', 2, {
-          baseIndent: 1,
-          switchCase: 1,
-        }],
+        'vue/script-indent': [
+          'error',
+          2,
+          {
+            baseIndent: 1,
+            switchCase: 1,
+          },
+        ],
+      },
+    },
+    {
+      files: [
+        '**/__tests__/*.{j,t}s?(x)',
+        '**/tests/unit/**/*.spec.{j,t}s?(x)',
+      ],
+      env: {
+        mocha: true,
       },
     },
   ],

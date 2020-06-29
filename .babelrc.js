@@ -1,10 +1,8 @@
-module.exports = function (api) {
-  api.cache(true)
-
-  const presets = [
+module.exports = {
+  presets: [
     ['@babel/preset-env', { modules: false }],
-  ]
-  const plugins = [
+  ],
+  plugins: [
     // Stage 0
     '@babel/plugin-proposal-function-bind',
     // Stage 1
@@ -13,7 +11,6 @@ module.exports = function (api) {
     ['@babel/plugin-proposal-optional-chaining', { loose: false }],
     ['@babel/plugin-proposal-pipeline-operator', { proposal: 'minimal' }],
     ['@babel/plugin-proposal-nullish-coalescing-operator', { loose: false }],
-    '@babel/plugin-proposal-do-expressions',
     // Stage 2
     ['@babel/plugin-proposal-decorators', { legacy: true }],
     '@babel/plugin-proposal-function-sent',
@@ -22,23 +19,15 @@ module.exports = function (api) {
     '@babel/plugin-proposal-throw-expressions',
     // Stage 3
     '@babel/plugin-syntax-dynamic-import',
-    '@babel/plugin-syntax-import-meta',
     ['@babel/plugin-proposal-class-properties', { loose: false }],
-    '@babel/plugin-proposal-json-strings',
     // Other
-    ['@babel/plugin-transform-runtime', { corejs: 3, helpers: true, regenerator: true, useESModules: true }],
-  ]
-  const env = {
-    testing: {
+    ['@babel/plugin-transform-runtime', { useESModules: true }],
+  ],
+  env: {
+    test: {
       plugins: [
-        'istanbul',
+        ['istanbul', { useInlineSourceMaps: false }],
       ],
     },
-  }
-
-  return {
-    presets,
-    plugins,
-    env,
-  }
+  },
 }

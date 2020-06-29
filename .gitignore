@@ -259,10 +259,8 @@ $RECYCLE.BIN/
 
 ### App ###
 /package-lock.json
-/test/e2e/reports
-/test/unit/coverage
+/tests/e2e/reports
+/tests/unit/coverage
 /dist
-/lib
-/dist-docs
 /out
 /docs/releases

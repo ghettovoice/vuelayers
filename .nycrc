@@ -1,0 +1,11 @@
+{
+  "include": [
+    "src/**/*.{js,vue}"
+  ],
+  "check-coverage": false,
+  "per-file": true,
+  "skip-full": true,
+  "all": true,
+  "reporter": ["text-summary"],
+  "extension": [".vue", ".js"]
+}

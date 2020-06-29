@@ -5,7 +5,7 @@ For in-browser usage, there is a full standalone **UMD** bundle provided.
 
 ## Installation
 
-!> VueLayers works with Vue.js **^2.3** and OpenLayers **^5.0**
+!> VueLayers works with Vue.js **^2.3** and OpenLayers **^6.0**
 
 ### NPM
 
@@ -30,10 +30,10 @@ You can browse the source of the npm package at [unpkg.com/vuelayers/](https://u
 <!-- include Vue -->
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <!-- include OpenLayers -->
-<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.0.1/build/ol.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
 <!-- include UMD VueLayers build -->
-<link rel="stylesheet" href="https://unpkg.com/vuelayers/lib/style.css">
-<script src="https://unpkg.com/vuelayers/lib/index.umd.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/vuelayers/dist/vuelayers.css">
+<script src="https://unpkg.com/vuelayers/dist/vuelayers.umd.min.js"></script>
 
 <script>
   // All VueLayers components now globally installed
@@ -48,7 +48,7 @@ Create a plugin file (ex: `vuelayers.js`) in the `plugins/` directory, with this
 ```js
 import Vue from 'vue'
 import VueLayers from 'vuelayers'
-import 'vuelayers/lib/style.css' // needs css-loader
+import 'vuelayers/dist/vuelayers.css' // needs css-loader
 
 Vue.use(VueLayers)
 ```
@@ -57,7 +57,7 @@ Create a file in `modules/` or `shared/` directory named `vuelayers.js`
 
 ```js
 export default function (moduleOptions) {
-	this.options.css.push('vuelayers/lib/style.css')
+	this.options.css.push('vuelayers/dist/vuelayers.css')
 }
 ```
 
@@ -89,8 +89,8 @@ npm install
 # build all targets
 npm run build
 
-# check lib dir, there are all ready to use components
-ls -l lib
+# check dist dir, there are all ready to use components
+ls -l dist
 ```
 
 ## Usage
@@ -100,7 +100,7 @@ To use VueLayers in your application, you can import all components or just what
 ```js
 import Vue from 'vue'
 import VueLayers from 'vuelayers'
-import 'vuelayers/lib/style.css' // needs css-loader
+import 'vuelayers/dist/vuelayers.css' // needs css-loader
 
 Vue.use(VueLayers)
 
@@ -108,7 +108,7 @@ Vue.use(VueLayers)
 
 import Vue from 'vue'
 import { Map, TileLayer, OsmSource, Geoloc } from 'vuelayers'
-import 'vuelayers/lib/style.css' // needs css-loader
+import 'vuelayers/dist/vuelayers.css' // needs css-loader
 
 Vue.use(Map)
 Vue.use(TileLayer)

@@ -52,5 +52,5 @@ export default function waitFor (condition, breakOn, timeout) {
       }
       throw err
     }),
-  ).toPromise(Promise)
+  ).toPromise()
 }
