@@ -1,4 +1,4 @@
-const { escapeRegExp } = require('lodash')
+const { escapeRegExp, noop } = require('lodash')
 const replace = require('rollup-plugin-re')
 const vue = require('rollup-plugin-vue')
 const babel = require('@rollup/plugin-babel').babel
@@ -18,53 +18,6 @@ const makeExternal = dependencies => {
     return !!(dependencies.includes(id) || (!resolved && re.exec(id)))
   }
 }
-const plugins = [
-  replace({
-    sourceMap: true,
-    include: [
-      'src/**/*',
-    ],
-    replaces: Object.assign({
-      '@import ~': '@import ',
-      '@import "~': '@import "',
-    }, config.replaces),
-  }),
-  vue({
-    sourceMap: true,
-    needMap: false,
-    css: false,
-  }),
-  sass({
-    banner: config.banner,
-    sourceMap: true,
-    sass: {
-      indentedSyntax: true,
-      includePaths: [
-        utils.resolve('src'),
-        utils.resolve('src/styles'),
-        utils.resolve('node_modules'),
-      ],
-    },
-    output: 'dist/vuelayers.css',
-    postProcess: style => utils.postcssProcess(style),
-  }),
-  babel({
-    babelHelpers: 'runtime',
-    sourceMap: true,
-    include: [
-      'src/**/*',
-    ],
-    extensions: ['.js', '.jsx', '.es6', '.es', '.mjs', '.vue'],
-  }),
-  nodeResolve({
-    mainFields: ['module', 'main'],
-    browser: true,
-    sourceMap: true,
-  }),
-  cjs({
-    sourceMap: true,
-  }),
-]
 const baseConf = {
   external: makeExternal(config.dependencies),
   input: config.entry,
@@ -74,7 +27,6 @@ const baseConf = {
     name: config.fullname,
     sourcemap: true,
   },
-  plugins,
 }
 const baseUmdConf = (function () {
   const ol = {}
@@ -111,19 +63,6 @@ const baseUmdConf = (function () {
       }
     }()),
     input: config.umdEntry,
-    plugins: [
-      replace({
-        sourceMap: true,
-        include: [
-          'src/**/*',
-        ],
-        replaces: {
-          'process.env.NODE_ENV': "'production'",
-          'process.env.VUELAYERS_DEBUG': 'false',
-        },
-      }),
-      ...plugins,
-    ],
     output: {
       ...baseConf.output,
       format: 'umd',
@@ -141,6 +80,7 @@ module.exports = [
   {
     ...baseConf,
     external: makeExternal(config.dependencies.concat(['../../mixins', '../../ol-ext', '../../rx-ext', '../../utils'])),
+    plugins: makePlugins(false, null, `dist/${config.name}.css`),
     output: {
       ...baseConf.output,
       file: utils.resolve(`dist/${config.name}.esm.js`),
@@ -150,20 +90,11 @@ module.exports = [
     ...baseConf,
     external: makeExternal(config.dependencies.concat(['./ol-ext', './rx-ext', './utils'])),
     input: utils.resolve('src/mixins/index.js'),
-    plugins: [
-      ...baseConf.plugins,
-      replace({
-        sourceMap: true,
-        include: [
-          'src/**/*',
-        ],
-        replaces: {
-          '../ol-ext': './ol-ext',
-          '../rx-ext': './rx-ext',
-          '../utils': './utils',
-        },
-      }),
-    ],
+    plugins: makePlugins(false, {
+      '../ol-ext': './ol-ext',
+      '../rx-ext': './rx-ext',
+      '../utils': './utils',
+    }),
     output: {
       ...baseConf.output,
       file: utils.resolve('dist/mixins.js'),
@@ -173,18 +104,9 @@ module.exports = [
     ...baseConf,
     external: makeExternal(config.dependencies.concat(['./utils'])),
     input: utils.resolve('src/ol-ext/index.js'),
-    plugins: [
-      ...baseConf.plugins,
-      replace({
-        sourceMap: true,
-        include: [
-          'src/**/*',
-        ],
-        replaces: {
-          '../utils': './utils',
-        },
-      }),
-    ],
+    plugins: makePlugins(false, {
+      '../utils': './utils',
+    }),
     output: {
       ...baseConf.output,
       file: utils.resolve('dist/ol-ext.js'),
@@ -194,18 +116,9 @@ module.exports = [
     ...baseConf,
     external: makeExternal(config.dependencies.concat(['./utils'])),
     input: utils.resolve('src/rx-ext/index.js'),
-    plugins: [
-      ...baseConf.plugins,
-      replace({
-        sourceMap: true,
-        include: [
-          'src/**/*',
-        ],
-        replaces: {
-          '../utils': './utils',
-        },
-      }),
-    ],
+    plugins: makePlugins(false, {
+      '../utils': './utils',
+    }),
     output: {
       ...baseConf.output,
       file: utils.resolve('dist/rx-ext.js'),
@@ -214,6 +127,7 @@ module.exports = [
   {
     ...baseConf,
     input: utils.resolve('src/utils/index.js'),
+    plugins: makePlugins(),
     output: {
       ...baseConf.output,
       file: utils.resolve('dist/utils.js'),
@@ -222,6 +136,10 @@ module.exports = [
   // umd
   {
     ...baseUmdConf,
+    plugins: makePlugins(false, {
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
+    }),
     output: {
       ...baseUmdConf.output,
       file: utils.resolve(`dist/${config.name}.umd.js`),
@@ -229,8 +147,67 @@ module.exports = [
   },
   {
     ...baseUmdConf,
-    plugins: [
-      ...baseUmdConf.plugins,
+    plugins: makePlugins(true, {
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
+    }, `dist/${config.name}.min.css`),
+    output: {
+      ...baseUmdConf.output,
+      file: utils.resolve(`dist/${config.name}.umd.min.js`),
+    },
+  },
+]
+
+function makePlugins (min, replaces, cssOutput) {
+  return [
+    replace({
+      sourceMap: true,
+      include: [
+        'src/**/*',
+      ],
+      replaces: {
+        '@import ~': '@import ',
+        '@import "~': '@import "',
+        ...config.replaces,
+        ...replaces,
+      },
+    }),
+    vue({
+      sourceMap: true,
+      needMap: false,
+      css: false,
+    }),
+    sass({
+      output: cssOutput || noop,
+      banner: config.banner,
+      sourceMap: true,
+      sass: {
+        indentedSyntax: true,
+        includePaths: [
+          utils.resolve('src'),
+          utils.resolve('src/styles'),
+          utils.resolve('node_modules'),
+        ],
+      },
+      postProcess: style => utils.postcssProcess(style, min),
+    }),
+    babel({
+      babelHelpers: 'runtime',
+      sourceMap: true,
+      include: [
+        'src/**/*',
+      ],
+      extensions: ['.js', '.jsx', '.es6', '.es', '.mjs', '.vue'],
+    }),
+    nodeResolve({
+      mainFields: ['module', 'main'],
+      browser: true,
+      sourceMap: true,
+    }),
+    cjs({
+      sourceMap: true,
+    }),
+    ...(min ? [
       terser({
         mangle: true,
         compress: {
@@ -241,10 +218,6 @@ module.exports = [
           preamble: config.banner,
         },
       }),
-    ],
-    output: {
-      ...baseUmdConf.output,
-      file: utils.resolve(`dist/${config.name}.umd.min.js`),
-    },
-  },
-]
+    ] : []),
+  ]
+}

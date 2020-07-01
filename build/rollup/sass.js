@@ -29,7 +29,7 @@ module.exports = function sass (options) {
     options (opts) {
       dest = typeof options.output === 'string'
         ? options.output
-        : opts.dest || opts.entry
+        : opts.output[0].file
       if (dest && (dest.endsWith('.js') || dest.endsWith('.ts'))) {
         dest = dest.slice(0, -3)
         dest = `${dest}.css`
