@@ -272,7 +272,7 @@
         feature = undefined
         forEach(this.$map.getLayers().getArray(), layer => {
           if (this.layerFilter && !this.layerFilter(layer)) {
-            return false
+            return
           }
 
           const source = layer.getSource()
