@@ -34,6 +34,9 @@ function postcssProcess (css, min) {
 }
 
 function writeFile (dest, data) {
+  if (typeof data === 'object') {
+    data = JSON.stringify(data)
+  }
   return fs.outputFile(dest, data)
     .then(() => ({
       path: dest,
