@@ -21,6 +21,7 @@
         <VlSourceVector
           :features.sync="features"
           url="https://gist.githubusercontent.com/ghettovoice/37ef37dd571ed39b0985c16560b157d3/raw/3499326b779d6c2c2e28ec49c9e492be3bbf8f0f/map.geojson" />
+        <VlStyleFunc :factory="createStyleFunc" />
       </VlLayerVector>
 
       <VlInteractionSelect
@@ -31,6 +32,7 @@
 </template>
 
 <script>
+  import { createStyle } from '../src/ol-ext'
 
   export default {
     name: 'App',
@@ -46,14 +48,14 @@
       }
     },
     methods: {
-      start (evt) {
-        console.log('start', evt)
-      },
-      end (evt) {
-        console.log('end', evt)
-      },
-      progress (evt) {
-        console.log('progress', evt)
+      createStyleFunc () {
+        return () => {
+          return createStyle({
+            fillColor: 'green',
+            strokeColor: 'red',
+            strokeWidth: 2,
+          })
+        }
       },
     },
   }
