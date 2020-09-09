@@ -1,4 +1,5 @@
 <script>
+  import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
   import { VectorTile as VectorTileSource } from 'ol/source'
   import { createXYZ } from 'ol/tilegrid'
   import { urlTileSource } from '../../mixins'
@@ -86,6 +87,14 @@
       },
       sealFormatFactory () {
         return sealFactory(::this.formatFactory)
+      },
+      resolvedTileUrlFunc () {
+        if (isFunction(this.tileUrlFunc)) {
+          return this.tileUrlFunc
+        }
+        if (this.expandedUrls.length === 0) return
+
+        return createTileUrlFunctionFromTemplates(this.expandedUrls, this.tileGrid)
       },
     },
     watch: {
