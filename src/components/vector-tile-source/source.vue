@@ -3,7 +3,7 @@
   import { createXYZ } from 'ol/tilegrid'
   import { urlTileSource } from '../../mixins'
   import { createMvtFmt, roundExtent, extentFromProjection } from '../../ol-ext'
-  import { isArray, isFunction, isNumber, sealFactory, makeWatchers } from '../../utils'
+  import { isArray, isFunction, isNumber, sealFactory, makeWatchers, isEqual } from '../../utils'
 
   export default {
     name: 'VlSourceVectorTile',
@@ -127,7 +127,9 @@
       .../*#__PURE__*/makeWatchers([
         'extentViewProj',
         'tileClass',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

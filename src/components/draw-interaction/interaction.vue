@@ -9,7 +9,16 @@
   import { interaction, styleContainer } from '../../mixins'
   import { initializeFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
-  import { assert, camelCase, instanceOf, isFunction, makeWatchers, mergeDescriptors, upperFirst } from '../../utils'
+  import {
+    assert,
+    camelCase,
+    instanceOf,
+    isEqual,
+    isFunction,
+    makeWatchers,
+    mergeDescriptors,
+    upperFirst,
+  } from '../../utils'
 
   const transformType = type => upperFirst(camelCase(type))
 
@@ -163,7 +172,9 @@
         'freehandCondition',
         'wrapX',
         'dragVertexDelay',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

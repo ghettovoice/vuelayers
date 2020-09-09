@@ -1,4 +1,4 @@
-import { pick, upperFirst, isFunction, mergeDescriptors, makeWatchers } from '../utils'
+import { pick, upperFirst, isFunction, mergeDescriptors, makeWatchers, isEqual } from '../utils'
 import fillStyleContainer from './fill-style-container'
 import imageStyle from './image-style'
 import strokeStyleContainer from './stroke-style-container'
@@ -27,11 +27,13 @@ export default {
       'radius1',
       'radius2',
       'angle',
-    ], prop => async function (value, prev) {
+    ], prop => async function (val, prev) {
       const handler = this[`on${upperFirst(prop)}Changed`]
       if (isFunction(handler)) {
-        return handler(value, prev)
+        return handler(val, prev)
       }
+
+      if (isEqual(val, prev)) return
 
       if (process.env.VUELAYERS_DEBUG) {
         this.$logger.log(`${prop} changed, scheduling recreate...`)

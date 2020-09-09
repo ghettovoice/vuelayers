@@ -1,7 +1,7 @@
 <script>
   import { TileWMS as TileWMSSource } from 'ol/source'
   import { tileImageSource, wmsSource } from '../../mixins'
-  import { makeWatchers } from '../../utils'
+  import { isEqual, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlSourceTileWms',
@@ -20,7 +20,9 @@
         'gutter',
         'hidpi',
         'serverType',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

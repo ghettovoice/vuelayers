@@ -159,7 +159,9 @@
         'autoPanAnimation',
         'autoPanOptions',
         'className',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

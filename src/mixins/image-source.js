@@ -1,7 +1,7 @@
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { makeWatchers, pick } from '../utils'
+import { isEqual, makeWatchers, pick } from '../utils'
 import source from './source'
 
 const ImageSourceEventType = {
@@ -35,7 +35,9 @@ export default {
   watch: {
     .../*#__PURE__*/makeWatchers([
       'resolutions',
-    ], prop => async function () {
+    ], prop => async function (val, prev) {
+      if (isEqual(val, prev)) return
+
       if (process.env.VUELAYERS_DEBUG) {
         this.$logger.log(`${prop} changed, scheduling recreate...`)
       }

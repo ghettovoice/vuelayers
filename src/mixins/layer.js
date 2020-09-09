@@ -1,6 +1,6 @@
 import RenderEventType from 'ol/render/EventType'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { isFunction, pick, mergeDescriptors, makeWatchers } from '../utils'
+import { isFunction, pick, mergeDescriptors, makeWatchers, isEqual } from '../utils'
 import baseLayer from './base-layer'
 import sourceContainer from './source-container'
 
@@ -31,7 +31,9 @@ export default {
     .../*#__PURE__*/makeWatchers([
       'render',
       'overlay',
-    ], prop => async function () {
+    ], prop => async function (val, prev) {
+      if (isEqual(val, prev)) return
+
       if (process.env.VUELAYERS_DEBUG) {
         this.$logger.log(`${prop} changed, scheduling recreate...`)
       }

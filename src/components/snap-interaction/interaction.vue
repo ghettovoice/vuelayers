@@ -3,7 +3,7 @@
   import { Snap as SnapInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
   import { interaction } from '../../mixins'
-  import { assert, instanceOf, isFunction, makeWatchers } from '../../utils'
+  import { assert, instanceOf, isEqual, isFunction, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlInteractionSnap',
@@ -50,7 +50,9 @@
         'edge',
         'vertex',
         'pixelTolerance',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

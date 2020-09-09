@@ -1,4 +1,4 @@
-import { makeWatchers, pick } from '../utils'
+import { isEqual, makeWatchers, pick } from '../utils'
 import urlTileSource from './url-tile-source'
 
 /**
@@ -28,7 +28,9 @@ export default {
       'crossOrigin',
       'reprojectionErrorThreshold',
       'tileClass',
-    ], prop => async function () {
+    ], prop => async function (val, prev) {
+      if (isEqual(val, prev)) return
+
       if (process.env.VUELAYERS_DEBUG) {
         this.$logger.log(`${prop} changed, scheduling recreate...`)
       }

@@ -8,7 +8,7 @@
   import { FRAME_TIME, interaction } from '../../mixins'
   import { getLayerId } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, isFunction, isString, map, makeWatchers } from '../../utils'
+  import { assert, instanceOf, isFunction, isString, map, makeWatchers, isEqual } from '../../utils'
 
   export default {
     name: 'VlInteractionTranslate',
@@ -62,7 +62,9 @@
       .../*#__PURE__*/makeWatchers([
         'source',
         'resolvedFilter',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

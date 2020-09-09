@@ -1,7 +1,7 @@
 <script>
   import { ImageStatic as ImageStaticSource } from 'ol/source'
   import { imageSource } from '../../mixins'
-  import { negate, isEmpty, makeWatchers } from '../../utils'
+  import { negate, isEmpty, makeWatchers, isEqual } from '../../utils'
 
   /**
    * A layer source for displaying a single, static image.
@@ -100,7 +100,9 @@
         'resolvedImgLoadFunc',
         'resolvedImgSize',
         'url',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

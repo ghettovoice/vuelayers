@@ -7,7 +7,7 @@
   import { map as mapObs, tap } from 'rxjs/operators'
   import { interaction, styleContainer } from '../../mixins'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, isFunction, map, mergeDescriptors, makeWatchers } from '../../utils'
+  import { assert, instanceOf, isFunction, map, mergeDescriptors, makeWatchers, isEqual } from '../../utils'
 
   export default {
     name: 'VlInteractionModify',
@@ -85,7 +85,9 @@
         'insertVertexCondition',
         'pixelTolerance',
         'wrapX',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

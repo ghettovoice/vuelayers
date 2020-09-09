@@ -3,7 +3,7 @@
   import { Cluster as ClusterSource } from 'ol/source'
   import { createSourceContainer, FRAME_TIME, vectorSource } from '../../mixins'
   import { createPointGeom, findPointOnSurface } from '../../ol-ext'
-  import { mergeDescriptors, makeWatchers } from '../../utils'
+  import { mergeDescriptors, makeWatchers, isEqual } from '../../utils'
 
   const sourceContainer = /*#__PURE__*/createSourceContainer({
     propName: 'innerSource',
@@ -58,7 +58,9 @@
       }, FRAME_TIME),
       .../*#__PURE__*/makeWatchers([
         'resolvedGeomFunc',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }

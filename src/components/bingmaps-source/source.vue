@@ -1,7 +1,7 @@
 <script>
   import { BingMaps as BingMapsSource } from 'ol/source'
   import { tileImageSource } from '../../mixins'
-  import { makeWatchers } from '../../utils'
+  import { isEqual, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlSourceBingmaps',
@@ -70,7 +70,9 @@
         'hidpi',
         'culture',
         'imagerySet',
-      ], prop => async function () {
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log(`${prop} changed, scheduling recreate...`)
         }
