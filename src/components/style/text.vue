@@ -211,6 +211,16 @@
         return this::style.methods.unmount()
       },
       /**
+       * @return {Promise}
+       */
+      async refresh () {
+        this::style.methods.refresh()
+
+        if (this.$textStyleContainer) {
+          this.$textStyleContainer.refresh()
+        }
+      },
+      /**
        * @returns {Object}
        * @protected
        */
@@ -233,7 +243,7 @@
         if (font === await this.getFont()) return
 
         (await this.resolveStyle()).setFont(font)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getMaxAngle () {
         return (await this.resolveStyle()).getMaxAngle()
@@ -242,7 +252,7 @@
         if (maxAngle === await this.getMaxAngle()) return
 
         (await this.resolveStyle()).setMaxAngle(maxAngle)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getOffsetX () {
         return (await this.resolveStyle()).getOffsetX()
@@ -251,7 +261,7 @@
         if (offsetX === await this.getOffsetX()) return
 
         (await this.resolveStyle()).setOffsetX(offsetX)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getOffsetY () {
         return (await this.resolveStyle()).getOffsetY()
@@ -260,7 +270,7 @@
         if (offsetY === await this.getOffsetY()) return
 
         (await this.resolveStyle()).setOffsetY(offsetY)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getOverflow () {
         return (await this.resolveStyle()).getOverflow()
@@ -269,7 +279,7 @@
         if (overflow === await this.getOverflow()) return
 
         (await this.resolveStyle()).setOverflow(overflow)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getPadding () {
         return (await this.resolveStyle()).getPadding()
@@ -278,7 +288,7 @@
         if (isEqual(padding, await this.getPadding())) return
 
         (await this.resolveStyle()).setPadding(padding)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getPlacement () {
         return (await this.resolveStyle()).getPlacement()
@@ -287,7 +297,7 @@
         if (placement === await this.getPlacement()) return
 
         (await this.resolveStyle()).setPlacement(placement)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getRotateWithView () {
         return (await this.resolveStyle()).getRotateWithView()
@@ -296,7 +306,7 @@
         if (rotateWithView === await this.getRotateWithView()) return
 
         (await this.resolveStyle()).setRotateWithView(rotateWithView)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getRotation () {
         return (await this.resolveStyle()).getRotation()
@@ -305,7 +315,7 @@
         if (rotation === await this.getRotation()) return
 
         (await this.resolveStyle()).setRotation(rotation)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getScale () {
         return (await this.resolveStyle()).getScale()
@@ -314,7 +324,7 @@
         if (scale === await this.getScale()) return
 
         (await this.resolveStyle()).setScale(scale)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getText () {
         return (await this.resolveStyle()).getText()
@@ -323,7 +333,7 @@
         if (text === await this.getText()) return
 
         (await this.resolveStyle()).setText(text)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getTextAlign () {
         return (await this.resolveStyle()).getTextAlign()
@@ -332,7 +342,7 @@
         if (textAlign === await this.getTextAlign()) return
 
         (await this.resolveStyle()).setTextAlign(textAlign)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getTextBaseline () {
         return (await this.resolveStyle()).getTextBaseline()
@@ -341,7 +351,7 @@
         if (textBaseline === await this.getTextBaseline()) return
 
         (await this.resolveStyle()).setTextBaseline(textBaseline)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getFillStyleTarget () {
         const style = await this.resolveStyle()
@@ -349,13 +359,7 @@
         return {
           setFill: async fill => {
             style.setFill(fill)
-            ++this.rev
-
-            if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('fill changed, scheduling remount...')
-            }
-
-            await this.scheduleRemount()
+            await this.scheduleRefresh()
           },
         }
       },
@@ -365,13 +369,7 @@
         return {
           setStroke: async stroke => {
             style.setStroke(stroke)
-            ++this.rev
-
-            if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('stroke changed, scheduling remount...')
-            }
-
-            await this.scheduleRemount()
+            await this.scheduleRefresh()
           },
         }
       },
@@ -390,13 +388,7 @@
         this._bgFillVm = fill?.vm && fill.vm[0]
         const style = await this.resolveStyle()
         style.setBackgroundFill(fill)
-        ++this.rev
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('backgroundFill changed, scheduling remount...')
-        }
-
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       getBackgroundStroke () {
         return this._bgStroke
@@ -413,13 +405,7 @@
         this._bgStrokeVm = stroke?.vm && stroke.vm[0]
         const style = await this.resolveStyle()
         style.setBackgroundStroke(stroke)
-        ++this.rev
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('backgroundStroke changed, scheduling remount...')
-        }
-
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
     },
   }

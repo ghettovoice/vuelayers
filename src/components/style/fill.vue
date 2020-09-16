@@ -60,6 +60,16 @@
 
         return this::style.methods.unmount()
       },
+      /**
+       * @return {Promise}
+       */
+      async refresh () {
+        this::style.methods.refresh()
+
+        if (this.$fillStyleContainer) {
+          this.$fillStyleContainer.refresh()
+        }
+      },
       async getColor () {
         return normalizeColor((await this.resolveStyle()).getColor())
       },
@@ -68,7 +78,7 @@
         if (isEqual(color, await this.getColor())) return
 
         (await this.resolveStyle()).setColor(color)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
     },
   }

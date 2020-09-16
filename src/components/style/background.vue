@@ -45,7 +45,8 @@
         return {
           setFill: async style => {
             await this.$bgStyleContainer.setBackgroundFill(style)
-            ++this.rev
+
+            await this.scheduleRefresh()
           },
         }
       },
@@ -53,7 +54,8 @@
         return {
           setStroke: async style => {
             await this.$bgStyleContainer.setBackgroundStroke(style)
-            ++this.rev
+
+            await this.scheduleRefresh()
           },
         }
       },

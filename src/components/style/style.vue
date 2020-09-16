@@ -134,6 +134,16 @@
         return this::style.methods.unmount()
       },
       /**
+       * @return {Promise}
+       */
+      async refresh () {
+        this::style.methods.refresh()
+
+        if (this.$styleContainer) {
+          this.$styleContainer.refresh()
+        }
+      },
+      /**
        * @returns {Object}
        * @protected
        */
@@ -177,10 +187,10 @@
             ++this.rev
 
             if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('fill changed, scheduling remount...')
+              this.$logger.log('fill changed, scheduling refresh...')
             }
 
-            await this.scheduleRemount()
+            await this.scheduleRefresh()
           },
         }
       },
@@ -193,10 +203,10 @@
             ++this.rev
 
             if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('stroke changed, scheduling remount...')
+              this.$logger.log('stroke changed, scheduling refresh...')
             }
 
-            await this.scheduleRemount()
+            await this.scheduleRefresh()
           },
         }
       },
@@ -209,10 +219,10 @@
             ++this.rev
 
             if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('text changed, scheduling remount...')
+              this.$logger.log('text changed, scheduling refresh...')
             }
 
-            await this.scheduleRemount()
+            await this.scheduleRefresh()
           },
         }
       },
@@ -225,10 +235,10 @@
             ++this.rev
 
             if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('image changed, scheduling remount...')
+              this.$logger.log('image changed, scheduling refresh...')
             }
 
-            await this.scheduleRemount()
+            await this.scheduleRefresh()
           },
         }
       },
@@ -241,10 +251,10 @@
             ++this.rev
 
             if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('geometry changed, scheduling remount...')
+              this.$logger.log('geometry changed, scheduling refresh...')
             }
 
-            await this.scheduleRemount()
+            await this.scheduleRefresh()
           },
         }
       },

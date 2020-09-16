@@ -95,12 +95,21 @@ export default {
 
       return this::style.methods.unmount()
     },
+    /**
+     * @return {Promise}
+     */
+    async refresh () {
+      this::style.methods.refresh()
+
+      if (this.$imageStyleContainer) {
+        this.$imageStyleContainer.refresh()
+      }
+    },
     .../*#__PURE__*/pick(style.methods, [
       'beforeInit',
       'init',
       'deinit',
       'beforeMount',
-      'refresh',
       'scheduleRefresh',
       'remount',
       'scheduleRemount',
@@ -125,7 +134,7 @@ export default {
       if (opacity === await this.getOpacity()) return
 
       (await this.resolveStyle()).setOpacity(opacity)
-      await this.scheduleRemount()
+      await this.scheduleRefresh()
     },
     /**
      * @returns {Promise<boolean>}
@@ -141,7 +150,7 @@ export default {
       if (rotateWithView === await this.getRotateWithView()) return
 
       (await this.resolveStyle()).setRotateWithView(rotateWithView)
-      await this.scheduleRemount()
+      await this.scheduleRefresh()
     },
     /**
      * @returns {Promise<number>}
@@ -157,7 +166,7 @@ export default {
       if (rotation === await this.getRotation()) return
 
       (await this.resolveStyle()).setRotation(rotation)
-      await this.scheduleRemount()
+      await this.scheduleRefresh()
     },
     /**
      * @returns {Promise<number>}
@@ -173,7 +182,7 @@ export default {
       if (scale === await this.getScale()) return
 
       (await this.resolveStyle()).setScale(scale)
-      await this.scheduleRemount()
+      await this.scheduleRefresh()
     },
     async getDisplacement () {
       return (await this.resolveStyle()).getDisplacement()

@@ -48,7 +48,7 @@
         if (radius === await this.getRadius()) return
 
         (await this.resolveStyle()).setRadius(radius)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       /**
        * @param {number} radius

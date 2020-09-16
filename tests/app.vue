@@ -6,16 +6,40 @@
       <VlView
         ref="view"
         :center.sync="center"
-        :rotation.sync="rotation"
         :zoom.sync="zoom" />
 
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
 
-      <VlLayerVectorTile>
-        <VlSourceVectorTile url="https://basemaps.arcgis.com/v1/arcgis/rest/services/World_Basemap/VectorTileServer/tile/{z}/{y}/{x}.pbf" />
-      </VlLayerVectorTile>
+      <vl-layer-vector
+        ref="layer"
+        :z-index="1">
+        <vl-source-vector ref="source">
+          <vl-feature>
+            <vl-geom-point :coordinates="[10, 10]" />
+            <vl-style-box>
+              <vl-style-icon
+                :src="markerUrl"
+                :scale="0.1"
+                :rotation="0"
+                :anchor="[0.5, 1]" />
+            </vl-style-box>
+          </vl-feature>
+
+          <vl-feature ref="feature">
+            <vl-geom-point :coordinates="[-10, -10]" />
+            <vl-style-box>
+              <vl-style-icon
+                :src="markerUrl"
+                :scale="0.1"
+                :anchor="[0.5, 1]"
+                :rotation="rotation"
+                :rotate-with-view="true" />
+            </vl-style-box>
+          </vl-feature>
+        </vl-source-vector>
+      </vl-layer-vector>
     </VlMap>
   </div>
 </template>
@@ -29,7 +53,13 @@
         center: [0, 0],
         rotation: 0,
         features: [],
+        markerUrl: 'https://cdn0.iconfinder.com/data/icons/navigation-set-arrows-part-two/32/Arrow_Up_Circle-256.png',
       }
+    },
+    created () {
+      setInterval(() => {
+        this.rotation = Math.random() * (1.5 - 1) + 1
+      }, 3000)
     },
   }
 </script>

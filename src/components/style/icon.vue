@@ -142,10 +142,13 @@
         return (await this.resolveStyle()).getAnchor()
       },
       async setAnchor (anchor) {
-        if (isEqual(anchor, await this.getAnchor())) return
+        const clone = (await this.resolveStyle()).clone()
+        clone.setAnchor(anchor)
+
+        if (isEqual(clone.getAnchor(), await this.getAnchor())) return
 
         (await this.resolveStyle()).setAnchor(anchor)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getColor () {
         return (await this.resolveStyle()).getColor()

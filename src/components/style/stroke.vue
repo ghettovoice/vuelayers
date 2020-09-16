@@ -105,6 +105,16 @@
 
         return this::style.methods.unmount()
       },
+      /**
+       * @return {Promise}
+       */
+      async refresh () {
+        this::style.methods.refresh()
+
+        if (this.$strokeStyleContainer) {
+          this.$strokeStyleContainer.refresh()
+        }
+      },
       async getColor () {
         return (await this.resolveStyle()).getColor()
       },
@@ -113,7 +123,7 @@
         if (isEqual(color, await this.getColor())) return
 
         (await this.resolveStyle()).setColor(color)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getLineCap () {
         return (await this.resolveStyle()).getLineCap()
@@ -122,7 +132,7 @@
         if (lineCap === await this.getLineCap()) return
 
         (await this.resolveStyle()).setLineCap(lineCap)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getLineJoin () {
         return (await this.resolveStyle()).getLineJoin()
@@ -131,7 +141,7 @@
         if (lineJoin === await this.getLineJoin()) return
 
         (await this.resolveStyle()).setLineJoin(lineJoin)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getLineDash () {
         return (await this.resolveStyle()).getLineDash()
@@ -140,7 +150,7 @@
         if (isEqual(lineDash, await this.getLineDash())) return
 
         (await this.resolveStyle()).setLineDash(lineDash)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getLineDashOffset () {
         return (await this.resolveStyle()).getLineDashOffset()
@@ -149,7 +159,7 @@
         if (lineDashOffset === await this.getLineDashOffset()) return
 
         (await this.resolveStyle()).setLineDashOffset(lineDashOffset)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getMiterLimit () {
         return (await this.resolveStyle()).getMiterLimit()
@@ -158,7 +168,7 @@
         if (miterLimit === await this.getMiterLimit()) return
 
         (await this.resolveStyle()).setMiterLimit(miterLimit)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
       async getWidth () {
         return (await this.resolveStyle()).getWidth()
@@ -167,7 +177,7 @@
         if (width === await this.getWidth()) return
 
         (await this.resolveStyle()).setWidth(width)
-        await this.scheduleRemount()
+        await this.scheduleRefresh()
       },
     },
   }
