@@ -179,7 +179,7 @@ export default {
       await this.setTileLoadFunction(tileLoadFunc)
     },
     async onTileUrlFuncChanged (tileUrlFunc) {
-      await this.setTileUrlFunction(tileUrlFunc)
+      await this.setTileUrlFunction(tileUrlFunc, this.rev)
     },
   },
 }

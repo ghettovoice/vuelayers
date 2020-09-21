@@ -1,5 +1,11 @@
 <template>
   <div id="app">
+    <button @click="url = urls[0]">
+      OSM
+    </button>
+    <button @click="url = urls[1]">
+      Sputnik
+    </button>
     <VlMap
       ref="map"
       data-projection="EPSG:4326">
@@ -9,37 +15,8 @@
         :zoom.sync="zoom" />
 
       <VlLayerTile>
-        <VlSourceOsm />
+        <VlSourceXyz :url="url" />
       </VlLayerTile>
-
-      <vl-layer-vector
-        ref="layer"
-        :z-index="1">
-        <vl-source-vector ref="source">
-          <vl-feature>
-            <vl-geom-point :coordinates="[10, 10]" />
-            <vl-style-box>
-              <vl-style-icon
-                :src="markerUrl"
-                :scale="0.1"
-                :rotation="0"
-                :anchor="[0.5, 1]" />
-            </vl-style-box>
-          </vl-feature>
-
-          <vl-feature ref="feature">
-            <vl-geom-point :coordinates="[-10, -10]" />
-            <vl-style-box>
-              <vl-style-icon
-                :src="markerUrl"
-                :scale="0.1"
-                :anchor="[0.5, 1]"
-                :rotation="rotation"
-                :rotate-with-view="true" />
-            </vl-style-box>
-          </vl-feature>
-        </vl-source-vector>
-      </vl-layer-vector>
     </VlMap>
   </div>
 </template>
@@ -52,14 +29,15 @@
         zoom: 3,
         center: [0, 0],
         rotation: 0,
-        features: [],
-        markerUrl: 'https://cdn0.iconfinder.com/data/icons/navigation-set-arrows-part-two/32/Arrow_Up_Circle-256.png',
+        urls: [
+          'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          'http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png',
+        ],
+        url: null,
       }
     },
     created () {
-      setInterval(() => {
-        this.rotation = Math.random() * (1.5 - 1) + 1
-      }, 3000)
+      this.url = this.urls[0]
     },
   }
 </script>
