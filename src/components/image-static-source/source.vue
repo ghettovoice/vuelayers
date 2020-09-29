@@ -154,6 +154,9 @@
           url: this.url,
         })
       },
+      async getUrl () {
+        return (await this.resolveSource()).getUrl()
+      },
     },
   }
 </script>

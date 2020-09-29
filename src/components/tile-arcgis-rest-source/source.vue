@@ -30,6 +30,9 @@
           params: this.allParams,
         })
       },
+      async onExpandedUrlsChanged (urls) {
+        await this.setUrls(urls)
+      },
       async onTileUrlFuncChanged (tileUrlFunc) {},
     },
   }

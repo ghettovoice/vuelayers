@@ -184,7 +184,7 @@
           tilePixelRatio: this.tilePixelRatio,
           transition: this.transition,
           // ol/source/UrlTile
-          tileLoadFunction: this.resolvedTileLoadFunc,
+          urls: this.expandedUrls,
           // ol/source/TileImage
           crossOrigin: this.crossOrigin,
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,
@@ -196,7 +196,6 @@
           matrixSet: this.matrixSet,
           requestEncoding: this.requestEncoding,
           version: this.version,
-          urls: this.expandedUrls,
         })
       },
       async getDimensions () {
@@ -219,6 +218,9 @@
       },
       async getVersion () {
         return (await this.resolveSource()).getVersion()
+      },
+      async onExpandedUrlsChanged (urls) {
+        await this.setUrls(urls)
       },
       async onTileUrlFuncChanged (tileUrlFunc) {},
     },

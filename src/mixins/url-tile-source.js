@@ -74,6 +74,12 @@ export default {
     },
   },
   watch: {
+    async parsedUrl (value) {
+      await this.onParsedUrlChanged(value)
+    },
+    async expandedUrls (value) {
+      await this.onExpandedUrlsChanged(value)
+    },
     async resolvedTileLoadFunc (value) {
       await this.onTileLoadFuncChanged(value)
     },
@@ -175,6 +181,8 @@ export default {
     async setUrl (url) {
       await this.setUrls(expandUrl(url))
     },
+    async onParsedUrlChanged (url) {},
+    async onExpandedUrlsChanged (urls) {},
     async onTileLoadFuncChanged (tileLoadFunc) {
       await this.setTileLoadFunction(tileLoadFunc)
     },

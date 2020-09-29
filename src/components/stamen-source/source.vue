@@ -49,6 +49,10 @@
           layer: this.layer,
         })
       },
+      async onParsedUrlChanged (url) {
+        await this.setUrl(url)
+      },
+      async onTileLoadFuncChanged (tileLoadFunc) {},
     },
   }
 </script>

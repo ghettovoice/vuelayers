@@ -1,7 +1,7 @@
 <script>
   import { ImageArcGISRest as ImageArcGISRestSource } from 'ol/source'
   import { imageSource, arcgisSource } from '../../mixins'
-  import { negate, isEmpty } from '../../utils'
+  import { negate, isEmpty, makeWatchers, isEqual } from '../../utils'
 
   export default {
     name: 'VlSourceImageArcgisRest',
@@ -20,8 +20,26 @@
       url: {
         type: String,
         required: true,
-        validator: negate(isEmpty),
+        validator: /*#__PURE__*/negate(isEmpty),
       },
+    },
+    watch: {
+      async url (value) {
+        await this.setUrl(value)
+      },
+      .../*#__PURE__*/makeWatchers([
+        'crossOrigin',
+        'imageLoadFunc',
+        'ratio',
+      ], prop => async function (val, prev) {
+        if (isEqual(val, prev)) return
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        }
+
+        await this.scheduleRecreate()
+      }),
     },
     methods: {
       createSource () {
@@ -39,6 +57,14 @@
           ratio: this.ratio,
           url: this.url,
         })
+      },
+      async getUrl () {
+        return (await this.resolveSource()).getUrl()
+      },
+      async setUrl (url) {
+        if (url === await this.getUrl()) return
+
+        (await this.resolveSource()).setUrl(url)
       },
     },
   }
