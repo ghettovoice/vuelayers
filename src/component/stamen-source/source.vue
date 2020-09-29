@@ -36,6 +36,15 @@
         wrapX: this.wrapX,
       })
     },
+    onUrlFuncChange () {},
+  }
+
+  const watch = {
+    urlTmpl (value) {
+      if (!this.$source) return
+
+      this.$source.setUrl(value)
+    },
   }
 
   export default {
@@ -43,5 +52,6 @@
     mixins: [xyzSource],
     props,
     methods,
+    watch,
   }
 </script>

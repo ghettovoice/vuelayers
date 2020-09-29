@@ -67,6 +67,7 @@
           tileLoadFunction: this.tileLoadFunction,
         })
       },
+      onUrlFuncChange () {},
     },
     watch: {
       ...makeWatchers([

@@ -154,6 +154,10 @@ export default {
       this::source.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
+    onUrlFuncChange (value) {
+      this.$source.setTileUrlFunction(value)
+      this.scheduleRefresh()
+    },
   },
   watch: {
     opaque (value) {
@@ -185,8 +189,7 @@ export default {
     urlFunc (value) {
       if (!this.$source) return
 
-      this.$source.setTileUrlFunction(value)
-      this.scheduleRefresh()
+      this.onUrlFuncChange(value)
     },
     ...makeWatchers([
       'cacheSize',

@@ -28,6 +28,14 @@
           transition: this.transition,
         })
       },
+      onUrlFuncChange () {},
+    },
+    watch: {
+      urlTmpl (value) {
+        if (!this.$source) return
+
+        this.$source.setUrl(value)
+      },
     },
   }
 </script>

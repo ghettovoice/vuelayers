@@ -102,8 +102,14 @@
           matrixIds,
         })
       },
+      onUrlFuncChange () {},
     },
     watch: {
+      urlTmpl (value) {
+        if (!this.$source) return
+
+        this.$source.setUrl(value)
+      },
       ...makeWatchers([
         'dimensions',
         'format',
