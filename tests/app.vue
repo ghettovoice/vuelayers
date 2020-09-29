@@ -1,27 +1,45 @@
 <template>
   <div id="app">
-    <button @click="url = urls[0]">
-      OSM
-    </button>
-    <button @click="url = urls[1]">
-      Sputnik
-    </button>
     <VlMap
-      ref="map"
-      data-projection="EPSG:4326">
+      ref="map">
       <VlView
         ref="view"
         :center.sync="center"
         :zoom.sync="zoom" />
 
       <VlLayerTile>
-        <VlSourceXyz :url="url" />
+        <VlSourceOsm />
+      </VlLayerTile>
+
+      <VlLayerVector>
+        <VlSourceVector
+          :features="features"
+          projection="EPSG:4326" />
+      </VlLayerVector>
+
+      <VlLayerTile>
+        <VlSourceTileWms
+          url="https://wms.geo.admin.ch/"
+          projection="EPSG:21781"
+          layers="ch.swisstopo.pixelkarte-farbe-pk1000.noscale"
+          cross-origin="anonymous" />
       </VlLayerTile>
     </VlMap>
   </div>
 </template>
 
 <script>
+  import proj4 from 'proj4'
+  import { register } from 'ol/proj/proj4'
+
+  proj4.defs(
+    'EPSG:21781',
+    '+proj=somerc +lat_0=46.95240555555556 ' +
+      '+lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel ' +
+      '+towgs84=674.4,15.1,405.3,0,0,0,0 +units=m +no_defs',
+  )
+  register(proj4)
+
   export default {
     name: 'App',
     data () {
@@ -29,15 +47,16 @@
         zoom: 3,
         center: [0, 0],
         rotation: 0,
-        urls: [
-          'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          'http://tiles.maps.sputnik.ru/{z}/{x}/{y}.png',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [20, 20],
+            },
+          },
         ],
-        url: null,
       }
-    },
-    created () {
-      this.url = this.urls[0]
     },
   }
 </script>

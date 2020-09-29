@@ -36,8 +36,8 @@ export default {
      */
     resolvedDataProjection () {
       return coalesce(
-        this.dataProjection, // may or may not be present
         this.projection, // may or may not be present
+        this.dataProjection, // may or may not be present
         this.$mapVm?.resolvedDataProjection,
         this.$map && getMapDataProjection(this.$map),
         this.$options?.dataProjection,
