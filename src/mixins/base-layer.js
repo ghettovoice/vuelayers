@@ -2,13 +2,13 @@ import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { from as fromObs, merge as mergeObs } from 'rxjs'
 import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-import { getLayerId, initializeLayer, roundExtent, setLayerId, transformExtent } from '../ol-ext'
+import { EPSG_3857, getLayerId, initializeLayer, roundExtent, setLayerId, transformExtent } from '../ol-ext'
 import {
   fromOlChangeEvent as obsFromOlChangeEvent,
   fromVueEvent as obsFromVueEvent,
   fromVueWatcher as obsFromVueWatcher,
 } from '../rx-ext'
-import { assert, addPrefix, hasProp, isEqual, isNumber, pick, mergeDescriptors, waitFor } from '../utils'
+import { addPrefix, assert, hasProp, isEqual, isNumber, mergeDescriptors, pick, waitFor } from '../utils'
 import olCmp, { FRAME_TIME, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
@@ -88,7 +88,8 @@ export default {
   },
   data () {
     return {
-      dataProjection: null,
+      viewProjection: EPSG_3857,
+      dataProjection: EPSG_3857,
     }
   },
   computed: {
@@ -99,7 +100,7 @@ export default {
       return roundExtent(this.extent)
     },
     extentViewProj () {
-      return transformExtent(this.extent, this.resolvedExtentProjection, this.viewProjection)
+      return transformExtent(this.extent, this.resolvedExtentProjection, this.resolvedViewProjection)
     },
     currentExtentDataProj () {
       if (this.rev && this.$layer) {
@@ -182,8 +183,8 @@ export default {
 
       this.$emit('update:visible', value)
     }, FRAME_TIME),
-    async extentDataProj (value) {
-      await this.setExtent(value)
+    async extentViewProj (value) {
+      await this.setExtent(value, true)
     },
     currentExtentDataProj: /*#__PURE__*/debounce(function (value) {
       if (isEqual(value, this.extentDataProj)) return
@@ -250,9 +251,16 @@ export default {
           ),
           1000,
         )
+        this.viewProjection = this.$mapVm.resolvedViewProjection
         this.dataProjection = this.$mapVm.resolvedDataProjection
-        const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
-        this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
+        this.subscribeTo(
+          obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
+          ({ value }) => { this.viewProjection = value },
+        )
+        this.subscribeTo(
+          obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
+          ({ value }) => { this.dataProjection = value },
+        )
         await this.$nextTickPromise()
 
         return this::olCmp.methods.beforeInit()
@@ -372,7 +380,7 @@ export default {
     getExtentInternal (viewProj = false) {
       if (viewProj) return roundExtent(this.$layer.getExtent())
 
-      return transformExtent(this.$layer.getExtent(), this.viewProjection, this.resolvedExtentProjection)
+      return transformExtent(this.$layer.getExtent(), this.resolvedViewProjection, this.resolvedExtentProjection)
     },
     /**
      * @param {number[]} extent

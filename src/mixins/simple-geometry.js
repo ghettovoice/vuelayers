@@ -20,7 +20,7 @@ export default {
     coordinates: {
       type: Array,
       required: true,
-      validator: negate(isEmpty),
+      validator: /*#__PURE__*/negate(isEmpty),
     },
     // todo add support of coord layout
     // /**
@@ -74,10 +74,10 @@ export default {
     // },
   },
   watch: {
-    coordinatesDataProj: {
+    coordinatesViewProj: {
       deep: true,
       async handler (value) {
-        await this.setCoordinates(value)
+        await this.setCoordinates(value, true)
       },
     },
     currentCoordinatesDataProj: {
@@ -130,7 +130,7 @@ export default {
     coordinatesToDataProj (coordinates) {
       const transform = this.getCoordinatesTransformFunction()
 
-      return transform(coordinates, this.viewProjection, this.resolvedDataProjection)
+      return transform(coordinates, this.resolvedViewProjection, this.resolvedDataProjection)
     },
     /**
      * @param {number[]} coordinates
@@ -139,7 +139,7 @@ export default {
     coordinatesToViewProj (coordinates) {
       const transform = this.getCoordinatesTransformFunction()
 
-      return transform(coordinates, this.resolvedDataProjection, this.viewProjection)
+      return transform(coordinates, this.resolvedDataProjection, this.resolvedViewProjection)
     },
     /**
      * @param {boolean} [viewProj=false]

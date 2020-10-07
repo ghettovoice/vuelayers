@@ -21,7 +21,7 @@
   import { from as fromObs, merge as mergeObs } from 'rxjs'
   import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
   import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
-  import { getMapDataProjection, writeGeoJsonGeometry } from '../../ol-ext'
+  import { EPSG_3857, EPSG_4326 } from '../../ol-ext'
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromVueEvent as obsFromVueEvent,
@@ -48,12 +48,14 @@
       trackingOptions: Object,
       projection: {
         type: String,
+        default: EPSG_4326,
         validator: value => getProj(value) != null,
       },
     },
     data () {
       return {
-        dataProjection: null,
+        viewProjection: EPSG_3857,
+        dataProjection: EPSG_3857,
       }
     },
     computed: {
@@ -81,11 +83,9 @@
       resolvedDataProjection () {
         return coalesce(
           this.currentProjection, // may or may not be present
+          this.$options?.dataProjection, // may or may not be present
           this.dataProjection, // may or may not be present
-          this.$mapVm?.resolvedDataProjection,
-          this.$map && getMapDataProjection(this.$map),
-          this.$options?.dataProjection,
-          this.viewProjection,
+          this.resolvedViewProjection,
         )
       },
       currentAccuracy () {
@@ -96,20 +96,12 @@
       currentAccuracyGeometryDataProj () {
         if (!(this.rev && this.$geolocation)) return
 
-        return writeGeoJsonGeometry(
-          this.getAccuracyGeometryInternal(),
-          this.currentProjection || this.resolvedDataProjection,
-          this.resolvedDataProjection,
-        )
+        return this.writeGeometryInDataProj(this.getAccuracyGeometryInternal())
       },
       currentAccuracyGeometryViewProj () {
         if (!(this.rev && this.$geolocation)) return
 
-        return writeGeoJsonGeometry(
-          this.getAccuracyGeometryInternal(),
-          this.currentProjection || this.resolvedDataProjection,
-          this.viewProjection,
-        )
+        return this.writeGeometryInViewProj(this.getAccuracyGeometryInternal())
       },
       currentAltitude () {
         if (!(this.rev && this.$geolocation)) return
@@ -223,9 +215,16 @@
             ),
             1000,
           )
+          this.viewProjection = this.$mapVm.resolvedViewProjection
           this.dataProjection = this.$mapVm.resolvedDataProjection
-          const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
-          this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
+          this.subscribeTo(
+            obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
+            ({ value }) => { this.viewProjection = value },
+          )
+          this.subscribeTo(
+            obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
+            ({ value }) => { this.dataProjection = value },
+          )
           await this.$nextTickPromise()
 
           return this::olCmp.methods.beforeInit()
@@ -516,7 +515,7 @@
       obsFromOlChangeEvent(this.$geolocation, [
         'accuracy',
         'altitude',
-        'altitudeaccuracy',
+        'altitudeAccuracy',
         'heading',
         'speed',
         'position',

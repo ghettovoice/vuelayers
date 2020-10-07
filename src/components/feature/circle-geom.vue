@@ -91,8 +91,8 @@
       },
     },
     watch: {
-      async radiusDataProj (value) {
-        await this.setRadius(value)
+      async radiusViewProj (value) {
+        await this.setRadius(value, true)
       },
       currentRadiusDataProj: /*#__PURE__*/debounce(function (value) {
         if (value === this.radiusDataProj) return
@@ -221,10 +221,10 @@
         (await this.resolveGeometry()).setCenterAndRadius(center, radius)
       },
       radiusToViewProj (radius) {
-        return transformDistance(radius, this.resolvedRadiusProjection, this.viewProjection)
+        return transformDistance(radius, this.resolvedRadiusProjection, this.resolvedViewProjection)
       },
       radiusToDataProj (radius) {
-        return transformDistance(radius, this.viewProjection, this.resolvedRadiusProjection)
+        return transformDistance(radius, this.resolvedViewProjection, this.resolvedRadiusProjection)
       },
     },
   }

@@ -92,7 +92,7 @@
           return this.tileGridFactory
         }
 
-        const extent = this.extentDataProj || extentFromProjection(this.projection)
+        const extent = this.extentViewProj || extentFromProjection(this.resolvedViewProjection)
         const resolutions = this.resolutions || resolutionsFromExtent(extent, this.maxZoom, this.tileSizeArr)
         const origin = this.originViewProj || getExtentCorner(extent, ExtentCorner.TOP_LEFT)
         const matrixIds = this.matrixIds || range(this.minZoom, resolutions.length)
@@ -176,7 +176,7 @@
         return new WMTSSource({
           // ol/source/Source
           attributions: this.currentAttributions,
-          projection: this.projection,
+          projection: this.resolvedDataProjection,
           wrapX: this.wrapX,
           // ol/source/Tile
           cacheSize: this.cacheSize,

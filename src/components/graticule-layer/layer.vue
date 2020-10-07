@@ -48,7 +48,7 @@
 <script>
   import debounce from 'debounce-promise'
   import GraticuleLayer from 'ol/layer/Graticule'
-  import { vectorLayer } from '../../mixins'
+  import { FRAME_TIME, vectorLayer } from '../../mixins'
   import { dumpStrokeStyle, dumpTextStyle } from '../../ol-ext'
   import { clonePlainObject, isEqual, isFunction, makeWatchers, map, mergeDescriptors } from '../../utils'
   import { FillStyle, StrokeStyle, TextStyle } from '../style'
@@ -136,7 +136,7 @@
           if (isEqual(value, prev)) return
 
           this.$emit('update:meridians', clonePlainObject(value))
-        }),
+        }, FRAME_TIME),
       },
       currentParallels: {
         deep: true,
@@ -144,7 +144,7 @@
           if (isEqual(value, prev)) return
 
           this.$emit('update:parallels', clonePlainObject(value))
-        }),
+        }, FRAME_TIME),
       },
       currentLonLabelStyle: {
         deep: true,
@@ -152,7 +152,7 @@
           if (isEqual(value, prev)) return
 
           this.$emit('update:lonLabelStyle', clonePlainObject(value))
-        }),
+        }, FRAME_TIME),
       },
       currentLatLabelStyle: {
         deep: true,
@@ -160,7 +160,7 @@
           if (isEqual(value, prev)) return
 
           this.$emit('update:latLabelStyle', clonePlainObject(value))
-        }),
+        }, FRAME_TIME),
       },
       currentStrokeStyle: {
         deep: true,
@@ -168,7 +168,7 @@
           if (isEqual(value, prev)) return
 
           this.$emit('update:strokeStyle', clonePlainObject(value))
-        }),
+        }, FRAME_TIME),
       },
       .../*#__PURE__*/makeWatchers([
         'maxLines',

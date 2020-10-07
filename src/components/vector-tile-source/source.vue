@@ -167,7 +167,7 @@
           // ol/source/Source
           attributions: this.currentAttributions,
           attributionsCollapsible: this.attributionsCollapsible,
-          projection: this.projection,
+          projection: this.resolvedDataProjection,
           state: this.currentState,
           wrapX: this.wrapX,
           // ol/source/Tile

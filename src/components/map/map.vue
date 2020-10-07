@@ -41,13 +41,30 @@
     overlaysContainer,
     projTransforms,
   } from '../../mixins'
-  import { getMapDataProjection, getMapId, roundPointCoords, setMapDataProjection, setMapId } from '../../ol-ext'
+  import {
+    EPSG_3857,
+    getMapDataProjection,
+    getMapId,
+    roundPointCoords,
+    setMapDataProjection,
+    setMapId,
+  } from '../../ol-ext'
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromOlEvent as obsFromOlEvent,
-    fromVueEvent as obsFromVueEvent,
+    fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { addPrefix, assert, hasProp, isEqual, isFunction, makeWatchers, mergeDescriptors, waitFor } from '../../utils'
+  import {
+    addPrefix,
+    assert,
+    coalesce,
+    hasProp,
+    isEqual,
+    isFunction,
+    makeWatchers,
+    mergeDescriptors,
+    waitFor,
+  } from '../../utils'
   import { Layer as VectorLayerCmp } from '../vector-layer'
   import { Source as VectorSourceCmp } from '../vector-source'
   import ViewCmp from './view.vue'
@@ -150,6 +167,20 @@
       updateWhileAnimating: Boolean,
       updateWhileInteracting: Boolean,
     },
+    data () {
+      return {
+        viewProjection: EPSG_3857,
+      }
+    },
+    computed: {
+      resolvedDataProjection () {
+        return coalesce(
+          this.dataProjection, // may or may not be present
+          this.$options?.dataProjection, // may or may not be present
+          this.resolvedViewProjection,
+        )
+      },
+    },
     watch: {
       async defaultControls (value) {
         await this.initDefaultControls(value)
@@ -230,6 +261,12 @@
             ),
             1000,
           )
+          this.viewProjection = this.$viewVm.resolvedViewProjection
+          this.subscribeTo(
+            obsFromVueWatcher(this, () => this.$viewVm.resolvedViewProjection),
+            ({ value }) => { this.viewProjection = value },
+          )
+          await this.$nextTickPromise()
 
           return this::olCmp.methods.beforeMount()
         } catch (err) {

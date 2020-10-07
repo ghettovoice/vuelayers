@@ -1,10 +1,19 @@
 import debounce from 'debounce-promise'
 import { Feature } from 'ol'
 import { all as loadAll } from 'ol/loadingstrategy'
+import { get as getProj } from 'ol/proj'
 import VectorEventType from 'ol/source/VectorEventType'
 import { from as fromObs, merge as mergeObs } from 'rxjs'
 import { map as mapObs, mergeMap } from 'rxjs/operators'
-import { getFeatureId, getGeoJsonFmt, initializeFeature, isGeoJSONFeature, transform, transforms } from '../ol-ext'
+import {
+  EPSG_4326,
+  getFeatureId,
+  getGeoJsonFmt,
+  initializeFeature,
+  isGeoJSONFeature,
+  transform,
+  transforms,
+} from '../ol-ext'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import {
   and,
@@ -115,6 +124,11 @@ export default {
       type: Boolean,
       default: true,
     },
+    projection: {
+      type: String,
+      default: EPSG_4326,
+      validator: value => getProj(value) != null,
+    },
   },
   data () {
     return {
@@ -136,7 +150,7 @@ export default {
           coordinates: transforms[feature.geometry.type].transform(
             feature.geometry.coordinates,
             this.resolvedDataProjection,
-            this.viewProjection,
+            this.resolvedViewProjection,
           ),
         },
       }))
@@ -190,15 +204,15 @@ export default {
     },
   },
   watch: {
-    featuresDataProj: {
+    featuresViewProj: {
       deep: true,
       handler: async function (features) {
-        if (isEqual(features, this.currentFeaturesDataProj)) return
+        if (isEqual(features, this.currentFeaturesViewProj)) return
         // add new features
-        await this.addFeatures(features)
+        await this.addFeatures(features, true)
         // remove non-matched features
         await this.removeFeatures(difference(
-          this.currentFeaturesDataProj,
+          this.currentFeaturesViewProj,
           features,
           (a, b) => getFeatureId(a) === getFeatureId(b),
         ))
@@ -330,10 +344,10 @@ export default {
       'resolveOlObject',
       'resolveSource',
     ]),
-    async addFeatures (features) {
+    async addFeatures (features, viewProj = false) {
       const newFeatures = []
       await Promise.all(map(features || [], async feature => {
-        feature = await this.initializeFeature(feature)
+        feature = await this.initializeFeature(feature, viewProj)
         instanceOf(feature, Feature)
 
         const foundFeature = await this.getFeatureById(getFeatureId(feature))
@@ -346,8 +360,8 @@ export default {
 
       (await this.resolveSource()).addFeatures(newFeatures)
     },
-    async addFeature (feature) {
-      await this.addFeatures([feature])
+    async addFeature (feature, viewProj = false) {
+      await this.addFeatures([feature], viewProj)
     },
     async removeFeatures (features) {
       await Promise.all(map(features, ::this.removeFeature))
@@ -604,7 +618,7 @@ export default {
      */
     readSource (data) {
       return this.format.readFeatures(data, {
-        featureProjection: this.viewProjection,
+        featureProjection: this.resolvedViewProjection,
         dataProjection: this.resolvedDataProjection,
       })
     },

@@ -4,7 +4,7 @@ import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { and, isEmpty, isEqual, isString, negate, pick, replaceTokens } from '../utils'
 import tileSource from './tile-source'
 
-const isNotEmptyString = and(isString, negate(isEmpty))
+const isNotEmptyString = /*#__PURE__*/and(isString, negate(isEmpty))
 
 export default {
   mixins: [

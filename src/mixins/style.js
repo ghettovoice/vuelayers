@@ -1,6 +1,6 @@
 import { map as mapObs } from 'rxjs/operators'
-import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
-import { fromVueEvent as obsFromVueEvent } from '../rx-ext'
+import { EPSG_3857, getStyleId, initializeStyle, setStyleId } from '../ol-ext'
+import { fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher } from '../rx-ext'
 import { assert, hasProp, pick, mergeDescriptors, waitFor } from '../utils'
 import olCmp, { OlObjectEvent } from './ol-cmp'
 import stubVNode from './stub-vnode'
@@ -17,6 +17,12 @@ export default {
     empty () {
       return this.vmId
     },
+  },
+  data () {
+    return {
+      viewProjection: EPSG_3857,
+      dataProjection: EPSG_3857,
+    }
   },
   created () {
     this::defineServices()
@@ -37,6 +43,17 @@ export default {
           ),
           1000,
         )
+        this.viewProjection = this.$mapVm.resolvedViewProjection
+        this.dataProjection = this.$mapVm.resolvedDataProjection
+        this.subscribeTo(
+          obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
+          ({ value }) => { this.viewProjection = value },
+        )
+        this.subscribeTo(
+          obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
+          ({ value }) => { this.dataProjection = value },
+        )
+        await this.$nextTickPromise()
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {

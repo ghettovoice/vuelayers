@@ -65,9 +65,9 @@ export function fromOlChangeEvent (
     return mergeObs(...prop.map(p => fromOlChangeEvent(target, p, distinct, selector)))
   }
 
-  selector = selector || ((target, prop) => target.get(prop))
+  selector || (selector = identity)
   const event = `change:${prop}`
-  const observable = fromOlEvent(target, event, () => selector(target, prop))
+  const observable = fromOlEvent(target, event, () => target.get(prop))
   const operations = []
 
   if (distinct) {
@@ -75,7 +75,7 @@ export function fromOlChangeEvent (
     operations.push(distinctUntilChanged(distinct))
   }
 
-  operations.push(mapObs(value => ({ prop, value })))
+  operations.push(mapObs(value => selector({ prop, value })))
 
   return observable.pipe(...operations)
 }

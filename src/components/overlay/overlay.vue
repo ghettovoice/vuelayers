@@ -16,8 +16,8 @@
   import OverlayPositioning from 'ol/OverlayPositioning'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
   import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { olCmp, OlObjectEvent, projTransforms } from '../../mixins'
-  import { getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
+  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
+  import { EPSG_3857, getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromVueEvent as obsFromVueEvent,
@@ -70,6 +70,8 @@
     data () {
       return {
         visible: false,
+        viewProjection: EPSG_3857,
+        dataProjection: EPSG_3857,
       }
     },
     computed: {
@@ -127,12 +129,12 @@
           if (isEqual(value, this.offset)) return
 
           this.$emit('update:offset', clonePlainObject(value))
-        }),
+        }, FRAME_TIME),
       },
-      positionDataProj: {
+      positionViewProj: {
         deep: true,
         async handler (value) {
-          await this.setPosition(value)
+          await this.setPosition(value, true)
         },
       },
       currentPositionDataProj: {
@@ -141,7 +143,7 @@
           if (isEqual(value, this.positionDataProj)) return
 
           this.$emit('update:position', clonePlainObject(value))
-        }),
+        }, FRAME_TIME),
       },
       async positioning (value) {
         await this.setPositioning(value)
@@ -150,7 +152,7 @@
         if (value === this.positioning) return
 
         this.$emit('update:positioning', value)
-      }),
+      }, FRAME_TIME),
       .../*#__PURE__*/makeWatchers([
         'stopEvent',
         'insertFirst',
@@ -188,9 +190,16 @@
             ),
             1000,
           )
+          this.viewProjection = this.$mapVm.resolvedViewProjection
           this.dataProjection = this.$mapVm.resolvedDataProjection
-          const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
-          this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
+          this.subscribeTo(
+            obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
+            ({ value }) => { this.viewProjection = value },
+          )
+          this.subscribeTo(
+            obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
+            ({ value }) => { this.dataProjection = value },
+          )
           await this.$nextTickPromise()
 
           return this::olCmp.methods.beforeInit()
@@ -205,9 +214,9 @@
        */
       createOlObject () {
         const overlay = new Overlay({
-          id: this.id,
+          id: this.currentId,
           offset: this.currentOffset,
-          position: this.currentPositionDataProj,
+          position: this.currentPositionViewProj,
           positioning: this.currentPositioning,
           stopEvent: this.stopEvent,
           insertFirst: this.insertFirst,

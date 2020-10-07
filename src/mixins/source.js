@@ -1,7 +1,7 @@
 import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { map as mapObs, skipWhile } from 'rxjs/operators'
-import { getSourceId, initializeSource, setSourceId } from '../ol-ext'
+import { EPSG_3857, getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import {
   fromOlChangeEvent as obsFromOlChangeEvent,
   fromVueEvent as obsFromVueEvent,
@@ -63,7 +63,8 @@ export default {
   },
   data () {
     return {
-      dataProjection: null,
+      viewProjection: EPSG_3857,
+      dataProjection: EPSG_3857,
     }
   },
   computed: {
@@ -145,9 +146,16 @@ export default {
           ),
           1000,
         )
+        this.viewProjection = this.$mapVm.resolvedViewProjection
         this.dataProjection = this.$mapVm.resolvedDataProjection
-        const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
-        this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
+        this.subscribeTo(
+          obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
+          ({ value }) => { this.viewProjection = value },
+        )
+        this.subscribeTo(
+          obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
+          ({ value }) => { this.dataProjection = value },
+        )
         await this.$nextTickPromise()
 
         return this::olCmp.methods.beforeInit()

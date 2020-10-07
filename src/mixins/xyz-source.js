@@ -40,7 +40,7 @@ export default {
         return this.tileGridFactory
       }
 
-      const extent = extentFromProjection(this.projection)
+      const extent = extentFromProjection(this.resolvedViewProjection)
       const maxZoom = this.maxZoom
       const minZoom = this.minZoom
       const maxResolution = this.maxResolution
@@ -67,7 +67,7 @@ export default {
         // ol/source/Source
         attributions: this.currentAttributions,
         attributionsCollapsible: this.attributionsCollapsible,
-        projection: this.projection,
+        projection: this.resolvedDataProjection,
         wrapX: this.wrapX,
         // ol/source/Tile
         cacheSize: this.cacheSize,

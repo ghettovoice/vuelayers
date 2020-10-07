@@ -14,7 +14,6 @@
 <script>
   import debounce from 'debounce-promise'
   import { View } from 'ol'
-  import GeometryType from 'ol/geom/GeometryType'
   import { get as getProj } from 'ol/proj'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
   import { distinctUntilKeyChanged, map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
@@ -24,7 +23,6 @@
     getViewId,
     initializeView,
     isGeoJSONGeometry,
-    roundCoords,
     roundExtent,
     roundPointCoords,
     setViewId,
@@ -185,12 +183,12 @@
     },
     data () {
       return {
-        dataProjection: null,
+        dataProjection: EPSG_3857,
       }
     },
     computed: {
       centerDataProj () {
-        return roundCoords(GeometryType.POINT, this.center)
+        return roundPointCoords(this.center)
       },
       centerViewProj () {
         return this.pointToViewProj(this.center)
@@ -271,25 +269,24 @@
 
         return this.getMinZoomInternal()
       },
-      /**
-       * @return {module:ol/proj~ProjectionLike}
-       */
+      resolvedViewProjection () {
+        return this.projection
+      },
       resolvedDataProjection () {
         // exclude this.projection from lookup to allow view rendering in projection
         // that differs from data projection
         return coalesce(
-          this.dataProjection,
-          this.$mapVm?.resolvedDataProjection,
-          this.$options?.dataProjection,
-          this.viewProjection,
+          this.$options?.dataProjection, // may or may not be present
+          this.dataProjection, // may or may not be present
+          this.resolvedViewProjection,
         )
       },
     },
     watch: {
-      async centerDataProj (value) {
+      async centerViewProj (value) {
         if (await this.getAnimating()) return
 
-        await this.setCenter(value)
+        await this.setCenter(value, true)
       },
       currentCenterDataProj: {
         deep: true,
@@ -339,40 +336,40 @@
         if (value === prev) return
 
         this.$emit('update:animating', value)
-      }),
+      }, FRAME_TIME),
       currentInteracting: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:interacting', value)
-      }),
+      }, FRAME_TIME),
       currentResolutions: /*#__PURE__*/debounce(function (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:resolutions', value)
-      }),
+      }, FRAME_TIME),
       currentMaxResolution: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:maxResolution', value)
-      }),
+      }, FRAME_TIME),
       currentMinResolution: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:minResolution', value)
-      }),
+      }, FRAME_TIME),
       currentMaxZoom: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:maxZoom', value)
-      }),
+      }, FRAME_TIME),
       currentMinZoom: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
         this.$emit('update:minZoom', value)
-      }),
+      }, FRAME_TIME),
       .../*#__PURE__*/makeWatchers([
         'constrainOnlyCenter',
-        'extentDataProj',
+        'extentViewProj',
         'smoothExtentConstraint',
         'enableRotation',
         'constrainRotation',
@@ -383,7 +380,7 @@
         'smoothResolutionConstraint',
         'zoomFactor',
         'multiWorld',
-        'projection',
+        'resolvedViewProjection',
       ], prop => async function (val, prev) {
         if (isEqual(val, prev)) return
 
@@ -414,8 +411,10 @@
             1000,
           )
           this.dataProjection = this.$mapVm.resolvedDataProjection
-          const dataProjChanges = obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection)
-          this.subscribeTo(dataProjChanges, ({ value }) => { this.dataProjection = value })
+          this.subscribeTo(
+            obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
+            ({ value }) => { this.dataProjection = value },
+          )
           await this.$nextTickPromise()
 
           return this::olCmp.methods.beforeInit()
@@ -448,7 +447,7 @@
           maxZoom: this.maxZoom,
           minZoom: this.minZoom,
           multiWorld: this.multiWorld,
-          projection: this.projection,
+          projection: this.resolvedViewProjection,
           showFullExtent: this.showFullExtent,
         })
         initializeView(view, this.currentId)
@@ -662,7 +661,7 @@
        */
       getCenterInternal (viewProj = false) {
         if (viewProj) {
-          return roundCoords(this.$view.getCenter())
+          return roundPointCoords(this.$view.getCenter())
         }
 
         return this.pointToDataProj(this.$view.getCenter())

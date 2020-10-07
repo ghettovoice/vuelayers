@@ -42,7 +42,7 @@
           className: this.className,
           opacity: this.currentOpacity,
           visible: this.currentVisible,
-          extent: this.currentExtentDataProj,
+          extent: this.currentExtentViewProj,
           zIndex: this.currentZIndex,
           minResolution: this.currentMinResolution,
           maxResolution: this.currentMaxResolution,
