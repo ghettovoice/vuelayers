@@ -103,6 +103,7 @@
       async createInteraction () {
         let source = this._source = await this.getInstance(this.source)
         assert(!!source, `Source "${this.source}" not found in identity map.`)
+
         let features
         if (source instanceof VectorSource) {
           features = source.getFeaturesCollection()

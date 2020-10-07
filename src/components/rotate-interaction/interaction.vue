@@ -4,6 +4,7 @@
   import RotateInteraction from 'ol-rotate-feature'
   import { always } from 'ol/events/condition'
   import { Vector as VectorSource } from 'ol/source'
+  import VectorEventType from 'ol/source/VectorEventType'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
   import { FRAME_TIME, interaction, styleContainer } from '../../mixins'
@@ -83,10 +84,10 @@
       },
     },
     watch: {
-      anchorDataProj: {
+      anchorViewProj: {
         deep: true,
         async handler (value) {
-          await this.setAnchor(value)
+          await this.setAnchor(value, true)
         },
       },
       currentAnchorDataProj: {
@@ -129,6 +130,17 @@
         let features
         if (source instanceof VectorSource) {
           features = source.getFeaturesCollection()
+          if (!features) {
+            features = new Collection(source.getFeatures())
+            this.subscribeTo(
+              obsFromOlEvent(source, VectorEventType.ADDFEATURE),
+              ({ feature }) => feature && features.push(feature),
+            )
+            this.subscribeTo(
+              obsFromOlEvent(source, VectorEventType.REMOVEFEATURE),
+              ({ feature }) => feature && features.remove(feature),
+            )
+          }
           instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
         } else {
           if (isFunction(source.getFeaturesCollection)) {

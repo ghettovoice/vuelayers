@@ -13,7 +13,7 @@
         return new TileArcGISRestSource({
           // ol/source/Source
           attributions: this.currentAttributions,
-          projection: this.projection,
+          projection: this.resolvedDataProjection,
           wrapX: this.wrapX,
           // ol/source/Tile
           cacheSize: this.cacheSize,

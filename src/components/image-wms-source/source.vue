@@ -46,7 +46,7 @@
         return new ImageWMSSource({
           // ol/source/Source
           attributions: this.currentAttributions,
-          projection: this.projection,
+          projection: this.resolvedDataProjection,
           // ol/source/Image
           resolutions: this.resolutions,
           // ol/source/ImageWMS

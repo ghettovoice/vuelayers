@@ -406,19 +406,17 @@ export default {
 }
 
 function defineDebounceMethods () {
-  const t = 1000 / 60
-
   this.debounceRefresh = debounce(function () {
     return this.refresh()
-  }, t)
+  }, FRAME_TIME)
 
   this.debounceRemount = debounce(function () {
     return this.remount()
-  }, t)
+  }, FRAME_TIME)
 
   this.debounceRecreate = debounce(function () {
     return this.recreate()
-  }, t)
+  }, FRAME_TIME)
 }
 
 function defineServices () {

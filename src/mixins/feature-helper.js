@@ -1,25 +1,31 @@
-import { Style } from 'ol/style'
 import {
-  CIRCLE_SERIALIZE_PROP, createStyle, dumpStyle,
+  CIRCLE_SERIALIZE_PROP,
   getFeatureId,
-  getFeatureProperties, initializeFeature,
+  getFeatureProperties,
+  initializeFeature,
   setFeatureId,
-  setFeatureProperties, STYLE_SERIALIZE_PROP,
+  setFeatureProperties,
+  STYLE_SERIALIZE_PROP,
 } from '../ol-ext'
-import { get, isArray, isEqual, isFunction, isPlainObject } from '../utils'
+import { get, isEqual, isFunction, isPlainObject } from '../utils'
 
 export default {
   methods: {
     /**
      * @param {FeatureLike} feature
+     * @param {boolean} [viewProj=false]
      * @return {Promise<Feature>}
      * @protected
      */
-    async initializeFeature (feature) {
+    async initializeFeature (feature, viewProj = false) {
       if (isFunction(feature?.resolveOlObject)) {
         feature = await feature.resolveOlObject()
       } else if (isPlainObject(feature)) {
-        feature = this.readFeatureInDataProj(feature)
+        if (viewProj) {
+          feature = this.readFeatureInViewProj(feature)
+        } else {
+          feature = this.readFeatureInDataProj(feature)
+        }
       }
 
       return initializeFeature(feature)
@@ -30,8 +36,8 @@ export default {
      * @protected
      */
     updateFeature (feature, newFeature) {
-      const featureJson = this.writeFeatureInDataProj(feature)
-      const newFeatureJson = this.writeFeatureInDataProj(newFeature)
+      const featureJson = this.writeFeatureInViewProj(feature)
+      const newFeatureJson = this.writeFeatureInViewProj(newFeature)
 
       if (isEqual(featureJson, newFeatureJson)) return
 
@@ -51,29 +57,20 @@ export default {
         feature.setGeometry(newFeature.getGeometry() || null)
       }
 
-      let styleJson = get(newFeatureJson, `properties.${STYLE_SERIALIZE_PROP}`) || null
-      if (styleJson && !isArray(styleJson)) {
-        styleJson = [styleJson]
-      }
-      let style = null
-      if (styleJson) {
-        style = styleJson.map(style => createStyle(style, geom => this.readGeometryInDataProj(geom)))
-      }
-      let currentStyle = feature.getStyle() || null
-      if (currentStyle instanceof Style) {
-        currentStyle = [currentStyle]
-      }
-      const currentStyleJson = isArray(currentStyle)
-        ? currentStyle.map(style => dumpStyle(style, geom => this.writeGeometryInDataProj(geom)))
-        : null
-      if (!style || !currentStyle || isFunction(currentStyle)) {
-        if (style !== currentStyle) {
+      const style = newFeature.getStyle()
+      const currentStyle = feature.getStyle()
+      if (isFunction(currentStyle) && isFunction(style)) {
+        if (currentStyle !== style) {
           feature.setStyle(style)
         }
-      } else {
-        if (!isEqual(styleJson, currentStyleJson)) {
-          feature.setStyle(style)
-        }
+      } else if (isFunction(style)) {
+        feature.setStyle(style)
+      }
+
+      const styleJson = get(newFeatureJson, `properties.${STYLE_SERIALIZE_PROP}`) || null
+      const currentStyleJson = get(featureJson, `properties.${STYLE_SERIALIZE_PROP}`) || null
+      if (!isEqual(styleJson, currentStyleJson)) {
+        feature.setStyle(style)
       }
     },
   },

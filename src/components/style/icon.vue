@@ -59,31 +59,31 @@
         await this.setAnchor(value)
       },
       async src (value) {
-        if (!isEqual(value, await this.getSrc())) {
-          if (process.env.VUELAYERS_DEBUG) {
-            this.$logger.log('src changed, scheduling recreate...')
-          }
+        if (isEqual(value, await this.getSrc())) return
 
-          await this.scheduleRecreate()
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('src changed, scheduling recreate...')
         }
+
+        await this.scheduleRecreate()
       },
       async size (value) {
-        if (!isEqual(value, await this.getSize())) {
-          if (process.env.VUELAYERS_DEBUG) {
-            this.$logger.log('size changed, scheduling recreate...')
-          }
+        if (isEqual(value, await this.getSize())) return
 
-          await this.scheduleRecreate()
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('size changed, scheduling recreate...')
         }
+
+        await this.scheduleRecreate()
       },
       async color (value) {
-        if (!isEqual(value, await this.getColor())) {
-          if (process.env.VUELAYERS_DEBUG) {
-            this.$logger.log('color changed, scheduling recreate...')
-          }
+        if (isEqual(value, await this.getColor())) return
 
-          await this.scheduleRecreate()
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log('color changed, scheduling recreate...')
         }
+
+        await this.scheduleRecreate()
       },
       .../*#__PURE__*/makeWatchers([
         'anchorOrigin',

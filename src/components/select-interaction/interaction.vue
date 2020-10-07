@@ -142,7 +142,7 @@
             coordinates: transforms[feature.geometry.type].transform(
               feature.geometry.coordinates,
               this.resolvedDataProjection,
-              this.viewProjection,
+              this.resolvedViewProjection,
             ),
           },
         }))
@@ -157,12 +157,12 @@
       },
     },
     watch: {
-      featuresDataProj: {
+      featuresViewProj: {
         deep: true,
         handler: async function (features) {
           const ids = map(features, feature => isObjectLike(feature) ? getFeatureId(feature) : feature)
           if (isEqual(ids, this.currentFeatureIds)) return
-          console.log('input', ids, this.currentFeatureIds)
+
           await this.unselectAll()
           await Promise.all(map(features, ::this.select))
         },

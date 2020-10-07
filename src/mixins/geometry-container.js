@@ -85,13 +85,18 @@ export default {
     },
     /**
      * @param {GeometryLike|undefined} geom
+     * @param {boolean} [viewProj=false]
      * @return {Promise<void>}
      */
-    async setGeometry (geom) {
+    async setGeometry (geom, viewProj = false) {
       if (isFunction(geom?.resolveOlObject)) {
         geom = await geom.resolveOlObject()
       } else if (isGeoJSONGeometry(geom)) {
-        geom = this.readGeometryInDataProj(geom)
+        if (viewProj) {
+          geom = this.readGeometryInViewProj(geom)
+        } else {
+          geom = this.readGeometryInDataProj(geom)
+        }
       }
       geom || (geom = undefined)
 

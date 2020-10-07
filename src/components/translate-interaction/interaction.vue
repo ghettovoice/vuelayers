@@ -3,6 +3,7 @@
   import { Collection } from 'ol'
   import { Translate as TranslateInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
+  import VectorEventType from 'ol/source/VectorEventType'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
   import { FRAME_TIME, interaction } from '../../mixins'
@@ -25,7 +26,10 @@
       },
     },
     props: {
-      source: String,
+      source: {
+        type: String,
+        required: true,
+      },
       layers: [String, Array],
       filter: Function,
       hitTolerance: {
@@ -78,22 +82,31 @@
        * @protected
        */
       async createInteraction () {
-        let source, features
-        if (this.source) {
-          source = this._source = await this.getInstance(this.source)
-          assert(!!source, `Source "${this.source}" not found in identity map.`)
+        const source = this._source = await this.getInstance(this.source)
+        assert(!!source, `Source "${this.source}" not found in identity map.`)
 
-          if (source instanceof VectorSource) {
-            features = source.getFeaturesCollection()
-            instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
-          } else {
-            if (isFunction(source.getFeaturesCollection)) {
-              features = source.getFeaturesCollection()
-            } else if (isFunction(source.getFeatures)) {
-              features = source.getFeatures()
-            }
-            instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
+        let features
+        if (source instanceof VectorSource) {
+          features = source.getFeaturesCollection()
+          if (!features) {
+            features = new Collection(source.getFeatures())
+            this.subscribeTo(
+              obsFromOlEvent(source, VectorEventType.ADDFEATURE),
+              ({ feature }) => feature && features.push(feature),
+            )
+            this.subscribeTo(
+              obsFromOlEvent(source, VectorEventType.REMOVEFEATURE),
+              ({ feature }) => feature && features.remove(feature),
+            )
           }
+          instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
+        } else {
+          if (isFunction(source.getFeaturesCollection)) {
+            features = source.getFeaturesCollection()
+          } else if (isFunction(source.getFeatures)) {
+            features = source.getFeatures()
+          }
+          instanceOf(features, Collection, `Source "${this.source}" doesn't provide features collection.`)
         }
 
         return new TranslateInteraction({

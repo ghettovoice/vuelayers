@@ -145,7 +145,7 @@
         return new ImageStaticSource({
           // ol/source/Source
           attributions: this.currentAttributions,
-          projection: this.projection,
+          projection: this.resolvedDataProjection,
           // ol/source/ImageStatic
           crossOrigin: this.crossOrigin,
           imageExtent: this.resolvedImgExtent,

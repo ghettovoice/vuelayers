@@ -20,7 +20,7 @@
     upperFirst,
   } from '../../utils'
 
-  const transformType = type => upperFirst(camelCase(type))
+  const transformType = /*#__PURE__*/type => upperFirst(camelCase(type))
 
   export default {
     name: 'VlInteractionDraw',

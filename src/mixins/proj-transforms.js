@@ -1,8 +1,11 @@
 import LRU from 'lru-cache'
 import {
   COORD_PRECISION,
-  EPSG_3857, getFeatureId, getFeatureProperties, getGeomCoords, getGeomType,
-  getMapDataProjection,
+  EPSG_3857,
+  getFeatureId,
+  getFeatureProperties,
+  getGeomCoords,
+  getGeomType,
   readGeoJsonFeature,
   readGeoJsonGeometry,
   transformExtent,
@@ -25,11 +28,11 @@ export default {
     /**
      * @return {module:ol/proj~ProjectionLike}
      */
-    viewProjection () {
-      if (this.rev && this.$viewVm) {
-        return this.$viewVm.projection
-      }
-      return this.projection || EPSG_3857
+    resolvedViewProjection () {
+      return coalesce(
+        this.viewProjection,
+        EPSG_3857,
+      )
     },
     /**
      * @return {module:ol/proj~ProjectionLike}
@@ -37,11 +40,9 @@ export default {
     resolvedDataProjection () {
       return coalesce(
         this.projection, // may or may not be present
+        this.$options?.dataProjection, // may or may not be present
         this.dataProjection, // may or may not be present
-        this.$mapVm?.resolvedDataProjection,
-        this.$map && getMapDataProjection(this.$map),
-        this.$options?.dataProjection,
-        this.viewProjection,
+        this.resolvedViewProjection,
       )
     },
   },
@@ -53,47 +54,47 @@ export default {
   },
   methods: {
     pointToViewProj (point, precision = COORD_PRECISION) {
-      return transformPoint(point, this.resolvedDataProjection, this.viewProjection, precision)
+      return transformPoint(point, this.resolvedDataProjection, this.resolvedViewProjection, precision)
     },
     pointToDataProj (point, precision = COORD_PRECISION) {
-      return transformPoint(point, this.viewProjection, this.resolvedDataProjection, precision)
+      return transformPoint(point, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     lineToViewProj (line, precision = COORD_PRECISION) {
-      return transformLine(line, this.resolvedDataProjection, this.viewProjection, precision)
+      return transformLine(line, this.resolvedDataProjection, this.resolvedViewProjection, precision)
     },
     lineToDataProj (line, precision = COORD_PRECISION) {
-      return transformLine(line, this.viewProjection, this.resolvedDataProjection, precision)
+      return transformLine(line, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     polygonToViewProj (polygon, precision = COORD_PRECISION) {
-      return transformPolygon(polygon, this.resolvedDataProjection, this.viewProjection, precision)
+      return transformPolygon(polygon, this.resolvedDataProjection, this.resolvedViewProjection, precision)
     },
     polygonToDataProj (polygon, precision = COORD_PRECISION) {
-      return transformPolygon(polygon, this.viewProjection, this.resolvedDataProjection, precision)
+      return transformPolygon(polygon, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     multiPointToViewProj (multiPoint, precision = COORD_PRECISION) {
-      return transformMultiPoint(multiPoint, this.resolvedDataProjection, this.viewProjection, precision)
+      return transformMultiPoint(multiPoint, this.resolvedDataProjection, this.resolvedViewProjection, precision)
     },
     multiPointToDataProj (multiPoint, precision = COORD_PRECISION) {
-      return transformMultiPoint(multiPoint, this.viewProjection, this.resolvedDataProjection, precision)
+      return transformMultiPoint(multiPoint, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     multiLineToViewProj (multiLine, precision = COORD_PRECISION) {
-      return transformMultiLine(multiLine, this.resolvedDataProjection, this.viewProjection, precision)
+      return transformMultiLine(multiLine, this.resolvedDataProjection, this.resolvedViewProjection, precision)
     },
     multiLineToDataProj (multiLine, precision = COORD_PRECISION) {
-      return transformMultiLine(multiLine, this.viewProjection, this.resolvedDataProjection, precision)
+      return transformMultiLine(multiLine, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     multiPolygonToViewProj (multiPolygon, precision = COORD_PRECISION) {
-      return transformMultiPolygon(multiPolygon, this.resolvedDataProjection, this.viewProjection, precision)
+      return transformMultiPolygon(multiPolygon, this.resolvedDataProjection, this.resolvedViewProjection, precision)
     },
     multiPolygonToDataProj (multiPolygon, precision = COORD_PRECISION) {
-      return transformMultiPolygon(multiPolygon, this.viewProjection, this.resolvedDataProjection, precision)
+      return transformMultiPolygon(multiPolygon, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
 
     extentToViewProj (extent, precision = COORD_PRECISION) {
-      return transformExtent(extent, this.resolvedDataProjection, this.viewProjection, precision)
+      return transformExtent(extent, this.resolvedDataProjection, this.resolvedViewProjection, precision)
     },
     extentToDataProj (extent, precision = COORD_PRECISION) {
-      return transformExtent(extent, this.viewProjection, this.resolvedDataProjection, precision)
+      return transformExtent(extent, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
 
     writeGeometryInDataProj (geometry, precision = COORD_PRECISION) {
@@ -104,31 +105,31 @@ export default {
       if (geometryJson) {
         return geometryJson
       }
-      geometryJson = writeGeoJsonGeometry(geometry, this.viewProjection, this.resolvedDataProjection, precision)
+      geometryJson = writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedDataProjection, precision)
       this._projTransformCache.set(key, geometryJson)
       return geometryJson
     },
     writeGeometryInViewProj (geometry, precision = COORD_PRECISION) {
       if (!geometry) return
 
-      const key = this.makeGeometryKey(geometry, this.viewProjection, precision)
+      const key = this.makeGeometryKey(geometry, this.resolvedViewProjection, precision)
       let geometryJson = this._projTransformCache.get(key)
       if (geometryJson) {
         return geometryJson
       }
-      geometryJson = writeGeoJsonGeometry(geometry, this.viewProjection, this.viewProjection, precision)
+      geometryJson = writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedViewProjection, precision)
       this._projTransformCache.set(key, geometryJson)
       return geometryJson
     },
     readGeometryInDataProj (geometry, precision = COORD_PRECISION) {
       if (!geometry) return
 
-      return readGeoJsonGeometry(geometry, this.viewProjection, this.resolvedDataProjection, precision)
+      return readGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     readGeometryInViewProj (geometry, precision = COORD_PRECISION) {
       if (!geometry) return
 
-      return readGeoJsonGeometry(geometry, this.viewProjection, this.viewProjection, precision)
+      return readGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedViewProjection, precision)
     },
 
     writeFeatureInDataProj (feature, precision = COORD_PRECISION) {
@@ -139,31 +140,31 @@ export default {
       if (featureJson) {
         return featureJson
       }
-      featureJson = writeGeoJsonFeature(feature, this.viewProjection, this.resolvedDataProjection, precision)
+      featureJson = writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedDataProjection, precision)
       this._projTransformCache.set(key, featureJson)
       return featureJson
     },
     writeFeatureInViewProj (feature, precision = COORD_PRECISION) {
       if (!feature) return
 
-      const key = this.makeFeatureKey(feature, this.viewProjection, precision)
+      const key = this.makeFeatureKey(feature, this.resolvedViewProjection, precision)
       let featureJson = this._projTransformCache.get(key)
       if (featureJson) {
         return featureJson
       }
-      featureJson = writeGeoJsonFeature(feature, this.viewProjection, this.viewProjection, precision)
+      featureJson = writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedViewProjection, precision)
       this._projTransformCache.set(key, featureJson)
       return featureJson
     },
     readFeatureInDataProj (feature, precision = COORD_PRECISION) {
       if (!feature) return
 
-      return readGeoJsonFeature(feature, this.viewProjection, this.resolvedDataProjection, precision)
+      return readGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     readFeatureInViewProj (feature, precision = COORD_PRECISION) {
       if (!feature) return
 
-      return readGeoJsonFeature(feature, this.viewProjection, this.viewProjection, precision)
+      return readGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedViewProjection, precision)
     },
 
     makeKey (object, projection, precision) {

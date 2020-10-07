@@ -63,9 +63,6 @@ export default {
         this.$emit('update:features', clonePlainObject(value))
       }, FRAME_TIME),
     },
-    async resolvedDataProjection () {
-      await this.addFeatures(this.currentFeaturesDataProj)
-    },
     featuresCollectionIdent (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
@@ -101,17 +98,19 @@ export default {
     },
     /**
      * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features
+     * @param {boolean} [viewProj=false]
      * @return {Promise<void>}
      */
-    async addFeatures (features) {
-      await Promise.all(map(features, ::this.addFeature))
+    async addFeatures (features, viewProj = false) {
+      await Promise.all(map(features, feature => this.addFeature(feature, viewProj)))
     },
     /**
      * @param {FeatureLike} feature
+     * @param {boolean} [viewProj=false]
      * @return {Promise<void>}
      */
-    async addFeature (feature) {
-      feature = await this.initializeFeature(feature)
+    async addFeature (feature, viewProj = false) {
+      feature = await this.initializeFeature(feature, viewProj)
       instanceOf(feature, Feature)
       // todo add hash {featureId => featureIdx, ....}
       const foundFeature = this.getFeatureById(getFeatureId(feature))
