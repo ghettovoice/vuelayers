@@ -92,9 +92,9 @@
           return this.tileGridFactory
         }
 
-        const extent = this.extentViewProj || extentFromProjection(this.resolvedViewProjection)
+        const extent = this.extentDataProj || extentFromProjection(this.resolvedDataProjection)
         const resolutions = this.resolutions || resolutionsFromExtent(extent, this.maxZoom, this.tileSizeArr)
-        const origin = this.originViewProj || getExtentCorner(extent, ExtentCorner.TOP_LEFT)
+        const origin = this.originDataProj || getExtentCorner(extent, ExtentCorner.TOP_LEFT)
         const matrixIds = this.matrixIds || range(this.minZoom, resolutions.length)
         const tileSize = this.tileSizeArr
         const minZoom = this.minZoom

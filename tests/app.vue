@@ -13,53 +13,22 @@
         <VlSourceOsm />
       </VlLayerTile>
 
-      <VlLayerTile>
-        <VlSourceWmts
-          url="https://services.arcgisonline.com/arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS/"
-          layer-name="0"
-          matrix-set="EPSG:3857"
-          format="image/png"
-          projection="EPSG:3857"
-          style-name="default"
-          :resolutions="resolutions"
-          :matrix-dds="matrixIds" />
-      </VlLayerTile>
-
-      <VlLayerVector>
-        <VlSourceVector
-          ident="draw"
-          :features="features"
-          :projection="featProj" />
-      </VlLayerVector>
+<!--      <VlLayerVector>-->
+<!--        <VlSourceVector-->
+<!--          ident="draw"-->
+<!--          :features="features"-->
+<!--          :projection="featProj" />-->
+<!--      </VlLayerVector>-->
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { getWidth } from 'ol/extent'
-  import { get as getProjection } from 'ol/proj'
   import { register } from 'ol/proj/proj4'
   import proj4 from 'proj4'
 
-  proj4.defs(
-    'EPSG:21781',
-    '+proj=somerc +lat_0=46.95240555555556 ' +
-      '+lon_0=7.439583333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel ' +
-      '+towgs84=674.4,15.1,405.3,0,0,0,0 +units=m +no_defs',
-  )
   proj4.defs('EPSG:25832', '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs')
   register(proj4)
-
-  const projection = getProjection('EPSG:3857')
-  const projectionExtent = projection.getExtent()
-  const size = getWidth(projectionExtent) / 256
-  const resolutions = new Array(14)
-  const matrixIds = new Array(14)
-  for (let z = 0; z < 14; ++z) {
-    // generate resolutions and matrixIds arrays for this WMTS
-    resolutions[z] = size / Math.pow(2, z)
-    matrixIds[z] = z
-  }
 
   export default {
     name: 'App',
@@ -74,8 +43,6 @@
         viewProj: 'EPSG:25832',
         featProj: 'EPSG:4326',
         selectedFeatures: [],
-        resolutions,
-        matrixIds,
       }
     },
     mounted () {

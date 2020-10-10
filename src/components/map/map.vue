@@ -3,9 +3,11 @@
     :id="vmId"
     :class="vmClass"
     :tabindex="tabindex">
-    <slot>
-      <ViewCmp :id="'vl-' + id + '-default-view'" />
-    </slot>
+    <slot />
+    <ViewCmp
+      v-if="!viewProvided"
+      :id="'vl-' + id + '-default-view'"
+      ref="view" />
     <VectorLayerCmp
       :id="'vl-' + id + '-default-layer'"
       ref="featuresOverlay"
@@ -52,7 +54,8 @@
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromOlEvent as obsFromOlEvent,
-    fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher,
+    fromVueEvent as obsFromVueEvent,
+    fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
   import {
     addPrefix,
@@ -170,6 +173,7 @@
     data () {
       return {
         viewProjection: EPSG_3857,
+        viewProvided: false,
       }
     },
     computed: {
@@ -490,16 +494,17 @@
        * @return {Promise<void>}
        */
       async setView (view) {
-        if (view && isFunction(view.resolveOlObject)) {
+        if (isFunction(view?.resolveOlObject)) {
           view = await view.resolveOlObject()
         }
-        view || (view = new View())
 
         if (view === await this.getView()) return
 
         (await this.resolveMap()).setView(view)
         this._view = view
-        this._viewVm = view.vm && view.vm[0]
+        this._viewVm = view?.vm && view?.vm[0]
+
+        this.viewProvided = !!view
       },
       /**
        * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
