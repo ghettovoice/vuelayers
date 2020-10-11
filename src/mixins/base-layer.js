@@ -1,15 +1,15 @@
 import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { from as fromObs, merge as mergeObs } from 'rxjs'
-import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
+import { filter as filterObs, map as mapObs, mapTo, mergeMap, skipWhile } from 'rxjs/operators'
 import { EPSG_3857, getLayerId, initializeLayer, roundExtent, setLayerId, transformExtent } from '../ol-ext'
 import {
   fromOlChangeEvent as obsFromOlChangeEvent,
   fromVueEvent as obsFromVueEvent,
   fromVueWatcher as obsFromVueWatcher,
 } from '../rx-ext'
-import { addPrefix, assert, hasProp, isEqual, isNumber, mergeDescriptors, pick, waitFor } from '../utils'
-import olCmp, { FRAME_TIME, OlObjectEvent } from './ol-cmp'
+import { addPrefix, assert, hasProp, isEqual, isNumber, mergeDescriptors, pick, stubTrue, waitFor } from '../utils'
+import olCmp, { FRAME_TIME, isCreateError, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 
@@ -244,12 +244,14 @@ export default {
       try {
         await waitFor(
           () => this.$mapVm != null,
-          obsFromVueEvent(this.$eventBus, [
-            OlObjectEvent.CREATE_ERROR,
-          ]).pipe(
-            mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+          obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+            filterObs(([err, vm]) => {
+              return isCreateError(err) &&
+                hasProp(vm, '$map') &&
+                this.$vq.closest(vm)
+            }),
+            mapTo(stubTrue()),
           ),
-          1000,
         )
         this.viewProjection = this.$mapVm.resolvedViewProjection
         this.dataProjection = this.$mapVm.resolvedDataProjection

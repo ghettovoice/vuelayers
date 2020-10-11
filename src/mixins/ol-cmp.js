@@ -166,18 +166,7 @@ export default {
     await this::execMount()
   },
   async beforeDestroy () {
-    if ([
-      OlObjectState.UNDEF,
-      OlObjectState.CREATING,
-      OlObjectState.CREATED,
-      OlObjectState.MOUNTING,
-    ].includes(this.$olObjectState)) {
-      const err = new CanceledError(`${this.vmName} ol object lifecycle canceled`)
-      this.$emit(OlObjectEvent.ERROR, err, this)
-      this.$eventBus.$emit(OlObjectEvent.ERROR, err, this)
-    }
-
-    await this::execUnmount()
+    await this::execUnmount(true)
   },
   async destroyed () {
     await this::execDeinit()
@@ -672,11 +661,25 @@ async function execMount () {
 }
 
 /**
+ * @param {boolean} [fireCancel=false]
  * @return {void|Promise<void>}
  * @private
  */
-async function execUnmount () {
+async function execUnmount (fireCancel = false) {
   const prevState = this._olObjectState
+
+  if (fireCancel) {
+    if ([
+      OlObjectState.UNDEF,
+      OlObjectState.CREATING,
+      OlObjectState.CREATED,
+      OlObjectState.MOUNTING,
+    ].includes(this.$olObjectState)) {
+      const err = new CanceledError(`${this.vmName} ol object lifecycle canceled`)
+      this.$emit(OlObjectEvent.ERROR, err, this)
+      this.$eventBus.$emit(OlObjectEvent.ERROR, err, this)
+    }
+  }
 
   try {
     try {
@@ -792,4 +795,24 @@ export class LifecycleError extends Error {
 
 export class CanceledError extends Error {
   name = 'CanceledError'
+}
+
+export function isCreateError (err) {
+  return err instanceof LifecycleError &&
+    err.action === OlObjectAction.CREATE
+}
+
+export function isMountError (err) {
+  return err instanceof LifecycleError &&
+    err.action === OlObjectAction.MOUNT
+}
+
+export function isUnmountError (err) {
+  return err instanceof LifecycleError &&
+    err.action === OlObjectAction.UNMOUNT
+}
+
+export function isDestroyError (err) {
+  return err instanceof LifecycleError &&
+    err.action === OlObjectAction.DESTROY
 }

@@ -17,7 +17,18 @@ export interaction from './interaction'
 export interactionsContainer from './interactions-container'
 export layer from './layer'
 export layersContainer from './layers-container'
-export olCmp, { VM_PROP, FRAME_TIME, OlObjectState, OlObjectEvent } from './ol-cmp'
+export olCmp, {
+  VM_PROP,
+  FRAME_TIME,
+  OlObjectState,
+  OlObjectEvent,
+  OlObjectAction,
+  LifecycleError,
+  isCreateError,
+  isMountError,
+  isUnmountError,
+  isDestroyError,
+} from './ol-cmp'
 export overlaysContainer from './overlays-container'
 export projTransforms from './proj-transforms'
 export regShapeStyle from './reg-shape-style'

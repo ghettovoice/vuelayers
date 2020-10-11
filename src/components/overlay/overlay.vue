@@ -15,15 +15,25 @@
   import { Overlay } from 'ol'
   import OverlayPositioning from 'ol/OverlayPositioning'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
+  import { filter as filterObs, map as mapObs, mapTo, mergeMap, skipWhile } from 'rxjs/operators'
+  import { FRAME_TIME, isCreateError, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
   import { EPSG_3857, getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, hasProp, identity, isEqual, makeWatchers, waitFor } from '../../utils'
+  import {
+    addPrefix,
+    assert,
+    clonePlainObject,
+    hasProp,
+    identity,
+    isEqual,
+    makeWatchers,
+    stubTrue,
+    waitFor,
+  } from '../../utils'
 
   export default {
     name: 'VlOverlay',
@@ -183,12 +193,14 @@
         try {
           await waitFor(
             () => this.$mapVm != null,
-            obsFromVueEvent(this.$eventBus, [
-              OlObjectEvent.CREATE_ERROR,
-            ]).pipe(
-              mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+              filterObs(([err, vm]) => {
+                return isCreateError(err) &&
+                  hasProp(vm, '$map') &&
+                  this.$vq.closest(vm)
+              }),
+              mapTo(stubTrue()),
             ),
-            1000,
           )
           this.viewProjection = this.$mapVm.resolvedViewProjection
           this.dataProjection = this.$mapVm.resolvedDataProjection

@@ -32,11 +32,13 @@
   import { get as getProj } from 'ol/proj'
   import RenderEventType from 'ol/render/EventType'
   import { merge as mergeObs } from 'rxjs'
-  import { distinctUntilChanged, map as mapObs, skipWhile } from 'rxjs/operators'
+  import { distinctUntilChanged, filter as filterObs, map as mapObs, mapTo, skipWhile } from 'rxjs/operators'
   import {
     controlsContainer,
     featuresContainer,
     interactionsContainer,
+    isCreateError,
+    isMountError,
     layersContainer,
     olCmp,
     OlObjectEvent,
@@ -66,6 +68,7 @@
     isFunction,
     makeWatchers,
     mergeDescriptors,
+    stubTrue,
     waitFor,
   } from '../../utils'
   import { Layer as VectorLayerCmp } from '../vector-layer'
@@ -257,13 +260,14 @@
         try {
           await waitFor(
             () => this.$viewVm != null,
-            obsFromVueEvent(this.$eventBus, [
-              OlObjectEvent.CREATE_ERROR,
-              OlObjectEvent.MOUNT_ERROR,
-            ]).pipe(
-              mapObs(([vm]) => hasProp(vm, '$view') && vm.$vq?.closest(this)),
+            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+              filterObs(([err, vm]) => {
+                return (isCreateError(err) || isMountError()) &&
+                  hasProp(vm, '$view') &&
+                  vm.$vq?.closest(this)
+              }),
+              mapTo(stubTrue()),
             ),
-            1000,
           )
           this.viewProjection = this.$viewVm.resolvedViewProjection
           this.subscribeTo(
