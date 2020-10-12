@@ -31,7 +31,7 @@
   import MapEventType from 'ol/MapEventType'
   import { get as getProj } from 'ol/proj'
   import RenderEventType from 'ol/render/EventType'
-  import { merge as mergeObs } from 'rxjs'
+  import { merge as mergeObs, race as raceObs } from 'rxjs'
   import { distinctUntilChanged, filter as filterObs, map as mapObs, mapTo, skipWhile } from 'rxjs/operators'
   import {
     controlsContainer,
@@ -45,6 +45,7 @@
     overlaysContainer,
     projTransforms,
   } from '../../mixins'
+  import { CanceledError } from '../../mixins/ol-cmp'
   import {
     EPSG_3857,
     getMapDataProjection,
@@ -260,12 +261,21 @@
         try {
           await waitFor(
             () => this.$viewVm != null,
-            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
-              filterObs(([err, vm]) => {
-                return (isCreateError(err) || isMountError()) &&
-                  hasProp(vm, '$view') &&
-                  vm.$vq?.closest(this)
-              }),
+            raceObs(
+              this.$olObjectEvents.pipe(
+                filterObs(({ name, args }) => {
+                  return name === OlObjectEvent.ERROR &&
+                    args[0] instanceof CanceledError
+                }),
+              ),
+              obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+                filterObs(([err, vm]) => {
+                  return (isCreateError(err) || isMountError()) &&
+                    hasProp(vm, '$view') &&
+                    vm.$vq?.closest(this)
+                }),
+              ),
+            ).pipe(
               mapTo(stubTrue()),
             ),
           )

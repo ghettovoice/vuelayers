@@ -1,6 +1,7 @@
 import debounce from 'debounce-promise'
 import { Feature } from 'ol'
 import ObjectEventType from 'ol/ObjectEventType'
+import { race as raceObs } from 'rxjs'
 import { filter as filterObs, mapTo, skipWhile } from 'rxjs/operators'
 import {
   EPSG_3857,
@@ -10,11 +11,7 @@ import {
   setFeatureId,
   setFeatureProperties,
 } from '../ol-ext'
-import {
-  fromOlEvent as obsFromOlEvent,
-  fromVueEvent as obsFromVueEvent,
-  fromVueWatcher as obsFromVueWatcher,
-} from '../rx-ext'
+import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
 import {
   assert,
   clonePlainObject,
@@ -27,10 +24,11 @@ import {
   waitFor,
 } from '../utils'
 import geometryContainer from './geometry-container'
-import olCmp, { FRAME_TIME, isCreateError, isMountError, OlObjectEvent } from './ol-cmp'
+import olCmp, { CanceledError, FRAME_TIME, isCreateError, isMountError, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 import styleContainer from './style-container'
+import waitForMap from './wait-for-map'
 
 /**
  * A vector object for geographic features with a geometry and other attribute properties,
@@ -43,6 +41,7 @@ export default {
     geometryContainer,
     styleContainer,
     olCmp,
+    waitForMap,
   ],
   stubVNode: {
     empty: false,
@@ -105,41 +104,6 @@ export default {
   },
   methods: {
     /**
-     * @return {Promise<void>}
-     * @protected
-     */
-    async beforeInit () {
-      try {
-        await waitFor(
-          () => this.$mapVm != null,
-          obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
-            filterObs(([err, vm]) => {
-              return isCreateError(err) &&
-                hasProp(vm, '$map') &&
-                this.$vq.closest(vm)
-            }),
-            mapTo(stubTrue()),
-          ),
-        )
-        this.viewProjection = this.$mapVm.resolvedViewProjection
-        this.dataProjection = this.$mapVm.resolvedDataProjection
-        this.subscribeTo(
-          obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
-          ({ value }) => { this.viewProjection = value },
-        )
-        this.subscribeTo(
-          obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
-          ({ value }) => { this.dataProjection = value },
-        )
-        await this.$nextTickPromise()
-
-        return this::olCmp.methods.beforeInit()
-      } catch (err) {
-        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
-        throw err
-      }
-    },
-    /**
      * Create feature without inner style applying, feature level style
      * will be applied in the layer level style function.
      * @return {module:ol/Feature~Feature}
@@ -165,12 +129,21 @@ export default {
       try {
         await waitFor(
           () => this.$geometryVm != null,
-          obsFromVueEvent(this.$eventBus, ObjectEventType.ERROR).pipe(
-            filterObs(([err, vm]) => {
-              return (isCreateError(err) || isMountError(err)) &&
-                hasProp(vm, '$geometry') &&
-                vm.$vq?.closest(this)
-            }),
+          raceObs(
+            this.$olObjectEvents.pipe(
+              filterObs(({ name, args }) => {
+                return name === OlObjectEvent.ERROR &&
+                  args[0] instanceof CanceledError
+              }),
+            ),
+            obsFromVueEvent(this.$eventBus, ObjectEventType.ERROR).pipe(
+              filterObs(([err, vm]) => {
+                return (isCreateError(err) || isMountError(err)) &&
+                  hasProp(vm, '$geometry') &&
+                  vm.$vq?.closest(this)
+              }),
+            ),
+          ).pipe(
             mapTo(stubTrue()),
           ),
         )
@@ -235,6 +208,9 @@ export default {
       'recreate',
       'scheduleRecreate',
       'resolveOlObject',
+    ]),
+    .../*#__PURE__*/pick(waitForMap.methods, [
+      'beforeInit',
     ]),
     .../*#__PURE__*/pick(geometryContainer.methods, [
       'setGeometry',

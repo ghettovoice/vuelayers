@@ -16,15 +16,8 @@
   import { View } from 'ol'
   import { get as getProj } from 'ol/proj'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import {
-    distinctUntilKeyChanged,
-    filter as filterObs,
-    map as mapObs,
-    mapTo,
-    mergeMap,
-    skipWhile,
-  } from 'rxjs/operators'
-  import { FRAME_TIME, isCreateError, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
+  import { distinctUntilKeyChanged, map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
+  import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
   import {
     EPSG_3857,
     getViewId,
@@ -34,25 +27,8 @@
     roundPointCoords,
     setViewId,
   } from '../../ol-ext'
-  import {
-    fromOlChangeEvent as obsFromOlChangeEvent,
-    fromVueEvent as obsFromVueEvent,
-    fromVueWatcher as obsFromVueWatcher,
-  } from '../../rx-ext'
-  import {
-    addPrefix,
-    assert,
-    coalesce,
-    hasProp,
-    isArray,
-    isEqual,
-    isFunction,
-    isNumber,
-    makeWatchers,
-    noop,
-    stubTrue,
-    waitFor,
-  } from '../../utils'
+  import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
+  import { addPrefix, assert, coalesce, isArray, isEqual, isFunction, isNumber, makeWatchers, noop } from '../../utils'
 
   /**
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
@@ -63,6 +39,7 @@
     mixins: [
       projTransforms,
       olCmp,
+      waitForMap,
     ],
     stubVNode: {
       empty () {
@@ -403,36 +380,6 @@
       this::defineServices()
     },
     methods: {
-      /**
-       * @returns {Promise<void>}
-       * @protected
-       */
-      async beforeInit () {
-        try {
-          await waitFor(
-            () => this.$mapVm != null,
-            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
-              filterObs(([err, vm]) => {
-                return isCreateError(err) &&
-                  hasProp(vm, '$map') &&
-                  this.$vq.closest(vm)
-              }),
-              mapTo(stubTrue()),
-            ),
-          )
-          this.dataProjection = this.$mapVm.resolvedDataProjection
-          this.subscribeTo(
-            obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
-            ({ value }) => { this.dataProjection = value },
-          )
-          await this.$nextTickPromise()
-
-          return this::olCmp.methods.beforeInit()
-        } catch (err) {
-          err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
-          throw err
-        }
-      },
       /**
        * @return {module:ol/View~View}
        * @protected
