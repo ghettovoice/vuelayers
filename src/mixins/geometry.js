@@ -117,7 +117,7 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$geometryContainer) {
+      if (this.$geometryContainer && this.$geometryContainer.getGeometryVm() === this) {
         await this.$geometryContainer.setGeometry(null)
       }
 

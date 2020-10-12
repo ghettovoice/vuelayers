@@ -34,6 +34,9 @@
 
         return obj
       },
+      refresh () {
+        ++this.rev
+      },
       getServices () {
         return mergeDescriptors(
           this::olCmp.methods.getServices(),
@@ -45,7 +48,6 @@
         return {
           setFill: async style => {
             await this.$bgStyleContainer.setBackgroundFill(style)
-
             await this.scheduleRefresh()
           },
         }
@@ -54,7 +56,6 @@
         return {
           setStroke: async style => {
             await this.$bgStyleContainer.setBackgroundStroke(style)
-
             await this.scheduleRefresh()
           },
         }

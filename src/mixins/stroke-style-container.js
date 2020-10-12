@@ -61,6 +61,12 @@ export default {
       return this._stroke
     },
     /**
+     * @return {Object}
+     */
+    getStrokeVm () {
+      return this._strokeVm
+    },
+    /**
      * @param {module:ol/style/Stroke~Stroke|undefined} stroke
      * @returns {Promise<void>}
      */
@@ -90,7 +96,7 @@ function defineServices () {
     },
     $strokeVm: {
       enumerable: true,
-      get: () => this._strokeVm,
+      get: this.getStrokeVm,
     },
   })
 }

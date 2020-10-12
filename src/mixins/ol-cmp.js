@@ -490,21 +490,21 @@ function defineServices () {
      */
     $mountPromise: {
       enumerable: true,
-      get: () => this::newLifecyclePromise(
+      get: () => this.$createPromise.then(() => this::newLifecyclePromise(
         OlObjectAction.MOUNT,
         OlObjectEvent.MOUNTED,
         {
           [OlObjectState.CREATING]: [OlObjectAction.CREATE, OlObjectEvent.CREATED],
           [OlObjectState.MOUNTING]: [OlObjectAction.MOUNT, OlObjectEvent.MOUNTED],
         },
-      ),
+      )),
     },
     /**
      * @type {Promise<void>}
      */
     $unmountPromise: {
       enumerable: true,
-      get: () => this::newLifecyclePromise(
+      get: () => this.$mountPromise.then(() => this::newLifecyclePromise(
         OlObjectAction.UNMOUNT,
         OlObjectEvent.UNMOUNTED,
         {
@@ -512,14 +512,23 @@ function defineServices () {
           [OlObjectState.MOUNTING]: [OlObjectAction.MOUNT, OlObjectEvent.MOUNTED],
           [OlObjectState.UNMOUNTING]: [OlObjectAction.UNMOUNT, OlObjectEvent.UNMOUNTED],
         },
-      ),
+      )),
     },
     /**
      * @type {Promise<void>}
      */
     $destroyPromise: {
       enumerable: true,
-      get: () => this::newLifecyclePromise(OlObjectAction.DESTROY, OlObjectState.DESTROYING, OlObjectEvent.DESTROYED),
+      get: () => this.$unmountPromise.then(() => this::newLifecyclePromise(
+        OlObjectAction.DESTROY,
+        OlObjectEvent.DESTROYED,
+        {
+          [OlObjectState.CREATING]: [OlObjectAction.CREATE, OlObjectEvent.CREATED],
+          [OlObjectState.MOUNTING]: [OlObjectAction.MOUNT, OlObjectEvent.MOUNTED],
+          [OlObjectState.UNMOUNTING]: [OlObjectAction.UNMOUNT, OlObjectEvent.UNMOUNTED],
+          [OlObjectState.DESTROYING]: [OlObjectAction.DESTROY, OlObjectEvent.DESTROYED],
+        },
+      )),
     },
   })
 }
@@ -608,7 +617,7 @@ async function execInit (resetEventsObs = true) {
     this.$emit(OlObjectEvent.CREATED, this)
     this.$eventBus.$emit(OlObjectEvent.CREATED, this)
   } catch (err) {
-    const lerr = new LifecycleError(err, OlObjectAction.CREATE)
+    const lerr = new LifecycleError(err, this.vmName, OlObjectAction.CREATE)
     this._olObjectState = prevState
 
     this.$emit(OlObjectEvent.ERROR, lerr, this)
@@ -650,7 +659,7 @@ async function execMount () {
       return
     }
 
-    const werr = new LifecycleError(err, OlObjectAction.MOUNT)
+    const werr = new LifecycleError(err, this.vmName, OlObjectAction.MOUNT)
     this._olObjectState = prevState
 
     this.$emit(OlObjectEvent.ERROR, werr, this)
@@ -711,7 +720,7 @@ async function execUnmount (fireCancel = false) {
     this.$emit(OlObjectEvent.UNMOUNTED, this)
     this.$eventBus.$emit(OlObjectEvent.UNMOUNTED, this)
   } catch (err) {
-    const werr = new LifecycleError(err, OlObjectAction.UNMOUNT)
+    const werr = new LifecycleError(err, this.vmName, OlObjectAction.UNMOUNT)
     this._olObjectState = prevState
 
     this.$emit(OlObjectEvent.ERROR, this, werr)
@@ -758,7 +767,7 @@ async function execDeinit () {
     this.$emit(OlObjectEvent.DESTROYED, this)
     this.$eventBus.$emit(OlObjectEvent.DESTROYED, this)
   } catch (err) {
-    const werr = new LifecycleError(err, OlObjectAction.DESTROY)
+    const werr = new LifecycleError(err, this.vmName, OlObjectAction.DESTROY)
     this._olObjectState = prevState
 
     this.$emit(OlObjectEvent.ERROR, this, werr)
@@ -782,8 +791,9 @@ function subscribeToOlObjectEvents () {
 export class LifecycleError extends Error {
   name = 'LifecycleError'
 
-  constructor (err, action) {
-    super(`${action} ol object failed`)
+  constructor (err, vmName, action) {
+    super(`${vmName} ${action} ol object failed`)
+    this.vmName = vmName
     this.action = action
     this.err = err
   }

@@ -61,6 +61,12 @@ export default {
       return this._fill
     },
     /**
+     * @return {Object}
+     */
+    getFillVm () {
+      return this._fillVm
+    },
+    /**
      * @param {module:ol/style/Fill~Fill|undefined} fill
      * @returns {Promise<void>}
      */
@@ -90,7 +96,7 @@ function defineServices () {
     },
     $fillVm: {
       enumerable: true,
-      get: () => this._fillVm,
+      get: this.getFillVm,
     },
   })
 }

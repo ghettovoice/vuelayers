@@ -208,7 +208,7 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$sourceContainer) {
+      if (this.$sourceContainer && this.$sourceContainer.getSourceVm() === this) {
         await this.$sourceContainer.setSource(null)
       }
 

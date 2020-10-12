@@ -76,7 +76,7 @@ export default {
      * @abstract
      */
     createStyle () {
-      throw new Error('Not implemented method: createStyle')
+      throw new Error(`${this.vmName} not implemented method: createStyle()`)
     },
     /**
      * @return {Promise<void>}

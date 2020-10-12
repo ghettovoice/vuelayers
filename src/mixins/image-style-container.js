@@ -64,6 +64,12 @@ export default {
       return this._image
     },
     /**
+     * @return {Object}
+     */
+    getImageVm () {
+      return this._imageVm
+    },
+    /**
      * @param {module:ol/style/Image~ImageStyle|undefined} image
      * @returns {Promise<void>}
      */
@@ -93,7 +99,7 @@ function defineServices () {
     },
     $imageVm: {
       enumerable: true,
-      get: () => this._imageVm,
+      get: this.getImageVm,
     },
   })
 }

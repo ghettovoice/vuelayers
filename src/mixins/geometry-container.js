@@ -84,6 +84,12 @@ export default {
       return this._geometry
     },
     /**
+     * @return {Object}
+     */
+    getGeometryVm () {
+      return this._geometryVm
+    },
+    /**
      * @param {GeometryLike|undefined} geom
      * @param {boolean} [viewProj=false]
      * @return {Promise<void>}
@@ -120,7 +126,7 @@ function defineService () {
     },
     $geometryVm: {
       enumerable: true,
-      get: () => this._geometryVm,
+      get: this.getGeometryVm,
     },
   })
 }

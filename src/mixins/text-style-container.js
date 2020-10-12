@@ -64,6 +64,12 @@ export default {
       return this._text
     },
     /**
+     * @return {Object}
+     */
+    getTextVm () {
+      return this._textVm
+    },
+    /**
      * @param {module:ol/style/Text~Text|undefined} text
      * @returns {Promise<void>}
      */
@@ -93,7 +99,7 @@ function defineServices () {
     },
     $textVm: {
       enumerable: true,
-      get: () => this._textVm,
+      get: this.getTextVm,
     },
   })
 }

@@ -480,7 +480,7 @@
        * @protected
        */
       async unmount () {
-        if (this.$viewContainer) {
+        if (this.$viewContainer && this.$viewContainer.getViewVm() === this) {
           await this.$viewContainer.setView(null)
         }
 

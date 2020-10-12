@@ -68,7 +68,7 @@ describe('vl-map', () => {
     })
   })
 
-  describe('#focus', () => {
+  describe('focus()', () => {
     it('should focus on map container', done => {
       const div = document.createElement('div')
       document.body.appendChild(div)
@@ -91,7 +91,7 @@ describe('vl-map', () => {
     })
   })
 
-  describe('#$view / #getView()', () => {
+  describe('$view / getView()', () => {
     it('should return ol.View instance', done => {
       const vm = new Ctor({
         propsData: {

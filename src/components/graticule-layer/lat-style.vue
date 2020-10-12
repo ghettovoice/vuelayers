@@ -33,6 +33,9 @@
 
         return obj
       },
+      refresh () {
+        ++this.rev
+      },
       getServices () {
         return mergeDescriptors(
           this::olCmp.methods.getServices(),
@@ -43,7 +46,7 @@
         return {
           setText: async style => {
             await this.$latStyleContainer.setLatLabelStyle(style)
-            ++this.rev
+            await this.scheduleRefresh()
           },
         }
       },

@@ -132,8 +132,8 @@
        * @protected
        */
       async unmount () {
-        if (this.$styleContainer) {
-          await this.$styleContainer.setStyle(this)
+        if (this.$styleContainer && this.$styleContainer.getStyle() === this.$styleFunc) {
+          await this.$styleContainer.setStyle(null)
         }
 
         return this::olCmp.methods.unmount()

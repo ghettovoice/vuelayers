@@ -5,7 +5,7 @@
     :tabindex="tabindex">
     <slot />
     <ViewCmp
-      v-if="!viewProvided"
+      v-if="!withCustomView"
       :id="'vl-' + id + '-default-view'"
       ref="view" />
     <VectorLayerCmp
@@ -176,7 +176,7 @@
     data () {
       return {
         viewProjection: EPSG_3857,
-        viewProvided: false,
+        withCustomView: false,
       }
     },
     computed: {
@@ -494,6 +494,12 @@
         return this._view
       },
       /**
+       * @return {Object}
+       */
+      getViewVm () {
+        return this._viewVm
+      },
+      /**
        * @param {module:ol/View~View|Vue|undefined} view
        * @return {Promise<void>}
        */
@@ -508,7 +514,7 @@
         this._view = view
         this._viewVm = view?.vm && view?.vm[0]
 
-        this.viewProvided = !!view
+        this.withCustomView = (view && (!view.vm || view.vm.some(vm => vm !== this.$refs.view)))
       },
       /**
        * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
@@ -609,7 +615,7 @@
        */
       $viewVm: {
         enumerable: true,
-        get: () => this._viewVm,
+        get: this.getViewVm,
       },
       $featuresOverlayVm: {
         enumerable: true,
