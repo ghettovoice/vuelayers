@@ -2,8 +2,7 @@ import { race as raceObs } from 'rxjs'
 import { filter as filterObs, mapTo } from 'rxjs/operators'
 import { fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher } from '../rx-ext'
 import { hasProp, stubTrue, waitFor } from '../utils'
-import { olCmp } from './index'
-import { CanceledError, isCreateError, OlObjectEvent } from './ol-cmp'
+import olCmp, { CanceledError, isCreateError, OlObjectEvent } from './ol-cmp'
 
 export default {
   methods: {
