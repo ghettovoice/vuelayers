@@ -24,6 +24,7 @@ export olCmp, {
   OlObjectEvent,
   OlObjectAction,
   LifecycleError,
+  CanceledError,
   isCreateError,
   isMountError,
   isUnmountError,

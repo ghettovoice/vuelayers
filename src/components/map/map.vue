@@ -34,6 +34,7 @@
   import { merge as mergeObs, race as raceObs } from 'rxjs'
   import { distinctUntilChanged, filter as filterObs, map as mapObs, mapTo, skipWhile } from 'rxjs/operators'
   import {
+    CanceledError,
     controlsContainer,
     featuresContainer,
     interactionsContainer,
@@ -45,7 +46,6 @@
     overlaysContainer,
     projTransforms,
   } from '../../mixins'
-  import { CanceledError } from '../../mixins/ol-cmp'
   import {
     EPSG_3857,
     getMapDataProjection,
