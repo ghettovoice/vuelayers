@@ -17,7 +17,18 @@ export interaction from './interaction'
 export interactionsContainer from './interactions-container'
 export layer from './layer'
 export layersContainer from './layers-container'
-export olCmp, { VM_PROP, FRAME_TIME, OlObjectState, OlObjectEvent } from './ol-cmp'
+export olCmp, {
+  VM_PROP,
+  FRAME_TIME,
+  OlObjectState,
+  OlObjectEvent,
+  OlObjectAction,
+  LifecycleError,
+  isCreateError,
+  isMountError,
+  isUnmountError,
+  isDestroyError,
+} from './ol-cmp'
 export overlaysContainer from './overlays-container'
 export projTransforms from './proj-transforms'
 export regShapeStyle from './reg-shape-style'
@@ -25,7 +36,7 @@ export rxSubs from './rx-subs'
 export services, { SERVICES_PROP } from './services'
 export simpleGeometry from './simple-geometry'
 export source from './source'
-export sourceContainer, { createSourceContainer } from './source-container'
+export sourceContainer from './source-container'
 export strokeStyleContainer from './stroke-style-container'
 export stubVNode from './stub-vnode'
 export style from './style'

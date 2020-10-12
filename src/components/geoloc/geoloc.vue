@@ -19,15 +19,15 @@
   import { Geolocation } from 'ol'
   import { equivalent as isEqProj, get as getProj } from 'ol/proj'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
+  import { filter as filterObs, map as mapObs, mapTo, mergeMap, skipWhile } from 'rxjs/operators'
+  import { FRAME_TIME, isCreateError, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
   import { EPSG_3857, EPSG_4326 } from '../../ol-ext'
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, coalesce, hasProp, isEqual, waitFor } from '../../utils'
+  import { addPrefix, assert, clonePlainObject, coalesce, hasProp, isEqual, stubTrue, waitFor } from '../../utils'
 
   export default {
     name: 'VlGeoloc',
@@ -208,12 +208,14 @@
         try {
           await waitFor(
             () => this.$mapVm != null,
-            obsFromVueEvent(this.$eventBus, [
-              OlObjectEvent.CREATE_ERROR,
-            ]).pipe(
-              mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+              filterObs(([err, vm]) => {
+                return isCreateError(err) &&
+                  hasProp(vm, '$map') &&
+                  this.$vq.closest(vm)
+              }),
+              mapTo(stubTrue()),
             ),
-            1000,
           )
           this.viewProjection = this.$mapVm.resolvedViewProjection
           this.dataProjection = this.$mapVm.resolvedDataProjection
@@ -229,7 +231,7 @@
 
           return this::olCmp.methods.beforeInit()
         } catch (err) {
-          err.message = 'Wait for $mapVm injection: ' + err.message
+          err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
           throw err
         }
       },

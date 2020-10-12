@@ -1,14 +1,25 @@
 import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
-import { map as mapObs, skipWhile } from 'rxjs/operators'
+import { filter as filterObs, mapTo, skipWhile } from 'rxjs/operators'
 import { EPSG_3857, getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import {
   fromOlChangeEvent as obsFromOlChangeEvent,
   fromVueEvent as obsFromVueEvent,
   fromVueWatcher as obsFromVueWatcher,
 } from '../rx-ext'
-import { assert, addPrefix, hasProp, isArray, isEqual, isString, pick, mergeDescriptors, waitFor } from '../utils'
-import olCmp, { FRAME_TIME, OlObjectEvent } from './ol-cmp'
+import {
+  addPrefix,
+  assert,
+  hasProp,
+  isArray,
+  isEqual,
+  isString,
+  mergeDescriptors,
+  pick,
+  stubTrue,
+  waitFor,
+} from '../utils'
+import olCmp, { FRAME_TIME, isCreateError, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 
@@ -139,12 +150,14 @@ export default {
       try {
         await waitFor(
           () => this.$mapVm != null,
-          obsFromVueEvent(this.$eventBus, [
-            OlObjectEvent.CREATE_ERROR,
-          ]).pipe(
-            mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+          obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+            filterObs(([err, vm]) => {
+              return isCreateError(err) &&
+                hasProp(vm, '$map') &&
+                this.$vq.closest(vm)
+            }),
+            mapTo(stubTrue()),
           ),
-          1000,
         )
         this.viewProjection = this.$mapVm.resolvedViewProjection
         this.dataProjection = this.$mapVm.resolvedDataProjection
@@ -160,7 +173,7 @@ export default {
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {
-        err.message = 'Wait for $mapVm injection: ' + err.message
+        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
         throw err
       }
     },
@@ -177,7 +190,7 @@ export default {
      * @abstract
      */
     createSource () {
-      throw new Error('Not implemented method: createSource')
+      throw new Error(`${this.vmName} not implemented method: createSource()`)
     },
     /**
      * @return {Promise<void>}
@@ -195,7 +208,7 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$sourceContainer) {
+      if (this.$sourceContainer && this.$sourceContainer.getSourceVm() === this) {
         await this.$sourceContainer.setSource(null)
       }
 

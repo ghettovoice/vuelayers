@@ -1,12 +1,12 @@
 <script>
-  import { olCmp, stubVNode, strokeStyleContainer } from '../../mixins'
-  import { stubObject, mergeDescriptors } from '../../utils'
+  import { olCmp, stubVNode, sourceContainer } from '../../mixins'
+  import { mergeDescriptors, stubObject } from '../../utils'
 
   export default {
-    name: 'VlLayerGraticuleStrokeStyle',
+    name: 'VlSourceInner',
     mixins: [
       stubVNode,
-      strokeStyleContainer,
+      sourceContainer,
       olCmp,
     ],
     stubVNode: {
@@ -20,9 +20,9 @@
     },
     created () {
       Object.defineProperties(this, {
-        $strokeStyleContainer: {
+        $innerSourceContainer: {
           enumerable: true,
-          get: () => this.$services?.strokeStyleContainer,
+          get: () => this.$services?.innerSourceContainer,
         },
       })
     },
@@ -39,13 +39,13 @@
       getServices () {
         return mergeDescriptors(
           this::olCmp.methods.getServices(),
-          this::strokeStyleContainer.methods.getServices(),
+          this::sourceContainer.methods.getServices(),
         )
       },
-      getStrokeStyleTarget () {
+      getSourceTarget () {
         return {
-          setStroke: async style => {
-            await this.$strokeStyleContainer.setStrokeStyle(style)
+          setSource: async source => {
+            await this.$innerSourceContainer.setInnerSource(source)
             await this.scheduleRefresh()
           },
         }

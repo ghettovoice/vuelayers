@@ -3,9 +3,11 @@
     :id="vmId"
     :class="vmClass"
     :tabindex="tabindex">
-    <slot>
-      <ViewCmp :id="'vl-' + id + '-default-view'" />
-    </slot>
+    <slot />
+    <ViewCmp
+      v-if="!withCustomView"
+      :id="'vl-' + id + '-default-view'"
+      ref="view" />
     <VectorLayerCmp
       :id="'vl-' + id + '-default-layer'"
       ref="featuresOverlay"
@@ -30,11 +32,13 @@
   import { get as getProj } from 'ol/proj'
   import RenderEventType from 'ol/render/EventType'
   import { merge as mergeObs } from 'rxjs'
-  import { distinctUntilChanged, map as mapObs, skipWhile } from 'rxjs/operators'
+  import { distinctUntilChanged, filter as filterObs, map as mapObs, mapTo, skipWhile } from 'rxjs/operators'
   import {
     controlsContainer,
     featuresContainer,
     interactionsContainer,
+    isCreateError,
+    isMountError,
     layersContainer,
     olCmp,
     OlObjectEvent,
@@ -52,7 +56,8 @@
   import {
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromOlEvent as obsFromOlEvent,
-    fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher,
+    fromVueEvent as obsFromVueEvent,
+    fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
   import {
     addPrefix,
@@ -63,6 +68,7 @@
     isFunction,
     makeWatchers,
     mergeDescriptors,
+    stubTrue,
     waitFor,
   } from '../../utils'
   import { Layer as VectorLayerCmp } from '../vector-layer'
@@ -170,6 +176,7 @@
     data () {
       return {
         viewProjection: EPSG_3857,
+        withCustomView: false,
       }
     },
     computed: {
@@ -253,13 +260,14 @@
         try {
           await waitFor(
             () => this.$viewVm != null,
-            obsFromVueEvent(this.$eventBus, [
-              OlObjectEvent.CREATE_ERROR,
-              OlObjectEvent.MOUNT_ERROR,
-            ]).pipe(
-              mapObs(([vm]) => hasProp(vm, '$view') && vm.$vq?.closest(this)),
+            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+              filterObs(([err, vm]) => {
+                return (isCreateError(err) || isMountError()) &&
+                  hasProp(vm, '$view') &&
+                  vm.$vq?.closest(this)
+              }),
+              mapTo(stubTrue()),
             ),
-            1000,
           )
           this.viewProjection = this.$viewVm.resolvedViewProjection
           this.subscribeTo(
@@ -270,7 +278,7 @@
 
           return this::olCmp.methods.beforeMount()
         } catch (err) {
-          err.message = 'Wait for $viewVm failed: ' + err.message
+          err.message = `${this.vmName} wait for $viewVm failed: ${err.message}`
           throw err
         }
       },
@@ -486,20 +494,27 @@
         return this._view
       },
       /**
+       * @return {Object}
+       */
+      getViewVm () {
+        return this._viewVm
+      },
+      /**
        * @param {module:ol/View~View|Vue|undefined} view
        * @return {Promise<void>}
        */
       async setView (view) {
-        if (view && isFunction(view.resolveOlObject)) {
+        if (isFunction(view?.resolveOlObject)) {
           view = await view.resolveOlObject()
         }
-        view || (view = new View())
 
         if (view === await this.getView()) return
 
         (await this.resolveMap()).setView(view)
         this._view = view
-        this._viewVm = view.vm && view.vm[0]
+        this._viewVm = view?.vm && view?.vm[0]
+
+        this.withCustomView = (view && (!view.vm || view.vm.some(vm => vm !== this.$refs.view)))
       },
       /**
        * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
@@ -600,7 +615,7 @@
        */
       $viewVm: {
         enumerable: true,
-        get: () => this._viewVm,
+        get: this.getViewVm,
       },
       $featuresOverlayVm: {
         enumerable: true,

@@ -52,13 +52,19 @@ export default {
       }
     },
     getStrokeStyleTarget () {
-      throw new Error('Not implemented method: getStrokeStyleTarget')
+      throw new Error(`${this.vmName} not implemented method: getStrokeStyleTarget()`)
     },
     /**
      * @returns {module:ol/style/Stroke~Stroke|undefined}
      */
     getStroke () {
       return this._stroke
+    },
+    /**
+     * @return {Object}
+     */
+    getStrokeVm () {
+      return this._strokeVm
     },
     /**
      * @param {module:ol/style/Stroke~Stroke|undefined} stroke
@@ -90,7 +96,7 @@ function defineServices () {
     },
     $strokeVm: {
       enumerable: true,
-      get: () => this._strokeVm,
+      get: this.getStrokeVm,
     },
   })
 }

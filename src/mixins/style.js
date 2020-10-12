@@ -1,8 +1,8 @@
-import { map as mapObs } from 'rxjs/operators'
+import { filter as filterObs, mapTo } from 'rxjs/operators'
 import { EPSG_3857, getStyleId, initializeStyle, setStyleId } from '../ol-ext'
 import { fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher } from '../rx-ext'
-import { assert, hasProp, pick, mergeDescriptors, waitFor } from '../utils'
-import olCmp, { OlObjectEvent } from './ol-cmp'
+import { assert, hasProp, mergeDescriptors, pick, stubTrue, waitFor } from '../utils'
+import olCmp, { isCreateError, OlObjectEvent } from './ol-cmp'
 import stubVNode from './stub-vnode'
 
 /**
@@ -36,12 +36,14 @@ export default {
       try {
         await waitFor(
           () => this.$mapVm != null,
-          obsFromVueEvent(this.$eventBus, [
-            OlObjectEvent.CREATE_ERROR,
-          ]).pipe(
-            mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+          obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+            filterObs(([err, vm]) => {
+              return isCreateError(err) &&
+                hasProp(vm, '$map') &&
+                this.$vq.closest(vm)
+            }),
+            mapTo(stubTrue()),
           ),
-          1000,
         )
         this.viewProjection = this.$mapVm.resolvedViewProjection
         this.dataProjection = this.$mapVm.resolvedDataProjection
@@ -57,7 +59,7 @@ export default {
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {
-        err.message = 'Wait for $mapVm injection: ' + err.message
+        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
         throw err
       }
     },
@@ -74,7 +76,7 @@ export default {
      * @abstract
      */
     createStyle () {
-      throw new Error('Not implemented method: createStyle')
+      throw new Error(`${this.vmName} not implemented method: createStyle()`)
     },
     /**
      * @return {Promise<void>}

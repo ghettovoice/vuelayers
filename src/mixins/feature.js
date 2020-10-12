@@ -1,7 +1,7 @@
 import debounce from 'debounce-promise'
 import { Feature } from 'ol'
 import ObjectEventType from 'ol/ObjectEventType'
-import { map as mapObs, skipWhile } from 'rxjs/operators'
+import { filter as filterObs, mapTo, skipWhile } from 'rxjs/operators'
 import {
   EPSG_3857,
   getFeatureId,
@@ -15,9 +15,19 @@ import {
   fromVueEvent as obsFromVueEvent,
   fromVueWatcher as obsFromVueWatcher,
 } from '../rx-ext'
-import { assert, clonePlainObject, hasProp, isEqual, mergeDescriptors, pick, stubObject, waitFor } from '../utils'
+import {
+  assert,
+  clonePlainObject,
+  hasProp,
+  isEqual,
+  mergeDescriptors,
+  pick,
+  stubObject,
+  stubTrue,
+  waitFor,
+} from '../utils'
 import geometryContainer from './geometry-container'
-import olCmp, { FRAME_TIME, OlObjectEvent } from './ol-cmp'
+import olCmp, { FRAME_TIME, isCreateError, isMountError, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 import styleContainer from './style-container'
@@ -102,12 +112,14 @@ export default {
       try {
         await waitFor(
           () => this.$mapVm != null,
-          obsFromVueEvent(this.$eventBus, [
-            OlObjectEvent.CREATE_ERROR,
-          ]).pipe(
-            mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+          obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+            filterObs(([err, vm]) => {
+              return isCreateError(err) &&
+                hasProp(vm, '$map') &&
+                this.$vq.closest(vm)
+            }),
+            mapTo(stubTrue()),
           ),
-          1000,
         )
         this.viewProjection = this.$mapVm.resolvedViewProjection
         this.dataProjection = this.$mapVm.resolvedDataProjection
@@ -123,7 +135,7 @@ export default {
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {
-        err.message = 'Wait for $mapVm injection: ' + err.message
+        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
         throw err
       }
     },
@@ -153,18 +165,19 @@ export default {
       try {
         await waitFor(
           () => this.$geometryVm != null,
-          obsFromVueEvent(this.$eventBus, [
-            ObjectEventType.CREATE_ERROR,
-            ObjectEventType.MOUNT_ERROR,
-          ]).pipe(
-            mapObs(([vm]) => hasProp(vm, '$geometry') && this.$vq.find(vm).length),
+          obsFromVueEvent(this.$eventBus, ObjectEventType.ERROR).pipe(
+            filterObs(([err, vm]) => {
+              return (isCreateError(err) || isMountError(err)) &&
+                hasProp(vm, '$geometry') &&
+                vm.$vq?.closest(this)
+            }),
+            mapTo(stubTrue()),
           ),
-          1000,
         )
 
         return this::olCmp.methods.beforeMount()
       } catch (err) {
-        err.message = 'Wait for $geometry failed: ' + err.message
+        err.message = `${this.vmName} wait for $geometry failed: ${err.message}`
         throw err
       }
     },

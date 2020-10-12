@@ -16,8 +16,15 @@
   import { View } from 'ol'
   import { get as getProj } from 'ol/proj'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { distinctUntilKeyChanged, map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
+  import {
+    distinctUntilKeyChanged,
+    filter as filterObs,
+    map as mapObs,
+    mapTo,
+    mergeMap,
+    skipWhile,
+  } from 'rxjs/operators'
+  import { FRAME_TIME, isCreateError, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
   import {
     EPSG_3857,
     getViewId,
@@ -43,6 +50,7 @@
     isNumber,
     makeWatchers,
     noop,
+    stubTrue,
     waitFor,
   } from '../../utils'
 
@@ -403,12 +411,14 @@
         try {
           await waitFor(
             () => this.$mapVm != null,
-            obsFromVueEvent(this.$eventBus, [
-              OlObjectEvent.CREATE_ERROR,
-            ]).pipe(
-              mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+              filterObs(([err, vm]) => {
+                return isCreateError(err) &&
+                  hasProp(vm, '$map') &&
+                  this.$vq.closest(vm)
+              }),
+              mapTo(stubTrue()),
             ),
-            1000,
           )
           this.dataProjection = this.$mapVm.resolvedDataProjection
           this.subscribeTo(
@@ -419,7 +429,7 @@
 
           return this::olCmp.methods.beforeInit()
         } catch (err) {
-          err.message = 'Wait for $mapVm injection: ' + err.message
+          err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
           throw err
         }
       },
@@ -470,7 +480,7 @@
        * @protected
        */
       async unmount () {
-        if (this.$viewContainer) {
+        if (this.$viewContainer && this.$viewContainer.getViewVm() === this) {
           await this.$viewContainer.setView(null)
         }
 

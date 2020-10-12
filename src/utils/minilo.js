@@ -40,6 +40,14 @@ export function stubCollection () {
   return new Collection()
 }
 
+export function stubTrue () {
+  return true
+}
+
+export function stubFalse () {
+  return false
+}
+
 export function identity (value) {
   return value
 }

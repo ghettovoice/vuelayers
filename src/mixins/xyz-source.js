@@ -40,7 +40,7 @@ export default {
         return this.tileGridFactory
       }
 
-      const extent = extentFromProjection(this.resolvedViewProjection)
+      const extent = extentFromProjection(this.resolvedDataProjection)
       const maxZoom = this.maxZoom
       const minZoom = this.minZoom
       const maxResolution = this.maxResolution

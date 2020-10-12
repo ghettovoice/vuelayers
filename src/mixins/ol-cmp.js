@@ -1,12 +1,20 @@
 import debounce from 'debounce-promise'
 import { Observable } from 'ol'
 import EventType from 'ol/events/EventType'
-import { concat as concatObs, from as fromObs, race as raceObs, throwError as throwErrorObs } from 'rxjs'
-import { first as firstObs, mergeMap } from 'rxjs/operators'
+import { merge as mergeObs, of as obsOf, race as raceObs, throwError as throwErrorObs } from 'rxjs'
+import {
+  delayWhen,
+  filter as filterObs,
+  first as firstObs,
+  map as mapObs,
+  mergeMap,
+  publishReplay,
+  refCount,
+} from 'rxjs/operators'
 import { v4 as uuid } from 'uuid'
 import VueQuery from 'vuequery'
-import { bufferDebounceTime, fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../rx-ext'
-import { assert, identity, isFunction, kebabCase, newLogger } from '../utils'
+import { bufferDebounceTime, fromOlEvent as obsFromOlEvent, fromVueEvent } from '../rx-ext'
+import { assert, identity, isArray, isFunction, kebabCase, newLogger } from '../utils'
 import eventBus from './event-bus'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
@@ -21,17 +29,25 @@ export const OlObjectState = {
   CREATED: 'created',
   MOUNTING: 'mounting',
   MOUNTED: 'mounted',
+  UNMOUNTING: 'unmounting',
+  UNMOUNTED: 'unmounted',
+  DESTROYING: 'destroying',
+  DESTROYED: 'destroyed',
 }
 
 export const OlObjectEvent = {
-  CREATED: 'created',
-  CREATE_ERROR: 'createerror',
-  MOUNTED: 'mounted',
-  MOUNT_ERROR: 'mounterror',
-  UNMOUNTED: 'unmounted',
-  UNMOUNT_ERROR: 'unmounterror',
-  DESTROYED: 'destroyed',
-  DESTROY_ERROR: 'destroyerror',
+  CREATED: OlObjectState.CREATED,
+  MOUNTED: OlObjectState.MOUNTED,
+  UNMOUNTED: OlObjectState.UNMOUNTED,
+  DESTROYED: OlObjectState.DESTROYED,
+  ERROR: 'error',
+}
+
+export const OlObjectAction = {
+  CREATE: 'create',
+  MOUNT: 'mount',
+  UNMOUNT: 'unmount',
+  DESTROY: 'destroy',
 }
 
 /**
@@ -135,22 +151,24 @@ export default {
      * @private
      */
     this._olObject = undefined
+    /**
+     * @type {Observable}
+     * @private
+     */
+    this._olObjectEvents = this::newOlObjectEventsObs()
 
     this::defineDebounceMethods()
     this::defineServices()
 
-    await this::execInit()
+    await this::execInit(false)
   },
   async mounted () {
-    await this.$createPromise
     await this::execMount()
   },
   async beforeDestroy () {
-    await this.$mountPromise
-    await this::execUnmount()
+    await this::execUnmount(true)
   },
   async destroyed () {
-    await this.$unmountPromise
     await this::execDeinit()
   },
   methods: {
@@ -182,7 +200,7 @@ export default {
      * @abstract
      */
     createOlObject () {
-      throw new Error('Not implemented method: createOlObject')
+      throw new Error(`${this.vmName} not implemented method: createOlObject()`)
     },
     /**
      * @return {Promise<void>}
@@ -284,6 +302,8 @@ export default {
         OlObjectState.CREATED,
         OlObjectState.MOUNTING,
         OlObjectState.MOUNTED,
+        OlObjectState.UNMOUNTING,
+        OlObjectState.UNMOUNTED,
       ].includes(this.$olObjectState)) {
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log('recreating...')
@@ -318,6 +338,8 @@ export default {
         OlObjectState.CREATED,
         OlObjectState.MOUNTING,
         OlObjectState.MOUNTED,
+        OlObjectState.UNMOUNTING,
+        OlObjectState.UNMOUNTED,
       ].includes(this.$olObjectState)) {
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log('recreate scheduled')
@@ -351,7 +373,7 @@ export default {
     async resolveOlObject () {
       await this.$createPromise
 
-      return this.$olObject || throw new Error('OpenLayers object is undefined')
+      return this.$olObject || throw new OLObjectNotInitializedError(`${this.vmName} OpenLayers object is undefined`)
     },
     async $nextTickPromise () {
       return new Promise(::this.$nextTick)
@@ -446,107 +468,144 @@ function defineServices () {
       enumerable: true,
       get: () => this._olObject,
     },
+    $olObjectEvents: {
+      enumerable: true,
+      get: () => this._olObjectEvents,
+    },
     /**
      * @type {Promise<void>}
      */
     $createPromise: {
       enumerable: true,
-      get: () => {
-        if ([
-          OlObjectState.CREATED,
-          OlObjectState.MOUNTING,
-          OlObjectState.MOUNTED,
-        ].includes(this._olObjectState)) {
-          return Promise.resolve()
-        }
-
-        return raceObs(
-          obsFromVueEvent(this, [OlObjectEvent.CREATED]),
-          obsFromVueEvent(this, [OlObjectEvent.CREATE_ERROR]).pipe(
-            mergeMap(([_, err]) => throwErrorObs(err)),
-          ),
-        ).pipe(firstObs())
-          .toPromise()
-      },
+      get: () => this::newLifecyclePromise(
+        OlObjectAction.CREATE,
+        OlObjectEvent.CREATED,
+        {
+          [OlObjectState.CREATING]: [OlObjectAction.CREATE, OlObjectEvent.CREATED],
+        },
+      ),
     },
     /**
      * @type {Promise<void>}
      */
     $mountPromise: {
       enumerable: true,
-      get: () => {
-        if ([OlObjectState.MOUNTED].includes(this._olObjectState)) {
-          return Promise.resolve()
-        }
-
-        return raceObs(
-          obsFromVueEvent(this, [OlObjectEvent.MOUNTED]),
-          obsFromVueEvent(this, [
-            OlObjectEvent.CREATE_ERROR,
-            OlObjectEvent.MOUNT_ERROR,
-          ]).pipe(
-            mergeMap(([_, err]) => throwErrorObs(err)),
-          ),
-        ).pipe(firstObs())
-          .toPromise()
-      },
+      get: () => this.$createPromise.then(() => this::newLifecyclePromise(
+        OlObjectAction.MOUNT,
+        OlObjectEvent.MOUNTED,
+        {
+          [OlObjectState.CREATING]: [OlObjectAction.CREATE, OlObjectEvent.CREATED],
+          [OlObjectState.MOUNTING]: [OlObjectAction.MOUNT, OlObjectEvent.MOUNTED],
+        },
+      )),
     },
     /**
      * @type {Promise<void>}
      */
     $unmountPromise: {
       enumerable: true,
-      get: () => {
-        return concatObs(
-          fromObs(this.$mountPromise),
-          raceObs(
-            obsFromVueEvent(this, [OlObjectEvent.UNMOUNTED]),
-            obsFromVueEvent(this, [
-              OlObjectEvent.CREATE_ERROR,
-              OlObjectEvent.MOUNT_ERROR,
-              OlObjectEvent.UNMOUNT_ERROR,
-            ]).pipe(
-              mergeMap(([_, err]) => throwErrorObs(err)),
-            ),
-          ).pipe(firstObs()),
-        ).toPromise()
-      },
+      get: () => this.$mountPromise.then(() => this::newLifecyclePromise(
+        OlObjectAction.UNMOUNT,
+        OlObjectEvent.UNMOUNTED,
+        {
+          [OlObjectState.CREATING]: [OlObjectAction.CREATE, OlObjectEvent.CREATED],
+          [OlObjectState.MOUNTING]: [OlObjectAction.MOUNT, OlObjectEvent.MOUNTED],
+          [OlObjectState.UNMOUNTING]: [OlObjectAction.UNMOUNT, OlObjectEvent.UNMOUNTED],
+        },
+      )),
     },
     /**
      * @type {Promise<void>}
      */
     $destroyPromise: {
       enumerable: true,
-      get: () => {
-        return concatObs(
-          fromObs(this.$unmountPromise),
-          raceObs(
-            obsFromVueEvent(this, [OlObjectEvent.DESTROYED]),
-            obsFromVueEvent(this, [
-              OlObjectEvent.CREATE_ERROR,
-              OlObjectEvent.MOUNT_ERROR,
-              OlObjectEvent.UNMOUNT_ERROR,
-              OlObjectEvent.DESTROY_ERROR,
-            ]).pipe(
-              mergeMap(([_, err]) => throwErrorObs(err)),
-            ),
-          ).pipe(firstObs()),
-        ).toPromise()
-      },
+      get: () => this.$unmountPromise.then(() => this::newLifecyclePromise(
+        OlObjectAction.DESTROY,
+        OlObjectEvent.DESTROYED,
+        {
+          [OlObjectState.CREATING]: [OlObjectAction.CREATE, OlObjectEvent.CREATED],
+          [OlObjectState.MOUNTING]: [OlObjectAction.MOUNT, OlObjectEvent.MOUNTED],
+          [OlObjectState.UNMOUNTING]: [OlObjectAction.UNMOUNT, OlObjectEvent.UNMOUNTED],
+          [OlObjectState.DESTROYING]: [OlObjectAction.DESTROY, OlObjectEvent.DESTROYED],
+        },
+      )),
     },
   })
 }
 
+function newOlObjectEventsObs () {
+  return mergeObs(
+    ...Object.values(OlObjectEvent)
+      .map(name => fromVueEvent(this.$eventBus, name, args => ({ name, args: isArray(args) ? args : [args] }))
+        .pipe(
+          filterObs(({ args }) => args[0] === this || args[1] === this),
+        )),
+  ).pipe(
+    publishReplay(),
+    refCount(),
+  )
+}
+
+function newLifecyclePromise (action, endEvent, startStates) {
+  const newFinishObs = (action, endEvent) => raceObs(
+    this.$olObjectEvents.pipe(filterObs(({ name }) => name === endEvent)),
+    this.$olObjectEvents.pipe(filterObs(({ name, args }) => {
+      return name === OlObjectEvent.ERROR &&
+        args[0] instanceof LifecycleError &&
+        args[0].action === action
+    })),
+  )
+
+  return mergeObs(
+    newFinishObs(action, endEvent),
+    this.$olObjectEvents.pipe(
+      filterObs(({ name, args }) => {
+        return name === OlObjectEvent.ERROR &&
+          args[0] instanceof CanceledError
+      }),
+    ),
+  ).pipe(
+    firstObs(),
+    mergeMap(evt => {
+      let obs = obsOf(evt)
+      // If at the time of CancelError the ol object stay in some intermediate
+      // we need to delay observable emit until current hook complete
+      if (
+        evt.name === OlObjectEvent.ERROR &&
+        evt.args[0] instanceof CanceledError &&
+        startStates[this.$olObjectState] != null
+      ) {
+        obs = obs.pipe(delayWhen(() => newFinishObs(...startStates[this.$olObjectState])))
+      }
+      return obs
+    }),
+    mergeMap(evt => {
+      if (evt.name === OlObjectEvent.ERROR) {
+        return throwErrorObs(evt.args[0])
+      }
+      return obsOf(evt)
+    }),
+    mapObs(({ args }) => args.length === 1 ? args[0] : args),
+  ).toPromise()
+}
+
 /**
+ * @param {boolean} [resetEventsObs=true]
  * @returns {Promise<void>}
  * @private
  */
-async function execInit () {
-  try {
-    await this.beforeInit()
+async function execInit (resetEventsObs = true) {
+  const prevState = this._olObjectState
 
+  if (resetEventsObs) {
+    this._olObjectEvents = this::newOlObjectEventsObs()
+  }
+  this._olObjectEvents.subscribe()
+
+  try {
     this._olObjectState = OlObjectState.CREATING
 
+    await this.beforeInit()
     await this.init()
 
     this._olObjectState = OlObjectState.CREATED
@@ -558,42 +617,11 @@ async function execInit () {
     this.$emit(OlObjectEvent.CREATED, this)
     this.$eventBus.$emit(OlObjectEvent.CREATED, this)
   } catch (err) {
-    this._olObjectState = OlObjectState.UNDEF
+    const lerr = new LifecycleError(err, this.vmName, OlObjectAction.CREATE)
+    this._olObjectState = prevState
 
-    if (process.env.VUELAYERS_DEBUG) {
-      this.$logger.error(`ol object ${OlObjectEvent.CREATE_ERROR}`, err)
-    }
-
-    this.$emit(OlObjectEvent.CREATE_ERROR, this, err)
-    this.$eventBus.$emit(OlObjectEvent.CREATE_ERROR, this, err)
-
-    throw err
-  }
-}
-
-/**
- * @returns {Promise<void>}
- * @private
- */
-async function execDeinit () {
-  try {
-    this._olObjectState = OlObjectState.UNDEF
-
-    await this.deinit()
-
-    if (process.env.VUELAYERS_DEBUG) {
-      this.$logger.log(`ol object ${OlObjectEvent.DESTROYED}`)
-    }
-
-    this.$emit(OlObjectEvent.DESTROYED, this)
-    this.$eventBus.$emit(OlObjectEvent.DESTROYED, this)
-  } catch (err) {
-    if (process.env.VUELAYERS_DEBUG) {
-      this.$logger.error(`ol object ${OlObjectEvent.DESTROY_ERROR}`, err)
-    }
-
-    this.$emit(OlObjectEvent.DESTROY_ERROR, this, err)
-    this.$eventBus.$emit(OlObjectEvent.DESTROY_ERROR, this, err)
+    this.$emit(OlObjectEvent.ERROR, lerr, this)
+    this.$eventBus.$emit(OlObjectEvent.ERROR, lerr, this)
 
     throw err
   }
@@ -604,11 +632,14 @@ async function execDeinit () {
  * @private
  */
 async function execMount () {
+  const prevState = this._olObjectState
+
   try {
-    await this.beforeMount()
+    await this.$createPromise
 
     this._olObjectState = OlObjectState.MOUNTING
 
+    await this.beforeMount()
     await this.mount()
 
     this._olObjectState = OlObjectState.MOUNTED
@@ -620,28 +651,67 @@ async function execMount () {
     this.$emit(OlObjectEvent.MOUNTED, this)
     this.$eventBus.$emit(OlObjectEvent.MOUNTED, this)
   } catch (err) {
-    this._olObjectState = OlObjectState.CREATED
+    if (err instanceof CanceledError) {
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`ol object ${OlObjectAction.MOUNT} canceled`)
+      }
 
-    if (process.env.VUELAYERS_DEBUG) {
-      this.$logger.error(`ol object ${OlObjectEvent.MOUNT_ERROR}`, err)
+      return
     }
 
-    this.$emit(OlObjectEvent.MOUNT_ERROR, this, err)
-    this.$eventBus.$emit(OlObjectEvent.MOUNT_ERROR, this, err)
+    const werr = new LifecycleError(err, this.vmName, OlObjectAction.MOUNT)
+    this._olObjectState = prevState
+
+    this.$emit(OlObjectEvent.ERROR, werr, this)
+    this.$eventBus.$emit(OlObjectEvent.ERROR, werr, this)
 
     throw err
   }
 }
 
 /**
+ * @param {boolean} [fireCancel=false]
  * @return {void|Promise<void>}
  * @private
  */
-async function execUnmount () {
+async function execUnmount (fireCancel = false) {
+  const prevState = this._olObjectState
+
+  if (fireCancel) {
+    if ([
+      OlObjectState.UNDEF,
+      OlObjectState.CREATING,
+      OlObjectState.CREATED,
+      OlObjectState.MOUNTING,
+    ].includes(this.$olObjectState)) {
+      const err = new CanceledError(`${this.vmName} ol object lifecycle canceled`)
+      this.$emit(OlObjectEvent.ERROR, err, this)
+      this.$eventBus.$emit(OlObjectEvent.ERROR, err, this)
+    }
+  }
+
   try {
-    this._olObjectState = OlObjectState.CREATED
+    try {
+      await this.$mountPromise
+    } catch (err) {
+      if (err instanceof CanceledError) {
+        if (this.$olObjectState !== OlObjectState.MOUNTED) {
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.log(`ol object ${OlObjectAction.UNMOUNT} canceled`)
+          }
+
+          return
+        }
+      } else {
+        throw err
+      }
+    }
+
+    this._olObjectState = OlObjectState.UNMOUNTING
 
     await this.unmount()
+
+    this._olObjectState = OlObjectState.UNMOUNTED
 
     if (process.env.VUELAYERS_DEBUG) {
       this.$logger.log(`ol object ${OlObjectEvent.UNMOUNTED}`)
@@ -650,12 +720,58 @@ async function execUnmount () {
     this.$emit(OlObjectEvent.UNMOUNTED, this)
     this.$eventBus.$emit(OlObjectEvent.UNMOUNTED, this)
   } catch (err) {
-    if (process.env.VUELAYERS_DEBUG) {
-      this.$logger.error(`ol object ${OlObjectEvent.UNMOUNT_ERROR}`, err)
+    const werr = new LifecycleError(err, this.vmName, OlObjectAction.UNMOUNT)
+    this._olObjectState = prevState
+
+    this.$emit(OlObjectEvent.ERROR, this, werr)
+    this.$eventBus.$emit(OlObjectEvent.ERROR, this, werr)
+
+    throw err
+  }
+}
+
+/**
+ * @returns {Promise<void>}
+ * @private
+ */
+async function execDeinit () {
+  const prevState = this._olObjectState
+
+  try {
+    try {
+      await this.$unmountPromise
+    } catch (err) {
+      if (err instanceof CanceledError) {
+        if (this.$olObjectState !== OlObjectState.CREATED) {
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.log(`ol object ${OlObjectAction.DESTROY} canceled`)
+          }
+
+          return
+        }
+      } else {
+        throw err
+      }
     }
 
-    this.$emit(OlObjectEvent.UNMOUNT_ERROR, this, err)
-    this.$eventBus.$emit(OlObjectEvent.UNMOUNT_ERROR, this, err)
+    this._olObjectState = OlObjectState.DESTROYING
+
+    await this.deinit()
+
+    this._olObjectState = OlObjectState.DESTROYED
+
+    if (process.env.VUELAYERS_DEBUG) {
+      this.$logger.log(`ol object ${OlObjectEvent.DESTROYED}`)
+    }
+
+    this.$emit(OlObjectEvent.DESTROYED, this)
+    this.$eventBus.$emit(OlObjectEvent.DESTROYED, this)
+  } catch (err) {
+    const werr = new LifecycleError(err, this.vmName, OlObjectAction.DESTROY)
+    this._olObjectState = prevState
+
+    this.$emit(OlObjectEvent.ERROR, this, werr)
+    this.$eventBus.$emit(OlObjectEvent.ERROR, this, werr)
 
     throw err
   }
@@ -670,4 +786,47 @@ function subscribeToOlObjectEvents () {
   this.subscribeTo(changes, () => {
     ++this.rev
   })
+}
+
+export class LifecycleError extends Error {
+  name = 'LifecycleError'
+
+  constructor (err, vmName, action) {
+    super(`${vmName} ${action} ol object failed`)
+    this.vmName = vmName
+    this.action = action
+    this.err = err
+  }
+
+  unwrap () {
+    return this.err
+  }
+}
+
+export class CanceledError extends Error {
+  name = 'CanceledError'
+}
+
+export function isCreateError (err) {
+  return err instanceof LifecycleError &&
+    err.action === OlObjectAction.CREATE
+}
+
+export function isMountError (err) {
+  return err instanceof LifecycleError &&
+    err.action === OlObjectAction.MOUNT
+}
+
+export function isUnmountError (err) {
+  return err instanceof LifecycleError &&
+    err.action === OlObjectAction.UNMOUNT
+}
+
+export function isDestroyError (err) {
+  return err instanceof LifecycleError &&
+    err.action === OlObjectAction.DESTROY
+}
+
+export class OLObjectNotInitializedError extends Error {
+  name = 'OLObjectNotInitializedError'
 }

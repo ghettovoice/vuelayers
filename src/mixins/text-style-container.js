@@ -55,13 +55,19 @@ export default {
      * @return {Promise<module:ol/style/Text~Text|undefined>}
      */
     getTextStyleTarget () {
-      throw new Error('Not implemented method: getTextStyleTarget')
+      throw new Error(`${this.vmName} not implemented method: getTextStyleTarget()`)
     },
     /**
      * @returns {module:ol/style/Text~Text|null}
      */
     getText () {
       return this._text
+    },
+    /**
+     * @return {Object}
+     */
+    getTextVm () {
+      return this._textVm
     },
     /**
      * @param {module:ol/style/Text~Text|undefined} text
@@ -93,7 +99,7 @@ function defineServices () {
     },
     $textVm: {
       enumerable: true,
-      get: () => this._textVm,
+      get: this.getTextVm,
     },
   })
 }

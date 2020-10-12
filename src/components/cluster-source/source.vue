@@ -1,18 +1,28 @@
+<template>
+  <i
+    :id="vmId"
+    :class="vmClass"
+    style="display: none !important;">
+    <InnerSource :id="'vl-' + id + '-inner-source'">
+      <slot />
+    </InnerSource>
+  </i>
+</template>
+
 <script>
   import debounce from 'debounce-promise'
   import { Cluster as ClusterSource } from 'ol/source'
-  import { createSourceContainer, FRAME_TIME, vectorSource } from '../../mixins'
-  import { createPointGeom, findPointOnSurface } from '../../ol-ext'
-  import { mergeDescriptors, makeWatchers, isEqual } from '../../utils'
-
-  const sourceContainer = /*#__PURE__*/createSourceContainer({
-    propName: 'innerSource',
-  })
+  import { FRAME_TIME, vectorSource } from '../../mixins'
+  import { createPointGeom, findPointOnSurface, getSourceId } from '../../ol-ext'
+  import { mergeDescriptors, makeWatchers, isEqual, clonePlainObject, isFunction } from '../../utils'
+  import InnerSource from './inner-source.vue'
 
   export default {
     name: 'VlSourceCluster',
+    components: {
+      InnerSource,
+    },
     mixins: [
-      sourceContainer,
       vectorSource,
     ],
     props: {
@@ -46,6 +56,11 @@
 
         return geomFunc || defaultGeomFunc
       },
+      currentInnerSource () {
+        if (!(this.rev && this.$innerSource)) return
+
+        return getSourceId(this.$innerSource)
+      },
     },
     watch: {
       async distance (value) {
@@ -55,6 +70,11 @@
         if (value === this.distance) return
 
         this.$emit('update:distance', value)
+      }, FRAME_TIME),
+      currentInnerSource: debounce(function (value, prev) {
+        if (value === prev) return
+
+        this.$emit('update:innerSource', value && clonePlainObject(value))
       }, FRAME_TIME),
       .../*#__PURE__*/makeWatchers([
         'resolvedGeomFunc',
@@ -74,6 +94,11 @@
           this.$logger.warn("'geomFuncFactory' prop is deprecated. Use 'geomFunc' prop instead.")
         }
       }
+
+      this._innerSource = null
+      this._innerSourceVm = null
+
+      this::defineServices()
     },
     updated () {
       if (process.env.NODE_ENV !== 'production') {
@@ -95,9 +120,13 @@
         })
       },
       getServices () {
+        const vm = this
+
         return mergeDescriptors(
           this::vectorSource.methods.getServices(),
-          this::sourceContainer.methods.getServices(),
+          {
+            get innerSourceContainer () { return vm },
+          },
         )
       },
       getSourceTarget: vectorSource.methods.resolveOlObject,
@@ -114,7 +143,39 @@
 
         (await this.resolveSource()).setDistance(distance)
       },
+      getInnerSource () {
+        return this._innerSource
+      },
+      getInnerSourceVm () {
+        return this._innerSourceVm
+      },
+      async setInnerSource (innerSource) {
+        if (isFunction(innerSource?.resolveOlObject)) {
+          innerSource = await innerSource.resolveOlObject()
+        }
+        innerSource || (innerSource = null)
+
+        if (innerSource === this._innerSource) return
+
+        this._innerSource = innerSource
+        this._innerSourceVm = innerSource?.vm && innerSource.vm[0]
+        const source = await this.resolveSource()
+        source.setSource(innerSource)
+      },
     },
+  }
+
+  function defineServices () {
+    Object.defineProperties(this, {
+      $innerSource: {
+        enumerable: true,
+        get: this.getInnerSource,
+      },
+      $innerSourceVm: {
+        enumerable: true,
+        get: this.getInnerSourceVm,
+      },
+    })
   }
 
   function defaultGeomFunc (feature) {

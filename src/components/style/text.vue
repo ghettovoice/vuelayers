@@ -204,7 +204,7 @@
        * @protected
        */
       async unmount () {
-        if (this.$textStyleContainer) {
+        if (this.$textStyleContainer && this.$textStyleContainer.getTextVm() === this) {
           await this.$textStyleContainer.setText(null)
         }
 

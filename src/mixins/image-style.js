@@ -89,7 +89,7 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$imageStyleContainer) {
+      if (this.$imageStyleContainer && this.$imageStyleContainer.getImageVm() === this) {
         await this.$imageStyleContainer.setImage(null)
       }
 

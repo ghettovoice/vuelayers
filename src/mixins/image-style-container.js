@@ -55,13 +55,19 @@ export default {
      * @return {ImageStyleTarget}
      */
     getImageStyleTarget () {
-      throw new Error('Not implemented method: getImageStyleTarget')
+      throw new Error(`${this.vmName} not implemented method: getImageStyleTarget()`)
     },
     /**
      * @returns {module:ol/style/Image~ImageStyle|undefined}
      */
     getImage () {
       return this._image
+    },
+    /**
+     * @return {Object}
+     */
+    getImageVm () {
+      return this._imageVm
     },
     /**
      * @param {module:ol/style/Image~ImageStyle|undefined} image
@@ -93,7 +99,7 @@ function defineServices () {
     },
     $imageVm: {
       enumerable: true,
-      get: () => this._imageVm,
+      get: this.getImageVm,
     },
   })
 }

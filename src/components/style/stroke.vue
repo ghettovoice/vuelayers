@@ -99,8 +99,8 @@
        * @protected
        */
       async unmount () {
-        if (this.$strokeStyleContainer) {
-          await this.$strokeStyleContainer.setStroke(undefined)
+        if (this.$strokeStyleContainer && this.$strokeStyleContainer.getStrokeVm() === this) {
+          await this.$strokeStyleContainer.setStroke(null)
         }
 
         return this::style.methods.unmount()

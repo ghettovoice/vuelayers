@@ -54,8 +54,8 @@
        * @protected
        */
       async unmount () {
-        if (this.$fillStyleContainer) {
-          await this.$fillStyleContainer.setFill(undefined)
+        if (this.$fillStyleContainer && this.$fillStyleContainer.getFillVm() === this) {
+          await this.$fillStyleContainer.setFill(null)
         }
 
         return this::style.methods.unmount()

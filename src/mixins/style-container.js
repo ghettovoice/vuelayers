@@ -76,7 +76,7 @@ export default {
      * @abstract
      */
     getStyleTarget () {
-      throw new Error('Not implemented method: getStyleTarget')
+      throw new Error(`${this.vmName} not implemented method: getStyleTarget()`)
     },
     /**
      * @return {StyleLike|null}

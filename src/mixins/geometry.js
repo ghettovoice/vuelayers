@@ -1,8 +1,12 @@
-import { map as mapObs, skipWhile } from 'rxjs/operators'
+import { filter as filterObs, mapTo, skipWhile } from 'rxjs/operators'
 import { EPSG_3857, getGeometryId, initializeGeometry, roundExtent, roundPointCoords, setGeometryId } from '../ol-ext'
-import { fromOlChangeEvent as obsFromOlChangeEvent, fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher } from '../rx-ext'
-import { assert, addPrefix, hasProp, isEqual, pick, mergeDescriptors, waitFor } from '../utils'
-import olCmp, { OlObjectEvent } from './ol-cmp'
+import {
+  fromOlChangeEvent as obsFromOlChangeEvent,
+  fromVueEvent as obsFromVueEvent,
+  fromVueWatcher as obsFromVueWatcher,
+} from '../rx-ext'
+import { addPrefix, assert, hasProp, isEqual, mergeDescriptors, pick, stubTrue, waitFor } from '../utils'
+import olCmp, { isCreateError, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 
@@ -55,12 +59,14 @@ export default {
       try {
         await waitFor(
           () => this.$mapVm != null,
-          obsFromVueEvent(this.$eventBus, [
-            OlObjectEvent.CREATE_ERROR,
-          ]).pipe(
-            mapObs(([vm]) => hasProp(vm, '$map') && this.$vq.closest(vm)),
+          obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
+            filterObs(([err, vm]) => {
+              return isCreateError(err) &&
+                hasProp(vm, '$map') &&
+                this.$vq.closest(vm)
+            }),
+            mapTo(stubTrue()),
           ),
-          1000,
         )
         this.viewProjection = this.$mapVm.resolvedViewProjection
         this.dataProjection = this.$mapVm.resolvedDataProjection
@@ -76,7 +82,7 @@ export default {
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {
-        err.message = 'Wait for $mapVm injection: ' + err.message
+        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
         throw err
       }
     },
@@ -93,7 +99,7 @@ export default {
      * @abstract
      */
     createGeometry () {
-      throw new Error('Not implemented method: createGeometry')
+      throw new Error(`${this.vmName} not implemented method: createGeometry()`)
     },
     /**
      * @return {Promise<void>}
@@ -111,7 +117,7 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$geometryContainer) {
+      if (this.$geometryContainer && this.$geometryContainer.getGeometryVm() === this) {
         await this.$geometryContainer.setGeometry(null)
       }
 
