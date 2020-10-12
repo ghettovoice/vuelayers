@@ -55,7 +55,7 @@ export default {
      * @return {ImageStyleTarget}
      */
     getImageStyleTarget () {
-      throw new Error('Not implemented method: getImageStyleTarget')
+      throw new Error(`${this.vmName} not implemented method: getImageStyleTarget()`)
     },
     /**
      * @returns {module:ol/style/Image~ImageStyle|undefined}

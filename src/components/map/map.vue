@@ -278,7 +278,7 @@
 
           return this::olCmp.methods.beforeMount()
         } catch (err) {
-          err.message = 'Wait for $viewVm failed: ' + err.message
+          err.message = `${this.vmName} wait for $viewVm failed: ${err.message}`
           throw err
         }
       },

@@ -173,7 +173,7 @@ export default {
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {
-        err.message = 'Wait for $mapVm injection: ' + err.message
+        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
         throw err
       }
     },
@@ -190,7 +190,7 @@ export default {
      * @abstract
      */
     createSource () {
-      throw new Error('Not implemented method: createSource')
+      throw new Error(`${this.vmName} not implemented method: createSource()`)
     },
     /**
      * @return {Promise<void>}

@@ -267,7 +267,7 @@ export default {
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {
-        err.message = 'Wait for $mapVm injection: ' + err.message
+        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
         throw err
       }
     },
@@ -284,7 +284,7 @@ export default {
      * @abstract
      */
     createLayer () {
-      throw new Error('Not implemented method: createLayer')
+      throw new Error(`${this.vmName} not implemented method: createLayer`)
     },
     /**
      * @return {Promise<void>}

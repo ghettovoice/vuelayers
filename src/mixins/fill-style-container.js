@@ -52,7 +52,7 @@ export default {
       }
     },
     getFillStyleTarget () {
-      throw new Error('Not implemented method: getFillStyleTarget')
+      throw new Error(`${this.vmName} not implemented method: getFillStyleTarget()`)
     },
     /**
      * @returns {module:ol/style/Fill~Fill|undefined}

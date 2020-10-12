@@ -75,7 +75,7 @@ export default {
      * @protected
      */
     getGeometryTarget () {
-      throw new Error('Not implemented method: getGeometryTarget')
+      throw new Error(`${this.vmName} not implemented method: getGeometryTarget()`)
     },
     /**
      * @return {module:ol/geom/Geometry~Geometry|undefined}

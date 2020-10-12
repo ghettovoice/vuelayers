@@ -55,7 +55,7 @@ export default {
      * @return {Promise<module:ol/style/Text~Text|undefined>}
      */
     getTextStyleTarget () {
-      throw new Error('Not implemented method: getTextStyleTarget')
+      throw new Error(`${this.vmName} not implemented method: getTextStyleTarget()`)
     },
     /**
      * @returns {module:ol/style/Text~Text|null}

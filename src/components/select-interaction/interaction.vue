@@ -288,7 +288,7 @@
 
         const featureId = isString(feature) || isNumber(feature) ? feature : getFeatureId(feature)
         if (!featureId) {
-          throw new Error('Undefined feature id')
+          throw new Error(`${this.vmName} undefined feature id`)
         }
 
         feature = null

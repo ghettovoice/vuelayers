@@ -135,7 +135,7 @@ export default {
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {
-        err.message = 'Wait for $mapVm injection: ' + err.message
+        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
         throw err
       }
     },
@@ -177,7 +177,7 @@ export default {
 
         return this::olCmp.methods.beforeMount()
       } catch (err) {
-        err.message = 'Wait for $geometry failed: ' + err.message
+        err.message = `${this.vmName} wait for $geometry failed: ${err.message}`
         throw err
       }
     },

@@ -200,7 +200,7 @@ export default {
      * @abstract
      */
     createOlObject () {
-      throw new Error('Not implemented method: createOlObject')
+      throw new Error(`${this.vmName} not implemented method: createOlObject()`)
     },
     /**
      * @return {Promise<void>}
@@ -373,7 +373,7 @@ export default {
     async resolveOlObject () {
       await this.$createPromise
 
-      return this.$olObject || throw new Error('OpenLayers object is undefined')
+      return this.$olObject || throw new OLObjectNotInitializedError(`${this.vmName} OpenLayers object is undefined`)
     },
     async $nextTickPromise () {
       return new Promise(::this.$nextTick)
@@ -825,4 +825,8 @@ export function isUnmountError (err) {
 export function isDestroyError (err) {
   return err instanceof LifecycleError &&
     err.action === OlObjectAction.DESTROY
+}
+
+export class OLObjectNotInitializedError extends Error {
+  name = 'OLObjectNotInitializedError'
 }

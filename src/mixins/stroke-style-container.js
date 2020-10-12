@@ -52,7 +52,7 @@ export default {
       }
     },
     getStrokeStyleTarget () {
-      throw new Error('Not implemented method: getStrokeStyleTarget')
+      throw new Error(`${this.vmName} not implemented method: getStrokeStyleTarget()`)
     },
     /**
      * @returns {module:ol/style/Stroke~Stroke|undefined}

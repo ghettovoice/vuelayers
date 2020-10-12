@@ -216,7 +216,7 @@
 
           return this::olCmp.methods.beforeInit()
         } catch (err) {
-          err.message = 'Wait for $mapVm injection: ' + err.message
+          err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
           throw err
         }
       },
