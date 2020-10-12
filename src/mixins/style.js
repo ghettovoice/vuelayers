@@ -1,9 +1,8 @@
-import { filter as filterObs, mapTo } from 'rxjs/operators'
 import { EPSG_3857, getStyleId, initializeStyle, setStyleId } from '../ol-ext'
-import { fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher } from '../rx-ext'
-import { assert, hasProp, mergeDescriptors, pick, stubTrue, waitFor } from '../utils'
-import olCmp, { isCreateError, OlObjectEvent } from './ol-cmp'
+import { assert, mergeDescriptors, pick } from '../utils'
+import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
+import waitForMap from './wait-for-map'
 
 /**
  * Basic style mixin.
@@ -12,6 +11,7 @@ export default {
   mixins: [
     stubVNode,
     olCmp,
+    waitForMap,
   ],
   stubVNode: {
     empty () {
@@ -28,41 +28,6 @@ export default {
     this::defineServices()
   },
   methods: {
-    /**
-     * @returns {Promise<void>}
-     * @protected
-     */
-    async beforeInit () {
-      try {
-        await waitFor(
-          () => this.$mapVm != null,
-          obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
-            filterObs(([err, vm]) => {
-              return isCreateError(err) &&
-                hasProp(vm, '$map') &&
-                this.$vq.closest(vm)
-            }),
-            mapTo(stubTrue()),
-          ),
-        )
-        this.viewProjection = this.$mapVm.resolvedViewProjection
-        this.dataProjection = this.$mapVm.resolvedDataProjection
-        this.subscribeTo(
-          obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
-          ({ value }) => { this.viewProjection = value },
-        )
-        this.subscribeTo(
-          obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
-          ({ value }) => { this.dataProjection = value },
-        )
-        await this.$nextTickPromise()
-
-        return this::olCmp.methods.beforeInit()
-      } catch (err) {
-        err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
-        throw err
-      }
-    },
     /**
      * @return {OlStyle|Promise<OlStyle>}
      * @protected
@@ -120,6 +85,9 @@ export default {
       'scheduleRecreate',
       'subscribeAll',
       'resolveOlObject',
+    ]),
+    .../*#__PURE__*/pick(waitForMap.methods, [
+      'beforeInit',
     ]),
     /**
      * @returns {string|number}

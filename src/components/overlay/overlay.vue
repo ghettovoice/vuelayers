@@ -15,31 +15,18 @@
   import { Overlay } from 'ol'
   import OverlayPositioning from 'ol/OverlayPositioning'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { filter as filterObs, map as mapObs, mapTo, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, isCreateError, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
+  import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
+  import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
   import { EPSG_3857, getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
-  import {
-    fromOlChangeEvent as obsFromOlChangeEvent,
-    fromVueEvent as obsFromVueEvent,
-    fromVueWatcher as obsFromVueWatcher,
-  } from '../../rx-ext'
-  import {
-    addPrefix,
-    assert,
-    clonePlainObject,
-    hasProp,
-    identity,
-    isEqual,
-    makeWatchers,
-    stubTrue,
-    waitFor,
-  } from '../../utils'
+  import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
+  import { addPrefix, assert, clonePlainObject, identity, isEqual, makeWatchers } from '../../utils'
 
   export default {
     name: 'VlOverlay',
     mixins: [
       projTransforms,
       olCmp,
+      waitForMap,
     ],
     props: {
       offset: {
@@ -185,41 +172,6 @@
       this::defineServices()
     },
     methods: {
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
-      async beforeInit () {
-        try {
-          await waitFor(
-            () => this.$mapVm != null,
-            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
-              filterObs(([err, vm]) => {
-                return isCreateError(err) &&
-                  hasProp(vm, '$map') &&
-                  this.$vq.closest(vm)
-              }),
-              mapTo(stubTrue()),
-            ),
-          )
-          this.viewProjection = this.$mapVm.resolvedViewProjection
-          this.dataProjection = this.$mapVm.resolvedDataProjection
-          this.subscribeTo(
-            obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
-            ({ value }) => { this.viewProjection = value },
-          )
-          this.subscribeTo(
-            obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
-            ({ value }) => { this.dataProjection = value },
-          )
-          await this.$nextTickPromise()
-
-          return this::olCmp.methods.beforeInit()
-        } catch (err) {
-          err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
-          throw err
-        }
-      },
       /**
        * @return {module:ol/Overlay~Overlay}
        * @protected

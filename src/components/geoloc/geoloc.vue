@@ -19,21 +19,18 @@
   import { Geolocation } from 'ol'
   import { equivalent as isEqProj, get as getProj } from 'ol/proj'
   import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { filter as filterObs, map as mapObs, mapTo, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, isCreateError, olCmp, OlObjectEvent, projTransforms } from '../../mixins'
+  import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
+  import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
   import { EPSG_3857, EPSG_4326 } from '../../ol-ext'
-  import {
-    fromOlChangeEvent as obsFromOlChangeEvent,
-    fromVueEvent as obsFromVueEvent,
-    fromVueWatcher as obsFromVueWatcher,
-  } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, coalesce, hasProp, isEqual, stubTrue, waitFor } from '../../utils'
+  import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
+  import { addPrefix, assert, clonePlainObject, coalesce, isEqual } from '../../utils'
 
   export default {
     name: 'VlGeoloc',
     mixins: [
       projTransforms,
       olCmp,
+      waitForMap,
     ],
     stubVNode: {
       empty () {
@@ -200,41 +197,6 @@
       this::defineServices()
     },
     methods: {
-      /**
-       * @returns {Promise<void>}
-       * @protected
-       */
-      async beforeInit () {
-        try {
-          await waitFor(
-            () => this.$mapVm != null,
-            obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
-              filterObs(([err, vm]) => {
-                return isCreateError(err) &&
-                  hasProp(vm, '$map') &&
-                  this.$vq.closest(vm)
-              }),
-              mapTo(stubTrue()),
-            ),
-          )
-          this.viewProjection = this.$mapVm.resolvedViewProjection
-          this.dataProjection = this.$mapVm.resolvedDataProjection
-          this.subscribeTo(
-            obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
-            ({ value }) => { this.viewProjection = value },
-          )
-          this.subscribeTo(
-            obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
-            ({ value }) => { this.dataProjection = value },
-          )
-          await this.$nextTickPromise()
-
-          return this::olCmp.methods.beforeInit()
-        } catch (err) {
-          err.message = `${this.vmName} wait for $mapVm injection: ${err.message}`
-          throw err
-        }
-      },
       /**
        * @return {module:ol/Geolocation~Geolocation}
        * @private
