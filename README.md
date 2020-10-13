@@ -9,12 +9,11 @@
 
 [![Build Status](https://travis-ci.com/ghettovoice/vuelayers.svg?branch=master)](https://travis-ci.com/ghettovoice/vuelayers)
 [![Coverage Status](https://coveralls.io/repos/github/ghettovoice/vuelayers/badge.svg?branch=master)](https://coveralls.io/github/ghettovoice/vuelayers?branch=master)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
 [![GitHub tag](https://img.shields.io/github/tag/ghettovoice/vuelayers.svg)](https://github.com/ghettovoice/vuelayers/releases)
 [![NPM version](https://img.shields.io/npm/v/vuelayers.svg)](https://www.npmjs.com/package/vuelayers)
 [![License](https://img.shields.io/github/license/ghettovoice/vuelayers.svg)](https://github.com/ghettovoice/vuelayers/blob/master/LICENSE)
+[![Downloads](https://img.shields.io/npm/dm/vuelayers)](https://npmcharts.com/compare/vuelayers?minimal=true)
 [![Dependencies](https://img.shields.io/david/ghettovoice/vuelayers.svg)](https://david-dm.org/ghettovoice/vuelayers)
-[![Dev dependencies](https://img.shields.io/david/dev/ghettovoice/vuelayers.svg)](https://david-dm.org/ghettovoice/vuelayers?type=dev)
 
 ## Overview
 
