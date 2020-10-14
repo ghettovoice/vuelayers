@@ -786,6 +786,9 @@ function subscribeToOlObjectEvents () {
   this.subscribeTo(changes, () => {
     ++this.rev
   })
+
+  const errors = obsFromOlEvent(this.$olObject, EventType.ERROR)
+  this.subscribeTo(errors, evt => this.$emit(OlObjectEvent.ERROR, evt))
 }
 
 export class LifecycleError extends Error {
