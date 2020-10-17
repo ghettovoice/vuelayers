@@ -50,20 +50,30 @@ export function initializeFeature (feature, defaultFeatureId) {
   return feature
 }
 
-export function getFeatureGeometryName (feature) {
+export function getFeatureGeomName (feature) {
   if (feature instanceof Feature) {
     return feature.getGeometryName()
   }
   return 'geometry'
 }
 
+export function getFeatureGeom (feature) {
+  if (feature instanceof Feature) {
+    return feature.getGeometry()
+  } else if (isPlainObject(feature)) {
+    return feature.geometry
+  }
+
+  throw new Error('Illegal feature format')
+}
+
 export function getFeatureProperties (feature) {
   if (!feature) return
 
   return omit(
-    feature instanceof Feature ? feature.getProperties() : feature.properties,
+    (feature instanceof Feature ? feature.getProperties() : feature.properties) || {},
     [
-      getFeatureGeometryName(feature),
+      getFeatureGeomName(feature),
       CIRCLE_SERIALIZE_PROP,
       STYLE_SERIALIZE_PROP,
     ],
@@ -73,8 +83,8 @@ export function getFeatureProperties (feature) {
 export function setFeatureProperties (feature, properties) {
   if (!feature) return
 
-  properties = omit(properties, [
-    getFeatureGeometryName(feature),
+  properties = omit(properties || {}, [
+    getFeatureGeomName(feature),
     CIRCLE_SERIALIZE_PROP,
     STYLE_SERIALIZE_PROP,
   ])

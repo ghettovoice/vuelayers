@@ -1,8 +1,7 @@
 <template>
   <div id="app">
     <VlMap
-      ref="map"
-      :data-projection="dataProj">
+      ref="map">
       <VlView
         ref="view"
         :center.sync="center"
@@ -14,20 +13,17 @@
       </VlLayerTile>
 
       <VlLayerVector>
-        <VlSourceCluster>
-          <VlSourceVector :features="features" />
-        </VlSourceCluster>
+        <VlSourceVector
+          ref="vectorSource"
+          :features.sync="features" />
       </VlLayerVector>
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { register } from 'ol/proj/proj4'
-  import proj4 from 'proj4'
-
-  proj4.defs('EPSG:25832', '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs')
-  register(proj4)
+  import { Feature } from 'ol'
+  import { Circle } from 'ol/geom'
 
   export default {
     name: 'App',
@@ -42,24 +38,27 @@
       }
     },
     mounted () {
-      this.features = [
-        {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Point',
-            coordinates: [10, 10],
+      setTimeout(() => {
+        this.$refs.vectorSource.addFeatures([
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: [10, 10],
+            },
           },
-        },
-        {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Point',
-            coordinates: [14, 14],
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: [20, 20],
+            },
           },
-        },
-      ]
+          new Feature(new Circle([-20e5, -20e5], 20e5)),
+        ])
+      }, 1000)
     },
   }
 </script>

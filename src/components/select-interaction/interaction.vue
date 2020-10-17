@@ -8,12 +8,12 @@
 </template>
 
 <script>
-  import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import { Feature } from 'ol'
+  import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import { Select as SelectInteraction } from 'ol/interaction'
   import { merge as mergeObs } from 'rxjs'
   import { featuresContainer, interaction, styleContainer } from '../../mixins'
-  import { getFeatureId, getLayerId, initializeFeature, isGeoJSONFeature, transforms } from '../../ol-ext'
+  import { getFeatureId, getLayerId, initializeFeature, isGeoJSONFeature } from '../../ol-ext'
   import { fromVueEvent as obsFromVueEvent } from '../../rx-ext'
   import {
     clonePlainObject,
@@ -24,11 +24,11 @@
     isNumber,
     isObjectLike,
     isString,
+    makeWatchers,
     map,
+    mergeDescriptors,
     or,
     stubArray,
-    mergeDescriptors,
-    makeWatchers,
   } from '../../utils'
 
   export default {
@@ -135,17 +135,7 @@
         })
       },
       featuresViewProj () {
-        return map(this.featuresDataProj, feature => ({
-          ...feature,
-          geometry: {
-            ...feature.geometry,
-            coordinates: transforms[feature.geometry.type].transform(
-              feature.geometry.coordinates,
-              this.resolvedDataProjection,
-              this.resolvedViewProjection,
-            ),
-          },
-        }))
+        return map(this.featuresDataProj, feature => this.writeFeatureInViewProj(this.readFeatureInDataProj(feature)))
       },
       layerFilter () {
         return Array.isArray(this.layers)

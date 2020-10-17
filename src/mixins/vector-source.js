@@ -5,15 +5,7 @@ import { get as getProj } from 'ol/proj'
 import VectorEventType from 'ol/source/VectorEventType'
 import { from as fromObs, merge as mergeObs } from 'rxjs'
 import { map as mapObs, mergeMap } from 'rxjs/operators'
-import {
-  EPSG_4326,
-  getFeatureId,
-  getGeoJsonFmt,
-  initializeFeature,
-  isGeoJSONFeature,
-  transform,
-  transforms,
-} from '../ol-ext'
+import { EPSG_4326, getFeatureId, getGeoJsonFmt, initializeFeature, isGeoJSONFeature, transform } from '../ol-ext'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import {
   and,
@@ -143,17 +135,7 @@ export default {
       return map(this.features, feature => initializeFeature(clonePlainObject(feature)))
     },
     featuresViewProj () {
-      return map(this.featuresDataProj, feature => ({
-        ...feature,
-        geometry: {
-          ...feature.geometry,
-          coordinates: transforms[feature.geometry.type].transform(
-            feature.geometry.coordinates,
-            this.resolvedDataProjection,
-            this.resolvedViewProjection,
-          ),
-        },
-      }))
+      return map(this.featuresDataProj, feature => this.writeFeatureInViewProj(this.readFeatureInDataProj(feature)))
     },
     currentFeaturesDataProj () {
       if (!(this.rev && this.$source)) return []
