@@ -12,11 +12,34 @@
         <VlSourceOsm />
       </VlLayerTile>
 
-      <VlLayerVector>
+      <VlLayerVectorImage
+        id="vector"
+        :z-index="2">
         <VlSourceVector
           ref="vectorSource"
           :features.sync="features" />
-      </VlLayerVector>
+      </VlLayerVectorImage>
+
+      <VlInteractionSelect
+        :hit-tolerance="8"
+        :condition="hoverCond"
+        :layers="['vector']">
+        <template slot-scope="selection">
+          <VlOverlay
+            v-for="feature in selection.features"
+            :id="feature.id"
+            :key="feature.id"
+            :position="findPoint(feature.geometry)"
+            :auto-pan="true"
+            :auto-pan-animation="{ duration: 300 }"
+            :style="{ maxWidth: '300px', maxHeight: '200px', overflow: 'auto', backgroundColor: 'whitesmoke', padding: '10px' }">
+            <p>
+              {{ feature.id }}<br>
+              Qwerty 123
+            </p>
+          </VlOverlay>
+        </template>
+      </VlInteractionSelect>
     </VlMap>
   </div>
 </template>
@@ -24,6 +47,8 @@
 <script>
   import { Feature } from 'ol'
   import { Circle } from 'ol/geom'
+  import { pointerMove } from 'ol/events/condition'
+  import { findPointOnSurface } from '@/ol-ext'
 
   export default {
     name: 'App',
@@ -56,9 +81,24 @@
               coordinates: [20, 20],
             },
           },
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [-20, 20],
+                [-15, 25],
+                [-10, 30],
+              ],
+            },
+          },
           new Feature(new Circle([-20e5, -20e5], 20e5)),
         ])
       }, 1000)
+    },
+    methods: {
+      hoverCond: pointerMove,
+      findPoint: findPointOnSurface,
     },
   }
 </script>
