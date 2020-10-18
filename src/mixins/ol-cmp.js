@@ -568,7 +568,7 @@ function newLifecyclePromise (action, endEvent, startStates) {
     firstObs(),
     mergeMap(evt => {
       let obs = obsOf(evt)
-      // If at the time of CancelError the ol object stay in some intermediate
+      // If at the time of CancelError the ol object stay in some intermediate state
       // we need to delay observable emit until current hook complete
       if (
         evt.name === OlObjectEvent.ERROR &&
@@ -799,10 +799,6 @@ export class LifecycleError extends Error {
     this.vmName = vmName
     this.action = action
     this.err = err
-  }
-
-  unwrap () {
-    return this.err
   }
 }
 
