@@ -23,8 +23,7 @@
   import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
   import { EPSG_3857 } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, coalesce, isEqual } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { addPrefix, assert, clonePlainObject, coalesce, isEqual, sequential } from '../../utils'
 
   export default {
     name: 'VlGeoloc',

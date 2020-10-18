@@ -4,8 +4,7 @@
   import { createXYZ } from 'ol/tilegrid'
   import { urlTileSource } from '../../mixins'
   import { createMvtFmt, roundExtent, extentFromProjection } from '../../ol-ext'
-  import { isArray, isFunction, isNumber, sealFactory, makeWatchers, isEqual } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { isArray, isFunction, isNumber, sealFactory, makeWatchers, isEqual, sequential } from '../../utils'
 
   export default {
     name: 'VlSourceVectorTile',

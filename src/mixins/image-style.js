@@ -1,5 +1,4 @@
-import { isEqual, pick } from '../utils'
-import sequential from '../utils/sequential'
+import { isEqual, pick, sequential } from '../utils'
 import style from './style'
 
 export default {

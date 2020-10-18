@@ -1,8 +1,7 @@
 import debounce from 'debounce-promise'
 import { skipWhile } from 'rxjs/operators'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
-import { addPrefix, isEqual, pick } from '../utils'
-import sequential from '../utils/sequential'
+import { addPrefix, isEqual, pick, sequential } from '../utils'
 import layer from './layer'
 import { FRAME_TIME } from './ol-cmp'
 

@@ -1,8 +1,7 @@
 <script>
   import { ImageArcGISRest as ImageArcGISRestSource } from 'ol/source'
-  import { imageSource, arcgisSource } from '../../mixins'
-  import { negate, isEmpty, makeWatchers, isEqual } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { arcgisSource, imageSource } from '../../mixins'
+  import { isEmpty, isEqual, makeWatchers, negate, sequential } from '../../utils'
 
   export default {
     name: 'VlSourceImageArcgisRest',

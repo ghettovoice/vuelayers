@@ -1,7 +1,6 @@
 import WMSServerType from 'ol/source/WMSServerType'
 import { cleanSourceParams } from '../ol-ext'
-import { isArray, isEqual, makeWatchers } from '../utils'
-import sequential from '../utils/sequential'
+import { isArray, isEqual, makeWatchers, sequential } from '../utils'
 
 /**
  * Basic WMS params and methods mixin.

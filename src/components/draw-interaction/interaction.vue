@@ -17,9 +17,9 @@
     isFunction,
     makeWatchers,
     mergeDescriptors,
+    sequential,
     upperFirst,
   } from '../../utils'
-  import sequential from '../../utils/sequential'
 
   const transformType = /*#__PURE__*/type => upperFirst(camelCase(type))
 

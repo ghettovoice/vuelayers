@@ -19,11 +19,11 @@ import {
   isEqual,
   mergeDescriptors,
   pick,
+  sequential,
   stubObject,
   stubTrue,
   waitFor,
 } from '../utils'
-import sequential from '../utils/sequential'
 import geometryContainer from './geometry-container'
 import olCmp, { CanceledError, FRAME_TIME, isCreateError, isMountError, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'

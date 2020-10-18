@@ -1,7 +1,7 @@
 <script>
   import { VectorImage as VectorImageLayer } from 'ol/layer'
   import { vectorLayer } from '../../mixins'
-  import sequential from '../../utils/sequential'
+  import { sequential } from '../../utils'
 
   /**
    * Layer for data that is rendered client-side.

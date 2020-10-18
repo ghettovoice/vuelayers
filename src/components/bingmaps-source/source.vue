@@ -1,8 +1,7 @@
 <script>
   import { BingMaps as BingMapsSource } from 'ol/source'
   import { tileImageSource } from '../../mixins'
-  import { isEqual, makeWatchers } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { isEqual, makeWatchers, sequential } from '../../utils'
 
   export default {
     name: 'VlSourceBingmaps',

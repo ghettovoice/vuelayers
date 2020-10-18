@@ -21,8 +21,7 @@
     style,
     textStyleContainer,
   } from '../../mixins'
-  import { mergeDescriptors } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { mergeDescriptors, sequential } from '../../utils'
   import CircleStyle from './circle.vue'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'

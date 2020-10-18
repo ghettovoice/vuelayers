@@ -1,8 +1,7 @@
 import TileEventType from 'ol/source/TileEventType'
 import { expandUrl } from '../ol-ext'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { and, isEmpty, isEqual, isString, negate, pick, replaceTokens } from '../utils'
-import sequential from '../utils/sequential'
+import { and, isEmpty, isEqual, isString, negate, pick, replaceTokens, sequential } from '../utils'
 import tileSource from './tile-source'
 
 const isNotEmptyString = /*#__PURE__*/and(isString, negate(isEmpty))

@@ -69,10 +69,10 @@
     isFunction,
     makeWatchers,
     mergeDescriptors,
+    sequential,
     stubTrue,
     waitFor,
   } from '../../utils'
-  import sequential from '../../utils/sequential'
   import { Layer as VectorLayerCmp } from '../vector-layer'
   import { Source as VectorSourceCmp } from '../vector-source'
   import ViewCmp from './view.vue'

@@ -2,10 +2,9 @@
   import debounce from 'debounce-promise'
   import { Heatmap as HeatmapLayer } from 'ol/layer'
   import { skipWhile } from 'rxjs/operators'
-  import { vectorLayer, FRAME_TIME } from '../../mixins'
+  import { FRAME_TIME, vectorLayer } from '../../mixins'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { addPrefix, isEqual, makeWatchers } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { addPrefix, isEqual, makeWatchers, sequential } from '../../utils'
 
   export default {
     name: 'VlLayerHeatmap',

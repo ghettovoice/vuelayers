@@ -1,8 +1,7 @@
 <script>
   import { TileWMS as TileWMSSource } from 'ol/source'
   import { tileImageSource, wmsSource } from '../../mixins'
-  import { isEqual, makeWatchers } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { isEqual, makeWatchers, sequential } from '../../utils'
 
   export default {
     name: 'VlSourceTileWms',

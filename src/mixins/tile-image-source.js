@@ -1,5 +1,4 @@
-import { isEqual, makeWatchers, pick } from '../utils'
-import sequential from '../utils/sequential'
+import { isEqual, makeWatchers, pick, sequential } from '../utils'
 import urlTileSource from './url-tile-source'
 
 /**

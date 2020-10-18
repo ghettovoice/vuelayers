@@ -1,9 +1,8 @@
 <script>
   import { VectorTile as VectorTileLayer } from 'ol/layer'
   import RenderType from 'ol/layer/VectorTileRenderType'
-  import { isEqual, makeWatchers } from '../../utils'
   import { tileLayer, vectorLayer } from '../../mixins'
-  import sequential from '../../utils/sequential'
+  import { isEqual, makeWatchers, sequential } from '../../utils'
 
   export default {
     name: 'VlLayerVectorTile',

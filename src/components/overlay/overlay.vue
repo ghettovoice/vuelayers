@@ -19,8 +19,7 @@
   import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
   import { EPSG_3857, getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, identity, isEqual, makeWatchers } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { addPrefix, assert, clonePlainObject, identity, isEqual, makeWatchers, sequential } from '../../utils'
 
   export default {
     name: 'VlOverlay',

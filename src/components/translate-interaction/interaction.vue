@@ -9,8 +9,7 @@
   import { FRAME_TIME, interaction } from '../../mixins'
   import { getLayerId } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, isFunction, isString, map, makeWatchers, isEqual } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { assert, instanceOf, isFunction, isString, map, makeWatchers, isEqual, sequential } from '../../utils'
 
   export default {
     name: 'VlInteractionTranslate',

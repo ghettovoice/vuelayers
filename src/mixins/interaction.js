@@ -9,8 +9,7 @@ import {
   setInteractionPriority,
 } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
-import { addPrefix, assert, isEqual, mergeDescriptors, pick } from '../utils'
-import sequential from '../utils/sequential'
+import { addPrefix, assert, isEqual, mergeDescriptors, pick, sequential } from '../utils'
 import olCmp, { FRAME_TIME } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'

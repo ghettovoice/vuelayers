@@ -1,8 +1,7 @@
 <script>
   import { ImageWMS as ImageWMSSource } from 'ol/source'
   import { imageSource, wmsSource } from '../../mixins'
-  import { negate, isEmpty, makeWatchers, isEqual } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { negate, isEmpty, makeWatchers, isEqual, sequential } from '../../utils'
 
   export default {
     name: 'VlSourceImageWms',

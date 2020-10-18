@@ -7,8 +7,7 @@
   import { map as mapObs, tap } from 'rxjs/operators'
   import { interaction, styleContainer } from '../../mixins'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, isFunction, map, mergeDescriptors, makeWatchers, isEqual } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { assert, instanceOf, isEqual, isFunction, makeWatchers, map, mergeDescriptors, sequential } from '../../utils'
 
   export default {
     name: 'VlInteractionModify',

@@ -1,8 +1,7 @@
 import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
-import { clonePlainObject, isFunction, pick, sealFactory, makeWatchers, isEqual } from '../utils'
-import sequential from '../utils/sequential'
+import { clonePlainObject, isFunction, pick, sealFactory, makeWatchers, isEqual, sequential } from '../utils'
 import { FRAME_TIME } from './ol-cmp'
 import source from './source'
 

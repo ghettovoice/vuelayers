@@ -2,8 +2,7 @@
   import { Icon as IconStyle } from 'ol/style'
   import { imageStyle } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
-  import { assert, isEmpty, isEqual, makeWatchers } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { assert, isEmpty, isEqual, makeWatchers, sequential } from '../../utils'
 
   export default {
     name: 'VlStyleIcon',

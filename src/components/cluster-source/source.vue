@@ -14,8 +14,7 @@
   import { Cluster as ClusterSource } from 'ol/source'
   import { FRAME_TIME, vectorSource } from '../../mixins'
   import { createPointGeom, findPointOnSurface, getSourceId } from '../../ol-ext'
-  import { mergeDescriptors, makeWatchers, isEqual, clonePlainObject, isFunction } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { clonePlainObject, isEqual, isFunction, makeWatchers, mergeDescriptors, sequential } from '../../utils'
   import InnerSource from './inner-source.vue'
 
   export default {

@@ -25,9 +25,9 @@ import {
   negate,
   pick,
   sealFactory,
+  sequential,
   stubArray,
 } from '../utils'
-import sequential from '../utils/sequential'
 import featureHelper from './feature-helper'
 import { FRAME_TIME } from './ol-cmp'
 import source from './source'

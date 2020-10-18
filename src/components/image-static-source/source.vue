@@ -1,8 +1,7 @@
 <script>
   import { ImageStatic as ImageStaticSource } from 'ol/source'
   import { imageSource } from '../../mixins'
-  import { negate, isEmpty, makeWatchers, isEqual } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { isEmpty, isEqual, makeWatchers, negate, sequential } from '../../utils'
 
   /**
    * A layer source for displaying a single, static image.

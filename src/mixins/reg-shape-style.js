@@ -1,5 +1,4 @@
-import { pick, upperFirst, isFunction, mergeDescriptors, makeWatchers, isEqual } from '../utils'
-import sequential from '../utils/sequential'
+import { pick, upperFirst, isFunction, mergeDescriptors, makeWatchers, isEqual, sequential } from '../utils'
 import fillStyleContainer from './fill-style-container'
 import imageStyle from './image-style'
 import strokeStyleContainer from './stroke-style-container'

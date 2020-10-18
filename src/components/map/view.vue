@@ -28,8 +28,18 @@
     setViewId,
   } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { addPrefix, assert, coalesce, isArray, isEqual, isFunction, isNumber, makeWatchers, noop } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import {
+    addPrefix,
+    assert,
+    coalesce,
+    isArray,
+    isEqual,
+    isFunction,
+    isNumber,
+    makeWatchers,
+    noop,
+    sequential,
+  } from '../../utils'
 
   /**
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,

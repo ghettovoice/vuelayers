@@ -6,8 +6,7 @@
   import { get as getProj } from 'ol/proj'
   import { FRAME_TIME, simpleGeometry } from '../../mixins'
   import { COORD_PRECISION, roundCoords, transformDistance, transformExtent, transformPoint } from '../../ol-ext'
-  import { constant, isEqual, round } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { constant, isEqual, round, sequential } from '../../utils'
 
   export default {
     name: 'VlGeomCircle',

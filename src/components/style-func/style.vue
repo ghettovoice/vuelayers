@@ -1,8 +1,7 @@
 <script>
   import { Style } from 'ol/style'
   import { olCmp, styleContainer, stubVNode } from '../../mixins'
-  import { isFunction, noop, mergeDescriptors } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { isFunction, noop, mergeDescriptors, sequential } from '../../utils'
 
   /**
    * Style function component for advanced styling.

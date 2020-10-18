@@ -28,9 +28,9 @@
     map,
     mergeDescriptors,
     or,
+    sequential,
     stubArray,
   } from '../../utils'
-  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlInteractionSelect',

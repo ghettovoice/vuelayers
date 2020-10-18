@@ -1,6 +1,5 @@
 import { cleanSourceParams } from '../ol-ext'
-import { isArray, isEqual, makeWatchers } from '../utils'
-import sequential from '../utils/sequential'
+import { isArray, isEqual, makeWatchers, sequential } from '../utils'
 
 const serialize = value => {
   if (value == null) return value

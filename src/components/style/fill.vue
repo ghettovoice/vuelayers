@@ -2,8 +2,7 @@
   import { Fill as FillStyle } from 'ol/style'
   import { style } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
-  import { isEqual } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { isEqual, sequential } from '../../utils'
 
   export default {
     name: 'VlStyleFill',

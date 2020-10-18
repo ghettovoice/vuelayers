@@ -1,7 +1,6 @@
 import RenderEventType from 'ol/render/EventType'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { isFunction, pick, mergeDescriptors, makeWatchers, isEqual } from '../utils'
-import sequential from '../utils/sequential'
+import { isFunction, pick, mergeDescriptors, makeWatchers, isEqual, sequential } from '../utils'
 import baseLayer from './base-layer'
 import sourceContainer from './source-container'
 

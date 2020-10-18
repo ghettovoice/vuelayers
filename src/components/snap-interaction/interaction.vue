@@ -3,8 +3,7 @@
   import { Snap as SnapInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
   import { interaction } from '../../mixins'
-  import { assert, instanceOf, isEqual, isFunction, makeWatchers } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import { assert, instanceOf, isEqual, isFunction, makeWatchers, sequential } from '../../utils'
 
   export default {
     name: 'VlInteractionSnap',

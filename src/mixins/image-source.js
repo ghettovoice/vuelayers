@@ -1,8 +1,7 @@
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { isEqual, makeWatchers, pick } from '../utils'
-import sequential from '../utils/sequential'
+import { isEqual, makeWatchers, pick, sequential } from '../utils'
 import source from './source'
 
 const ImageSourceEventType = {

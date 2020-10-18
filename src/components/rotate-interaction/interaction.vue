@@ -10,8 +10,17 @@
   import { FRAME_TIME, interaction, styleContainer } from '../../mixins'
   import { roundPointCoords } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, clonePlainObject, isEqual, isFunction, map, mergeDescriptors, makeWatchers } from '../../utils'
-  import sequential from '../../utils/sequential'
+  import {
+    assert,
+    clonePlainObject,
+    instanceOf,
+    isEqual,
+    isFunction,
+    makeWatchers,
+    map,
+    mergeDescriptors,
+    sequential,
+  } from '../../utils'
 
   export default {
     name: 'VlInteractionRotate',
