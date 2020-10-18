@@ -1,5 +1,6 @@
 import { cleanSourceParams } from '../ol-ext'
 import { isArray, isEqual, makeWatchers } from '../utils'
+import sequential from '../utils/sequential'
 
 const serialize = value => {
   if (value == null) return value
@@ -159,15 +160,15 @@ export default {
     },
   },
   watch: {
-    async allParams (value) {
+    allParams: /*#__PURE__*/sequential(async function (value) {
       await this.updateParams(value)
-    },
-    async layersStr (value) {
+    }),
+    layersStr: /*#__PURE__*/sequential(async function (value) {
       await this.updateParam('layers', value)
-    },
-    async timeStr (value) {
+    }),
+    timeStr: /*#__PURE__*/sequential(async function (value) {
       await this.updateParam('time', value)
-    },
+    }),
     .../*#__PURE__*/makeWatchers([
       'format',
       'layerDefs',
@@ -183,12 +184,12 @@ export default {
       'layerRangeValues',
       'layerParameterValues',
       'historicMoment',
-    ], prop => async function (value) {
+    ], prop => /*#__PURE__*/sequential(async function (value) {
       await this.updateParam(prop, serialize(value))
-    }),
+    })),
     .../*#__PURE__*/makeWatchers([
       'hidpi',
-    ], prop => async function (val, prev) {
+    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
       if (isEqual(val, prev)) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -196,7 +197,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    }),
+    })),
   },
   methods: {
     /**

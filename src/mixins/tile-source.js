@@ -2,6 +2,7 @@ import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
 import { EPSG_3857 } from '../ol-ext'
 import { clonePlainObject, isFunction, pick, sealFactory, makeWatchers, isEqual } from '../utils'
+import sequential from '../utils/sequential'
 import { FRAME_TIME } from './ol-cmp'
 import source from './source'
 
@@ -105,9 +106,9 @@ export default {
     },
   },
   watch: {
-    async tileKey (value) {
+    tileKey: /*#__PURE__*/sequential(async function (value) {
       await this.setTileKey(value)
-    },
+    }),
     currentTileKey: /*#__PURE__*/debounce(function (value) {
       if (value === this.tileKey) return
 
@@ -116,7 +117,7 @@ export default {
     currentResolutions: /*#__PURE__*/debounce(function (value) {
       this.$emit('update:resolutions', clonePlainObject(value))
     }, FRAME_TIME),
-    tileGridIdent (value, prevValue) {
+    tileGridIdent: /*#__PURE__*/sequential(function (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
       } else if (value && !prevValue && this.tileGrid) {
@@ -124,8 +125,8 @@ export default {
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
       }
-    },
-    async sealTileGridFactory (value) {
+    }),
+    sealTileGridFactory: /*#__PURE__*/sequential(async function (value) {
       while (this.hasInstance(this.tileGridIdent)) {
         this.unsetInstance(this.tileGridIdent)
       }
@@ -141,8 +142,8 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    async opaque (value) {
+    }),
+    opaque: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getOpaque()) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -150,8 +151,8 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    async tilePixelRatio (value) {
+    }),
+    tilePixelRatio: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getTilePixelRatio(value)) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -159,12 +160,12 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
+    }),
     .../*#__PURE__*/makeWatchers([
       'cacheSize',
       'transition',
       'zDirection',
-    ], prop => async function (val, prev) {
+    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
       if (isEqual(val, prev)) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -172,7 +173,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    }),
+    })),
   },
   created () {
     if (isFunction(this.sealTileGridFactory)) {

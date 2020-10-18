@@ -10,6 +10,7 @@
   import { getLayerId } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { assert, instanceOf, isFunction, isString, map, makeWatchers, isEqual } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlInteractionTranslate',
@@ -55,9 +56,9 @@
       },
     },
     watch: {
-      async hitTolerance (value) {
+      hitTolerance: /*#__PURE__*/sequential(async function (value) {
         await this.setHitTolerance(value)
-      },
+      }),
       currentHitTolerance: /*#__PURE__*/debounce(function (value) {
         if (value === this.hitTolerance) return
 
@@ -66,7 +67,7 @@
       .../*#__PURE__*/makeWatchers([
         'source',
         'resolvedFilter',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -74,7 +75,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

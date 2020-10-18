@@ -5,6 +5,7 @@
   import { vectorLayer, FRAME_TIME } from '../../mixins'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
   import { addPrefix, isEqual, makeWatchers } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlLayerHeatmap',
@@ -65,17 +66,17 @@
       },
     },
     watch: {
-      async blur (value) {
+      blur: /*#__PURE__*/sequential(async function (value) {
         await this.setBlur(value)
-      },
+      }),
       currentBlur: /*#__PURE__*/debounce(function (value) {
         if (value === this.blur) return
 
         this.$emit('update:blur', value)
       }, FRAME_TIME),
-      async gradient (value) {
+      gradient: /*#__PURE__*/sequential(async function (value) {
         await this.setGradient(value)
-      },
+      }),
       currentGradient: {
         deep: true,
         handler: /*#__PURE__*/debounce(function (value) {
@@ -84,9 +85,9 @@
           this.$emit('update:gradient', value.slice())
         }, FRAME_TIME),
       },
-      async radius (value) {
+      radius: /*#__PURE__*/sequential(async function (value) {
         await this.setRadius(value)
-      },
+      }),
       currentRadius: /*#__PURE__*/debounce(function (value) {
         if (value === this.radius) return
 
@@ -94,7 +95,7 @@
       }, FRAME_TIME),
       .../*#__PURE__*/makeWatchers([
         'weight',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -102,7 +103,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

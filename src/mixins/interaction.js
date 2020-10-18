@@ -10,6 +10,7 @@ import {
 } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
 import { addPrefix, assert, isEqual, mergeDescriptors, pick } from '../utils'
+import sequential from '../utils/sequential'
 import olCmp, { FRAME_TIME } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
@@ -71,17 +72,17 @@ export default {
     },
   },
   watch: {
-    async active (value) {
+    active: /*#__PURE__*/sequential(async function (value) {
       await this.setActive(value)
-    },
+    }),
     currentActive: /*#__PURE__*/debounce(function (value) {
       if (value === this.active) return
 
       this.$emit('update:active', value)
     }, FRAME_TIME),
-    async priority (value) {
+    priority: /*#__PURE__*/sequential(async function (value) {
       await this.setPriority(value)
-    },
+    }),
     currentPriority: /*#__PURE__*/debounce(function (value) {
       if (value === this.priority) return
 

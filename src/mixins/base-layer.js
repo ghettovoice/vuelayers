@@ -5,6 +5,7 @@ import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
 import { EPSG_3857, getLayerId, initializeLayer, roundExtent, setLayerId, transformExtent } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
 import { addPrefix, assert, isEqual, isNumber, mergeDescriptors, pick } from '../utils'
+import sequential from '../utils/sequential'
 import olCmp, { FRAME_TIME } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
@@ -165,65 +166,65 @@ export default {
     },
   },
   watch: {
-    async opacity (value) {
+    opacity: /*#__PURE__*/sequential(async function (value) {
       await this.setOpacity(value)
-    },
+    }),
     currentOpacity: /*#__PURE__*/debounce(function (value) {
       if (value === this.opacity) return
 
       this.$emit('update:opacity', value)
     }, FRAME_TIME),
-    async visible (value) {
+    visible: /*#__PURE__*/sequential(async function (value) {
       await this.setVisible(value)
-    },
+    }),
     currentVisible: /*#__PURE__*/debounce(function (value) {
       if (value === this.visible) return
 
       this.$emit('update:visible', value)
     }, FRAME_TIME),
-    async extentViewProj (value) {
+    extentViewProj: /*#__PURE__*/sequential(async function (value) {
       await this.setExtent(value, true)
-    },
+    }),
     currentExtentDataProj: /*#__PURE__*/debounce(function (value) {
       if (isEqual(value, this.extentDataProj)) return
 
       this.$emit('update:extent', value.slice())
     }, FRAME_TIME),
-    async zIndex (value) {
+    zIndex: /*#__PURE__*/sequential(async function (value) {
       await this.setZIndex(value)
-    },
+    }),
     currentZIndex: /*#__PURE__*/debounce(function (value) {
       if (value === this.zIndex) return
 
       this.$emit('update:zIndex', value)
     }, FRAME_TIME),
-    async minResolution (value) {
+    minResolution: /*#__PURE__*/sequential(async function (value) {
       await this.setMinResolution(value)
-    },
+    }),
     currentMinResolution: /*#__PURE__*/debounce(function (value) {
       if (value === this.minResolution) return
 
       this.$emit('update:minResolution', value)
     }, FRAME_TIME),
-    async maxResolution (value) {
+    maxResolution: /*#__PURE__*/sequential(async function (value) {
       await this.setMaxResolution(value)
-    },
+    }),
     currentMaxResolution: /*#__PURE__*/debounce(function (value) {
       if (value === this.maxResolution) return
 
       this.$emit('update:maxResolution', value)
     }, FRAME_TIME),
-    async minZoom (value) {
+    minZoom: /*#__PURE__*/sequential(async function (value) {
       await this.setMinZoom(value)
-    },
+    }),
     currentMinZoom: /*#__PURE__*/debounce(function (value) {
       if (value === this.minZoom) return
 
       this.$emit('update:minZoom', value)
     }, FRAME_TIME),
-    async maxZoom (value) {
+    maxZoom: /*#__PURE__*/sequential(async function (value) {
       await this.setMaxZoom(value)
-    },
+    }),
     currentMaxZoom: /*#__PURE__*/debounce(function (value) {
       if (value === this.maxZoom) return
 

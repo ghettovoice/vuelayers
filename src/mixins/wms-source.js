@@ -1,6 +1,7 @@
 import WMSServerType from 'ol/source/WMSServerType'
 import { cleanSourceParams } from '../ol-ext'
 import { isArray, isEqual, makeWatchers } from '../utils'
+import sequential from '../utils/sequential'
 
 /**
  * Basic WMS params and methods mixin.
@@ -112,28 +113,28 @@ export default {
     },
   },
   watch: {
-    async allParams (value) {
+    allParams: /*#__PURE__*/sequential(async function (value) {
       await this.updateParams(value)
-    },
-    async layersStr (value) {
+    }),
+    layersStr: /*#__PURE__*/sequential(async function (value) {
       await this.updateParam('layers', value)
-    },
-    async stylesStr (value) {
+    }),
+    stylesStr: /*#__PURE__*/sequential(async function (value) {
       await this.updateParam('styles', value)
-    },
+    }),
     .../*#__PURE__*/makeWatchers([
       'version',
       'transparent',
       'format',
       'bgColor',
       'time',
-    ], prop => async function (value) {
+    ], prop => /*#__PURE__*/sequential(async function (value) {
       await this.updateParam(prop, value)
-    }),
+    })),
     .../*#__PURE__*/makeWatchers([
       'hidpi',
       'serverType',
-    ], prop => async function (val, prev) {
+    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
       if (isEqual(val, prev)) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -141,7 +142,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    }),
+    })),
   },
   methods: {
     /**

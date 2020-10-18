@@ -2,6 +2,7 @@
   import { ImageArcGISRest as ImageArcGISRestSource } from 'ol/source'
   import { imageSource, arcgisSource } from '../../mixins'
   import { negate, isEmpty, makeWatchers, isEqual } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlSourceImageArcgisRest',
@@ -24,14 +25,14 @@
       },
     },
     watch: {
-      async url (value) {
+      url: /*#__PURE__*/sequential(async function (value) {
         await this.setUrl(value)
-      },
+      }),
       .../*#__PURE__*/makeWatchers([
         'crossOrigin',
         'imageLoadFunc',
         'ratio',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -39,7 +40,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       createSource () {

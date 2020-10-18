@@ -2,6 +2,7 @@
   import { ImageStatic as ImageStaticSource } from 'ol/source'
   import { imageSource } from '../../mixins'
   import { negate, isEmpty, makeWatchers, isEqual } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   /**
    * A layer source for displaying a single, static image.
@@ -100,7 +101,7 @@
         'resolvedImgLoadFunc',
         'resolvedImgSize',
         'url',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -108,7 +109,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     created () {
       if (process.env.NODE_ENV !== 'production') {

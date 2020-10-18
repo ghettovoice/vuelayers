@@ -8,6 +8,7 @@ import { debounceTime, map as mapObs, mergeMap, tap } from 'rxjs/operators'
 import { getFeatureId } from '../ol-ext'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { instanceOf, clonePlainObject, forEach, isEqual, isFunction, map, find } from '../utils'
+import sequential from '../utils/sequential'
 import featureHelper from './feature-helper'
 import identMap from './ident-map'
 import { FRAME_TIME } from './ol-cmp'
@@ -63,7 +64,7 @@ export default {
         this.$emit('update:features', clonePlainObject(value))
       }, FRAME_TIME),
     },
-    featuresCollectionIdent (value, prevValue) {
+    featuresCollectionIdent: /*#__PURE__*/sequential(function (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
       } else if (value && !prevValue && this.$featuresCollection) {
@@ -71,7 +72,7 @@ export default {
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
       }
-    },
+    }),
   },
   created () {
     /**

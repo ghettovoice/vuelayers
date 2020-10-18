@@ -23,6 +23,7 @@
   import { fillStyleContainer, FRAME_TIME, strokeStyleContainer, style } from '../../mixins'
   import { dumpFillStyle, dumpStrokeStyle } from '../../ol-ext'
   import { clonePlainObject, isEqual, isFunction, mergeDescriptors } from '../../utils'
+  import sequential from '../../utils/sequential'
   import BackgroundStyle from './background.vue'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'
@@ -98,45 +99,45 @@
       },
     },
     watch: {
-      async font (value) {
+      font: /*#__PURE__*/sequential(async function (value) {
         await this.setFont(value)
-      },
-      async maxAngle (value) {
+      }),
+      maxAngle: /*#__PURE__*/sequential(async function (value) {
         await this.setMaxAngle(value)
-      },
-      async placement (value) {
+      }),
+      placement: /*#__PURE__*/sequential(async function (value) {
         await this.setPlacement(value)
-      },
-      async offsetX (value) {
+      }),
+      offsetX: /*#__PURE__*/sequential(async function (value) {
         await this.setOffsetX(value)
-      },
-      async offsetY (value) {
+      }),
+      offsetY: /*#__PURE__*/sequential(async function (value) {
         await this.setOffsetY(value)
-      },
-      async overflow (value) {
+      }),
+      overflow: /*#__PURE__*/sequential(async function (value) {
         await this.setOverflow(value)
-      },
-      async rotation (value) {
+      }),
+      rotation: /*#__PURE__*/sequential(async function (value) {
         await this.setRotation(value)
-      },
-      async rotateWithView (value) {
+      }),
+      rotateWithView: /*#__PURE__*/sequential(async function (value) {
         await this.setRotateWithView(value)
-      },
-      async scale (value) {
+      }),
+      scale: /*#__PURE__*/sequential(async function (value) {
         await this.setScale(value)
-      },
-      async text (value) {
+      }),
+      text: /*#__PURE__*/sequential(async function (value) {
         await this.setText(value)
-      },
-      async textAlign (value) {
+      }),
+      textAlign: /*#__PURE__*/sequential(async function (value) {
         await this.setTextAlign(value)
-      },
-      async textBaseline (value) {
+      }),
+      textBaseline: /*#__PURE__*/sequential(async function (value) {
         await this.setTextBaseline(value)
-      },
-      async padding (value) {
+      }),
+      padding: /*#__PURE__*/sequential(async function (value) {
         await this.setPadding(value)
-      },
+      }),
       currentBackgroundFill: {
         deep: true,
         handler: /*#__PURE__*/debounce(function (value, prev) {

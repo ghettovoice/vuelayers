@@ -20,6 +20,7 @@
   import { EPSG_3857, getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
   import { addPrefix, assert, clonePlainObject, identity, isEqual, makeWatchers } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlOverlay',
@@ -110,9 +111,9 @@
     watch: {
       offset: {
         deep: true,
-        async handler (value) {
+        handler: /*#__PURE__*/sequential(async function (value) {
           await this.setOffset(value)
-        },
+        }),
       },
       currentOffset: {
         deep: true,
@@ -124,9 +125,9 @@
       },
       positionViewProj: {
         deep: true,
-        async handler (value) {
+        handler: /*#__PURE__*/sequential(async function (value) {
           await this.setPosition(value, true)
-        },
+        }),
       },
       currentPositionDataProj: {
         deep: true,
@@ -136,9 +137,9 @@
           this.$emit('update:position', clonePlainObject(value))
         }, FRAME_TIME),
       },
-      async positioning (value) {
+      positioning: /*#__PURE__*/sequential(async function (value) {
         await this.setPositioning(value)
-      },
+      }),
       currentPositioning: /*#__PURE__*/debounce(function (value) {
         if (value === this.positioning) return
 
@@ -152,7 +153,7 @@
         'autoPanAnimation',
         'autoPanOptions',
         'className',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -160,7 +161,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     created () {
       this::defineServices()

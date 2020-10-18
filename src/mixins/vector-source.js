@@ -27,6 +27,7 @@ import {
   sealFactory,
   stubArray,
 } from '../utils'
+import sequential from '../utils/sequential'
 import featureHelper from './feature-helper'
 import { FRAME_TIME } from './ol-cmp'
 import source from './source'
@@ -182,17 +183,19 @@ export default {
   watch: {
     featuresViewProj: {
       deep: true,
-      handler: async function (features) {
+      handler: /*#__PURE__*/sequential(async function (features) {
         if (isEqual(features, this.currentFeaturesViewProj)) return
         // add new features
+        const p = this.resolvedDataProjection
         await this.addFeatures(features, true)
+        console.log('done', p)
         // remove non-matched features
         await this.removeFeatures(difference(
           this.currentFeaturesViewProj,
           features,
           (a, b) => getFeatureId(a) === getFeatureId(b),
         ))
-      },
+      }),
     },
     currentFeaturesDataProj: {
       deep: true,
@@ -202,13 +205,13 @@ export default {
         this.$emit('update:features', clonePlainObject(value))
       }, FRAME_TIME),
     },
-    async urlFunc (value) {
+    urlFunc: /*#__PURE__*/sequential(async function (value) {
       await this.setUrlInternal(value)
-    },
-    async loaderFunc (value) {
+    }),
+    loaderFunc: /*#__PURE__*/sequential(async function (value) {
       await this.setLoaderInternal(value)
-    },
-    formatIdent (value, prevValue) {
+    }),
+    formatIdent: /*#__PURE__*/sequential(function (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
       } else if (value && !prevValue && this.format) {
@@ -216,8 +219,8 @@ export default {
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
       }
-    },
-    async sealFormatFactory (value) {
+    }),
+    sealFormatFactory: /*#__PURE__*/sequential(async function (value) {
       while (this.hasInstance(this.formatIdent)) {
         this.unsetInstance(this.formatIdent)
       }
@@ -233,8 +236,8 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    async overlaps (value) {
+    }),
+    overlaps: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getOverlaps()) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -242,11 +245,11 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
+    }),
     .../*#__PURE__*/makeWatchers([
       'loadingStrategyFunc',
       'useSpatialIndex',
-    ], prop => async function (val, prev) {
+    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
       if (isEqual(val, prev)) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -254,7 +257,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    }),
+    })),
   },
   created () {
     if (process.env.NODE_ENV !== 'production') {
@@ -288,10 +291,6 @@ export default {
     }
   },
   methods: {
-    async mount () {
-      await this.addFeatures(this.featuresDataProj)
-      await this::source.methods.mount()
-    },
     getServices () {
       const vm = this
 

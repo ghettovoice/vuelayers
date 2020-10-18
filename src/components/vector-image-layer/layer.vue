@@ -1,6 +1,7 @@
 <script>
   import { VectorImage as VectorImageLayer } from 'ol/layer'
   import { vectorLayer } from '../../mixins'
+  import sequential from '../../utils/sequential'
 
   /**
    * Layer for data that is rendered client-side.
@@ -21,7 +22,7 @@
       },
     },
     watch: {
-      async imageRatio (value) {
+      imageRatio: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getImageRatio()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -29,7 +30,7 @@
         }
 
         await this.scheduleRecreate()
-      },
+      }),
     },
     methods: {
       /**

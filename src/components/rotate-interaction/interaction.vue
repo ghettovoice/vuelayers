@@ -11,6 +11,7 @@
   import { roundPointCoords } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { assert, instanceOf, clonePlainObject, isEqual, isFunction, map, mergeDescriptors, makeWatchers } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlInteractionRotate',
@@ -86,9 +87,9 @@
     watch: {
       anchorViewProj: {
         deep: true,
-        async handler (value) {
+        handler: /*#__PURE__*/sequential(async function (value) {
           await this.setAnchor(value, true)
-        },
+        }),
       },
       currentAnchorDataProj: {
         deep: true,
@@ -98,9 +99,9 @@
           this.$emit('update:anchor', clonePlainObject(value))
         }, FRAME_TIME),
       },
-      async angle (value) {
+      angle: /*#__PURE__*/sequential(async function (value) {
         await this.setAngle(value)
-      },
+      }),
       currentAngle: /*#__PURE__*/debounce(function (value) {
         if (value === this.angle) return
 
@@ -108,7 +109,7 @@
       }, FRAME_TIME),
       .../*#__PURE__*/makeWatchers([
         'source',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -116,7 +117,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

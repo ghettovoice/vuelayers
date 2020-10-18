@@ -23,6 +23,7 @@ import {
   stubTrue,
   waitFor,
 } from '../utils'
+import sequential from '../utils/sequential'
 import geometryContainer from './geometry-container'
 import olCmp, { CanceledError, FRAME_TIME, isCreateError, isMountError, OlObjectEvent } from './ol-cmp'
 import projTransforms from './proj-transforms'
@@ -81,9 +82,9 @@ export default {
   watch: {
     properties: {
       deep: true,
-      async handler (value) {
+      handler: /*#__PURE__*/sequential(async function (value) {
         await this.setProperties(value)
-      },
+      }),
     },
     currentProperties: {
       deep: true,

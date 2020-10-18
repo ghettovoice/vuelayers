@@ -2,6 +2,7 @@
   import { Style } from 'ol/style'
   import { olCmp, styleContainer, stubVNode } from '../../mixins'
   import { isFunction, noop, mergeDescriptors } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   /**
    * Style function component for advanced styling.
@@ -55,13 +56,13 @@
       },
     },
     watch: {
-      async styleFunc () {
+      styleFunc: /*#__PURE__*/sequential(async function () {
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log('styleFunc changed, scheduling recreate...')
         }
 
         await this.scheduleRecreate()
-      },
+      }),
     },
     created () {
       if (process.env.NODE_ENV !== 'production') {

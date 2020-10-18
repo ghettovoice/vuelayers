@@ -2,6 +2,7 @@
   import { TileWMS as TileWMSSource } from 'ol/source'
   import { tileImageSource, wmsSource } from '../../mixins'
   import { isEqual, makeWatchers } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlSourceTileWms',
@@ -20,7 +21,7 @@
         'gutter',
         'hidpi',
         'serverType',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -28,7 +29,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       createSource () {

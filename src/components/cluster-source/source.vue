@@ -15,6 +15,7 @@
   import { FRAME_TIME, vectorSource } from '../../mixins'
   import { createPointGeom, findPointOnSurface, getSourceId } from '../../ol-ext'
   import { mergeDescriptors, makeWatchers, isEqual, clonePlainObject, isFunction } from '../../utils'
+  import sequential from '../../utils/sequential'
   import InnerSource from './inner-source.vue'
 
   export default {
@@ -63,9 +64,9 @@
       },
     },
     watch: {
-      async distance (value) {
+      distance: /*#__PURE__*/sequential(async function (value) {
         await this.setDistance(value)
-      },
+      }),
       currentDistance: /*#__PURE__*/ debounce(function (value) {
         if (value === this.distance) return
 
@@ -78,7 +79,7 @@
       }, FRAME_TIME),
       .../*#__PURE__*/makeWatchers([
         'resolvedGeomFunc',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -86,7 +87,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     created () {
       if (process.env.NODE_ENV !== 'production') {

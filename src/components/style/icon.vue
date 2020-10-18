@@ -3,6 +3,7 @@
   import { imageStyle } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
   import { assert, isEmpty, isEqual, makeWatchers } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlStyleIcon',
@@ -55,10 +56,10 @@
       },
     },
     watch: {
-      async anchor (value) {
+      anchor: /*#__PURE__*/sequential(async function (value) {
         await this.setAnchor(value)
-      },
-      async src (value) {
+      }),
+      src: /*#__PURE__*/sequential(async function (value) {
         if (isEqual(value, await this.getSrc())) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -66,8 +67,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async size (value) {
+      }),
+      size: /*#__PURE__*/sequential(async function (value) {
         if (isEqual(value, await this.getSize())) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -75,8 +76,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async color (value) {
+      }),
+      color: /*#__PURE__*/sequential(async function (value) {
         if (isEqual(value, await this.getColor())) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -84,7 +85,7 @@
         }
 
         await this.scheduleRecreate()
-      },
+      }),
       .../*#__PURE__*/makeWatchers([
         'anchorOrigin',
         'anchorXUnits',
@@ -94,7 +95,7 @@
         'offsetOrigin',
         'img',
         'imgSize',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -102,7 +103,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

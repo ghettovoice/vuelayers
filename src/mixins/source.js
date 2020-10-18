@@ -4,6 +4,7 @@ import { skipWhile } from 'rxjs/operators'
 import { EPSG_3857, getSourceId, initializeSource, setSourceId } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
 import { addPrefix, assert, isArray, isEqual, isString, mergeDescriptors, pick } from '../utils'
+import sequential from '../utils/sequential'
 import olCmp, { FRAME_TIME } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
@@ -82,21 +83,21 @@ export default {
     },
   },
   watch: {
-    async attributions (value) {
+    attributions: /*#__PURE__*/sequential(async function (value) {
       await this.setAttributions(value)
-    },
+    }),
     currentAttributions: /*#__PURE__*/debounce(function (value) {
       if (isEqual(value, this.attributions)) return
 
       this.$emit('update:attributions', value)
     }, FRAME_TIME),
-    async state (value) {
+    state: /*#__PURE__*/sequential(async function (value) {
       await this.setState(value)
-    },
+    }),
     currentState: /*#__PURE__*/debounce(function (value) {
       this.$emit('update:state', value)
     }, FRAME_TIME),
-    async attributionsCollapsible (value) {
+    attributionsCollapsible: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getAttributionsCollapsible()) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -104,8 +105,8 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    async projection (value) {
+    }),
+    projection: /*#__PURE__*/sequential(async function (value) {
       const projection = await this.getProjection()
       if (value === projection?.getCode()) return
 
@@ -114,8 +115,8 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    async wrapX (value) {
+    }),
+    wrapX: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getWrapX()) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -123,7 +124,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
+    }),
   },
   created () {
     this::defineServices()

@@ -8,6 +8,7 @@
   import { interaction, styleContainer } from '../../mixins'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { assert, instanceOf, isFunction, map, mergeDescriptors, makeWatchers, isEqual } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlInteractionModify',
@@ -85,7 +86,7 @@
         'insertVertexCondition',
         'pixelTolerance',
         'wrapX',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -93,7 +94,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

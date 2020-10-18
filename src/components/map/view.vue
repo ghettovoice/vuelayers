@@ -29,6 +29,7 @@
   } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
   import { addPrefix, assert, coalesce, isArray, isEqual, isFunction, isNumber, makeWatchers, noop } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   /**
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
@@ -268,11 +269,11 @@
       },
     },
     watch: {
-      async centerViewProj (value) {
+      centerViewProj: /*#__PURE__*/sequential(async function (value) {
         if (await this.getAnimating()) return
 
         await this.setCenter(value, true)
-      },
+      }),
       currentCenterDataProj: {
         deep: true,
         handler: /*#__PURE__*/debounce(function (value) {
@@ -281,42 +282,42 @@
           this.$emit('update:center', value.slice())
         }, FRAME_TIME),
       },
-      async rotation (value) {
+      rotation: /*#__PURE__*/sequential(async function (value) {
         if (await this.getAnimating()) return
 
         await this.setRotation(value)
-      },
+      }),
       currentRotation: /*#__PURE__*/debounce(function (value) {
         if (value === this.rotation) return
 
         this.$emit('update:rotation', value)
       }, FRAME_TIME),
-      async resolution (value) {
+      resolution: /*#__PURE__*/sequential(async function (value) {
         if (await this.getAnimating()) return
 
         await this.setResolution(value)
-      },
+      }),
       currentResolution: /*#__PURE__*/debounce(function (value) {
         if (value === this.resolution) return
 
         this.$emit('update:resolution', value)
       }, FRAME_TIME),
-      async zoom (value) {
+      zoom: /*#__PURE__*/sequential(async function (value) {
         if (await this.getAnimating()) return
 
         await this.setZoom(value)
-      },
+      }),
       currentZoom: /*#__PURE__*/debounce(function (value) {
         if (value === this.zoom) return
 
         this.$emit('update:zoom', value)
       }, FRAME_TIME),
-      async minZoom (value) {
+      minZoom: /*#__PURE__*/sequential(async function (value) {
         await this.setMinZoom(value)
-      },
-      async maxZoom (value) {
+      }),
+      maxZoom: /*#__PURE__*/sequential(async function (value) {
         await this.setMaxZoom(value)
-      },
+      }),
       currentAnimating: /*#__PURE__*/debounce(function (value, prev) {
         if (value === prev) return
 
@@ -366,7 +367,7 @@
         'zoomFactor',
         'multiWorld',
         'resolvedViewProjection',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -374,7 +375,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     created () {
       this::defineServices()

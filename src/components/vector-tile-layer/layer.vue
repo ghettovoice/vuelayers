@@ -3,6 +3,7 @@
   import RenderType from 'ol/layer/VectorTileRenderType'
   import { isEqual, makeWatchers } from '../../utils'
   import { tileLayer, vectorLayer } from '../../mixins'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlLayerVectorTile',
@@ -20,7 +21,7 @@
     watch: {
       .../*#__PURE__*/makeWatchers([
         'renderMode',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -28,7 +29,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

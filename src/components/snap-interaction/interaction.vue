@@ -4,6 +4,7 @@
   import { Vector as VectorSource } from 'ol/source'
   import { interaction } from '../../mixins'
   import { assert, instanceOf, isEqual, isFunction, makeWatchers } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlInteractionSnap',
@@ -50,7 +51,7 @@
         'edge',
         'vertex',
         'pixelTolerance',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -58,7 +59,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

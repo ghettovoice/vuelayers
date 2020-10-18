@@ -19,6 +19,7 @@
     mergeDescriptors,
     upperFirst,
   } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   const transformType = /*#__PURE__*/type => upperFirst(camelCase(type))
 
@@ -172,7 +173,7 @@
         'freehandCondition',
         'wrapX',
         'dragVertexDelay',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -180,7 +181,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

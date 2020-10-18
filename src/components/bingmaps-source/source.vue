@@ -2,6 +2,7 @@
   import { BingMaps as BingMapsSource } from 'ol/source'
   import { tileImageSource } from '../../mixins'
   import { isEqual, makeWatchers } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlSourceBingmaps',
@@ -48,7 +49,7 @@
       },
     },
     watch: {
-      async apiKey (value) {
+      apiKey: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getApiKey()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -56,8 +57,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async imagerySet (value) {
+      }),
+      imagerySet: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getImagerySet()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -65,12 +66,12 @@
         }
 
         await this.scheduleRecreate()
-      },
+      }),
       .../*#__PURE__*/makeWatchers([
         'hidpi',
         'culture',
         'imagerySet',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -78,7 +79,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

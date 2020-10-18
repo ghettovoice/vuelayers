@@ -1,4 +1,5 @@
 import { isEqual, makeWatchers, pick } from '../utils'
+import sequential from '../utils/sequential'
 import urlTileSource from './url-tile-source'
 
 /**
@@ -28,7 +29,7 @@ export default {
       'crossOrigin',
       'reprojectionErrorThreshold',
       'tileClass',
-    ], prop => async function (val, prev) {
+    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
       if (isEqual(val, prev)) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -36,7 +37,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    }),
+    })),
   },
   methods: {
     .../*#__PURE__*/pick(urlTileSource.methods, [

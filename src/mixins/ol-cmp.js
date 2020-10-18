@@ -15,6 +15,7 @@ import { v4 as uuid } from 'uuid'
 import VueQuery from 'vuequery'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent, fromVueEvent } from '../rx-ext'
 import { assert, identity, isArray, isFunction, kebabCase, newLogger } from '../utils'
+import sequential from '../utils/sequential'
 import eventBus from './event-bus'
 import identMap from './ident-map'
 import rxSubs from './rx-subs'
@@ -117,15 +118,15 @@ export default {
     },
   },
   watch: {
-    async id (value) {
+    id: /*#__PURE__*/sequential(async function (value) {
       await this.setId(value)
-    },
+    }),
     currentId: /*#__PURE__*/debounce(function (value) {
       if (value === this.id) return
 
       this.$emit('update:id', value)
     }, FRAME_TIME),
-    olObjIdent (value, prevValue) {
+    olObjIdent: /*#__PURE__*/sequential(function (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
       } else if (value && !prevValue && this.$olObject) {
@@ -133,7 +134,7 @@ export default {
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
       }
-    },
+    }),
   },
   async created () {
     /**

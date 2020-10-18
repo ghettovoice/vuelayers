@@ -30,6 +30,7 @@
     or,
     stubArray,
   } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlInteractionSelect',
@@ -149,13 +150,13 @@
     watch: {
       featuresViewProj: {
         deep: true,
-        handler: async function (features) {
+        handler: /*#__PURE__*/sequential(async function (features) {
           const ids = map(features, feature => isObjectLike(feature) ? getFeatureId(feature) : feature)
           if (isEqual(ids, this.currentFeatureIds)) return
 
           await this.unselectAll()
           await Promise.all(map(features, ::this.select))
-        },
+        }),
       },
       .../*#__PURE__*/makeWatchers([
         'filter',
@@ -166,7 +167,7 @@
         'condition',
         'removeCondition',
         'toggleCondition',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -174,7 +175,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     methods: {
       /**

@@ -3,6 +3,7 @@
   import { style } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
   import { isEqual } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlStyleFill',
@@ -21,9 +22,9 @@
       },
     },
     watch: {
-      async color (value) {
+      color: /*#__PURE__*/sequential(async function (value) {
         await this.setColor(value)
-      },
+      }),
     },
     created () {
       this::defineServices()

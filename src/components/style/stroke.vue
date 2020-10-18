@@ -3,6 +3,7 @@
   import { style } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
   import { isEqual } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlStyleStroke',
@@ -42,27 +43,27 @@
       },
     },
     watch: {
-      async color (value) {
+      color: /*#__PURE__*/sequential(async function (value) {
         await this.setColor(value)
-      },
-      async lineCap (value) {
+      }),
+      lineCap: /*#__PURE__*/sequential(async function (value) {
         await this.setLineCap(value)
-      },
-      async lineJoin (value) {
+      }),
+      lineJoin: /*#__PURE__*/sequential(async function (value) {
         await this.setLineJoin(value)
-      },
-      async lineDash (value) {
+      }),
+      lineDash: /*#__PURE__*/sequential(async function (value) {
         await this.setLineDash(value)
-      },
-      async lineDashOffset (value) {
+      }),
+      lineDashOffset: /*#__PURE__*/sequential(async function (value) {
         await this.setLineDashOffset(value)
-      },
-      async miterLimit (value) {
+      }),
+      miterLimit: /*#__PURE__*/sequential(async function (value) {
         await this.setMiterLimit(value)
-      },
-      async width (value) {
+      }),
+      width: /*#__PURE__*/sequential(async function (value) {
         await this.setWidth(value)
-      },
+      }),
     },
     created () {
       this::defineServices()

@@ -51,6 +51,7 @@
   import { FRAME_TIME, vectorLayer } from '../../mixins'
   import { dumpStrokeStyle, dumpTextStyle } from '../../ol-ext'
   import { clonePlainObject, isEqual, isFunction, makeWatchers, map, mergeDescriptors } from '../../utils'
+  import sequential from '../../utils/sequential'
   import { FillStyle, StrokeStyle, TextStyle } from '../style'
   import LatStyle from './lat-style.vue'
   import LonStyle from './lon-style.vue'
@@ -180,7 +181,7 @@
         'latLabelPosition',
         'intervals',
         'wrapX',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -188,7 +189,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     created () {
       this._lonLabelStyle = undefined

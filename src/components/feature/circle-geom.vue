@@ -7,6 +7,7 @@
   import { FRAME_TIME, simpleGeometry } from '../../mixins'
   import { COORD_PRECISION, roundCoords, transformDistance, transformExtent, transformPoint } from '../../ol-ext'
   import { constant, isEqual, round } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlGeomCircle',
@@ -91,17 +92,14 @@
       },
     },
     watch: {
-      async radiusViewProj (value) {
+      radiusViewProj: /*#__PURE__*/sequential(async function (value) {
         await this.setRadius(value, true)
-      },
+      }),
       currentRadiusDataProj: /*#__PURE__*/debounce(function (value) {
         if (value === this.radiusDataProj) return
 
         this.$emit('update:radius', value)
       }, FRAME_TIME),
-      async resolvedRadiusProjection () {
-        await this.setRadius(this.radiusDataProj)
-      },
     },
     methods: {
       /**

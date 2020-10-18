@@ -2,6 +2,7 @@ import TileEventType from 'ol/source/TileEventType'
 import { expandUrl } from '../ol-ext'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { and, isEmpty, isEqual, isString, negate, pick, replaceTokens } from '../utils'
+import sequential from '../utils/sequential'
 import tileSource from './tile-source'
 
 const isNotEmptyString = /*#__PURE__*/and(isString, negate(isEmpty))
@@ -74,18 +75,18 @@ export default {
     },
   },
   watch: {
-    async parsedUrl (value) {
+    parsedUrl: /*#__PURE__*/sequential(async function (value) {
       await this.onParsedUrlChanged(value)
-    },
-    async expandedUrls (value) {
+    }),
+    expandedUrls: /*#__PURE__*/sequential(async function (value) {
       await this.onExpandedUrlsChanged(value)
-    },
-    async resolvedTileLoadFunc (value) {
+    }),
+    resolvedTileLoadFunc: /*#__PURE__*/sequential(async function (value) {
       await this.onTileLoadFuncChanged(value)
-    },
-    async resolvedTileUrlFunc (value) {
+    }),
+    resolvedTileUrlFunc: /*#__PURE__*/sequential(async function (value) {
       await this.onTileUrlFuncChanged(value)
-    },
+    }),
   },
   created () {
     if (process.env.NODE_ENV !== 'production') {

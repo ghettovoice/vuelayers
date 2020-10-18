@@ -2,6 +2,7 @@ import debounce from 'debounce-promise'
 import { skipWhile } from 'rxjs/operators'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
 import { addPrefix, isEqual, pick, mergeDescriptors } from '../utils'
+import sequential from '../utils/sequential'
 import layer from './layer'
 import { FRAME_TIME } from './ol-cmp'
 import styleContainer from './style-container'
@@ -49,15 +50,15 @@ export default {
     },
   },
   watch: {
-    async renderOrder (value) {
+    renderOrder: /*#__PURE__*/sequential(async function (value) {
       await this.setRenderOrder(value)
-    },
+    }),
     currentRenderOrder: /*#__PURE__*/debounce(function (value) {
       if (value === this.renderOrder) return
 
       this.$emit('update:renderOrder', value)
     }, FRAME_TIME),
-    async renderBuffer (value) {
+    renderBuffer: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getRenderBuffer()) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -65,8 +66,8 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    async declutter (value) {
+    }),
+    declutter: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getDeclutter()) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -74,8 +75,8 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    async updateWhileAnimating (value) {
+    }),
+    updateWhileAnimating: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getUpdateWhileAnimating()) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -83,8 +84,8 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
-    async updateWhileInteracting (value) {
+    }),
+    updateWhileInteracting: /*#__PURE__*/sequential(async function (value) {
       if (value === await this.getUpdateWhileInteracting()) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -92,7 +93,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
+    }),
   },
   methods: {
     /**

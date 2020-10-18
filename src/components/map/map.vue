@@ -72,6 +72,7 @@
     stubTrue,
     waitFor,
   } from '../../utils'
+  import sequential from '../../utils/sequential'
   import { Layer as VectorLayerCmp } from '../vector-layer'
   import { Source as VectorSourceCmp } from '../vector-source'
   import ViewCmp from './view.vue'
@@ -190,21 +191,21 @@
       },
     },
     watch: {
-      async defaultControls (value) {
+      defaultControls: /*#__PURE__*/sequential(async function (value) {
         await this.initDefaultControls(value)
-      },
-      async defaultInteractions (value) {
+      }),
+      defaultInteractions: /*#__PURE__*/sequential(async function (value) {
         await this.initDefaultInteractions(value)
-      },
-      async dataProjection (value) {
+      }),
+      dataProjection: /*#__PURE__*/sequential(async function (value) {
         await this.setDataProjection(value)
-      },
+      }),
       .../*#__PURE__*/makeWatchers([
         'keyboardEventTarget',
         'moveTolerance',
         'pixelRatio',
         'maxTilesLoading',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -212,7 +213,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     created () {
       /**

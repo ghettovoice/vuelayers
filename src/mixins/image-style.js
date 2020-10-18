@@ -1,4 +1,5 @@
 import { isEqual, pick } from '../utils'
+import sequential from '../utils/sequential'
 import style from './style'
 
 export default {
@@ -47,19 +48,19 @@ export default {
     },
   },
   watch: {
-    async opacity (value) {
+    opacity: /*#__PURE__*/sequential(async function (value) {
       await this.setOpacity(value)
-    },
-    async rotateWithView (value) {
+    }),
+    rotateWithView: /*#__PURE__*/sequential(async function (value) {
       await this.setRotateWithView(value)
-    },
-    async rotation (value) {
+    }),
+    rotation: /*#__PURE__*/sequential(async function (value) {
       await this.setRotation(value)
-    },
-    async scale (value) {
+    }),
+    scale: /*#__PURE__*/sequential(async function (value) {
       await this.setScale(value)
-    },
-    async displacement (value) {
+    }),
+    displacement: /*#__PURE__*/sequential(async function (value) {
       if (isEqual(value, await this.getDisplacement())) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -67,7 +68,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    },
+    }),
   },
   created () {
     this::defineServices()

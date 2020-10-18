@@ -1,6 +1,7 @@
 import RenderEventType from 'ol/render/EventType'
 import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { isFunction, pick, mergeDescriptors, makeWatchers, isEqual } from '../utils'
+import sequential from '../utils/sequential'
 import baseLayer from './base-layer'
 import sourceContainer from './source-container'
 
@@ -31,7 +32,7 @@ export default {
     .../*#__PURE__*/makeWatchers([
       'render',
       'overlay',
-    ], prop => async function (val, prev) {
+    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
       if (isEqual(val, prev)) return
 
       if (process.env.VUELAYERS_DEBUG) {
@@ -39,7 +40,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    }),
+    })),
   },
   methods: {
     /**

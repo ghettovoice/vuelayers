@@ -2,6 +2,7 @@ import debounce from 'debounce-promise'
 import { skipWhile } from 'rxjs/operators'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
 import { addPrefix, isEqual, pick } from '../utils'
+import sequential from '../utils/sequential'
 import layer from './layer'
 import { FRAME_TIME } from './ol-cmp'
 
@@ -46,17 +47,17 @@ export default {
     },
   },
   watch: {
-    async preload (value) {
+    preload: /*#__PURE__*/sequential(async function (value) {
       await this.setPreload(value)
-    },
+    }),
     currentPreload: /*#__PURE__*/debounce(function (value) {
       if (value === this.preload) return
 
       this.$emit('update:preload', value)
     }, FRAME_TIME),
-    async useInterimTilesOnError (value) {
+    useInterimTilesOnError: /*#__PURE__*/sequential(async function (value) {
       await this.setUseInterimTilesOnError(value)
-    },
+    }),
     currentUseInterimTilesOnError: /*#__PURE__*/debounce(function (value) {
       if (value === this.useInterimTilesOnError) return
 

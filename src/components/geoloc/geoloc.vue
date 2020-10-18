@@ -24,6 +24,7 @@
   import { EPSG_3857 } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
   import { addPrefix, assert, clonePlainObject, coalesce, isEqual } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlGeoloc',
@@ -131,17 +132,17 @@
       },
     },
     watch: {
-      async tracking (value) {
+      tracking: /*#__PURE__*/sequential(async function (value) {
         await this.setTracking(value)
-      },
+      }),
       currentTracking: /*#__PURE__*/debounce(function (value) {
         if (value === this.tracking) return
 
         this.$emit('update:tracking', value)
       }, FRAME_TIME),
-      async tracingOptions (value) {
+      tracingOptions: /*#__PURE__*/sequential(async function (value) {
         await this.setTrackingOptions(value)
-      },
+      }),
       currentTrackingOptions: {
         deep: true,
         handler: /*#__PURE__*/debounce(function (value) {

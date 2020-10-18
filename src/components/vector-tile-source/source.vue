@@ -5,6 +5,7 @@
   import { urlTileSource } from '../../mixins'
   import { createMvtFmt, roundExtent, extentFromProjection } from '../../ol-ext'
   import { isArray, isFunction, isNumber, sealFactory, makeWatchers, isEqual } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlSourceVectorTile',
@@ -98,7 +99,7 @@
       },
     },
     watch: {
-      formatIdent (value, prevValue) {
+      formatIdent: /*#__PURE__*/sequential(function (value, prevValue) {
         if (value && prevValue) {
           this.moveInstance(value, prevValue)
         } else if (value && !prevValue && this.format) {
@@ -106,8 +107,8 @@
         } else if (!value && prevValue) {
           this.unsetInstance(prevValue)
         }
-      },
-      async sealFormatFactory (value) {
+      }),
+      sealFormatFactory: /*#__PURE__*/sequential(async function (value) {
         while (this.hasInstance(this.formatIdent)) {
           this.unsetInstance(this.formatIdent)
         }
@@ -123,8 +124,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async overlaps (value) {
+      }),
+      overlaps: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getOverlaps()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -132,11 +133,11 @@
         }
 
         await this.scheduleRecreate()
-      },
+      }),
       .../*#__PURE__*/makeWatchers([
         'extentViewProj',
         'tileClass',
-      ], prop => async function (val, prev) {
+      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
         if (isEqual(val, prev)) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -144,7 +145,7 @@
         }
 
         await this.scheduleRecreate()
-      }),
+      })),
     },
     created () {
       if (isFunction(this.sealFormatFactory)) {

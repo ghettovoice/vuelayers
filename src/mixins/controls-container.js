@@ -7,6 +7,7 @@ import { map as mapObs, mergeMap } from 'rxjs/operators'
 import { getControlId, initializeControl } from '../ol-ext'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { instanceOf, isArray, isFunction, isPlainObject, map, find, forEach, isEqual } from '../utils'
+import sequential from '../utils/sequential'
 import identMap from './ident-map'
 import { FRAME_TIME } from './ol-cmp'
 import rxSubs from './rx-subs'
@@ -47,7 +48,7 @@ export default {
 
       this.$emit('update:controls', value.slice())
     }, FRAME_TIME),
-    controlsCollectionIdent (value, prevValue) {
+    controlsCollectionIdent: /*#__PURE__*/sequential(function (value, prevValue) {
       if (value && prevValue) {
         this.moveInstance(value, prevValue)
       } else if (value && !prevValue && this.$controlsCollection) {
@@ -55,7 +56,7 @@ export default {
       } else if (!value && prevValue) {
         this.unsetInstance(prevValue)
       }
-    },
+    }),
   },
   created () {
     /**

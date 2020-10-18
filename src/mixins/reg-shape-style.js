@@ -1,4 +1,5 @@
 import { pick, upperFirst, isFunction, mergeDescriptors, makeWatchers, isEqual } from '../utils'
+import sequential from '../utils/sequential'
 import fillStyleContainer from './fill-style-container'
 import imageStyle from './image-style'
 import strokeStyleContainer from './stroke-style-container'
@@ -27,7 +28,7 @@ export default {
       'radius1',
       'radius2',
       'angle',
-    ], prop => async function (val, prev) {
+    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
       const handler = this[`on${upperFirst(prop)}Changed`]
       if (isFunction(handler)) {
         return handler(val, prev)
@@ -40,7 +41,7 @@ export default {
       }
 
       await this.scheduleRecreate()
-    }),
+    })),
   },
   methods: {
     /**

@@ -22,6 +22,7 @@
     textStyleContainer,
   } from '../../mixins'
   import { mergeDescriptors } from '../../utils'
+  import sequential from '../../utils/sequential'
   import CircleStyle from './circle.vue'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'
@@ -74,12 +75,12 @@
       condition: [Boolean, Function],
     },
     watch: {
-      async zIndex (value) {
+      zIndex: /*#__PURE__*/sequential(async function (value) {
         await this.setZIndex(value)
-      },
-      async renderer (value) {
+      }),
+      renderer: /*#__PURE__*/sequential(async function (value) {
         await this.setRenderer(value)
-      },
+      }),
     },
     created () {
       if (process.env.NODE_ENV !== 'production') {

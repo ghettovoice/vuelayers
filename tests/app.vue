@@ -49,9 +49,7 @@
 
 <script>
   import { findPointOnSurface } from '@/ol-ext'
-  import { Feature } from 'ol'
   import { pointerMove } from 'ol/events/condition'
-  import { Circle } from 'ol/geom'
   import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style'
 
   export default {
@@ -92,38 +90,35 @@
       },
     },
     mounted () {
-      setTimeout(() => {
-        this.$refs.vectorSource.addFeatures([
-          {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Point',
-              coordinates: [10, 10],
-            },
+      this.features = [
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [10, 10],
           },
-          {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Point',
-              coordinates: [20, 20],
-            },
+        },
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [20, 20],
           },
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'LineString',
-              coordinates: [
-                [-20, 20],
-                [-15, 25],
-                [-10, 30],
-              ],
-            },
+        },
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [-20, 20],
+              [-15, 25],
+              [-10, 30],
+            ],
           },
-          new Feature(new Circle([-20e5, -20e5], 20e5)),
-        ])
-      }, 1000)
+        },
+      ]
     },
     methods: {
       hoverCond: pointerMove,

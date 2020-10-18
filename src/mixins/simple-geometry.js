@@ -2,6 +2,7 @@ import debounce from 'debounce-promise'
 import { boundingExtent } from 'ol/extent'
 import { findPointOnSurface, flatCoords, isEqualCoord, roundCoords, roundPointCoords, transforms } from '../ol-ext'
 import { clonePlainObject, isEmpty, negate, pick } from '../utils'
+import sequential from '../utils/sequential'
 import geometry from './geometry'
 import { FRAME_TIME } from './ol-cmp'
 
@@ -76,9 +77,9 @@ export default {
   watch: {
     coordinatesViewProj: {
       deep: true,
-      async handler (value) {
+      handler: /*#__PURE__*/sequential(async function (value) {
         await this.setCoordinates(value, true)
-      },
+      }),
     },
     currentCoordinatesDataProj: {
       deep: true,

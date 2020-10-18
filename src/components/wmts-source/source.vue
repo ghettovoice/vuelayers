@@ -8,6 +8,7 @@
   import { tileImageSource } from '../../mixins'
   import { roundExtent, roundPointCoords, extentFromProjection, getCorner as getExtentCorner } from '../../ol-ext'
   import { isArray, isEqual, isFunction, isNumber, range } from '../../utils'
+  import sequential from '../../utils/sequential'
 
   export default {
     name: 'VlSourceWmts',
@@ -103,7 +104,7 @@
       },
     },
     watch: {
-      async dimensions (value) {
+      dimensions: /*#__PURE__*/sequential(async function (value) {
         if (isEqual(value, await this.getDimensions())) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -111,8 +112,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async format (value) {
+      }),
+      format: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getFormat()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -120,8 +121,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async layer (value) {
+      }),
+      layer: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getLayer()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -129,8 +130,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async matrixSet (value) {
+      }),
+      matrixSet: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getMatrixSet()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -138,8 +139,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async requestEncoding (value) {
+      }),
+      requestEncoding: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getRequestEncoding()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -147,8 +148,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async style (value) {
+      }),
+      style: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getStyle()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -156,8 +157,8 @@
         }
 
         await this.scheduleRecreate()
-      },
-      async version (value) {
+      }),
+      version: /*#__PURE__*/sequential(async function (value) {
         if (value === await this.getVersion()) return
 
         if (process.env.VUELAYERS_DEBUG) {
@@ -165,7 +166,7 @@
         }
 
         await this.scheduleRecreate()
-      },
+      }),
     },
     methods: {
       /**
