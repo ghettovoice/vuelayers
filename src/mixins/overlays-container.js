@@ -64,7 +64,6 @@ export default {
     this._overlaysCollection = this.instanceFactoryCall(this.overlaysCollectionIdent, () => new Collection())
 
     this::defineServices()
-    this::subscribeToCollectionEvents()
   },
   methods: {
     /**
@@ -77,6 +76,13 @@ export default {
       return {
         get overlaysContainer () { return vm },
       }
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToCollectionEvents()
     },
     /**
      * @param {OverlayLike} overlay

@@ -22,10 +22,12 @@
       </VlLayerVectorImage>
 
       <VlInteractionSelect
+        :features.sync="selectedFeatures"
         :hit-tolerance="8"
         :condition="hoverCond"
         :layers="['vector']">
         <template slot-scope="selection">
+          <VlStyleFunc :func="styleFunc" />
           <VlOverlay
             v-for="feature in selection.features"
             :id="feature.id"
@@ -50,6 +52,7 @@
   import { Feature } from 'ol'
   import { pointerMove } from 'ol/events/condition'
   import { Circle } from 'ol/geom'
+  import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style'
 
   export default {
     name: 'App',
@@ -59,9 +62,34 @@
         zoom: 3,
         rotation: 0,
         features: [],
+        selectedFeatures: [],
         dataProj: 'EPSG:4326',
         viewProj: 'EPSG:3857',
       }
+    },
+    computed: {
+      styleFunc () {
+        const stroke = new Stroke({
+          color: 'red',
+          width: 3,
+          lineCap: 'square',
+          lineJoin: 'miter',
+        })
+        const fill = new Fill({
+          color: 'white',
+        })
+        return () => {
+          return new Style({
+            stroke,
+            fill,
+            image: new CircleStyle({
+              stroke,
+              fill,
+              radius: 10,
+            }),
+          })
+        }
+      },
     },
     mounted () {
       setTimeout(() => {

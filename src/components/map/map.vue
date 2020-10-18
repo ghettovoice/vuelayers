@@ -317,6 +317,11 @@
        */
       subscribeAll () {
         this::olCmp.methods.subscribeAll()
+        this::layersContainer.methods.subscribeAll()
+        this::controlsContainer.methods.subscribeAll()
+        this::interactionsContainer.methods.subscribeAll()
+        this::overlaysContainer.methods.subscribeAll()
+        this::featuresContainer.methods.subscribeAll()
         this::subscribeToEvents()
       },
       /**
