@@ -47,20 +47,6 @@ export default {
       )
     },
   },
-  created () {
-    Object.defineProperty(this, '$projTransformCache', {
-      enumerable: true,
-      get: () => {
-        if (!this._projTransformCache) {
-          this._projTransformCache = new LRU({
-            max: 10e3,
-            maxAge: 3600e3,
-          })
-        }
-        return this._projTransformCache
-      },
-    })
-  },
   methods: {
     pointToViewProj (point, precision = COORD_PRECISION) {
       return transformPoint(point, this.resolvedDataProjection, this.resolvedViewProjection, precision)
@@ -110,24 +96,24 @@ export default {
       if (!geometry) return
 
       const key = this.makeGeometryKey(geometry, this.resolvedDataProjection, precision)
-      let geometryJson = this.$projTransformCache.get(key)
+      let geometryJson = this.getProjTransformCache().get(key)
       if (geometryJson) {
         return geometryJson
       }
       geometryJson = writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedDataProjection, precision)
-      this.$projTransformCache.set(key, geometryJson)
+      this.getProjTransformCache().set(key, geometryJson)
       return geometryJson
     },
     writeGeometryInViewProj (geometry, precision = COORD_PRECISION) {
       if (!geometry) return
 
       const key = this.makeGeometryKey(geometry, this.resolvedViewProjection, precision)
-      let geometryJson = this.$projTransformCache.get(key)
+      let geometryJson = this.getProjTransformCache().get(key)
       if (geometryJson) {
         return geometryJson
       }
       geometryJson = writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedViewProjection, precision)
-      this.$projTransformCache.set(key, geometryJson)
+      this.getProjTransformCache().set(key, geometryJson)
       return geometryJson
     },
     readGeometryInDataProj (geometry, precision = COORD_PRECISION) {
@@ -145,24 +131,24 @@ export default {
       if (!feature) return
 
       const key = this.makeFeatureKey(feature, this.resolvedDataProjection, precision)
-      let featureJson = this.$projTransformCache.get(key)
+      let featureJson = this.getProjTransformCache().get(key)
       if (featureJson) {
         return featureJson
       }
       featureJson = writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedDataProjection, precision)
-      this.$projTransformCache.set(key, featureJson)
+      this.getProjTransformCache().set(key, featureJson)
       return featureJson
     },
     writeFeatureInViewProj (feature, precision = COORD_PRECISION) {
       if (!feature) return
 
       const key = this.makeFeatureKey(feature, this.resolvedViewProjection, precision)
-      let featureJson = this.$projTransformCache.get(key)
+      let featureJson = this.getProjTransformCache().get(key)
       if (featureJson) {
         return featureJson
       }
       featureJson = writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedViewProjection, precision)
-      this.$projTransformCache.set(key, featureJson)
+      this.getProjTransformCache().set(key, featureJson)
       return featureJson
     },
     readFeatureInDataProj (feature, precision = COORD_PRECISION) {
@@ -175,16 +161,49 @@ export default {
 
       return readGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedViewProjection, precision)
     },
-
+    /**
+     * @return {LRUCache}
+     * @protected
+     */
+    getProjTransformCache () {
+      if (!this._projTransformCache) {
+        this._projTransformCache = new LRU({
+          max: 10e3,
+          maxAge: 3600e3,
+        })
+      }
+      return this._projTransformCache
+    },
+    /**
+     * @param object
+     * @param projection
+     * @param precision
+     * @return {string}
+     * @protected
+     */
     makeKey (object, projection, precision) {
       return serialize({ object, projection, precision })
     },
+    /**
+     * @param geometry
+     * @param projection
+     * @param precision
+     * @return {string}
+     * @protected
+     */
     makeGeometryKey (geometry, projection, precision) {
       return this.makeKey({
         type: getGeomType(geometry),
         coordinates: getGeomCoords(geometry),
       }, projection, precision)
     },
+    /**
+     * @param feature
+     * @param projection
+     * @param precision
+     * @return {string}
+     * @protected
+     */
     makeFeatureKey (feature, projection, precision) {
       return this.makeKey({
         id: getFeatureId(feature),
