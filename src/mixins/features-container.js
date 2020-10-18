@@ -82,7 +82,6 @@ export default {
     this._featureSubs = {}
 
     this::defineServices()
-    this::subscribeToCollectionEvents()
   },
   methods: {
     /**
@@ -95,6 +94,13 @@ export default {
       return {
         get featuresContainer () { return vm },
       }
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToCollectionEvents()
     },
     /**
      * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features

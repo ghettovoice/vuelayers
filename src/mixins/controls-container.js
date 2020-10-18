@@ -65,7 +65,6 @@ export default {
     this._controlsCollection = this.instanceFactoryCall(this.controlsCollectionIdent, () => new Collection())
 
     this::defineServices()
-    this::subscribeToCollectionEvents()
   },
   methods: {
     /**
@@ -78,6 +77,13 @@ export default {
       return {
         get controlsContainer () { return vm },
       }
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToCollectionEvents()
     },
     /**
      * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} defaultControls

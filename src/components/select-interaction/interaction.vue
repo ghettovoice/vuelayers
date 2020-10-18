@@ -219,6 +219,7 @@
        */
       subscribeAll () {
         this::interaction.methods.subscribeAll()
+        this::featuresContainer.methods.subscribeAll()
         this::subscribeToInteractionChanges()
       },
       /**

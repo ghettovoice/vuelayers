@@ -65,7 +65,6 @@ export default {
     this._layersCollection = this.instanceFactoryCall(this.layersCollectionIdent, () => new Collection())
 
     this::defineServices()
-    this::subscribeToCollectionEvents()
   },
   methods: {
     /**
@@ -78,6 +77,13 @@ export default {
       return {
         get layersContainer () { return vm },
       }
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToCollectionEvents()
     },
     /**
      * @param {LayerLike} layer

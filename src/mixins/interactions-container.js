@@ -65,7 +65,6 @@ export default {
     this._interactionsCollection = this.instanceFactoryCall(this.interactionsCollectionIdent, () => new Collection())
 
     this::defineServices()
-    this::subscribeToCollectionEvents()
   },
   methods: {
     /**
@@ -78,6 +77,13 @@ export default {
       return {
         get interactionsContainer () { return vm },
       }
+    },
+    /**
+     * @return {void}
+     * @protected
+     */
+    subscribeAll () {
+      this::subscribeToCollectionEvents()
     },
     /**
      * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} defaultInteractions
