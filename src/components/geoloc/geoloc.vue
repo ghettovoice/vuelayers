@@ -21,7 +21,7 @@
   import { from as fromObs, merge as mergeObs } from 'rxjs'
   import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
   import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
-  import { EPSG_3857, EPSG_4326 } from '../../ol-ext'
+  import { EPSG_3857 } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
   import { addPrefix, assert, clonePlainObject, coalesce, isEqual } from '../../utils'
 
@@ -45,7 +45,6 @@
       trackingOptions: Object,
       projection: {
         type: String,
-        default: EPSG_4326,
         validator: value => getProj(value) != null,
       },
     },
@@ -79,7 +78,7 @@
       },
       resolvedDataProjection () {
         return coalesce(
-          this.currentProjection, // may or may not be present
+          this.currentProjection,
           this.$options?.dataProjection, // may or may not be present
           this.dataProjection, // may or may not be present
           this.resolvedViewProjection,

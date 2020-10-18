@@ -2,6 +2,7 @@ import LRU from 'lru-cache'
 import {
   COORD_PRECISION,
   EPSG_3857,
+  getFeatureGeom,
   getFeatureId,
   getFeatureProperties,
   getGeomCoords,
@@ -180,8 +181,8 @@ export default {
       return this.makeKey({
         id: getFeatureId(feature),
         properties: getFeatureProperties(feature),
-        geometry: feature.getGeometry()
-          ? this.makeGeometryKey(feature.getGeometry(), projection, precision)
+        geometry: getFeatureGeom(feature)
+          ? this.makeGeometryKey(getFeatureGeom(feature), projection, precision)
           : null,
       }, projection, precision)
     },

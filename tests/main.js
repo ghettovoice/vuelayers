@@ -4,9 +4,7 @@ import App from './app.vue'
 
 Vue.config.productionTip = false
 
-Vue.use(VueLayers, {
-  // dataProjection: 'EPSG:4326',
-})
+Vue.use(VueLayers)
 /* eslint-disable no-console */
 console.log(process.env.NODE_ENV)
 console.dir(VueLayers)

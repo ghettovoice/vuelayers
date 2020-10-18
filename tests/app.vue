@@ -2,7 +2,7 @@
   <div id="app">
     <VlMap
       ref="map"
-      :data-projection="dataProj">
+      data-projection="EPSG:4326">
       <VlView
         ref="view"
         :center.sync="center"
@@ -13,21 +13,43 @@
         <VlSourceOsm />
       </VlLayerTile>
 
-      <VlLayerVector>
-        <VlSourceCluster>
-          <VlSourceVector :features="features" />
-        </VlSourceCluster>
-      </VlLayerVector>
+      <VlLayerVectorImage
+        id="vector"
+        :z-index="2">
+        <VlSourceVector
+          ref="vectorSource"
+          :features.sync="features" />
+      </VlLayerVectorImage>
+
+      <VlInteractionSelect
+        :hit-tolerance="8"
+        :condition="hoverCond"
+        :layers="['vector']">
+        <template slot-scope="selection">
+          <VlOverlay
+            v-for="feature in selection.features"
+            :id="feature.id"
+            :key="feature.id"
+            :position="findPoint(feature.geometry)"
+            :auto-pan="true"
+            :auto-pan-animation="{ duration: 300 }"
+            :style="{ maxWidth: '300px', maxHeight: '200px', overflow: 'auto', backgroundColor: 'whitesmoke', padding: '10px' }">
+            <p>
+              {{ feature.id }}<br>
+              Qwerty 123
+            </p>
+          </VlOverlay>
+        </template>
+      </VlInteractionSelect>
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { register } from 'ol/proj/proj4'
-  import proj4 from 'proj4'
-
-  proj4.defs('EPSG:25832', '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs')
-  register(proj4)
+  import { findPointOnSurface } from '@/ol-ext'
+  import { Feature } from 'ol'
+  import { pointerMove } from 'ol/events/condition'
+  import { Circle } from 'ol/geom'
 
   export default {
     name: 'App',
@@ -42,24 +64,42 @@
       }
     },
     mounted () {
-      this.features = [
-        {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Point',
-            coordinates: [10, 10],
+      setTimeout(() => {
+        this.$refs.vectorSource.addFeatures([
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: [10, 10],
+            },
           },
-        },
-        {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Point',
-            coordinates: [14, 14],
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: [20, 20],
+            },
           },
-        },
-      ]
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [-20, 20],
+                [-15, 25],
+                [-10, 30],
+              ],
+            },
+          },
+          new Feature(new Circle([-20e5, -20e5], 20e5)),
+        ])
+      }, 1000)
+    },
+    methods: {
+      hoverCond: pointerMove,
+      findPoint: findPointOnSurface,
     },
   }
 </script>
