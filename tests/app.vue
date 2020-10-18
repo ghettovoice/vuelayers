@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <VlMap
-      ref="map">
+      ref="map"
+      data-projection="EPSG:4326">
       <VlView
         ref="view"
         :center.sync="center"
@@ -45,10 +46,10 @@
 </template>
 
 <script>
-  import { Feature } from 'ol'
-  import { Circle } from 'ol/geom'
-  import { pointerMove } from 'ol/events/condition'
   import { findPointOnSurface } from '@/ol-ext'
+  import { Feature } from 'ol'
+  import { pointerMove } from 'ol/events/condition'
+  import { Circle } from 'ol/geom'
 
   export default {
     name: 'App',

@@ -1,11 +1,10 @@
 import debounce from 'debounce-promise'
 import { Feature } from 'ol'
 import { all as loadAll } from 'ol/loadingstrategy'
-import { get as getProj } from 'ol/proj'
 import VectorEventType from 'ol/source/VectorEventType'
 import { from as fromObs, merge as mergeObs } from 'rxjs'
 import { map as mapObs, mergeMap } from 'rxjs/operators'
-import { EPSG_4326, getFeatureId, getGeoJsonFmt, initializeFeature, isGeoJSONFeature, transform } from '../ol-ext'
+import { getFeatureId, getGeoJsonFmt, initializeFeature, isGeoJSONFeature, transform } from '../ol-ext'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import {
   and,
@@ -115,11 +114,6 @@ export default {
     useSpatialIndex: {
       type: Boolean,
       default: true,
-    },
-    projection: {
-      type: String,
-      default: EPSG_4326,
-      validator: value => getProj(value) != null,
     },
   },
   data () {
