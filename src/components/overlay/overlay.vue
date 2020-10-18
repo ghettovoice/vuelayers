@@ -52,14 +52,8 @@
         type: Boolean,
         default: true,
       },
-      autoPan: {
-        type: Boolean,
-        default: false,
-      },
-      autoPanMargin: {
-        type: Number,
-        default: 20,
-      },
+      autoPan: [Boolean, Object],
+      autoPanMargin: Number,
       autoPanAnimation: Object,
       autoPanOptions: Object,
       className: String,
@@ -179,6 +173,7 @@
       createOlObject () {
         const overlay = new Overlay({
           id: this.currentId,
+          element: this.$el,
           offset: this.currentOffset,
           position: this.currentPositionViewProj,
           positioning: this.currentPositioning,
@@ -199,15 +194,10 @@
        * @protected
        */
       async mount () {
-        this.$overlay.setElement(this.$el)
+        this.visible = true
         if (this.$overlaysContainer) {
           await this.$overlaysContainer.addOverlay(this.$overlay)
         }
-        // reset position to trigger panIntoView
-        this.$nextTick(async () => {
-          await this.setPosition(this.positionDataProj)
-          this.visible = true
-        })
 
         return this::olCmp.methods.mount()
       },
@@ -216,7 +206,6 @@
        * @protected
        */
       async unmount () {
-        this.$overlay.setElement(undefined)
         if (this.$overlaysContainer) {
           await this.$overlaysContainer.removeOverlay(this.$overlay)
         }

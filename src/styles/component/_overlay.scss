@@ -1,8 +1,9 @@
 .vl-overlay {
-  position: relative;
+  position: absolute;
   visibility: hidden;
 
   &.visible {
+    position: relative;
     visibility: visible;
   }
 }
