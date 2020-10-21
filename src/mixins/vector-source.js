@@ -186,9 +186,7 @@ export default {
       handler: /*#__PURE__*/sequential(async function (features) {
         if (isEqual(features, this.currentFeaturesViewProj)) return
         // add new features
-        const p = this.resolvedDataProjection
         await this.addFeatures(features, true)
-        console.log('done', p)
         // remove non-matched features
         await this.removeFeatures(difference(
           this.currentFeaturesViewProj,
