@@ -2,7 +2,7 @@ dist: xenial
 os: linux
 language: node_js
 node_js:
-  - node
+  - lts/*
 addons:
   chrome: stable
 services:
