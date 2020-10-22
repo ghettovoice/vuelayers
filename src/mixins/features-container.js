@@ -1,16 +1,15 @@
-import debounce from 'debounce-promise'
-import { Collection, Feature, getUid } from 'ol'
+import { Collection, getUid } from 'ol'
 import CollectionEventType from 'ol/CollectionEventType'
 import EventType from 'ol/events/EventType'
 import ObjectEventType from 'ol/ObjectEventType'
-import { from as fromObs, merge as mergeObs } from 'rxjs'
-import { debounceTime, map as mapObs, mergeMap, tap } from 'rxjs/operators'
-import { getFeatureId } from '../ol-ext'
+import { merge as mergeObs } from 'rxjs'
+import { distinctUntilChanged, map as mapObs, tap } from 'rxjs/operators'
+import { getFeatureId, roundExtent, roundPointCoords } from '../ol-ext'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { instanceOf, clonePlainObject, forEach, isEqual, isFunction, map, find, sequential } from '../utils'
+import { find, forEach, identity, isEqual } from '../utils'
 import featureHelper from './feature-helper'
 import identMap from './ident-map'
-import { FRAME_TIME } from './ol-cmp'
+import { FRAME_TIME, makeChangeOrRecreateWatchers } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import rxSubs from './rx-subs'
 
@@ -30,22 +29,6 @@ export default {
   ],
   computed: {
     /**
-     * @type {Object[]}
-     */
-    currentFeaturesDataProj () {
-      if (!this.rev) return []
-
-      return map(this.getFeatures(), feature => this.writeFeatureInDataProj(feature))
-    },
-    /**
-     * @type {Object[]}
-     */
-    currentFeaturesViewProj () {
-      if (!this.rev) return []
-
-      return map(this.getFeatures(), feature => this.writeFeatureInViewProj(feature))
-    },
-    /**
      * @returns {string|undefined}
      */
     featuresCollectionIdent () {
@@ -55,23 +38,9 @@ export default {
     },
   },
   watch: {
-    currentFeaturesDataProj: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(async function (value, prev) {
-        if (isEqual(value, prev)) return
-
-        this.$emit('update:features', clonePlainObject(value))
-      }, FRAME_TIME),
-    },
-    featuresCollectionIdent: /*#__PURE__*/sequential(function (value, prevValue) {
-      if (value && prevValue) {
-        this.moveInstance(value, prevValue)
-      } else if (value && !prevValue && this.$featuresCollection) {
-        this.setInstance(value, this.$featuresCollection)
-      } else if (!value && prevValue) {
-        this.unsetInstance(prevValue)
-      }
-    }),
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'featuresCollectionIdent',
+    ]),
   },
   created () {
     /**
@@ -105,19 +74,16 @@ export default {
     /**
      * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features
      * @param {boolean} [viewProj=false]
-     * @return {Promise<void>}
      */
-    async addFeatures (features, viewProj = false) {
-      await Promise.all(map(features, feature => this.addFeature(feature, viewProj)))
+    addFeatures (features, viewProj = false) {
+      forEach(features, feature => this.addFeature(feature, viewProj))
     },
     /**
      * @param {FeatureLike} feature
      * @param {boolean} [viewProj=false]
-     * @return {Promise<void>}
      */
-    async addFeature (feature, viewProj = false) {
-      feature = await this.initializeFeature(feature, viewProj)
-      instanceOf(feature, Feature)
+    addFeature (feature, viewProj = false) {
+      feature = this.initializeFeature(feature, viewProj)
       // todo add hash {featureId => featureIdx, ....}
       const foundFeature = this.getFeatureById(getFeatureId(feature))
       if (foundFeature == null) {
@@ -128,21 +94,15 @@ export default {
     },
     /**
      * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features
-     * @return {Promise<void>}
      */
-    async removeFeatures (features) {
-      await Promise.all(map(features, ::this.removeFeature))
+    removeFeatures (features) {
+      forEach(features, ::this.removeFeature)
     },
     /**
      * @param {FeatureLike} feature
-     * @return {Promise<void>}
      */
-    async removeFeature (feature) {
-      if (isFunction(feature.resolveOlObject)) {
-        feature = await feature.resolveOlObject()
-      }
-
-      feature = this.getFeatureById(getFeatureId(feature))
+    removeFeature (feature) {
+      feature = this.getFeatureById(getFeatureId(feature?.$feature || feature))
       if (!feature) return
 
       this.$featuresCollection.remove(feature)
@@ -159,9 +119,7 @@ export default {
      */
     getFeatureById (featureId) {
       // todo add hash {featureId => featureIdx, ....}
-      return find(this.getFeatures(), feature => {
-        return getFeatureId(feature) === featureId
-      })
+      return find(this.getFeatures(), feature => getFeatureId(feature) === featureId)
     },
     /**
      * @return {Array<module:ol/Feature~Feature>}
@@ -174,6 +132,133 @@ export default {
      */
     getFeaturesCollection () {
       return this._featuresCollection
+    },
+    /**
+     * @param {function} callback
+     * @return {*}
+     */
+    forEachFeature (callback) {
+      let res
+      this.$featuresCollection.forEach((...args) => {
+        res = callback(...args)
+      })
+
+      return res
+    },
+    /**
+     * @param {number[]} extent
+     * @param {function} callback
+     * @param {boolean} [viewProj=false]
+     * @returns {*}
+     */
+    forEachFeatureInExtent (extent, callback, viewProj = false) {
+      extent = viewProj ? roundExtent(extent) : this.extentToViewProj(extent)
+
+      return this.forEachFeature(feature => {
+        const geometry = feature.getGeometry()
+        if (geometry && geometry.intersectsExtent(extent)) {
+          const result = callback(feature)
+          if (result) {
+            return result
+          }
+        }
+      })
+    },
+    /**
+     * @param {number[]} extent
+     * @param {function} callback
+     * @param {boolean} [viewProj=false]
+     * @returns {*}
+     */
+    forEachFeatureIntersectingExtent (extent, callback, viewProj = false) {
+      return this.forEachFeatureInExtent(extent, callback, viewProj)
+    },
+    /**
+     * @param {number[]} coordinate
+     * @param {boolean} [viewProj=false]
+     * @returns {Array<module:ol/Feature~Feature>}
+     */
+    getFeaturesAtCoordinate (coordinate, viewProj = false) {
+      return this.getFeaturesInExtent([coordinate[0], coordinate[1], coordinate[0], coordinate[1]], viewProj)
+    },
+    /**
+     * @param {number[]} extent
+     * @param {boolean} [viewProj=false]
+     * @returns {Array<module:ol/Feature~Feature>}
+     */
+    getFeaturesInExtent (extent, viewProj = false) {
+      const features = []
+      this.forEachFeatureIntersectingExtent(extent, feature => {
+        features.push(feature)
+      }, viewProj)
+
+      return features
+    },
+    /**
+     * @param {number[]} coordinate
+     * @param {function} [filter]
+     * @param {boolean} [viewProj=false]
+     * @returns {module:ol/Feature~Feature}
+     */
+    getClosestFeatureToCoordinate (coordinate, filter = identity, viewProj = false) {
+      coordinate = viewProj ? roundPointCoords(coordinate) : this.pointToViewProj(coordinate)
+
+      let closestFeature
+      let minSquaredDistance = Infinity
+      this.forEachFeature(feature => {
+        if (!filter(feature)) return
+
+        const geometry = feature.getGeometry()
+        if (!geometry) return
+
+        const closestPoint = geometry.getClosestPoint(coordinate)
+        const prevSquaredDistance = minSquaredDistance
+        minSquaredDistance = Math.pow(closestPoint[0] - coordinate[0], 2) + Math.pow(closestPoint[1] - coordinate[1])
+        if (minSquaredDistance < prevSquaredDistance) {
+          closestFeature = feature
+        }
+      })
+
+      return closestFeature
+    },
+    /**
+     * @param {boolean} [viewProj=false]
+     * @returns {number[]}
+     */
+    getFeaturesExtent (viewProj = false) {
+      let extent
+      this.forEachFeature(feature => {
+        const geometry = feature.getGeometry()
+        if (!geometry) return
+
+        const geomExtent = geometry.getExtent()
+        if (!extent) {
+          extent = geomExtent
+        } else {
+          extent = [
+            geomExtent[0] < extent[0] ? geomExtent[0] : extent[0],
+            geomExtent[1] < extent[1] ? geomExtent[1] : extent[1],
+            geomExtent[2] > extent[2] ? geomExtent[2] : extent[2],
+            geomExtent[3] > extent[3] ? geomExtent[3] : extent[3],
+          ]
+        }
+      })
+
+      return viewProj ? extent : this.extentToDataProj(extent)
+    },
+    /**
+     * @param {string|undefined} value
+     * @param {string|undefined} prevValue
+     * @protected
+     */
+    featuresCollectionIdentChanged (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue && this.$featuresCollection) {
+        this.setInstance(value, this.$featuresCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
     },
   },
 }
@@ -190,26 +275,22 @@ function defineServices () {
 function subscribeToCollectionEvents () {
   const vm = this
   const adds = obsFromOlEvent(this.$featuresCollection, CollectionEventType.ADD).pipe(
-    mergeMap(({ type, element }) => fromObs(this.initializeFeature(element)).pipe(
-      mapObs(element => ({ type, element })),
-    )),
-    tap(({ type, element }) => {
+    mapObs(evt => ({
+      ...evt,
+      element: this.initializeFeature(evt.element),
+    })),
+    tap(({ element }) => {
       const uid = getUid(element)
       const propChanges = obsFromOlEvent(element, ObjectEventType.PROPERTYCHANGE)
       const changes = obsFromOlEvent(element, EventType.CHANGE)
-      const events = mergeObs(
-        propChanges,
-        changes,
-      ).pipe(
-        debounceTime(FRAME_TIME),
+      const events = mergeObs(propChanges, changes).pipe(
+        distinctUntilChanged(isEqual),
       )
-      this._featureSubs[uid] = this.subscribeTo(events, () => {
-        ++this.rev
-      })
+      this._featureSubs[uid] = this.subscribeTo(events, ::this.scheduleRefresh)
     }),
   )
   const removes = obsFromOlEvent(this.$featuresCollection, CollectionEventType.REMOVE).pipe(
-    tap(({ type, element }) => {
+    tap(({ element }) => {
       const uid = getUid(element)
       if (this._featureSubs[uid]) {
         this.unsubscribe(this._featureSubs[uid])
@@ -230,8 +311,8 @@ function subscribeToCollectionEvents () {
     })),
     bufferDebounceTime(FRAME_TIME),
   )
-  this.subscribeTo(events, events => {
-    ++this.rev
+  this.subscribeTo(events, async events => {
+    await this.scheduleRefresh()
 
     this.$nextTick(() => {
       forEach(events, evt => {

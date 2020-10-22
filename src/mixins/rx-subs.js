@@ -5,6 +5,16 @@ import { newLogger, noop } from '../utils'
  * RxJS subscriptions manager.
  */
 export default {
+  beforeCreate () {
+    /**
+     * @type {Subscription[]}
+     * @private
+     */
+    this._rxSubs = []
+  },
+  destroyed () {
+    this.unsubscribeAll()
+  },
   methods: {
     /**
      * @return {void}
@@ -53,15 +63,5 @@ export default {
       subs.unsubscribe()
       this._rxSubs.splice(idx, 1)
     },
-  },
-  beforeCreate () {
-    /**
-     * @type {Subscription[]}
-     * @private
-     */
-    this._rxSubs = []
-  },
-  destroyed () {
-    this.unsubscribeAll()
   },
 }

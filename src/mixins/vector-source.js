@@ -1,35 +1,40 @@
-import debounce from 'debounce-promise'
 import { Feature } from 'ol'
 import { all as loadAll } from 'ol/loadingstrategy'
-import VectorEventType from 'ol/source/VectorEventType'
-import { from as fromObs, merge as mergeObs } from 'rxjs'
-import { map as mapObs, mergeMap } from 'rxjs/operators'
-import { getFeatureId, getGeoJsonFmt, initializeFeature, isGeoJSONFeature, transform } from '../ol-ext'
-import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
+import { Vector as VectorSource } from 'ol/source'
+import {
+  getFeatureId,
+  getGeoJsonFmt,
+  initializeFeature,
+  isGeoJSONFeature,
+  roundExtent,
+  roundPointCoords,
+  transform,
+} from '../ol-ext'
 import {
   and,
   clonePlainObject,
+  coalesce,
   constant,
   difference,
   every,
   forEach,
+  identity,
   instanceOf,
   isArray,
   isEmpty,
   isEqual,
   isFunction,
   isString,
-  makeWatchers,
   map,
   mergeDescriptors,
   negate,
-  pick,
+  noop,
   sealFactory,
-  sequential,
   stubArray,
 } from '../utils'
 import featureHelper from './feature-helper'
-import { FRAME_TIME } from './ol-cmp'
+import featuresContainer from './features-container'
+import { makeChangeOrRecreateWatchers } from './ol-cmp'
 import source from './source'
 
 const isNotEmptyString = /*#__PURE__*/and(isString, negate(isEmpty))
@@ -40,6 +45,7 @@ const isNotEmptyString = /*#__PURE__*/and(isString, negate(isEmpty))
 export default {
   mixins: [
     featureHelper,
+    featuresContainer,
     source,
   ],
   stubVNode: {
@@ -120,9 +126,12 @@ export default {
   data () {
     return {
       /**
-       * @returns {module:ol/format/Feature~FeatureFormat|null}
+       * @returns {module:ol/format/Feature~FeatureFormat|undefined}
        */
-      format: null,
+      format: undefined,
+      currentUrl: undefined,
+      currentLoader: undefined,
+      extentViewProj: undefined,
     }
   },
   computed: {
@@ -133,29 +142,22 @@ export default {
       return map(this.featuresDataProj, feature => this.writeFeatureInViewProj(this.readFeatureInDataProj(feature)))
     },
     currentFeaturesDataProj () {
-      if (!(this.rev && this.$source)) return []
+      if (!this.rev) return []
 
-      return map(this.getFeaturesInternal(), feature => this.writeFeatureInDataProj(feature))
+      return map(this.getFeatures(), feature => this.writeFeatureInDataProj(feature))
     },
     currentFeaturesViewProj () {
-      if (!(this.rev && this.$source)) return []
+      if (!this.rev) return []
 
-      return map(this.getFeaturesInternal(), feature => this.writeFeatureInViewProj(feature))
+      return map(this.getFeatures(), feature => this.writeFeatureInViewProj(feature))
     },
-    currentExtentDataProj () {
-      if (!(this.rev && this.$source)) return
-
-      return this.getExtentInternal()
+    extentDataProj () {
+      return this.extentToDataProj(this.extentViewProj)
     },
-    currentExtentViewProj () {
-      if (!(this.rev && this.$source)) return
-
-      return this.getExtentInternal(null, true)
-    },
-    urlFunc () {
+    inputUrl () {
       return this.createUrlFunc(this.url)
     },
-    loaderFunc () {
+    inputLoader () {
       let loader = this.loader
       if (!loader && this.loaderFactory) {
         loader = this.loaderFactory()
@@ -163,15 +165,7 @@ export default {
 
       return this.createLoaderFunc(loader)
     },
-    formatIdent () {
-      if (!this.olObjIdent) return
-
-      return this.makeIdent(this.olObjIdent, 'format')
-    },
-    sealFormatFactory () {
-      return sealFactory(::this.formatFactory)
-    },
-    loadingStrategyFunc () {
+    inputLoadingStrategy () {
       let loadingStrategy = this.loadingStrategy
       if (!loadingStrategy && this.strategyFactory) {
         loadingStrategy = this.strategyFactory()
@@ -179,83 +173,45 @@ export default {
 
       return loadingStrategy || loadAll
     },
+    formatIdent () {
+      if (!this.olObjIdent) return
+
+      return this.makeIdent(this.olObjIdent, 'format')
+    },
+    inputFormatFactory () {
+      return sealFactory(::this.formatFactory)
+    },
   },
   watch: {
-    featuresViewProj: {
-      deep: true,
-      handler: /*#__PURE__*/sequential(async function (features) {
-        if (isEqual(features, this.currentFeaturesViewProj)) return
-        // add new features
-        await this.addFeatures(features, true)
-        // remove non-matched features
-        await this.removeFeatures(difference(
-          this.currentFeaturesViewProj,
-          features,
-          (a, b) => getFeatureId(a) === getFeatureId(b),
-        ))
-      }),
+    rev () {
+      if (!this.$source) return
+
+      if (this.currentUrl !== this.$source.getUrl()) {
+        this.currentUrl = this.$source.getUrl()
+      }
+      if (!isEqual(this.extentViewProj, this.$source.getExtent())) {
+        this.extentViewProj = this.$source.getExtent()
+      }
     },
-    currentFeaturesDataProj: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(function (value) {
-        if (isEqual(value, this.featuresDataProj)) return
-
-        this.$emit('update:features', clonePlainObject(value))
-      }, FRAME_TIME),
-    },
-    urlFunc: /*#__PURE__*/sequential(async function (value) {
-      await this.setUrlInternal(value)
-    }),
-    loaderFunc: /*#__PURE__*/sequential(async function (value) {
-      await this.setLoaderInternal(value)
-    }),
-    formatIdent: /*#__PURE__*/sequential(function (value, prevValue) {
-      if (value && prevValue) {
-        this.moveInstance(value, prevValue)
-      } else if (value && !prevValue && this.format) {
-        this.setInstance(value, this.format)
-      } else if (!value && prevValue) {
-        this.unsetInstance(prevValue)
-      }
-    }),
-    sealFormatFactory: /*#__PURE__*/sequential(async function (value) {
-      while (this.hasInstance(this.formatIdent)) {
-        this.unsetInstance(this.formatIdent)
-      }
-
-      if (isFunction(value)) {
-        this.format = this.instanceFactoryCall(this.formatIdent, this::value)
-      } else {
-        this.format = undefined
-      }
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('sealDataFormatFactory changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    }),
-    overlaps: /*#__PURE__*/sequential(async function (value) {
-      if (value === await this.getOverlaps()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('overlaps changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    }),
-    .../*#__PURE__*/makeWatchers([
-      'loadingStrategyFunc',
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'featuresViewProj',
+      'currentFeaturesDataProj',
+      'extentDataProj',
+      'inputUrl',
+      'currentUrl',
+      'inputLoader',
+      'currentLoader',
+      'inputLoadingStrategy',
+      'inputFormatFactory',
+      'formatIdent',
+      'format',
+      'overlaps',
       'useSpatialIndex',
-    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-      if (isEqual(val, prev)) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log(`${prop} changed, scheduling recreate...`)
-      }
-
-      await this.scheduleRecreate()
-    })),
+    ], [
+      'featuresViewProj',
+      'currentFeaturesDataProj',
+      'extentDataProj',
+    ]),
   },
   created () {
     if (process.env.NODE_ENV !== 'production') {
@@ -267,16 +223,11 @@ export default {
       }
     }
 
-    if (isFunction(this.sealFormatFactory)) {
-      this.format = this.instanceFactoryCall(this.formatIdent, ::this.sealFormatFactory)
-      // this.$watch('format', async () => {
-      //   if (process.env.VUELAYERS_DEBUG) {
-      //     this.$logger.log('format changed, scheduling recreate...')
-      //   }
-      //
-      //   await this.scheduleRecreate()
-      // })
+    if (isFunction(this.inputFormatFactory)) {
+      this.format = this.instanceFactoryCall(this.formatIdent, ::this.inputFormatFactory)
     }
+    this.currentUrl = this.inputUrl
+    this.currentLoader = this.inputLoader
   },
   updated () {
     if (process.env.NODE_ENV !== 'production') {
@@ -289,6 +240,30 @@ export default {
     }
   },
   methods: {
+    /**
+     * @return {module:ol/source/Vector~VectorSource}
+     * @protected
+     */
+    createSource () {
+      return new VectorSource({
+        // ol/source/Source
+        attributions: this.currentAttributions,
+        projection: this.resolvedDataProjection,
+        wrapX: this.wrapX,
+        // ol/source/Vector
+        format: this.format,
+        loader: this.currentLoader,
+        strategy: this.inputLoadingStrategy,
+        url: this.currentUrl,
+        overlaps: this.overlaps,
+        useSpatialIndex: this.useSpatialIndex,
+        features: this.$featuresCollection,
+      })
+    },
+    /**
+     * @return {Object}
+     * @protected
+     */
     getServices () {
       const vm = this
 
@@ -299,76 +274,92 @@ export default {
         },
       )
     },
+    /**
+     * @protected
+     */
     subscribeAll () {
       this::source.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
-    .../*#__PURE__*/pick(source.methods, [
-      'beforeInit',
-      'init',
-      'deinit',
-      'beforeMount',
-      'unmount',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'resolveOlObject',
-      'resolveSource',
-    ]),
-    async addFeatures (features, viewProj = false) {
+    /**
+     * @param {FeatureLike} features
+     * @param {boolean} [viewProj=false]
+     */
+    addFeatures (features, viewProj = false) {
       const newFeatures = []
-      await Promise.all(map(features || [], async feature => {
-        feature = await this.initializeFeature(feature, viewProj)
+      forEach(features || [], feature => {
+        feature = this.initializeFeature(feature, viewProj)
         instanceOf(feature, Feature)
 
-        const foundFeature = await this.getFeatureById(getFeatureId(feature))
+        const foundFeature = this.getFeatureById(getFeatureId(feature))
         if (foundFeature) {
           this.updateFeature(foundFeature, feature)
         } else {
           newFeatures.push(feature)
         }
-      }));
+      })
 
-      (await this.resolveSource()).addFeatures(newFeatures)
+      if (this.$source) {
+        this.$source.addFeatures(newFeatures)
+      } else {
+        forEach(newFeatures, feature => this::featuresContainer.methods.addFeature(feature, true))
+      }
     },
-    async addFeature (feature, viewProj = false) {
-      await this.addFeatures([feature], viewProj)
+    /**
+     * @param {FeatureLike} feature
+     * @param {boolean} [viewProj=false]
+     */
+    addFeature (feature, viewProj = false) {
+      this.addFeatures([feature], viewProj)
     },
-    async removeFeatures (features) {
-      await Promise.all(map(features, ::this.removeFeature))
+    /**
+     * @param {FeatureLike} feature
+     */
+    removeFeature (feature) {
+      feature = feature?.$feature || feature
+
+      if (this.$source) {
+        this.$source.removeFeature(feature)
+      } else {
+        this::featuresContainer.methods.removeFeature(feature)
+      }
     },
-    async removeFeature (feature) {
-      if (isFunction(feature.resolveOlObject)) {
-        feature = await feature.resolveOlObject()
+    /**
+     * @param {string} featureId
+     * @return {module:ol/Feature~Feature|undefined}
+     */
+    getFeatureById (featureId) {
+      if (this.$source) {
+        return this.$source.getFeatureById(featureId)
       }
 
-      feature = await this.getFeatureById(getFeatureId(feature))
-      if (!feature) return
+      return this::featuresContainer.methods.getFeatureById(featureId)
+    },
+    /**
+     * @return {Array<module:ol/Feature~Feature>}
+     */
+    getFeatures () {
+      return coalesce(this.$source?.getFeatures(), this::featuresContainer.methods.getFeatures())
+    },
+    /**
+     * @return {module:ol/Collection~Collection|undefined}
+     */
+    getFeaturesCollection () {
+      return coalesce(this.$source?.getFeaturesCollection(), this._featuresCollection)
+    },
+    /**
+     * @return {boolean}
+     */
+    isEmpty () {
+      return coalesce(this.$source?.isEmpty(), this.$featuresCollection.getLength() === 0)
+    },
+    /**
+     * @param {boolean} [fast]
+     * @return {Promise<void>}
+     */
+    async clear (fast) {
+      if (!this.$source) return this.clearFeatures()
 
-      (await this.resolveSource()).removeFeature(feature)
-    },
-    async getFeatureById (featureId) {
-      return (await this.resolveSource()).getFeatureById(featureId)
-    },
-    async getFeatures () {
-      await this.resolveSource()
-
-      return this.getFeaturesInternal()
-    },
-    getFeaturesInternal () {
-      return this.$source.getFeatures()
-    },
-    async getFeaturesCollection () {
-      await this.resolveSource()
-
-      return this.getFeaturesCollectionInternal()
-    },
-    getFeaturesCollectionInternal () {
-      return this.$source.getFeaturesCollection()
-    },
-    async clear () {
       const source = await this.resolveSource()
 
       return new Promise(resolve => {
@@ -376,157 +367,147 @@ export default {
         source.clear()
       })
     },
-    async isEmpty () {
-      return (await this.resolveSource()).isEmpty()
-    },
     /**
      * @param {function} callback
-     * @returns {Promise<*>}
+     * @returns {*}
      */
-    async forEachFeature (callback) {
-      return (await this.resolveSource()).forEachFeature(callback)
+    forEachFeature (callback) {
+      if (this.$source) {
+        return this.$source.forEachFeature(callback)
+      }
+
+      return this::featuresContainer.methods.forEachFeature(callback)
     },
     /**
      * @param {number[]} extent
      * @param {function} callback
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<*>}
+     * @returns {*}
      */
-    async forEachFeatureInExtent (extent, callback, viewProj = false) {
-      if (!viewProj) {
-        extent = this.extentToViewProj(extent)
+    forEachFeatureInExtent (extent, callback, viewProj = false) {
+      extent = viewProj ? roundExtent(extent) : this.extentToViewProj(extent)
+
+      if (this.$source) {
+        return this.$source.forEachFeatureInExtent(extent, callback)
       }
 
-      return (await this.resolveSource()).forEachFeatureInExtent(extent, callback)
+      return this::featuresContainer.methods.forEachFeatureInExtent(extent, callback, true)
     },
     /**
      * @param {number[]} extent
      * @param {function} callback
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<*>}
+     * @returns {*}
      */
-    async forEachFeatureIntersectingExtent (extent, callback, viewProj = false) {
-      if (!viewProj) {
-        extent = this.extentToViewProj(extent)
+    forEachFeatureIntersectingExtent (extent, callback, viewProj = false) {
+      extent = viewProj ? roundExtent(extent) : this.extentToViewProj(extent)
+
+      if (this.$source) {
+        return this.$source.forEachFeatureIntersectingExtent(extent, callback)
       }
 
-      return (await this.resolveSource()).forEachFeatureIntersectingExtent(extent, callback)
+      return this::featuresContainer.methods.forEachFeatureIntersectingExtent(extent, callback, true)
     },
     /**
      * @param {number[]} coordinate
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<Array<module:ol/Feature~Feature>>}
+     * @returns {Array<module:ol/Feature~Feature>}
      */
-    async getFeaturesAtCoordinate (coordinate, viewProj = false) {
-      if (!viewProj) {
-        coordinate = this.pointToViewProj(coordinate)
+    getFeaturesAtCoordinate (coordinate, viewProj = false) {
+      coordinate = viewProj ? roundPointCoords(coordinate) : this.pointToViewProj(coordinate)
+
+      if (this.$source) {
+        return this.$source.getFeaturesAtCoordinate(coordinate)
       }
 
-      return (await this.resolveSource()).getFeaturesAtCoordinate(coordinate)
+      return this::featuresContainer.methods.getFeaturesAtCoordinate(coordinate, true)
     },
     /**
      * @param {number[]} extent
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<Array<module:ol/Feature~Feature>>}
+     * @returns {Array<module:ol/Feature~Feature>}
      */
-    async getFeaturesInExtent (extent, viewProj = false) {
-      if (!viewProj) {
-        extent = this.extentToViewProj(extent)
+    getFeaturesInExtent (extent, viewProj = false) {
+      extent = viewProj ? roundExtent(extent) : this.extentToViewProj(extent)
+
+      if (this.$source) {
+        return this.$source.getFeaturesInExtent(extent)
       }
 
-      return (await this.resolveSource()).getFeaturesInExtent(extent)
+      return this::featuresContainer.methods.getFeaturesInExtent(extent, true)
     },
     /**
      * @param {number[]} coordinate
      * @param {function} [filter]
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<module:ol/Feature~Feature>}
+     * @returns {module:ol/Feature~Feature}
      */
-    async getClosestFeatureToCoordinate (coordinate, filter, viewProj = false) {
-      if (!viewProj) {
-        coordinate = this.pointToViewProj(coordinate)
+    getClosestFeatureToCoordinate (coordinate, filter = identity, viewProj = false) {
+      coordinate = viewProj ? roundPointCoords(coordinate) : this.pointToViewProj(coordinate)
+
+      if (this.$source) {
+        return this.$source.getClosestFeatureToCoordinate(coordinate, filter)
       }
 
-      return (await this.resolveSource()).getClosestFeatureToCoordinate(coordinate, filter)
+      return this::featuresContainer.methods.getClosestFeatureToCoordinate(coordinate, filter, true)
     },
     /**
-     * @param {number[]} [extent]
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<number[]>}
+     * @returns {number[]}
      */
-    async getExtent (extent, viewProj = false) {
-      await this.resolveSource()
-
-      return this.getExtentInternal(extent, viewProj)
-    },
-    getExtentInternal (extent, viewProj = false) {
-      if (viewProj) {
-        return this.$source.getExtent(extent)
+    getExtent (viewProj = false) {
+      let extent
+      if (this.$source) {
+        extent = this.$source.getExtent()
+      } else {
+        extent = this::featuresContainer.methods.getFeaturesExtent(true)
       }
 
-      return this.extentToDataProj(this.$source.getExtent(this.extentToViewProj(extent)))
+      return viewProj ? extent : this.extentToDataProj(extent)
     },
     /**
      * @returns {module:ol/format/Feature~FeatureFormat|undefined}
      */
     getFormat () {
-      return this.format
-    },
-    /**
-     * @returns {Promise<boolean>}
-     */
-    async getOverlaps () {
-      return (await this.resolveSource()).getOverlaps()
+      return coalesce(this.$source?.getFormat(), this.format)
     },
     /**
      * @returns {Promise<string|function|undefined>}
      */
-    async getUrl () {
-      return (await this.resolveSource()).getUrl()
+    getUrl () {
+      return coalesce(this.$source?.getUrl(), this.currentUrl)
     },
     /**
      * @param {string|function} url
-     * @returns {Promise<void>}
      */
-    async setUrl (url) {
-      await this.setUrlInternal(this.createUrlFunc(url))
-    },
-    /**
-     * @param {string|function} url
-     * @returns {Promise<void>}
-     * @protected
-     */
-    async setUrlInternal (url) {
-      (await this.resolveSource()).setUrl(url)
-      await this.refresh()
+    setUrl (url) {
+      url = this.createUrlFunc(url)
+
+      if (url !== this.currentUrl) {
+        this.currentUrl = url
+      }
+      if (this.$source && url !== this.$source.getUrl()) {
+        this.$source.setUrl(url)
+      }
     },
     /**
      * @param {function} loader
-     * @returns {Promise<void>}
      */
-    async setLoader (loader) {
-      await this.setLoaderInternal(this.wrapLoaderFunc(loader))
-    },
-    /**
-     * @param {function} loader
-     * @returns {Promise<void>}
-     * @protected
-     */
-    async setLoaderInternal (loader) {
-      (await this.resolveSource()).setLoader(loader)
-      await this.refresh()
+    setLoader (loader) {
+      loader = this.createLoaderFunc(loader)
+
+      if (loader !== this.currentLoader) {
+        this.currentLoader = loader
+        this.$source?.setLoader(loader)
+      }
     },
     /**
      * @param {number[]} extent
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<void>}
      */
-    async removeLoadedExtent (extent, viewProj = false) {
-      if (!viewProj) {
-        extent = this.extentToViewProj(extent)
-      }
-
-      (await this.resolveSource()).removeLoadedExtent(extent)
+    removeLoadedExtent (extent, viewProj = false) {
+      extent = viewProj ? roundExtent(extent) : this.extentToViewProj(extent)
+      this.$source?.removeLoadedExtent(extent)
     },
     /**
      * @param {string|function|undefined} url
@@ -548,12 +529,19 @@ export default {
      * @protected
      */
     wrapUrlFunc (urlFunc) {
-      return (extent, resolution, projection) => {
-        extent = transformExtent(extent, projection, this.resolvedDataProjection)
-        projection = this.resolvedDataProjection
+      let fn = urlFunc
 
-        return urlFunc(extent, resolution, projection)
+      if (!fn.wrapped) {
+        fn = (extent, resolution, projection) => {
+          extent = transformExtent(extent, projection, this.resolvedDataProjection)
+          projection = this.resolvedDataProjection
+
+          return urlFunc(extent, resolution, projection)
+        }
+        fn.wrapped = true
       }
+
+      return fn
     },
     /**
      * @param {function|undefined} loader
@@ -571,69 +559,139 @@ export default {
      * @protected
      */
     wrapLoaderFunc (loaderFunc) {
-      return async (extent, resolution, projection) => {
-        let features = await loaderFunc(
-          transformExtent(extent, projection, this.resolvedDataProjection),
-          resolution,
-          this.resolvedDataProjection,
-        )
-        if (!(isArray(features) && features[0] instanceof Feature)) {
-          features = this.readSource(features)
+      let fn = loaderFunc
+
+      if (!fn.wrapped) {
+        fn = async (extent, resolution, projection) => {
+          let features = await loaderFunc(
+            transformExtent(extent, projection, this.resolvedDataProjection),
+            resolution,
+            this.resolvedDataProjection,
+          )
+          if (!(isArray(features) && features[0] instanceof Feature)) {
+            features = this.readSource(features)
+          }
+          if (isArray(features)) {
+            this.addFeatures(features)
+          }
         }
-        if (isArray(features)) {
-          await this.addFeatures(features)
-        }
+        fn.wrapped = true
       }
+
+      return fn
     },
     /**
      * @param {*} data
      * @returns {Array<module:ol/Feature~Feature>}
      */
     readSource (data) {
-      return this.format.readFeatures(data, {
+      return this.getFormat().readFeatures(data, {
         featureProjection: this.resolvedViewProjection,
         dataProjection: this.resolvedDataProjection,
       })
     },
+    /**
+     * @param {GeoJSONFeature[]} value
+     * @protected
+     */
+    featuresViewProjChanged (value) {
+      if (isEqual(value, this.currentFeaturesViewProj)) return
+      // add new features
+      this.addFeatures(value, true)
+      // remove non-matched features
+      this.removeFeatures(difference(
+        this.currentFeaturesViewProj,
+        value,
+        (a, b) => getFeatureId(a) === getFeatureId(b),
+      ))
+    },
+    /**
+     * @param {GeoJSONFeature[]} value
+     * @protected
+     */
+    currentFeaturesDataProjChanged (value) {
+      if (isEqual(value, this.featuresDataProj)) return
+
+      this.$emit('update:features', clonePlainObject(value))
+    },
+    /**
+     * @param {number[]|undefined} value
+     * @param {number[]|undefined} prev
+     * @protected
+     */
+    extentDataProjChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:extent', value?.slice())
+    },
+    /**
+     * @param {string|function|undefined} value
+     * @protected
+     */
+    inputUrlChanged (value) {
+      this.setUrl(value)
+    },
+    /**
+     * @param {string|function|undefined} value
+     * @protected
+     */
+    currentUrlChanged (value) {
+      if (value === this.inputUrl) return
+
+      this.$emit('update:url', value)
+    },
+    /**
+     * @param {function|undefined} value
+     * @protected
+     */
+    inputLoaderChanged (value) {
+      this.setLoader(value)
+    },
+    /**
+     * @param {function|undefined} value
+     * @protected
+     */
+    currentLoaderChanged (value) {
+      if (value === this.inputLoader) return
+
+      this.$emit('update:loader', value)
+    },
+    /**
+     * @param {string|undefined} value
+     * @param {string|undefined} prevValue
+     * @protected
+     */
+    formatIdentChanged (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue && this.format) {
+        this.setInstance(value, this.format)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
+    },
+    /**
+     * @param {function} value
+     * @protected
+     */
+    inputFormatFactoryChanged (value) {
+      while (this.hasInstance(this.formatIdent)) {
+        this.unsetInstance(this.formatIdent)
+      }
+
+      if (isFunction(value)) {
+        this.format = this.instanceFactoryCall(this.formatIdent, this::value)
+      } else {
+        this.format = undefined
+      }
+    },
+    // skip not used watchers
+    attributionsCollapsibleChanged: noop,
+    stateChanged: noop,
   },
 }
 
 function subscribeToSourceEvents () {
-  const vm = this
-  const adds = obsFromOlEvent(this.$source, VectorEventType.ADDFEATURE).pipe(
-    mergeMap(({ type, feature }) => fromObs(this.initializeFeature(feature)).pipe(
-      mapObs(feature => ({ type, feature, oldType: 'add:feature' })),
-    )),
-  )
-  const removes = obsFromOlEvent(this.$source, VectorEventType.REMOVEFEATURE).pipe(
-    mapObs(evt => ({ ...evt, oldType: 'remove:feature' })),
-  )
-  const events = mergeObs(adds, removes).pipe(
-    mapObs(({ type, feature, oldType }) => ({
-      type,
-      feature,
-      oldType,
-      get json () {
-        if (!this._json) {
-          this._json = vm.writeFeatureInDataProj(this.feature)
-        }
-        return this._json
-      },
-    })),
-    bufferDebounceTime(FRAME_TIME),
-  )
-  this.subscribeTo(events, events => {
-    this.$nextTick(() => {
-      forEach(events, evt => {
-        const oldType = evt.oldType
-        delete evt.oldType
-
-        this.$emit(evt.type, evt)
-        // todo remove in v0.13.x
-        this.$emit(oldType, evt.feature)
-      })
-    })
-  })
 }
 
 function transformExtent (extent, sourceProj, destProj) {

@@ -5,24 +5,32 @@
     style="display: none !important;">
     <slot>
       <FillStyle
-        :id="'vl-' + id + '-default-fill-style'"
-        color="#222" />
+        :id="'vl-' + currentId + '-default-fill-style'"
+        color="#333" />
       <StrokeStyle
-        :id="'vl-' + id + '-default-stroke-style'"
+        :id="'vl-' + currentId + '-default-stroke-style'"
         color="#eee" />
     </slot>
-    <BackgroundStyle :id="'vl-' + id + '-background-style'">
+    <BackgroundStyle :id="'vl-' + currentId + '-background-style'">
       <slot name="background" />
     </BackgroundStyle>
   </i>
 </template>
 
 <script>
-  import debounce from 'debounce-promise'
   import { Text as TextStyle } from 'ol/style'
-  import { fillStyleContainer, FRAME_TIME, strokeStyleContainer, style } from '../../mixins'
+  import { fillStyleContainer, strokeStyleContainer, style } from '../../mixins'
   import { dumpFillStyle, dumpStrokeStyle } from '../../ol-ext'
-  import { clonePlainObject, isEqual, isFunction, mergeDescriptors, sequential } from '../../utils'
+  import {
+    clonePlainObject,
+    coalesce,
+    isEqual,
+    isObjectLike,
+    lowerFirst,
+    makeWatchers,
+    mergeDescriptors,
+    upperFirst,
+  } from '../../utils'
   import BackgroundStyle from './background.vue'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'
@@ -85,80 +93,141 @@
         validate: val => val.length && val.length === 4,
       },
     },
+    data () {
+      return {
+        currentFont: this.font,
+        currentMaxAngle: this.maxAngle,
+        currentPlacement: this.placement,
+        currentOffsetX: this.offsetX,
+        currentOffsetY: this.offsetY,
+        currentOverflow: this.overflow,
+        currentRotateWithView: this.rotateWithView,
+        currentRotation: this.rotation,
+        currentScale: this.scale,
+        currentText: this.text,
+        currentTextAlign: this.textAlign,
+        currentTextBaseline: this.textBaseline,
+        currentPadding: this.padding?.slice(),
+      }
+    },
     computed: {
-      currentBackgroundFill () {
+      inputPadding () {
+        return this.padding?.slice()
+      },
+      stroke () {
+        if (!(this.rev && this.$stroke)) return
+
+        return dumpStrokeStyle(this.$stroke)
+      },
+      fill () {
+        if (!(this.rev && this.$fill)) return
+
+        return dumpFillStyle(this.$fill)
+      },
+      backgroundFill () {
         if (!(this.rev && this.$bgFill)) return
 
         return dumpFillStyle(this.$bgFill)
       },
-      currentBackgroundStroke () {
+      backgroundStroke () {
         if (!(this.rev && this.$bgStroke)) return
 
         return dumpStrokeStyle(this.$bgStroke)
       },
     },
     watch: {
-      font: /*#__PURE__*/sequential(async function (value) {
-        await this.setFont(value)
+      rev () {
+        if (!this.$style) return
+
+        this.setFont(this.getFont())
+        this.setMaxAngle(this.getMaxAngle())
+        this.setPlacement(this.getPlacement())
+        this.setOffsetX(this.getOffsetX())
+        this.setOffsetY(this.getOffsetY())
+        this.setOverflow(this.getOverflow())
+        this.setRotateWithView(this.getRotateWithView())
+        this.setRotation(this.getRotation())
+        this.setScale(this.getScale())
+        this.setText(this.getText())
+        this.setTextAlign(this.getTextAlign())
+        this.setTextBaseline(this.getTextBaseline())
+        this.setPadding(this.getPadding())
+      },
+      .../*#__PURE__*/makeWatchers([
+        'font',
+        'maxAngle',
+        'placement',
+        'offsetX',
+        'offsetY',
+        'overflow',
+        'rotateWithView',
+        'rotation',
+        'scale',
+        'text',
+        'textAlign',
+        'textBaseline',
+        'inputPadding',
+      ], inProp => {
+        const prop = inProp.slice(0, 5) === 'input' ? lowerFirst(inProp.slice(5)) : inProp
+        const setter = 'set' + upperFirst(prop)
+
+        return {
+          deep: [
+            'inputPadding',
+          ].includes(inProp),
+          handler (value) {
+            this[setter](value)
+          },
+        }
       }),
-      maxAngle: /*#__PURE__*/sequential(async function (value) {
-        await this.setMaxAngle(value)
+      .../*#__PURE__*/makeWatchers([
+        'currentFont',
+        'currentMaxAngle',
+        'currentPlacement',
+        'currentOffsetX',
+        'currentOffsetY',
+        'currentOverflow',
+        'currentRotateWithView',
+        'currentRotation',
+        'currentScale',
+        'currentText',
+        'currentTextAlign',
+        'currentTextBaseline',
+        'currentPadding',
+      ], curProp => {
+        const prop = curProp.slice(0, 7) === 'current' ? lowerFirst(curProp.slice(7)) : curProp
+        const inProp = 'input' + upperFirst(prop)
+
+        return {
+          deep: [
+            'currentPadding',
+          ].includes(curProp),
+          handler (value) {
+            if (isEqual(value, coalesce(this[inProp], this[prop]))) return
+
+            this.$emit(`update:${prop}`, isObjectLike(value) ? clonePlainObject(value) : value)
+          },
+        }
       }),
-      placement: /*#__PURE__*/sequential(async function (value) {
-        await this.setPlacement(value)
-      }),
-      offsetX: /*#__PURE__*/sequential(async function (value) {
-        await this.setOffsetX(value)
-      }),
-      offsetY: /*#__PURE__*/sequential(async function (value) {
-        await this.setOffsetY(value)
-      }),
-      overflow: /*#__PURE__*/sequential(async function (value) {
-        await this.setOverflow(value)
-      }),
-      rotation: /*#__PURE__*/sequential(async function (value) {
-        await this.setRotation(value)
-      }),
-      rotateWithView: /*#__PURE__*/sequential(async function (value) {
-        await this.setRotateWithView(value)
-      }),
-      scale: /*#__PURE__*/sequential(async function (value) {
-        await this.setScale(value)
-      }),
-      text: /*#__PURE__*/sequential(async function (value) {
-        await this.setText(value)
-      }),
-      textAlign: /*#__PURE__*/sequential(async function (value) {
-        await this.setTextAlign(value)
-      }),
-      textBaseline: /*#__PURE__*/sequential(async function (value) {
-        await this.setTextBaseline(value)
-      }),
-      padding: /*#__PURE__*/sequential(async function (value) {
-        await this.setPadding(value)
-      }),
-      currentBackgroundFill: {
+      .../*#__PURE__*/makeWatchers([
+        'fill',
+        'stroke',
+        'backgroundFill',
+        'backgroundStroke',
+      ], prop => ({
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value, prev) {
+        handler (value, prev) {
           if (isEqual(value, prev)) return
 
-          this.$emit('update:backgroundFill', value && clonePlainObject(value))
-        }, FRAME_TIME),
-      },
-      currentBackgroundStroke: {
-        deep: true,
-        handler: /*#__PURE__*/debounce(function (value, prev) {
-          if (isEqual(value, prev)) return
-
-          this.$emit('update:backgroundStroke', value && clonePlainObject(value))
-        }, FRAME_TIME),
-      },
+          this.$emit(`update:${prop}`, isObjectLike(value) ? clonePlainObject(value) : value)
+        },
+      })),
     },
     created () {
-      this._bgFill = null
-      this._bgFillVm = null
-      this._bgStroke = null
-      this._bgStrokeVm = null
+      this._bgFill = undefined
+      this._bgFillVm = undefined
+      this._bgStroke = undefined
+      this._bgStrokeVm = undefined
 
       this::defineServices()
     },
@@ -169,19 +238,19 @@
        */
       createStyle () {
         return new TextStyle({
-          font: this.font,
-          maxAngle: this.maxAngle,
-          placement: this.placement,
-          offsetX: this.offsetX,
-          offsetY: this.offsetY,
-          overflow: this.overflow,
-          rotateWithView: this.rotateWithView,
-          rotation: this.rotation,
-          scale: this.scale,
-          text: this.text,
-          textAlign: this.textAlign,
-          textBaseline: this.textBaseline,
-          padding: this.padding,
+          font: this.currentFont,
+          maxAngle: this.currentMaxAngle,
+          placement: this.currentPlacement,
+          offsetX: this.currentOffsetX,
+          offsetY: this.currentOffsetY,
+          overflow: this.currentOverflow,
+          rotateWithView: this.currentRotateWithView,
+          rotation: this.currentRotation,
+          scale: this.currentScale,
+          text: this.currentText,
+          textAlign: this.currentTextAlign,
+          textBaseline: this.currentTextBaseline,
+          padding: this.currentPadding,
           fill: this.$fill,
           stroke: this.$stroke,
           backgroundFill: this.$bgFill,
@@ -193,9 +262,7 @@
        * @protected
        */
       async mount () {
-        if (this.$textStyleContainer) {
-          await this.$textStyleContainer.setText(this)
-        }
+        this.$textStyleContainer?.setText(this)
 
         return this::style.methods.mount()
       },
@@ -204,21 +271,20 @@
        * @protected
        */
       async unmount () {
-        if (this.$textStyleContainer && this.$textStyleContainer.getTextVm() === this) {
+        if (this.$textStyleContainer?.getTextVm() === this) {
           await this.$textStyleContainer.setText(null)
         }
 
         return this::style.methods.unmount()
       },
       /**
-       * @return {Promise}
+       * @return {Promise<void>}
        */
       async refresh () {
-        this::style.methods.refresh()
-
-        if (this.$textStyleContainer) {
-          this.$textStyleContainer.refresh()
-        }
+        await Promise.all([
+          this::style.methods.refresh(),
+          this.$textStyleContainer?.refresh(),
+        ])
       },
       /**
        * @returns {Object}
@@ -236,176 +302,236 @@
           },
         )
       },
-      async getFont () {
-        return (await this.resolveStyle()).getFont()
-      },
-      async setFont (font) {
-        if (font === await this.getFont()) return
+      /**
+       * @protected
+       */
+      syncNonObservable () {
+        this::style.methods.syncNonObservable()
 
-        (await this.resolveStyle()).setFont(font)
-        await this.scheduleRefresh()
+        this.setFont(this.getFont())
+        this.setMaxAngle(this.getMaxAngle())
+        this.setPlacement(this.getPlacement())
+        this.setOffsetX(this.getOffsetX())
+        this.setOffsetY(this.getOffsetY())
+        this.setOverflow(this.getOverflow())
+        this.setRotateWithView(this.getRotateWithView())
+        this.setRotation(this.getRotation())
+        this.setScale(this.getScale())
+        this.setText(this.getText())
+        this.setTextAlign(this.getTextAlign())
+        this.setTextBaseline(this.getTextBaseline())
+        this.setPadding(this.getPadding())
       },
-      async getMaxAngle () {
-        return (await this.resolveStyle()).getMaxAngle()
+      getFont () {
+        return coalesce(this.$style?.getFont(), this.currentFont)
       },
-      async setMaxAngle (maxAngle) {
-        if (maxAngle === await this.getMaxAngle()) return
-
-        (await this.resolveStyle()).setMaxAngle(maxAngle)
-        await this.scheduleRefresh()
-      },
-      async getOffsetX () {
-        return (await this.resolveStyle()).getOffsetX()
-      },
-      async setOffsetX (offsetX) {
-        if (offsetX === await this.getOffsetX()) return
-
-        (await this.resolveStyle()).setOffsetX(offsetX)
-        await this.scheduleRefresh()
-      },
-      async getOffsetY () {
-        return (await this.resolveStyle()).getOffsetY()
-      },
-      async setOffsetY (offsetY) {
-        if (offsetY === await this.getOffsetY()) return
-
-        (await this.resolveStyle()).setOffsetY(offsetY)
-        await this.scheduleRefresh()
-      },
-      async getOverflow () {
-        return (await this.resolveStyle()).getOverflow()
-      },
-      async setOverflow (overflow) {
-        if (overflow === await this.getOverflow()) return
-
-        (await this.resolveStyle()).setOverflow(overflow)
-        await this.scheduleRefresh()
-      },
-      async getPadding () {
-        return (await this.resolveStyle()).getPadding()
-      },
-      async setPadding (padding) {
-        if (isEqual(padding, await this.getPadding())) return
-
-        (await this.resolveStyle()).setPadding(padding)
-        await this.scheduleRefresh()
-      },
-      async getPlacement () {
-        return (await this.resolveStyle()).getPlacement()
-      },
-      async setPlacement (placement) {
-        if (placement === await this.getPlacement()) return
-
-        (await this.resolveStyle()).setPlacement(placement)
-        await this.scheduleRefresh()
-      },
-      async getRotateWithView () {
-        return (await this.resolveStyle()).getRotateWithView()
-      },
-      async setRotateWithView (rotateWithView) {
-        if (rotateWithView === await this.getRotateWithView()) return
-
-        (await this.resolveStyle()).setRotateWithView(rotateWithView)
-        await this.scheduleRefresh()
-      },
-      async getRotation () {
-        return (await this.resolveStyle()).getRotation()
-      },
-      async setRotation (rotation) {
-        if (rotation === await this.getRotation()) return
-
-        (await this.resolveStyle()).setRotation(rotation)
-        await this.scheduleRefresh()
-      },
-      async getScale () {
-        return (await this.resolveStyle()).getScale()
-      },
-      async setScale (scale) {
-        if (scale === await this.getScale()) return
-
-        (await this.resolveStyle()).setScale(scale)
-        await this.scheduleRefresh()
-      },
-      async getText () {
-        return (await this.resolveStyle()).getText()
-      },
-      async setText (text) {
-        if (text === await this.getText()) return
-
-        (await this.resolveStyle()).setText(text)
-        await this.scheduleRefresh()
-      },
-      async getTextAlign () {
-        return (await this.resolveStyle()).getTextAlign()
-      },
-      async setTextAlign (textAlign) {
-        if (textAlign === await this.getTextAlign()) return
-
-        (await this.resolveStyle()).setTextAlign(textAlign)
-        await this.scheduleRefresh()
-      },
-      async getTextBaseline () {
-        return (await this.resolveStyle()).getTextBaseline()
-      },
-      async setTextBaseline (textBaseline) {
-        if (textBaseline === await this.getTextBaseline()) return
-
-        (await this.resolveStyle()).setTextBaseline(textBaseline)
-        await this.scheduleRefresh()
-      },
-      async getFillStyleTarget () {
-        const style = await this.resolveStyle()
-
-        return {
-          setFill: async fill => {
-            style.setFill(fill)
-            await this.scheduleRefresh()
-          },
+      setFont (font) {
+        if (font !== this.currentFont) {
+          this.currentFont = font
+          this.scheduleRefresh()
+        }
+        if (this.$style && font !== this.$style.getFont()) {
+          this.$style.setFont(font)
+          this.scheduleRefresh()
         }
       },
-      async getStrokeStyleTarget () {
-        const style = await this.resolveStyle()
-
-        return {
-          setStroke: async stroke => {
-            style.setStroke(stroke)
-            await this.scheduleRefresh()
-          },
+      getMaxAngle () {
+        return coalesce(this.$style?.getMaxAngle(), this.currentMaxAngle)
+      },
+      setMaxAngle (maxAngle) {
+        if (maxAngle !== this.currentMaxAngle) {
+          this.currentMaxAngle = maxAngle
+          this.scheduleRefresh()
         }
+        if (this.$style && maxAngle !== this.$style.getMaxAngle()) {
+          this.$style.setMaxAngle(maxAngle)
+          this.scheduleRefresh()
+        }
+      },
+      getOffsetX () {
+        return coalesce(this.$style?.getOffsetX(), this.currentOffsetX)
+      },
+      setOffsetX (offsetX) {
+        if (offsetX !== this.currentOffsetX) {
+          this.currentOffsetX = offsetX
+          this.scheduleRefresh()
+        }
+        if (this.$style && offsetX !== this.$style.getOffsetX()) {
+          this.$style.setOffsetX(offsetX)
+          this.scheduleRefresh()
+        }
+      },
+      getOffsetY () {
+        return coalesce(this.$style?.getOffsetY(), this.currentOffsetY)
+      },
+      setOffsetY (offsetY) {
+        if (offsetY !== this.currentOffsetY) {
+          this.currentOffsetY = offsetY
+          this.scheduleRefresh()
+        }
+        if (this.$style && offsetY !== this.$style.getOffsetY()) {
+          this.$style.setOffsetY(offsetY)
+          this.scheduleRefresh()
+        }
+      },
+      getOverflow () {
+        return coalesce(this.$style?.getOverflow(), this.currentOverflow)
+      },
+      setOverflow (overflow) {
+        if (overflow !== this.currentOverflow) {
+          this.currentOverflow = overflow
+          this.scheduleRefresh()
+        }
+        if (this.$style && overflow !== this.$style.getOverflow()) {
+          this.$style.setOverflow(overflow)
+          this.scheduleRefresh()
+        }
+      },
+      getPadding () {
+        return coalesce(this.$style?.getPadding(), this.currentPadding)
+      },
+      setPadding (padding) {
+        padding = padding?.slice()
+
+        if (!isEqual(padding, this.currentPadding)) {
+          this.currentPadding = padding
+          this.scheduleRefresh()
+        }
+        if (this.$style && !isEqual(padding, this.$style.getPadding())) {
+          this.$style.setPadding(padding)
+          this.scheduleRefresh()
+        }
+      },
+      getPlacement () {
+        return coalesce(this.$source?.getPlacement(), this.currentPlacement)
+      },
+      setPlacement (placement) {
+        if (placement !== this.currentPlacement) {
+          this.currentPlacement = placement
+          this.scheduleRefresh()
+        }
+        if (this.$style && placement !== this.$style.getPlacement()) {
+          this.$style.setPlacement(placement)
+          this.scheduleRefresh()
+        }
+      },
+      getRotateWithView () {
+        return coalesce(this.$style?.getRotateWithView(), this.currentRotateWithView)
+      },
+      setRotateWithView (rotateWithView) {
+        if (rotateWithView !== this.currentRotateWithView) {
+          this.currentRotateWithView = rotateWithView
+          this.scheduleRefresh()
+        }
+        if (this.$style && rotateWithView !== this.$style.getRotateWithView()) {
+          this.$style.setRotateWithView(rotateWithView)
+          this.scheduleRefresh()
+        }
+      },
+      getRotation () {
+        return coalesce(this.$style?.getRotation(), this.currentRotation)
+      },
+      setRotation (rotation) {
+        if (rotation !== this.currentRotation) {
+          this.currentRotation = rotation
+          this.scheduleRefresh()
+        }
+        if (this.$style && rotation !== this.$style.getRotation()) {
+          this.$style.setRotation(rotation)
+          this.scheduleRefresh()
+        }
+      },
+      getScale () {
+        return coalesce(this.$style?.getScale(), this.currentScale)
+      },
+      setScale (scale) {
+        if (scale !== this.currentScale) {
+          this.currentScale = scale
+          this.scheduleRefresh()
+        }
+        if (this.$style && scale !== this.$style.getScale()) {
+          this.$style.setScale(scale)
+          this.scheduleRefresh()
+        }
+      },
+      getText () {
+        return coalesce(this.$style?.getText(), this.currentText)
+      },
+      setText (text) {
+        if (text !== this.currentText) {
+          this.currentText = text
+          this.scheduleRefresh()
+        }
+        if (this.$style && text !== this.$style.getText()) {
+          this.$style.setText(text)
+          this.scheduleRefresh()
+        }
+      },
+      getTextAlign () {
+        return coalesce(this.$style?.getTextAlign(), this.currentTextAlign)
+      },
+      setTextAlign (textAlign) {
+        if (textAlign !== this.currentTextAlign) {
+          this.currentTextAlign = textAlign
+          this.scheduleRefresh()
+        }
+        if (this.$style && textAlign !== this.$style.getTextAlign()) {
+          this.$style.setTextAlign(textAlign)
+          this.scheduleRefresh()
+        }
+      },
+      getTextBaseline () {
+        return coalesce(this.$style?.getTextBaseline(), this.currentTextBaseline)
+      },
+      setTextBaseline (textBaseline) {
+        if (textBaseline !== this.currentTextBaseline) {
+          this.currentTextBaseline = textBaseline
+          this.scheduleRefresh()
+        }
+        if (this.$style && textBaseline !== this.$style.getTextBaseline()) {
+          this.$style.setTextBaseline(textBaseline)
+          this.scheduleRefresh()
+        }
+      },
+      getFillStyleTarget () {
+        return this.$style
+      },
+      getStrokeStyleTarget () {
+        return this.$style
       },
       getBackgroundFill () {
         return this._bgFill
       },
-      async setBackgroundFill (fill) {
-        if (fill && isFunction(fill.resolveOlObject)) {
-          fill = await fill.resolveOlObject()
+      setBackgroundFill (fill) {
+        fill = fill?.$fill || fill
+        fill || (fill = undefined)
+
+        if (fill !== this._bgFill) {
+          this._bgFill = fill
+          this._bgFillVm = fill?.vm && fill.vm[0]
+          this.scheduleRefresh()
         }
-        fill || (fill = null)
-
-        if (fill === this._bgFill) return
-
-        this._bgFill = fill
-        this._bgFillVm = fill?.vm && fill.vm[0]
-        const style = await this.resolveStyle()
-        style.setBackgroundFill(fill)
-        await this.scheduleRefresh()
+        if (this.$style && fill !== this.$style.getBackgroundFill()) {
+          this.$style.setBackgroundFill(fill)
+          this.scheduleRefresh()
+        }
       },
       getBackgroundStroke () {
         return this._bgStroke
       },
-      async setBackgroundStroke (stroke) {
-        if (stroke && isFunction(stroke.resolveOlObject)) {
-          stroke = await stroke.resolveOlObject()
+      setBackgroundStroke (stroke) {
+        stroke = stroke?.$stroke || stroke
+        stroke || (stroke = undefined)
+
+        if (stroke !== this._bgStroke) {
+          this._bgStroke = stroke
+          this._bgStrokeVm = stroke?.vm && stroke.vm[0]
+          this.scheduleRefresh()
         }
-        stroke || (stroke = null)
-
-        if (stroke === this._bgStroke) return
-
-        this._bgStroke = stroke
-        this._bgStrokeVm = stroke?.vm && stroke.vm[0]
-        const style = await this.resolveStyle()
-        style.setBackgroundStroke(stroke)
-        await this.scheduleRefresh()
+        if (this.$style && stroke !== this.$style.getBackgroundStroke()) {
+          this.$style.setBackgroundStroke(stroke)
+          this.scheduleRefresh()
+        }
       },
     },
   }

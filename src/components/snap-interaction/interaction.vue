@@ -2,8 +2,8 @@
   import { Collection } from 'ol'
   import { Snap as SnapInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import { interaction } from '../../mixins'
-  import { assert, instanceOf, isEqual, isFunction, makeWatchers, sequential } from '../../utils'
+  import { interaction, makeChangeOrRecreateWatchers } from '../../mixins'
+  import { assert, instanceOf, isFunction } from '../../utils'
 
   export default {
     name: 'VlInteractionSnap',
@@ -45,20 +45,12 @@
       },
     },
     watch: {
-      .../*#__PURE__*/makeWatchers([
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'source',
         'edge',
         'vertex',
         'pixelTolerance',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ]),
     },
     methods: {
       /**

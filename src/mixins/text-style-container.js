@@ -1,7 +1,5 @@
-import debounce from 'debounce-promise'
-import { dumpTextStyle } from '../ol-ext'
-import { clonePlainObject, isEqual, isFunction } from '../utils'
-import { FRAME_TIME } from './ol-cmp'
+import { Text } from 'ol/style'
+import { assert, coalesce } from '../utils'
 
 /**
  * @typedef {module:ol/style/Text~Text|Object|undefined} TextStyleLike
@@ -17,23 +15,6 @@ import { FRAME_TIME } from './ol-cmp'
  * Text style container.
  */
 export default {
-  computed: {
-    currentText () {
-      if (!(this.rev && this.$text)) return
-
-      return dumpTextStyle(this.$text)
-    },
-  },
-  watch: {
-    currentText: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(function (value, prev) {
-        if (isEqual(value, prev)) return
-
-        this.$emit('update:text', value && clonePlainObject(value))
-      }, FRAME_TIME),
-    },
-  },
   created () {
     this._text = undefined
     this._textVm = undefined
@@ -52,7 +33,7 @@ export default {
       }
     },
     /**
-     * @return {Promise<module:ol/style/Text~Text|undefined>}
+     * @return {TextStyleTarget|undefined}
      */
     getTextStyleTarget () {
       throw new Error(`${this.vmName} not implemented method: getTextStyleTarget()`)
@@ -61,7 +42,7 @@ export default {
      * @returns {module:ol/style/Text~Text|null}
      */
     getText () {
-      return this._text
+      return coalesce(this.getTextStyleTarget()?.getText(), this._text)
     },
     /**
      * @return {Object}
@@ -71,22 +52,23 @@ export default {
     },
     /**
      * @param {module:ol/style/Text~Text|undefined} text
-     * @returns {Promise<void>}
      */
-    async setText (text) {
-      if (isFunction(text?.resolveOlObject)) {
-        text = await text.resolveOlObject()
+    setText (text) {
+      text = text?.$style || text
+      text || (text = undefined)
+      assert(!text || text instanceof Text, 'Invalid text style')
+
+      if (text !== this._text) {
+        this._text = text
+        this._textVm = text?.vm && text.vm[0]
+        this.scheduleRefresh()
       }
-      text || (text = null)
 
-      if (text === this._text) return
-
-      const textTarget = await this.getTextStyleTarget()
-      if (!textTarget) return
-
-      this._text = text
-      this._textVm = text?.vm && text.vm[0]
-      await textTarget.setText(text)
+      const textTarget = this.getTextStyleTarget()
+      if (textTarget && text !== textTarget.getText()) {
+        textTarget.setText(text)
+        this.scheduleRefresh()
+      }
     },
   },
 }

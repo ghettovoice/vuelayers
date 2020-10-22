@@ -30,6 +30,8 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'comma-dangle': ['error', 'always-multiline'],
     'spaced-comment': 'off', // to allow PURE annotation
+    'no-unused-expressions': 'off',
+    'standard/no-callback-literal': 'off',
   },
   overrides: [
     {

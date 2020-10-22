@@ -1,7 +1,9 @@
 <script>
   import { ImageArcGISRest as ImageArcGISRestSource } from 'ol/source'
-  import { arcgisSource, imageSource } from '../../mixins'
-  import { isEmpty, isEqual, makeWatchers, negate, sequential } from '../../utils'
+  import { arcgisSource, imageSource, makeChangeOrRecreateWatchers } from '../../mixins'
+  import { and, assert, coalesce, isEmpty, isFunction, isString, negate, noop } from '../../utils'
+
+  const validateUrl = /*#__PURE__*/and(isString, negate(isEmpty))
 
   export default {
     name: 'VlSourceImageArcgisRest',
@@ -12,7 +14,11 @@
     props: {
       // ol/source/ImageArcGISRest
       crossOrigin: String,
-      imageLoadFunc: Function,
+      imageLoadFunction: Function,
+      imageSmoothing: {
+        type: Boolean,
+        default: true,
+      },
       ratio: {
         type: Number,
         default: 1.5,
@@ -20,26 +26,47 @@
       url: {
         type: String,
         required: true,
-        validator: /*#__PURE__*/negate(isEmpty),
+        validator: validateUrl,
       },
     },
+    data () {
+      return {
+        currentImageLoadFunction: this.imageLoadFunction,
+        currentUrl: this.url,
+      }
+    },
     watch: {
-      url: /*#__PURE__*/sequential(async function (value) {
-        await this.setUrl(value)
-      }),
-      .../*#__PURE__*/makeWatchers([
-        'crossOrigin',
-        'imageLoadFunc',
-        'ratio',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
+      rev () {
+        if (!this.$source) return
 
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
+        if (this.currentImageLoadFunction !== this.$source.getImageLoadFunction()) {
+          this.currentImageLoadFunction = this.$source.getImageLoadFunction()
         }
+        if (this.currentUrl !== this.$source.getUrl()) {
+          this.currentUrl = this.$source.getUrl()
+        }
+      },
+      url (value) {
+        this.setUrl(value)
+      },
+      currentUrl (value) {
+        if (value === this.url) return
 
-        await this.scheduleRecreate()
-      })),
+        this.$emit('update:url', value)
+      },
+      imageLoadFunction (value) {
+        this.setImageLoadFunction(value)
+      },
+      currentImageLoadFunction (value) {
+        if (value === this.imageLoadFunction) return
+
+        this.$emit('update:imageLoadFunction', value)
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
+        'crossOrigin',
+        'imageSmoothing',
+        'ratio',
+      ]),
     },
     methods: {
       createSource () {
@@ -48,24 +75,44 @@
           attributions: this.currentAttributions,
           projection: this.resolvedDataProjection,
           // ol/source/Image
-          resolutions: this.resolutions,
+          resolutions: this.inputResolutions,
           // ol/source/ImageArcGISRest
           crossOrigin: this.crossOrigin,
           hidpi: this.hidpi,
-          imageLoadFunction: this.imageLoadFunc,
-          params: this.allParams,
+          imageLoadFunction: this.currentImageLoadFunction,
+          imageSmoothing: this.imageSmoothing,
+          params: this.currentParams,
           ratio: this.ratio,
-          url: this.url,
+          url: this.currentUrl,
         })
       },
-      async getUrl () {
-        return (await this.resolveSource()).getUrl()
+      getUrl () {
+        return coalesce(this.$source?.getUrl(), this.currentUrl)
       },
-      async setUrl (url) {
-        if (url === await this.getUrl()) return
+      setUrl (url) {
+        assert(validateUrl(url), 'Invalid url')
 
-        (await this.resolveSource()).setUrl(url)
+        if (url !== this.currentUrl) {
+          this.currentUrl = url
+        }
+        if (this.$source && url !== this.$source.getUrl()) {
+          this.$source.setUrl(url)
+        }
       },
+      getImageLoadFunction () {
+        return coalesce(this.$source?.getImageLoadFunction(), this.currentImageLoadFunction)
+      },
+      setImageLoadFunction (func) {
+        assert(isFunction(func), 'Invalid image load function')
+
+        if (func !== this.currentImageLoadFunction) {
+          this.currentImageLoadFunction = func
+        }
+        if (this.$source && func !== this.$source.getImageLoadFunction()) {
+          this.$source.setImageLoadFunction(func)
+        }
+      },
+      stateChanged: noop,
     },
   }
 </script>

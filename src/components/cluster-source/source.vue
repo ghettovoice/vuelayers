@@ -3,18 +3,17 @@
     :id="vmId"
     :class="vmClass"
     style="display: none !important;">
-    <InnerSource :id="'vl-' + id + '-inner-source'">
+    <InnerSource :id="'vl-' + currentId + '-inner-source'">
       <slot />
     </InnerSource>
   </i>
 </template>
 
 <script>
-  import debounce from 'debounce-promise'
-  import { Cluster as ClusterSource } from 'ol/source'
-  import { FRAME_TIME, vectorSource } from '../../mixins'
+  import { Cluster as ClusterSource, Source } from 'ol/source'
+  import { makeChangeOrRecreateWatchers, vectorSource } from '../../mixins'
   import { createPointGeom, findPointOnSurface, getSourceId } from '../../ol-ext'
-  import { clonePlainObject, isEqual, isFunction, makeWatchers, mergeDescriptors, sequential } from '../../utils'
+  import { assert, clonePlainObject, coalesce, isNumber, mergeDescriptors, noop } from '../../utils'
   import InnerSource from './inner-source.vue'
 
   export default {
@@ -30,7 +29,7 @@
         type: Number,
         default: 20,
       },
-      geomFunc: {
+      geometryFunction: {
         type: Function,
         // default: defaultGeomFunc,
       },
@@ -40,53 +39,61 @@
        */
       geomFuncFactory: Function,
     },
+    data () {
+      return {
+        currentDistance: this.distance,
+      }
+    },
     computed: {
-      currentDistance () {
-        if (this.rev && this.$source) {
-          return this.getDistanceInternal()
-        }
-
-        return this.distance
-      },
-      resolvedGeomFunc () {
-        let geomFunc = this.geomFunc
+      inputGeometryFunction () {
+        let geomFunc = this.geometryFunction
         if (!geomFunc && this.geomFuncFactory) {
           geomFunc = this.geomFuncFactory()
         }
 
         return geomFunc || defaultGeomFunc
       },
-      currentInnerSource () {
+      innerSource () {
         if (!(this.rev && this.$innerSource)) return
 
-        return getSourceId(this.$innerSource)
+        return {
+          id: getSourceId(this.$innerSource),
+          type: this.$innerSource.constructor.name,
+        }
       },
+      inputUrl: noop,
+      inputLoader: noop,
+      inputLoadingStrategy: noop,
+      formatIdent: noop,
+      inputFormatFactory: noop,
     },
     watch: {
-      distance: /*#__PURE__*/sequential(async function (value) {
-        await this.setDistance(value)
-      }),
-      currentDistance: /*#__PURE__*/ debounce(function (value) {
+      rev () {
+        if (!this.$source) return
+
+        if (this.currentDistance !== this.$source.getDistance()) {
+          this.currentDistance = this.$source.getDistance()
+        }
+      },
+      distance (value) {
+        this.setDistance(value)
+      },
+      currentDistance (value) {
         if (value === this.distance) return
 
         this.$emit('update:distance', value)
-      }, FRAME_TIME),
-      currentInnerSource: debounce(function (value, prev) {
-        if (value === prev) return
+      },
+      innerSource: {
+        deep: true,
+        handler (value, prev) {
+          if (value === prev) return
 
-        this.$emit('update:innerSource', value && clonePlainObject(value))
-      }, FRAME_TIME),
-      .../*#__PURE__*/makeWatchers([
-        'resolvedGeomFunc',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+          this.$emit('update:innerSource', value && clonePlainObject(value))
+        },
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
+        'inputGeometryFunction',
+      ]),
     },
     created () {
       if (process.env.NODE_ENV !== 'production') {
@@ -95,8 +102,8 @@
         }
       }
 
-      this._innerSource = null
-      this._innerSourceVm = null
+      this._innerSource = undefined
+      this._innerSourceVm = undefined
 
       this::defineServices()
     },
@@ -116,7 +123,7 @@
           // ol/source/Cluster
           source: this.$innerSource,
           distance: this.currentDistance,
-          geometryFunction: this.resolvedGeomFunc,
+          geometryFunction: this.inputGeometryFunction,
         })
       },
       getServices () {
@@ -129,19 +136,18 @@
           },
         )
       },
-      getSourceTarget: vectorSource.methods.resolveOlObject,
-      async getDistance () {
-        await this.resolveSource()
-
-        return this.getDistanceInternal()
+      getDistance () {
+        return coalesce(this.$source?.getDistance(), this.currentDistance)
       },
-      getDistanceInternal () {
-        return this.$source.getDistance()
-      },
-      async setDistance (distance) {
-        if (distance === await this.getDistance()) return
+      setDistance (distance) {
+        assert(isNumber(distance), 'Invalid distance')
 
-        (await this.resolveSource()).setDistance(distance)
+        if (distance !== this.currentDistance) {
+          this.currentDistance = distance
+        }
+        if (this.$source && distance !== this.$source.getDistance()) {
+          this.$source.setDistance(distance)
+        }
       },
       getInnerSource () {
         return this._innerSource
@@ -149,19 +155,30 @@
       getInnerSourceVm () {
         return this._innerSourceVm
       },
-      async setInnerSource (innerSource) {
-        if (isFunction(innerSource?.resolveOlObject)) {
-          innerSource = await innerSource.resolveOlObject()
+      setInnerSource (innerSource) {
+        innerSource = innerSource?.$source || innerSource
+        assert(!innerSource || innerSource instanceof Source)
+        innerSource || (innerSource = undefined)
+
+        if (innerSource !== this._innerSource) {
+          this._innerSource = innerSource
+          this._innerSourceVm = innerSource?.vm && innerSource.vm[0]
+          this.scheduleRefresh()
         }
-        innerSource || (innerSource = null)
-
-        if (innerSource === this._innerSource) return
-
-        this._innerSource = innerSource
-        this._innerSourceVm = innerSource?.vm && innerSource.vm[0]
-        const source = await this.resolveSource()
-        source.setSource(innerSource)
+        if (this.$source && innerSource !== this.$source.getSource()) {
+          this.$source.setSource(innerSource)
+          this.scheduleRefresh()
+        }
       },
+      projectionChanged: noop,
+      inputUrlChanged: noop,
+      inputLoaderChanged: noop,
+      inputLoadingStrategyChanged: noop,
+      inputFormatFactoryChanged: noop,
+      formatIdentChanged: noop,
+      formatChanged: noop,
+      overlapsChanged: noop,
+      useSpatialIndexChanged: noop,
     },
   }
 

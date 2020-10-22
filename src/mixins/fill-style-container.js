@@ -1,7 +1,5 @@
-import debounce from 'debounce-promise'
-import { dumpFillStyle } from '../ol-ext'
-import { clonePlainObject, isEqual, isFunction } from '../utils'
-import { FRAME_TIME } from './ol-cmp'
+import { Fill } from 'ol/style'
+import { assert, coalesce } from '../utils'
 
 /**
  * @typedef {module:ol/style/Fill~Fill|Object|undefined} FillStyleLike
@@ -17,23 +15,6 @@ import { FRAME_TIME } from './ol-cmp'
  * Fill style container.
  */
 export default {
-  computed: {
-    currentFill () {
-      if (!(this.rev && this.$fill)) return
-
-      return dumpFillStyle(this.$fill)
-    },
-  },
-  watch: {
-    currentFill: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(function (value, prev) {
-        if (isEqual(value, prev)) return
-
-        this.$emit('update:fill', value && clonePlainObject(value))
-      }, FRAME_TIME),
-    },
-  },
   created () {
     this._fill = undefined
     this._fillVm = undefined
@@ -51,6 +32,9 @@ export default {
         get fillStyleContainer () { return vm },
       }
     },
+    /**
+     * @return {FillStyleTarget}
+     */
     getFillStyleTarget () {
       throw new Error(`${this.vmName} not implemented method: getFillStyleTarget()`)
     },
@@ -58,7 +42,7 @@ export default {
      * @returns {module:ol/style/Fill~Fill|undefined}
      */
     getFill () {
-      return this._fill
+      return coalesce(this.getFillStyleTarget()?.getFill(), this._fill)
     },
     /**
      * @return {Object}
@@ -68,22 +52,23 @@ export default {
     },
     /**
      * @param {module:ol/style/Fill~Fill|undefined} fill
-     * @returns {Promise<void>}
      */
-    async setFill (fill) {
-      if (isFunction(fill?.resolveOlObject)) {
-        fill = await fill.resolveOlObject()
-      }
+    setFill (fill) {
+      fill = fill?.$style || fill
       fill || (fill = undefined)
+      assert(!fill || fill instanceof Fill, 'Invalid fill style')
 
-      if (fill === this._fill) return
+      if (fill !== this._fill) {
+        this._fill = fill
+        this._fillVm = fill?.vm && fill.vm[0]
+        this.scheduleRefresh()
+      }
 
-      const fillTarget = await this.getFillStyleTarget()
-      if (!fillTarget) return
-
-      this._fill = fill
-      this._fillVm = fill?.vm && fill.vm[0]
-      await fillTarget.setFill(fill)
+      const fillTarget = this.getFillStyleTarget()
+      if (fillTarget && fill !== fillTarget.getFill()) {
+        fillTarget.setFill(fill)
+        this.scheduleRefresh()
+      }
     },
   },
 }

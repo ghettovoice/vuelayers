@@ -266,15 +266,25 @@ export function freeze (object) {
 }
 
 export function sealFactory (factory) {
-  return function (...args) {
-    return seal(factory(...args))
+  let fn = factory
+  if (!fn.sealed) {
+    fn = function (...args) {
+      return seal(factory(...args))
+    }
+    fn.sealed = true
   }
+  return fn
 }
 
 export function freezeFactory (factory) {
-  return function (...args) {
-    return freeze(factory(...args))
+  let fn = factory
+  if (!fn.freezed) {
+    fn = function (...args) {
+      return freeze(factory(...args))
+    }
+    fn.freezed = true
   }
+  return fn
 }
 
 export function forEach (collection, iteratee) {

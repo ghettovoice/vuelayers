@@ -1,7 +1,5 @@
-import debounce from 'debounce-promise'
-import { dumpImageStyle } from '../ol-ext'
-import { clonePlainObject, isEqual, isFunction } from '../utils'
-import { FRAME_TIME } from './ol-cmp'
+import { Image } from 'ol/style'
+import { assert, coalesce } from '../utils'
 
 /**
  * @typedef {module:ol/style/Image~ImageStyle|Object|undefined} ImageStyleLike
@@ -17,23 +15,6 @@ import { FRAME_TIME } from './ol-cmp'
  * Image style container.
  */
 export default {
-  computed: {
-    currentImage () {
-      if (!(this.rev && this.$image)) return
-
-      return dumpImageStyle(this.$image)
-    },
-  },
-  watch: {
-    currentImage: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(function (value, prev) {
-        if (isEqual(value, prev)) return
-
-        this.$emit('update:image', value && clonePlainObject(value))
-      }, FRAME_TIME),
-    },
-  },
   created () {
     this._image = undefined
     this._imageVm = undefined
@@ -52,7 +33,7 @@ export default {
       }
     },
     /**
-     * @return {ImageStyleTarget}
+     * @return {ImageStyleTarget|undefined}
      */
     getImageStyleTarget () {
       throw new Error(`${this.vmName} not implemented method: getImageStyleTarget()`)
@@ -61,7 +42,7 @@ export default {
      * @returns {module:ol/style/Image~ImageStyle|undefined}
      */
     getImage () {
-      return this._image
+      return coalesce(this.getImageStyleTarget()?.getImage(), this._image)
     },
     /**
      * @return {Object}
@@ -71,22 +52,23 @@ export default {
     },
     /**
      * @param {module:ol/style/Image~ImageStyle|undefined} image
-     * @returns {Promise<void>}
      */
-    async setImage (image) {
-      if (isFunction(image?.resolveOlObject)) {
-        image = await image.resolveOlObject()
-      }
+    setImage (image) {
+      image = image?.$style || image
       image || (image = undefined)
+      assert(!image || image instanceof Image, 'Invalid image style')
 
-      if (image === this._image) return
+      if (image !== this._image) {
+        this._image = image
+        this._imageVm = image?.vm && image.vm[0]
+        this.scheduleRefresh()
+      }
 
-      const imageTarget = await this.getImageStyleTarget()
-      if (!imageTarget) return
-
-      this._image = image
-      this._imageVm = image?.vm && image.vm[0]
-      await imageTarget.setImage(image)
+      const imageTarget = this.getImageStyleTarget()
+      if (imageTarget && image !== imageTarget.getImage()) {
+        imageTarget.setImage(image)
+        this.scheduleRefresh()
+      }
     },
   },
 }

@@ -29,6 +29,7 @@ export olCmp, {
   isMountError,
   isUnmountError,
   isDestroyError,
+  makeChangeOrRecreateWatchers,
 } from './ol-cmp'
 export overlaysContainer from './overlays-container'
 export projTransforms from './proj-transforms'

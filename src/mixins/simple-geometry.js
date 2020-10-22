@@ -1,9 +1,10 @@
-import debounce from 'debounce-promise'
-import { boundingExtent } from 'ol/extent'
-import { findPointOnSurface, flatCoords, isEqualCoord, roundCoords, roundPointCoords, transforms } from '../ol-ext'
-import { clonePlainObject, isEmpty, negate, pick, sequential } from '../utils'
+import { boundingExtent as baseBoundingExtent } from 'ol/extent'
+import GeometryLayout from 'ol/geom/GeometryLayout'
+import GeometryType from 'ol/geom/GeometryType'
+import { findPointOnSurface, isEqualCoord, roundCoords, roundPointCoords, transforms } from '../ol-ext'
+import { assert, clonePlainObject, coalesce, isArray, isEmpty, isEqual, negate } from '../utils'
 import geometry from './geometry'
-import { FRAME_TIME } from './ol-cmp'
+import { makeChangeOrRecreateWatchers } from './ol-cmp'
 
 /**
  * Base simple geometry with coordinates mixin.
@@ -32,6 +33,11 @@ export default {
     //   validator: value => Object.values(GeometryLayout).includes(value.toUpperCase()),
     // },
   },
+  data () {
+    return {
+      currentCoordinatesViewProj: clonePlainObject(this.coordinates),
+    }
+  },
   computed: {
     coordinatesDataProj () {
       return roundCoords(this.type, this.coordinates)
@@ -39,89 +45,56 @@ export default {
     coordinatesViewProj () {
       return this.coordinatesToViewProj(this.coordinates)
     },
-    extentDataProj () {
-      return boundingExtent(flatCoords(this.type, this.coordinatesDataProj))
-    },
-    extentViewProj () {
-      return this.extentToViewProj(this.extentDataProj)
-    },
     currentCoordinatesDataProj () {
-      if (this.rev && this.$geometry) {
-        return this.getCoordinatesInternal()
-      }
-
-      return this.coordinatesDataProj
+      return this.coordinatesToDataProj(this.currentCoordinatesViewProj)
     },
-    currentCoordinatesViewProj () {
-      if (this.rev && this.$geometry) {
-        return this.getCoordinatesInternal(true)
-      }
-
-      return this.coordinatesViewProj
+    pointDataProj () {
+      return this.rev ? this.findPointOnSurface() : findPointOnSurface({
+        type: this.type,
+        coordinates: this.coordinatesDataProj,
+      })
     },
-    currentPointDataProj () {
-      if (!(this.rev && this.$geometry)) return
-
-      return this.findPointOnSurfaceInternal()
+    pointViewProj () {
+      return this.rev ? this.findPointOnSurface(true) : findPointOnSurface({
+        type: this.type,
+        coordinates: this.coordinatesViewProj,
+      })
     },
-    currentPointViewProj () {
-      if (!(this.rev && this.$geometry)) return
-
-      return this.findPointOnSurfaceInternal(true)
-    },
-    // layoutUpCase () {
-    //   return this.layout.toUpperCase()
-    // },
   },
   watch: {
-    coordinatesViewProj: {
-      deep: true,
-      handler: /*#__PURE__*/sequential(async function (value) {
-        await this.setCoordinates(value, true)
-      }),
-    },
-    currentCoordinatesDataProj: {
-      deep: true,
-      handler: debounce(function (value) {
-        if (isEqualCoord({
-          coordinates: value,
-          extent: boundingExtent(flatCoords(this.type, value)),
-        }, {
-          coordinates: this.coordinatesDataProj,
-          extent: this.extentDataProj,
-        })) return
+    rev () {
+      if (!this.$geometry) return
 
-        this.$emit('update:coordinates', clonePlainObject(value))
-      }, FRAME_TIME),
+      if (!isEqualCoord({
+        coordinates: this.currentCoordinatesViewProj,
+        extent: boundingExtent(this.currentCoordinatesViewProj),
+      }, {
+        coordinates: this.$geometry.getCoordinates(),
+        extent: this.$geometry.getExtent(),
+      })) {
+        this.currentCoordinatesViewProj = this.$geometry.getCoordinates()
+      }
     },
-    // ...makeWatchers([
-    //   'layoutUpCase',
-    // ], () => geometry.methods.scheduleRecreate),
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'coordinatesViewProj',
+      'currentCoordinatesDataProj',
+      'pointDataProj',
+    ], [
+      'coordinatesViewProj',
+      'currentCoordinatesDataProj',
+      'pointDataProj',
+    ]),
+  },
+  created () {
+    this.currentCoordinatesViewProj = clonePlainObject(this.coordinatesViewProj)
+    this.extentViewProj = boundingExtent(this.currentCoordinatesViewProj)
   },
   methods: {
-    .../*#__PURE__*/pick(geometry.methods, [
-      'beforeInit',
-      'init',
-      'deinit',
-      'beforeMount',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'getServices',
-      'subscribeAll',
-      'resolveOlObject',
-      'resolveGeometry',
-    ]),
     /**
      * @returns {function}
      */
     getCoordinatesTransformFunction () {
-      return transforms[this.type].transform
+      return transforms[this.getType()].transform
     },
     /**
      * @param {number[]} coordinates
@@ -143,106 +116,154 @@ export default {
     },
     /**
      * @param {boolean} [viewProj=false]
-     * @return {Promise<number[]>}
-     */
-    async getCoordinates (viewProj = false) {
-      await this.resolveGeometry()
-
-      return this.getCoordinatesInternal(viewProj)
-    },
-    /**
-     * @param {boolean} [viewProj=false]
      * @return {number[]}
-     * @protected
      */
-    getCoordinatesInternal (viewProj = false) {
-      if (viewProj) {
-        return roundCoords(this.getTypeInternal(), this.$geometry.getCoordinates())
-      }
+    getCoordinates (viewProj = false) {
+      const coordinates = coalesce(this.$geometry?.getCoordinates(), this.currentCoordinatesViewProj)
 
-      return this.coordinatesToDataProj(this.$geometry.getCoordinates())
+      return viewProj ? roundCoords(this.getType(), coordinates) : this.coordinatesToDataProj(coordinates)
     },
     /**
      * @param {number[]} coordinates
      * @param {boolean} [viewProj=false]
      */
-    async setCoordinates (coordinates, viewProj = false) {
-      await this.resolveGeometry()
+    setCoordinates (coordinates, viewProj = false) {
+      assert(isArray(coordinates), 'Invalid coordinates')
+      coordinates = viewProj ? roundCoords(this.getType(), coordinates) : this.coordinatesToViewProj(coordinates)
+      const extent = boundingExtent(coordinates)
 
-      this.setCoordinatesInternal(coordinates, viewProj)
-    },
-    /**
-     * @param {number[]} coordinates
-     * @param {boolean} [viewProj=false]
-     * @protected
-     */
-    setCoordinatesInternal (coordinates, viewProj = false) {
-      coordinates = roundCoords(this.getTypeInternal(), coordinates)
-      const currentCoordinates = this.getCoordinatesInternal(viewProj)
-
-      if (isEqualCoord({
+      if (!isEqualCoord({
         coordinates,
-        extent: boundingExtent(flatCoords(this.getTypeInternal(), coordinates)),
+        extent,
       }, {
-        coordinates: currentCoordinates,
-        extent: boundingExtent(flatCoords(this.getTypeInternal(), currentCoordinates)),
-      })) return
-
-      if (!viewProj) {
-        coordinates = this.coordinatesToViewProj(coordinates)
+        coordinates: this.currentCoordinatesViewProj,
+        extent: this.extentViewProj,
+      })) {
+        this.currentCoordinatesViewProj = coordinates
       }
-
-      this.$geometry.setCoordinates(coordinates)
+      if (this.$geometry && !isEqualCoord({
+        coordinates,
+        extent,
+      }, {
+        coordinates: this.$geometry.getCoordinates(),
+        extent: this.$geometry.getExtent(),
+      })) {
+        this.$geometry.setCoordinates(coordinates)
+      }
     },
     /**
      * @param {boolean} [viewProj=false]
      * @returns {number[]>}
      */
-    async getFirstCoordinate (viewProj = false) {
-      const coordinate = (await this.resolveGeometry()).getFirstCoordinate()
-      if (viewProj) {
-        return roundPointCoords(coordinate)
+    getFirstCoordinate (viewProj = false) {
+      let coordinate
+      if (this.$geometry) {
+        coordinate = this.$geometry.getFirstCoordinate()
+      } else {
+        switch (this.getType()) {
+          case GeometryType.POINT:
+          case GeometryType.CIRCLE:
+            coordinate = this.currentCoordinatesViewProj
+            break
+          case GeometryType.LINE_STRING:
+          case GeometryType.MULTI_POINT:
+            coordinate = this.currentCoordinatesViewProj[0]
+            break
+          case GeometryType.POLYGON:
+          case GeometryType.MULTI_LINE_STRING:
+            coordinate = this.currentCoordinatesViewProj[0][0]
+            break
+          case GeometryType.MULTI_POLYGON:
+            coordinate = this.currentCoordinatesViewProj[0][0][0]
+            break
+        }
       }
 
-      return this.pointToDataProj(coordinate)
+      return viewProj ? roundPointCoords(coordinate) : this.pointToDataProj(coordinate)
     },
     /**
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<number[]>}
+     * @returns {number[]}
      */
-    async getLastCoordinate (viewProj = false) {
-      const coordinate = (await this.resolveGeometry()).getLastCoordinate()
-      if (viewProj) {
-        return roundPointCoords(coordinate)
+    getLastCoordinate (viewProj = false) {
+      let coordinate
+      if (this.$geometry) {
+        coordinate = this.$geometry.getLastCoordinate()
+      } else {
+        let arr
+        switch (this.getType()) {
+          case GeometryType.POINT:
+          case GeometryType.CIRCLE:
+            coordinate = this.currentCoordinatesViewProj
+            break
+          case GeometryType.LINE_STRING:
+          case GeometryType.MULTI_POINT:
+            coordinate = this.currentCoordinatesViewProj[this.currentCoordinatesViewProj.length - 1]
+            break
+          case GeometryType.POLYGON:
+          case GeometryType.MULTI_LINE_STRING:
+            arr = this.currentCoordinatesViewProj[this.currentCoordinatesViewProj.length - 1]
+            coordinate = arr[arr.length - 1]
+            break
+          case GeometryType.MULTI_POLYGON:
+            arr = this.currentCoordinatesViewProj[this.currentCoordinatesViewProj.length - 1]
+            arr = arr[arr.length - 1]
+            coordinate = arr[arr.length - 1]
+            break
+        }
       }
 
-      return this.pointToDataProj(coordinate)
+      return viewProj ? roundPointCoords(coordinate) : this.pointToDataProj(coordinate)
     },
     /**
-     * @returns {Promise<string>}
+     * @returns {string}
      */
-    async getLayout () {
-      return (await this.resolveGeometry()).getLayout()
-    },
-    /**
-     * @param {boolean} [viewProj=false]
-     * @return {Promise<number[]|undefined>}
-     */
-    async findPointOnSurface (viewProj = false) {
-      await this.resolveGeometry()
-
-      return this.findPointOnSurfaceInternal(viewProj)
+    getLayout () {
+      return coalesce(this.$geometry?.getLayout(), GeometryLayout.XY)
     },
     /**
      * @param {boolean} [viewProj=false]
      * @return {number[]|undefined}
-     * @protected
      */
-    findPointOnSurfaceInternal (viewProj = false) {
+    findPointOnSurface (viewProj = false) {
       return findPointOnSurface({
-        type: this.$geometry.getType(),
-        coordinates: this.getCoordinatesInternal(viewProj),
+        type: this.getType(),
+        coordinates: this.getCoordinates(viewProj),
       })
     },
+    /**
+     * @param {number[]} value
+     * @protected
+     */
+    coordinatesViewProjChanged (value) {
+      this.setCoordinates(value, true)
+    },
+    /**
+     * @param {number[]} value
+     * @protected
+     */
+    currentCoordinatesDataProjChanged (value) {
+      if (isEqual(value, this.coordinatesDataProj)) return
+
+      this.$emit('update:coordinates', clonePlainObject(value))
+    },
+    /**
+     * @param {number[]} value
+     * @param {number[]} prev
+     * @protected
+     */
+    pointDataProjChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:point', value?.slice())
+    },
   },
+}
+
+function boundingExtent (coordinates) {
+  if (!coordinates) return
+  if (!isArray(coordinates[0])) {
+    coordinates = [coordinates]
+  }
+  return baseBoundingExtent(coordinates)
 }

@@ -5,9 +5,9 @@
   import { WMTS as WMTSSource } from 'ol/source'
   import { DEFAULT_MAX_ZOOM, DEFAULT_TILE_SIZE } from 'ol/tilegrid/common'
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
-  import { tileImageSource } from '../../mixins'
-  import { roundExtent, roundPointCoords, extentFromProjection, getCorner as getExtentCorner } from '../../ol-ext'
-  import { isArray, isEqual, isFunction, isNumber, range, sequential } from '../../utils'
+  import { makeChangeOrRecreateWatchers, tileImageSource } from '../../mixins'
+  import { extentFromProjection, getCorner as getExtentCorner, roundExtent, roundPointCoords } from '../../ol-ext'
+  import { coalesce, isArray, isFunction, isNumber, noop, range } from '../../utils'
 
   export default {
     name: 'VlSourceWmts',
@@ -84,7 +84,7 @@
       originViewProj () {
         return this.pointToViewProj(this.origin)
       },
-      tileSizeArr () {
+      inputTileSize () {
         return isArray(this.tileSize) ? this.tileSize : [this.tileSize, this.tileSize]
       },
       derivedTileGridFactory () {
@@ -93,79 +93,28 @@
         }
 
         const extent = this.extentDataProj || extentFromProjection(this.resolvedDataProjection)
-        const resolutions = this.resolutions || resolutionsFromExtent(extent, this.maxZoom, this.tileSizeArr)
+        const resolutions = this.resolutions || resolutionsFromExtent(extent, this.maxZoom, this.inputTileSize)
         const origin = this.originDataProj || getExtentCorner(extent, ExtentCorner.TOP_LEFT)
         const matrixIds = this.matrixIds || range(this.minZoom, resolutions.length)
-        const tileSize = this.tileSizeArr
+        const tileSize = this.inputTileSize
         const minZoom = this.minZoom
 
         return () => (new WMTSTileGrid({ extent, origin, resolutions, minZoom, matrixIds, tileSize }))
       },
+      inputTileUrlFunction: noop,
     },
     watch: {
-      dimensions: /*#__PURE__*/sequential(async function (value) {
-        if (isEqual(value, await this.getDimensions())) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('dimensions changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      format: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getFormat()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('format changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      layer: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getLayer()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('layer changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      matrixSet: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getMatrixSet()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('matrixSet changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      requestEncoding: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getRequestEncoding()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('requestEncoding changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      style: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getStyle()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('style changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      version: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getVersion()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('version changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
+        'dimensions',
+        'format',
+        'layerName',
+        'styleName',
+        'matrixSet',
+        'requestEncoding',
+        'version',
+      ], [
+        'dimensions',
+      ]),
     },
     methods: {
       /**
@@ -184,10 +133,13 @@
           tilePixelRatio: this.tilePixelRatio,
           transition: this.transition,
           // ol/source/UrlTile
-          urls: this.expandedUrls,
+          urls: this.currentUrls,
+          tileLoadFunction: this.currentTileLoadFunction,
           // ol/source/TileImage
           crossOrigin: this.crossOrigin,
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+          tileClass: this.tileClass,
+          imageSmoothing: this.imageSmoothing,
           // ol/source/WMTS
           dimensions: this.dimensions,
           format: this.format,
@@ -198,31 +150,33 @@
           version: this.version,
         })
       },
-      async getDimensions () {
-        return (await this.resolveSource()).getDimensions()
+      getDimensions () {
+        return coalesce(this.$source?.getDimensions(), this.dimensions)
       },
-      async getFormat () {
-        return (await this.resolveSource()).getFormat()
+      getFormat () {
+        return coalesce(this.$source?.getFormat(), this.format)
       },
-      async getLayer () {
-        return (await this.resolveSource()).getLayer()
+      getLayer () {
+        return coalesce(this.$source?.getLayer(), this.layerName)
       },
-      async getMatrixSet () {
-        return (await this.resolveSource()).getMatrixSet()
+      getMatrixSet () {
+        return coalesce(this.$source?.getMatrixSet(), this.matrixSet)
       },
-      async getRequestEncoding () {
-        return (await this.resolveSource()).getRequestEncoding()
+      getRequestEncoding () {
+        return coalesce(this.$source?.getRequestEncoding(), this.requestEncoding)
       },
-      async getStyle () {
-        return (await this.resolveSource()).getStyle()
+      getStyle () {
+        return coalesce(this.$source?.getStyle(), this.styleName)
       },
-      async getVersion () {
-        return (await this.resolveSource()).getVersion()
+      getVersion () {
+        return coalesce(this.$source?.getVersion(), this.version)
       },
-      async onExpandedUrlsChanged (urls) {
-        await this.setUrls(urls)
-      },
-      async onTileUrlFuncChanged (tileUrlFunc) {},
+      attributionsCollapsibleChanged: noop,
+      stateChanged: noop,
+      tileKeyChanged: noop,
+      opaqueChanged: noop,
+      zDirectionChanged: noop,
+      inputTileUrlFunctionChanged: noop,
     },
   }
 

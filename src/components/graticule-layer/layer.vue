@@ -3,42 +3,42 @@
     :id="vmId"
     :class="vmClass"
     style="display: none !important;">
-    <LonStyle :id="'vl-' + id + '-lon-style'">
+    <LonStyle :id="'vl-' + currentId + '-lon-style'">
       <slot name="lon">
         <TextStyle
-          :id="'vl-' + id + '-default-text-style'"
-          font="'12px Calibri,sans-serif'"
+          :id="'vl-' + currentId + '-default-text-style'"
+          font="'12px sans-serif'"
           text-baseline="bottom">
           <FillStyle
-            :id="'vl-' + id + '-default-fill-style'"
+            :id="'vl-' + currentId + '-default-fill-style'"
             color="rgba(0,0,0,1)" />
           <StrokeStyle
-            :id="'vl-' + id + '-default-stroke-style'"
+            :id="'vl-' + currentId + '-default-stroke-style'"
             color="rgba(255,255,255,1)"
             :width="3" />
         </TextStyle>
       </slot>
     </LonStyle>
-    <LatStyle :id="'vl-' + id + '-lat-style'">
+    <LatStyle :id="'vl-' + currentId + '-lat-style'">
       <slot name="lat">
         <TextStyle
-          :id="'vl-' + id + '-default-text-style'"
+          :id="'vl-' + currentId + '-default-text-style'"
           font="'12px Calibri,sans-serif'"
           text-baseline="bottom">
           <FillStyle
-            :id="'vl-' + id + '-default-fill-style'"
+            :id="'vl-' + currentId + '-default-fill-style'"
             color="rgba(0,0,0,1)" />
           <StrokeStyle
-            :id="'vl-' + id + '-default-stroke-style'"
+            :id="'vl-' + currentId + '-default-stroke-style'"
             color="rgba(255,255,255,1)"
             :width="3" />
         </TextStyle>
       </slot>
     </LatStyle>
-    <GStrokeStyle :id="'vl-' + id + '-graticule-style'">
+    <GStrokeStyle :id="'vl-' + currentId + '-graticule-style'">
       <slot name="stroke">
         <StrokeStyle
-          :id="'vl-' + id + '-default-graticule-stroke-style'"
+          :id="'vl-' + currentId + '-default-graticule-stroke-style'"
           color="rgba(0,0,0,0.2)" />
       </slot>
     </GStrokeStyle>
@@ -46,11 +46,11 @@
 </template>
 
 <script>
-  import debounce from 'debounce-promise'
   import GraticuleLayer from 'ol/layer/Graticule'
-  import { FRAME_TIME, vectorLayer } from '../../mixins'
+  import { Stroke, Text } from 'ol/style'
+  import { makeChangeOrRecreateWatchers, vectorLayer } from '../../mixins'
   import { dumpStrokeStyle, dumpTextStyle } from '../../ol-ext'
-  import { clonePlainObject, isEqual, isFunction, makeWatchers, map, mergeDescriptors, sequential } from '../../utils'
+  import { assert, clonePlainObject, coalesce, isEqual, map, mergeDescriptors } from '../../utils'
   import { FillStyle, StrokeStyle, TextStyle } from '../style'
   import LatStyle from './lat-style.vue'
   import LonStyle from './lon-style.vue'
@@ -103,74 +103,77 @@
       },
     },
     computed: {
-      currentMeridians () {
-        if (!(this.rev && this.$layer)) return []
-
-        return map(this.getMeridiansInternal(), geom => this.writeGeometryInDataProj(geom))
+      inputIntervals () {
+        return this.intervals?.slice()
       },
-      currentParallels () {
-        if (!(this.rev && this.$layer)) return []
+      meridians () {
+        if (!this.rev) return []
 
-        return map(this.getParallelsInternal(), geom => this.writeGeometryInDataProj(geom))
+        return map(this.getMeridians(), geom => this.writeGeometryInDataProj(geom))
       },
-      currentLonLabelStyle () {
+      parallels () {
+        if (!this.rev) return []
+
+        return map(this.getParallels(), geom => this.writeGeometryInDataProj(geom))
+      },
+      lonLabelStyle () {
         if (!(this.rev && this.$lonLabelStyle)) return
 
         return dumpTextStyle(this.$lonLabelStyle)
       },
-      currentLatLabelStyle () {
+      latLabelStyle () {
         if (!(this.rev && this.$latLabelStyle)) return
 
         return dumpTextStyle(this.$latLabelStyle)
       },
-      currentStrokeStyle () {
+      strokeStyle () {
         if (!(this.rev && this.$strokeStyle)) return
 
         return dumpStrokeStyle(this.$strokeStyle)
       },
     },
     watch: {
-      currentMeridians: {
+      meridians: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value, prev) {
+        handler (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:meridians', clonePlainObject(value))
-        }, FRAME_TIME),
+        },
       },
-      currentParallels: {
+      parallels: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value, prev) {
+        handler (value, prev) {
           if (isEqual(value, prev)) return
 
           this.$emit('update:parallels', clonePlainObject(value))
-        }, FRAME_TIME),
+        },
       },
-      currentLonLabelStyle: {
+      lonLabelStyle: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value, prev) {
+        handler (value, prev) {
           if (isEqual(value, prev)) return
 
-          this.$emit('update:lonLabelStyle', clonePlainObject(value))
-        }, FRAME_TIME),
+          this.$emit('update:lonLabelStyle', value && clonePlainObject(value))
+        },
       },
-      currentLatLabelStyle: {
+      latLabelStyle: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value, prev) {
+        handler (value, prev) {
           if (isEqual(value, prev)) return
 
-          this.$emit('update:latLabelStyle', clonePlainObject(value))
-        }, FRAME_TIME),
+          this.$emit('update:latLabelStyle', value && clonePlainObject(value))
+        },
       },
-      currentStrokeStyle: {
+      strokeStyle: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value, prev) {
+        handler (value, prev) {
           if (isEqual(value, prev)) return
 
-          this.$emit('update:strokeStyle', clonePlainObject(value))
-        }, FRAME_TIME),
+          this.$emit('update:strokeStyle', value && clonePlainObject(value))
+        },
       },
-      .../*#__PURE__*/makeWatchers([
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'maxLines',
         'targetSize',
         'showLabels',
@@ -178,17 +181,11 @@
         'latLabelFormatter',
         'lonLabelPosition',
         'latLabelPosition',
-        'intervals',
+        'inputIntervals',
         'wrapX',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ], [
+        'inputIntervals',
+      ]),
     },
     created () {
       this._lonLabelStyle = undefined
@@ -205,7 +202,7 @@
         },
         $lonLabelStyleVm: {
           enumerable: true,
-          get: () => this._lonLabelStyleVm,
+          get: this.getLonLabelStyleVm,
         },
         $latLabelStyle: {
           enumerable: true,
@@ -213,7 +210,7 @@
         },
         $latLabelStyleVm: {
           enumerable: true,
-          get: () => this._latLabelStyleVm,
+          get: this.getLatLabelStyleVm,
         },
         $strokeStyle: {
           enumerable: true,
@@ -221,7 +218,7 @@
         },
         $strokeStyleVm: {
           enumerable: true,
-          get: () => this._strokeStyleVm,
+          get: this.getStrokeStyleVm,
         },
       })
     },
@@ -238,6 +235,14 @@
           maxResolution: this.currentMaxResolution,
           minZoom: this.currentMinZoom,
           maxZoom: this.currentMaxZoom,
+          // ol/layer/Layer
+          render: this.render,
+          // ol/layer/Vector
+          renderOrder: this.renderOrder,
+          renderBuffer: this.renderBuffer,
+          declutter: this.declutter,
+          updateWhileAnimating: this.updateWhileAnimating,
+          updateWhileInteracting: this.updateWhileInteracting,
           // ol/layer/Graticule
           maxLines: this.maxLines,
           strokeStyle: this.$strokeStyle,
@@ -249,7 +254,7 @@
           latLabelPosition: this.latLabelPosition,
           lonLabelStyle: this.$lonLabelStyle,
           latLabelStyle: this.$latLabelStyle,
-          intervals: this.intervals,
+          intervals: this.inputIntervals,
           wrapX: this.wrapX,
         })
       },
@@ -265,81 +270,77 @@
           },
         )
       },
-      async getMeridians () {
-        await this.resolveLayer()
-
-        return this.getMeridiansInternal()
+      getMeridians () {
+        return coalesce(this.$layer?.getMeridians(), [])
       },
-      getMeridiansInternal () {
-        return this.$layer.getMeridians()
-      },
-      async getParallels () {
-        await this.resolveLayer()
-
-        return this.getParallelsInternal()
-      },
-      getParallelsInternal () {
-        return this.$layer.getParallels()
+      getParallels () {
+        return coalesce(this.$layer?.getParallels(), [])
       },
       getLonLabelStyle () {
         return this._lonLabelStyle
       },
-      async setLonLabelStyle (style) {
-        if (style && isFunction(style.resolveOlObject)) {
-          style = await style.resolveOlObject()
-        }
+      getLonLabelStyleVm () {
+        return this._lonLabelStyleVm
+      },
+      setLonLabelStyle (style) {
+        style = style?.$style || style
         style || (style = undefined)
+        assert(!style || style instanceof Text, 'Invalid lon label style')
 
         if (style === this._lonLabelStyle) return
 
         this._lonLabelStyle = style
-        this._lonLabelStyleVm = style?.vm && style.vm[0]
+        this._lonLabelStyleVm = style?.vm && style?.vm[0]
 
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log('lonLabelStyle changed, scheduling recreate...')
         }
 
-        await this.scheduleRecreate()
+        this.scheduleRecreate()
       },
       getLatLabelStyle () {
         return this._latLabelStyle
       },
-      async setLatLabelStyle (style) {
-        if (style && isFunction(style.resolveOlObject)) {
-          style = await style.resolveOlObject()
-        }
+      getLatLabelStyleVm () {
+        return this._latLabelStyleVm
+      },
+      setLatLabelStyle (style) {
+        style = style?.$style || style
         style || (style = undefined)
+        assert(!style || style instanceof Text, 'Invalid lat label style')
 
         if (style === this._latLabelStyle) return
 
         this._latLabelStyle = style
-        this._latLabelStyleVm = style?.vm && style.vm[0]
+        this._latLabelStyleVm = style?.vm && style?.vm[0]
 
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log('latLabelStyle changed, scheduling recreate...')
         }
 
-        await this.scheduleRecreate()
+        this.scheduleRecreate()
       },
       getStrokeStyle () {
         return this._strokeStyle
       },
-      async setStrokeStyle (style) {
-        if (style && isFunction(style.resolveOlObject)) {
-          style = await style.resolveOlObject()
-        }
+      getStrokeStyleVm () {
+        return this._strokeStyleVm
+      },
+      setStrokeStyle (style) {
+        style = style?.$style
         style || (style = undefined)
+        assert(!style || style instanceof Stroke, 'Invalid stroke style')
 
         if (style === this._strokeStyle) return
 
         this._strokeStyle = style
-        this._strokeStyleVm = style?.vm && style.vm[0]
+        this._strokeStyleVm = style?.vm && style?.vm[0]
 
         if (process.env.VUELAYERS_DEBUG) {
           this.$logger.log('strokeStyle changed, scheduling recreate...')
         }
 
-        await this.scheduleRecreate()
+        this.scheduleRecreate()
       },
     },
   }

@@ -14,13 +14,12 @@ export default {
     /**
      * @param {FeatureLike} feature
      * @param {boolean} [viewProj=false]
-     * @return {Promise<Feature>}
+     * @return {Feature}
      * @protected
      */
-    async initializeFeature (feature, viewProj = false) {
-      if (isFunction(feature?.resolveOlObject)) {
-        feature = await feature.resolveOlObject()
-      } else if (isPlainObject(feature)) {
+    initializeFeature (feature, viewProj = false) {
+      feature = feature?.$feature || feature
+      if (isPlainObject(feature)) {
         if (viewProj) {
           feature = this.readFeatureInViewProj(feature)
         } else {

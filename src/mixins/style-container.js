@@ -1,8 +1,5 @@
-import debounce from 'debounce-promise'
 import { Style } from 'ol/style'
-import { dumpStyle } from '../ol-ext'
-import { clonePlainObject, isArray, isEqual, isFunction } from '../utils'
-import { FRAME_TIME } from './ol-cmp'
+import { coalesce, hasProp, isArray, isEqual, isFunction } from '../utils'
 
 /**
  * @typedef {
@@ -14,6 +11,7 @@ import { FRAME_TIME } from './ol-cmp'
 /**
  * @typedef {Object} StyleTarget
  * @property {function(OlStyleLike|undefined): void} setStyle
+ * @property {function(): OlStyleLike|undefined} getStyle
  */
 /**
  * @typedef {OlStyleLike|Object} StyleLike
@@ -23,29 +21,6 @@ import { FRAME_TIME } from './ol-cmp'
  * Style container mixin.
  */
 export default {
-  computed: {
-    currentStyle () {
-      if (!(this.rev && this.$style)) return
-
-      let style = this.$style
-      if (isFunction(style)) return style
-      if (!style) return
-
-      isArray(style) || (style = [style])
-
-      return style.map(style => dumpStyle(style, geom => this.writeGeometryInDataProj(geom)))
-    },
-  },
-  watch: {
-    currentStyle: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(function (value, prev) {
-        if (isEqual(value, prev)) return
-
-        this.$emit('update:style', value && clonePlainObject(value))
-      }, FRAME_TIME),
-    },
-  },
   created () {
     this._style = undefined
 
@@ -71,7 +46,7 @@ export default {
     getDefaultStyle () {},
     /**
      * Returns OL object that can be styled (i.e. has setStyle/getStyle methods) or undefined
-     * @return {Promise<StyleTarget>|StyleTarget}
+     * @return {StyleTarget|undefined}
      * @protected
      * @abstract
      */
@@ -79,26 +54,19 @@ export default {
       throw new Error(`${this.vmName} not implemented method: getStyleTarget()`)
     },
     /**
-     * @return {StyleLike|null}
+     * @return {StyleLike|undefined}
      */
     getStyle () {
-      return this._style
+      return coalesce(this.getStyleTarget()?.getStyle(), this._style)
     },
     /**
      * @param {StyleLike} style
-     * @return {Promise<void>}
      */
-    async addStyle (style) {
+    addStyle (style) {
       if (!style) return
 
-      let olStyle
-      if (isFunction(style.resolveOlObject)) {
-        olStyle = await style.resolveOlObject()
-      } else {
-        olStyle = style
-      }
-
-      let currentStyle = this.$style
+      const olStyle = style?.$style || style
+      let currentStyle = this._style
 
       if (isFunction(olStyle)) {
         if (currentStyle) {
@@ -126,20 +94,17 @@ export default {
         }
       }
 
-      await this.setStyle(currentStyle)
+      this.setStyle(currentStyle)
     },
     /**
      * @param {StyleLike|undefined} style
-     * @return {Promise<void>}
      */
-    async removeStyle (style) {
+    removeStyle (style) {
       if (!style) return
 
-      if (isFunction(style.resolveOlObject)) {
-        style = await style.resolveOlObject()
-      }
+      style = style?.$style || style
+      let currentStyle = this._style
 
-      let currentStyle = this.$style
       if (currentStyle === style) {
         currentStyle = undefined
       } else if (isArray(currentStyle)) {
@@ -150,45 +115,37 @@ export default {
         }
       }
 
-      await this.setStyle(currentStyle)
+      this.setStyle(currentStyle)
     },
     /**
      * @param {StyleLike|undefined} style
-     * @return {void}
      */
-    async setStyle (style) {
-      if (style) {
-        if (isFunction(style.resolveOlObject)) {
-          style = await style.resolveOlObject()
-        } else if (isArray(style)) {
-          style = await Promise.all(style.map(async style => {
-            if (isFunction(style.resolveOlObject)) {
-              return style.resolveOlObject()
-            }
-            return style
-          }))
-        }
-      }
+    setStyle (style) {
       style || (style = undefined)
-
-      if (isEqual(style, this._style)) return
-
-      const styleTarget = await this.getStyleTarget()
-      if (!styleTarget) return
-
       if (style) {
+        if (hasProp(style, '$style') || hasProp(style, '$styleFunction')) {
+          style = style.$style || style.$styleFunction
+        } else if (isArray(style)) {
+          style = style.map(style => style?.$style || style)
+        }
         if (isFunction(style)) {
           style = this.createStyleFunc(style, this.getDefaultStyle())
         } else {
           isArray(style) || (style = [style])
           style.length > 0 || (style = undefined)
         }
-      } else {
-        style = undefined
       }
 
-      this._style = style
-      await styleTarget.setStyle(style)
+      if (!isEqual(style, this._style)) {
+        this._style = style
+        this.scheduleRefresh()
+      }
+
+      const styleTarget = this.getStyleTarget()
+      if (styleTarget && !isEqual(style, styleTarget.getStyle())) {
+        styleTarget.setStyle(style)
+        this.scheduleRefresh()
+      }
     },
     /**
      * Style function factory

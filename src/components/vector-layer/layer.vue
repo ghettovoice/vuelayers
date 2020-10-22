@@ -52,7 +52,7 @@
           render: this.render,
           source: this.$source,
           // ol/layer/BaseVector
-          renderOrder: this.currentRenderOrder,
+          renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,

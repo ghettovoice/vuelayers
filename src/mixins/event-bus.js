@@ -4,7 +4,7 @@ import { hasProp } from '../utils'
 export const EVENT_BUS_PROP = '$vlEventBus'
 
 export default {
-  created () {
+  beforeCreate () {
     initEventBus()
     // define local getter
     Object.defineProperties(this, {

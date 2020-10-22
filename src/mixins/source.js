@@ -1,13 +1,13 @@
-import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
-import { skipWhile } from 'rxjs/operators'
+import SourceState from 'ol/source/State'
 import { EPSG_3857, getSourceId, initializeSource, setSourceId } from '../ol-ext'
-import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
-import { addPrefix, assert, isArray, isEqual, isString, mergeDescriptors, pick, sequential } from '../utils'
-import olCmp, { FRAME_TIME } from './ol-cmp'
+import { assert, coalesce, isArray, isEqual, isFunction, isString, mergeDescriptors, or } from '../utils'
+import olCmp, { makeChangeOrRecreateWatchers } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 import waitForMap from './wait-for-map'
+
+const validateAttributions = /*#__PURE__*/or(isString, isFunction, value => isArray(value) && value.every(isString))
 
 /**
  * Base source mixin.
@@ -30,8 +30,8 @@ export default {
      * @type {string|string[]|undefined}
      */
     attributions: {
-      type: [String, Array],
-      validator: value => isString(value) || (isArray(value) && value.every(isString)),
+      type: [String, Array, Function],
+      validator: validateAttributions,
     },
     /**
      * @type {boolean}
@@ -57,78 +57,68 @@ export default {
     /**
      * @type {string|undefined}
      */
-    state: String,
+    state: {
+      type: String,
+      default: SourceState.READY,
+      validator: value => Object.values(SourceState).includes(value),
+    },
   },
   data () {
     return {
       viewProjection: EPSG_3857,
       dataProjection: EPSG_3857,
+      currentAttributions: adaptAttributions(this.attributions),
+      currentState: this.state,
     }
   },
   computed: {
-    currentAttributions () {
-      if (this.rev && this.$source) {
-        return this.getAttributionsInternal()
-      }
-
-      return this.attributions
+    inputAttributions () {
+      return adaptAttributions(this.attributions)
     },
-    currentState () {
-      if (this.rev && this.$source) {
-        return this.getStateInternal()
-      }
-
-      return this.state
+    currentResolutions () {
+      return this.rev ? this.getResolutions() : []
     },
   },
   watch: {
-    attributions: /*#__PURE__*/sequential(async function (value) {
-      await this.setAttributions(value)
-    }),
-    currentAttributions: /*#__PURE__*/debounce(function (value) {
-      if (isEqual(value, this.attributions)) return
+    rev () {
+      if (!this.$source) return
 
-      this.$emit('update:attributions', value)
-    }, FRAME_TIME),
-    state: /*#__PURE__*/sequential(async function (value) {
-      await this.setState(value)
-    }),
-    currentState: /*#__PURE__*/debounce(function (value) {
-      this.$emit('update:state', value)
-    }, FRAME_TIME),
-    attributionsCollapsible: /*#__PURE__*/sequential(async function (value) {
-      if (value === await this.getAttributionsCollapsible()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('attributionsCollapsible changed, scheduling recreate...')
+      if (this.currentAttributions !== this.$source.getAttributions()) {
+        this.currentAttributions = this.$source.getAttributions()
       }
-
-      await this.scheduleRecreate()
-    }),
-    projection: /*#__PURE__*/sequential(async function (value) {
-      const projection = await this.getProjection()
-      if (value === projection?.getCode()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('projection changed, scheduling recreate...')
+      if (this.currentState !== this.$source.getState()) {
+        this.currentState = this.$source.getState()
       }
-
-      await this.scheduleRecreate()
-    }),
-    wrapX: /*#__PURE__*/sequential(async function (value) {
-      if (value === await this.getWrapX()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('wrapX changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    }),
+    },
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'inputAttributions',
+      'currentAttributions',
+      'state',
+      'currentState',
+      'attributionsCollapsible',
+      'projection',
+      'wrapX',
+      'currentResolutions',
+    ], [
+      'inputAttributions',
+      'currentAttributions',
+      'currentResolutions',
+    ]),
   },
   created () {
     this::defineServices()
   },
   methods: {
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async beforeInit () {
+      await Promise.all([
+        this::olCmp.methods.beforeInit(),
+        this::waitForMap.methods.beforeInit(),
+      ])
+    },
     /**
      * @return {Promise<module:ol/source/Source~Source>}
      * @protected
@@ -149,9 +139,7 @@ export default {
      * @protected
      */
     async mount () {
-      if (this.$sourceContainer) {
-        await this.$sourceContainer.setSource(this)
-      }
+      this.$sourceContainer?.setSource(this)
 
       return this::olCmp.methods.mount()
     },
@@ -160,8 +148,8 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$sourceContainer && this.$sourceContainer.getSourceVm() === this) {
-        await this.$sourceContainer.setSource(null)
+      if (this.$sourceContainer?.getSourceVm() === this) {
+        this.$sourceContainer.setSource(null)
       }
 
       return this::olCmp.methods.unmount()
@@ -192,119 +180,137 @@ export default {
       )
     },
     /**
-     * @returns {void}
+     * @protected
      */
     subscribeAll () {
       this::olCmp.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
-    .../*#__PURE__*/pick(olCmp.methods, [
-      'init',
-      'deinit',
-      'beforeMount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'resolveOlObject',
-    ]),
-    .../*#__PURE__*/pick(waitForMap.methods, [
-      'beforeInit',
-    ]),
-    /**
-     * @return {Promise<module:ol/source/Source~Source>}
-     */
-    resolveSource: olCmp.methods.resolveOlObject,
     /**
      * @returns {string|number}
+     * @protected
      */
     getIdInternal () {
       return getSourceId(this.$source)
     },
     /**
      * @param {string|number} id
-     * @returns {void}
+     * @protected
      */
     setIdInternal (id) {
-      assert(id != null && id !== '', 'Invalid source id')
-
       if (id === this.getIdInternal()) return
 
       setSourceId(this.$source, id)
     },
     /**
-     * @returns {Promise<string|string[]|undefined>}
+     * @return {Promise<module:ol/source/Source~Source>}
      */
-    async getAttributions () {
-      await this.resolveSource()
-
-      return this.getAttributionsInternal()
-    },
+    resolveSource: olCmp.methods.resolveOlObject,
     /**
-     * @return {string|string[]|undefined}
-     * @protected
+     * @returns {string|string[]|undefined}
      */
-    getAttributionsInternal () {
-      return this.$source.getAttributions()
+    getAttributions () {
+      return coalesce(this.$source?.getAttributions(), this.currentAttributions)
     },
     /**
      * @param {string} attributions
-     * @returns {Promise<void>}
      */
-    async setAttributions (attributions) {
-      if (isEqual(attributions, await this.getAttributions())) return
+    setAttributions (attributions) {
+      assert(!attributions || validateAttributions(attributions), 'Invalid attributions')
+      attributions = adaptAttributions(attributions)
 
-      (await this.resolveSource()).setAttributions(attributions)
+      if (!isEqual(attributions, this.currentAttributions)) {
+        this.currentAttributions = attributions
+      }
+      if (this.$source && !isEqual(attributions, this.$source.getAttributions())) {
+        this.$source.setAttributions(attributions)
+      }
     },
     /**
-     * @returns {Promise<boolean>}
+     * @returns {boolean}
      */
-    async getAttributionsCollapsible () {
-      return (await this.resolveSource()).getAttributionsCollapsible()
+    getAttributionsCollapsible () {
+      return coalesce(this.$source?.getAttributionsCollapsible(), this.attributionsCollapsible)
     },
     /**
-     * @returns {Promise<module:ol/proj/Projection~Projection>}
+     * @returns {module:ol/proj/Projection~Projection}
      */
-    async getProjection () {
-      return (await this.resolveSource()).getProjection()
+    getProjection () {
+      return coalesce(this.$source?.getProjection(), getProj(this.resolvedDataProjection))
     },
     /**
-     * @returns {Promise<string>}
+     * @returns {string}
      */
-    async getState () {
-      await this.resolveSource()
-
-      return this.getStateInternal()
+    getState () {
+      return coalesce(this.$source?.getState(), this.currentState)
     },
     /**
-     * @return {string}
+     * @returns {boolean}
+     */
+    getWrapX () {
+      return coalesce(this.$source?.getWrapX(), this.wrapX)
+    },
+    /**
+     * @returns {number[]}
+     */
+    getResolutions () {
+      try {
+        // can be not implemented in source class
+        return coalesce(this.$source?.getResolutions(), [])
+      } catch (err) {
+        return []
+      }
+    },
+    /**
+     * @param {string|string[]|Function|undefined} value
      * @protected
      */
-    getStateInternal () {
-      return this.$source.getState()
+    inputAttributionsChanged (value) {
+      this.setAttributions(value)
     },
     /**
-     * @param {string} state
-     * @return {Promise<void>}
+     * @param {string|string[]|Function|undefined} value
+     * @protected
      */
-    async setState (state) {
-      if (state === await this.getState()) return
+    currentAttributionsChanged (value) {
+      if (isEqual(value, this.inputAttributions)) return
 
-      (await this.resolveSource()).setState(state)
+      this.$emit('update:attributions', value)
     },
     /**
-     * @returns {Promise<boolean>}
+     * @param {string} value
+     * @protected
      */
-    async getWrapX () {
-      return (await this.resolveSource()).getWrapX()
+    stateChanged (value) {
+      if (value === this.currentState) return
+
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log('state changed, scheduling recreate... %O ===> %O',
+          this.currentState, value)
+      }
+
+      this.currentState = value
+
+      return this.scheduleRecreate()
     },
     /**
-     * @returns {Promise<number[]>}
+     * @param {string} value
+     * @protected
      */
-    async getResolutions () {
-      return (await this.resolveSource()).getResolutions()
+    currentStateChanged (value) {
+      if (value === this.state) return
+
+      this.$emit('update:state', value)
+    },
+    /**
+     * @param {number[]} value
+     * @param {number[]} prev
+     * @protected
+     */
+    currentResolutionsChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:resolutions', value?.slice())
     },
   },
 }
@@ -342,17 +348,12 @@ function defineServices () {
   })
 }
 
-async function subscribeToSourceEvents () {
-  const prefixKey = addPrefix('current')
-  const propChanges = obsFromOlChangeEvent(this.$source, [
-    'id',
-  ], true, evt => ({
-    ...evt,
-    compareWith: this[prefixKey(evt.prop)],
-  })).pipe(
-    skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
-  )
-  this.subscribeTo(propChanges, () => {
-    ++this.rev
-  })
+function subscribeToSourceEvents () {
+}
+
+function adaptAttributions (attributions) {
+  if (!attributions) return
+  if (isFunction(attributions)) return attributions
+
+  return () => isArray(attributions) ? attributions : [attributions]
 }

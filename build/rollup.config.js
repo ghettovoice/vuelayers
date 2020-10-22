@@ -1,3 +1,5 @@
+import GeometryLayout from 'ol/geom/GeometryLayout'
+
 const { escapeRegExp, noop } = require('lodash')
 const replace = require('rollup-plugin-re')
 const vue = require('rollup-plugin-vue')
@@ -33,6 +35,7 @@ const baseUmdConf = (function () {
   const olInclude = {
     'ol/obj': true,
     'ol/geom/GeometryType': true,
+    'ol/geom/GeometryLayout': true,
     'ol/events/EventType': true,
     'ol/CollectionEventType': true,
     'ol/ObjectEventType': true,
@@ -40,6 +43,7 @@ const baseUmdConf = (function () {
     'ol/source/TileEventType': true,
     'ol/source/VectorEventType': true,
     'ol/source/WMSServerType': true,
+    'ol/source/State': true,
     'ol/MapBrowserEventType': true,
     'ol/MapEventType': true,
     'ol/OverlayPositioning': true,
@@ -47,6 +51,8 @@ const baseUmdConf = (function () {
     'ol/extent/Corner': true,
     'ol/tilegrid/common': true,
     'ol/proj/Units': true,
+    'ol/style/IconAnchorUnits': true,
+    'ol/style/IconOrigin': true,
   }
   return {
     ...baseConf,

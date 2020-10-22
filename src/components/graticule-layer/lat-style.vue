@@ -1,9 +1,10 @@
 <script>
   import { olCmp, stubVNode, textStyleContainer } from '../../mixins'
-  import { stubObject, mergeDescriptors } from '../../utils'
+  import { dumpTextStyle } from '../../ol-ext'
+  import { clonePlainObject, isEqual, mergeDescriptors, stubObject } from '../../utils'
 
   export default {
-    name: 'VlLayerGraticuleLatStyle',
+    name: 'VlLayerGraticuleLatStyleAdapter',
     mixins: [
       stubVNode,
       textStyleContainer,
@@ -16,6 +17,23 @@
           id: this.vmId,
           class: this.vmClass,
         }
+      },
+    },
+    computed: {
+      text () {
+        if (!(this.rev && this.$text)) return
+
+        return dumpTextStyle(this.$text)
+      },
+    },
+    watch: {
+      text: {
+        deep: true,
+        handler (value, prev) {
+          if (!isEqual(value, prev)) return
+
+          this.$emit('update:text', value && clonePlainObject(value))
+        },
       },
     },
     created () {
@@ -33,9 +51,6 @@
 
         return obj
       },
-      refresh () {
-        ++this.rev
-      },
       getServices () {
         return mergeDescriptors(
           this::olCmp.methods.getServices(),
@@ -44,10 +59,8 @@
       },
       getTextStyleTarget () {
         return {
-          setText: async style => {
-            await this.$latStyleContainer.setLatLabelStyle(style)
-            await this.scheduleRefresh()
-          },
+          setText: style => this.$latStyleContainer.setLatLabelStyle(style),
+          getText: () => this.$latStyleContainer.getLatLabelStyle(),
         }
       },
     },

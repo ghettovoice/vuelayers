@@ -1,7 +1,10 @@
 import RenderEventType from 'ol/render/EventType'
-import { fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { isFunction, pick, mergeDescriptors, makeWatchers, isEqual, sequential } from '../utils'
+import { map as mapObs, tap } from 'rxjs/operators'
+import { getSourceId } from '../ol-ext'
+import { fromOlChangeEvent as obsFromOlChangeEvent, fromOlEvent as obsFromOlEvent } from '../rx-ext'
+import { addPrefix, mergeDescriptors } from '../utils'
 import baseLayer from './base-layer'
+import { makeChangeOrRecreateWatchers } from './ol-cmp'
 import sourceContainer from './source-container'
 
 /**
@@ -27,19 +30,24 @@ export default {
       default: false,
     },
   },
+  computed: {
+    source () {
+      if (!(this.rev && this.$source)) return
+
+      return {
+        id: getSourceId(this.$source),
+        type: this.$source.constructor.name,
+      }
+    },
+  },
   watch: {
-    .../*#__PURE__*/makeWatchers([
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'source',
       'render',
       'overlay',
-    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-      if (isEqual(val, prev)) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log(`${prop} changed, scheduling recreate...`)
-      }
-
-      await this.scheduleRecreate()
-    })),
+    ], [
+      'source',
+    ]),
   },
   methods: {
     /**
@@ -48,7 +56,7 @@ export default {
      */
     async mount () {
       if (this.overlay && this.$mapVm) {
-        await this.setMap(this.$mapVm)
+        this.setMap(this.$mapVm)
         return
       }
 
@@ -60,7 +68,7 @@ export default {
      */
     async unmount () {
       if (this.overlay) {
-        await this.setMap(null)
+        this.setMap(null)
         return
       }
 
@@ -84,51 +92,64 @@ export default {
       this::baseLayer.methods.subscribeAll()
       this::subscribeToLayerEvents()
     },
-    .../*#__PURE__*/pick(baseLayer.methods, [
-      'beforeInit',
-      'init',
-      'deinit',
-      'beforeMount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'resolveOlObject',
-      'resolveLayer',
-    ]),
     /**
-     * @return {Promise<module:ol/layer/Base~BaseLayer>}
+     * @return {module:ol/layer/Base~BaseLayer}
      * @protected
      */
-    getSourceTarget: baseLayer.methods.resolveOlObject,
+    getSourceTarget () {
+      return this.$layer
+    },
     /**
-     * @returns {Promise<module:ol/renderer/Layer~LayerRenderer>}
+     * @returns {module:ol/renderer/Layer~LayerRenderer}
      */
-    async getRenderer () {
-      return (await this.resolveLayer()).getRenderer()
+    getRenderer () {
+      return this.$layer?.getRenderer()
     },
     /**
      * @param {module:ol/Map~Map|Object|undefined} map
-     * @return {Promise<void>}
      */
-    async setMap (map) {
-      if (map && isFunction(map.resolveOlObject)) {
-        map = await map.resolveOlObject()
-      }
+    setMap (map) {
+      map = map?.$map || map
 
-      (await this.resolveLayer()).setMap(map)
+      this.$layer?.setMap(map)
+    },
+    /**
+     * @param {string|undefined} value
+     * @param {string|undefined} prev
+     * @protected
+     */
+    sourceChanged (value, prev) {
+      if (value === prev) return
+
+      this.$emit('update:source', value)
     },
   },
 }
 
 async function subscribeToLayerEvents () {
+  const setterKey = addPrefix('set')
+  const sourceChanges = obsFromOlChangeEvent(this.$layer, 'source', true).pipe(
+    tap(({ value: source }) => {
+      if (this._sourceSubs) {
+        this.unsubscribe(this._sourceSubs)
+      }
+      if (source) {
+        this._sourceSubs = this.subscribeTo(
+          obsFromOlChangeEvent(source, 'id', true),
+          ::this.scheduleRefresh,
+        )
+      }
+    }),
+    mapObs(evt => ({
+      ...evt,
+      setter: this[setterKey(evt.prop)],
+    })),
+  )
+  this.subscribeTo(sourceChanges, ({ setter, value }) => setter(value))
+
   const renderEvents = obsFromOlEvent(this.$layer, [
     RenderEventType.PRERENDER,
     RenderEventType.POSTRENDER,
   ])
-  this.subscribeTo(renderEvents, evt => {
-    this.$emit(evt.type, evt)
-  })
+  this.subscribeTo(renderEvents, evt => this.$emit(evt.type, evt))
 }

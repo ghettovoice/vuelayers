@@ -11,10 +11,28 @@ import { isFunction, negate } from './minilo'
 
 export class WaitCancelError extends Error {
   name = 'WaitCancelError'
+
+  constructor (message) {
+    super(message)
+    if (isFunction(Error.captureStackTrace)) {
+      Error.captureStackTrace(this, this.constructor)
+    } else {
+      this.stack = (new Error(message)).stack
+    }
+  }
 }
 
 export class WaitTimeoutError extends Error {
   name = 'WaitTimeoutError'
+
+  constructor (message) {
+    super(message)
+    if (isFunction(Error.captureStackTrace)) {
+      Error.captureStackTrace(this, this.constructor)
+    } else {
+      this.stack = (new Error(message)).stack
+    }
+  }
 }
 
 /**

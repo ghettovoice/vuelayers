@@ -4,10 +4,10 @@
     :class="vmClass"
     style="display: none !important;">
     <slot
-      :id="id"
-      :properties="properties">
+      :id="currentId"
+      :properties="currentProperties">
       <PointGeom
-        :id="'vl-' + id + '-default-geom'"
+        :id="'vl-' + currentId + '-default-geom'"
         :coordinates="[0, 0]" />
     </slot>
   </i>

@@ -7,17 +7,17 @@
       :center="currentCenterDataProj"
       :zoom="currentZoom"
       :resolution="currentResolution"
-      :rotation="currentRotation" />
+      :rotation="currentRotation"
+      :extent="visibleExtentDataProj" />
   </i>
 </template>
 
 <script>
-  import debounce from 'debounce-promise'
   import { View } from 'ol'
   import { get as getProj } from 'ol/proj'
-  import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { distinctUntilKeyChanged, map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
+  import { merge as mergeObs } from 'rxjs'
+  import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
+  import { makeChangeOrRecreateWatchers, olCmp, projTransforms, waitForMap } from '../../mixins'
   import {
     EPSG_3857,
     getViewId,
@@ -28,18 +28,7 @@
     setViewId,
   } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import {
-    addPrefix,
-    assert,
-    coalesce,
-    isArray,
-    isEqual,
-    isFunction,
-    isNumber,
-    makeWatchers,
-    noop,
-    sequential,
-  } from '../../utils'
+  import { addPrefix, assert, coalesce, isArray, isEqual, isFunction, isNumber, noop } from '../../utils'
 
   /**
    * Represents a simple **2D view** of the map. This is the component to act upon to change the **center**,
@@ -180,6 +169,16 @@
     data () {
       return {
         dataProjection: EPSG_3857,
+        currentCenterViewProj: roundPointCoords(this.center),
+        currentZoom: this.zoom,
+        currentRotation: this.rotation,
+        currentResolution: this.resolution,
+        currentMinZoom: this.minZoom,
+        currentMaxZoom: this.maxZoom,
+        currentResolutions: this.resolutions?.slice(),
+        currentMaxResolution: this.maxResolution,
+        currentMinResolution: this.minResolution,
+        currentProjection: this.projection,
       }
     },
     computed: {
@@ -189,208 +188,290 @@
       centerViewProj () {
         return this.pointToViewProj(this.center)
       },
+      currentCenterDataProj () {
+        return this.pointToDataProj(this.currentCenterViewProj)
+      },
       extentDataProj () {
         return roundExtent(this.extent)
       },
       extentViewProj () {
         return this.extentToViewProj(this.extent)
       },
-      currentZoom () {
-        if (this.rev && this.$view) {
-          return this.getZoomInternal()
-        }
-
-        return this.zoom
+      inputResolutions () {
+        return this.resolutions?.slice()
       },
-      currentRotation () {
-        if (this.rev && this.$view) {
-          return this.getRotationInternal()
-        }
+      visibleExtentDataProj () {
+        if (!this.rev) return
 
-        return this.rotation
+        return this.getExtent()?.slice()
       },
-      currentResolution () {
-        if (this.rev && this.$view) {
-          return this.getResolutionInternal()
-        }
+      visibleExtentViewProj () {
+        if (!this.rev) return
 
-        return this.resolution
+        return this.getExtent(true)?.slice()
       },
-      currentCenterDataProj () {
-        if (this.rev && this.$view) {
-          return this.getCenterInternal()
-        }
-
-        return this.centerDataProj
+      animating () {
+        return !!(this.rev && this.getAnimating())
       },
-      currentCenterViewProj () {
-        if (this.rev && this.$view) {
-          return this.getCenterInternal(true)
-        }
-
-        return this.centerViewProj
-      },
-      currentAnimating () {
-        if (!(this.rev && this.$view)) return false
-
-        return this.getAnimatingInternal()
-      },
-      currentInteracting () {
-        if (!(this.rev && this.$view)) return false
-
-        return this.getInteractingInteraction()
-      },
-      currentResolutions () {
-        if (!(this.rev && this.$view)) return false
-
-        return this.getResolutionsInternal()
-      },
-      currentMaxResolution () {
-        if (!(this.rev && this.$view)) return false
-
-        return this.getMaxResolutionInternal()
-      },
-      currentMinResolution () {
-        if (!(this.rev && this.$view)) return false
-
-        return this.getMinResolutionInternal()
-      },
-      currentMaxZoom () {
-        if (!(this.rev && this.$view)) return false
-
-        return this.getMaxZoomInternal()
-      },
-      currentMinZoom () {
-        if (!(this.rev && this.$view)) return false
-
-        return this.getMinZoomInternal()
+      interacting () {
+        return !!(this.rev && this.getInteracting())
       },
       resolvedViewProjection () {
-        return this.projection
+        return this.currentProjection
       },
       resolvedDataProjection () {
         // exclude this.projection from lookup to allow view rendering in projection
         // that differs from data projection
         return coalesce(
-          this.$options?.dataProjection, // may or may not be present
-          this.dataProjection, // may or may not be present
+          this.dataProjection,
+          this.$options?.dataProjection,
           this.resolvedViewProjection,
         )
       },
     },
     watch: {
-      centerViewProj: /*#__PURE__*/sequential(async function (value) {
-        if (await this.getAnimating()) return
+      rev () {
+        if (!this.$view) return
 
-        await this.setCenter(value, true)
-      }),
+        if (this.currentProjection !== this.$view.getProjection().getCode()) {
+          this.currentProjection = this.$view.getProjection().getCode()
+        }
+        if (!isEqual(this.currentCenterViewProj, this.$view.getCenter())) {
+          this.currentCenterViewProj = this.$view.getCenter()
+        }
+        if (this.currentZoom !== this.$view.getZoom()) {
+          this.currentZoom = this.$view.getZoom()
+        }
+        if (this.currentRotation !== this.$view.getRotation()) {
+          this.currentRotation = this.$view.getRotation()
+        }
+        if (this.currentResolution !== this.$view.getResolution()) {
+          this.currentResolution = this.$view.getResolution()
+        }
+        if (this.currentMinZoom !== this.$view.getMinZoom()) {
+          this.currentMinZoom = this.$view.getMinZoom()
+        }
+        if (this.currentMaxZoom !== this.$view.getMaxZoom()) {
+          this.currentMaxZoom = this.$view.getMaxZoom()
+        }
+        if (!isEqual(this.currentResolutions, this.$view.getResolutions())) {
+          this.currentResolutions = this.$view.getResolutions()
+        }
+        if (this.currentMaxResolution !== this.$view.getMaxResolution()) {
+          this.currentMaxResolution = this.$view.getMaxResolution()
+        }
+        if (this.currentMinResolution !== this.$view.getMinResolution()) {
+          this.currentMinResolution = this.$view.getMinResolution()
+        }
+        if (this.currentProjection !== this.$view.getProjection().getCode()) {
+          this.currentProjection = this.$view.getProjection().getCode()
+        }
+      },
+      centerViewProj: {
+        deep: true,
+        handler (value) {
+          if (this.getAnimating()) return
+
+          this.setCenter(value, true)
+        },
+      },
       currentCenterDataProj: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value) {
+        handler (value) {
           if (isEqual(value, this.centerDataProj)) return
 
           this.$emit('update:center', value.slice())
-        }, FRAME_TIME),
+        },
       },
-      rotation: /*#__PURE__*/sequential(async function (value) {
-        if (await this.getAnimating()) return
+      rotation (value) {
+        if (this.getAnimating()) return
 
-        await this.setRotation(value)
-      }),
-      currentRotation: /*#__PURE__*/debounce(function (value) {
+        this.setRotation(value)
+      },
+      currentRotation (value) {
         if (value === this.rotation) return
 
         this.$emit('update:rotation', value)
-      }, FRAME_TIME),
-      resolution: /*#__PURE__*/sequential(async function (value) {
-        if (await this.getAnimating()) return
+      },
+      resolution (value) {
+        if (this.getAnimating()) return
 
-        await this.setResolution(value)
-      }),
-      currentResolution: /*#__PURE__*/debounce(function (value) {
+        this.setResolution(value)
+      },
+      currentResolution (value) {
         if (value === this.resolution) return
 
         this.$emit('update:resolution', value)
-      }, FRAME_TIME),
-      zoom: /*#__PURE__*/sequential(async function (value) {
-        if (await this.getAnimating()) return
+      },
+      constrainResolution (value) {
+        this.setConstrainResolution(value)
+      },
+      zoom (value) {
+        if (this.getAnimating()) return
 
-        await this.setZoom(value)
-      }),
-      currentZoom: /*#__PURE__*/debounce(function (value) {
+        this.setZoom(value)
+      },
+      currentZoom (value) {
         if (value === this.zoom) return
 
         this.$emit('update:zoom', value)
-      }, FRAME_TIME),
-      minZoom: /*#__PURE__*/sequential(async function (value) {
-        await this.setMinZoom(value)
-      }),
-      maxZoom: /*#__PURE__*/sequential(async function (value) {
-        await this.setMaxZoom(value)
-      }),
-      currentAnimating: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      minZoom (value) {
+        this.setMinZoom(value)
+      },
+      currentMinZoom (value) {
+        if (value === this.minZoom) return
+
+        this.$emit('update:minZoom', value)
+      },
+      maxZoom (value) {
+        this.setMaxZoom(value)
+      },
+      currentMaxZoom (value) {
+        if (value === this.maxZoom) return
+
+        this.$emit('update:maxZoom', value)
+      },
+      inputResolutions: {
+        deep: true,
+        handler (value) {
+          if (value === this.currentResolutions) return
+
+          if (process.env.VUELAYERS_DEBUG) {
+            this.$logger.log(
+              'resolutions changed, scheduling recreate... %O ===> %O',
+              this.currentResolutions,
+              value,
+            )
+          }
+
+          this.currentResolutions = value?.slice()
+
+          return this.scheduleRecreate()
+        },
+      },
+      currentResolutions: {
+        deep: true,
+        handler (value) {
+          if (isEqual(value, this.inputResolutions)) return
+
+          this.$emit('update:resolutions', value?.slice())
+        },
+      },
+      maxResolution (value) {
+        if (value === this.currentMaxResolution) return
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(
+            'maxResolution changed, scheduling recreate... %O ===> %O',
+            this.currentMaxResolution,
+            value,
+          )
+        }
+
+        this.currentMaxResolution = value
+
+        return this.scheduleRecreate()
+      },
+      currentMaxResolution (value) {
+        if (value === this.maxResolution) return
+
+        this.$emit('update:maxResolution', value)
+      },
+      minResolution (value) {
+        if (value === this.currentMinResolution) return
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(
+            'minResolution changed, scheduling recreate... %O ===> %O',
+            this.currentMinResolution,
+            value,
+          )
+        }
+
+        this.currentMinResolution = value
+
+        return this.scheduleRecreate()
+      },
+      currentMinResolution (value) {
+        if (value === this.minResolution) return
+
+        this.$emit('update:minResolution', value)
+      },
+      projection (value) {
+        if (value === this.currentProjection) return
+
+        if (process.env.VUELAYERS_DEBUG) {
+          this.$logger.log(
+            'projection changed, scheduling recreate... %O ===> %O',
+            this.currentProjection,
+            value,
+          )
+        }
+
+        this.currentProjection = value
+        // reset current resolution fields to inputs
+        // so zoom fields will take precedence
+        this.currentResolution = this.resolution
+        this.currentResolutions = this.inputResolutions?.slice()
+        this.currentMaxResolution = this.maxResolution
+        this.currentMinResolution = this.minResolution
+
+        return this.scheduleRecreate()
+      },
+      currentProjection (value) {
+        if (value === this.projection) return
+
+        this.$emit('update:projection', value)
+      },
+      animating (value, prev) {
         if (value === prev) return
 
         this.$emit('update:animating', value)
-      }, FRAME_TIME),
-      currentInteracting: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      interacting (value, prev) {
         if (value === prev) return
 
         this.$emit('update:interacting', value)
-      }, FRAME_TIME),
-      currentResolutions: /*#__PURE__*/debounce(function (value, prev) {
-        if (isEqual(value, prev)) return
+      },
+      visibleExtentDataProj: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
 
-        this.$emit('update:resolutions', value)
-      }, FRAME_TIME),
-      currentMaxResolution: /*#__PURE__*/debounce(function (value, prev) {
-        if (value === prev) return
-
-        this.$emit('update:maxResolution', value)
-      }, FRAME_TIME),
-      currentMinResolution: /*#__PURE__*/debounce(function (value, prev) {
-        if (value === prev) return
-
-        this.$emit('update:minResolution', value)
-      }, FRAME_TIME),
-      currentMaxZoom: /*#__PURE__*/debounce(function (value, prev) {
-        if (value === prev) return
-
-        this.$emit('update:maxZoom', value)
-      }, FRAME_TIME),
-      currentMinZoom: /*#__PURE__*/debounce(function (value, prev) {
-        if (value === prev) return
-
-        this.$emit('update:minZoom', value)
-      }, FRAME_TIME),
-      .../*#__PURE__*/makeWatchers([
+          this.$emit('update:visibleExtent', value?.slice())
+        },
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'constrainOnlyCenter',
-        'extentViewProj',
         'smoothExtentConstraint',
         'enableRotation',
         'constrainRotation',
-        'resolutions',
-        'maxResolution',
-        'minResolution',
         'constrainResolution',
         'smoothResolutionConstraint',
         'zoomFactor',
         'multiWorld',
-        'resolvedViewProjection',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+        'extentViewProj',
+      ], [
+        'extentViewProj',
+      ]),
     },
     created () {
       this::defineServices()
+
+      this.currentCenterViewProj = this.centerViewProj.slice()
     },
     methods: {
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async beforeInit () {
+        await Promise.all([
+          this::olCmp.methods.beforeInit(),
+          this::waitForMap.methods.beforeInit(),
+        ])
+      },
       /**
        * @return {module:ol/View~View}
        * @protected
@@ -405,17 +486,17 @@
           enableRotation: this.enableRotation,
           constrainRotation: this.constrainRotation,
           resolution: this.currentResolution,
-          resolutions: this.resolutions,
-          maxResolution: this.maxResolution,
-          minResolution: this.minResolution,
+          resolutions: this.currentResolutions,
+          maxResolution: this.currentMaxResolution,
+          minResolution: this.currentMinResolution,
           constrainResolution: this.constrainResolution,
           smoothResolutionConstraint: this.smoothResolutionConstraint,
           zoom: this.currentZoom,
           zoomFactor: this.zoomFactor,
-          maxZoom: this.maxZoom,
-          minZoom: this.minZoom,
+          maxZoom: this.currentMaxZoom,
+          minZoom: this.currentMinZoom,
           multiWorld: this.multiWorld,
-          projection: this.resolvedViewProjection,
+          projection: this.currentProjection,
           showFullExtent: this.showFullExtent,
         })
         initializeView(view, this.currentId)
@@ -427,9 +508,7 @@
        * @protected
        */
       async mount () {
-        if (this.$viewContainer) {
-          await this.$viewContainer.setView(this)
-        }
+        this.$viewContainer?.setView(this)
 
         return this::olCmp.methods.mount()
       },
@@ -438,8 +517,8 @@
        * @protected
        */
       async unmount () {
-        if (this.$viewContainer && this.$viewContainer.getViewVm() === this) {
-          await this.$viewContainer.setView(null)
+        if (this.$viewContainer?.getViewVm() === this) {
+          this.$viewContainer.setView(null)
         }
 
         return this::olCmp.methods.unmount()
@@ -453,26 +532,25 @@
         this::subscribeToEvents()
       },
       /**
-       * @return {Promise<module:ol/View~View>}
-       */
-      resolveView: olCmp.methods.resolveOlObject,
-      /**
-       * @return {Promise<string|number|undefined>}
+       * @return {*}
+       * @protected
        */
       getIdInternal () {
         return getViewId(this.$view)
       },
       /**
-       * @param {number|string|undefined} id
-       * @return {Promise<void>}
+       * @param {*} id
+       * @protected
        */
       setIdInternal (id) {
-        assert(id != null && id !== '', 'Invalid view id')
-
         if (id === this.getIdInternal()) return
 
         setViewId(this.$view, id)
       },
+      /**
+       * @return {Promise<module:ol/View~View>}
+       */
+      resolveView: olCmp.methods.resolveOlObject,
       /**
        * @see {@link https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#animate}
        * @param {...(module:ol/View~AnimationOptions|function(boolean))} args
@@ -532,25 +610,16 @@
         })
       },
       /**
-       * @return {Promise<boolean>}
-       */
-      async getAnimating () {
-        await this.resolveView()
-
-        return this.getAnimatingInternal()
-      },
-      /**
-       * @return {boolean}
-       * @protected
-       */
-      getAnimatingInternal () {
-        return this.$view.getAnimating()
-      },
-      /**
        * @return {Promise<void>}
        */
       async cancelAnimations () {
         (await this.resolveView()).cancelAnimations()
+      },
+      /**
+       * @return {boolean}
+       */
+      getAnimating () {
+        return coalesce(this.$view?.getAnimating(), false)
       },
       /**
        * @return {Promise<void>}
@@ -573,19 +642,10 @@
         (await this.resolveView()).endInteraction(duration, resolutionDirection, anchor)
       },
       /**
-       * @return {Promise<boolean>}
-       */
-      async getInteracting () {
-        await this.resolveView()
-
-        return this.getInteractingInteraction()
-      },
-      /**
        * @return {boolean}
-       * @protected
        */
-      getInteractingInteraction () {
-        return this.$view.getInteracting()
+      getInteracting () {
+        return coalesce(this.$view?.getInteracting(), false)
       },
       /**
        * @param {number[]|undefined} [size]
@@ -597,6 +657,18 @@
         if (viewProj) {
           return roundExtent(extent)
         }
+
+        return this.extentToDataProj(extent)
+      },
+      /**
+       * @param {boolean} [viewProj=false]
+       * @return {number[]|undefined}
+       */
+      getExtent (viewProj = false) {
+        if (!this.$view) return
+
+        const extent = this.$view.calculateExtent()
+        if (viewProj) return roundExtent(extent)
 
         return this.extentToDataProj(extent)
       },
@@ -616,60 +688,57 @@
       },
       /**
        * @param {boolean} [viewProj=false]
-       * @return {Promise<number[]>}
-       */
-      async getCenter (viewProj = false) {
-        await this.resolveView()
-
-        return this.getCenterInternal(viewProj)
-      },
-      /**
-       * @param {boolean} [viewProj=false]
        * @return {number[]}
        */
-      getCenterInternal (viewProj = false) {
-        if (viewProj) {
-          return roundPointCoords(this.$view.getCenter())
+      getCenter (viewProj = false) {
+        if (!this.$view) {
+          return viewProj ? this.currentCenterViewProj : this.currentCenterDataProj
         }
 
-        return this.pointToDataProj(this.$view.getCenter())
+        const center = this.$view.getCenter()
+        if (viewProj) return center
+
+        return this.pointToDataProj(center)
       },
       /**
        * @param {number[]} center
        * @param {boolean} [viewProj=false]
-       * @return {Promise<void>}
        */
-      async setCenter (center, viewProj = false) {
-        center = roundPointCoords(center)
-        if (isEqual(center, await this.getCenter(viewProj))) return
-        if (!viewProj) {
+      setCenter (center, viewProj = false) {
+        assert(isArray(center) && center.length === 2, 'Invalid center')
+
+        if (viewProj) {
+          center = roundPointCoords(center)
+        } else {
           center = this.pointToViewProj(center)
         }
 
-        (await this.resolveView()).setCenter(center)
-      },
-      /**
-       * @return {Promise<number>}
-       */
-      async getResolution () {
-        await this.resolveView()
-
-        return this.getResolutionInternal()
+        if (!isEqual(center, this.currentCenterViewProj)) {
+          this.currentCenterViewProj = center
+        }
+        if (this.$view && !isEqual(center, this.$view.getCenter())) {
+          this.$view.setCenter(center)
+        }
       },
       /**
        * @return {number}
        */
-      getResolutionInternal () {
-        return this.$view.getResolution()
+      getResolution () {
+        return coalesce(this.$view?.getResolution(), this.currentResolution)
       },
       /**
        * @param {number} resolution
-       * @return {Promise<void>}
        */
-      async setResolution (resolution) {
-        if (resolution === await this.getResolution()) return
+      setResolution (resolution) {
+        resolution = Number(resolution)
+        assert(isNumber(resolution), 'Invalid resolution')
 
-        (await this.resolveView()).setResolution(resolution)
+        if (resolution !== this.currentResolution) {
+          this.currentResolution = resolution
+        }
+        if (this.$view && resolution !== this.$view.getResolution()) {
+          this.$view.setResolution(resolution)
+        }
       },
       /**
        * @param {number[]} extent
@@ -692,73 +761,42 @@
         return (await this.resolveView()).getResolutionForZoom(zoom)
       },
       /**
-       * @return {Promise<number[]|undefined>}
-       */
-      async getResolutions () {
-        await this.resolveView()
-
-        return this.getResolutionsInternal()
-      },
-      /**
        * @return {number[]|undefined}
-       * @protected
        */
-      getResolutionsInternal () {
-        return this.$view.getResolutions()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getMaxResolution () {
-        await this.resolveView()
-
-        return this.getMaxResolutionInternal()
+      getResolutions () {
+        return coalesce(this.$view?.getResolutions(), this.currentResolutions)
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getMaxResolutionInternal () {
-        return this.$view.getMaxResolution()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getMinResolution () {
-        await this.resolveView()
-
-        return this.getMinResolutionInternal()
+      getMaxResolution () {
+        return coalesce(this.$view?.getMaxResolution(), this.currentMaxResolution)
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getMinResolutionInternal () {
-        this.$view.getMinResolution()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getZoom () {
-        await this.resolveView()
-
-        return this.getZoomInternal()
+      getMinResolution () {
+        return coalesce(this.$view?.getMinResolution(), this.currentMinResolution)
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getZoomInternal () {
-        return this.$view.getZoom()
+      getZoom () {
+        return coalesce(this.$view?.getZoom(), this.currentZoom)
       },
       /**
        * @param {number} zoom
-       * @return {Promise<void>}
        */
-      async setZoom (zoom) {
-        if (zoom === await this.getZoom()) return
+      setZoom (zoom) {
+        zoom = Number(zoom)
+        assert(isNumber(zoom), 'Invalid zoom')
 
-        (await this.resolveView()).setZoom(zoom)
+        if (zoom !== this.currentZoom) {
+          this.currentZoom = zoom
+        }
+        if (this.$view && zoom !== this.$view.getZoom()) {
+          this.$view.setZoom(zoom)
+        }
       },
       /**
        * @param {number} resolution
@@ -768,82 +806,70 @@
         return (await this.resolveView()).getZoomForResolution(resolution)
       },
       /**
-       * @return {Promise<number|undefined>}
-       */
-      async getMaxZoom () {
-        await this.resolveView()
-
-        return this.getMaxZoomInternal()
-      },
-      /**
        * @return {number|undefined}
-       * @protected
        */
-      getMaxZoomInternal () {
-        return this.$view.getMaxZoom()
+      getMaxZoom () {
+        return coalesce(this.$view?.getMaxZoom(), this.currentMaxZoom)
       },
       /**
        * @param {number} zoom
-       * @return {Promise<void>}
        */
-      async setMaxZoom (zoom) {
-        if (zoom === await this.getMaxZoom()) return
+      setMaxZoom (zoom) {
+        zoom = Number(zoom)
+        assert(isNumber(zoom), 'Invalid maxZoom')
 
-        (await this.resolveView()).setMaxZoom(zoom)
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getMinZoom () {
-        await this.resolveView()
-
-        return this.getMinZoomInternal()
+        if (zoom !== this.currentMaxZoom) {
+          this.currentMaxZoom = zoom
+        }
+        if (this.$view && zoom !== this.$view.getMaxZoom()) {
+          this.$view.setMaxZoom(zoom)
+        }
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getMinZoomInternal () {
-        return this.$view.getMinZoom()
+      getMinZoom () {
+        return coalesce(this.$view?.getMinZoom(), this.currentMinZoom)
       },
       /**
        * @param {number} zoom
-       * @return {Promise<void>}
        */
-      async setMinZoom (zoom) {
-        if (zoom === await this.getMinZoom()) return
+      setMinZoom (zoom) {
+        zoom = Number(zoom)
+        assert(isNumber(zoom), 'Invalid minZoom')
 
-        (await this.resolveView()).setMinZoom(zoom)
+        if (zoom !== this.currentMinZoom) {
+          this.currentMinZoom = zoom
+        }
+        if (this.$view && zoom !== this.$view.getMinZoom()) {
+          this.$view.setMinZoom(zoom)
+        }
       },
       /**
-       * @return {Promise<module:ol/proj/Projection>}
+       * @return {module:ol/proj/ProjectionLike}
        */
-      async getProjection () {
-        return (await this.resolveView()).getProjection()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getRotation () {
-        await this.resolveView()
-
-        return this.getRotationInternal()
+      getProjection () {
+        return coalesce(this.$view?.getProjection(), getProj(this.currentProjection))
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getRotationInternal () {
-        return this.$view.getRotation()
+      getRotation () {
+        return coalesce(this.$view?.getRotation(), this.currentRotation)
       },
       /**
        * @param {number} rotation
-       * @return {Promise<void>}
        */
-      async setRotation (rotation) {
-        if (rotation === await this.getRotation()) return
+      setRotation (rotation) {
+        rotation = Number(rotation)
+        assert(isNumber(rotation), 'Invalid rotation')
 
-        (await this.resolveView()).setRotation(rotation)
+        if (rotation !== this.currentRotation) {
+          this.currentRotation = rotation
+        }
+        if (this.$view && rotation !== this.$view.getRotation()) {
+          this.$view.setRotation(rotation)
+        }
       },
     },
   }
@@ -880,46 +906,35 @@
    * @private
    */
   async function subscribeToEvents () {
-    const prefixKey = addPrefix('current')
-    const resolutionChanges = obsFromOlChangeEvent(this.$view, 'resolution', true, evt => ({
-      ...evt,
-      compareWith: this.currentResolution,
-    }))
+    const setterKey = addPrefix('set')
+    const resolutionChanges = obsFromOlChangeEvent(this.$view, 'resolution', true)
     const zoomChanges = resolutionChanges.pipe(
-      mergeMap(() => fromObs(this.getZoom()).pipe(
-        mapObs(zoom => ({
-          prop: 'zoom',
-          value: zoom,
-          compareWith: this.currentZoom,
-        })),
-      )),
+      mapObs(() => ({
+        prop: 'zoom',
+        value: this.getZoom(),
+      })),
       distinctUntilKeyChanged('value'),
-    )
-    const centerChanges = obsFromOlChangeEvent(this.$view, 'center', true).pipe(
-      mergeMap(({ prop }) => fromObs(this.getCenter()).pipe(
-        mapObs(center => ({
-          prop,
-          value: center,
-          compareWith: this.currentCenterDataProj,
-        })),
-      )),
     )
     const propChanges = mergeObs(
       obsFromOlChangeEvent(this.$view, [
         'id',
         'rotation',
-      ], true, evt => ({
-        ...evt,
-        compareWith: this[prefixKey(evt.prop)],
-      })),
+        'center',
+      ], true),
       resolutionChanges,
       zoomChanges,
-      centerChanges,
     ).pipe(
-      skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
+      mapObs(evt => ({
+        ...evt,
+        setter: val => {
+          const args = [val]
+          if (evt.prop === 'center') {
+            args.push(true)
+          }
+          this[setterKey(evt.prop)](...args)
+        },
+      })),
     )
-    this.subscribeTo(propChanges, () => {
-      ++this.rev
-    })
+    this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
   }
 </script>

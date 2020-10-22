@@ -2,9 +2,11 @@ import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
 import { XYZ as XYZSource } from 'ol/source'
 import { createXYZ } from 'ol/tilegrid'
 import { extentFromProjection } from '../ol-ext'
-import { isArray, isFunction, isNumber, pick } from '../utils'
+import { and, coalesce, isArray, isFunction, isNumber, noop, or } from '../utils'
 import tileImageSource from './tile-image-source'
 
+const validateMinZoom = value => value >= 0
+const validateTileSize = /*#__PURE__*/or(isNumber, and(isArray, value => value.length === 2 && value.every(isNumber)))
 /**
  * Base XYZ source mixin.
  */
@@ -21,19 +23,18 @@ export default {
     minZoom: {
       type: Number,
       default: 0,
-      validator: value => value >= 0,
+      validator: validateMinZoom,
     },
     maxResolution: Number,
     tileSize: {
       type: [Number, Array],
       default: () => [256, 256],
-      validator: value => isNumber(value) ||
-        (isArray(value) && value.length === 2 && value.every(isNumber)),
+      validator: validateTileSize,
     },
   },
   computed: {
-    tileSizeArr () {
-      return isArray(this.tileSize) ? this.tileSize : [this.tileSize, this.tileSize]
+    inputTileSize () {
+      return isArray(this.tileSize) ? this.tileSize.slice() : [this.tileSize, this.tileSize]
     },
     derivedTileGridFactory () {
       if (isFunction(this.tileGridFactory)) {
@@ -44,17 +45,16 @@ export default {
       const maxZoom = this.maxZoom
       const minZoom = this.minZoom
       const maxResolution = this.maxResolution
-      const tileSize = this.tileSizeArr
+      const tileSize = this.inputTileSize
 
       return () => createXYZ({ extent, maxZoom, minZoom, maxResolution, tileSize })
     },
-    resolvedTileUrlFunc () {
-      if (isFunction(this.tileUrlFunc)) {
-        return this.tileUrlFunc
-      }
-      if (this.expandedUrls.length === 0) return
+    inputTileUrlFunction () {
+      const urlFunc = coalesce(this.tileUrlFunction, this.tileUrlFunc)
+      if (isFunction(urlFunc)) return urlFunc
+      if (this.currentUrls.length === 0) return
 
-      return createTileUrlFunctionFromTemplates(this.expandedUrls, this.tileGrid)
+      return createTileUrlFunctionFromTemplates(this.currentUrls, this.tileGrid)
     },
   },
   methods: {
@@ -77,31 +77,16 @@ export default {
         zDirection: this.zDirection,
         tileGrid: this.tileGrid,
         // ol/source/UrlTile
-        tileLoadFunction: this.resolvedTileLoadFunc,
-        tileUrlFunction: this.resolvedTileUrlFunc,
+        tileLoadFunction: this.currentTileLoadFunction,
+        tileUrlFunction: this.currentTileUrlFunction,
         // ol/source/TileImage
         crossOrigin: this.crossOrigin,
         reprojectionErrorThreshold: this.reprojectionErrorThreshold,
         tileClass: this.tileClass,
+        imageSmoothing: this.imageSmoothing,
       })
     },
-    .../*#__PURE__*/pick(tileImageSource.methods, [
-      'beforeInit',
-      'init',
-      'deinit',
-      'beforeMount',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'getServices',
-      'subscribeAll',
-      'resolveSource',
-      'resolveOlObject',
-    ]),
+    tileKeyChanged: noop, // input tileKey is not allowed in XYZ constructor
+    stateChanged: noop, // input state is not allowed in XYZ constructor
   },
 }

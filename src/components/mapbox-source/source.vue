@@ -1,5 +1,5 @@
 <script>
-  import { xyzSource } from '../../mixins'
+  import { source, urlTileSource, xyzSource } from '../../mixins'
   import { coalesce } from '../../utils'
 
   const MAPBOX_URL_TEMPLATE = 'https://{a-c}.tiles.mapbox.com/v4/{mapId}/{z}/{x}/{y}{tileNameSuffix}.{tileFormat}?access_token={accessToken}'
@@ -11,16 +11,18 @@
       xyzSource,
     ],
     props: {
+      /* eslint-disable vue/require-prop-types */
       // ol/source/Source
       attributions: {
-        type: [String, Array],
+        ...source.props.attributions,
         default: MAPBOX_ATTRIBUTIONS,
       },
       // ol/source/UrlTile
       url: {
-        type: String,
+        ...urlTileSource.props.url,
         default: MAPBOX_URL_TEMPLATE,
       },
+      /* eslint-enable vue/require-prop-types */
       // custom
       accessToken: {
         type: String,

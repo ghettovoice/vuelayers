@@ -2,7 +2,7 @@
   import { Stroke as StrokeStyle } from 'ol/style'
   import { style } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
-  import { isEqual, sequential } from '../../utils'
+  import { clonePlainObject, coalesce, isEqual, isObjectLike, lowerFirst, makeWatchers, upperFirst } from '../../utils'
 
   export default {
     name: 'VlStyleStroke',
@@ -36,33 +36,151 @@
         default: 1.25,
       },
     },
+    data () {
+      return {
+        currentColor: normalizeColor(this.color),
+        currentLineCap: this.lineCap,
+        currentLineJoin: this.lineJoin,
+        currentLineDash: this.lineDash?.slice(),
+        currentLineDashOffset: this.lineDashOffset,
+        currentMiterLimit: this.miterLimit,
+        currentWidth: this.width,
+      }
+    },
     computed: {
-      parsedColor () {
+      inputColor () {
         return normalizeColor(this.color)
+      },
+      inputLineDash () {
+        return this.lineDash?.slice()
       },
     },
     watch: {
-      color: /*#__PURE__*/sequential(async function (value) {
-        await this.setColor(value)
+      rev () {
+        if (!this.$style) return
+
+        this.setColor(this.getColor())
+        this.setLineCap(this.getLineCap())
+        this.setLineJoin(this.getLineJoin())
+        this.setLineDash(this.getLineDash())
+        this.setLineDashOffset(this.getLineDashOffset())
+        this.setMiterLimit(this.getMiterLimit())
+        this.setWidth(this.getWidth())
+      },
+      .../*#__PURE__*/makeWatchers([
+        'inputColor',
+        'lineCap',
+        'lineJoin',
+        'inputLineDash',
+        'lineDashOffset',
+        'miterLimit',
+        'width',
+      ], inProp => {
+        const prop = inProp.slice(0, 5) === 'input' ? lowerFirst(inProp.slice(5)) : inProp
+        const setter = 'set' + upperFirst(prop)
+
+        return {
+          deep: [
+            'inputColor',
+            'inputLineDash',
+          ].includes(inProp),
+          handler (value) {
+            this[setter](value)
+          },
+        }
       }),
-      lineCap: /*#__PURE__*/sequential(async function (value) {
-        await this.setLineCap(value)
+      .../*#__PURE__*/makeWatchers([
+        'currentColor',
+        'currentLineCap',
+        'currentLineJoin',
+        'currentLineDash',
+        'currentLineDashOffset',
+        'currentMiterLimit',
+        'currentWidth',
+      ], curProp => {
+        const prop = curProp.slice(0, 7) === 'current' ? lowerFirst(curProp.slice(7)) : curProp
+        const inProp = 'input' + upperFirst(prop)
+
+        return {
+          deep: [
+            'currentColor',
+            'currentLineDash',
+          ].includes(curProp),
+          handler (value) {
+            if (isEqual(value, coalesce(this[inProp], this[prop]))) return
+
+            this.$emit(`update:${prop}`, isObjectLike(value) ? clonePlainObject(value) : value)
+          },
+        }
       }),
-      lineJoin: /*#__PURE__*/sequential(async function (value) {
-        await this.setLineJoin(value)
-      }),
-      lineDash: /*#__PURE__*/sequential(async function (value) {
-        await this.setLineDash(value)
-      }),
-      lineDashOffset: /*#__PURE__*/sequential(async function (value) {
-        await this.setLineDashOffset(value)
-      }),
-      miterLimit: /*#__PURE__*/sequential(async function (value) {
-        await this.setMiterLimit(value)
-      }),
-      width: /*#__PURE__*/sequential(async function (value) {
-        await this.setWidth(value)
-      }),
+      inputColor: {
+        deep: true,
+        handler (value) {
+          this.setColor(value)
+        },
+      },
+      currentColor: {
+        deep: true,
+        handler (value) {
+          if (isEqual(value, this.inputColor)) return
+
+          this.$emit('update:color', value?.slice())
+        },
+      },
+      lineCap (value) {
+        this.setLineCap(value)
+      },
+      currentLineCap (value) {
+        if (value === this.lineCap) return
+
+        this.$emit('update:lineCap', value)
+      },
+      lineJoin (value) {
+        this.setLineJoin(value)
+      },
+      currentLineJoin (value) {
+        if (value === this.lineJoin) return
+
+        this.$emit('update:lineJoin', value)
+      },
+      inputLineDash: {
+        deep: true,
+        handler (value) {
+          this.setLineDash(value)
+        },
+      },
+      currentLineDash: {
+        deep: true,
+        handler (value) {
+          if (isEqual(value, this.currentLineDash)) return
+
+          this.$emit('update:lineDash', value?.slice())
+        },
+      },
+      lineDashOffset (value) {
+        this.setLineDashOffset(value)
+      },
+      currentLineDashOffset (value) {
+        if (value === this.lineDashOffset) return
+
+        this.$emit('update:lineDashOffset', value)
+      },
+      miterLimit (value) {
+        this.setMiterLimit(value)
+      },
+      currentMiterLimit (value) {
+        if (value === this.miterLimit) return
+
+        this.$emit('update:miterLimit', value)
+      },
+      width (value) {
+        this.setWidth(value)
+      },
+      currentWidth (value) {
+        if (value === this.width) return
+
+        this.$emit('update:width', value)
+      },
     },
     created () {
       this::defineServices()
@@ -74,13 +192,13 @@
        */
       createStyle () {
         return new StrokeStyle({
-          color: this.parsedColor,
-          lineCap: this.lineCap,
-          lineJoin: this.lineJoin,
-          lineDash: this.lineDash,
-          lineDashOffset: this.lineDashOffset,
-          miterLimit: this.miterLimit,
-          width: this.width,
+          color: this.currentColor,
+          lineCap: this.currentLineCap,
+          lineJoin: this.currentLineJoin,
+          lineDash: this.currentLineDash,
+          lineDashOffset: this.currentLineDashOffset,
+          miterLimit: this.currentMiterLimit,
+          width: this.currentWidth,
         })
       },
       /**
@@ -88,9 +206,7 @@
        * @protected
        */
       async mount () {
-        if (this.$strokeStyleContainer) {
-          await this.$strokeStyleContainer.setStroke(this)
-        }
+        this.$strokeStyleContainer?.setStroke(this)
 
         return this::style.methods.mount()
       },
@@ -99,8 +215,8 @@
        * @protected
        */
       async unmount () {
-        if (this.$strokeStyleContainer && this.$strokeStyleContainer.getStrokeVm() === this) {
-          await this.$strokeStyleContainer.setStroke(null)
+        if (this.$strokeStyleContainer?.getStrokeVm() === this) {
+          this.$strokeStyleContainer.setStroke(null)
         }
 
         return this::style.methods.unmount()
@@ -109,75 +225,118 @@
        * @return {Promise}
        */
       async refresh () {
-        this::style.methods.refresh()
+        await Promise.all([
+          this::style.methods.refresh(),
+          this.$strokeStyleContainer?.refresh(),
+        ])
+      },
+      /**
+       * @protected
+       */
+      syncNonObservable () {
+        this::style.methods.syncNonObservable()
 
-        if (this.$strokeStyleContainer) {
-          this.$strokeStyleContainer.refresh()
+        this.setColor(this.getColor())
+        this.setLineCap(this.getLineCap())
+        this.setLineJoin(this.getLineJoin())
+        this.setLineDash(this.getLineDash())
+        this.setLineDashOffset(this.getLineDashOffset())
+        this.setMiterLimit(this.getMiterLimit())
+        this.setWidth(this.getWidth())
+      },
+      getColor () {
+        return coalesce(this.$style?.getColor(), this.currentColor)
+      },
+      setColor (color) {
+        color = normalizeColor(color)
+
+        if (!isEqual(color, this.currentColor)) {
+          this.currentColor = color
+          this.scheduleRefresh()
+        }
+        if (this.$style && !isEqual(color, this.$style.getColor())) {
+          this.$style.setColor(color)
+          this.scheduleRefresh()
         }
       },
-      async getColor () {
-        return (await this.resolveStyle()).getColor()
+      getLineCap () {
+        return coalesce(this.$style?.getLineCap(), this.currentLineCap)
       },
-      async setColor (color) {
-        color = normalizeColor(color)
-        if (isEqual(color, await this.getColor())) return
+      setLineCap (lineCap) {
+        if (lineCap !== this.currentLineCap) {
+          this.currentLineCap = lineCap
+          this.scheduleRefresh()
+        }
+        if (this.$style && lineCap !== this.$style.getLineCap()) {
+          this.$style.setLineCap(lineCap)
+          this.scheduleRefresh()
+        }
+      },
+      getLineJoin () {
+        return coalesce(this.$style?.getLineJoin(), this.currentLineJoin)
+      },
+      setLineJoin (lineJoin) {
+        if (lineJoin !== this.currentLineJoin) {
+          this.currentLineJoin = lineJoin
+        }
+        if (this.$style && lineJoin !== this.$style.getLineJoin()) {
+          this.$style.setLineJoin(lineJoin)
+          this.scheduleRefresh()
+        }
+      },
+      getLineDash () {
+        return coalesce(this.$style?.getLineDash(), this.currentLineDash)
+      },
+      setLineDash (lineDash) {
+        lineDash = lineDash?.slice()
 
-        (await this.resolveStyle()).setColor(color)
-        await this.scheduleRefresh()
+        if (!isEqual(lineDash, this.currentLineDash)) {
+          this.currentLineDash = lineDash
+          this.scheduleRefresh()
+        }
+        if (this.$style && !isEqual(lineDash, this.$style.getLineDash())) {
+          this.$style.setLineDash(lineDash)
+          this.scheduleRefresh()
+        }
       },
-      async getLineCap () {
-        return (await this.resolveStyle()).getLineCap()
+      getLineDashOffset () {
+        return coalesce(this.$style?.getLineDashOffset(), this.currentLineDashOffset)
       },
-      async setLineCap (lineCap) {
-        if (lineCap === await this.getLineCap()) return
-
-        (await this.resolveStyle()).setLineCap(lineCap)
-        await this.scheduleRefresh()
+      setLineDashOffset (lineDashOffset) {
+        if (lineDashOffset !== this.currentLineDashOffset) {
+          this.currentLineDashOffset = lineDashOffset
+          this.scheduleRefresh()
+        }
+        if (this.$style && lineDashOffset !== this.$style.getLineDashOffset()) {
+          this.$style.setLineDashOffset(lineDashOffset)
+          this.scheduleRefresh()
+        }
       },
-      async getLineJoin () {
-        return (await this.resolveStyle()).getLineJoin()
+      getMiterLimit () {
+        return coalesce(this.$style?.getMiterLimit(), this.currentMiterLimit)
       },
-      async setLineJoin (lineJoin) {
-        if (lineJoin === await this.getLineJoin()) return
-
-        (await this.resolveStyle()).setLineJoin(lineJoin)
-        await this.scheduleRefresh()
+      setMiterLimit (miterLimit) {
+        if (miterLimit !== this.currentMiterLimit) {
+          this.currentMiterLimit = miterLimit
+          this.scheduleRefresh()
+        }
+        if (this.$style && miterLimit !== this.$style.getMiterLimit()) {
+          this.$style.setMiterLimit(miterLimit)
+          this.scheduleRefresh()
+        }
       },
-      async getLineDash () {
-        return (await this.resolveStyle()).getLineDash()
+      getWidth () {
+        return coalesce(this.$style?.getWidth(), this.currentWidth)
       },
-      async setLineDash (lineDash) {
-        if (isEqual(lineDash, await this.getLineDash())) return
-
-        (await this.resolveStyle()).setLineDash(lineDash)
-        await this.scheduleRefresh()
-      },
-      async getLineDashOffset () {
-        return (await this.resolveStyle()).getLineDashOffset()
-      },
-      async setLineDashOffset (lineDashOffset) {
-        if (lineDashOffset === await this.getLineDashOffset()) return
-
-        (await this.resolveStyle()).setLineDashOffset(lineDashOffset)
-        await this.scheduleRefresh()
-      },
-      async getMiterLimit () {
-        return (await this.resolveStyle()).getMiterLimit()
-      },
-      async setMiterLimit (miterLimit) {
-        if (miterLimit === await this.getMiterLimit()) return
-
-        (await this.resolveStyle()).setMiterLimit(miterLimit)
-        await this.scheduleRefresh()
-      },
-      async getWidth () {
-        return (await this.resolveStyle()).getWidth()
-      },
-      async setWidth (width) {
-        if (width === await this.getWidth()) return
-
-        (await this.resolveStyle()).setWidth(width)
-        await this.scheduleRefresh()
+      setWidth (width) {
+        if (width !== this.currentWidth) {
+          this.currentWidth = width
+          this.scheduleRefresh()
+        }
+        if (this.$style && width !== this.$style.getWidth()) {
+          this.$style.setWidth(width)
+          this.scheduleRefresh()
+        }
       },
     },
   }

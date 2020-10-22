@@ -1,8 +1,7 @@
-import { EPSG_3857, getStyleId, initializeStyle, setStyleId } from '../ol-ext'
-import { assert, mergeDescriptors, pick } from '../utils'
+import { getStyleId, initializeStyle, setStyleId } from '../ol-ext'
+import { assert, mergeDescriptors } from '../utils'
 import olCmp from './ol-cmp'
 import stubVNode from './stub-vnode'
-import waitForMap from './wait-for-map'
 
 /**
  * Basic style mixin.
@@ -11,23 +10,23 @@ export default {
   mixins: [
     stubVNode,
     olCmp,
-    waitForMap,
   ],
   stubVNode: {
     empty () {
       return this.vmId
     },
   },
-  data () {
-    return {
-      viewProjection: EPSG_3857,
-      dataProjection: EPSG_3857,
-    }
-  },
   created () {
     this::defineServices()
   },
   methods: {
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    beforeInit () {
+      return this::olCmp.methods.beforeInit()
+    },
     /**
      * @return {OlStyle|Promise<OlStyle>}
      * @protected
@@ -46,13 +45,31 @@ export default {
     /**
      * @return {Promise<void>}
      */
+    async mount () {
+      await this::olCmp.methods.mount()
+    },
+    /**
+     * @return {Promise<void>}
+     */
+    async unmount () {
+      await this::olCmp.methods.unmount()
+    },
+    /**
+     * @return {Promise<void>}
+     */
     async remount () {
-      await this.refresh()
       await this::olCmp.methods.remount()
+      await this.refresh()
 
       if (this.$mapVm) {
         await this.$mapVm.render()
       }
+    },
+    /**
+     * @return {Promise<void>}
+     */
+    async refresh () {
+      await this::olCmp.methods.refresh()
     },
     /**
      * @return {Object}
@@ -69,26 +86,23 @@ export default {
       )
     },
     /**
-     * @return {Promise<OlStyle>}
+     * @protected
      */
-    resolveStyle: olCmp.methods.resolveOlObject,
-    .../*#__PURE__*/pick(olCmp.methods, [
-      'init',
-      'deinit',
-      'beforeMount',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'subscribeAll',
-      'resolveOlObject',
-    ]),
-    .../*#__PURE__*/pick(waitForMap.methods, [
-      'beforeInit',
-    ]),
+    subscribeAll () {
+      this::olCmp.methods.subscribeAll()
+    },
+    /**
+     * @param {string|number} id
+     */
+    setId (id) {
+      assert(id != null && id !== '', 'Invalid id')
+
+      if (this.currentId !== id) {
+        this.currentId = id
+        this.scheduleRefresh()
+      }
+      this.$olObject && this.setIdInternal(id)
+    },
     /**
      * @returns {string|number}
      */
@@ -100,11 +114,20 @@ export default {
      * @returns {void}
      */
     setIdInternal (id) {
-      assert(id != null && id !== '', 'Invalid style id')
-
       if (id === this.getIdInternal()) return
 
       setStyleId(this.$style, id)
+      this.scheduleRefresh()
+    },
+    /**
+     * @return {Promise<OlStyle>}
+     */
+    resolveStyle: olCmp.methods.resolveOlObject,
+    /**
+     * @protected
+     */
+    syncNonObservable () {
+      this::olCmp.methods.syncNonObservable()
     },
   },
 }
@@ -117,20 +140,6 @@ function defineServices () {
     $style: {
       enumerable: true,
       get: () => this.$olObject,
-    },
-    /**
-     * @type {Object|undefined}
-     */
-    $mapVm: {
-      enumerable: true,
-      get: () => this.$services?.mapVm,
-    },
-    /**
-     * @type {Object|undefined}
-     */
-    $viewVm: {
-      enumerable: true,
-      get: () => this.$services?.viewVm,
     },
     /**
      * @type {Object|undefined}

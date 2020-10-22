@@ -1,7 +1,6 @@
 <script>
   import { VectorImage as VectorImageLayer } from 'ol/layer'
-  import { vectorLayer } from '../../mixins'
-  import { sequential } from '../../utils'
+  import { makeChangeOrRecreateWatchers, vectorLayer } from '../../mixins'
 
   /**
    * Layer for data that is rendered client-side.
@@ -22,15 +21,9 @@
       },
     },
     watch: {
-      imageRatio: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getImageRatio()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('imageRatio changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
+        'imageRatio',
+      ]),
     },
     methods: {
       /**
@@ -53,7 +46,7 @@
           render: this.render,
           source: this.$source,
           // ol/layer/BaseVector
-          renderOrder: this.currentRenderOrder,
+          renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,

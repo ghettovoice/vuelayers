@@ -5,9 +5,9 @@
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs, tap } from 'rxjs/operators'
-  import { interaction, styleContainer } from '../../mixins'
+  import { interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, isEqual, isFunction, makeWatchers, map, mergeDescriptors, sequential } from '../../utils'
+  import { assert, instanceOf, isFunction, map, mergeDescriptors } from '../../utils'
 
   export default {
     name: 'VlInteractionModify',
@@ -78,22 +78,14 @@
       },
     },
     watch: {
-      .../*#__PURE__*/makeWatchers([
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'source',
         'condition',
         'deleteCondition',
         'insertVertexCondition',
         'pixelTolerance',
         'wrapX',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ]),
     },
     methods: {
       /**
@@ -156,17 +148,21 @@
        */
       getStyleTarget () {
         return {
-          setStyle: async () => {
+          getStyle: () => this._style,
+          setStyle: () => {
             if (process.env.VUELAYERS_DEBUG) {
               this.$logger.log('style changed, scheduling recreate...')
             }
 
-            await this.scheduleRecreate()
+            this.scheduleRecreate()
           },
         }
       },
       async getOverlay () {
         return (await this.resolveInteraction()).getOverlay()
+      },
+      async getPointerCount () {
+        return (await this.resolveInteraction()).getPointerCount()
       },
       async removePoint () {
         return (await this.resolveInteraction()).removePoint()
@@ -202,7 +198,7 @@
       mapObs(({ type, features, modified }) => ({
         type,
         features: features instanceof Collection ? features.getArray() : features,
-        modified: modified || [],
+        modified: modified || {},
         get json () {
           if (!this._json) {
             this._json = map(this.features, feature => vm.writeFeatureInDataProj(feature))
@@ -212,6 +208,7 @@
       })),
     )
     this.subscribeTo(events, evt => {
+      this.scheduleRefresh()
       this.$emit(evt.type, evt)
     })
   }

@@ -16,10 +16,11 @@ import { identity, isEqual, isFunction } from '../utils'
  *                          or an array of events/selectors like `[{ event: 'event1', selector?: x => x }, ...]`.
  * @param {function(...*): *} [selector] An optional function to post-process results. It takes the arguments
  *    from the event handler and should return a single value.
+ * @param {Observable[]} [pipeEach]
  * @return {Observable<T>}
  * @memberOf {Observable}
  */
-export function fromOlEvent (target, eventName, selector) {
+export function fromOlEvent (target, eventName, selector, pipeEach = []) {
   if (Array.isArray(eventName)) {
     return mergeObs(
       ...eventName.map(
@@ -33,7 +34,7 @@ export function fromOlEvent (target, eventName, selector) {
             eventName = elem
           }
 
-          return fromOlEvent(target, eventName, selector)
+          return fromOlEvent(target, eventName, selector).pipe(...pipeEach)
         },
       ),
     )
@@ -53,6 +54,7 @@ export function fromOlEvent (target, eventName, selector) {
  * @param {string|string[]} [prop]
  * @param {boolean|function(a, b):boolean|undefined} [distinct] Distinct values by isEqual fn or by custom comparator
  * @param {function|undefined} [selector] Custom selector
+ * @param {Observable[]} [pipeEach]
  * @return {Observable<{prop: string, value: *}>}
  */
 export function fromOlChangeEvent (
@@ -60,9 +62,10 @@ export function fromOlChangeEvent (
   prop,
   distinct,
   selector,
+  pipeEach = [],
 ) {
   if (Array.isArray(prop)) {
-    return mergeObs(...prop.map(p => fromOlChangeEvent(target, p, distinct, selector)))
+    return mergeObs(...prop.map(p => fromOlChangeEvent(target, p, distinct, selector).pipe(...pipeEach)))
   }
 
   selector || (selector = identity)

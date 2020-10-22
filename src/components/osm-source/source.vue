@@ -1,6 +1,7 @@
 <script>
   import { OSM as OSMSource } from 'ol/source'
-  import { xyzSource } from '../../mixins'
+  import { makeChangeOrRecreateWatchers, source, urlTileSource, xyzSource } from '../../mixins'
+  import { noop } from '../../utils'
 
   const OSM_ATTRIBUTIONS = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.'
   const OSM_URL_TEMPLATE = 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -12,21 +13,34 @@
       xyzSource,
     ],
     props: {
+      /* eslint-disable vue/require-prop-types */
       // ol/source/Source
       attributions: {
-        type: [String, Array],
+        ...source.props.attributions,
         default: OSM_ATTRIBUTIONS,
       },
       // ol/source/UrlTile
       url: {
-        type: String,
+        ...urlTileSource.props.url,
         default: OSM_URL_TEMPLATE,
       },
       // ol/source/XYZ
       maxZoom: {
-        type: Number,
+        ...xyzSource.props.maxZoom,
         default: OSM_MAX_ZOOM,
       },
+      /* eslint-enable vue/require-prop-types */
+    },
+    computed: {
+      tileGridIdent: noop,
+      inputTileGridFactory: noop,
+      inputTileUrlFunction: noop,
+    },
+    watch: {
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
+        'inputUrl',
+        'maxZoom',
+      ]),
     },
     methods: {
       createSource () {
@@ -38,17 +52,30 @@
           // ol/source/Tile
           cacheSize: this.cacheSize,
           opaque: this.opaque,
-          transition: this.transition,
           // ol/source/UrlTile
-          tileLoadFunction: this.resolvedTileLoadFunc,
-          url: this.parsedUrl,
+          tileLoadFunction: this.currentTileLoadFunction,
+          url: this.currentUrls[0],
           // ol/source/TileImage
           crossOrigin: this.crossOrigin,
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+          imageSmoothing: this.imageSmoothing,
           // ol/source/XYZ
           maxZoom: this.maxZoom,
         })
       },
+      inputUrlChanged (value) {
+        this.setUrl(value)
+      },
+      // skip all other handlers
+      tileClassChanged: noop,
+      inputTileUrlFunctionChanged: noop,
+      inputTileGridFactoryChanged: noop,
+      tileGridChanged: noop,
+      tilePixelRatioChanged: noop,
+      transitionChanged: noop,
+      zDirectionChanged: noop,
+      attributionsCollapsibleChanged: noop,
+      projectionChanged: noop,
     },
   }
 </script>

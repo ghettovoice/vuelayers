@@ -1,8 +1,6 @@
-import { skipWhile } from 'rxjs/operators'
 import { EPSG_3857, getGeometryId, initializeGeometry, roundExtent, roundPointCoords, setGeometryId } from '../ol-ext'
-import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
-import { addPrefix, assert, isEqual, mergeDescriptors, pick } from '../utils'
-import olCmp from './ol-cmp'
+import { coalesce, isEqual, mergeDescriptors } from '../utils'
+import olCmp, { makeChangeOrRecreateWatchers } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 import waitForMap from './wait-for-map'
@@ -26,29 +24,47 @@ export default {
     return {
       viewProjection: EPSG_3857,
       dataProjection: EPSG_3857,
+      extentViewProj: undefined,
     }
   },
   computed: {
     type () {
       if (!(this.rev && this.$geometry)) return
 
-      return this.getTypeInternal()
+      return this.getType()
     },
-    currentExtentDataProj () {
-      if (!(this.rev && this.$geometry)) return
+    extentDataProj () {
+      return this.extentToDataProj(this.extentViewProj)
+    },
+  },
+  watch: {
+    rev () {
+      if (!this.$geometry) return
 
-      return this.getExtentSync()
+      if (!isEqual(this.extentViewProj, this.$geometry.getExtent())) {
+        this.extentViewProj = this.$geometry.getExtent().slice()
+      }
     },
-    currentExtentViewProj () {
-      if (!(this.rev && this.$geometry)) return
-
-      return this.getExtentSync(null, true)
-    },
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'extentDataProj',
+    ], [
+      'extentDataProj',
+    ]),
   },
   created () {
     this::defineServices()
   },
   methods: {
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async beforeInit () {
+      await Promise.all([
+        this::olCmp.methods.beforeInit(),
+        this::waitForMap.methods.beforeInit(),
+      ])
+    },
     /**
      * @return {Promise<module:ol/geom/Geometry~Geometry>}
      * @protected
@@ -69,9 +85,7 @@ export default {
      * @protected
      */
     async mount () {
-      if (this.$geometryContainer) {
-        await this.$geometryContainer.setGeometry(this)
-      }
+      this.$geometryContainer?.setGeometry(this)
 
       return this::olCmp.methods.mount()
     },
@@ -80,8 +94,8 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$geometryContainer && this.$geometryContainer.getGeometryVm() === this) {
-        await this.$geometryContainer.setGeometry(null)
+      if (this.$geometryContainer?.getGeometryVm() === this) {
+        this.$geometryContainer.setGeometry(null)
       }
 
       return this::olCmp.methods.unmount()
@@ -108,25 +122,6 @@ export default {
       this::subscribeToGeometryEvents()
     },
     /**
-     * @return {Promise<module:ol/geom/Geometry~Geometry>}
-     */
-    resolveGeometry: olCmp.methods.resolveOlObject,
-    .../*#__PURE__*/pick(olCmp.methods, [
-      'init',
-      'deinit',
-      'beforeMount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'resolveOlObject',
-    ]),
-    .../*#__PURE__*/pick(waitForMap.methods, [
-      'beforeInit',
-    ]),
-    /**
      * @returns {string|number}
      */
     getIdInternal () {
@@ -134,67 +129,41 @@ export default {
     },
     /**
      * @param {string|number} id
-     * @returns {void}
      */
     setIdInternal (id) {
-      assert(id != null && id !== '', 'Invalid geometry id')
-
       if (id === this.getIdInternal()) return
 
       setGeometryId(this.$geometry, id)
     },
     /**
-     * @returns {Promise<string>}
+     * @return {Promise<module:ol/geom/Geometry~Geometry>}
      */
-    async getType () {
-      await this.resolveGeometry()
-
-      return this.getTypeInternal()
+    resolveGeometry: olCmp.methods.resolveOlObject,
+    /**
+     * @returns {string}
+     */
+    getType () {
+      return coalesce(this.$geometry?.getType(), this.type)
     },
     /**
-     * @return {string}
-     * @protected
-     */
-    getTypeInternal () {
-      return this.$geometry.getType()
-    },
-    /**
-     * @param {number[]|undefined} [extent]
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<number[]>}
+     * @returns {number[]}
      */
-    async getExtent (extent, viewProj = false) {
-      await this.resolveGeometry()
+    getExtent (viewProj = false) {
+      const extent = coalesce(this.$geometry?.getExtent(), this.extentViewProj)
 
-      return this.getExtentSync(extent, viewProj)
-    },
-    /**
-     * @param {number[]|undefined} extent
-     * @param {boolean} [viewProj=false]
-     * @return {number[]}
-     */
-    getExtentSync (extent, viewProj = false) {
-      if (viewProj) {
-        return roundExtent(this.$geometry.getExtent(extent))
-      }
-
-      return this.extentToDataProj(this.$geometry.getExtent(this.extentToViewProj(extent)))
+      return viewProj ? roundExtent(extent) : this.extentToDataProj(extent)
     },
     /**
      * @param {number[]} point
-     * @param {number[]} [closestPoint]
      * @param {boolean} [viewProj=false]
      * @returns {Promise<number[]>}
      */
-    async getClosestPoint (point, closestPoint, viewProj = false) {
-      if (viewProj) {
-        return roundPointCoords((await this.resolveGeometry()).getClosestPoint(point, closestPoint))
-      }
+    async getClosestPoint (point, viewProj = false) {
+      point = viewProj ? roundPointCoords(point) : this.pointToViewProj(point)
+      const closestPoint = (await this.resolveGeometry()).getClosestPoint(point)
 
-      return this.pointToDataProj((await this.resolveGeometry()).getClosestPoint(
-        this.pointToViewProj(point),
-        this.pointToViewProj(closestPoint),
-      ))
+      return viewProj ? roundPointCoords(closestPoint) : this.pointToDataProj(closestPoint)
     },
     /**
      * @param {number[]} coordinate
@@ -202,9 +171,7 @@ export default {
      * @returns {Promise<boolean>}
      */
     async intersectsCoordinate (coordinate, viewProj = false) {
-      if (!viewProj) {
-        coordinate = this.pointToViewProj(coordinate)
-      }
+      coordinate = viewProj ? roundPointCoords(coordinate) : this.pointToViewProj(coordinate)
 
       return (await this.resolveGeometry()).intersectsCoordinate(coordinate)
     },
@@ -214,9 +181,7 @@ export default {
      * @returns {Promise<boolean>}
      */
     async intersectsExtent (extent, viewProj = false) {
-      if (!viewProj) {
-        extent = this.extentToViewProj(extent)
-      }
+      extent = viewProj ? roundExtent(extent) : this.extentToViewProj(extent)
 
       return (await this.resolveGeometry()).intersectsExtent(extent)
     },
@@ -227,9 +192,7 @@ export default {
      * @returns {Promise<void>}
      */
     async rotate (angle, anchor, viewProj = false) {
-      if (!viewProj) {
-        anchor = this.pointToViewProj(anchor)
-      }
+      anchor = viewProj ? roundPointCoords(anchor) : this.pointToViewProj(anchor);
 
       (await this.resolveGeometry()).rotate(angle, anchor)
     },
@@ -241,11 +204,9 @@ export default {
      * @returns {Promise<void>}
      */
     async scale (sx, sy, anchor, viewProj = false) {
-      if (!viewProj) {
-        anchor = this.pointToViewProj(anchor);
-        [sx] = this.pointToViewProj([sx, 0]);
-        [, sy] = this.pointToViewProj([0, sy])
-      }
+      anchor = viewProj ? roundPointCoords(anchor) : this.pointToViewProj(anchor);
+      [sx] = viewProj ? roundPointCoords([sx, 0]) : this.pointToViewProj([sx, 0]);
+      [, sy] = viewProj ? roundPointCoords([0, sy]) : this.pointToViewProj([0, sy]);
 
       (await this.resolveGeometry()).scale(sx, sy, anchor)
     },
@@ -263,12 +224,20 @@ export default {
      * @returns {Promise<*>}
      */
     async translate (dx, dy, viewProj = false) {
-      if (!viewProj) {
-        [dx] = this.pointToViewProj([dx, 0]);
-        [, dy] = this.pointToViewProj([0, dy])
-      }
+      [dx] = viewProj ? roundPointCoords([dx, 0]) : this.pointToViewProj([dx, 0]);
+      [, dy] = viewProj ? roundPointCoords([0, dy]) : this.pointToViewProj([0, dy])
 
       return (await this.resolveGeometry()).translate(dx, dy)
+    },
+    /**
+     * @param {number[]} value
+     * @param {number[]} prev
+     * @protected
+     */
+    extentDataProjChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:extent', value?.slice())
     },
   },
 }
@@ -307,16 +276,4 @@ function defineServices () {
 }
 
 async function subscribeToGeometryEvents () {
-  const prefixKey = addPrefix('current')
-  const propChanges = obsFromOlChangeEvent(this.$geometry, [
-    'id',
-  ], true, evt => ({
-    ...evt,
-    compareWith: this[prefixKey(evt.prop)],
-  })).pipe(
-    skipWhile(({ compareWith, value }) => isEqual(value, compareWith)),
-  )
-  this.subscribeTo(propChanges, () => {
-    ++this.rev
-  })
 }

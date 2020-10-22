@@ -2,7 +2,8 @@
   import { LineString } from 'ol/geom'
   import GeometryType from 'ol/geom/GeometryType'
   import { simpleGeometry } from '../../mixins'
-  import { constant } from '../../utils'
+  import { isLineCoords } from '../../ol-ext'
+  import { assert, constant } from '../../utils'
 
   export default {
     name: 'VlGeomLineString',
@@ -10,11 +11,12 @@
       simpleGeometry,
     ],
     props: {
+      /* eslint-disable vue/require-prop-types */
       coordinates: {
-        type: Array,
-        required: true,
-        // validator: value => every(value, point => isArray(point) && point.length >= 2),
+        ...simpleGeometry.props.coordinates,
+        validator: isLineCoords,
       },
+      /* eslint-enable vue/require-prop-types */
     },
     computed: {
       type: /*#__PURE__*/constant(GeometryType.LINE_STRING),
@@ -26,6 +28,15 @@
        */
       createGeometry () {
         return new LineString(this.currentCoordinatesViewProj)
+      },
+      /**
+       * @param {number[]} coordinates
+       * @param {boolean} [viewProj=false]
+       */
+      setCoordinates (coordinates, viewProj = false) {
+        assert(isLineCoords(coordinates), 'Invalid coordinates')
+
+        this::simpleGeometry.methods.setCoordinates(coordinates, viewProj)
       },
     },
   }

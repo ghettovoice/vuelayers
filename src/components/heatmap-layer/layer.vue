@@ -1,10 +1,8 @@
 <script>
-  import debounce from 'debounce-promise'
   import { Heatmap as HeatmapLayer } from 'ol/layer'
-  import { skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, vectorLayer } from '../../mixins'
+  import { makeChangeOrRecreateWatchers, vectorLayer } from '../../mixins'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { addPrefix, isEqual, makeWatchers, sequential } from '../../utils'
+  import { addPrefix, assert, coalesce, isArray, isEqual, isNumber } from '../../utils'
 
   export default {
     name: 'VlLayerHeatmap',
@@ -41,68 +39,62 @@
         default: 'weight',
       },
     },
+    data () {
+      return {
+        currentGradient: this.gradient.slice(),
+        currentRadius: this.radius,
+        currentBlur: this.blur,
+      }
+    },
     computed: {
-      currentBlur () {
-        if (this.rev && this.$layer) {
-          return this.$layer.getBlur()
-        }
-
-        return this.blur
-      },
-      currentGradient () {
-        if (this.rev && this.$layer) {
-          return this.$layer.getGradient()
-        }
-
-        return this.gradient
-      },
-      currentRadius () {
-        if (this.rev && this.$layer) {
-          return this.$layer.getRadius()
-        }
-
-        return this.radius
+      inputGradient () {
+        return this.gradient.slice()
       },
     },
     watch: {
-      blur: /*#__PURE__*/sequential(async function (value) {
-        await this.setBlur(value)
-      }),
-      currentBlur: /*#__PURE__*/debounce(function (value) {
-        if (value === this.blur) return
+      rev () {
+        if (!this.$layer) return
 
-        this.$emit('update:blur', value)
-      }, FRAME_TIME),
-      gradient: /*#__PURE__*/sequential(async function (value) {
-        await this.setGradient(value)
-      }),
+        if (!isEqual(this.currentGradient, this.$layer.getGradient())) {
+          this.currentGradient = this.$layer.getGradient()
+        }
+        if (this.currentRadius !== this.$layer.getRadius()) {
+          this.currentRadius = this.$layer.getRadius()
+        }
+        if (this.currentBlur !== this.$layer.getBlur()) {
+          this.currentBlur = this.$layer.getBlur()
+        }
+      },
+      inputGradient (value) {
+        this.setGradient(value)
+      },
       currentGradient: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value) {
-          if (isEqual(value, this.gradient)) return
+        handler (value) {
+          if (isEqual(value, this.inputGradient)) return
 
           this.$emit('update:gradient', value.slice())
-        }, FRAME_TIME),
+        },
       },
-      radius: /*#__PURE__*/sequential(async function (value) {
-        await this.setRadius(value)
-      }),
-      currentRadius: /*#__PURE__*/debounce(function (value) {
+      radius (value) {
+        this.setRadius(value)
+      },
+      currentRadius (value) {
         if (value === this.radius) return
 
         this.$emit('update:radius', value)
-      }, FRAME_TIME),
-      .../*#__PURE__*/makeWatchers([
+      },
+      blur (value) {
+        this.setBlur(value)
+      },
+      currentBlur (value) {
+        if (value === this.blur) return
+
+        this.$emit('update:blur', value)
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'weight',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ]),
     },
     methods: {
       /**
@@ -124,7 +116,7 @@
           render: this.render,
           source: this.$source,
           // ol/layer/BaseVector
-          renderOrder: this.currentRenderOrder,
+          renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
@@ -140,53 +132,61 @@
         this::vectorLayer.methods.subscribeAll()
         this::subscribeToLayerEvents()
       },
-      async getBlur () {
-        return (await this.resolveLayer()).getBlur()
+      getBlur () {
+        return coalesce(this.$layer?.getBlur(), this.currentBlur)
       },
-      async setBlur (blur) {
-        const layer = await this.resolveLayer()
+      setBlur (blur) {
+        blur = Number(blur)
+        assert(isNumber(blur), 'Invalid blur')
 
-        if (blur === layer.getBlur()) return
-
-        layer.setBlur(blur)
+        if (blur !== this.currentBlur) {
+          this.currentBlur = blur
+        }
+        if (this.$layer && blur !== this.$layer.getBlur()) {
+          this.$layer.setBlur(blur)
+        }
       },
-      async getGradient () {
-        return (await this.resolveLayer()).getGradient()
+      getGradient () {
+        return coalesce(this.$layer?.getGradient(), this.currentGradient)
       },
-      async setGradient (gradient) {
-        const layer = await this.resolveLayer()
+      setGradient (gradient) {
+        assert(isArray(gradient), 'Invalid gradient')
+        gradient = gradient.slice()
 
-        if (isEqual(gradient, layer.getGradient())) return
-
-        layer.setGradient(gradient)
+        if (!isEqual(gradient, this.currentGradient)) {
+          this.currentGradient = gradient
+        }
+        if (this.$layer && !isEqual(gradient, this.$layer.getGradient())) {
+          this.$layer.setGradient(gradient)
+        }
       },
-      async getRadius () {
-        return (await this.resolveLayer()).getRadius()
+      getRadius () {
+        return coalesce(this.$layer?.getRadius(), this.currentRadius)
       },
-      async setRadius (radius) {
-        const layer = await this.resolveLayer()
+      setRadius (radius) {
+        radius = Number(radius)
+        assert(isNumber(radius), 'Invalid radius')
 
-        if (radius === layer.getRadius()) return
-
-        layer.setRadius(radius)
+        if (radius !== this.currentRadius) {
+          this.currentRadius = radius
+        }
+        if (this.$layer && radius !== this.$layer.getRadius()) {
+          this.$layer.setRadius(radius)
+        }
       },
     },
   }
 
   function subscribeToLayerEvents () {
-    const prefixKey = addPrefix('current')
+    const setterKey = addPrefix('set')
     const propChanges = obsFromOlChangeEvent(this.$layer, [
       'blur',
       'gradient',
       'radius',
     ], true, evt => ({
       ...evt,
-      compareWith: this[prefixKey(evt.prop)],
-    })).pipe(
-      skipWhile(({ compareWith, value }) => isEqual(value, compareWith)),
-    )
-    this.subscribeTo(propChanges, () => {
-      ++this.rev
-    })
+      setter: this[setterKey(evt.prop)],
+    }))
+    this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
   }
 </script>

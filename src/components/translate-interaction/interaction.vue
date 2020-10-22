@@ -1,15 +1,14 @@
 <script>
-  import debounce from 'debounce-promise'
   import { Collection } from 'ol'
   import { Translate as TranslateInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
   import VectorEventType from 'ol/source/VectorEventType'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
-  import { FRAME_TIME, interaction } from '../../mixins'
+  import { interaction, makeChangeOrRecreateWatchers } from '../../mixins'
   import { getLayerId } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
-  import { assert, instanceOf, isFunction, isString, map, makeWatchers, isEqual, sequential } from '../../utils'
+  import { assert, coalesce, instanceOf, isFunction, isNumber, isString, map } from '../../utils'
 
   export default {
     name: 'VlInteractionTranslate',
@@ -37,44 +36,43 @@
         default: 0,
       },
     },
+    data () {
+      return {
+        currentHitTolerance: this.hitTolerance,
+      }
+    },
     computed: {
-      resolvedFilter () {
+      inputFilter () {
         if (isFunction(this.filter)) return this.filter
 
         let layers = this.layers
         if (!layers) return
-        if (isString(layers)) layers = [layers]
-        return (feature, layer) => layers.includes(getLayerId(layer))
-      },
-      currentHitTolerance () {
-        if (this.rev && this.$interaction) {
-          return this.getHitToleranceInternal()
-        }
 
-        return this.hitTolerance
+        if (isString(layers)) layers = [layers]
+
+        return (feature, layer) => layers.includes(getLayerId(layer))
       },
     },
     watch: {
-      hitTolerance: /*#__PURE__*/sequential(async function (value) {
-        await this.setHitTolerance(value)
-      }),
-      currentHitTolerance: /*#__PURE__*/debounce(function (value) {
+      rev () {
+        if (!this.$interaction) return
+
+        if (this.currentHitTolerance !== this.$interaction.getHitTolerance()) {
+          this.currentHitTolerance = this.$interaction.getHitTolerance()
+        }
+      },
+      hitTolerance (value) {
+        this.setHitTolerance(value)
+      },
+      currentHitTolerance (value) {
         if (value === this.hitTolerance) return
 
         this.$emit('update:hitTolerance', value)
-      }, FRAME_TIME),
-      .../*#__PURE__*/makeWatchers([
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'source',
-        'resolvedFilter',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+        'inputFilter',
+      ]),
     },
     methods: {
       /**
@@ -111,8 +109,8 @@
 
         return new TranslateInteraction({
           features,
-          filter: this.resolvedFilter,
-          hitTolerance: this.hitTolerance,
+          filter: this.inputFilter,
+          hitTolerance: this.currentHitTolerance,
         })
       },
       /**
@@ -123,16 +121,18 @@
         this::interaction.methods.subscribeAll()
         this::subscribeToInteractionChanges()
       },
-      async getHitTolerance () {
-        await this.resolveInteraction()
+      getHitTolerance () {
+        return coalesce(this.$interaction?.getHitTolerance(), this.currentHitTolerance)
+      },
+      setHitTolerance (tolerance) {
+        assert(isNumber(tolerance), 'Invalid hit tolerance')
 
-        return this.getHitToleranceInternal()
-      },
-      getHitToleranceInternal () {
-        return this.$interaction.getHitTolerance()
-      },
-      async setHitTolerance (tolerance) {
-        (await this.resolveInteraction()).setHitTolerance(tolerance)
+        if (tolerance !== this.currentHitTolerance) {
+          this.currentHitTolerance = tolerance
+        }
+        if (this.$interaction && tolerance !== this.$interaction.getHitTolerance()) {
+          this.$interaction.setHitTolerance(tolerance)
+        }
       },
     },
   }
@@ -160,6 +160,7 @@
       })),
     )
     this.subscribeTo(events, evt => {
+      this.scheduleRefresh()
       this.$emit(evt.type, evt)
     })
   }

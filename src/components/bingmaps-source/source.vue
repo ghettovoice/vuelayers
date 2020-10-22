@@ -1,7 +1,7 @@
 <script>
   import { BingMaps as BingMapsSource } from 'ol/source'
-  import { tileImageSource } from '../../mixins'
-  import { isEqual, makeWatchers, sequential } from '../../utils'
+  import { makeChangeOrRecreateWatchers, tileImageSource } from '../../mixins'
+  import { coalesce, noop } from '../../utils'
 
   export default {
     name: 'VlSourceBingmaps',
@@ -42,43 +42,30 @@
         type: String,
         required: true,
       },
+      /**
+       * @type {number}
+       */
       maxZoom: {
         type: Number,
         default: 21,
       },
     },
+    computed: {
+      tileGridIdent: noop,
+      inputTileGridFactory: noop,
+      inputUrl: noop,
+      inputUrls: noop,
+      inputTileUrlFunction: noop,
+      inputAttributions: noop,
+    },
     watch: {
-      apiKey: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getApiKey()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('apiKey changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      imagerySet: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getImagerySet()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('imagerySet changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      .../*#__PURE__*/makeWatchers([
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'hidpi',
         'culture',
+        'apiKey',
         'imagerySet',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+        'maxZoom',
+      ]),
     },
     methods: {
       /**
@@ -94,9 +81,10 @@
           opaque: this.opaque,
           transition: this.transition,
           // ol/source/UrlTile
-          tileLoadFunction: this.resolvedTileLoadFunc,
+          tileLoadFunction: this.currentTileLoadFunction,
           // ol/source/TileImage
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+          imageSmoothing: this.imageSmoothing,
           // ol/source/BingMaps
           hidpi: this.hidpi,
           culture: this.culture,
@@ -105,13 +93,25 @@
           maxZoom: this.maxZoom,
         })
       },
-      async getApiKey () {
-        return (await this.resolveSource()).getApiKey()
+      getApiKey () {
+        return coalesce(this.$source?.getApiKey(), this.apiKey)
       },
-      async getImagerySet () {
-        return (await this.resolveSource()).getImagerySet()
+      getImagerySet () {
+        return coalesce(this.$source?.getImagerySet(), this.imagerySet)
       },
-      async onTileUrlFuncChanged (tileUrlFunc) {},
+      stateChanged: noop,
+      attributionsCollapsible: noop,
+      projectionChanged: noop,
+      tileGridIdentChanged: noop,
+      inputTileGridFactoryChanged: noop,
+      tileGridChanged: noop,
+      tileKeyChanged: noop,
+      tilePixelRatioChanged: noop,
+      zDirectionChanged: noop,
+      inputTileUrlFunctionChanged: noop,
+      inputUrlsChanged: noop,
+      crossOriginChanged: noop,
+      tileClassChanged: noop,
     },
   }
 </script>

@@ -1,9 +1,10 @@
 <script>
   import { olCmp, stubVNode, strokeStyleContainer } from '../../mixins'
-  import { stubObject, mergeDescriptors } from '../../utils'
+  import { dumpStrokeStyle } from '../../ol-ext'
+  import { stubObject, mergeDescriptors, isEqual, clonePlainObject } from '../../utils'
 
   export default {
-    name: 'VlLayerGraticuleStrokeStyle',
+    name: 'VlLayerGraticuleStrokeStyleAdapter',
     mixins: [
       stubVNode,
       strokeStyleContainer,
@@ -16,6 +17,23 @@
           id: this.vmId,
           class: this.vmClass,
         }
+      },
+    },
+    computed: {
+      stroke () {
+        if (!(this.rev && this.$stroke)) return
+
+        return dumpStrokeStyle(this.$stroke)
+      },
+    },
+    watch: {
+      stroke: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          this.$emit('update:stroke', value && clonePlainObject(value))
+        },
       },
     },
     created () {
@@ -33,9 +51,6 @@
 
         return obj
       },
-      refresh () {
-        ++this.rev
-      },
       getServices () {
         return mergeDescriptors(
           this::olCmp.methods.getServices(),
@@ -44,10 +59,8 @@
       },
       getStrokeStyleTarget () {
         return {
-          setStroke: async style => {
-            await this.$strokeStyleContainer.setStrokeStyle(style)
-            await this.scheduleRefresh()
-          },
+          setStroke: style => this.$strokeStyleContainer.setStrokeStyle(style),
+          getStroke: () => this.$strokeStyleContainer.getStrokeStyle(),
         }
       },
     },

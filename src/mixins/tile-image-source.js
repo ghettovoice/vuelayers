@@ -1,4 +1,4 @@
-import { isEqual, makeWatchers, pick, sequential } from '../utils'
+import { makeChangeOrRecreateWatchers } from './ol-cmp'
 import urlTileSource from './url-tile-source'
 
 /**
@@ -22,40 +22,25 @@ export default {
      * @type {string|undefined}
      */
     tileClass: String,
+    /**
+     * @type {boolean}
+     */
+    imageSmoothing: {
+      type: Boolean,
+      default: true,
+    },
   },
   watch: {
-    .../*#__PURE__*/makeWatchers([
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
       'crossOrigin',
       'reprojectionErrorThreshold',
       'tileClass',
-    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-      if (isEqual(val, prev)) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log(`${prop} changed, scheduling recreate...`)
-      }
-
-      await this.scheduleRecreate()
-    })),
+      'imageSmoothing',
+    ]),
   },
   methods: {
-    .../*#__PURE__*/pick(urlTileSource.methods, [
-      'beforeInit',
-      'init',
-      'deinit',
-      'beforeMount',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'getServices',
-      'subscribeAll',
-      'resolveSource',
-      'resolveOlObject',
-    ]),
+    async setRenderReprojectionEdges (render) {
+      (await this.resolveSource()).setRenderReprojectionEdges(render)
+    },
   },
 }

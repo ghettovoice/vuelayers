@@ -41,10 +41,18 @@ export default {
     resolvedDataProjection () {
       return coalesce(
         this.projection, // may or may not be present
-        this.$options?.dataProjection, // may or may not be present
         this.dataProjection, // may or may not be present
+        this.$options?.dataProjection, // may or may not be present
         this.resolvedViewProjection,
       )
+    },
+  },
+  watch: {
+    resolvedViewProjection (...args) {
+      return this.resolvedViewProjectionChanged(...args)
+    },
+    resolvedDataProjection (...args) {
+      return this.resolvedDataProjectionChanged(...args)
     },
   },
   methods: {
@@ -100,8 +108,10 @@ export default {
       if (geometryJson) {
         return geometryJson
       }
+
       geometryJson = writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedDataProjection, precision)
       this.getProjTransformCache().set(key, geometryJson)
+
       return geometryJson
     },
     writeGeometryInViewProj (geometry, precision = COORD_PRECISION) {
@@ -112,8 +122,10 @@ export default {
       if (geometryJson) {
         return geometryJson
       }
+
       geometryJson = writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedViewProjection, precision)
       this.getProjTransformCache().set(key, geometryJson)
+
       return geometryJson
     },
     readGeometryInDataProj (geometry, precision = COORD_PRECISION) {
@@ -135,8 +147,10 @@ export default {
       if (featureJson) {
         return featureJson
       }
+
       featureJson = writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedDataProjection, precision)
       this.getProjTransformCache().set(key, featureJson)
+
       return featureJson
     },
     writeFeatureInViewProj (feature, precision = COORD_PRECISION) {
@@ -147,8 +161,10 @@ export default {
       if (featureJson) {
         return featureJson
       }
+
       featureJson = writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedViewProjection, precision)
       this.getProjTransformCache().set(key, featureJson)
+
       return featureJson
     },
     readFeatureInDataProj (feature, precision = COORD_PRECISION) {
@@ -172,6 +188,7 @@ export default {
           maxAge: 3600e3,
         })
       }
+
       return this._projTransformCache
     },
     /**
@@ -212,6 +229,26 @@ export default {
           ? this.makeGeometryKey(getFeatureGeom(feature), projection, precision)
           : null,
       }, projection, precision)
+    },
+    /**
+     * @param {string} value
+     * @param {string} prev
+     * @protected
+     */
+    resolvedViewProjectionChanged (value, prev) {
+      if (value === prev) return
+
+      this.$emit('update:viewProjection', value)
+    },
+    /**
+     * @param {string} value
+     * @param {string} prev
+     * @protected
+     */
+    resolvedDataProjectionChanged (value, prev) {
+      if (value === prev) return
+
+      this.$emit('update:dataProjection', value)
     },
   },
 }

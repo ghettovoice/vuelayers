@@ -1,10 +1,11 @@
-import debounce from 'debounce-promise'
 import { Feature } from 'ol'
 import ObjectEventType from 'ol/ObjectEventType'
 import { race as raceObs } from 'rxjs'
-import { filter as filterObs, mapTo, skipWhile } from 'rxjs/operators'
+import { distinctUntilChanged, filter as filterObs, mapTo } from 'rxjs/operators'
 import {
+  dumpStyle,
   EPSG_3857,
+  findPointOnSurface,
   getFeatureId,
   getFeatureProperties,
   initializeFeature,
@@ -15,17 +16,27 @@ import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '
 import {
   assert,
   clonePlainObject,
+  coalesce,
   hasProp,
+  isArray,
+  isEmpty,
   isEqual,
+  isFunction,
+  isObjectLike,
+  isString,
   mergeDescriptors,
-  pick,
-  sequential,
   stubObject,
   stubTrue,
   waitFor,
 } from '../utils'
 import geometryContainer from './geometry-container'
-import olCmp, { CanceledError, FRAME_TIME, isCreateError, isMountError, OlObjectEvent } from './ol-cmp'
+import olCmp, {
+  CanceledError,
+  isCreateError,
+  isMountError,
+  makeChangeOrRecreateWatchers,
+  OlObjectEvent,
+} from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 import styleContainer from './style-container'
@@ -63,47 +74,81 @@ export default {
     return {
       viewProjection: EPSG_3857,
       dataProjection: EPSG_3857,
+      currentProperties: clonePlainObject(this.properties),
+      currentGeometryName: 'geometry',
     }
   },
   computed: {
-    currentProperties () {
-      if (this.rev && this.$feature) {
-        return this.getPropertiesInternal()
-      }
+    geometryDataProj () {
+      if (!(this.rev && this.$geometry)) return
 
-      return this.properties
+      return this.writeGeometryInDataProj(this.$geometry)
     },
-    currentGeometryName () {
-      if (!(this.rev && this.$feature)) return
+    geometryViewProj () {
+      if (!(this.rev && this.$geometry)) return
 
-      return this.getGeometryNameInternal()
+      return this.writeGeometryInViewProj(this.$geometry)
+    },
+    pointDataProj () {
+      return this.pointToDataProj(this.pointViewProj)
+    },
+    pointViewProj () {
+      if (!(this.rev && this.$geometry)) return
+
+      return findPointOnSurface(this.$geometry)
+    },
+    style () {
+      if (!(this.rev && this.$style)) return
+
+      let style = this.$style
+      if (isFunction(style)) return style
+      if (!style) return
+
+      isArray(style) || (style = [style])
+
+      return style.map(style => dumpStyle(style, geom => this.writeGeometryInDataProj(geom)))
     },
   },
   watch: {
-    properties: {
-      deep: true,
-      handler: /*#__PURE__*/sequential(async function (value) {
-        await this.setProperties(value)
-      }),
-    },
-    currentProperties: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(function (value) {
-        if (isEqual(value, this.properties)) return
+    rev () {
+      if (!this.$feature) return
 
-        this.$emit('update:properties', clonePlainObject(value))
-      }, FRAME_TIME),
+      if (!isEqual(this.currentProperties, getFeatureProperties(this.$feature))) {
+        this.currentProperties = getFeatureProperties(this.$feature)
+      }
+      if (this.currentGeometryName !== this.$feature.getGeometryName()) {
+        this.currentGeometryName = this.$feature.getGeometryName()
+      }
     },
-    currentGeometryName: /*#__PURE__*/debounce(function (value, prev) {
-      if (value === prev) return
-
-      this.$emit('update:geometryName', value)
-    }, FRAME_TIME),
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'properties',
+      'currentProperties',
+      'currentGeometryName',
+      'geometryDataProj',
+      'pointDataProj',
+      'style',
+    ], [
+      'properties',
+      'currentProperties',
+      'geometryDataProj',
+      'pointDataProj',
+      'style',
+    ]),
   },
   created () {
     this::defineServices()
   },
   methods: {
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async beforeInit () {
+      await Promise.all([
+        this::olCmp.methods.beforeInit(),
+        this::waitForMap.methods.beforeInit(),
+      ])
+    },
     /**
      * Create feature without inner style applying, feature level style
      * will be applied in the layer level style function.
@@ -112,7 +157,9 @@ export default {
      */
     createOlObject () {
       const feature = initializeFeature(this.createFeature(), this.currentId)
+      feature.setGeometryName(this.currentGeometryName)
       feature.setGeometry(this.$geometry)
+      feature.setStyle(this.$style)
 
       return feature
     },
@@ -120,7 +167,7 @@ export default {
      * @returns {Feature}
      */
     createFeature () {
-      return new Feature(this.properties)
+      return new Feature(this.currentProperties)
     },
     /**
      * @return {Promise<void>}
@@ -160,9 +207,7 @@ export default {
      * @protected
      */
     async mount () {
-      if (this.$featuresContainer) {
-        await this.$featuresContainer.addFeature(this)
-      }
+      this.$featuresContainer?.addFeature(this)
 
       return this::olCmp.methods.mount()
     },
@@ -171,9 +216,7 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$featuresContainer) {
-        await this.$featuresContainer.removeFeature(this)
-      }
+      this.$featuresContainer?.removeFeature(this)
 
       return this::olCmp.methods.unmount()
     },
@@ -201,27 +244,6 @@ export default {
         },
       )
     },
-    .../*#__PURE__*/pick(olCmp.methods, [
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'resolveOlObject',
-    ]),
-    .../*#__PURE__*/pick(waitForMap.methods, [
-      'beforeInit',
-    ]),
-    .../*#__PURE__*/pick(geometryContainer.methods, [
-      'setGeometry',
-    ]),
-    .../*#__PURE__*/pick(styleContainer.methods, [
-      'setStyle',
-    ]),
-    resolveFeature: olCmp.methods.resolveOlObject,
-    getGeometryTarget: olCmp.methods.resolveOlObject,
-    getStyleTarget: olCmp.methods.resolveOlObject,
     /**
      * @return {string|number}
      */
@@ -233,56 +255,65 @@ export default {
      * @return {void}
      */
     setIdInternal (id) {
-      assert(id != null && id !== '', 'Invalid feature id')
-
       if (id === this.getIdInternal()) return
 
       setFeatureId(this.$feature, id)
     },
     /**
-     * @return {Promise<string>}
+     * @return {Promise<Feature>}
      */
-    async getGeometryName () {
-      await this.resolveFeature()
-
-      return this.getGeometryNameInternal()
+    resolveFeature: olCmp.methods.resolveOlObject,
+    /**
+     * @return {Feature}
+     * @protected
+     */
+    getGeometryTarget () {
+      return this.$feature
+    },
+    /**
+     * @return {Feature}
+     * @protected
+     */
+    getStyleTarget () {
+      return this.$feature
     },
     /**
      * @return {string}
-     * @protected
      */
-    getGeometryNameInternal () {
-      return this.$feature.getGeometryName()
+    getGeometryName () {
+      return coalesce(this.$feature?.getGeometryName(), this.currentGeometryName)
     },
     /**
      * @param {string} geometryName
-     * @return {Promise<void>}
      */
-    async setGeometryName (geometryName) {
-      if (geometryName === await this.getGeometryName()) return
+    setGeometryName (geometryName) {
+      assert(isString(geometryName) && !isEmpty(geometryName), 'Invalid geometry name')
 
-      (await this.resolveFeature()).setGeometryName(geometryName)
+      if (geometryName !== this.currentGeometryName) {
+        this.currentGeometryName = geometryName
+      }
+      if (this.$feature && geometryName !== this.$feature.getGeometryName()) {
+        this.$feature.setGeometryName(geometryName)
+      }
     },
     /**
-     * @return {Promise<Object>}
+     * @return {Object}
      */
-    async getProperties () {
-      await this.resolveFeature()
-
-      return this.getPropertiesInternal()
-    },
-    getPropertiesInternal () {
-      return getFeatureProperties(this.$feature)
+    getProperties () {
+      return coalesce(this.$feature && getFeatureProperties(this.$feature), this.currentProperties)
     },
     /**
      * @param {Object} properties
-     * @return {Promise<void>}
      */
-    async setProperties (properties) {
+    setProperties (properties) {
       properties = getFeatureProperties({ properties })
-      if (isEqual(properties, await this.getProperties())) return
 
-      setFeatureProperties(await this.resolveFeature(), properties)
+      if (!isEqual(properties, this.currentProperties)) {
+        this.currentProperties = properties
+      }
+      if (this.$feature && !isEqual(properties, getFeatureProperties(this.$feature))) {
+        setFeatureProperties(this.$feature, properties)
+      }
     },
     /**
      * Checks if feature lies at `pixel`.
@@ -298,6 +329,62 @@ export default {
       }
 
       return this.$mapVm.forEachFeatureAtPixel(pixel, feature => feature === selfFeature, { layerFilter })
+    },
+    /**
+     * @param {Object|undefined} value
+     * @protected
+     */
+    propertiesChanged (value) {
+      this.setProperties(value)
+    },
+    /**
+     * @param {Object|undefined} value
+     * @protected
+     */
+    currentPropertiesChanged (value) {
+      if (isEqual(value, this.properties)) return
+
+      this.$emit('update:properties', value && clonePlainObject(value))
+    },
+    /**
+     * @param {string} value
+     * @param {string} prev
+     * @protected
+     */
+    currentGeometryNameChanged (value, prev) {
+      if (value === prev) return
+
+      this.$emit('update:geometryName', value)
+    },
+    /**
+     * @param {Object|undefined} value
+     * @param {Object|undefined} prev
+     * @protected
+     */
+    geometryDataProjChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:geometry', value && clonePlainObject(value))
+    },
+    /**
+     * @param {Object|undefined} value
+     * @param {Object|undefined} prev
+     * @protected
+     */
+    pointDataProjChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:point', value && clonePlainObject(value))
+    },
+    /**
+     * @param {Object|Function|Array|undefined} value
+     * @param {Object|Function|Array|undefined} prev
+     * @protected
+     */
+    styleChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:style', isObjectLike(value) ? clonePlainObject(value) : value)
     },
   },
 }
@@ -332,24 +419,19 @@ async function subscribeToEvents () {
         case this.$feature.getGeometryName():
           return {
             prop: 'geometry',
-            value: this.writeGeometryInDataProj(this.getGeometry()),
-            compareWith: this.currentGeometryDataProj,
+            value: this.$feature.getGeometry(),
+            setter: geom => this.setGeometry(geom, true),
           }
         default:
           return {
             prop: 'properties',
-            value: {
-              ...this.properties,
-              [key]: this.$feature.get(key),
-            },
-            compareWith: this.currentProperties,
+            value: getFeatureProperties(this.$feature),
+            setter: this.setProperties,
           }
       }
     },
   ).pipe(
-    skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
+    distinctUntilChanged(isEqual),
   )
-  this.subscribeTo(propChanges, () => {
-    ++this.rev
-  })
+  this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
 }

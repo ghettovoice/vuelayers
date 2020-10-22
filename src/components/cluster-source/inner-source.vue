@@ -1,9 +1,10 @@
 <script>
-  import { olCmp, stubVNode, sourceContainer } from '../../mixins'
-  import { mergeDescriptors, stubObject } from '../../utils'
+  import { olCmp, sourceContainer, stubVNode } from '../../mixins'
+  import { getSourceId } from '../../ol-ext'
+  import { clonePlainObject, isEqual, mergeDescriptors, stubObject } from '../../utils'
 
   export default {
-    name: 'VlSourceInner',
+    name: 'VlSourceInnerAdapter',
     mixins: [
       stubVNode,
       sourceContainer,
@@ -16,6 +17,26 @@
           id: this.vmId,
           class: this.vmClass,
         }
+      },
+    },
+    computed: {
+      source () {
+        if (!(this.rev && this.$source)) return
+
+        return {
+          id: getSourceId(this.$source),
+          type: this.$source.constructor.name,
+        }
+      },
+    },
+    watch: {
+      source: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          this.$emit('update:source', value && clonePlainObject(value))
+        },
       },
     },
     created () {
@@ -33,9 +54,6 @@
 
         return obj
       },
-      refresh () {
-        ++this.rev
-      },
       getServices () {
         return mergeDescriptors(
           this::olCmp.methods.getServices(),
@@ -44,10 +62,8 @@
       },
       getSourceTarget () {
         return {
-          setSource: async source => {
-            await this.$innerSourceContainer.setInnerSource(source)
-            await this.scheduleRefresh()
-          },
+          setSource: source => this.$innerSourceContainer?.setInnerSource(source),
+          getSource: () => this.$innerSourceContainer?.getInnerSource(),
         }
       },
     },

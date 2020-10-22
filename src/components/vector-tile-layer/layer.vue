@@ -1,8 +1,7 @@
 <script>
   import { VectorTile as VectorTileLayer } from 'ol/layer'
   import RenderType from 'ol/layer/VectorTileRenderType'
-  import { tileLayer, vectorLayer } from '../../mixins'
-  import { isEqual, makeWatchers, sequential } from '../../utils'
+  import { makeChangeOrRecreateWatchers, tileLayer, vectorLayer } from '../../mixins'
 
   export default {
     name: 'VlLayerVectorTile',
@@ -18,17 +17,9 @@
       },
     },
     watch: {
-      .../*#__PURE__*/makeWatchers([
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'renderMode',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ]),
     },
     methods: {
       /**
@@ -51,7 +42,7 @@
           render: this.render,
           source: this.$source,
           // ol/layer/BaseVector
-          renderOrder: this.currentRenderOrder,
+          renderOrder: this.renderOrder,
           renderBuffer: this.renderBuffer,
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,

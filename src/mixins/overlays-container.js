@@ -1,13 +1,12 @@
-import debounce from 'debounce-promise'
-import { Collection, Overlay } from 'ol'
+import { Collection, getUid, Overlay } from 'ol'
 import CollectionEventType from 'ol/CollectionEventType'
-import { from as fromObs, merge as mergeObs } from 'rxjs'
-import { map as mapObs, mergeMap } from 'rxjs/operators'
+import { merge as mergeObs } from 'rxjs'
+import { map as mapObs, tap } from 'rxjs/operators'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
-import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { instanceOf, isFunction, map, forEach, find, isEqual, sequential } from '../utils'
+import { bufferDebounceTime, fromOlChangeEvent as obsFromOlChangeEvent, fromOlEvent as obsFromOlEvent } from '../rx-ext'
+import { find, forEach, instanceOf } from '../utils'
 import identMap from './ident-map'
-import { FRAME_TIME } from './ol-cmp'
+import { FRAME_TIME, makeChangeOrRecreateWatchers } from './ol-cmp'
 import rxSubs from './rx-subs'
 
 /**
@@ -24,14 +23,6 @@ export default {
   ],
   computed: {
     /**
-     * @returns {string[]}
-     */
-    currentOverlays () {
-      if (!this.rev) return []
-
-      return map(this.getOverlays(), getOverlayId)
-    },
-    /**
      * @returns {string|undefined}
      */
     overlaysCollectionIdent () {
@@ -41,20 +32,9 @@ export default {
     },
   },
   watch: {
-    currentOverlays: /*#__PURE__*/debounce(function (value, prev) {
-      if (isEqual(value, prev)) return
-
-      this.$emit('update:overlays', value.slice())
-    }, FRAME_TIME),
-    overlaysCollectionIdent: /*#__PURE__*/sequential(function (value, prevValue) {
-      if (value && prevValue) {
-        this.moveInstance(value, prevValue)
-      } else if (value && !prevValue && this.$overlaysCollection) {
-        this.setInstance(value, this.$overlaysCollection)
-      } else if (!value && prevValue) {
-        this.unsetInstance(prevValue)
-      }
-    }),
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'overlaysCollectionIdent',
+    ]),
   },
   created () {
     /**
@@ -62,6 +42,7 @@ export default {
      * @private
      */
     this._overlaysCollection = this.instanceFactoryCall(this.overlaysCollectionIdent, () => new Collection())
+    this._overlaySubs = {}
 
     this::defineServices()
   },
@@ -86,29 +67,25 @@ export default {
     },
     /**
      * @param {OverlayLike} overlay
-     * @return {Promise<Overlay>}
+     * @return {Overlay}
      */
-    async initializeOverlay (overlay) {
-      if (isFunction(overlay.resolveOlObject)) {
-        overlay = await overlay.resolveOlObject()
-      }
+    initializeOverlay (overlay) {
+      overlay = overlay?.$overlay || overlay
+      instanceOf(overlay, Overlay)
 
       return initializeOverlay(overlay)
     },
     /**
      * @param {OverlayLike[]|module:ol/Collection~Collection<OverlayLike>} overlays
-     * @returns {Promise<void>}
      */
-    async addOverlays (overlays) {
-      await Promise.all(map(overlays, ::this.addOverlay))
+    addOverlays (overlays) {
+      forEach(overlays, ::this.addOverlay)
     },
     /**
      * @param {OverlayLike} overlay
-     * @return {void}
      */
-    async addOverlay (overlay) {
-      overlay = await this.initializeOverlay(overlay)
-      instanceOf(overlay, Overlay)
+    addOverlay (overlay) {
+      overlay = this.initializeOverlay(overlay)
 
       if (this.getOverlayById(getOverlayId(overlay))) return
 
@@ -116,21 +93,15 @@ export default {
     },
     /**
      * @param {OverlayLike[]|module:ol/Collection~Collection<OverlayLike>} overlays
-     * @returns {Promise<void>}
      */
-    async removeOverlays (overlays) {
-      await Promise.all(map(overlays, ::this.removeOverlay))
+    removeOverlays (overlays) {
+      forEach(overlays, ::this.removeOverlay)
     },
     /**
      * @param {OverlayLike} overlay
-     * @return {void}
      */
-    async removeOverlay (overlay) {
-      if (isFunction(overlay.resolveOlObject)) {
-        overlay = await overlay.resolveOlObject()
-      }
-
-      overlay = this.getOverlayById(getOverlayId(overlay))
+    removeOverlay (overlay) {
+      overlay = this.getOverlayById(getOverlayId(overlay?.$overlay || overlay))
       if (!overlay) return
 
       this.$overlaysCollection.remove(overlay)
@@ -160,6 +131,20 @@ export default {
     getOverlayById (overlayId) {
       return find(this.getOverlays(), overlay => getOverlayId(overlay) === overlayId)
     },
+    /**
+     * @param {string|undefined} value
+     * @param {string|undefined} prevValue
+     * @protected
+     */
+    overlaysCollectionIdentChanged (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue && this.$overlaysCollection) {
+        this.setInstance(value, this.$overlaysCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
+    },
   },
 }
 
@@ -174,16 +159,30 @@ function defineServices () {
 
 function subscribeToCollectionEvents () {
   const adds = obsFromOlEvent(this.$overlaysCollection, CollectionEventType.ADD).pipe(
-    mergeMap(({ type, element }) => fromObs(this.initializeOverlay(element)).pipe(
-      mapObs(element => ({ type, element })),
-    )),
+    mapObs(evt => ({
+      ...evt,
+      element: this.initializeOverlay(evt.element),
+    })),
+    tap(({ element }) => {
+      const uid = getUid(element)
+      const propChanges = obsFromOlChangeEvent(element, 'id', true)
+      this._overlaySubs[uid] = this.subscribeTo(propChanges, ::this.scheduleRefresh)
+    }),
   )
-  const removes = obsFromOlEvent(this.$overlaysCollection, CollectionEventType.REMOVE)
+  const removes = obsFromOlEvent(this.$overlaysCollection, CollectionEventType.REMOVE).pipe(
+    tap(({ element }) => {
+      const uid = getUid(element)
+      if (this._overlaySubs[uid]) {
+        this.unsubscribe(this._overlaySubs[uid])
+        delete this._overlaySubs[uid]
+      }
+    }),
+  )
   const events = mergeObs(adds, removes).pipe(
     bufferDebounceTime(FRAME_TIME),
   )
-  this.subscribeTo(events, events => {
-    ++this.rev
+  this.subscribeTo(events, async events => {
+    await this.scheduleRefresh()
 
     this.$nextTick(() => {
       forEach(events, ({ type, element }) => {

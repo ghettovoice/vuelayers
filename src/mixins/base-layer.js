@@ -1,11 +1,8 @@
-import debounce from 'debounce-promise'
 import { get as getProj } from 'ol/proj'
-import { from as fromObs, merge as mergeObs } from 'rxjs'
-import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
 import { EPSG_3857, getLayerId, initializeLayer, roundExtent, setLayerId, transformExtent } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
-import { addPrefix, assert, isEqual, isNumber, mergeDescriptors, pick, sequential } from '../utils'
-import olCmp, { FRAME_TIME } from './ol-cmp'
+import { addPrefix, assert, coalesce, isArray, isEqual, isNumber, mergeDescriptors } from '../utils'
+import olCmp, { makeChangeOrRecreateWatchers } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 import waitForMap from './wait-for-map'
@@ -59,6 +56,9 @@ export default {
       type: Array,
       validator: value => value.length === 4 && value.every(isNumber),
     },
+    /**
+     * @type {string|undefined}
+     */
     extentProjection: {
       type: String,
       validator: value => !!getProj(value),
@@ -88,11 +88,19 @@ export default {
     return {
       viewProjection: EPSG_3857,
       dataProjection: EPSG_3857,
+      currentExtentViewProj: roundExtent(this.extent),
+      currentMaxResolution: this.maxResolution,
+      currentMinResolution: this.minResolution,
+      currentMaxZoom: this.maxZoom,
+      currentMinZoom: this.minZoom,
+      currentOpacity: this.opacity,
+      currentVisible: this.visible,
+      currentZIndex: this.zIndex,
     }
   },
   computed: {
     resolvedExtentProjection () {
-      return this.extentProjection || this.resolvedDataProjection
+      return coalesce(this.extentProjection, this.resolvedDataProjection)
     },
     extentDataProj () {
       return roundExtent(this.extent)
@@ -101,139 +109,77 @@ export default {
       return transformExtent(this.extent, this.resolvedExtentProjection, this.resolvedViewProjection)
     },
     currentExtentDataProj () {
-      if (this.rev && this.$layer) {
-        return this.getExtentInternal()
-      }
-
-      return this.extentDataProj
-    },
-    currentExtentViewProj () {
-      if (this.rev && this.$layer) {
-        return this.getExtentInternal(true)
-      }
-
-      return this.extentViewProj
-    },
-    currentMaxResolution () {
-      if (this.rev && this.$layer) {
-        return this.getMaxResolutionInternal()
-      }
-
-      return this.maxResolution
-    },
-    currentMinResolution () {
-      if (this.rev && this.$layer) {
-        return this.getMinResolutionInternal()
-      }
-
-      return this.minResolution
-    },
-    currentMaxZoom () {
-      if (this.rev && this.$layer) {
-        return this.getMaxZoomInternal()
-      }
-
-      return this.maxZoom
-    },
-    currentMinZoom () {
-      if (this.rev && this.$layer) {
-        return this.getMinZoomInternal()
-      }
-
-      return this.minZoom
-    },
-    currentOpacity () {
-      if (this.rev && this.$layer) {
-        return this.getOpacityInternal()
-      }
-
-      return this.opacity
-    },
-    currentVisible () {
-      if (this.rev && this.$layer) {
-        return this.getVisibleInternal()
-      }
-
-      return this.visible
-    },
-    currentZIndex () {
-      if (this.rev && this.$layer) {
-        return this.getZIndexInternal()
-      }
-
-      return this.zIndex
+      return transformExtent(this.currentExtentViewProj, this.resolvedViewProjection, this.resolvedExtentProjection)
     },
   },
   watch: {
-    opacity: /*#__PURE__*/sequential(async function (value) {
-      await this.setOpacity(value)
-    }),
-    currentOpacity: /*#__PURE__*/debounce(function (value) {
-      if (value === this.opacity) return
+    rev () {
+      if (!this.$layer) return
 
-      this.$emit('update:opacity', value)
-    }, FRAME_TIME),
-    visible: /*#__PURE__*/sequential(async function (value) {
-      await this.setVisible(value)
-    }),
-    currentVisible: /*#__PURE__*/debounce(function (value) {
-      if (value === this.visible) return
-
-      this.$emit('update:visible', value)
-    }, FRAME_TIME),
-    extentViewProj: /*#__PURE__*/sequential(async function (value) {
-      await this.setExtent(value, true)
-    }),
-    currentExtentDataProj: /*#__PURE__*/debounce(function (value) {
-      if (isEqual(value, this.extentDataProj)) return
-
-      this.$emit('update:extent', value.slice())
-    }, FRAME_TIME),
-    zIndex: /*#__PURE__*/sequential(async function (value) {
-      await this.setZIndex(value)
-    }),
-    currentZIndex: /*#__PURE__*/debounce(function (value) {
-      if (value === this.zIndex) return
-
-      this.$emit('update:zIndex', value)
-    }, FRAME_TIME),
-    minResolution: /*#__PURE__*/sequential(async function (value) {
-      await this.setMinResolution(value)
-    }),
-    currentMinResolution: /*#__PURE__*/debounce(function (value) {
-      if (value === this.minResolution) return
-
-      this.$emit('update:minResolution', value)
-    }, FRAME_TIME),
-    maxResolution: /*#__PURE__*/sequential(async function (value) {
-      await this.setMaxResolution(value)
-    }),
-    currentMaxResolution: /*#__PURE__*/debounce(function (value) {
-      if (value === this.maxResolution) return
-
-      this.$emit('update:maxResolution', value)
-    }, FRAME_TIME),
-    minZoom: /*#__PURE__*/sequential(async function (value) {
-      await this.setMinZoom(value)
-    }),
-    currentMinZoom: /*#__PURE__*/debounce(function (value) {
-      if (value === this.minZoom) return
-
-      this.$emit('update:minZoom', value)
-    }, FRAME_TIME),
-    maxZoom: /*#__PURE__*/sequential(async function (value) {
-      await this.setMaxZoom(value)
-    }),
-    currentMaxZoom: /*#__PURE__*/debounce(function (value) {
-      if (value === this.maxZoom) return
-
-      this.$emit('update:maxZoom', value)
-    }, FRAME_TIME),
+      if (!isEqual(this.currentExtentViewProj, this.$layer.getExtent())) {
+        this.currentExtentViewProj = this.$layer.getExtent()
+      }
+      if (this.currentMaxResolution !== this.$layer.getMaxResolution()) {
+        this.currentMaxResolution = this.$layer.getMaxResolution()
+      }
+      if (this.currentMinResolution !== this.$layer.getMinResolution()) {
+        this.currentMinResolution = this.$layer.getMinResolution()
+      }
+      if (this.currentMaxZoom !== this.$layer.getMaxZoom()) {
+        this.currentMaxZoom = this.$layer.getMaxZoom()
+      }
+      if (this.currentMinZoom !== this.$layer.getMinZoom()) {
+        this.currentMinZoom = this.$layer.getMinZoom()
+      }
+      if (this.currentOpacity !== this.$layer.getOpacity()) {
+        this.currentOpacity = this.$layer.getOpacity()
+      }
+      if (this.currentVisible !== this.$layer.getVisible()) {
+        this.currentVisible = this.$layer.getVisible()
+      }
+      if (this.currentZIndex !== this.$layer.getZIndex()) {
+        this.currentZIndex = this.$layer.getZIndex()
+      }
+    },
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'className',
+      'opacity',
+      'currentOpacity',
+      'visible',
+      'currentVisible',
+      'extentViewProj',
+      'currentExtentDataProj',
+      'zIndex',
+      'currentZIndex',
+      'minResolution',
+      'currentMinResolution',
+      'maxResolution',
+      'currentMaxResolution',
+      'minZoom',
+      'currentMinZoom',
+      'maxZoom',
+      'currentMaxZoom',
+    ], [
+      'extentViewProj',
+      'currentExtentDataProj',
+    ]),
   },
   created () {
     this::defineServices()
+
+    this.currentExtentViewProj = this.extentViewProj?.slice()
   },
   methods: {
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async beforeInit () {
+      await Promise.all([
+        this::olCmp.methods.beforeInit(),
+        this::waitForMap.methods.beforeInit(),
+      ])
+    },
     /**
      * @return {Promise<module:ol/layer/Base~BaseLayer>}
      * @protected
@@ -254,9 +200,7 @@ export default {
      * @protected
      */
     async mount () {
-      if (this.$layersContainer) {
-        await this.$layersContainer.addLayer(this)
-      }
+      this.$layersContainer?.addLayer(this)
 
       return this::olCmp.methods.mount()
     },
@@ -265,9 +209,7 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$layersContainer) {
-        await this.$layersContainer.removeLayer(this)
-      }
+      this.$layersContainer?.removeLayer(this)
 
       return this::olCmp.methods.unmount()
     },
@@ -294,25 +236,6 @@ export default {
       this::subscribeToLayerEvents()
     },
     /**
-     * @return {Promise<module:ol/layer/Base~BaseLayer>}
-     */
-    resolveLayer: olCmp.methods.resolveOlObject,
-    .../*#__PURE__*/pick(olCmp.methods, [
-      'init',
-      'deinit',
-      'beforeMount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'resolveOlObject',
-    ]),
-    .../*#__PURE__*/pick(waitForMap.methods, [
-      'beforeInit',
-    ]),
-    /**
      * @returns {string|number}
      * @protected
      */
@@ -321,216 +244,186 @@ export default {
     },
     /**
      * @param {string|number} id
-     * @returns {void}
      * @protected
      */
     setIdInternal (id) {
-      assert(id != null && id !== '', 'Invalid layer id')
-
       if (id === this.getIdInternal()) return
 
       setLayerId(this.$layer, id)
     },
     /**
-     * @param {boolean} [viewProj=false]
-     * @returns {Promise<number[]|undefined>}
+     * @return {Promise<module:ol/layer/Base~BaseLayer>}
      */
-    async getExtent (viewProj = false) {
-      await this.resolveLayer()
-
-      return this.getExtentInternal(viewProj)
-    },
+    resolveLayer: olCmp.methods.resolveOlObject,
     /**
      * @param {boolean} [viewProj=false]
-     * @return {number[]|undefined}
-     * @protected
+     * @returns {number[]|undefined}
      */
-    getExtentInternal (viewProj = false) {
-      if (viewProj) return roundExtent(this.$layer.getExtent())
+    getExtent (viewProj = false) {
+      if (!this.$layer) {
+        return viewProj ? this.currentExtentViewProj : this.currentExtentDataProj
+      }
 
-      return transformExtent(this.$layer.getExtent(), this.resolvedViewProjection, this.resolvedExtentProjection)
+      const extent = this.$layer.getExtent()
+      if (viewProj) return roundExtent(extent)
+
+      return transformExtent(extent, this.resolvedViewProjection, this.resolvedExtentProjection)
     },
     /**
      * @param {number[]} extent
      * @param {boolean} [viewProj=false]
-     * @returns {Promise<void>}
      */
-    async setExtent (extent, viewProj = false) {
-      extent = roundExtent(extent)
-      if (isEqual(extent, await this.getExtent(viewProj))) return
-      if (!viewProj) {
-        extent = transformExtent(extent, this.resolvedExtentProjection, this.resolvedDataProjection)
+    setExtent (extent, viewProj = false) {
+      assert(extent == null || (isArray(extent) && extent.length === 4), 'Invalid extent')
+      extent = viewProj
+        ? roundExtent(extent)
+        : transformExtent(extent, this.resolvedExtentProjection, this.resolvedViewProjection)
+
+      if (!isEqual(extent, this.currentExtentViewProj)) {
+        this.currentExtentViewProj = extent
       }
-
-      (await this.resolveLayer()).setExtent(extent)
+      if (this.$layer && !isEqual(extent, this.$layer.getExtent())) {
+        this.$layer.setExtent(extent)
+      }
     },
     /**
-     * @returns {Promise<number|undefined>}
+     * @returns {number|undefined}
      */
-    async getMaxResolution () {
-      await this.resolveLayer()
-
-      return this.getMaxResolutionInternal()
-    },
-    /**
-     * @return {number|undefined}
-     * @protected
-     */
-    getMaxResolutionInternal () {
-      return this.$layer.getMaxResolution()
+    getMaxResolution () {
+      return coalesce(this.$layer?.getMaxResolution(), this.currentMaxResolution)
     },
     /**
      * @param {number} resolution
-     * @returns {Promise<void>}
      */
-    async setMaxResolution (resolution) {
-      if (resolution === await this.getMaxResolution()) return
+    setMaxResolution (resolution) {
+      resolution = Number(resolution)
+      assert(isNumber(resolution), 'Invalid max resolution')
 
-      (await this.resolveLayer()).setMaxResolution(resolution)
+      if (resolution !== this.currentMaxResolution) {
+        this.currentMaxResolution = resolution
+      }
+      if (this.$layer && resolution !== this.$layer.getMaxResolution()) {
+        this.$layer.setMaxResolution(resolution)
+      }
     },
     /**
-     * @returns {Promise<number|undefined>}
+     * @returns {number|undefined}
      */
-    async getMinResolution () {
-      await this.resolveLayer()
-
-      return this.getMinResolutionInternal()
-    },
-    /**
-     * @return {number|undefined}
-     * @protected
-     */
-    getMinResolutionInternal () {
-      return this.$layer.getMinResolution()
+    getMinResolution () {
+      return coalesce(this.$layer?.getMinResolution(), this.currentMinResolution)
     },
     /**
      * @param {number} resolution
-     * @returns {Promise<void>}
      */
-    async setMinResolution (resolution) {
-      if (resolution === await this.getMinResolution()) return
+    setMinResolution (resolution) {
+      resolution = Number(resolution)
+      assert(isNumber(resolution), 'Invalid min resolution')
 
-      (await this.resolveLayer()).setMinResolution(resolution)
+      if (resolution !== this.currentMinResolution) {
+        this.currentMinResolution = resolution
+      }
+      if (this.$layer && resolution !== this.$layer.getMinResolution()) {
+        this.$layer.getMinResolution(resolution)
+      }
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {number}
      */
-    async getMaxZoom () {
-      await this.resolveLayer()
-
-      return this.getMaxZoomInternal()
-    },
-    /**
-     * @return {number}
-     * @protected
-     */
-    getMaxZoomInternal () {
-      return this.$layer.getMaxZoom()
+    getMaxZoom () {
+      return coalesce(this.$layer?.getMaxZoom(), this.currentMaxZoom)
     },
     /**
      * @param {number} zoom
-     * @returns {Promise<void>}
      */
-    async setMaxZoom (zoom) {
-      if (zoom === await this.getMaxZoom()) return
+    setMaxZoom (zoom) {
+      zoom = Number(zoom)
+      assert(isNumber(zoom), 'Invalid max zoom')
 
-      (await this.resolveLayer()).setMaxZoom(zoom)
+      if (zoom !== this.currentMaxZoom) {
+        this.currentMaxZoom = zoom
+      }
+      if (this.$layer && zoom !== this.$layer.getMaxZoom()) {
+        this.$layer.setMaxZoom(zoom)
+      }
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {number}
      */
-    async getMinZoom () {
-      await this.resolveLayer()
-
-      return this.getMinZoomInternal()
-    },
-    /**
-     * @return {number}
-     * @protected
-     */
-    getMinZoomInternal () {
-      return this.$layer.getMinZoom()
+    getMinZoom () {
+      return coalesce(this.$layer?.getMinZoom(), this.currentMinZoom)
     },
     /**
      * @param {number} zoom
-     * @returns {Promise<void>}
      */
-    async setMinZoom (zoom) {
-      if (zoom === await this.getMinZoom()) return
+    setMinZoom (zoom) {
+      zoom = Number(zoom)
+      assert(isNumber(zoom), 'Invalid min zoom')
 
-      (await this.resolveLayer()).setMinZoom(zoom)
+      if (zoom !== this.currentMinZoom) {
+        this.currentMinZoom = zoom
+      }
+      if (this.$layer && zoom !== this.$layer.getMinZoom()) {
+        this.$layer.setMinZoom(zoom)
+      }
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {number}
      */
-    async getOpacity () {
-      await this.resolveLayer()
-
-      return this.getOpacityInternal()
-    },
-    /**
-     * @return {number}
-     * @protected
-     */
-    getOpacityInternal () {
-      return this.$layer.getOpacity()
+    getOpacity () {
+      return coalesce(this.$layer?.getOpacity(), this.currentOpacity)
     },
     /**
      * @param {number} opacity
-     * @returns {Promise<void>}
      */
-    async setOpacity (opacity) {
-      if (opacity === await this.getOpacity()) return
+    setOpacity (opacity) {
+      opacity = Number(opacity)
+      assert(isNumber(opacity), 'Invalid opacity')
 
-      (await this.resolveLayer()).setOpacity(opacity)
+      if (opacity !== this.currentOpacity) {
+        this.currentOpacity = opacity
+      }
+      if (this.$layer && opacity !== this.$layer.getOpacity()) {
+        this.$layer.setOpacity(opacity)
+      }
     },
     /**
-     * @returns {Promise<boolean>}
+     * @returns {boolean}
      */
-    async getVisible () {
-      await this.resolveLayer()
-
-      return this.getVisibleInternal()
-    },
-    /**
-     * @return {boolean}
-     * @protected
-     */
-    getVisibleInternal () {
-      return this.$layer.getVisible()
+    getVisible () {
+      return coalesce(this.$layer?.getVisible(), this.currentVisible)
     },
     /**
      * @param {boolean} visible
-     * @returns {Promise<void>}
      */
-    async setVisible (visible) {
-      if (visible === await this.getVisible()) return
+    setVisible (visible) {
+      visible = !!visible
 
-      (await this.resolveLayer()).setVisible(visible)
+      if (visible !== this.currentVisible) {
+        this.currentVisible = visible
+      }
+      if (this.$layer && visible !== this.$layer.getVisible()) {
+        this.$layer.setVisible(visible)
+      }
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {number}
      */
-    async getZIndex () {
-      await this.resolveLayer()
-
-      return this.getZIndexInternal()
-    },
-    /**
-     * @return {number}
-     * @protected
-     */
-    getZIndexInternal () {
-      return this.$layer.getZIndex()
+    getZIndex () {
+      return coalesce(this.$layer?.getZIndex(), this.currentZIndex)
     },
     /**
      * @param {number} zIndex
-     * @returns {Promise<void>}
      */
-    async setZIndex (zIndex) {
-      if (zIndex === await this.getZIndex()) return
+    setZIndex (zIndex) {
+      zIndex = Number(zIndex)
+      assert(isNumber(zIndex), 'Invalid zIndex')
 
-      (await this.resolveLayer()).setZIndex(zIndex)
+      if (zIndex !== this.currentZIndex) {
+        this.currentZIndex = zIndex
+      }
+      if (this.$layer && zIndex !== this.$layer.getZIndex()) {
+        this.$layer.setZIndex(zIndex)
+      }
     },
     /**
      * @param {number[]} pixel
@@ -540,6 +433,134 @@ export default {
       const layer = await this.resolveLayer()
 
       return this.$mapVm.forEachLayerAtPixel(pixel, mapLayer => mapLayer === layer)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    opacityChanged (value) {
+      this.setOpacity(value)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    currentOpacityChanged (value) {
+      if (value === this.opacity) return
+
+      this.$emit('update:opacity', value)
+    },
+    /**
+     * @param {boolean} value
+     * @protected
+     */
+    visibleChanged (value) {
+      this.setVisible(value)
+    },
+    /**
+     * @param {boolean} value
+     * @protected
+     */
+    currentVisibleChanged (value) {
+      if (value === this.visible) return
+
+      this.$emit('update:visible', value)
+    },
+    /**
+     * @param {number[]|undefined} value
+     * @protected
+     */
+    extentViewProjChanged (value) {
+      this.setExtent(value, true)
+    },
+    /**
+     * @param {number[]|undefined} value
+     * @protected
+     */
+    currentExtentDataProjChanged (value) {
+      if (isEqual(value, this.extentDataProj)) return
+
+      this.$emit('update:extent', value.slice())
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    zIndexChanged (value) {
+      this.setZIndex(value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    currentZIndexChanged (value) {
+      if (value === this.zIndex) return
+
+      this.$emit('update:zIndex', value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    minResolutionChanged (value) {
+      this.setMinResolution(value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    currentMinResolutionChanged (value) {
+      if (value === this.minResolution) return
+
+      this.$emit('update:minResolution', value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    maxResolutionChanged (value) {
+      this.setMaxResolution(value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    currentMaxResolutionChanged (value) {
+      if (value === this.maxResolution) return
+
+      this.$emit('update:maxResolution', value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    minZoomChanged (value) {
+      this.setMinZoom(value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    currentMinZoomChanged (value) {
+      if (value === this.minZoom) return
+
+      this.$emit('update:minZoom', value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    maxZoomChanged (value) {
+      this.setMaxZoom(value)
+    },
+    /**
+     * @param {number|undefined} value
+     * @protected
+     */
+    currentMaxZoomChanged (value) {
+      if (value === this.maxZoom) return
+
+      this.$emit('update:maxZoom', value)
     },
   },
 }
@@ -578,34 +599,25 @@ function defineServices () {
 }
 
 async function subscribeToLayerEvents () {
-  const prefixKey = addPrefix('current')
-  const propChanges = mergeObs(
-    obsFromOlChangeEvent(this.$layer, [
-      'id',
-      'opacity',
-      'visible',
-      'zIndex',
-      'minResolution',
-      'maxResolution',
-      'minZoom',
-      'maxZoom',
-    ], true, evt => ({
-      ...evt,
-      compareWith: this[prefixKey(evt.prop)],
-    })),
-    obsFromOlChangeEvent(this.$layer, 'extent', true).pipe(
-      mergeMap(({ prop }) => fromObs(this.getExtent()).pipe(
-        mapObs(extent => ({
-          prop,
-          value: extent,
-          compareWith: this.currentExtentDataProj,
-        })),
-      )),
-    ),
-  ).pipe(
-    skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
-  )
-  this.subscribeTo(propChanges, () => {
-    ++this.rev
-  })
+  const setterKey = addPrefix('set')
+  const propChanges = obsFromOlChangeEvent(this.$layer, [
+    'opacity',
+    'visible',
+    'zIndex',
+    'minResolution',
+    'maxResolution',
+    'minZoom',
+    'maxZoom',
+    'extent',
+  ], true, evt => ({
+    ...evt,
+    setter: val => {
+      const args = [val]
+      if (evt.prop === 'extent') {
+        args.push(true)
+      }
+      this[setterKey(evt.prop)](...args)
+    },
+  }))
+  this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
 }

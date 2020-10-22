@@ -1,14 +1,13 @@
-import debounce from 'debounce-promise'
-import { Collection } from 'ol'
+import { Collection, getUid } from 'ol'
 import CollectionEventType from 'ol/CollectionEventType'
 import { Control, defaults as createDefaultControls } from 'ol/control'
-import { from as fromObs, merge as mergeObs } from 'rxjs'
-import { map as mapObs, mergeMap } from 'rxjs/operators'
+import { merge as mergeObs } from 'rxjs'
+import { map as mapObs, tap } from 'rxjs/operators'
 import { getControlId, initializeControl } from '../ol-ext'
-import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { find, forEach, instanceOf, isArray, isEqual, isFunction, isPlainObject, map, sequential } from '../utils'
+import { bufferDebounceTime, fromOlChangeEvent as obsFromOlChangeEvent, fromOlEvent as obsFromOlEvent } from '../rx-ext'
+import { find, forEach, instanceOf, isArray, isPlainObject } from '../utils'
 import identMap from './ident-map'
-import { FRAME_TIME } from './ol-cmp'
+import { FRAME_TIME, makeChangeOrRecreateWatchers } from './ol-cmp'
 import rxSubs from './rx-subs'
 
 /**
@@ -25,14 +24,6 @@ export default {
   ],
   computed: {
     /**
-     * @returns {string[]}
-     */
-    currentControls () {
-      if (!this.rev) return []
-
-      return map(this.getControls(), getControlId)
-    },
-    /**
      * @type {string|undefined}
      */
     controlsCollectionIdent () {
@@ -42,20 +33,9 @@ export default {
     },
   },
   watch: {
-    currentControls: /*#__PURE__*/debounce(function (value, prev) {
-      if (isEqual(value, prev)) return
-
-      this.$emit('update:controls', value.slice())
-    }, FRAME_TIME),
-    controlsCollectionIdent: /*#__PURE__*/sequential(function (value, prevValue) {
-      if (value && prevValue) {
-        this.moveInstance(value, prevValue)
-      } else if (value && !prevValue && this.$controlsCollection) {
-        this.setInstance(value, this.$controlsCollection)
-      } else if (!value && prevValue) {
-        this.unsetInstance(prevValue)
-      }
-    }),
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'controlsCollectionIdent',
+    ]),
   },
   created () {
     /**
@@ -63,6 +43,7 @@ export default {
      * @private
      */
     this._controlsCollection = this.instanceFactoryCall(this.controlsCollectionIdent, () => new Collection())
+    this._controlSubs = {}
 
     this::defineServices()
   },
@@ -87,9 +68,8 @@ export default {
     },
     /**
      * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} defaultControls
-     * @returns {Promise<void>}
      */
-    async initDefaultControls (defaultControls) {
+    initDefaultControls (defaultControls) {
       this.clearControls()
 
       let controls
@@ -103,34 +83,30 @@ export default {
         )
       }
       if (controls) {
-        await this.addControls(controls)
+        this.addControls(controls)
       }
     },
     /**
      * @param {ControlLike} control
-     * @return {Promise<Control>}
+     * @return {Control}
      */
-    async initializeControl (control) {
-      if (isFunction(control.resolveOlObject)) {
-        control = await control.resolveOlObject()
-      }
+    initializeControl (control) {
+      control = control?.$control || control
+      instanceOf(control, Control)
 
       return initializeControl(control)
     },
     /**
      * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} controls
-     * @returns {Promise<void>}
      */
-    async addControls (controls) {
-      await Promise.all(map(controls, ::this.addControl))
+    addControls (controls) {
+      forEach(controls, ::this.addControl)
     },
     /**
      * @param {ControlLike} control
-     * @returns {Promise<void>}
      */
-    async addControl (control) {
-      control = await this.initializeControl(control)
-      instanceOf(control, Control)
+    addControl (control) {
+      control = this.initializeControl(control)
 
       if (this.getControlById(getControlId(control))) return
 
@@ -138,21 +114,15 @@ export default {
     },
     /**
      * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} controls
-     * @returns {Promise<void>}
      */
-    async removeControls (controls) {
-      await Promise.all(map(controls, ::this.removeControl))
+    removeControls (controls) {
+      forEach(controls, ::this.removeControl)
     },
     /**
      * @param {ControlLike} control
-     * @returns {Promise<void>}
      */
-    async removeControl (control) {
-      if (isFunction(control.resolveOlObject)) {
-        control = await control.resolveOlObject()
-      }
-
-      control = this.getControlById(getControlId(control))
+    removeControl (control) {
+      control = this.getControlById(getControlId(control?.$control || control))
       if (!control) return
 
       this.$controlsCollection.remove(control)
@@ -182,6 +152,20 @@ export default {
     getControlById (controlId) {
       return find(this.getControls(), control => getControlId(control) === controlId)
     },
+    /**
+     * @param {string|undefined} value
+     * @param {string|undefined} prevValue
+     * @protected
+     */
+    controlsCollectionIdentChanged (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue && this.$controlsCollection) {
+        this.setInstance(value, this.$controlsCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
+    },
   },
 }
 
@@ -196,16 +180,30 @@ function defineServices () {
 
 function subscribeToCollectionEvents () {
   const adds = obsFromOlEvent(this.$controlsCollection, CollectionEventType.ADD).pipe(
-    mergeMap(({ type, element }) => fromObs(this.initializeControl(element)).pipe(
-      mapObs(element => ({ type, element })),
-    )),
+    mapObs(evt => ({
+      ...evt,
+      element: this.initializeControl(evt.element),
+    })),
+    tap(({ element }) => {
+      const uid = getUid(element)
+      const propChanges = obsFromOlChangeEvent(element, 'id', true)
+      this._controlSubs[uid] = this.subscribeTo(propChanges, ::this.scheduleRefresh)
+    }),
   )
-  const removes = obsFromOlEvent(this.$controlsCollection, CollectionEventType.REMOVE)
+  const removes = obsFromOlEvent(this.$controlsCollection, CollectionEventType.REMOVE).pipe(
+    tap(({ element }) => {
+      const uid = getUid(element)
+      if (this._controlSubs[uid]) {
+        this.unsubscribe(this._controlSubs[uid])
+        delete this._controlSubs[uid]
+      }
+    }),
+  )
   const events = mergeObs(adds, removes).pipe(
     bufferDebounceTime(FRAME_TIME),
   )
-  this.subscribeTo(events, events => {
-    ++this.rev
+  this.subscribeTo(events, async events => {
+    await this.scheduleRefresh()
 
     this.$nextTick(() => {
       forEach(events, ({ type, element }) => {

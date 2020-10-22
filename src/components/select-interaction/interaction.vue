@@ -12,23 +12,23 @@
   import { never, shiftKeyOnly, singleClick } from 'ol/events/condition'
   import { Select as SelectInteraction } from 'ol/interaction'
   import { merge as mergeObs } from 'rxjs'
-  import { featuresContainer, interaction, styleContainer } from '../../mixins'
-  import { getFeatureId, getLayerId, initializeFeature, isGeoJSONFeature } from '../../ol-ext'
+  import { featuresContainer, interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
+  import { dumpStyle, getFeatureId, getLayerId, initializeFeature, isGeoJSONFeature } from '../../ol-ext'
   import { fromVueEvent as obsFromVueEvent } from '../../rx-ext'
   import {
+    assert,
     clonePlainObject,
+    coalesce,
     constant,
-    forEach,
+    forEach, isArray,
     isEqual,
     isFunction,
     isNumber,
-    isObjectLike,
+    isObjectLike, isPlainObject,
     isString,
-    makeWatchers,
     map,
     mergeDescriptors,
     or,
-    sequential,
     stubArray,
   } from '../../utils'
 
@@ -126,6 +126,11 @@
         default: shiftKeyOnly,
       },
     },
+    data () {
+      return {
+        currentHitTolerance: this.hitTolerance,
+      }
+    },
     computed: {
       featuresDataProj () {
         return map(this.features, feature => {
@@ -138,44 +143,90 @@
       featuresViewProj () {
         return map(this.featuresDataProj, feature => this.writeFeatureInViewProj(this.readFeatureInDataProj(feature)))
       },
+      currentFeaturesDataProj () {
+        if (!this.rev) return []
+
+        return map(this.getFeatures(), feature => this.writeFeatureInDataProj(feature))
+      },
+      currentFeaturesViewProj () {
+        if (!this.rev) return []
+
+        return map(this.getFeatures(), feature => this.writeFeatureInViewProj(feature))
+      },
+      currentFeatureIds () {
+        return map(this.currentFeaturesDataProj, feature => getFeatureId(feature))
+      },
       layerFilter () {
         return Array.isArray(this.layers)
           ? layer => this.layers.includes(getLayerId(layer))
           : this.layers
       },
-      currentFeatureIds () {
-        return map(this.currentFeaturesDataProj, feature => getFeatureId(feature))
+      style () {
+        if (!(this.rev && this.$style)) return
+
+        let style = this.$style
+        if (isFunction(style)) return style
+        if (!style) return
+
+        isArray(style) || (style = [style])
+
+        return style.map(style => dumpStyle(style, geom => this.writeGeometryInDataProj(geom)))
       },
     },
     watch: {
+      rev () {
+        if (!this.$interaction) return
+
+        if (this.currentHitTolerance !== this.$interaction.getHitTolerance()) {
+          this.currentHitTolerance = this.$interaction.getHitTolerance()
+        }
+      },
       featuresViewProj: {
         deep: true,
-        handler: /*#__PURE__*/sequential(async function (features) {
+        handler (features) {
           const ids = map(features, feature => isObjectLike(feature) ? getFeatureId(feature) : feature)
           if (isEqual(ids, this.currentFeatureIds)) return
 
-          await this.unselectAll()
-          await Promise.all(map(features, ::this.select))
-        }),
+          this.unselectAll()
+          forEach(features, ::this.select)
+        },
       },
-      .../*#__PURE__*/makeWatchers([
+      currentFeaturesDataProj: {
+        deep: true,
+        handler (value) {
+          if (isEqual(value, this.featuresDataProj)) return
+
+          this.$emit('update:features', value && clonePlainObject(value))
+        },
+      },
+      hitTolerance (value) {
+        this.setHitTolerance(value)
+      },
+      currentHitTolerance (value) {
+        if (value === this.hitTolerance) return
+
+        this.$emit('update:hitTolerance', value)
+      },
+      style: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          if (isPlainObject(value) || isArray(value)) {
+            value = clonePlainObject(value)
+          }
+          this.$emit('update:style', value)
+        },
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'filter',
-        'hitTolerance',
         'multi',
         'wrapX',
         'addCondition',
         'condition',
         'removeCondition',
         'toggleCondition',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ]),
     },
     methods: {
       /**
@@ -187,7 +238,7 @@
           multi: this.multi,
           filter: this.filter,
           layers: this.layerFilter,
-          hitTolerance: this.hitTolerance,
+          hitTolerance: this.currentHitTolerance,
           addCondition: this.addCondition,
           condition: this.condition,
           removeCondition: this.removeCondition,
@@ -195,13 +246,6 @@
           style: this.$style,
           features: this.$featuresCollection,
         })
-      },
-      /**
-       * @protected
-       */
-      async mount () {
-        await Promise.all(map(this.featuresDataProj, ::this.select))
-        await this::interaction.methods.mount()
       },
       /**
        * @returns {Object}
@@ -229,6 +273,7 @@
        */
       getStyleTarget () {
         return {
+          getStyle: () => this._style,
           setStyle: async () => {
             if (process.env.VUELAYERS_DEBUG) {
               this.$logger.log('style changed, scheduling recreate...')
@@ -240,23 +285,21 @@
       },
       /**
        * @param {FeatureLike} feature
-       * @return {Promise<void>}
        */
-      async select (feature) {
-        feature = await this.resolveFeature(feature)
+      select (feature) {
+        feature = this.resolveFeature(feature)
         if (!feature) return
 
-        await this.addFeature(feature)
+        this.addFeature(feature)
       },
       /**
        * @param {FeatureLike} feature
-       * @return {Promise<void>}
        */
-      async unselect (feature) {
-        feature = await this.resolveFeature(feature)
+      unselect (feature) {
+        feature = this.resolveFeature(feature)
         if (!feature) return
 
-        await this.removeFeature(feature)
+        this.removeFeature(feature)
       },
       /**
        * @return {void}
@@ -266,17 +309,13 @@
       },
       /**
        * @param {Object|Vue|Feature|string|number} feature
-       * @return {Promise<Feature|undefined>}
+       * @return {Feature|undefined}
        * @protected
        */
-      async resolveFeature (feature) {
+      resolveFeature (feature) {
         if (!feature) return
-        if (isFunction(feature.resolveOlObject)) {
-          feature = await feature.resolveOlObject()
-        }
-        if (feature instanceof Feature) {
-          return feature
-        }
+        feature = feature?.$feature || feature
+        if (feature instanceof Feature) return feature
 
         const featureId = isString(feature) || isNumber(feature) ? feature : getFeatureId(feature)
         if (!featureId) {
@@ -300,6 +339,24 @@
         return feature
       },
       updateFeature (feature) { /* disable update here, because wil always work with origin feature */ },
+      getHitTolerance () {
+        return coalesce(this.$interaction?.getHitTolerance(), this.currentHitTolerance)
+      },
+      setHitTolerance (tolerance) {
+        assert(isNumber(tolerance), 'Invalid tolerance')
+
+        if (tolerance !== this.currentHitTolerance) {
+          this.currentHitTolerance = tolerance
+        }
+        if (this.$interaction && tolerance !== this.$interaction.getHitTolerance()) {
+          this.$interaction.setHitTolerance(tolerance)
+        }
+      },
+      async getLayer (feature) {
+        feature = this.resolveFeature(feature)
+
+        return (await this.resolveInteraction()).getLayer(feature)
+      },
     },
   }
 
@@ -319,8 +376,6 @@
       get json () { return evt.json },
     }))
     const events = mergeObs(select, unselect)
-    this.subscribeTo(events, evt => {
-      this.$emit(evt.type, evt)
-    })
+    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
 </script>

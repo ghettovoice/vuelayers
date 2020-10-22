@@ -14,14 +14,16 @@
        */
       createStyle () {
         return new RegularShapeStyle({
+          // ol/style/Image
+          rotation: this.currentRotation,
+          rotateWithView: this.currentRotateWithView,
+          displacement: this.inputDisplacement,
+          // ol/style/RegularShape
           points: this.points,
           radius: this.radius,
           radius1: this.radius1,
           radius2: this.radius2,
           angle: this.angle,
-          rotation: this.rotation,
-          rotateWithView: this.rotateWithView,
-          displacement: this.displacement,
           fill: this.$fill,
           stroke: this.$stroke,
         })

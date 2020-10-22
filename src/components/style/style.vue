@@ -4,9 +4,9 @@
     :class="vmClass"
     style="display: none !important;">
     <slot>
-      <CircleStyle :id="'vl-' + id + '-default-circle-style'" />
-      <FillStyle :id="'vl-' + id + '-default-fill-style'" />
-      <StrokeStyle :id="'vl-' + id + '-default-stroke-style'" />
+      <CircleStyle :id="'vl-' + currentId + '-default-circle-style'" />
+      <FillStyle :id="'vl-' + currentId + '-default-fill-style'" />
+      <StrokeStyle :id="'vl-' + currentId + '-default-stroke-style'" />
     </slot>
   </i>
 </template>
@@ -17,11 +17,23 @@
     fillStyleContainer,
     geometryContainer,
     imageStyleContainer,
+    projTransforms,
     strokeStyleContainer,
     style,
     textStyleContainer,
+    waitForMap,
   } from '../../mixins'
-  import { mergeDescriptors, sequential } from '../../utils'
+  import { dumpFillStyle, dumpImageStyle, dumpStrokeStyle, dumpTextStyle, EPSG_3857 } from '../../ol-ext'
+  import {
+    clonePlainObject,
+    coalesce,
+    isEqual,
+    isObjectLike,
+    lowerFirst,
+    makeWatchers,
+    mergeDescriptors,
+    upperFirst,
+  } from '../../utils'
   import CircleStyle from './circle.vue'
   import FillStyle from './fill.vue'
   import StrokeStyle from './stroke.vue'
@@ -39,12 +51,14 @@
       StrokeStyle,
     },
     mixins: [
+      projTransforms,
       fillStyleContainer,
       strokeStyleContainer,
       textStyleContainer,
       imageStyleContainer,
       geometryContainer,
       style,
+      waitForMap,
     ],
     stubVNode: {
       empty: false,
@@ -73,12 +87,94 @@
        */
       condition: [Boolean, Function],
     },
+    data () {
+      return {
+        viewProjection: EPSG_3857,
+        dataProjection: EPSG_3857,
+        currentZIndex: this.zIndex,
+        currentRenderer: this.renderer,
+      }
+    },
+    computed: {
+      stroke () {
+        if (!(this.rev && this.$stroke)) return
+
+        return dumpStrokeStyle(this.$stroke)
+      },
+      fill () {
+        if (!(this.rev && this.$fill)) return
+
+        return dumpFillStyle(this.$fill)
+      },
+      text () {
+        if (!(this.rev && this.$text)) return
+
+        return dumpTextStyle(this.$text)
+      },
+      image () {
+        if (!(this.rev && this.$image)) return
+
+        return dumpImageStyle(this.$image)
+      },
+      geometryDataProj () {
+        if (!(this.rev && this.$geometry)) return
+
+        return this.writeGeometryInDataProj(this.$geometry)
+      },
+      geometryViewProj () {
+        if (!(this.rev && this.$geometry)) return
+
+        return this.writeGeometryInViewProj(this.$geometry)
+      },
+    },
     watch: {
-      zIndex: /*#__PURE__*/sequential(async function (value) {
-        await this.setZIndex(value)
+      rev () {
+        if (!this.$style) return
+
+        this.setZIndex(this.getZIndex())
+        this.setRenderer(this.getRenderer())
+      },
+      .../*#__PURE__*/makeWatchers([
+        'zIndex',
+        'renderer',
+      ], inProp => {
+        const prop = inProp.slice(0, 5) === 'input' ? lowerFirst(inProp.slice(5)) : inProp
+        const setter = 'set' + upperFirst(prop)
+
+        return function (value) {
+          this[setter](value)
+        }
       }),
-      renderer: /*#__PURE__*/sequential(async function (value) {
-        await this.setRenderer(value)
+      .../*#__PURE__*/makeWatchers([
+        'currentZIndex',
+        'currentRenderer',
+      ], curProp => {
+        const prop = curProp.slice(0, 7) === 'current' ? lowerFirst(curProp.slice(7)) : curProp
+        const inProp = 'input' + upperFirst(prop)
+
+        return function (value) {
+          if (isEqual(value, coalesce(this[inProp], this[prop]))) return
+
+          this.$emit(`update:${prop}`, isObjectLike(value) ? clonePlainObject(value) : value)
+        }
+      }),
+      .../*#__PURE__*/makeWatchers([
+        'fill',
+        'stroke',
+        'text',
+        'image',
+        'geometryDataProj',
+      ], prop => {
+        prop = prop.replace(/(DataProj|ViewProj)$/i, '')
+
+        return {
+          deep: true,
+          handler (value, prev) {
+            if (isEqual(value, prev)) return
+
+            this.$emit(`update:${prop}`, isObjectLike(value) ? clonePlainObject(value) : value)
+          },
+        }
       }),
     },
     created () {
@@ -87,6 +183,8 @@
           this.$logger.warn("'condition' is deprecated. Use v-if directive instead.")
         }
       }
+
+      this::defineServices()
     },
     updated () {
       if (process.env.NODE_ENV !== 'production') {
@@ -97,13 +195,23 @@
     },
     methods: {
       /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async beforeInit () {
+        await Promise.all([
+          this::style.methods.beforeInit(),
+          this::waitForMap.methods.beforeInit(),
+        ])
+      },
+      /**
        * @return {module:ol/style/Style~Style}
        * @protected
        */
       createStyle () {
         return new Style({
-          zIndex: this.zIndex,
-          renderer: this.renderer,
+          zIndex: this.currentZIndex,
+          renderer: this.currentRenderer,
           fill: this.$fill,
           stroke: this.$stroke,
           image: this.$image,
@@ -116,9 +224,7 @@
        * @protected
        */
       async mount () {
-        if (this.$styleContainer) {
-          await this.$styleContainer.addStyle(this)
-        }
+        this.$styleContainer?.addStyle(this)
 
         return this::style.methods.mount()
       },
@@ -127,9 +233,7 @@
        * @protected
        */
       async unmount () {
-        if (this.$styleContainer) {
-          await this.$styleContainer.removeStyle(this)
-        }
+        this.$styleContainer?.removeStyle(this)
 
         return this::style.methods.unmount()
       },
@@ -137,11 +241,10 @@
        * @return {Promise}
        */
       async refresh () {
-        this::style.methods.refresh()
-
-        if (this.$styleContainer) {
-          this.$styleContainer.refresh()
-        }
+        await Promise.all([
+          this::style.methods.refresh(),
+          this.$styleContainer?.refresh(),
+        ])
       },
       /**
        * @returns {Object}
@@ -157,107 +260,79 @@
           this::geometryContainer.methods.getServices(),
         )
       },
-      async getZIndex () {
-        return (await this.resolveStyle()).getZIndex()
-      },
-      async setZIndex (zIndex) {
-        if (zIndex === await this.getZIndex()) return
+      /**
+       * @protected
+       */
+      syncNonObservable () {
+        this::style.methods.syncNonObservable()
 
-        (await this.resolveStyle()).setZIndex(zIndex)
-        await this.scheduleRemount()
+        this.setZIndex(this.getZIndex())
+        this.setRenderer(this.getRenderer())
       },
-      async getRenderer () {
-        return (await this.resolveStyle()).getRenderer()
+      getZIndex () {
+        return coalesce(this.$style?.getZIndex(), this.currentZIndex)
       },
-      async setRenderer (renderer) {
-        if (renderer === await this.getRenderer()) return
-
-        (await this.resolveStyle()).setRenderer(renderer)
-        await this.scheduleRemount()
-      },
-      async getGeometryFunction () {
-        return (await this.resolveStyle()).getGeometryFunction()
-      },
-      async getFillStyleTarget () {
-        const style = await this.resolveStyle()
-
-        return {
-          setFill: async fill => {
-            style.setFill(fill)
-            ++this.rev
-
-            if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('fill changed, scheduling refresh...')
-            }
-
-            await this.scheduleRefresh()
-          },
+      setZIndex (zIndex) {
+        if (zIndex !== this.currentZIndex) {
+          this.currentZIndex = zIndex
+          this.scheduleRefresh()
+        }
+        if (this.$style && zIndex !== this.$style.getZIndex()) {
+          this.$style.setZIndex(zIndex)
+          this.scheduleRefresh()
         }
       },
-      async getStrokeStyleTarget () {
-        const style = await this.resolveStyle()
-
-        return {
-          setStroke: async stroke => {
-            style.setStroke(stroke)
-            ++this.rev
-
-            if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('stroke changed, scheduling refresh...')
-            }
-
-            await this.scheduleRefresh()
-          },
+      getRenderer () {
+        return coalesce(this.$style?.getRenderer(), this.currentRenderer)
+      },
+      setRenderer (renderer) {
+        if (renderer !== this.currentRenderer) {
+          this.currentRenderer = renderer
+          this.scheduleRefresh()
+        }
+        if (this.$style && renderer !== this.$style.getRenderer()) {
+          this.$style.setRenderer(renderer)
+          this.scheduleRefresh()
         }
       },
-      async getTextStyleTarget () {
-        const style = await this.resolveStyle()
-
-        return {
-          setText: async text => {
-            style.setText(text)
-            ++this.rev
-
-            if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('text changed, scheduling refresh...')
-            }
-
-            await this.scheduleRefresh()
-          },
-        }
+      // todo add support for geometry function
+      getGeometryFunction () {
+        return this.$style?.getGeometryFunction()
       },
-      async getImageStyleTarget () {
-        const style = await this.resolveStyle()
-
-        return {
-          setImage: async image => {
-            style.setImage(image)
-            ++this.rev
-
-            if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('image changed, scheduling refresh...')
-            }
-
-            await this.scheduleRefresh()
-          },
-        }
+      getFillStyleTarget () {
+        return this.$style
       },
-      async geometryContainer () {
-        const style = await this.resolveStyle()
-
-        return {
-          setGeometry: async geometry => {
-            style.setGeometry(geometry)
-            ++this.rev
-
-            if (process.env.VUELAYERS_DEBUG) {
-              this.$logger.log('geometry changed, scheduling refresh...')
-            }
-
-            await this.scheduleRefresh()
-          },
-        }
+      getStrokeStyleTarget () {
+        return this.$style
+      },
+      getTextStyleTarget () {
+        return this.$style
+      },
+      getImageStyleTarget () {
+        return this.$style
+      },
+      getGeometryTarget () {
+        return this.$style
       },
     },
+  }
+
+  function defineServices () {
+    Object.defineProperties(this, {
+      /**
+       * @type {Object|undefined}
+       */
+      $mapVm: {
+        enumerable: true,
+        get: () => this.$services?.mapVm,
+      },
+      /**
+       * @type {Object|undefined}
+       */
+      $viewVm: {
+        enumerable: true,
+        get: () => this.$services?.viewVm,
+      },
+    })
   }
 </script>

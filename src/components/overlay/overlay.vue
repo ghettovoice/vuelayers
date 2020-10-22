@@ -3,23 +3,29 @@
     :id="vmId"
     :class="classes">
     <slot
-      :id="currentId"
-      :position="currentPositionDataProj"
-      :offset="currentOffset"
-      :positioning="currentPositioning" />
+      :id="resolvedId"
+      :position="resolvedPositionDataProj"
+      :offset="resolvedOffset"
+      :positioning="resolvedPositioning" />
   </div>
 </template>
 
 <script>
-  import debounce from 'debounce-promise'
   import { Overlay } from 'ol'
   import OverlayPositioning from 'ol/OverlayPositioning'
-  import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
+  import { makeChangeOrRecreateWatchers, olCmp, projTransforms, waitForMap } from '../../mixins'
   import { EPSG_3857, getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, identity, isEqual, makeWatchers, sequential } from '../../utils'
+  import {
+    addPrefix,
+    assert,
+    clonePlainObject,
+    coalesce,
+    identity,
+    isArray,
+    isEqual,
+    isPlainObject,
+  } from '../../utils'
 
   export default {
     name: 'VlOverlay',
@@ -63,6 +69,9 @@
         visible: false,
         viewProjection: EPSG_3857,
         dataProjection: EPSG_3857,
+        currentOffset: this.offset.slice(),
+        currentPositionViewProj: roundPointCoords(this.position),
+        currentPositioning: this.positioning,
       }
     },
     computed: {
@@ -73,32 +82,25 @@
         return this.pointToViewProj(this.position)
       },
       currentPositionDataProj () {
-        if (this.rev && this.$overlay) {
-          return this.getPositionInternal()
-        }
-
-        return this.positionDataProj
+        return this.pointToDataProj(this.currentPositionViewProj)
       },
-      currentPositionViewProj () {
-        if (this.rev && this.$overlay) {
-          return this.getPositionInternal(true)
-        }
-
-        return this.positionViewProj
+      inputOffset () {
+        return this.offset.slice()
       },
-      currentPositioning () {
-        if (this.rev && this.$overlay) {
-          return this.getPositioningInternal()
-        }
-
-        return this.positioning
+      inputAutoPan () {
+        return isPlainObject(this.autoPan)
+          ? clonePlainObject(this.autoPan)
+          : this.autoPan
       },
-      currentOffset () {
-        if (this.rev && this.$overlay) {
-          return this.getOffsetInternal()
-        }
-
-        return this.offset
+      inputAutoPanAnimation () {
+        return isPlainObject(this.autoPanAnimation)
+          ? clonePlainObject(this.autoPanAnimation)
+          : this.autoPanAnimation
+      },
+      inputAutoPanOptions () {
+        return isPlainObject(this.autoPanOptions)
+          ? clonePlainObject(this.autoPanOptions)
+          : this.autoPanOptions
       },
       classes () {
         return [
@@ -108,64 +110,82 @@
       },
     },
     watch: {
-      offset: {
+      rev () {
+        if (!this.$overlay) return
+
+        if (!isEqual(this.currentOffset, this.$overlay.getOffset())) {
+          this.currentOffset = this.$overlay.getOffset()
+        }
+        if (!isEqual(this.currentPositionViewProj, this.$overlay.getPosition())) {
+          this.currentPositionViewProj = this.$overlay.getPosition()
+        }
+        if (this.currentPositioning !== this.$overlay.getPositioning()) {
+          this.currentPositioning = this.$overlay.getPositioning()
+        }
+      },
+      inputOffset: {
         deep: true,
-        handler: /*#__PURE__*/sequential(async function (value) {
-          await this.setOffset(value)
-        }),
+        handler (value) {
+          this.setOffset(value)
+        },
       },
       currentOffset: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value) {
-          if (isEqual(value, this.offset)) return
+        handler (value) {
+          if (isEqual(value, this.inputOffset)) return
 
-          this.$emit('update:offset', clonePlainObject(value))
-        }, FRAME_TIME),
+          this.$emit('update:offset', value.slice())
+        },
       },
       positionViewProj: {
         deep: true,
-        handler: /*#__PURE__*/sequential(async function (value) {
-          await this.setPosition(value, true)
-        }),
+        handler (value) {
+          this.setPosition(value, true)
+        },
       },
       currentPositionDataProj: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value) {
+        handler (value) {
           if (isEqual(value, this.positionDataProj)) return
 
-          this.$emit('update:position', clonePlainObject(value))
-        }, FRAME_TIME),
+          this.$emit('update:position', value?.slice())
+        },
       },
-      positioning: /*#__PURE__*/sequential(async function (value) {
-        await this.setPositioning(value)
-      }),
-      currentPositioning: /*#__PURE__*/debounce(function (value) {
+      positioning (value) {
+        this.setPositioning(value)
+      },
+      currentPositioning (value) {
         if (value === this.positioning) return
 
         this.$emit('update:positioning', value)
-      }, FRAME_TIME),
-      .../*#__PURE__*/makeWatchers([
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'stopEvent',
         'insertFirst',
-        'autoPan',
         'autoPanMargin',
-        'autoPanAnimation',
-        'autoPanOptions',
         'className',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
-    },
-    created () {
-      this::defineServices()
+        'inputAutoPan',
+        'inputAutoPanAnimation',
+        'inputAutoPanOptions',
+      ], [
+        'inputAutoPan',
+        'inputAutoPanAnimation',
+        'inputAutoPanOptions',
+      ]),
     },
     methods: {
+      /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async beforeInit () {
+        this::defineServices()
+
+        await Promise.all([
+          this::olCmp.methods.beforeInit(),
+          this::waitForMap.methods.beforeInit(),
+        ])
+      },
       /**
        * @return {module:ol/Overlay~Overlay}
        * @protected
@@ -179,10 +199,10 @@
           positioning: this.currentPositioning,
           stopEvent: this.stopEvent,
           insertFirst: this.insertFirst,
-          autoPan: this.autoPan,
+          autoPan: this.inputAutoPan,
           autoPanMargin: this.autoPanMargin,
-          autoPanAnimation: this.autoPanAnimation,
-          autoPanOptions: this.autoPanOptions,
+          autoPanAnimation: this.inputAutoPanAnimation,
+          autoPanOptions: this.inputAutoPanOptions,
           className: this.className,
         })
         initializeOverlay(overlay, this.currentId)
@@ -195,9 +215,7 @@
        */
       async mount () {
         this.visible = true
-        if (this.$overlaysContainer) {
-          await this.$overlaysContainer.addOverlay(this.$overlay)
-        }
+        this.$overlaysContainer?.addOverlay(this.$overlay)
 
         return this::olCmp.methods.mount()
       },
@@ -206,9 +224,7 @@
        * @protected
        */
       async unmount () {
-        if (this.$overlaysContainer) {
-          await this.$overlaysContainer.removeOverlay(this.$overlay)
-        }
+        this.$overlaysContainer?.removeOverlay(this.$overlay)
         this.visible = false
 
         return this::olCmp.methods.unmount()
@@ -221,63 +237,77 @@
         this::olCmp.methods.subscribeAll()
         this::subscribeToOverlayChanges()
       },
-      resolveOverlay: olCmp.methods.resolveOlObject,
+      /**
+       * @return {*}
+       * @protected
+       */
       getIdInternal () {
         return getOverlayId(this.$overlay)
       },
+      /**
+       * @param {*} id
+       * @protected
+       */
       setIdInternal (id) {
-        assert(id != null && id !== '', 'Invalid feature id')
-
         if (id === this.getIdInternal()) return
 
         setOverlayId(this.$overlay, id)
       },
-      async getOffset () {
-        await this.resolveOverlay()
+      /**
+       * @return {Promise<module:ol/Overlay~Overlay>}
+       */
+      resolveOverlay: olCmp.methods.resolveOlObject,
+      getOffset () {
+        return coalesce(this.$overlay?.getOffset(), this.currentOffset)
+      },
+      setOffset (offset) {
+        assert(isArray(offset) && offset.length === 2, 'Invalid offset')
+        offset = offset.slice()
 
-        return this.getOffsetInternal()
-      },
-      getOffsetInternal () {
-        return this.$overlay.getOffset()
-      },
-      async setOffset (offset) {
-        if (isEqual(offset, await this.getOffset())) return
-
-        (await this.resolveOverlay()).setOffset(offset)
-      },
-      async getPosition (viewProj = false) {
-        await this.resolveOverlay()
-
-        return this.getPositionInternal(viewProj)
-      },
-      getPositionInternal (viewProj = false) {
-        const position = this.$overlay.getPosition()
-        if (viewProj) {
-          return roundPointCoords(position)
+        if (!isEqual(offset, this.currentOffset)) {
+          this.currentOffset = offset
         }
+        if (this.$overlay && !isEqual(offset, this.$overlay.getOffset())) {
+          this.$overlay.setOffset(offset)
+        }
+      },
+      getPosition (viewProj = false) {
+        if (!this.$overlay) {
+          return viewProj ? this.currentPositionViewProj : this.currentPositionDataProj
+        }
+
+        const position = this.$overlay.getPosition()
+        if (viewProj) return roundPointCoords(position)
 
         return this.pointToDataProj(position)
       },
-      async setPosition (position, viewProj = false) {
-        if (isEqual(position, await this.getPosition(viewProj))) return
+      setPosition (position, viewProj = false) {
+        assert(isArray(position) && position.length === 2, 'Invalid position')
+        position = position.slice()
+
         if (!viewProj) {
           position = this.pointToViewProj(position)
         }
 
-        (await this.resolveOverlay()).setPosition(position)
+        if (!isEqual(position, this.currentPositionViewProj)) {
+          this.currentPositionViewProj = position
+        }
+        if (this.$overlay && !isEqual(position, this.$overlay.getPosition())) {
+          this.$overlay.setPosition(position)
+        }
       },
-      async getPositioning () {
-        await this.resolveOverlay()
+      getPositioning () {
+        return this.$overlay?.getPositioning() || this.currentPositioning
+      },
+      setPositioning (positioning) {
+        positioning = !!positioning
 
-        return this.getPositioningInternal()
-      },
-      getPositioningInternal () {
-        return this.$overlay.getPositioning()
-      },
-      async setPositioning (positioning) {
-        if (positioning === await this.getPositioning()) return
-
-        (await this.resolveOverlay()).setPositioning(positioning)
+        if (positioning !== this.currentPositioning) {
+          this.currentPositioning = positioning
+        }
+        if (this.$overlay && positioning !== this.$overlay.getPositioning()) {
+          this.$overlay.setPositioning(positioning)
+        }
       },
       async panIntoView (options = {}) {
         (await this.resolveOverlay()).panIntoView(options)
@@ -311,30 +341,21 @@
    * @private
    */
   function subscribeToOverlayChanges () {
-    const prefixKey = addPrefix('current')
-    const positionChanges = obsFromOlChangeEvent(this.$overlay, 'position', true).pipe(
-      mergeMap(({ prop }) => fromObs(this.getPosition()).pipe(
-        mapObs(position => ({
-          prop,
-          value: position,
-          compareWith: this.currentPositionDataProj,
-        })),
-      )),
-    )
-    const propChanges = mergeObs(
-      obsFromOlChangeEvent(this.$overlay, [
-        'offset',
-        'positioning',
-      ], true, evt => ({
-        ...evt,
-        compareWith: this[prefixKey(evt.prop)],
-      })),
-      positionChanges,
-    ).pipe(
-      skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
-    )
-    this.subscribeTo(propChanges, () => {
-      ++this.rev
-    })
+    const setterKey = addPrefix('set')
+    const propChanges = obsFromOlChangeEvent(this.$overlay, [
+      'offset',
+      'position',
+      'positioning',
+    ], true, evt => ({
+      ...evt,
+      setter: val => {
+        const args = [val]
+        if (evt.prop === 'position') {
+          args.push(true)
+        }
+        this[setterKey(evt.prop)](...args)
+      },
+    }))
+    this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
   }
 </script>

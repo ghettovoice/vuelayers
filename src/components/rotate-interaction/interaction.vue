@@ -1,5 +1,4 @@
 <script>
-  import debounce from 'debounce-promise'
   import { Collection } from 'ol'
   import RotateInteraction from 'ol-rotate-feature'
   import { always } from 'ol/events/condition'
@@ -7,19 +6,19 @@
   import VectorEventType from 'ol/source/VectorEventType'
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
-  import { FRAME_TIME, interaction, styleContainer } from '../../mixins'
-  import { roundPointCoords } from '../../ol-ext'
-  import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
+  import { interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
+  import { isPointCoords, roundPointCoords } from '../../ol-ext'
+  import { fromOlChangeEvent as obsFromOlChangeEvent, fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import {
+    addPrefix,
     assert,
-    clonePlainObject,
+    coalesce,
     instanceOf,
     isEqual,
     isFunction,
-    makeWatchers,
+    isNumber,
     map,
     mergeDescriptors,
-    sequential,
   } from '../../utils'
 
   export default {
@@ -63,70 +62,66 @@
         default: true,
       },
     },
+    data () {
+      return {
+        currentAnchorViewProj: roundPointCoords(this.anchor),
+        currentAngle: this.angle,
+      }
+    },
     computed: {
       anchorDataProj () {
-        if (!this.anchor) return
-
         return roundPointCoords(this.anchor)
       },
       anchorViewProj () {
-        if (!this.anchor) return
-
         return this.pointToViewProj(this.anchor)
       },
       currentAnchorDataProj () {
-        if (this.rev && this.$interaction) {
-          return this.getAnchorInternal()
-        }
-        return this.anchorDataProj
-      },
-      currentAnchorViewProj () {
-        if (this.rev && this.$interaction) {
-          return this.getAnchorInternal(true)
-        }
-        return this.anchorViewProj
-      },
-      currentAngle () {
-        if (this.rev && this.$interaction) {
-          return this.getAngleInternal()
-        }
-        return this.angle
+        return this.pointToDataProj(this.currentAnchorViewProj)
       },
     },
     watch: {
+      rev () {
+        if (!this.$interaction) return
+
+        if (!isEqual(this.currentAnchorViewProj, this.$interaction.getAnchor())) {
+          this.currentAnchorViewProj = this.$interaction.getAnchor()
+        }
+        if (this.currentAngle !== this.$interaction.getAngle()) {
+          this.currentAngle = this.$interaction.getAngle()
+        }
+      },
       anchorViewProj: {
         deep: true,
-        handler: /*#__PURE__*/sequential(async function (value) {
-          await this.setAnchor(value, true)
-        }),
+        handler (value) {
+          if (!value) return
+
+          this.setAnchor(value, true)
+        },
       },
       currentAnchorDataProj: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value) {
+        handler (value) {
           if (isEqual(value, this.anchorDataProj)) return
 
-          this.$emit('update:anchor', clonePlainObject(value))
-        }, FRAME_TIME),
+          this.$emit('update:anchor', value?.slice())
+        },
       },
-      angle: /*#__PURE__*/sequential(async function (value) {
-        await this.setAngle(value)
-      }),
-      currentAngle: /*#__PURE__*/debounce(function (value) {
+      angle (value) {
+        this.setAngle(value)
+      },
+      currentAngle (value) {
         if (value === this.angle) return
 
         this.$emit('update:angle', value)
-      }, FRAME_TIME),
-      .../*#__PURE__*/makeWatchers([
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'source',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+        'condition',
+        'allowAnchorMovement',
+      ]),
+    },
+    created () {
+      this.currentAnchorViewProj = this.anchorViewProj?.slice()
     },
     methods: {
       /**
@@ -181,7 +176,6 @@
         )
       },
       /**
-       * @return {void}
        * @protected
        */
       subscribeAll () {
@@ -194,45 +188,44 @@
        */
       getStyleTarget () {
         return {
-          setStyle: async () => {
+          getStyle: () => this._style,
+          setStyle: () => {
             if (process.env.VUELAYERS_DEBUG) {
               this.$logger.log('style changed, scheduling recreate...')
             }
 
-            await this.scheduleRecreate()
+            this.scheduleRecreate()
           },
         }
       },
-      async getAngle () {
-        await this.resolveInteraction()
+      getAngle () {
+        return coalesce(this.$interaction?.getAngle(), this.currentAngle)
+      },
+      setAngle (angle) {
+        assert(isNumber(angle), 'Invalid angle')
 
-        return this.getAngleInternal()
-      },
-      getAngleInternal () {
-        return this.$interaction.getAngle()
-      },
-      async setAngle (angle) {
-        (await this.resolveInteraction()).setAngle(angle)
-      },
-      async getAnchor (viewProj = false) {
-        await this.resolveInteraction()
-
-        return this.getAnchorInternal(viewProj)
-      },
-      getAnchorInternal (viewProj = false) {
-        const anchor = this.$interaction.getAnchor()
-        if (viewProj) {
-          return roundPointCoords(anchor)
+        if (angle !== this.currentAngle) {
+          this.currentAngle = angle
         }
-
-        return this.pointToDataProj(anchor)
-      },
-      async setAnchor (anchor, viewProj = false) {
-        if (isEqual(anchor, await this.getAnchor(viewProj))) return
-        if (!viewProj) {
-          anchor = this.pointToViewProj(anchor)
+        if (this.$interaction && angle !== this.$interaction.getAngle()) {
+          this.$interaction.setAngle(angle)
         }
-        (await this.resolveInteraction()).setAnchor(anchor)
+      },
+      getAnchor (viewProj = false) {
+        const anchor = coalesce(this.$interaction?.getAnchor(), this.currentAnchorViewProj)
+
+        return viewProj ? roundPointCoords(anchor) : this.pointToDataProj(anchor)
+      },
+      setAnchor (anchor, viewProj = false) {
+        assert(isPointCoords(anchor), 'Invalid anchor')
+        anchor = viewProj ? roundPointCoords(anchor) : this.pointToViewProj(anchor)
+
+        if (!isEqual(anchor, this.currentAnchorViewProj)) {
+          this.currentAnchorViewProj = anchor
+        }
+        if (this.$interaction && !isEqual(anchor, this.$interaction.getAnchor())) {
+          this.$interaction.setAnchor(anchor)
+        }
       },
     },
   }
@@ -241,6 +234,22 @@
    * @private
    */
   function subscribeToInteractionChanges () {
+    const setterKey = addPrefix('set')
+    const propChanges = obsFromOlChangeEvent(this.$interaction, [
+      'angle',
+      'anchor',
+    ], true, evt => ({
+      ...evt,
+      setter: val => {
+        const args = [val]
+        if (evt.prop === 'anchor') {
+          args.push(true)
+        }
+        this[setterKey(evt.prop)](...args)
+      },
+    }))
+    this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
+
     const vm = this
     const start = obsFromOlEvent(this.$interaction, 'rotatestart')
     const end = obsFromOlEvent(this.$interaction, 'rotateend')
@@ -260,8 +269,7 @@
       })),
     )
     this.subscribeTo(events, evt => {
-      ++this.rev
-
+      this.scheduleRefresh()
       this.$emit(evt.type, evt)
     })
   }

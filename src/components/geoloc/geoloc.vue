@@ -4,26 +4,27 @@
     :class="vmClass"
     style="display: none !important;">
     <slot
-      :accuracy="currentAccuracy"
-      :accuracy-geometry="currentAccuracyGeometryDataProj"
-      :altitude="currentAltitude"
-      :altitude-accuracy="currentAltitudeAccuracy"
-      :heading="currentHeading"
-      :position="currentPositionDataProj"
-      :speed="currentSpeed" />
+      :accuracy="accuracy"
+      :accuracy-geometry="accuracyGeometryDataProj"
+      :altitude="altitude"
+      :altitude-accuracy="altitudeAccuracy"
+      :heading="heading"
+      :position="positionDataProj"
+      :speed="speed" />
   </i>
 </template>
 
 <script>
-  import debounce from 'debounce-promise'
   import { Geolocation } from 'ol'
-  import { equivalent as isEqProj, get as getProj } from 'ol/proj'
-  import { from as fromObs, merge as mergeObs } from 'rxjs'
-  import { map as mapObs, mergeMap, skipWhile } from 'rxjs/operators'
-  import { FRAME_TIME, olCmp, projTransforms, waitForMap } from '../../mixins'
+  import { get as getProj } from 'ol/proj'
+  import { merge as mergeObs } from 'rxjs'
+  import { map as mapObs } from 'rxjs/operators'
+  import { olCmp, projTransforms, waitForMap } from '../../mixins'
   import { EPSG_3857 } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, coalesce, isEqual, sequential } from '../../utils'
+  import { addPrefix, and, assert, clonePlainObject, coalesce, isEqual, isString } from '../../utils'
+
+  const validateProjection = /*#__PURE__*/and(isString, value => getProj(value) != null)
 
   export default {
     name: 'VlGeoloc',
@@ -45,165 +46,157 @@
       trackingOptions: Object,
       projection: {
         type: String,
-        validator: value => getProj(value) != null,
+        validator: validateProjection,
       },
     },
     data () {
       return {
         viewProjection: EPSG_3857,
         dataProjection: EPSG_3857,
+        currentTracking: this.tracking,
+        currentTrackingOptions: this.trackingOptions && clonePlainObject(this.trackingOptions),
+        currentProjection: this.projection,
       }
     },
     computed: {
-      currentTracking () {
-        if (this.rev && this.$geolocation) {
-          return this.getTrackingInternal()
-        }
-
-        return this.tracking
-      },
-      currentTrackingOptions () {
-        if (this.rev && this.$geolocation) {
-          return this.getTrackingOptionsInternal()
-        }
-
-        return this.trackingOptions
-      },
-      currentProjection () {
-        if (this.rev && this.$geolocation) {
-          return getProj(this.getProjectionInternal()).getCode()
-        }
-
-        return this.projection
-      },
       resolvedDataProjection () {
         return coalesce(
           this.currentProjection,
-          this.$options?.dataProjection, // may or may not be present
-          this.dataProjection, // may or may not be present
+          this.$options?.dataProjection,
+          this.dataProjection,
           this.resolvedViewProjection,
         )
       },
-      currentAccuracy () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.getAccuracyInternal()
+      accuracy () {
+        return this.rev ? this.getAccuracy() : undefined
       },
-      currentAccuracyGeometryDataProj () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.writeGeometryInDataProj(this.getAccuracyGeometryInternal())
+      accuracyGeometryDataProj () {
+        return this.rev ? this.writeGeometryInDataProj(this.getAccuracyGeometry()) : undefined
       },
-      currentAccuracyGeometryViewProj () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.writeGeometryInViewProj(this.getAccuracyGeometryInternal())
+      accuracyGeometryViewProj () {
+        return this.rev ? this.writeGeometryInViewProj(this.getAccuracyGeometry()) : undefined
       },
-      currentAltitude () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.getAltitudeInternal()
+      altitude () {
+        return this.rev ? this.getAltitude() : undefined
       },
-      currentAltitudeAccuracy () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.getAltitudeAccuracyInternal()
+      altitudeAccuracy () {
+        return this.rev ? this.getAltitudeAccuracy() : undefined
       },
-      currentHeading () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.getHeadingInternal()
+      heading () {
+        return this.rev ? this.getHeading() : undefined
       },
-      currentSpeed () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.getSpeedInternal()
+      speed () {
+        return this.rev ? this.getSpeed() : undefined
       },
-      currentPositionDataProj () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.getPositionInternal()
+      positionDataProj () {
+        return this.rev ? this.getPosition() : undefined
       },
-      currentPositionViewProj () {
-        if (!(this.rev && this.$geolocation)) return
-
-        return this.pointToViewProj(this.getPositionInternal())
+      positionViewProj () {
+        return this.rev ? this.pointToViewProj(this.getPosition()) : undefined
       },
     },
     watch: {
-      tracking: /*#__PURE__*/sequential(async function (value) {
-        await this.setTracking(value)
-      }),
-      currentTracking: /*#__PURE__*/debounce(function (value) {
+      rev () {
+        if (!this.$geolocation) return
+
+        if (this.currentTracking !== this.$geolocation.getTracking()) {
+          this.currentTracking = this.$geolocation.getTracking()
+        }
+        if (!isEqual(this.currentTrackingOptions, this.$geolocation.getTrackingOptions())) {
+          this.currentTrackingOptions = this.$geolocation.getTrackingOptions()
+        }
+        if (this.currentProjection !== this.$geolocation.getProjection().getCode()) {
+          this.currentProjection = this.$geolocation.getProjection().getCode()
+        }
+      },
+      tracking (value) {
+        this.setTracking(value)
+      },
+      currentTracking (value) {
         if (value === this.tracking) return
 
         this.$emit('update:tracking', value)
-      }, FRAME_TIME),
-      tracingOptions: /*#__PURE__*/sequential(async function (value) {
-        await this.setTrackingOptions(value)
-      }),
+      },
+      tracingOptions: {
+        deep: true,
+        handler (value) {
+          this.setTrackingOptions(value)
+        },
+      },
       currentTrackingOptions: {
         deep: true,
-        handler: /*#__PURE__*/debounce(function (value) {
+        handler (value) {
           if (isEqual(value, this.trackingOptions)) return
 
-          value && (value = clonePlainObject(value))
-          this.$emit('update:tracingOptions', value)
-        }, FRAME_TIME),
+          this.$emit('update:tracingOptions', value && clonePlainObject(value))
+        },
       },
-      currentProjection: /*#__PURE__*/debounce(function (value) {
+      projection (value) {
+        this.setProjection(value)
+      },
+      currentProjection (value) {
         if (value === this.projection) return
 
         this.$emit('update:projection', value)
-      }, FRAME_TIME),
-      currentAccuracy: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      accuracy (value, prev) {
         if (value === prev) return
 
         this.$emit('update:accuracy', value)
-      }, FRAME_TIME),
-      currentAccuracyGeometryDataProj: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      accuracyGeometryDataProj (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:accuracyGeometry', value)
-      }, FRAME_TIME),
-      currentAltitude: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      currentAltitude (value, prev) {
         if (value === prev) return
 
         this.$emit('update:altitude', value)
-      }, FRAME_TIME),
-      currentAltitudeAccuracy: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      altitudeAccuracy (value, prev) {
         if (value === prev) return
 
         this.$emit('update:altitudeAccuracy', value)
-      }, FRAME_TIME),
-      currentHeading: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      heading (value, prev) {
         if (value === prev) return
 
         this.$emit('update:heading', value)
-      }, FRAME_TIME),
-      currentSpeed: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      speed (value, prev) {
         if (value === prev) return
 
         this.$emit('update:speed', value)
-      }, FRAME_TIME),
-      currentPositionDataProj: /*#__PURE__*/debounce(function (value, prev) {
+      },
+      positionDataProj (value, prev) {
         if (isEqual(value, prev)) return
 
         this.$emit('update:position', value)
-      }, FRAME_TIME),
+      },
     },
     created () {
       this::defineServices()
     },
     methods: {
       /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async beforeInit () {
+        await Promise.all([
+          this::olCmp.methods.beforeInit(),
+          this::waitForMap.methods.beforeInit(),
+        ])
+      },
+      /**
        * @return {module:ol/Geolocation~Geolocation}
        * @private
        */
       createOlObject () {
         const geoloc = new Geolocation({
-          tracking: this.tracking,
-          trackingOptions: this.trackingOptions,
+          tracking: this.currentTracking,
+          trackingOptions: this.currentTrackingOptions,
           projection: this.resolvedDataProjection,
         })
         geoloc.set('id', this.currentId)
@@ -214,8 +207,8 @@
        * @return {Promise<void>}
        * @protected
        */
-      async mount () {
-        await this.setTracking(this.tracking)
+      mount () {
+        this.setTracking(this.tracking)
 
         return this::olCmp.methods.mount()
       },
@@ -223,13 +216,12 @@
        * @return {Promise<void>}
        * @protected
        */
-      async unmount () {
-        await this.setTracking(false)
+      unmount () {
+        this.setTracking(false)
 
         return this::olCmp.methods.unmount()
       },
       /**
-       * @return {void}
        * @protected
        */
       subscribeAll () {
@@ -248,189 +240,105 @@
        * @return {void}
        */
       setIdInternal (id) {
-        assert(id != null && id !== '', 'Invalid geolocation id')
-
         if (id === this.getIdInternal()) return
 
         this.$geolocation.set('id', id)
       },
       /**
-       * @return {Promise<number|undefined>}
+       * @return {number|undefined}
        */
-      async getAccuracy () {
-        await this.resolveGeolocation()
-
-        return this.getAccuracyInternal()
-      },
-      /**
-       * @return {number}
-       * @protected
-       */
-      getAccuracyInternal () {
-        return this.$geolocation.getAccuracy()
-      },
-      /**
-       * @return {Promise<module:/ol/geom/Geometry~Geometry|undefined>}
-       */
-      async getAccuracyGeometry () {
-        await this.resolveGeolocation()
-
-        return this.getAccuracyGeometryInternal()
+      getAccuracy () {
+        return this.$geolocation?.getAccuracy()
       },
       /**
        * @return {module:/ol/geom/Geometry~Geometry|undefined}
-       * @protected
        */
-      getAccuracyGeometryInternal () {
-        return this.$geolocation.getAccuracyGeometry()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getAltitude () {
-        await this.resolveGeolocation()
-
-        return this.getAltitudeInternal()
+      getAccuracyGeometry () {
+        return this.$geolocation?.getAccuracyGeometry()
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getAltitudeInternal () {
-        return this.$geolocation.getAltitude()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getAltitudeAccuracy () {
-        await this.resolveGeolocation()
-
-        return this.getAltitudeAccuracyInternal()
+      getAltitude () {
+        return this.$geolocation?.getAltitude()
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getAltitudeAccuracyInternal () {
-        return this.$geolocation.getAltitudeAccuracy()
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getHeading () {
-        await this.resolveGeolocation()
-
-        return this.getHeadingInternal()
+      getAltitudeAccuracy () {
+        return this.$geolocation?.getAltitudeAccuracy()
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getHeadingInternal () {
-        return this.$geolocation.getHeading()
-      },
-      /**
-       * @return {Promise<number[]|undefined>}
-       */
-      async getPosition () {
-        await this.resolveGeolocation()
-
-        return this.getPositionInternal()
+      getHeading () {
+        return this.$geolocation?.getHeading()
       },
       /**
        * @return {number[]|undefined}
-       * @protected
        */
-      getPositionInternal () {
-        return this.$geolocation.getPosition()
-      },
-      /**
-       * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
-       */
-      async getProjection () {
-        await this.resolveGeolocation()
-
-        return this.getProjectionInternal()
+      getPosition () {
+        return this.$geolocation?.getPosition()
       },
       /**
        * @return {module:ol/proj~ProjectionLike|undefined}
-       * @protected
        */
-      getProjectionInternal () {
-        return this.$geolocation.getProjection()
+      getProjection () {
+        return coalesce(this.$geolocation?.getProjection(), this.currentProjection)
       },
       /**
        * @param {module:ol/proj~ProjectionLike} projection
-       * @return {Promise<void>}
        */
-      async setProjection (projection) {
+      setProjection (projection) {
+        assert(validateProjection(projection), 'Invalid projection')
         projection = getProj(projection)
-        if (isEqProj(projection, await this.getProjection())) return
 
-        (await this.resolveGeolocation()).setProjection(projection)
-      },
-      /**
-       * @return {Promise<number|undefined>}
-       */
-      async getSpeed () {
-        await this.resolveGeolocation()
-
-        return this.getSpeedInternal()
+        if (projection.getCode() !== this.currentProjection) {
+          this.currentProjection = projection.getCode()
+        }
+        if (this.$geolocation && projection !== this.$geolocation.getProjection()) {
+          this.$geolocation.setProjection(projection)
+        }
       },
       /**
        * @return {number|undefined}
-       * @protected
        */
-      getSpeedInternal () {
-        return this.$geolocation.getSpeed()
-      },
-      /**
-       * @return {Promise<boolean>}
-       */
-      async getTracking () {
-        await this.resolveGeolocation()
-
-        return this.getTrackingInternal()
+      getSpeed () {
+        return this.$geolocation?.getSpeed()
       },
       /**
        * @return {boolean}
-       * @protected
        */
-      getTrackingInternal () {
-        return this.$geolocation.getTracking()
+      getTracking () {
+        return coalesce(this.$geolocation?.getTracking(), this.currentTracking)
       },
       /**
        * @param {boolean} tracking
-       * @return {Promise<void>}
        */
-      async setTracking (tracking) {
-        if (tracking === await this.getTracking()) return
-
-        (await this.resolveGeolocation()).setTracking(tracking)
-      },
-      /**
-       * @return {Promise<Object|undefined>}
-       */
-      async getTrackingOptions () {
-        await this.resolveGeolocation()
-
-        return this.getTrackingOptionsInternal()
+      setTracking (tracking) {
+        if (tracking !== this.currentTracking) {
+          this.currentTracking = tracking
+        }
+        if (this.$geolocation && tracking !== this.$geolocation.getTracking()) {
+          this.$geolocation.setTracking(tracking)
+        }
       },
       /**
        * @return {Object|undefined}
-       * @protected
        */
-      getTrackingOptionsInternal () {
-        return this.$geolocation.getTrackingOptions()
+      getTrackingOptions () {
+        return coalesce(this.$geolocation?.getTrackingOptions(), this.currentTrackingOptions)
       },
       /**
        * @param {Promise<Object|undefined>} options
-       * @return {Promise<void>}
        */
-      async setTrackingOptions (options) {
-        if (isEqual(options, await this.getTrackingOptions())) return
-
-        (await this.resolveGeolocation()).setTrackingOptions(options)
+      setTrackingOptions (options) {
+        if (!isEqual(options, this.currentTrackingOptions)) {
+          this.currentTrackingOptions = options
+        }
+        if (this.$geolocation && !isEqual(options, this.$geolocation.getTrackingOptions())) {
+          this.$geolocation.setTrackingOptions(options)
+        }
       },
     },
   }
@@ -457,43 +365,36 @@
    * @private
    */
   function subscribeToGeolocation () {
-    const prefixKey = addPrefix('current')
-    const geomChanges = obsFromOlChangeEvent(this.$geolocation, 'accuracyGeometry', true).pipe(
-      mergeMap(({ prop }) => fromObs(this.getAccuracyGeometry()).pipe(
-        mapObs(geometry => ({
-          prop,
-          value: this.writeGeometryInDataProj(geometry),
-          compareWith: this.currentAccuracyGeometryDataProj,
-        })),
-      )),
-    )
-    const projChanges = obsFromOlChangeEvent(this.$geolocation, 'projection', true, evt => ({
-      ...evt,
-      value: getProj(evt.value).getCode(),
-      compareWith: this.currentProjection,
-    }))
-    const propsChanges = mergeObs(
-      geomChanges,
-      projChanges,
+    const setterKey = addPrefix('set')
+    const setPropsChanges = mergeObs(
+      obsFromOlChangeEvent(this.$geolocation, 'projection', true, evt => ({
+        ...evt,
+        value: getProj(evt.value).getCode(),
+      })),
       obsFromOlChangeEvent(this.$geolocation, [
-        'accuracy',
-        'altitude',
-        'altitudeAccuracy',
-        'heading',
-        'speed',
-        'position',
         'tracking',
         'trackingOptions',
-      ], true, evt => ({
-        ...evt,
-        compareWith: this[prefixKey(evt.prop)],
-      })),
+      ], true),
     ).pipe(
-      skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
+      mapObs(evt => ({
+        ...evt,
+        setter: val => {
+          this[setterKey(evt.prop)](val)
+          this.scheduleRefresh()
+        },
+      })),
     )
+    this.subscribeTo(setPropsChanges, ({ setter, value }) => setter(value))
 
-    this.subscribeTo(propsChanges, () => {
-      ++this.rev
-    })
+    const otherChanged = obsFromOlChangeEvent(this.$geolocation, [
+      'accuracy',
+      'accuracyGeometry',
+      'altitude',
+      'altitudeAccuracy',
+      'heading',
+      'speed',
+      'position',
+    ], true)
+    this.subscribeTo(otherChanged, ::this.scheduleRefresh)
   }
 </script>

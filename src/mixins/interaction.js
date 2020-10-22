@@ -1,5 +1,3 @@
-import debounce from 'debounce-promise'
-import { skipWhile } from 'rxjs/operators'
 import {
   EPSG_3857,
   getInteractionId,
@@ -9,8 +7,8 @@ import {
   setInteractionPriority,
 } from '../ol-ext'
 import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
-import { addPrefix, assert, isEqual, mergeDescriptors, pick, sequential } from '../utils'
-import olCmp, { FRAME_TIME } from './ol-cmp'
+import { addPrefix, assert, coalesce, isNumber, mergeDescriptors } from '../utils'
+import olCmp, { makeChangeOrRecreateWatchers } from './ol-cmp'
 import projTransforms from './proj-transforms'
 import stubVNode from './stub-vnode'
 import waitForMap from './wait-for-map'
@@ -52,46 +50,42 @@ export default {
     return {
       viewProjection: EPSG_3857,
       dataProjection: EPSG_3857,
+      currentActive: this.active,
+      currentPriority: this.priority,
     }
   },
-  computed: {
-    currentActive () {
-      if (this.rev && this.$interaction) {
-        return this.getActiveInternal()
-      }
-
-      return this.active
-    },
-    currentPriority () {
-      if (this.rev && this.$interaction) {
-        return this.getPriorityInternal()
-      }
-
-      return this.priority
-    },
-  },
   watch: {
-    active: /*#__PURE__*/sequential(async function (value) {
-      await this.setActive(value)
-    }),
-    currentActive: /*#__PURE__*/debounce(function (value) {
-      if (value === this.active) return
+    rev () {
+      if (!this.$interaction) return
 
-      this.$emit('update:active', value)
-    }, FRAME_TIME),
-    priority: /*#__PURE__*/sequential(async function (value) {
-      await this.setPriority(value)
-    }),
-    currentPriority: /*#__PURE__*/debounce(function (value) {
-      if (value === this.priority) return
-
-      this.$emit('update:priority', value)
-    }, FRAME_TIME),
+      if (this.currentActive !== this.$interaction.getActive()) {
+        this.currentActive = this.$interaction.getActive()
+      }
+      if (this.currentPriority !== getInteractionPriority(this.$interaction)) {
+        this.currentPriority = getInteractionPriority(this.$interaction)
+      }
+    },
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'active',
+      'currentActive',
+      'priority',
+      'currentPriority',
+    ]),
   },
   created () {
     this::defineServices()
   },
   methods: {
+    /**
+     * @return {Promise<void>}
+     * @protected
+     */
+    async beforeInit () {
+      await Promise.all([
+        this::olCmp.methods.beforeInit(),
+        this::waitForMap.methods.beforeInit(),
+      ])
+    },
     /**
      * @return {Promise<module:ol/interaction/Interaction~Interaction>}
      * @protected
@@ -102,7 +96,7 @@ export default {
         this.currentId,
         this.currentPriority,
       )
-      interaction.setActive(this.active)
+      interaction.setActive(this.currentActive)
 
       return interaction
     },
@@ -115,24 +109,20 @@ export default {
       throw new Error(`${this.vmName} not implemented method: createInteraction()`)
     },
     /**
-     * @return {void}
+     * @return {Promise<void>}
      * @protected
      */
     async mount () {
-      if (this.$interactionsContainer) {
-        await this.$interactionsContainer.addInteraction(this)
-      }
+      this.$interactionsContainer?.addInteraction(this)
 
       return this::olCmp.methods.mount()
     },
     /**
-     * @return {void}
+     * @return {Promise<void>}
      * @protected
      */
     async unmount () {
-      if (this.$interactionsContainer) {
-        await this.$interactionsContainer.removeInteraction(this)
-      }
+      this.$interactionsContainer?.removeInteraction(this)
 
       return this::olCmp.methods.unmount()
     },
@@ -161,21 +151,6 @@ export default {
      * @return {Promise<module:ol/interaction/Interaction~Interaction>}
      */
     resolveInteraction: olCmp.methods.resolveOlObject,
-    .../*#__PURE__*/pick(olCmp.methods, [
-      'init',
-      'deinit',
-      'beforeMount',
-      'refresh',
-      'scheduleRefresh',
-      'recreate',
-      'scheduleRecreate',
-      'remount',
-      'scheduleRemount',
-      'resolveOlObject',
-    ]),
-    .../*#__PURE__*/pick(waitForMap.methods, [
-      'beforeInit',
-    ]),
     /**
      * @returns {string|number}
      */
@@ -187,57 +162,93 @@ export default {
      * @returns {void}
      */
     setIdInternal (id) {
-      assert(id != null && id !== '', 'Invalid interaction id')
-
       if (id === this.getIdInternal()) return
 
       setInteractionId(this.$interaction, id)
     },
     /**
-     * @returns {Promise<boolean>}
+     * @returns {boolean}
      */
-    async getActive () {
-      await this.resolveInteraction()
-
-      return this.getActiveInternal()
-    },
-    /**
-     * @return {boolean}
-     * @protected
-     */
-    getActiveInternal () {
-      return this.$interaction.getActive()
+    getActive () {
+      return coalesce(this.$interaction?.getActive(), this.currentActive)
     },
     /**
      * @param {boolean} active
-     * @returns {Promise<void>}
      */
-    async setActive (active) {
-      if (active === await this.getActive()) return
+    setActive (active) {
+      active = !!active
 
-      (await this.resolveInteraction()).setActive(active)
+      if (active !== this.currentActive) {
+        this.currentActive = active
+      }
+      if (this.$interaction && active !== this.$interaction.getActive()) {
+        this.$interaction.setActive(active)
+      }
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {number}
      */
-    async getPriority () {
-      await this.resolveInteraction()
-
-      return this.getPriorityInternal()
-    },
-    getPriorityInternal () {
-      return getInteractionPriority(this.$interaction)
+    getPriority () {
+      return coalesce(this.$interaction && getInteractionPriority(this.$interaction), this.currentPriority)
     },
     /**
      * @param {number} priority
-     * @returns {Promise<void>}
      */
-    async setPriority (priority) {
-      if (priority === await this.getPriority()) return
+    setPriority (priority) {
+      assert(isNumber(priority), 'Invalid priority')
 
-      setInteractionPriority(await this.resolveInteraction(), priority)
+      if (priority !== this.currentPriority) {
+        this.currentPriority = priority
+      }
+      if (this.$interaction && priority !== getInteractionPriority(this.$interaction)) {
+        setInteractionPriority(this.$interaction, priority)
+      }
       // eslint-disable-next-line no-unused-expressions
       this.$interactionsContainer?.sortInteractions()
+    },
+    /**
+     * @return {module:ol/Map~Map|undefined}
+     */
+    getMap () {
+      return coalesce(this.$interaction?.getMap(), this.$map)
+    },
+    // /**
+    //  * @param {module:ol/Map~Map} map
+    //  */
+    // setMap (map) {
+    //   this.$interaction?.setMap(map)
+    // },
+    /**
+     * @param {boolean} value
+     * @protected
+     */
+    activeChanged (value) {
+      this.setActive(value)
+    },
+    /**
+     * @param {boolean} value
+     * @protected
+     */
+    currentActiveChanged (value) {
+      if (value === this.active) return
+
+      this.$emit('update:active', value)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    priorityChanged (value) {
+      this.setPriority(value)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    currentPriorityChanged (value) {
+      if (value === this.priority) return
+
+      this.$emit('update:priority', value)
     },
   },
 }
@@ -276,18 +287,13 @@ function defineServices () {
 }
 
 async function subscribeToInteractionEvents () {
-  const prefixKey = addPrefix('current')
+  const setterKey = addPrefix('current')
   const propChanges = obsFromOlChangeEvent(this.$interaction, [
-    'id',
     'active',
     'priority',
   ], true, evt => ({
     ...evt,
-    compareWith: this[prefixKey(evt.prop)],
-  })).pipe(
-    skipWhile(({ compareWith, value }) => isEqual(value, compareWith)),
-  )
-  this.subscribeTo(propChanges, () => {
-    ++this.rev
-  })
+    setter: this[setterKey(evt.prop)],
+  }))
+  this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
 }

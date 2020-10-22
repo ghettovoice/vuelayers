@@ -1,7 +1,15 @@
 <script>
   import { Style } from 'ol/style'
-  import { olCmp, styleContainer, stubVNode } from '../../mixins'
-  import { isFunction, noop, mergeDescriptors, sequential } from '../../utils'
+  import {
+    makeChangeOrRecreateWatchers,
+    olCmp,
+    projTransforms,
+    stubVNode,
+    styleContainer,
+    waitForMap,
+  } from '../../mixins'
+  import { EPSG_3857 } from '../../ol-ext'
+  import { mergeDescriptors } from '../../utils'
 
   /**
    * Style function component for advanced styling.
@@ -12,8 +20,10 @@
     name: 'VlStyleFunc',
     mixins: [
       stubVNode,
+      projTransforms,
       styleContainer,
       olCmp,
+      waitForMap,
     ],
     stubVNode: {
       empty: false,
@@ -28,7 +38,7 @@
       /**
        * @type {function(): function(feature: Feature): Style}
        */
-      func: {
+      function: {
         type: Function,
         // required: true,
       },
@@ -38,30 +48,26 @@
        */
       factory: Function,
     },
+    data () {
+      return {
+        viewProjection: EPSG_3857,
+        dataProjection: EPSG_3857,
+      }
+    },
     computed: {
-      styleFunc () {
-        let func = this.func
+      inputFunction () {
+        let func = this.function
         if (!func && this.factory) {
           func = this.factory()
-        }
-        if (!isFunction(func)) {
-          if (process.env.NODE_ENV !== 'production') {
-            this.$logger.warn('Factory returned a value not of Function type, fallback style will be used')
-          }
-          func = noop
         }
 
         return func
       },
     },
     watch: {
-      styleFunc: /*#__PURE__*/sequential(async function () {
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('styleFunc changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
+        'inputFunction',
+      ]),
     },
     created () {
       if (process.env.NODE_ENV !== 'production') {
@@ -81,12 +87,22 @@
     },
     methods: {
       /**
+       * @return {Promise<void>}
+       * @protected
+       */
+      async beforeInit () {
+        await Promise.all([
+          this::olCmp.methods.beforeInit(),
+          this::waitForMap.methods.beforeInit(),
+        ])
+      },
+      /**
        * @return {function(feature: Feature): Style}
        * @protected
        */
       createOlObject () {
         // user provided style function
-        const providedStyleFunc = this.styleFunc
+        const providedStyleFunc = this.inputFunction
         // fallback style function made from inner style containers
         const fallbackStyleFunc = this.createStyleFunc(this.$style, this.getDefaultStyle())
 
@@ -121,9 +137,7 @@
        * @protected
        */
       async mount () {
-        if (this.$styleContainer) {
-          await this.$styleContainer.setStyle(this)
-        }
+        this.$styleContainer?.setStyle(this)
 
         return this::olCmp.methods.mount()
       },
@@ -132,14 +146,18 @@
        * @protected
        */
       async unmount () {
-        if (this.$styleContainer && this.$styleContainer.getStyle() === this.$styleFunc) {
-          await this.$styleContainer.setStyle(null)
+        if (this.$styleContainer?.getStyle() === this.$styleFunc) {
+          this.$styleContainer.setStyle(null)
         }
 
         return this::olCmp.methods.unmount()
       },
-      async getStyleTarget () {
+      /**
+       * @protected
+       */
+      getStyleTarget () {
         return {
+          getStyle: () => this._style,
           setStyle: async () => {
             if (process.env.VUELAYERS_DEBUG) {
               this.$logger.log('style changed, scheduling recreate...')
@@ -154,9 +172,23 @@
 
   function defineServices () {
     Object.defineProperties(this, {
-      $styleFunc: {
+      $styleFunction: {
         enumerable: true,
         get: () => this.$olObject,
+      },
+      /**
+       * @type {Object|undefined}
+       */
+      $mapVm: {
+        enumerable: true,
+        get: () => this.$services?.mapVm,
+      },
+      /**
+       * @type {Object|undefined}
+       */
+      $viewVm: {
+        enumerable: true,
+        get: () => this.$services?.viewVm,
       },
       /**
        * @type {Object|undefined}

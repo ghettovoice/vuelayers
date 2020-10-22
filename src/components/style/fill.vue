@@ -2,7 +2,7 @@
   import { Fill as FillStyle } from 'ol/style'
   import { style } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
-  import { isEqual, sequential } from '../../utils'
+  import { coalesce, isEqual } from '../../utils'
 
   export default {
     name: 'VlStyleFill',
@@ -15,15 +15,36 @@
         default: () => [255, 255, 255, 0.4],
       },
     },
+    data () {
+      return {
+        currentColor: normalizeColor(this.color),
+      }
+    },
     computed: {
-      parsedColor () {
+      inputColor () {
         return normalizeColor(this.color)
       },
     },
     watch: {
-      color: /*#__PURE__*/sequential(async function (value) {
-        await this.setColor(value)
-      }),
+      rev () {
+        if (!this.$style) return
+
+        this.setColor(this.getColor())
+      },
+      inputColor: {
+        deep: true,
+        handler (value) {
+          this.setColor(value)
+        },
+      },
+      currentColor: {
+        deep: true,
+        handler (value) {
+          if (isEqual(value, this.inputColor)) return
+
+          this.$emit('update:color', value?.slice())
+        },
+      },
     },
     created () {
       this::defineServices()
@@ -35,7 +56,7 @@
        */
       createStyle () {
         return new FillStyle({
-          color: this.parsedColor,
+          color: this.currentColor,
         })
       },
       /**
@@ -43,9 +64,7 @@
        * @protected
        */
       async mount () {
-        if (this.$fillStyleContainer) {
-          await this.$fillStyleContainer.setFill(this)
-        }
+        this.$fillStyleContainer?.setFill(this)
 
         return this::style.methods.mount()
       },
@@ -54,31 +73,43 @@
        * @protected
        */
       async unmount () {
-        if (this.$fillStyleContainer && this.$fillStyleContainer.getFillVm() === this) {
-          await this.$fillStyleContainer.setFill(null)
+        if (this.$fillStyleContainer?.getFillVm() === this) {
+          this.$fillStyleContainer.setFill(null)
         }
 
         return this::style.methods.unmount()
       },
       /**
-       * @return {Promise}
+       * @return {Promise<void>}
        */
       async refresh () {
-        this::style.methods.refresh()
+        await Promise.all([
+          this::style.methods.refresh(),
+          this.$fillStyleContainer?.refresh(),
+        ])
+      },
+      /**
+       * @protected
+       */
+      syncNonObservable () {
+        this::style.methods.syncNonObservable()
 
-        if (this.$fillStyleContainer) {
-          this.$fillStyleContainer.refresh()
-        }
+        this.setColor(this.getColor())
       },
-      async getColor () {
-        return normalizeColor((await this.resolveStyle()).getColor())
+      getColor () {
+        return normalizeColor(coalesce(this.$style?.getColor(), this.currentColor))
       },
-      async setColor (color) {
+      setColor (color) {
         color = normalizeColor(color)
-        if (isEqual(color, await this.getColor())) return
 
-        (await this.resolveStyle()).setColor(color)
-        await this.scheduleRefresh()
+        if (!isEqual(color, this.currentColor)) {
+          this.currentColor = color
+          this.scheduleRefresh()
+        }
+        if (this.$style && !isEqual(color, this.$style.getColor())) {
+          this.$style.setColor(color)
+          this.scheduleRefresh()
+        }
       },
     },
   }

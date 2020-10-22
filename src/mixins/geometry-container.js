@@ -1,7 +1,6 @@
-import debounce from 'debounce-promise'
-import { findPointOnSurface, isGeoJSONGeometry } from '../ol-ext'
-import { clonePlainObject, isEqual, isFunction } from '../utils'
-import { FRAME_TIME } from './ol-cmp'
+import { Geometry } from 'ol/geom'
+import { isGeoJSONGeometry } from '../ol-ext'
+import { assert, coalesce } from '../utils'
 import projTransforms from './proj-transforms'
 
 /**
@@ -20,38 +19,6 @@ export default {
   mixins: [
     projTransforms,
   ],
-  computed: {
-    currentGeometryDataProj () {
-      if (!(this.rev && this.$geometry)) return
-
-      return this.writeGeometryInDataProj(this.$geometry)
-    },
-    currentGeometryViewProj () {
-      if (!(this.rev && this.$geometry)) return
-
-      return this.writeGeometryInViewProj(this.$geometry)
-    },
-    currentPointDataProj () {
-      if (!this.currentPointViewProj) return
-
-      return this.pointToDataProj(this.currentPointViewProj)
-    },
-    currentPointViewProj () {
-      if (!(this.rev && this.$geometry)) return
-
-      return findPointOnSurface(this.$geometry)
-    },
-  },
-  watch: {
-    currentGeometryDataProj: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(function (value, prev) {
-        if (isEqual(value, prev)) return
-
-        this.$emit('update:geometry', value && clonePlainObject(value))
-      }, FRAME_TIME),
-    },
-  },
   created () {
     this._geometry = undefined
     this._geometryVm = undefined
@@ -71,7 +38,7 @@ export default {
       }
     },
     /**
-     * @return {Promise<GeometryTarget|undefined>}
+     * @return {GeometryTarget|undefined}
      * @protected
      */
     getGeometryTarget () {
@@ -81,7 +48,7 @@ export default {
      * @return {module:ol/geom/Geometry~Geometry|undefined}
      */
     getGeometry () {
-      return this._geometry
+      return coalesce(this.getGeometryTarget()?.getGeometry(), this._geometry)
     },
     /**
      * @return {Object}
@@ -92,12 +59,10 @@ export default {
     /**
      * @param {GeometryLike|undefined} geom
      * @param {boolean} [viewProj=false]
-     * @return {Promise<void>}
      */
-    async setGeometry (geom, viewProj = false) {
-      if (isFunction(geom?.resolveOlObject)) {
-        geom = await geom.resolveOlObject()
-      } else if (isGeoJSONGeometry(geom)) {
+    setGeometry (geom, viewProj = false) {
+      geom = geom?.$geometry || geom
+      if (isGeoJSONGeometry(geom)) {
         if (viewProj) {
           geom = this.readGeometryInViewProj(geom)
         } else {
@@ -105,15 +70,19 @@ export default {
         }
       }
       geom || (geom = undefined)
+      assert(!geom || geom instanceof Geometry, 'Invalid geometry')
 
-      if (geom === this._geometry) return
+      if (geom !== this._geometry) {
+        this._geometry = geom
+        this._geometryVm = geom?.vm && geom.vm[0]
+        this.scheduleRefresh()
+      }
 
-      const geomTarget = await this.getGeometryTarget()
-      if (!geomTarget) return
-
-      this._geometry = geom
-      this._geometryVm = geom?.vm && geom.vm[0]
-      await geomTarget.setGeometry(geom)
+      const geomTarget = this.getGeometryTarget()
+      if (geomTarget && geom !== geomTarget.getGeometry()) {
+        geomTarget.setGeometry(geom)
+        this.scheduleRefresh()
+      }
     },
   },
 }

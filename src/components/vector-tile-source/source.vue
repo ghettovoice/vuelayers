@@ -2,9 +2,11 @@
   import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
   import { VectorTile as VectorTileSource } from 'ol/source'
   import { createXYZ } from 'ol/tilegrid'
-  import { urlTileSource } from '../../mixins'
-  import { createMvtFmt, roundExtent, extentFromProjection } from '../../ol-ext'
-  import { isArray, isFunction, isNumber, sealFactory, makeWatchers, isEqual, sequential } from '../../utils'
+  import { makeChangeOrRecreateWatchers, tileSource, urlTileSource } from '../../mixins'
+  import { createMvtFmt, extentFromProjection, roundExtent } from '../../ol-ext'
+  import { and, isArray, isFunction, isNumber, or, sealFactory, noop, coalesce } from '../../utils'
+
+  const validateTileSize = /*#__PURE__*/or(isNumber, and(isArray, value => value.length === 2 && value.every(isNumber)))
 
   export default {
     name: 'VlSourceVectorTile',
@@ -12,15 +14,17 @@
       urlTileSource,
     ],
     props: {
+      /* eslint-disable vue/require-prop-types */
       // ol/source/Tile
       cacheSize: {
-        type: Number,
+        ...tileSource.props.cacheSize,
         default: 128,
       },
       zDirection: {
-        type: Number,
+        ...tileSource.props.zDirection,
         default: 1,
       },
+      /* eslint-enable vue/require-prop-types */
       // ol/source/VectorTile
       extent: {
         type: Array,
@@ -48,17 +52,16 @@
       tileSize: {
         type: [Number, Array],
         default: () => [512, 512],
-        validator: value => isNumber(value) ||
-          (isArray(value) && value.length === 2 && value.every(isNumber)),
+        validator: validateTileSize,
       },
     },
     data () {
       return {
-        format: null,
+        format: undefined,
       }
     },
     computed: {
-      tileSizeArr () {
+      inputTileSize () {
         return isArray(this.tileSize) ? this.tileSize : [this.tileSize, this.tileSize]
       },
       derivedTileGridFactory () {
@@ -66,11 +69,11 @@
           return this.tileGridFactory
         }
 
-        const extent = this.extentDataProj || extentFromProjection(this.projection)
+        const extent = this.extentDataProj || extentFromProjection(this.resolvedDataProjection)
         const maxZoom = this.maxZoom
         const minZoom = this.minZoom
         const maxResolution = this.maxResolution
-        const tileSize = this.tileSizeArr
+        const tileSize = this.inputTileSize
 
         return () => createXYZ({ extent, maxZoom, minZoom, maxResolution, tileSize })
       },
@@ -85,20 +88,19 @@
 
         return this.makeIdent(this.olObjIdent, 'format')
       },
-      sealFormatFactory () {
+      inputFormatFactory () {
         return sealFactory(::this.formatFactory)
       },
-      resolvedTileUrlFunc () {
-        if (isFunction(this.tileUrlFunc)) {
-          return this.tileUrlFunc
-        }
-        if (this.expandedUrls.length === 0) return
+      inputTileUrlFunction () {
+        const urlFunc = coalesce(this.tileUrlFunction, this.tileUrlFunc)
+        if (isFunction(urlFunc)) return urlFunc
+        if (this.currentUrls.length === 0) return
 
-        return createTileUrlFunctionFromTemplates(this.expandedUrls, this.tileGrid)
+        return createTileUrlFunctionFromTemplates(this.currentUrls, this.tileGrid)
       },
     },
     watch: {
-      formatIdent: /*#__PURE__*/sequential(function (value, prevValue) {
+      formatIdent (value, prevValue) {
         if (value && prevValue) {
           this.moveInstance(value, prevValue)
         } else if (value && !prevValue && this.format) {
@@ -106,8 +108,8 @@
         } else if (!value && prevValue) {
           this.unsetInstance(prevValue)
         }
-      }),
-      sealFormatFactory: /*#__PURE__*/sequential(async function (value) {
+      },
+      inputFormatFactory (value) {
         while (this.hasInstance(this.formatIdent)) {
           this.unsetInstance(this.formatIdent)
         }
@@ -117,45 +119,18 @@
         } else {
           this.format = undefined
         }
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('sealDataFormatFactory changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      overlaps: /*#__PURE__*/sequential(async function (value) {
-        if (value === await this.getOverlaps()) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('overlaps changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      .../*#__PURE__*/makeWatchers([
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'extentViewProj',
+        'overlaps',
         'tileClass',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ], [
+        'extentViewProj',
+      ]),
     },
     created () {
-      if (isFunction(this.sealFormatFactory)) {
-        this.format = this.instanceFactoryCall(this.formatIdent, ::this.sealFormatFactory)
-        // this.$watch('format', async () => {
-        //   if (process.env.VUELAYERS_DEBUG) {
-        //     this.$logger.log('format changed, scheduling recreate...')
-        //   }
-        //
-        //   await this.scheduleRecreate()
-        // })
+      if (isFunction(this.inputFormatFactory)) {
+        this.format = this.instanceFactoryCall(this.formatIdent, ::this.inputFormatFactory)
       }
     },
     methods: {
@@ -176,8 +151,8 @@
           transition: this.transition,
           zDirection: this.zDirection,
           // ol/source/UrlTile
-          tileLoadFunction: this.resolvedTileLoadFunc,
-          tileUrlFunction: this.resolvedTileUrlFunc,
+          tileLoadFunction: this.currentTileLoadFunction,
+          tileUrlFunction: this.currentTileUrlFunction,
           // ol/source/VectorTile
           format: this.format,
           extent: this.extentViewProj,
@@ -186,18 +161,16 @@
         })
       },
       async getFeaturesInExtent (extent, viewProj = false) {
-        if (!viewProj) {
-          extent = this.extentToViewProj(extent)
-        }
+        extent = viewProj ? roundExtent(extent) : this.extentToViewProj(extent)
 
         return (await this.resolveSource()).getFeaturesInExtent(extent)
-      },
-      async getOverlaps () {
-        return (await this.resolveSource()).getOverlaps()
       },
       async clear () {
         (await this.resolveSource()).clear()
       },
+      tileKeyChanged: noop,
+      opaqueChanged: noop,
+      tilePixelRatioChanged: noop,
     },
   }
 </script>

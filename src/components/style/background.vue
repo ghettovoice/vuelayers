@@ -1,9 +1,10 @@
 <script>
   import { fillStyleContainer, olCmp, strokeStyleContainer, stubVNode } from '../../mixins'
-  import { stubObject, mergeDescriptors } from '../../utils'
+  import { dumpFillStyle, dumpStrokeStyle } from '../../ol-ext'
+  import { clonePlainObject, isEqual, isObjectLike, makeWatchers, mergeDescriptors, stubObject } from '../../utils'
 
   export default {
-    name: 'VlStyleBackground',
+    name: 'VlStyleBackgroundAdapter',
     mixins: [
       stubVNode,
       fillStyleContainer,
@@ -18,6 +19,28 @@
           class: this.vmClass,
         }
       },
+    },
+    computed: {
+      stroke () {
+        if (!(this.rev && this.$strokeStyle)) return
+
+        return dumpStrokeStyle(this.$strokeStyle)
+      },
+      fill () {
+        if (!(this.rev && this.$fill)) return
+
+        return dumpFillStyle(this.$fill)
+      },
+    },
+    watch: {
+      .../*#__PURE__*/makeWatchers([
+        'fill',
+        'stroke',
+      ], prop => function (value, prev) {
+        if (isEqual(value, prev)) return
+
+        this.$emit(`update:${prop}`, isObjectLike(value) ? clonePlainObject(value) : value)
+      }),
     },
     created () {
       Object.defineProperties(this, {
@@ -34,9 +57,6 @@
 
         return obj
       },
-      refresh () {
-        ++this.rev
-      },
       getServices () {
         return mergeDescriptors(
           this::olCmp.methods.getServices(),
@@ -46,18 +66,14 @@
       },
       getFillStyleTarget () {
         return {
-          setFill: async style => {
-            await this.$bgStyleContainer.setBackgroundFill(style)
-            await this.scheduleRefresh()
-          },
+          getFill: () => this.$bgStyleContainer?.getBackgroundFill(),
+          setFill: style => this.$bgStyleContainer?.setBackgroundFill(style),
         }
       },
       getStrokeStyleTarget () {
         return {
-          setStroke: async style => {
-            await this.$bgStyleContainer.setBackgroundStroke(style)
-            await this.scheduleRefresh()
-          },
+          getStroke: () => this.$bgStyleContainer?.getBackgroundStroke(),
+          setStroke: style => this.$bgStyleContainer?.setBackgroundStroke(style),
         }
       },
     },

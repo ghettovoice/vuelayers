@@ -1,9 +1,7 @@
-import debounce from 'debounce-promise'
-import { skipWhile } from 'rxjs/operators'
-import { fromOlChangeEvent as obsFromOlChangeEvent } from '../rx-ext'
-import { addPrefix, isEqual, pick, mergeDescriptors, sequential } from '../utils'
+import { dumpStyle } from '../ol-ext'
+import { clonePlainObject, isArray, isEqual, isFunction, isPlainObject, mergeDescriptors } from '../utils'
 import layer from './layer'
-import { FRAME_TIME } from './ol-cmp'
+import { makeChangeOrRecreateWatchers } from './ol-cmp'
 import styleContainer from './style-container'
 
 export default {
@@ -40,59 +38,29 @@ export default {
     updateWhileInteracting: Boolean,
   },
   computed: {
-    currentRenderOrder () {
-      if (this.rev && this.$layer) {
-        return this.getRenderOrderInternal()
-      }
+    style () {
+      if (!(this.rev && this.$style)) return
 
-      return this.renderOrder
+      let style = this.$style
+      if (isFunction(style)) return style
+      if (!style) return
+
+      isArray(style) || (style = [style])
+
+      return style.map(style => dumpStyle(style, geom => this.writeGeometryInDataProj(geom)))
     },
   },
   watch: {
-    renderOrder: /*#__PURE__*/sequential(async function (value) {
-      await this.setRenderOrder(value)
-    }),
-    currentRenderOrder: /*#__PURE__*/debounce(function (value) {
-      if (value === this.renderOrder) return
-
-      this.$emit('update:renderOrder', value)
-    }, FRAME_TIME),
-    renderBuffer: /*#__PURE__*/sequential(async function (value) {
-      if (value === await this.getRenderBuffer()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('renderBuffer changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    }),
-    declutter: /*#__PURE__*/sequential(async function (value) {
-      if (value === await this.getDeclutter()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('declutter changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    }),
-    updateWhileAnimating: /*#__PURE__*/sequential(async function (value) {
-      if (value === await this.getUpdateWhileAnimating()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('updateWhileAnimating changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    }),
-    updateWhileInteracting: /*#__PURE__*/sequential(async function (value) {
-      if (value === await this.getUpdateWhileInteracting()) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('updateWhileInteracting changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    }),
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'renderOrder',
+      'renderBuffer',
+      'declutter',
+      'updateWhileAnimating',
+      'updateWhileInteracting',
+      'style',
+    ], [
+      'style',
+    ]),
   },
   methods: {
     /**
@@ -106,94 +74,40 @@ export default {
       )
     },
     /**
-     * @returns {void}
+     * @protected
      */
     subscribeAll () {
       this::layer.methods.subscribeAll()
       this::subscribeToLayerEvents()
     },
-    .../*#__PURE__*/pick(layer.methods, [
-      'beforeInit',
-      'init',
-      'deinit',
-      'beforeMount',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'resolveOlObject',
-      'resolveLayer',
-    ]),
     /**
-     * @return {Promise<StyleTarget|undefined>}
+     * @return {StyleTarget|undefined}
      */
-    getStyleTarget: layer.methods.resolveLayer,
-    /**
-     * @returns {Promise<boolean>}
-     */
-    async getDeclutter () {
-      return (await this.resolveLayer()).getDeclutter()
+    getStyleTarget () {
+      return this.$layer
     },
     /**
-     * @returns {Promise<number>}
+     * @param {number[]} pixel
+     * @return {Promise<Array<module:ol/Feature~Feature>>}
      */
-    async getRenderBuffer () {
-      return (await this.resolveLayer()).getRenderBuffer()
+    async getFeatures (pixel) {
+      return (await this.resolveLayer()).getFeatures(pixel)
     },
     /**
-     * @returns {Promise<function>}
-     */
-    async getRenderOrder () {
-      await this.resolveLayer()
-
-      return this.getRenderOrderInternal()
-    },
-    /**
-     * @return {function}
+     * @param {Object|Function|Array|undefined} value
+     * @param {Object|Function|Array|undefined} prev
      * @protected
      */
-    getRenderOrderInternal () {
-      return this.$layer.getRenderOrder()
-    },
-    /**
-     * @param {function} renderOrder
-     * @returns {Promise<void>}
-     */
-    async setRenderOrder (renderOrder) {
-      if (renderOrder === await this.getRenderOrder()) return
+    styleChanged (value, prev) {
+      if (isEqual(value, prev)) return
 
-      (await this.resolveLayer()).setRenderOrder(renderOrder)
-    },
-    /**
-     * @returns {Promise<boolean>}
-     */
-    async getUpdateWhileAnimating () {
-      return (await this.resolveLayer()).getUpdateWhileAnimating()
-    },
-    /**
-     * @returns {Promise<boolean>}
-     */
-    async getUpdateWhileInteracting () {
-      return (await this.resolveLayer()).getUpdateWhileInteracting()
+      if (isPlainObject(value) || isArray(value)) {
+        value = clonePlainObject(value)
+      }
+      this.$emit('update:style', value)
     },
   },
 }
 
 async function subscribeToLayerEvents () {
-  const prefixKey = addPrefix('current')
-  const propChanges = obsFromOlChangeEvent(this.$layer, [
-    'renderOrder',
-  ], true, evt => ({
-    ...evt,
-    compareWith: this[prefixKey(evt.prop)],
-  })).pipe(
-    skipWhile(({ compareWith, value }) => isEqual(value, compareWith)),
-  )
-  this.subscribeTo(propChanges, () => {
-    ++this.rev
-  })
 }

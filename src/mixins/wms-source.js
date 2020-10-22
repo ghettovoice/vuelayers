@@ -1,6 +1,27 @@
 import WMSServerType from 'ol/source/WMSServerType'
 import { cleanSourceParams } from '../ol-ext'
-import { isArray, isEqual, makeWatchers, sequential } from '../utils'
+import {
+  clonePlainObject,
+  coalesce,
+  hasProp,
+  isArray,
+  isEqual, isObjectLike,
+  lowerFirst,
+  makeWatchers,
+  reduce,
+  upperFirst,
+} from '../utils'
+import { makeChangeOrRecreateWatchers } from './ol-cmp'
+
+const cleanWmsSourceParams = params => cleanSourceParams(params, [
+  'LAYERS',
+  'VERSION',
+  'STYLES',
+  'FORMAT',
+  'TRANSPARENT',
+  'BGCOLOR',
+  'TIME',
+])
 
 /**
  * Basic WMS params and methods mixin.
@@ -68,41 +89,38 @@ export default {
      */
     params: Object,
   },
+  data () {
+    return {
+      currentParams: undefined,
+    }
+  },
   computed: {
     /**
      * @returns {string}
      */
-    layersStr () {
+    inputLayers () {
       return isArray(this.layers) ? this.layers.join(',') : this.layers
     },
     /**
      * @returns {string|undefined}
      */
-    stylesStr () {
+    inputStyles () {
       return isArray(this.styles) ? this.styles.join(',') : this.styles
     },
     /**
      * @returns {Object|null}
      */
     customParams () {
-      return this.params ? cleanSourceParams(this.params, [
-        'LAYERS',
-        'VERSION',
-        'STYLES',
-        'FORMAT',
-        'TRANSPARENT',
-        'BGCOLOR',
-        'TIME',
-      ]) : null
+      return this.params ? cleanWmsSourceParams(this.params) : undefined
     },
     /**
      * @returns {Object}
      */
-    allParams () {
+    inputParams () {
       return {
         ...this.customParams || {},
-        LAYERS: this.layersStr,
-        STYLES: this.stylesStr,
+        LAYERS: this.inputLayers,
+        STYLES: this.inputStyles,
         VERSION: this.version,
         FORMAT: this.format,
         TRANSPARENT: this.transparent,
@@ -110,38 +128,60 @@ export default {
         TIME: this.time,
       }
     },
-  },
-  watch: {
-    allParams: /*#__PURE__*/sequential(async function (value) {
-      await this.updateParams(value)
-    }),
-    layersStr: /*#__PURE__*/sequential(async function (value) {
-      await this.updateParam('layers', value)
-    }),
-    stylesStr: /*#__PURE__*/sequential(async function (value) {
-      await this.updateParam('styles', value)
-    }),
-    .../*#__PURE__*/makeWatchers([
+    .../*#__PURE__*/reduce([
+      'inputLayers',
+      'inputStyles',
       'version',
-      'transparent',
       'format',
+      'transparent',
       'bgColor',
       'time',
-    ], prop => /*#__PURE__*/sequential(async function (value) {
-      await this.updateParam(prop, value)
-    })),
-    .../*#__PURE__*/makeWatchers([
-      'hidpi',
-      'serverType',
-    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-      if (isEqual(val, prev)) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log(`${prop} changed, scheduling recreate...`)
+    ], (props, inProp) => {
+      const prop = inProp.slice(0, 5) === 'input' ? lowerFirst(inProp.slice(5)) : inProp
+      const curProp = 'current' + upperFirst(prop)
+      props[curProp] = function () {
+        return coalesce((this.currentParams || {})[prop.toUpperCase()], (this.inputParams || {})[prop.toUpperCase()])
       }
 
-      await this.scheduleRecreate()
-    })),
+      return props
+    }, {}),
+  },
+  watch: {
+    rev () {
+      if (!this.$source) return
+
+      if (!isEqual(this.currentParams, this.$source.getParams())) {
+        this.currentParams = this.$source.getParams()
+      }
+    },
+    .../*#__PURE__*/makeWatchers([
+      'currentLayers',
+      'currentStyles',
+      'currentVersion',
+      'currentFormat',
+      'currentTransparent',
+      'currentBgColor',
+      'currentTime',
+    ], curProp => function (value) {
+      const prop = lowerFirst(curProp.slice(7))
+      const inProp = hasProp(this, 'input' + upperFirst(prop)) ? 'input' + upperFirst(prop) : prop
+
+      if (isEqual(value, this[inProp])) return
+
+      this.$emit('update:' + prop, isObjectLike(value) ? clonePlainObject(value) : value)
+    }),
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'hidpi',
+      'serverType',
+      'inputParams',
+      'currentParams',
+    ], [
+      'inputParams',
+      'currentParams',
+    ]),
+  },
+  created () {
+    this.currentParams = this.inputParams && clonePlainObject(this.inputParams)
   },
   methods: {
     /**
@@ -154,8 +194,8 @@ export default {
      * @return {Promise<string|undefined>}
      */
     async getFeatureInfoUrl (coordinate, resolution, projection, params = {}) {
-      resolution || (resolution = await this.$viewVm.getResolution())
-      projection || (projection = this.projection)
+      resolution || (resolution = this.$viewVm?.getResolution())
+      projection || (projection = this.resolvedDataProjection)
 
       return (await this.resolveSource()).getFeatureInfoUrl(coordinate, resolution, projection, params)
     },
@@ -168,28 +208,50 @@ export default {
       return (await this.resolveSource()).getLegendUrl(resolution, params)
     },
     /**
-     * @returns {Promise<Object>}
+     * @returns {Object}
      */
-    async getParams () {
-      return (await this.resolveSource()).getParams()
+    getParams () {
+      return coalesce(this.$source?.getParams(), this.currentParams)
     },
     /**
      * @param {Object} params
-     * @returns {Promise<void>}
      */
-    async updateParams (params) {
-      params = { ...this.allParams, ...params }
-      if (isEqual(params, await this.getParams())) return
+    updateParams (params) {
+      params = reduce({ ...this.currentParams, ...params }, (params, value, name) => ({
+        ...params,
+        [name.toUpperCase()]: value,
+      }), {})
 
-      (await this.resolveSource()).updateParams(params)
+      if (!isEqual(params, this.currentParams)) {
+        this.currentParams = params
+      }
+      if (this.$source && !isEqual(params, this.$source.getParams())) {
+        this.$source.updateParams(params)
+      }
     },
     /**
      * @param {string} param
      * @param {*} value
-     * @returns {Promise<void>}
      */
-    async updateParam (param, value) {
-      await this.updateParams({ [param.toUpperCase()]: value })
+    updateParam (param, value) {
+      this.updateParams({ [param.toUpperCase()]: value })
+    },
+    /**
+     * @param {Object|undefined} value
+     * @protected
+     */
+    inputParamsChanged (value) {
+      this.updateParams(value)
+    },
+    /**
+     * @param {Object|undefined} value
+     * @protected
+     */
+    currentParamsChanged (value) {
+      value = value ? cleanWmsSourceParams(value) : undefined
+      if (isEqual(value, this.customParams)) return
+
+      this.$emit('update:params', value && clonePlainObject(value))
     },
   },
 }

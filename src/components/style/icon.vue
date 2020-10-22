@@ -1,8 +1,10 @@
 <script>
   import { Icon as IconStyle } from 'ol/style'
-  import { imageStyle } from '../../mixins'
+  import IconAnchorUnits from 'ol/style/IconAnchorUnits'
+  import IconOrigin from 'ol/style/IconOrigin'
+  import { imageStyle, makeChangeOrRecreateWatchers } from '../../mixins'
   import { normalizeColor } from '../../ol-ext'
-  import { assert, isEmpty, isEqual, makeWatchers, sequential } from '../../utils'
+  import { assert, coalesce, isEmpty, isEqual, round } from '../../utils'
 
   export default {
     name: 'VlStyleIcon',
@@ -27,15 +29,15 @@
       },
       anchorOrigin: {
         type: String,
-        default: 'top-left', // bottom-left, bottom-right, top-left or top-right
+        default: IconOrigin.TOP_LEFT, // bottom-left, bottom-right, top-left or top-right
       },
       anchorXUnits: {
         type: String,
-        default: 'fraction', // pixels, fraction
+        default: IconAnchorUnits.FRACTION, // pixels, fraction
       },
       anchorYUnits: {
         type: String,
-        default: 'fraction', // pixels, fraction
+        default: IconAnchorUnits.FRACTION, // pixels, fraction
       },
       color: [Array, String],
       crossOrigin: String,
@@ -46,63 +48,70 @@
       },
       offsetOrigin: {
         type: String,
-        default: 'top-left', // bottom-left, bottom-right, top-left or top-right
+        default: IconOrigin.TOP_LEFT, // bottom-left, bottom-right, top-left or top-right
       },
     },
+    data () {
+      return {
+        currentAnchor: this.anchor?.slice(),
+      }
+    },
     computed: {
-      parsedColor () {
+      inputSize () {
+        return this.size?.slice()
+      },
+      inputImgSize () {
+        return this.imgSize?.slice()
+      },
+      inputAnchor () {
+        return this.anchor?.slice()
+      },
+      inputColor () {
         return this.color ? normalizeColor(this.color) : undefined
+      },
+      inputOffset () {
+        return this.offset?.slice()
       },
     },
     watch: {
-      anchor: /*#__PURE__*/sequential(async function (value) {
-        await this.setAnchor(value)
-      }),
-      src: /*#__PURE__*/sequential(async function (value) {
-        if (isEqual(value, await this.getSrc())) return
+      rev () {
+        if (!this.$style) return
 
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('src changed, scheduling recreate...')
-        }
+        this.setAnchor(this.getAnchor())
+      },
+      inputAnchor: {
+        deep: true,
+        handler (value) {
+          this.setAnchor(value)
+        },
+      },
+      currentAnchor: {
+        deep: true,
+        handler (value) {
+          if (isEqual(value, this.inputAnchor)) return
 
-        await this.scheduleRecreate()
-      }),
-      size: /*#__PURE__*/sequential(async function (value) {
-        if (isEqual(value, await this.getSize())) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('size changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      color: /*#__PURE__*/sequential(async function (value) {
-        if (isEqual(value, await this.getColor())) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log('color changed, scheduling recreate...')
-        }
-
-        await this.scheduleRecreate()
-      }),
-      .../*#__PURE__*/makeWatchers([
+          this.$emit('update:anchor', value?.slice())
+        },
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
+        'src',
+        'inputSize',
+        'img',
+        'inputImgSize',
         'anchorOrigin',
         'anchorXUnits',
         'anchorYUnits',
+        'anchorYUnits',
+        'inputColor',
         'crossOrigin',
-        'offset',
+        'inputOffset',
         'offsetOrigin',
-        'img',
-        'imgSize',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ], [
+        'inputSize',
+        'inputImgSize',
+        'inputColor',
+        'inputOffset',
+      ]),
     },
     methods: {
       /**
@@ -120,50 +129,88 @@
         )
 
         return new IconStyle({
-          anchor: this.anchor,
+          // ol/style/Image
+          opacity: this.currentOpacity,
+          scale: this.currentScale,
+          rotateWithView: this.currentRotateWithView,
+          rotation: this.currentRotation,
+          displacement: this.inputDisplacement,
+          // ol/style/Icon
+          anchor: this.currentAnchor,
           anchorOrigin: this.anchorOrigin,
           anchorXUnits: this.anchorXUnits,
           anchorYUnits: this.anchorYUnits,
-          color: this.color,
+          color: this.inputColor,
           crossOrigin: this.crossOrigin,
-          offset: this.offset,
+          offset: this.inputOffset,
           offsetOrigin: this.offsetOrigin,
-          opacity: this.opacity,
-          scale: this.scale,
-          rotateWithView: this.rotateWithView,
-          rotation: this.rotation,
-          size: this.size,
+          size: this.inputSize,
           src: this.src,
           img: this.img,
-          imgSize: this.imgSize,
+          imgSize: this.inputImgSize,
         })
       },
-      async getAnchor () {
-        return (await this.resolveStyle()).getAnchor()
-      },
-      async setAnchor (anchor) {
-        const clone = (await this.resolveStyle()).clone()
-        clone.setAnchor(anchor)
+      /**
+       * @protected
+       */
+      syncNonObservable () {
+        this::imageStyle.methods.syncNonObservable()
 
-        if (isEqual(clone.getAnchor(), await this.getAnchor())) return
+        this.setAnchor(this.getAnchor())
+      },
+      getAnchor () {
+        const anchor = this.$style?.getAnchor()?.slice()
+        if (!anchor) return this.currentAnchor
 
-        (await this.resolveStyle()).setAnchor(anchor)
-        await this.scheduleRefresh()
+        const size = this.getSize()
+        if (!size) return
+
+        if (this.anchorXUnits === IconAnchorUnits.FRACTION) {
+          anchor[0] /= size[0]
+        }
+        if (this.anchorYUnits === IconAnchorUnits.FRACTION) {
+          anchor[1] /= size[1]
+        }
+        if ([IconOrigin.TOP_RIGHT, IconOrigin.BOTTOM_RIGHT].includes(this.anchorOrigin)) {
+          anchor[0] = 1 - anchor[0]
+        }
+        if ([IconOrigin.BOTTOM_LEFT, IconOrigin.BOTTOM_RIGHT].includes(this.anchorOrigin)) {
+          anchor[1] = 1 - anchor[1]
+        }
+        anchor[0] = round(anchor[0], 3)
+        anchor[1] = round(anchor[1], 3)
+
+        return anchor
       },
-      async getColor () {
-        return (await this.resolveStyle()).getColor()
+      setAnchor (anchor) {
+        anchor = anchor?.slice()
+
+        if (!isEqual(anchor, this.currentAnchor)) {
+          this.currentAnchor = anchor
+          this.scheduleRefresh()
+        }
+        if (this.$style && !isEqual(anchor, this.$style.getAnchor())) {
+          this.$style.setAnchor(anchor)
+          this.scheduleRefresh()
+        }
       },
-      async getImage (pixelRatio) {
-        return (await this.resolveStyle()).getImage(pixelRatio)
+      getColor () {
+        return coalesce(this.$style?.getColor(), this.inputColor)
       },
-      async getOrigin () {
-        return (await this.resolveStyle()).getOrigin()
+      getImage (pixelRatio) {
+        return this.$style?.getImage(pixelRatio)
       },
-      async getSize () {
-        return (await this.resolveStyle()).getSize()
+      getPixelRatio (pixelRatio) {
+        return this.$style?.getPixelRatio(pixelRatio)
       },
-      async getSrc () {
-        return (await this.resolveStyle()).getSrc()
+      getOrigin () {
+        return this.$style?.getOrigin()
+      },
+      getSize () {
+        return coalesce(this.$style?.getSize(), this.inputSize)
+      },
+      getSrc () {
+        return coalesce(this.$style?.getSrc(), this.src)
       },
       async load () {
         (await this.resolveStyle()).load()

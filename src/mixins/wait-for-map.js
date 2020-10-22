@@ -28,17 +28,29 @@ export default {
             mapTo(stubTrue()),
           ),
         )
-        this.viewProjection = this.$mapVm.resolvedViewProjection
-        this.dataProjection = this.$mapVm.resolvedDataProjection
+        if (this.$mapVm.resolvedViewProjection !== this.viewProjection) {
+          this.viewProjection = this.$mapVm.resolvedViewProjection
+        }
+        if (this.$mapVm.resolvedDataProjection !== this.dataProjection) {
+          this.dataProjection = this.$mapVm.resolvedDataProjection
+        }
         this.subscribeTo(
           obsFromVueWatcher(this, () => this.$mapVm.resolvedViewProjection),
-          ({ value }) => { this.viewProjection = value },
+          ({ value }) => {
+            if (value !== this.viewProjection) {
+              this.viewProjection = value
+            }
+          },
         )
         this.subscribeTo(
           obsFromVueWatcher(this, () => this.$mapVm.resolvedDataProjection),
-          ({ value }) => { this.dataProjection = value },
+          ({ value }) => {
+            if (value !== this.dataProjection) {
+              this.dataProjection = value
+            }
+          },
         )
-        await this.$nextTickPromise()
+        await this.$nextTick()
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {

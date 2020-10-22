@@ -1,5 +1,5 @@
 import GeometryType from 'ol/geom/GeometryType'
-import { isEqual, round } from '../utils'
+import { and, every, isArray, isEqual, isNumber, round } from '../utils'
 
 export const COORD_PRECISION = -1
 
@@ -95,3 +95,26 @@ export function calcDistance (point1, point2, precision = COORD_PRECISION) {
 
   return round(Math.sqrt(squared), COORD_PRECISION)
 }
+
+export const isPointCoords = /*#__PURE__*/and(
+  isArray,
+  point => point.length >= 2,
+  point => every(point, isNumber),
+)
+export const isLineCoords = /*#__PURE__*/and(
+  isArray,
+  line => line.length >= 0,
+  line => every(line, isPointCoords),
+)
+export const isPolygonCoords = /*#__PURE__*/and(
+  isArray,
+  polygon => polygon.length >= 0,
+  polygon => every(polygon, isLineCoords),
+)
+export const isMultiPointCoords = isLineCoords
+export const isMultiLineCoords = isPolygonCoords
+export const isMultiPolygonCoords = /*#__PURE__*/and(
+  isArray,
+  multiPolygon => multiPolygon.length >= 0,
+  multiPolygon => every(multiPolygon, isPolygonCoords),
+)

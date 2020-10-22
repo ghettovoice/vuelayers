@@ -1,6 +1,7 @@
 <script>
   import { Stamen as StamenSource } from 'ol/source'
   import { xyzSource } from '../../mixins'
+  import { noop } from '../../utils'
 
   export default {
     name: 'VlSourceStamen',
@@ -8,15 +9,6 @@
       xyzSource,
     ],
     props: {
-      // ol/source/UrlTile
-      /**
-       * If nothing provided then default url resolved
-       * with current layer params will be used.
-       * @see {ol.source.Stamen}
-       *
-       * @type {string}
-       */
-      url: String,
       // ol/source/Stamen
       /**
        * Stamen layer name
@@ -28,6 +20,11 @@
         required: true,
       },
     },
+    computed: {
+      tileGridIdent: noop,
+      inputTileGridFactory: noop,
+      inputTileUrlFunction: noop,
+    },
     methods: {
       createSource () {
         return new StamenSource({
@@ -38,10 +35,11 @@
           opaque: this.opaque,
           transition: this.transition,
           // ol/source/UrlTile
-          tileLoadFunction: this.resolvedTileLoadFunc,
-          url: this.parsedUrl,
+          tileLoadFunction: this.currentTileLoadFunction,
+          url: this.currentUrls[0],
           // ol/source/TileImage
           reprojectionErrorThreshold: this.reprojectionErrorThreshold,
+          imageSmoothing: this.imageSmoothing,
           // ol/source/XYZ
           minZoom: this.minZoom,
           maxZoom: this.maxZoom,
@@ -49,10 +47,17 @@
           layer: this.layer,
         })
       },
-      async onParsedUrlChanged (url) {
-        await this.setUrl(url)
+      inputUrlChanged (value) {
+        this.setUrl(value)
       },
-      async onTileLoadFuncChanged (tileLoadFunc) {},
+      attributionsCollapsibleChanged: noop,
+      projectionChanged: noop,
+      inputTileGridFactoryChanged: noop,
+      tileGridChanged: noop,
+      zDirectionChanged: noop,
+      inputTileUrlFunctionChanged: noop,
+      crossOriginChanged: noop,
+      tileClassChanged: noop,
     },
   }
 </script>

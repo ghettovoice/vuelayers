@@ -1,7 +1,7 @@
 <script>
   import { ImageStatic as ImageStaticSource } from 'ol/source'
-  import { imageSource } from '../../mixins'
-  import { isEmpty, isEqual, makeWatchers, negate, sequential } from '../../utils'
+  import { imageSource, makeChangeOrRecreateWatchers } from '../../mixins'
+  import { coalesce, isEmpty, negate, noop } from '../../utils'
 
   /**
    * A layer source for displaying a single, static image.
@@ -18,7 +18,7 @@
        * Image extent in the source projection.
        * @type {number[]}
        */
-      imgExtent: {
+      imageExtent: {
         type: Array,
         // required: true,
         validator: value => value.length === 4,
@@ -35,7 +35,7 @@
        * Optional function to load an image given a URL.
        * @type {function|undefined}
        */
-      imgLoadFunc: Function,
+      imageLoadFunction: Function,
       /**
        * @deprecated Use `imgLoadFunc` instead.
        * @todo remove in v0.13.x
@@ -45,7 +45,7 @@
        * Image size in pixels.
        * @type {number[]}
        */
-      imgSize: {
+      imageSize: {
         type: Array,
         validator: value => value.length === 2,
       },
@@ -58,6 +58,13 @@
         validator: value => value.length === 2,
       },
       /**
+       * @type {boolean}
+       */
+      imageSmoothing: {
+        type: Boolean,
+        default: true,
+      },
+      /**
        * Image URL.
        * @type {string}
        */
@@ -68,47 +75,28 @@
       },
     },
     computed: {
-      resolvedImgExtent () {
-        let extent = this.imgExtent
-        if (!extent && this.extent) {
-          extent = this.extent
-        }
-
-        return extent
+      inputImageExtent () {
+        return coalesce(this.imageExtent, this.extent)?.slice()
       },
-      resolvedImgLoadFunc () {
-        let func = this.imgLoadFunc
-        if (!func && this.loadFunc) {
-          func = this.loadFunc
-        }
-
-        return func
+      inputImageLoadFunction () {
+        return coalesce(this.imageLoadFunction, this.loadFunc)
       },
-      resolvedImgSize () {
-        let size = this.imgSize
-        if (!size && this.size) {
-          size = this.size
-        }
-
-        return size
+      inputImageSize () {
+        return coalesce(this.imageSize, this.size)?.slice()
       },
     },
     watch: {
-      .../*#__PURE__*/makeWatchers([
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'crossOrigin',
-        'resolvedImgExtent',
-        'resolvedImgLoadFunc',
-        'resolvedImgSize',
+        'inputImageExtent',
+        'inputImageLoadFunction',
+        'inputImageSize',
+        'imageSmoothing',
         'url',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ], [
+        'inputImageExtent',
+        'inputImageSize',
+      ]),
     },
     created () {
       if (process.env.NODE_ENV !== 'production') {
@@ -148,15 +136,20 @@
           projection: this.resolvedDataProjection,
           // ol/source/ImageStatic
           crossOrigin: this.crossOrigin,
-          imageExtent: this.resolvedImgExtent,
-          imageLoadFunction: this.resolvedImgLoadFunc,
-          imageSize: this.resolvedImgSize,
+          imageExtent: this.inputImageExtent,
+          imageLoadFunction: this.inputImageLoadFunction,
+          imageSize: this.inputImageSize,
+          imageSmoothing: this.imageSmoothing,
           url: this.url,
         })
       },
-      async getUrl () {
-        return (await this.resolveSource()).getUrl()
+      getUrl () {
+        return coalesce(this.$source?.getUrl(), this.url)
       },
+      getImageExtent () {
+        return coalesce(this.$source?.getImageExtent(), this.inputImageExtent)
+      },
+      stateChanged: noop,
     },
   }
 </script>

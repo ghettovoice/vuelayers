@@ -1,7 +1,10 @@
-import { pick, upperFirst, isFunction, mergeDescriptors, makeWatchers, isEqual, sequential } from '../utils'
+import { dumpFillStyle, dumpStrokeStyle } from '../ol-ext'
+import { clonePlainObject, coalesce, isEqual, mergeDescriptors } from '../utils'
 import fillStyleContainer from './fill-style-container'
 import imageStyle from './image-style'
+import { makeChangeOrRecreateWatchers } from './ol-cmp'
 import strokeStyleContainer from './stroke-style-container'
+import style from './style'
 
 export default {
   mixins: [
@@ -20,27 +23,31 @@ export default {
       default: 0,
     },
   },
+  computed: {
+    stroke () {
+      if (!(this.rev && this.$stroke)) return
+
+      return dumpStrokeStyle(this.$stroke)
+    },
+    fill () {
+      if (!(this.rev && this.$fill)) return
+
+      return dumpFillStyle(this.$fill)
+    },
+  },
   watch: {
-    .../*#__PURE__*/makeWatchers([
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
       'points',
       'radius',
       'radius1',
       'radius2',
       'angle',
-    ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-      const handler = this[`on${upperFirst(prop)}Changed`]
-      if (isFunction(handler)) {
-        return handler(val, prev)
-      }
-
-      if (isEqual(val, prev)) return
-
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log(`${prop} changed, scheduling recreate...`)
-      }
-
-      await this.scheduleRecreate()
-    })),
+      'stroke',
+      'fill',
+    ], [
+      'stroke',
+      'fill',
+    ]),
   },
   methods: {
     /**
@@ -49,75 +56,92 @@ export default {
      */
     getServices () {
       return mergeDescriptors(
-        this::imageStyle.methods.getServices(),
+        this::style.methods.getServices(),
         this::fillStyleContainer.methods.getServices(),
         this::strokeStyleContainer.methods.getServices(),
       )
     },
-    .../*#__PURE__*/pick(imageStyle.methods, [
-      'init',
-      'deinit',
-      'mount',
-      'unmount',
-      'refresh',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'subscribeAll',
-      'resolveOlObject',
-      'resolveStyle',
-    ]),
-    async getFillStyleTarget () {
+    /**
+     * @protected
+     */
+    syncNonObservable () {
+      this::imageStyle.methods.syncNonObservable()
+    },
+    /**
+     * @return {FillStyleTarget}
+     * @protected
+     */
+    getFillStyleTarget () {
       return {
-        setFill: async () => {
-          ++this.rev
-
+        getFill: () => this.$style?.getFill(),
+        setFill: () => {
           if (process.env.VUELAYERS_DEBUG) {
             this.$logger.log('fill changed, scheduling recreate...')
           }
 
-          await this.scheduleRecreate()
+          this.scheduleRecreate()
         },
       }
     },
-    async getStrokeStyleTarget () {
+    /**
+     * @return {StrokeStyleTarget}
+     * @protected
+     */
+    getStrokeStyleTarget () {
       return {
-        setStroke: async () => {
-          ++this.rev
-
+        getStroke: () => this.$style?.getStroke(),
+        setStroke: () => {
           if (process.env.VUELAYERS_DEBUG) {
             this.$logger.log('stroke changed, scheduling recreate...')
           }
 
-          await this.scheduleRecreate()
+          this.scheduleRecreate()
         },
       }
     },
-    async getAnchor () {
-      return (await this.resolveStyle()).getAnchor()
+    getAnchor () {
+      return this.$style?.getAnchor()
     },
-    async getAngle () {
-      return (await this.resolveStyle()).getAngle()
+    getAngle () {
+      return coalesce(this.$style?.getAngle(), this.angle)
     },
-    async getImage () {
-      return (await this.resolveStyle()).getImage()
+    getImage () {
+      return this.$style?.getImage()
     },
-    async getOrigin () {
-      return (await this.resolveStyle()).getOrigin()
+    getOrigin () {
+      return this.$style?.getOrigin()
     },
-    async getPoints () {
-      return (await this.resolveStyle()).getPoints()
+    getPoints () {
+      return coalesce(this.$style?.getPoints(), this.points)
     },
-    async getRadius () {
-      return (await this.resolveStyle()).getRadius()
+    getRadius () {
+      return coalesce(this.$style?.getRadius(), this.radius)
     },
-    async getRadius2 () {
-      return (await this.resolveStyle()).getRadius2()
+    getRadius2 () {
+      return coalesce(this.$style?.getRadius2(), this.radius2)
     },
-    async getSize () {
-      return (await this.resolveStyle()).getSize()
+    getSize () {
+      return this.$style?.getSize()
+    },
+    /**
+     * @param {Object|undefined} value
+     * @param {Object|undefined} prev
+     * @protected
+     */
+    strokeChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:stroke', value && clonePlainObject(value))
+    },
+    /**
+     * @param {Object|undefined} value
+     * @param {Object|undefined} prev
+     * @protected
+     */
+    fillChanged (value, prev) {
+      if (isEqual(value, prev)) return
+
+      this.$emit('update:fill', value && clonePlainObject(value))
     },
   },
 }

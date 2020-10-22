@@ -6,19 +6,19 @@
     <slot />
     <ViewCmp
       v-if="!withCustomView"
-      :id="'vl-' + id + '-default-view'"
+      :id="'vl-' + currentId + '-default-view'"
       ref="view" />
     <VectorLayerCmp
-      :id="'vl-' + id + '-default-layer'"
+      :id="'vl-' + currentId + '-default-layer'"
       ref="featuresOverlay"
       :overlay="true"
       :update-while-animating="updateWhileAnimating"
       :update-while-interacting="updateWhileInteracting">
       <VectorSourceCmp
-        :id="'vl-' + id + '-default-source'"
+        :id="'vl-' + currentId + '-default-source'"
         ref="featuresOverlaySource"
         :wrap-x="wrapX"
-        @created="onFeaturesOverlaySourceCreated">
+        @created="featuresOverlaySourceCreated">
         <slot name="overlay" />
       </VectorSourceCmp>
     </VectorLayerCmp>
@@ -31,48 +31,40 @@
   import MapEventType from 'ol/MapEventType'
   import { get as getProj } from 'ol/proj'
   import RenderEventType from 'ol/render/EventType'
-  import { merge as mergeObs, race as raceObs } from 'rxjs'
-  import { distinctUntilChanged, filter as filterObs, map as mapObs, mapTo, skipWhile } from 'rxjs/operators'
+  import { merge as mergeObs } from 'rxjs'
+  import { distinctUntilChanged, map as mapObs, tap } from 'rxjs/operators'
   import {
-    CanceledError,
     controlsContainer,
     featuresContainer,
+    FRAME_TIME,
     interactionsContainer,
-    isCreateError,
-    isMountError,
     layersContainer,
+    makeChangeOrRecreateWatchers,
     olCmp,
-    OlObjectEvent,
     overlaysContainer,
     projTransforms,
   } from '../../mixins'
   import {
     EPSG_3857,
+    getControlId,
+    getInteractionId,
+    getLayerId,
     getMapDataProjection,
     getMapId,
+    getOverlayId,
+    getViewId,
     roundPointCoords,
     setMapDataProjection,
     setMapId,
   } from '../../ol-ext'
   import {
+    bufferDebounceTime,
     fromOlChangeEvent as obsFromOlChangeEvent,
     fromOlEvent as obsFromOlEvent,
     fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import {
-    addPrefix,
-    assert,
-    coalesce,
-    hasProp,
-    isEqual,
-    isFunction,
-    makeWatchers,
-    mergeDescriptors,
-    sequential,
-    stubTrue,
-    waitFor,
-  } from '../../utils'
+  import { addPrefix, assert, clonePlainObject, coalesce, isArray, isEqual, map, mergeDescriptors } from '../../utils'
   import { Layer as VectorLayerCmp } from '../vector-layer'
   import { Source as VectorSourceCmp } from '../vector-source'
   import ViewCmp from './view.vue'
@@ -172,48 +164,186 @@
         type: Boolean,
         default: true,
       },
-      updateWhileAnimating: Boolean,
-      updateWhileInteracting: Boolean,
+      /**
+       * @type {boolean}
+       */
+      updateWhileAnimating: {
+        type: Boolean,
+        default: false,
+      },
+      /**
+       * @type {boolean}
+       */
+      updateWhileInteracting: {
+        type: Boolean,
+        default: false,
+      },
     },
     data () {
       return {
         viewProjection: EPSG_3857,
         withCustomView: false,
+        size: undefined,
+        currentDataProjection: this.dataProjection,
       }
     },
     computed: {
       resolvedDataProjection () {
         return coalesce(
-          this.dataProjection, // may or may not be present
-          this.$options?.dataProjection, // may or may not be present
+          this.currentDataProjection,
+          this.dataProjection,
+          this.$options?.dataProjection,
           this.resolvedViewProjection,
         )
       },
+      view () {
+        if (!(this.rev && this.$view)) return
+
+        return {
+          id: getViewId(this.$view),
+          type: this.$view.constructor.name,
+        }
+      },
+      /**
+       * @returns {string[]}
+       */
+      layers () {
+        if (!this.rev) return []
+
+        return map(this.getLayers(), layer => ({
+          id: getLayerId(layer),
+          type: layer.constructor.name,
+        }))
+      },
+      /**
+       * @returns {string[]}
+       */
+      controls () {
+        if (!this.rev) return []
+
+        return map(this.getControls(), control => ({
+          id: getControlId(control),
+          type: control.constructor.name,
+        }))
+      },
+      /**
+       * @returns {string[]}
+       */
+      interactions () {
+        if (!this.rev) return []
+
+        return map(this.getInteractions(), interaction => ({
+          id: getInteractionId(interaction),
+          type: interaction.constructor.name,
+        }))
+      },
+      /**
+       * @returns {string[]}
+       */
+      overlays () {
+        if (!this.rev) return []
+
+        return map(this.getOverlays(), overlay => ({
+          id: getOverlayId(overlay),
+          type: overlay.constructor.name,
+        }))
+      },
+      /**
+       * @type {Object[]}
+       */
+      featuresDataProj () {
+        if (!this.rev) return []
+
+        return map(this.getFeatures(), feature => this.writeFeatureInDataProj(feature))
+      },
+      /**
+       * @type {Object[]}
+       */
+      featuresViewProj () {
+        if (!this.rev) return []
+
+        return map(this.getFeatures(), feature => this.writeFeatureInViewProj(feature))
+      },
     },
     watch: {
-      defaultControls: /*#__PURE__*/sequential(async function (value) {
-        await this.initDefaultControls(value)
-      }),
-      defaultInteractions: /*#__PURE__*/sequential(async function (value) {
-        await this.initDefaultInteractions(value)
-      }),
-      dataProjection: /*#__PURE__*/sequential(async function (value) {
-        await this.setDataProjection(value)
-      }),
-      .../*#__PURE__*/makeWatchers([
+      rev () {
+        if (!this.$map) return
+
+        if (!isEqual(this.size, this.$map.getSize())) {
+          this.size = this.$map.getSize()
+        }
+      },
+      size: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          this.$emit('update:size', value?.slice())
+        },
+      },
+      defaultControls (value) {
+        this.initDefaultControls(value)
+      },
+      defaultInteractions (value) {
+        this.initDefaultInteractions(value)
+      },
+      dataProjection (value) {
+        this.setDataProjection(value)
+      },
+      view: {
+        deep: true,
+        handler (value, prev) {
+          if (value === prev) return
+
+          this.$emit('update:view', value)
+        },
+      },
+      layers: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          this.$emit('update:layers', value.slice())
+        },
+      },
+      controls: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          this.$emit('update:controls', value.slice())
+        },
+      },
+      interactions: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          this.$emit('update:interactions', value.slice())
+        },
+      },
+      overlays: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          this.$emit('update:overlays', value.slice())
+        },
+      },
+      featuresDataProj: {
+        deep: true,
+        handler (value, prev) {
+          if (isEqual(value, prev)) return
+
+          this.$emit('update:features', clonePlainObject(value))
+        },
+      },
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'keyboardEventTarget',
         'moveTolerance',
         'pixelRatio',
         'maxTilesLoading',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ]),
     },
     created () {
       /**
@@ -225,16 +355,16 @@
        * @type {Object|undefined}
        */
       this._viewVm = undefined
+
+      this::defineServices()
       // todo wrap controls into components and provide vl-control-default
       this.initDefaultControls(this.defaultControls)
       // todo initialize without interactions and provide vl-interaction-default component
       this.initDefaultInteractions(this.defaultInteractions)
-
-      this::defineServices()
     },
     methods: {
       /**
-       * @return {Promise<module:ol/Map~Map>}
+       * @return {module:ol/Map~Map}
        * @protected
        */
       async createOlObject () {
@@ -250,7 +380,8 @@
           view: this.$view,
         })
         setMapId(map, this.currentId)
-        setMapDataProjection(map, this.dataProjection)
+        setMapDataProjection(map, this.resolvedDataProjection)
+        this.size && map.setSize(this.size)
 
         return map
       },
@@ -258,48 +389,8 @@
        * @return {Promise<void>}
        * @protected
        */
-      async beforeMount () {
-        try {
-          await waitFor(
-            () => this.$viewVm != null,
-            raceObs(
-              this.$olObjectEvents.pipe(
-                filterObs(({ name, args }) => {
-                  return name === OlObjectEvent.ERROR &&
-                    args[0] instanceof CanceledError
-                }),
-              ),
-              obsFromVueEvent(this.$eventBus, OlObjectEvent.ERROR).pipe(
-                filterObs(([err, vm]) => {
-                  return (isCreateError(err) || isMountError()) &&
-                    hasProp(vm, '$view') &&
-                    vm.$vq?.closest(this)
-                }),
-              ),
-            ).pipe(
-              mapTo(stubTrue()),
-            ),
-          )
-          this.viewProjection = this.$viewVm.resolvedViewProjection
-          this.subscribeTo(
-            obsFromVueWatcher(this, () => this.$viewVm.resolvedViewProjection),
-            ({ value }) => { this.viewProjection = value },
-          )
-          await this.$nextTickPromise()
-
-          return this::olCmp.methods.beforeMount()
-        } catch (err) {
-          err.message = `${this.vmName} wait for $viewVm failed: ${err.message}`
-          throw err
-        }
-      },
-      /**
-       * @return {Promise<void>}
-       * @protected
-       */
       async mount () {
-        await this.setTarget(this.$el)
-        this.$nextTick(::this.updateSize)
+        this.setTarget(this.$el)
 
         return this::olCmp.methods.mount()
       },
@@ -308,12 +399,11 @@
        * @protected
        */
       async unmount () {
-        await this.setTarget(null)
+        this.setTarget(null)
 
         return this::olCmp.methods.unmount()
       },
       /**
-       * @return {void}
        * @protected
        */
       subscribeAll () {
@@ -324,6 +414,12 @@
         this::overlaysContainer.methods.subscribeAll()
         this::featuresContainer.methods.subscribeAll()
         this::subscribeToEvents()
+
+        // view projection can be changed in runtime only through vl-view vm
+        this.subscribeTo(
+          obsFromVueWatcher(this, () => this.$viewVm?.resolvedViewProjection),
+          ({ value }) => { this.viewProjection = value || EPSG_3857 },
+        )
       },
       /**
        * @returns {Object}
@@ -347,26 +443,25 @@
         )
       },
       /**
-       * @return {Promise<module:ol/Map~Map>}
-       */
-      resolveMap: olCmp.methods.resolveOlObject,
-      /**
-       * @return {number|string}
+       * @return {string|number}
+       * @protected
        */
       getIdInternal () {
         return getMapId(this.$map)
       },
       /**
        * @param {string|number} id
-       * @return {Promise<void>}
+       * @protected
        */
       setIdInternal (id) {
-        assert(id != null && id !== '', 'Invalid map id')
-
         if (id === this.getIdInternal()) return
 
         setMapId(this.$map, id)
       },
+      /**
+       * @return {Promise<module:ol/Map~Map>}
+       */
+      resolveMap: olCmp.methods.resolveOlObject,
       /**
        * @param {number[]} pixel
        * @param {function} callback
@@ -447,18 +542,24 @@
         return (await this.resolveMap()).getPixelFromCoordinate(coordinate)
       },
       /**
-       * @return {Promise<number[]>}
+       * @return {number[]|undefined}
        */
-      async getSize () {
-        return (await this.resolveMap()).getSize()
+      getSize () {
+        return coalesce(this.$map?.getSize(), this.size)
       },
       /**
-       * @return {Promise<void>}
+       * @param {number[]} size
        */
-      async setSize (size) {
-        if (isEqual(size, await this.getSize())) return
+      setSize (size) {
+        assert(isArray(size) && size.length === 2, 'Invalid size')
+        size = size.slice()
 
-        (await this.resolveMap()).setSize(size)
+        if (!isEqual(size, this.size)) {
+          this.size = size
+        }
+        if (this.$map && !isEqual(size, this.$map.getSize())) {
+          this.$map.setSize(size)
+        }
       },
       /**
        * Updates map size.
@@ -479,35 +580,31 @@
         })
       },
       /**
-       * @return {Promise<HTMLElement>}
+       * @return {HTMLElement|undefined}
        */
-      async getTarget () {
-        return (await this.resolveMap()).getTarget()
+      getTarget () {
+        return coalesce(this.$map?.getTarget(), this.$el)
       },
       /**
        * @param {HTMLElement} target
-       * @return {Promise<void>}
        */
-      async setTarget (target) {
-        (await this.resolveMap()).setTarget(target)
+      setTarget (target) {
+        if (this.$map && target !== this.$map.getTarget()) {
+          this.$map.setTarget(target)
+          this.$emit('update:target', target)
+        }
       },
       /**
-       * @return {Promise<HTMLElement>}
+       * @return {HTMLElement|undefined}
        */
-      async getTargetElement () {
-        return (await this.resolveMap()).getTargetElement()
+      getViewport () {
+        return this.$map?.getViewport()
       },
       /**
-       * @return {Promise<HTMLElement>}
-       */
-      async getViewport () {
-        return (await this.resolveMap()).getViewport()
-      },
-      /**
-       * @return {module:ol/View~View}
+       * @return {module:ol/View~View|undefined}
        */
       getView () {
-        return this._view
+        return coalesce(this.$map?.getView(), this._view)
       },
       /**
        * @return {Object}
@@ -517,66 +614,43 @@
       },
       /**
        * @param {module:ol/View~View|Vue|undefined} view
-       * @return {Promise<void>}
        */
-      async setView (view) {
-        if (isFunction(view?.resolveOlObject)) {
-          view = await view.resolveOlObject()
+      setView (view) {
+        view = view?.$view || view
+        assert(!view || view instanceof View, 'Invalid view')
+
+        if (view !== this._view) {
+          this._view = view
+          this._viewVm = view?.vm && view?.vm[0]
+        }
+        if (this.$map && view !== this.$map.getView()) {
+          this.$map.setView(view)
         }
 
-        if (view === await this.getView()) return
-
-        (await this.resolveMap()).setView(view)
-        this._view = view
-        this._viewVm = view?.vm && view?.vm[0]
-
-        this.withCustomView = (view && (!view.vm || view.vm.some(vm => vm !== this.$refs.view)))
+        this.scheduleRefresh()
       },
       /**
-       * @return {Promise<module:ol/proj~ProjectionLike|undefined>}
+       * @return {module:ol/proj~ProjectionLike|undefined}
        */
-      async getDataProjection () {
-        return getMapDataProjection(await this.resolveMap())
+      getDataProjection () {
+        return coalesce(this.$map && getMapDataProjection(this.$map), this.resolvedDataProjection)
       },
       /**
        * @param {module:ol/proj~ProjectionLike} projection
-       * @return {Promise<void>}
        */
-      async setDataProjection (projection) {
-        assert(getProj(projection) != null, 'Map data projection is registered')
+      setDataProjection (projection) {
+        projection = getProj(projection)
+        assert(projection != null, 'Invalid projection')
 
-        if (projection === await this.getDataProjection()) return
-
-        setMapDataProjection(await this.resolveMap(), projection)
-        await this.scheduleRefresh()
-      },
-      /**
-       * @return {Promise<boolean>}
-       */
-      async getWrapX () {
-        if (!this.$featuresOverlaySourceVm) return false
-
-        return this.$featuresOverlaySourceVm.getWrapX()
-      },
-      /**
-       * @return {Promise<boolean>}
-       */
-      async getUpdateWhileAnimating () {
-        if (!this.$featuresOverlayVm) return false
-
-        return this.$featuresOverlayVm.getUpdateWhileAnimating()
-      },
-      /**
-       * @returns {Promise<boolean>}
-       */
-      async getUpdateWhileInteracting () {
-        if (!this.$featuresOverlayVm) return false
-
-        return this.$featuresOverlayVm.getUpdateWhileInteracting()
+        if (projection.getCode() !== this.currentDataProjection) {
+          this.currentDataProjection = projection.getCode()
+        }
+        if (this.$map && projection.getCode() !== getMapDataProjection(this.$map)) {
+          setMapDataProjection(this.$map, projection.getCode())
+        }
       },
       /**
        * Triggers focus on map container.
-       * @return {void}
        */
       focus () {
         this.$el.focus()
@@ -595,16 +669,29 @@
        * @param {Object} sourceVm
        * @protected
        */
-      async onFeaturesOverlaySourceCreated (sourceVm) {
-        if (!this.getFeatures().length) {
-          await Promise.all(this.getFeatures().map(::sourceVm.addFeature))
-        }
+      featuresOverlaySourceCreated (sourceVm) {
+        sourceVm.addFeatures(this.getFeatures())
 
-        const adds = obsFromVueEvent(this, 'addfeature')
-        this.subscribeTo(adds, ({ feature }) => sourceVm.addFeature(feature))
+        const adds = obsFromVueEvent(this, 'addfeature').pipe(
+          mapObs(({ feature }) => feature),
+          bufferDebounceTime(FRAME_TIME),
+        )
+        this.subscribeTo(adds, features => sourceVm.addFeatures(features))
 
-        const removes = obsFromVueEvent(this, 'removefeature')
-        this.subscribeTo(removes, ({ feature }) => sourceVm.removeFeature(feature))
+        const removes = obsFromVueEvent(this, 'removefeature').pipe(
+          mapObs(({ feature }) => feature),
+          bufferDebounceTime(FRAME_TIME),
+        )
+        this.subscribeTo(removes, features => sourceVm.removeFeatures(features))
+      },
+      /**
+       * @protected {string} value
+       * @protected
+       */
+      resolvedDataProjectionChanged (value) {
+        if (value === this.dataProjection) return
+
+        this.$emit('update:dataProjection', value)
       },
     },
   }
@@ -651,31 +738,37 @@
    * @private
    */
   async function subscribeToEvents () {
-    const prefixKey = addPrefix('current')
-    const propChanges = mergeObs(
-      obsFromOlChangeEvent(this.$map, [
-        'id',
-      ], true, evt => ({
-        ...evt,
-        compareWith: this[prefixKey(evt.prop)],
-      })),
-    ).pipe(
-      skipWhile(({ value, compareWith }) => isEqual(value, compareWith)),
+    const setterKey = addPrefix('set')
+    const viewChanges = obsFromOlChangeEvent(this.$map, 'view', true).pipe(
+      tap(({ value: view }) => {
+        if (this._viewSubs) {
+          this.unsubscribe(this._viewSubs)
+        }
+        if (view) {
+          this._viewSubs = this.subscribeTo(
+            obsFromOlChangeEvent(view, 'id', true),
+            ::this.scheduleRefresh,
+          )
+        }
+        this.viewProjection = view?.getProjection().getCode() || EPSG_3857
+        this.withCustomView = view && (!view.vm || view.vm.some(vm => vm !== this.$refs.view))
+      }),
     )
-    this.subscribeTo(propChanges, () => {
-      ++this.rev
-    })
-
-    const otherChanges = obsFromOlChangeEvent(this.$map, [
-      'layerGroup',
-      'size',
-      'target',
-      'view',
-    ], true)
-    this.subscribeTo(otherChanges, ({ prop, value }) => {
-      ++this.rev
-      this.$nextTick(() => this.$emit(`update:${prop}`, value))
-    })
+    const propChanges = mergeObs(
+      viewChanges,
+      obsFromOlChangeEvent(this.$map, [
+        'dataProjection',
+        'size',
+        'target',
+        // 'layerGroup', FIXME not ready
+      ], true),
+    ).pipe(
+      mapObs(evt => ({
+        ...evt,
+        setter: this[setterKey(evt.prop)],
+      })),
+    )
+    this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
 
     // pointer
     const pointerEvents = mergeObs(
@@ -687,9 +780,9 @@
       obsFromOlEvent(this.$map, [
         MapBrowserEventType.POINTERDRAG,
         MapBrowserEventType.POINTERMOVE,
-      ]).pipe(
+      ], null, [
         distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
-      ),
+      ]),
     ).pipe(
       mapObs(evt => ({
         ...evt,
@@ -705,8 +798,6 @@
       RenderEventType.POSTCOMPOSE,
       RenderEventType.RENDERCOMPLETE,
     ])
-    this.subscribeTo(mergeObs(pointerEvents, otherEvents), evt => {
-      this.$emit(evt.type, evt)
-    })
+    this.subscribeTo(mergeObs(pointerEvents, otherEvents), evt => this.$emit(evt.type, evt))
   }
 </script>

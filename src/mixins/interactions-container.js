@@ -1,14 +1,13 @@
-import debounce from 'debounce-promise'
-import { Collection } from 'ol'
+import { Collection, getUid } from 'ol'
 import CollectionEventType from 'ol/CollectionEventType'
 import { defaults as createDefaultInteractions, Interaction } from 'ol/interaction'
-import { from as fromObs, merge as mergeObs } from 'rxjs'
-import { map as mapObs, mergeMap } from 'rxjs/operators'
+import { merge as mergeObs } from 'rxjs'
+import { map as mapObs, tap } from 'rxjs/operators'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'
-import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
-import { find, forEach, instanceOf, isArray, isEqual, isFunction, isPlainObject, map, sequential } from '../utils'
+import { bufferDebounceTime, fromOlChangeEvent as obsFromOlChangeEvent, fromOlEvent as obsFromOlEvent } from '../rx-ext'
+import { find, forEach, instanceOf, isArray, isPlainObject } from '../utils'
 import identMap from './ident-map'
-import { FRAME_TIME } from './ol-cmp'
+import { FRAME_TIME, makeChangeOrRecreateWatchers } from './ol-cmp'
 import rxSubs from './rx-subs'
 
 /**
@@ -25,14 +24,6 @@ export default {
   ],
   computed: {
     /**
-     * @returns {string[]}
-     */
-    currentInteractions () {
-      if (!this.rev) return []
-
-      return map(this.getInteractions(), getInteractionId)
-    },
-    /**
      * @returns {string|undefined}
      */
     interactionsCollectionIdent () {
@@ -42,20 +33,9 @@ export default {
     },
   },
   watch: {
-    currentInteractions: /*#__PURE__*/debounce(function (value, prev) {
-      if (isEqual(value, prev)) return
-
-      this.$emit('update:interactions', value.slice())
-    }, FRAME_TIME),
-    interactionsCollectionIdent: /*#__PURE__*/sequential(function (value, prevValue) {
-      if (value && prevValue) {
-        this.moveInstance(value, prevValue)
-      } else if (value && !prevValue && this.$interactionsCollection) {
-        this.setInstance(value, this.$interactionsCollection)
-      } else if (!value && prevValue) {
-        this.unsetInstance(prevValue)
-      }
-    }),
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'interactionsCollectionIdent',
+    ]),
   },
   created () {
     /**
@@ -63,6 +43,7 @@ export default {
      * @private
      */
     this._interactionsCollection = this.instanceFactoryCall(this.interactionsCollectionIdent, () => new Collection())
+    this._interactionSubs = {}
 
     this::defineServices()
   },
@@ -87,9 +68,8 @@ export default {
     },
     /**
      * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} defaultInteractions
-     * @returns {Promise<void>}
      */
-    async initDefaultInteractions (defaultInteractions) {
+    initDefaultInteractions (defaultInteractions) {
       this.clearInteractions()
 
       let interactions
@@ -103,34 +83,30 @@ export default {
         )
       }
       if (interactions) {
-        await this.addInteractions(interactions)
+        this.addInteractions(interactions)
       }
     },
     /**
      * @param {InteractionLike} interaction
-     * @return {Promise<Interaction>}
+     * @return {Interaction}
      */
-    async initializeInteraction (interaction) {
-      if (isFunction(interaction.resolveOlObject)) {
-        interaction = await interaction.resolveOlObject()
-      }
+    initializeInteraction (interaction) {
+      interaction = interaction?.$interaction || interaction
+      instanceOf(interaction, Interaction)
 
       return initializeInteraction(interaction)
     },
     /**
      * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} interactions
-     * @returns {Promise<void>}
      */
-    async addInteractions (interactions) {
-      await Promise.all(map(interactions, ::this.addInteraction))
+    addInteractions (interactions) {
+      forEach(interactions, ::this.addInteraction)
     },
     /**
      * @param {InteractionLike} interaction
-     * @return {void}
      */
-    async addInteraction (interaction) {
-      interaction = await this.initializeInteraction(interaction)
-      instanceOf(interaction, Interaction)
+    addInteraction (interaction) {
+      interaction = this.initializeInteraction(interaction)
 
       if (this.getInteractionById(getInteractionId(interaction))) return
 
@@ -139,21 +115,15 @@ export default {
     },
     /**
      * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} interactions
-     * @returns {Promise<void>}
      */
-    async removeInteractions (interactions) {
-      await Promise.all(map(interactions, ::this.removeInteraction))
+    removeInteractions (interactions) {
+      forEach(interactions, ::this.removeInteraction)
     },
     /**
      * @param {InteractionLike} interaction
-     * @return {void}
      */
-    async removeInteraction (interaction) {
-      if (isFunction(interaction.resolveOlObject)) {
-        interaction = await interaction.resolveOlObject()
-      }
-
-      interaction = this.getInteractionById(getInteractionId(interaction))
+    removeInteraction (interaction) {
+      interaction = this.getInteractionById(getInteractionId(interaction?.$interaction || interaction))
       if (!interaction) return
 
       this.$interactionsCollection.remove(interaction)
@@ -185,7 +155,7 @@ export default {
       return find(this.getInteractions(), interaction => getInteractionId(interaction) === interactionId)
     },
     /**
-     * @return {void}
+     * @param {function} [sorter]
      */
     sortInteractions (sorter) {
       sorter || (sorter = this.getDefaultInteractionsSorter())
@@ -205,6 +175,20 @@ export default {
         return ap === bp ? 0 : ap - bp
       }
     },
+    /**
+     * @param {string|undefined} value
+     * @param {string|undefined} prevValue
+     * @protected
+     */
+    interactionsCollectionIdentChanged (value, prevValue) {
+      if (value && prevValue) {
+        this.moveInstance(value, prevValue)
+      } else if (value && !prevValue && this.$interactionsCollection) {
+        this.setInstance(value, this.$interactionsCollection)
+      } else if (!value && prevValue) {
+        this.unsetInstance(prevValue)
+      }
+    },
   },
 }
 
@@ -219,16 +203,30 @@ function defineServices () {
 
 function subscribeToCollectionEvents () {
   const adds = obsFromOlEvent(this.$interactionsCollection, CollectionEventType.ADD).pipe(
-    mergeMap(({ type, element }) => fromObs(this.initializeInteraction(element)).pipe(
-      mapObs(element => ({ type, element })),
-    )),
+    mapObs(evt => ({
+      ...evt,
+      element: this.initializeInteraction(evt.element),
+    })),
+    tap(({ element }) => {
+      const uid = getUid(element)
+      const propChanges = obsFromOlChangeEvent(element, 'id', true)
+      this._interactionSubs[uid] = this.subscribeTo(propChanges, ::this.scheduleRefresh)
+    }),
   )
-  const removes = obsFromOlEvent(this.$interactionsCollection, CollectionEventType.REMOVE)
+  const removes = obsFromOlEvent(this.$interactionsCollection, CollectionEventType.REMOVE).pipe(
+    tap(({ element }) => {
+      const uid = getUid(element)
+      if (this._interactionSubs[uid]) {
+        this.unsubscribe(this._interactionSubs[uid])
+        delete this._interactionSubs[uid]
+      }
+    }),
+  )
   const events = mergeObs(adds, removes).pipe(
     bufferDebounceTime(FRAME_TIME),
   )
-  this.subscribeTo(events, events => {
-    ++this.rev
+  this.subscribeTo(events, async events => {
+    await this.scheduleRefresh()
 
     this.$nextTick(() => {
       forEach(events, ({ type, element }) => {

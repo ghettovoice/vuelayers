@@ -1,7 +1,5 @@
-import debounce from 'debounce-promise'
-import { dumpStrokeStyle } from '../ol-ext'
-import { clonePlainObject, isEqual, isFunction } from '../utils'
-import { FRAME_TIME } from './ol-cmp'
+import { Stroke } from 'ol/style'
+import { assert, coalesce } from '../utils'
 
 /**
  * @typedef {module:ol/style/Stroke~Stroke|Object|undefined} StrokeStyleLike
@@ -17,23 +15,6 @@ import { FRAME_TIME } from './ol-cmp'
  * Stroke style container.
  */
 export default {
-  computed: {
-    currentStroke () {
-      if (!(this.rev && this.$stroke)) return
-
-      return dumpStrokeStyle(this.$stroke)
-    },
-  },
-  watch: {
-    currentStroke: {
-      deep: true,
-      handler: /*#__PURE__*/debounce(function (value, prev) {
-        if (isEqual(value, prev)) return
-
-        this.$emit('update:stroke', value && clonePlainObject(value))
-      }, FRAME_TIME),
-    },
-  },
   created () {
     this._stroke = undefined
     this._strokeVm = undefined
@@ -51,6 +32,9 @@ export default {
         get strokeStyleContainer () { return vm },
       }
     },
+    /**
+     * @return {StrokeStyleTarget}
+     */
     getStrokeStyleTarget () {
       throw new Error(`${this.vmName} not implemented method: getStrokeStyleTarget()`)
     },
@@ -58,7 +42,7 @@ export default {
      * @returns {module:ol/style/Stroke~Stroke|undefined}
      */
     getStroke () {
-      return this._stroke
+      return coalesce(this.getStrokeStyleTarget()?.getStroke(), this._stroke)
     },
     /**
      * @return {Object}
@@ -68,22 +52,23 @@ export default {
     },
     /**
      * @param {module:ol/style/Stroke~Stroke|undefined} stroke
-     * @returns {Promise<void>}
      */
-    async setStroke (stroke) {
-      if (isFunction(stroke?.resolveOlObject)) {
-        stroke = await stroke.resolveOlObject()
-      }
+    setStroke (stroke) {
+      stroke = stroke?.$style || stroke
       stroke || (stroke = undefined)
+      assert(!stroke || stroke instanceof Stroke, 'Invalid stroke')
 
-      if (stroke === this._stroke) return
+      if (stroke !== this._stroke) {
+        this._stroke = stroke
+        this._strokeVm = stroke?.vm && stroke.vm[0]
+        this.scheduleRefresh()
+      }
 
-      const strokeTarget = await this.getStrokeStyleTarget()
-      if (!strokeTarget) return
-
-      this._stroke = stroke
-      this._strokeVm = stroke?.vm && stroke.vm[0]
-      await strokeTarget.setStroke(stroke)
+      const strokeTarget = this.getStrokeStyleTarget()
+      if (strokeTarget && stroke !== strokeTarget.getStroke()) {
+        strokeTarget.setStroke(stroke)
+        this.scheduleRefresh()
+      }
     },
   },
 }

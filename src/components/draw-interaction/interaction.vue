@@ -6,20 +6,10 @@
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs, of as obsOf } from 'rxjs'
   import { first, map as mapObs, mapTo, mergeMap } from 'rxjs/operators'
-  import { interaction, styleContainer } from '../../mixins'
-  import { initializeFeature } from '../../ol-ext'
+  import { interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
+  import { initializeFeature, roundLineCoords } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
-  import {
-    assert,
-    camelCase,
-    instanceOf,
-    isEqual,
-    isFunction,
-    makeWatchers,
-    mergeDescriptors,
-    sequential,
-    upperFirst,
-  } from '../../utils'
+  import { assert, camelCase, instanceOf, isFunction, mergeDescriptors, upperFirst } from '../../utils'
 
   const transformType = /*#__PURE__*/type => upperFirst(camelCase(type))
 
@@ -156,12 +146,17 @@
         default: 500,
       },
     },
+    computed: {
+      inputType () {
+        return transformType(this.type)
+      },
+    },
     watch: {
-      .../*#__PURE__*/makeWatchers([
+      .../*#__PURE__*/makeChangeOrRecreateWatchers([
         'source',
         'clickTolerance',
         'snapTolerance',
-        'type',
+        'inputType',
         'stopClick',
         'maxPoints',
         'minPoints',
@@ -173,15 +168,7 @@
         'freehandCondition',
         'wrapX',
         'dragVertexDelay',
-      ], prop => /*#__PURE__*/sequential(async function (val, prev) {
-        if (isEqual(val, prev)) return
-
-        if (process.env.VUELAYERS_DEBUG) {
-          this.$logger.log(`${prop} changed, scheduling recreate...`)
-        }
-
-        await this.scheduleRecreate()
-      })),
+      ]),
     },
     methods: {
       /**
@@ -207,7 +194,7 @@
           features,
           clickTolerance: this.clickTolerance,
           snapTolerance: this.snapTolerance,
-          type: transformType(this.type),
+          type: this.inputType,
           stopClick: this.stopClick,
           maxPoints: this.maxPoints,
           minPoints: this.minPoints,
@@ -246,12 +233,13 @@
        */
       getStyleTarget () {
         return {
-          setStyle: async () => {
+          getStyle: () => this._style,
+          setStyle: () => {
             if (process.env.VUELAYERS_DEBUG) {
               this.$logger.log('style changed, scheduling recreate...')
             }
 
-            await this.scheduleRecreate()
+            this.scheduleRecreate()
           },
         }
       },
@@ -265,14 +253,15 @@
         (await this.resolveInteraction()).finishDrawing()
       },
       async appendCoordinates (coordinates, viewProj = false) {
-        if (!viewProj) {
-          coordinates = this.lineToViewProj(coordinates)
-        }
+        coordinates = viewProj ? roundLineCoords(coordinates) : this.lineToViewProj(coordinates);
 
         (await this.resolveInteraction()).appendCoordinates(coordinates)
       },
       async removeLastPoint () {
         (await this.resolveInteraction()).removeLastPoint()
+      },
+      async getPointerCount () {
+        return (await this.resolveInteraction()).getPointerCount()
       },
     },
   }
@@ -284,10 +273,10 @@
   function subscribeToInteractionChanges () {
     const vm = this
     const start = obsFromOlEvent(this.$interaction, 'drawstart').pipe(
-      mapObs(evt => {
-        initializeFeature(evt.feature)
-        return evt
-      }),
+      mapObs(evt => ({
+        ...evt,
+        feature: initializeFeature(evt.feature),
+      })),
     )
     const sourceUpdObs = () => {
       if (!this._source?.vm?.length) {
@@ -318,6 +307,7 @@
       })),
     )
     this.subscribeTo(events, evt => {
+      this.scheduleRefresh()
       this.$emit(evt.type, evt)
     })
   }

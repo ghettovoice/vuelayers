@@ -1,4 +1,5 @@
-import { isEqual, pick, sequential } from '../utils'
+import { coalesce } from '../utils'
+import { makeChangeOrRecreateWatchers } from './ol-cmp'
 import style from './style'
 
 export default {
@@ -46,28 +47,41 @@ export default {
       default: () => [0, 0],
     },
   },
+  data () {
+    return {
+      currentOpacity: this.opacity,
+      currentRotateWithView: this.rotateWithView,
+      currentRotation: this.rotation,
+      currentScale: this.scale,
+    }
+  },
+  computed: {
+    inputDisplacement () {
+      return this.displacement?.slice()
+    },
+  },
   watch: {
-    opacity: /*#__PURE__*/sequential(async function (value) {
-      await this.setOpacity(value)
-    }),
-    rotateWithView: /*#__PURE__*/sequential(async function (value) {
-      await this.setRotateWithView(value)
-    }),
-    rotation: /*#__PURE__*/sequential(async function (value) {
-      await this.setRotation(value)
-    }),
-    scale: /*#__PURE__*/sequential(async function (value) {
-      await this.setScale(value)
-    }),
-    displacement: /*#__PURE__*/sequential(async function (value) {
-      if (isEqual(value, await this.getDisplacement())) return
+    rev () {
+      if (!this.$style) return
 
-      if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('displacement changed, scheduling recreate...')
-      }
-
-      await this.scheduleRecreate()
-    }),
+      this.setOpacity(this.getOpacity())
+      this.setRotateWithView(this.getRotateWithView())
+      this.setRotation(this.getRotation())
+      this.setScale(this.getScale())
+    },
+    .../*#__PURE__*/makeChangeOrRecreateWatchers([
+      'opacity',
+      'currentOpacity',
+      'rotateWithView',
+      'currentRotateWithView',
+      'rotation',
+      'currentRotation',
+      'scale',
+      'currentScale',
+      'inputDisplacement',
+    ], [
+      'inputDisplacement',
+    ]),
   },
   created () {
     this::defineServices()
@@ -78,9 +92,7 @@ export default {
      * @protected
      */
     async mount () {
-      if (this.$imageStyleContainer) {
-        await this.$imageStyleContainer.setImage(this)
-      }
+      this.$imageStyleContainer?.setImage(this)
 
       return this::style.methods.mount()
     },
@@ -89,103 +101,177 @@ export default {
      * @protected
      */
     async unmount () {
-      if (this.$imageStyleContainer && this.$imageStyleContainer.getImageVm() === this) {
+      if (this.$imageStyleContainer?.getImageVm() === this) {
         await this.$imageStyleContainer.setImage(null)
       }
 
       return this::style.methods.unmount()
     },
     /**
-     * @return {Promise}
+     * @return {Promise<void>}
      */
     async refresh () {
-      this::style.methods.refresh()
-
-      if (this.$imageStyleContainer) {
-        this.$imageStyleContainer.refresh()
-      }
+      await Promise.all([
+        this::style.methods.refresh(),
+        this.$imageStyleContainer?.refresh(),
+      ])
     },
-    .../*#__PURE__*/pick(style.methods, [
-      'beforeInit',
-      'init',
-      'deinit',
-      'beforeMount',
-      'scheduleRefresh',
-      'remount',
-      'scheduleRemount',
-      'recreate',
-      'scheduleRecreate',
-      'getServices',
-      'subscribeAll',
-      'resolveOlObject',
-      'resolveStyle',
-    ]),
     /**
-     * @returns {Promise<number>}
+     * @protected
      */
-    async getOpacity () {
-      return (await this.resolveStyle()).getOpacity()
+    syncNonObservable () {
+      this::style.methods.syncNonObservable()
+
+      this.setOpacity(this.getOpacity())
+      this.setRotateWithView(this.getRotateWithView())
+      this.setRotation(this.getRotation())
+      this.setScale(this.getScale())
+    },
+    /**
+     * @returns {number}
+     */
+    getOpacity () {
+      return coalesce(this.$style?.getOpacity(), this.currentOpacity)
     },
     /**
      * @param {number} opacity
-     * @returns {Promise<void>}
      */
-    async setOpacity (opacity) {
-      if (opacity === await this.getOpacity()) return
-
-      (await this.resolveStyle()).setOpacity(opacity)
-      await this.scheduleRefresh()
+    setOpacity (opacity) {
+      if (opacity !== this.currentOpacity) {
+        this.currentOpacity = opacity
+        this.scheduleRefresh()
+      }
+      if (this.$style && opacity !== this.$style.getOpacity()) {
+        this.$style.setOpacity(opacity)
+        this.scheduleRefresh()
+      }
     },
     /**
-     * @returns {Promise<boolean>}
+     * @returns {boolean}
      */
-    async getRotateWithView () {
-      return (await this.resolveStyle()).getRotateWithView()
+    getRotateWithView () {
+      return coalesce(this.$style?.getRotateWithView(), this.currentRotateWithView)
     },
     /**
      * @param {boolean} rotateWithView
-     * @returns {Promise<void>}
      */
-    async setRotateWithView (rotateWithView) {
-      if (rotateWithView === await this.getRotateWithView()) return
-
-      (await this.resolveStyle()).setRotateWithView(rotateWithView)
-      await this.scheduleRefresh()
+    setRotateWithView (rotateWithView) {
+      if (rotateWithView !== this.currentRotateWithView) {
+        this.currentRotateWithView = rotateWithView
+        this.scheduleRefresh()
+      }
+      if (this.$style && rotateWithView !== this.$style.getRotateWithView()) {
+        this.$style.setRotateWithView(rotateWithView)
+        this.scheduleRefresh()
+      }
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {number}
      */
-    async getRotation () {
-      return (await this.resolveStyle()).getRotation()
+    getRotation () {
+      return coalesce(this.$style?.getRotation(), this.currentRotation)
     },
     /**
      * @param {number} rotation
-     * @returns {Promise<void>}
      */
-    async setRotation (rotation) {
-      if (rotation === await this.getRotation()) return
-
-      (await this.resolveStyle()).setRotation(rotation)
-      await this.scheduleRefresh()
+    setRotation (rotation) {
+      if (rotation !== this.currentRotation) {
+        this.currentRotation = rotation
+        this.scheduleRefresh()
+      }
+      if (this.$style && rotation !== this.$style.getRotation()) {
+        this.$style.setRotation(rotation)
+        this.scheduleRefresh()
+      }
     },
     /**
-     * @returns {Promise<number>}
+     * @returns {number}
      */
-    async getScale () {
-      return (await this.resolveStyle()).getScale()
+    getScale () {
+      return coalesce(this.$style?.getScale(), this.currentScale)
     },
     /**
      * @param {number} scale
-     * @returns {Promise<void>}
      */
-    async setScale (scale) {
-      if (scale === await this.getScale()) return
-
-      (await this.resolveStyle()).setScale(scale)
-      await this.scheduleRefresh()
+    setScale (scale) {
+      if (scale !== this.currentScale) {
+        this.currentScale = scale
+        this.scheduleRefresh()
+      }
+      if (this.$style && scale !== this.$style.getScale()) {
+        this.$style.setScale(scale)
+        this.scheduleRefresh()
+      }
     },
-    async getDisplacement () {
-      return (await this.resolveStyle()).getDisplacement()
+    /**
+     * @return {number[]}
+     */
+    getDisplacement () {
+      return coalesce(this.$style?.getDisplacement(), this.inputDisplacement)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    opacityChanged (value) {
+      this.setOpacity(value)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    currentOpacityChanged (value) {
+      if (value === this.opacity) return
+
+      this.$emit('update:opacity', value)
+    },
+    /**
+     * @param {boolean} value
+     * @protected
+     */
+    rotateWithViewChanged (value) {
+      this.setRotateWithView(value)
+    },
+    /**
+     * @param {boolean} value
+     * @protected
+     */
+    currentRotateWithViewChanged (value) {
+      if (value === this.rotateWithView) return
+
+      this.$emit('update:rotateWithView', value)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    rotationChanged (value) {
+      this.setRotation(value)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    currentRotationChanged (value) {
+      if (value === this.rotation) return
+
+      this.$emit('update:rotation', value)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    scaleChanged (value) {
+      this.setScale(value)
+    },
+    /**
+     * @param {number} value
+     * @protected
+     */
+    currentScaleChanged (value) {
+      if (value === this.scale) return
+
+      this.$emit('update:scale', value)
     },
   },
 }
