@@ -51,6 +51,7 @@
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          style: this.$style,
           // ol/layer/VectorImage
           imageRatio: this.imageRatio,
         })

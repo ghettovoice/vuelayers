@@ -121,6 +121,7 @@
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          style: this.$style,
           // ol/layer/Heatmap
           blur: this.currentBlur,
           gradient: this.currentGradient,

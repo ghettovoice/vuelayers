@@ -47,6 +47,7 @@
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          style: this.$style,
           // ol/layer/VectorTile
           // tile layer props
           preload: this.currentPreload,

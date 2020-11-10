@@ -243,6 +243,7 @@
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          style: this.$style,
           // ol/layer/Graticule
           maxLines: this.maxLines,
           strokeStyle: this.$strokeStyle,

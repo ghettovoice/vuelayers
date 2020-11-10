@@ -57,6 +57,7 @@
           declutter: this.declutter,
           updateWhileAnimating: this.updateWhileAnimating,
           updateWhileInteracting: this.updateWhileInteracting,
+          style: this.$style,
         })
       },
     },

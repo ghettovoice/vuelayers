@@ -14,11 +14,18 @@
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
+
+      <VlLayerVector :declutter.sync="decl">
+        <VlSourceVector :features.sync="features" />
+        <VlStyleFunc :function="styleFunc" />
+      </VlLayerVector>
     </VlMap>
   </div>
 </template>
 
 <script>
+  import { createStyle } from '../src/ol-ext'
+
   export default {
     name: 'App',
     data () {
@@ -31,6 +38,7 @@
         viewId: 'asdfg',
         dataProj: 'EPSG:4326',
         viewProj: 'EPSG:3857',
+        decl: true,
       }
     },
     mounted () {
@@ -60,6 +68,17 @@
       ]
     },
     methods: {
+      styleFunc () {
+        return createStyle({
+          fillColor: 'pink',
+          strokeColor: 'black',
+          strokeWidth: 2,
+          imageRadius: 5,
+          imageFillColor: 'pink',
+          imageStrokeColor: 'black',
+          imageStrokeWidth: 2,
+        })
+      },
     },
   }
 </script>
