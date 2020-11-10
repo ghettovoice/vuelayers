@@ -1,5 +1,3 @@
-import GeometryLayout from 'ol/geom/GeometryLayout'
-
 const { escapeRegExp, noop } = require('lodash')
 const replace = require('rollup-plugin-re')
 const vue = require('rollup-plugin-vue')
