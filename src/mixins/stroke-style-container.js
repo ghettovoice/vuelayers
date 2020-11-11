@@ -58,15 +58,14 @@ export default {
       stroke || (stroke = undefined)
       assert(!stroke || stroke instanceof Stroke, 'Invalid stroke')
 
-      if (stroke !== this._stroke) {
-        this._stroke = stroke
-        this._strokeVm = stroke?.vm && stroke.vm[0]
-        this.scheduleRefresh()
-      }
-
       const strokeTarget = this.getStrokeStyleTarget()
       if (strokeTarget && stroke !== strokeTarget.getStroke()) {
         strokeTarget.setStroke(stroke)
+        this.scheduleRefresh()
+      }
+      if (stroke !== this._stroke) {
+        this._stroke = stroke
+        this._strokeVm = stroke?.vm && stroke.vm[0]
         this.scheduleRefresh()
       }
     },

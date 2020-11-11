@@ -58,15 +58,14 @@ export default {
       text || (text = undefined)
       assert(!text || text instanceof Text, 'Invalid text style')
 
-      if (text !== this._text) {
-        this._text = text
-        this._textVm = text?.vm && text.vm[0]
-        this.scheduleRefresh()
-      }
-
       const textTarget = this.getTextStyleTarget()
       if (textTarget && text !== textTarget.getText()) {
         textTarget.setText(text)
+        this.scheduleRefresh()
+      }
+      if (text !== this._text) {
+        this._text = text
+        this._textVm = text?.vm && text.vm[0]
         this.scheduleRefresh()
       }
     },

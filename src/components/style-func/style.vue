@@ -146,7 +146,7 @@
        * @protected
        */
       async unmount () {
-        if (this.$styleContainer?.getStyle() === this.$styleFunc) {
+        if (this.$styleContainer?.getStyle() === this.$styleFunction) {
           this.$styleContainer.setStyle(null)
         }
 

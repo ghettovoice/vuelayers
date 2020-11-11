@@ -136,14 +136,13 @@ export default {
         }
       }
 
-      if (!isEqual(style, this._style)) {
-        this._style = style
-        this.scheduleRefresh()
-      }
-
       const styleTarget = this.getStyleTarget()
       if (styleTarget && !isEqual(style, styleTarget.getStyle())) {
         styleTarget.setStyle(style)
+        this.scheduleRefresh()
+      }
+      if (!isEqual(style, this._style)) {
+        this._style = style
         this.scheduleRefresh()
       }
     },

@@ -62,8 +62,8 @@
       },
       getSourceTarget () {
         return {
-          setSource: source => this.$innerSourceContainer?.setInnerSource(source),
           getSource: () => this.$innerSourceContainer?.getInnerSource(),
+          setSource: source => this.$innerSourceContainer?.setInnerSource(source),
         }
       },
     },

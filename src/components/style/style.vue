@@ -269,6 +269,21 @@
         this.setZIndex(this.getZIndex())
         this.setRenderer(this.getRenderer())
       },
+      getFillStyleTarget () {
+        return this.$style
+      },
+      getStrokeStyleTarget () {
+        return this.$style
+      },
+      getTextStyleTarget () {
+        return this.$style
+      },
+      getImageStyleTarget () {
+        return this.$style
+      },
+      getGeometryTarget () {
+        return this.$style
+      },
       getZIndex () {
         return coalesce(this.$style?.getZIndex(), this.currentZIndex)
       },
@@ -298,21 +313,6 @@
       // todo add support for geometry function
       getGeometryFunction () {
         return this.$style?.getGeometryFunction()
-      },
-      getFillStyleTarget () {
-        return this.$style
-      },
-      getStrokeStyleTarget () {
-        return this.$style
-      },
-      getTextStyleTarget () {
-        return this.$style
-      },
-      getImageStyleTarget () {
-        return this.$style
-      },
-      getGeometryTarget () {
-        return this.$style
       },
     },
   }

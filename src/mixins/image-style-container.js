@@ -58,15 +58,14 @@ export default {
       image || (image = undefined)
       assert(!image || image instanceof Image, 'Invalid image style')
 
-      if (image !== this._image) {
-        this._image = image
-        this._imageVm = image?.vm && image.vm[0]
-        this.scheduleRefresh()
-      }
-
       const imageTarget = this.getImageStyleTarget()
       if (imageTarget && image !== imageTarget.getImage()) {
         imageTarget.setImage(image)
+        this.scheduleRefresh()
+      }
+      if (image !== this._image) {
+        this._image = image
+        this._imageVm = image?.vm && image.vm[0]
         this.scheduleRefresh()
       }
     },

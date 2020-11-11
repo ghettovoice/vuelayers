@@ -274,12 +274,12 @@
       getStyleTarget () {
         return {
           getStyle: () => this._style,
-          setStyle: async () => {
+          setStyle: () => {
             if (process.env.VUELAYERS_DEBUG) {
               this.$logger.log('style changed, scheduling recreate...')
             }
 
-            await this.scheduleRecreate()
+            this.scheduleRecreate()
           },
         }
       },

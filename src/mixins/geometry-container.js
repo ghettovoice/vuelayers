@@ -72,15 +72,14 @@ export default {
       geom || (geom = undefined)
       assert(!geom || geom instanceof Geometry, 'Invalid geometry')
 
-      if (geom !== this._geometry) {
-        this._geometry = geom
-        this._geometryVm = geom?.vm && geom.vm[0]
-        this.scheduleRefresh()
-      }
-
       const geomTarget = this.getGeometryTarget()
       if (geomTarget && geom !== geomTarget.getGeometry()) {
         geomTarget.setGeometry(geom)
+        this.scheduleRefresh()
+      }
+      if (geom !== this._geometry) {
+        this._geometry = geom
+        this._geometryVm = geom?.vm && geom.vm[0]
         this.scheduleRefresh()
       }
     },

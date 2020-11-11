@@ -67,15 +67,14 @@ export default {
       source || (source = undefined)
       assert(!source || source instanceof Source, 'Invalid source')
 
-      if (source !== this._source) {
-        this._source = source
-        this._sourceVm = source?.vm && source.vm[0]
-        this.scheduleRefresh()
-      }
-
       const sourceTarget = this.getSourceTarget()
       if (sourceTarget && source !== sourceTarget.getSource()) {
         sourceTarget.setSource(source)
+        this.scheduleRefresh()
+      }
+      if (source !== this._source) {
+        this._source = source
+        this._sourceVm = source?.vm && source.vm[0]
         this.scheduleRefresh()
       }
     },

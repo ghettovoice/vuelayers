@@ -17,13 +17,29 @@
 
       <VlLayerVector :declutter.sync="decl">
         <VlSourceVector :features.sync="features" />
-        <VlStyleFunc :function="styleFunc" />
+        <VlStyle>
+          <VlStyleStroke
+            :width="2"
+            color="black" />
+          <VlStyleFill color="pink" />
+          <VlStyleCircle :radius="5">
+            <VlStyleStroke
+              :width="2"
+              color="black" />
+            <VlStyleFill color="pink" />
+          </VlStyleCircle>
+        </VlStyle>
       </VlLayerVector>
+
+      <VlInteractionSelect :condition="pointerMove">
+        <VlStyleFunc :function="selectStyleFunc" />
+      </VlInteractionSelect>
     </VlMap>
   </div>
 </template>
 
 <script>
+  import { pointerMove } from 'ol/events/condition'
   import { createStyle } from '../src/ol-ext'
 
   export default {
@@ -77,6 +93,18 @@
           imageFillColor: 'pink',
           imageStrokeColor: 'black',
           imageStrokeWidth: 2,
+        })
+      },
+      pointerMove,
+      selectStyleFunc () {
+        return createStyle({
+          fillColor: 'green',
+          strokeColor: 'black',
+          strokeWidth: 3,
+          imageRadius: 6,
+          imageFillColor: 'green',
+          imageStrokeColor: 'black',
+          imageStrokeWidth: 3,
         })
       },
     },

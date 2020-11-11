@@ -59,8 +59,8 @@
       },
       getTextStyleTarget () {
         return {
-          setText: style => this.$latStyleContainer.setLatLabelStyle(style),
-          getText: () => this.$latStyleContainer.getLatLabelStyle(),
+          getText: () => this.$latStyleContainer?.getLatLabelStyle(),
+          setText: style => this.$latStyleContainer?.setLatLabelStyle(style),
         }
       },
     },

@@ -59,8 +59,8 @@
       },
       getTextStyleTarget () {
         return {
-          setText: style => this.$lonStyleContainer.setLonLabelStyle(style),
-          getText: () => this.$lonStyleContainer.getLonLabelStyle(),
+          getText: () => this.$lonStyleContainer?.getLonLabelStyle(),
+          setText: style => this.$lonStyleContainer?.setLonLabelStyle(style),
         }
       },
     },
