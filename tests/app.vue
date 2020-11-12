@@ -58,43 +58,34 @@
       }
     },
     mounted () {
-      this.features = [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [10, 10],
-                [10, 20],
-                [20, 20],
-                [20, 10],
-                [10, 10],
+      setTimeout(() => {
+        this.features = [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [10, 10],
+                  [10, 20],
+                  [20, 20],
+                  [20, 10],
+                  [10, 10],
+                ],
               ],
-            ],
+            },
           },
-        },
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [-10, -10],
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [-10, -10],
+            },
           },
-        },
-      ]
+        ]
+      }, 1000)
     },
     methods: {
-      styleFunc () {
-        return createStyle({
-          fillColor: 'pink',
-          strokeColor: 'black',
-          strokeWidth: 2,
-          imageRadius: 5,
-          imageFillColor: 'pink',
-          imageStrokeColor: 'black',
-          imageStrokeWidth: 2,
-        })
-      },
       pointerMove,
       selectStyleFunc () {
         return createStyle({

@@ -319,7 +319,10 @@ export default {
       feature = feature?.$feature || feature
 
       if (this.$source) {
-        this.$source.removeFeature(feature)
+        feature = this.$source.getFeatureById(getFeatureId(feature))
+        if (feature) {
+          this.$source.removeFeature(feature)
+        }
       } else {
         this::featuresContainer.methods.removeFeature(feature)
       }
@@ -604,6 +607,14 @@ export default {
         value,
         (a, b) => getFeatureId(a) === getFeatureId(b),
       ))
+      this.removeFeatures([{
+        type: 'Feature',
+        id: '123',
+        geometry: {
+          type: 'Point',
+          coordinates: [10, 10],
+        },
+      }])
     },
     /**
      * @param {GeoJSONFeature[]} value
