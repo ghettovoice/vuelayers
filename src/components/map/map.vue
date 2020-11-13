@@ -64,7 +64,17 @@
     fromVueEvent as obsFromVueEvent,
     fromVueWatcher as obsFromVueWatcher,
   } from '../../rx-ext'
-  import { addPrefix, assert, clonePlainObject, coalesce, isArray, isEqual, map, mergeDescriptors } from '../../utils'
+  import {
+    addPrefix,
+    assert,
+    clonePlainObject,
+    coalesce,
+    isArray,
+    isEqual,
+    map,
+    mergeDescriptors,
+    omit,
+  } from '../../utils'
   import { Layer as VectorLayerCmp } from '../vector-layer'
   import { Source as VectorSourceCmp } from '../vector-source'
   import ViewCmp from './view.vue'
@@ -784,10 +794,14 @@
         distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
       ]),
     ).pipe(
-      mapObs(evt => ({
+      mapObs(evt => omit({
         ...evt,
+        pixel: evt.pixel,
         coordinate: this.pointToDataProj(evt.coordinate),
-      })),
+      }, [
+        'pixel_',
+        'coordinate_',
+      ])),
     )
     // other
     const otherEvents = obsFromOlEvent(this.$map, [

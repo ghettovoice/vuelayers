@@ -7,7 +7,7 @@
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
   import { interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
-  import { isPointCoords, roundPointCoords } from '../../ol-ext'
+  import { COORD_PRECISION, isPointCoords, roundPointCoords, writeGeoJsonFeature } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent, fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import {
     addPrefix,
@@ -250,23 +250,26 @@
     }))
     this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
 
-    const vm = this
     const start = obsFromOlEvent(this.$interaction, 'rotatestart')
     const end = obsFromOlEvent(this.$interaction, 'rotateend')
     const progress = obsFromOlEvent(this.$interaction, 'rotating')
     const events = mergeObs(start, end, progress).pipe(
-      mapObs(({ type, features, angle, anchor }) => ({
-        type,
-        features: features instanceof Collection ? features.getArray() : features,
-        angle,
-        anchor: vm.pointToDataProj(anchor),
-        get json () {
-          if (!this._json) {
-            this._json = map(this.features, feature => vm.writeFeatureInDataProj(feature))
-          }
-          return this._json
-        },
-      })),
+      mapObs(({ type, features, angle, anchor }) => {
+        const viewProj = this.resolvedViewProjection
+        const dataProj = this.resolvedDataProjection
+        return {
+          type,
+          features: features instanceof Collection ? features.getArray() : features,
+          angle,
+          anchor: this.pointToDataProj(anchor),
+          get json () {
+            if (!this._json) {
+              this._json = map(this.features, feature => writeGeoJsonFeature(feature, viewProj, dataProj, COORD_PRECISION))
+            }
+            return this._json
+          },
+        }
+      }),
     )
     this.subscribeTo(events, evt => {
       this.scheduleRefresh()

@@ -6,7 +6,7 @@
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs } from 'rxjs/operators'
   import { interaction, makeChangeOrRecreateWatchers } from '../../mixins'
-  import { getLayerId } from '../../ol-ext'
+  import { COORD_PRECISION, getLayerId, writeGeoJsonFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { assert, coalesce, instanceOf, isFunction, isNumber, isString, map } from '../../utils'
 
@@ -141,23 +141,26 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    const vm = this
     const start = obsFromOlEvent(this.$interaction, 'translatestart')
     const end = obsFromOlEvent(this.$interaction, 'translateend')
     const progress = obsFromOlEvent(this.$interaction, 'translating')
     const events = mergeObs(start, end, progress).pipe(
-      mapObs(({ type, features, coordinate, startCoordinate }) => ({
-        type,
-        features: features instanceof Collection ? features.getArray() : features,
-        coordinate: vm.pointToDataProj(coordinate),
-        startCoordinate: vm.pointToDataProj(startCoordinate),
-        get json () {
-          if (!this._json) {
-            this._json = map(this.features, feature => vm.writeFeatureInDataProj(feature))
-          }
-          return this._json
-        },
-      })),
+      mapObs(({ type, features, coordinate, startCoordinate }) => {
+        const viewProj = this.resolvedViewProjection
+        const dataProj = this.resolvedDataProjection
+        return {
+          type,
+          features: features instanceof Collection ? features.getArray() : features,
+          coordinate: this.pointToDataProj(coordinate),
+          startCoordinate: this.pointToDataProj(startCoordinate),
+          get json () {
+            if (!this._json) {
+              this._json = map(this.features, feature => writeGeoJsonFeature(feature, viewProj, dataProj, COORD_PRECISION))
+            }
+            return this._json
+          },
+        }
+      }),
     )
     this.subscribeTo(events, evt => {
       this.scheduleRefresh()

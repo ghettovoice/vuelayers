@@ -6,6 +6,7 @@
   import { merge as mergeObs } from 'rxjs'
   import { map as mapObs, tap } from 'rxjs/operators'
   import { interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
+  import { COORD_PRECISION, writeGeoJsonFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
   import { assert, instanceOf, isFunction, map, mergeDescriptors } from '../../utils'
 
@@ -174,7 +175,6 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    const vm = this
     this.modifing = []
     const start = obsFromOlEvent(this.$interaction, 'modifystart').pipe(
       tap(evt => {
@@ -195,17 +195,21 @@
       })),
     )
     const events = mergeObs(start, end).pipe(
-      mapObs(({ type, features, modified }) => ({
-        type,
-        features: features instanceof Collection ? features.getArray() : features,
-        modified: modified || {},
-        get json () {
-          if (!this._json) {
-            this._json = map(this.features, feature => vm.writeFeatureInDataProj(feature))
-          }
-          return this._json
-        },
-      })),
+      mapObs(({ type, features, modified }) => {
+        const viewProj = this.resolvedViewProjection
+        const dataProj = this.resolvedDataProjection
+        return {
+          type,
+          features: features instanceof Collection ? features.getArray() : features,
+          modified: modified || {},
+          get json () {
+            if (!this._json) {
+              this._json = map(this.features, feature => writeGeoJsonFeature(feature, viewProj, dataProj, COORD_PRECISION))
+            }
+            return this._json
+          },
+        }
+      }),
     )
     this.subscribeTo(events, evt => {
       this.scheduleRefresh()

@@ -7,7 +7,7 @@
   import { merge as mergeObs, of as obsOf } from 'rxjs'
   import { first, map as mapObs, mapTo, mergeMap } from 'rxjs/operators'
   import { interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
-  import { initializeFeature, roundLineCoords } from '../../ol-ext'
+  import { COORD_PRECISION, initializeFeature, roundLineCoords, writeGeoJsonFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
   import { assert, camelCase, instanceOf, isFunction, mergeDescriptors, upperFirst } from '../../utils'
 
@@ -271,7 +271,6 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    const vm = this
     const start = obsFromOlEvent(this.$interaction, 'drawstart').pipe(
       mapObs(evt => ({
         ...evt,
@@ -295,16 +294,20 @@
       )),
     )
     const events = mergeObs(start, end).pipe(
-      mapObs(({ type, feature }) => ({
-        type,
-        feature,
-        get json () {
-          if (!this._json) {
-            this._json = vm.writeFeatureInDataProj(this.feature)
-          }
-          return this._json
-        },
-      })),
+      mapObs(({ type, feature }) => {
+        const viewProj = this.resolvedViewProjection
+        const dataProj = this.resolvedDataProjection
+        return {
+          type,
+          feature,
+          get json () {
+            if (!this._json) {
+              this._json = writeGeoJsonFeature(this.feature, viewProj, dataProj, COORD_PRECISION)
+            }
+            return this._json
+          },
+        }
+      }),
     )
     this.subscribeTo(events, evt => {
       this.scheduleRefresh()

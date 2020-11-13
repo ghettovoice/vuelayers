@@ -4,7 +4,7 @@ import EventType from 'ol/events/EventType'
 import ObjectEventType from 'ol/ObjectEventType'
 import { merge as mergeObs } from 'rxjs'
 import { distinctUntilChanged, map as mapObs, tap } from 'rxjs/operators'
-import { getFeatureId, roundExtent, roundPointCoords } from '../ol-ext'
+import { COORD_PRECISION, getFeatureId, roundExtent, roundPointCoords, writeGeoJsonFeature } from '../ol-ext'
 import { bufferDebounceTime, fromOlEvent as obsFromOlEvent } from '../rx-ext'
 import { find, forEach, identity, isEqual } from '../utils'
 import featureHelper from './feature-helper'
@@ -273,7 +273,6 @@ function defineServices () {
 }
 
 function subscribeToCollectionEvents () {
-  const vm = this
   const adds = obsFromOlEvent(this.$featuresCollection, CollectionEventType.ADD).pipe(
     mapObs(evt => ({
       ...evt,
@@ -299,16 +298,20 @@ function subscribeToCollectionEvents () {
     }),
   )
   const events = mergeObs(adds, removes).pipe(
-    mapObs(({ type, element }) => ({
-      type,
-      feature: element,
-      get json () {
-        if (!this._json) {
-          this._json = vm.writeFeatureInDataProj(this.feature)
-        }
-        return this._json
-      },
-    })),
+    mapObs(({ type, element }) => {
+      const viewProj = this.resolvedViewProjection
+      const dataProj = this.resolvedDataProjection
+      return {
+        type,
+        feature: element,
+        get json () {
+          if (!this._json) {
+            this._json = writeGeoJsonFeature(this.feature, viewProj, dataProj, COORD_PRECISION)
+          }
+          return this._json
+        },
+      }
+    }),
     bufferDebounceTime(FRAME_TIME),
   )
   this.subscribeTo(events, async events => {
