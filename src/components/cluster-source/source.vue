@@ -34,6 +34,11 @@
         // default: defaultGeomFunc,
       },
       /**
+       * @deprecated
+       * @todo remove later
+       */
+      geomFunc: Function,
+      /**
        * @deprecated Use geomFunc prop instead.
        * @todo remove in v0.13.x
        */
@@ -46,7 +51,7 @@
     },
     computed: {
       inputGeometryFunction () {
-        let geomFunc = this.geometryFunction
+        let geomFunc = this.geometryFunction || this.geomFunc
         if (!geomFunc && this.geomFuncFactory) {
           geomFunc = this.geomFuncFactory()
         }
@@ -98,7 +103,10 @@
     created () {
       if (process.env.NODE_ENV !== 'production') {
         if (this.geomFuncFactory) {
-          this.$logger.warn("'geomFuncFactory' prop is deprecated. Use 'geomFunc' prop instead.")
+          this.$logger.warn("'geomFuncFactory' prop is deprecated. Use 'geometryFunction' prop instead.")
+        }
+        if (this.geomFunc) {
+          this.$logger.warn("'geomFunc' prop is deprecated. Use 'geometryFunction' prop instead.")
         }
       }
 
@@ -110,7 +118,10 @@
     updated () {
       if (process.env.NODE_ENV !== 'production') {
         if (this.geomFuncFactory) {
-          this.$logger.warn("'geomFuncFactory' prop is deprecated. Use 'geomFunc' prop instead.")
+          this.$logger.warn("'geomFuncFactory' prop is deprecated. Use 'geometryFunction' prop instead.")
+        }
+        if (this.geomFunc) {
+          this.$logger.warn("'geomFunc' prop is deprecated. Use 'geometryFunction' prop instead.")
         }
       }
     },

@@ -24,6 +24,14 @@
         validator: value => value.length === 4,
       },
       /**
+       * @deprecated
+       * @todo remove later
+       */
+      imgExtent: {
+        type: Array,
+        validator: value => value.length === 4,
+      },
+      /**
        * @deprecated Use `imgExtent` instead.
        * @todo remove in v0.13.x
        */
@@ -37,6 +45,11 @@
        */
       imageLoadFunction: Function,
       /**
+       * @deprecated
+       * @todo remove later
+       */
+      imgLoadFunc: Function,
+      /**
        * @deprecated Use `imgLoadFunc` instead.
        * @todo remove in v0.13.x
        */
@@ -46,6 +59,14 @@
        * @type {number[]}
        */
       imageSize: {
+        type: Array,
+        validator: value => value.length === 2,
+      },
+      /**
+       * @deprecated
+       * @todo remove later
+       */
+      imgSize: {
         type: Array,
         validator: value => value.length === 2,
       },
@@ -76,13 +97,13 @@
     },
     computed: {
       inputImageExtent () {
-        return coalesce(this.imageExtent, this.extent)?.slice()
+        return coalesce(this.imageExtent, this.imgExtent, this.extent)?.slice()
       },
       inputImageLoadFunction () {
-        return coalesce(this.imageLoadFunction, this.loadFunc)
+        return coalesce(this.imageLoadFunction, this.imgLoadFunc, this.loadFunc)
       },
       inputImageSize () {
-        return coalesce(this.imageSize, this.size)?.slice()
+        return coalesce(this.imageSize, this.imgSize, this.size)?.slice()
       },
     },
     watch: {
@@ -101,26 +122,44 @@
     created () {
       if (process.env.NODE_ENV !== 'production') {
         if (this.extent) {
-          this.$logger.warn("'extent' is deprecated. Use `imgExtent` prop instead.")
+          this.$logger.warn("'extent' is deprecated. Use `imageExtent` prop instead.")
+        }
+        if (this.imgExtent) {
+          this.$logger.warn("'imgExtent' is deprecated. Use `imageExtent` prop instead.")
         }
         if (this.loadFunc) {
-          this.$logger.warn("'loadFunc' is deprecated. Use `imgLoadFunc` prop instead.")
+          this.$logger.warn("'loadFunc' is deprecated. Use `imageLoadFunction` prop instead.")
+        }
+        if (this.imgLoadFunc) {
+          this.$logger.warn("'imgLoadFunc' is deprecated. Use `imageLoadFunction` prop instead.")
         }
         if (this.size) {
-          this.$logger.warn("'size' is deprecated. Use `imgSize` prop instead.")
+          this.$logger.warn("'size' is deprecated. Use `imageSize` prop instead.")
+        }
+        if (this.imgSize) {
+          this.$logger.warn("'imgSize' is deprecated. Use `imageSize` prop instead.")
         }
       }
     },
     updated () {
       if (process.env.NODE_ENV !== 'production') {
         if (this.extent) {
-          this.$logger.warn("'extent' is deprecated. Use `imgExtent` prop instead.")
+          this.$logger.warn("'extent' is deprecated. Use `imageExtent` prop instead.")
+        }
+        if (this.imgExtent) {
+          this.$logger.warn("'imgExtent' is deprecated. Use `imageExtent` prop instead.")
         }
         if (this.loadFunc) {
-          this.$logger.warn("'loadFunc' is deprecated. Use `imgLoadFunc` prop instead.")
+          this.$logger.warn("'loadFunc' is deprecated. Use `imageLoadFunction` prop instead.")
+        }
+        if (this.imgLoadFunc) {
+          this.$logger.warn("'imgLoadFunc' is deprecated. Use `imageLoadFunction` prop instead.")
         }
         if (this.size) {
-          this.$logger.warn("'size' is deprecated. Use `imgSize` prop instead.")
+          this.$logger.warn("'size' is deprecated. Use `imageSize` prop instead.")
+        }
+        if (this.imgSize) {
+          this.$logger.warn("'imgSize' is deprecated. Use `imageSize` prop instead.")
         }
       }
     },

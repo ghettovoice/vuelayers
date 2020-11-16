@@ -15,6 +15,11 @@
       // ol/source/ImageArcGISRest
       crossOrigin: String,
       imageLoadFunction: Function,
+      /**
+       * @deprecated
+       * @todo remove later
+       */
+      imageLoadFunc: Function,
       imageSmoothing: {
         type: Boolean,
         default: true,
@@ -35,6 +40,11 @@
         currentUrl: this.url,
       }
     },
+    computed: {
+      inputImageLoadFunction () {
+        return this.imageLoadFunction || this.imageLoadFunc
+      },
+    },
     watch: {
       rev () {
         if (!this.$source) return
@@ -54,7 +64,7 @@
 
         this.$emit('update:url', value)
       },
-      imageLoadFunction (value) {
+      inputImageLoadFunction (value) {
         this.setImageLoadFunction(value)
       },
       currentImageLoadFunction (value) {
@@ -67,6 +77,22 @@
         'imageSmoothing',
         'ratio',
       ]),
+    },
+    created () {
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.imageLoadFunc) {
+          this.$logger.warn("'imageLoadFunc' prop is deprecated. Use 'imageLoadFunction' prop instead.")
+        }
+      }
+
+      this.currentImageLoadFunction = this.inputImageLoadFunction
+    },
+    updated () {
+      if (process.env.NODE_ENV !== 'production') {
+        if (this.imageLoadFunc) {
+          this.$logger.warn("'imageLoadFunc' prop is deprecated. Use 'imageLoadFunction' prop instead.")
+        }
+      }
     },
     methods: {
       createSource () {

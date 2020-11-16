@@ -43,6 +43,11 @@
         // required: true,
       },
       /**
+       * @deprecated
+       * @todo remove later
+       */
+      func: Function,
+      /**
        * @deprecated Use `func` prop instead.
        * @todo remove in v0.13.x
        */
@@ -56,7 +61,7 @@
     },
     computed: {
       inputFunction () {
-        let func = this.function
+        let func = this.function || this.func
         if (!func && this.factory) {
           func = this.factory()
         }
@@ -72,7 +77,10 @@
     created () {
       if (process.env.NODE_ENV !== 'production') {
         if (this.factory) {
-          this.$logger.warn("'factory' prop is deprecated. Use 'func' prop instead.")
+          this.$logger.warn("'factory' prop is deprecated. Use 'function' prop instead.")
+        }
+        if (this.func) {
+          this.$logger.warn("'func' prop is deprecated. Use 'function' prop instead.")
         }
       }
 
@@ -81,7 +89,10 @@
     updated () {
       if (process.env.NODE_ENV !== 'production') {
         if (this.factory) {
-          this.$logger.warn("'factory' prop is deprecated. Use 'func' prop instead.")
+          this.$logger.warn("'factory' prop is deprecated. Use 'function' prop instead.")
+        }
+        if (this.func) {
+          this.$logger.warn("'func' prop is deprecated. Use 'function' prop instead.")
         }
       }
     },
