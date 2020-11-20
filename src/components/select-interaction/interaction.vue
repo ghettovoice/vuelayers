@@ -141,7 +141,12 @@
         })
       },
       featuresViewProj () {
-        return map(this.featuresDataProj, feature => this.writeFeatureInViewProj(this.readFeatureInDataProj(feature)))
+        return map(this.features, feature => {
+          if (isGeoJSONFeature(feature)) {
+            feature = this.writeFeatureInViewProj(this.readFeatureInDataProj(feature))
+          }
+          return feature
+        })
       },
       currentFeaturesDataProj () {
         if (!this.rev) return []

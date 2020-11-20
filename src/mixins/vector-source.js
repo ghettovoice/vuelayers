@@ -131,7 +131,6 @@ export default {
       format: undefined,
       currentUrl: undefined,
       currentLoader: undefined,
-      extentViewProj: undefined,
     }
   },
   computed: {
@@ -139,7 +138,7 @@ export default {
       return map(this.features, feature => initializeFeature(clonePlainObject(feature)))
     },
     featuresViewProj () {
-      return map(this.featuresDataProj, feature => this.writeFeatureInViewProj(this.readFeatureInDataProj(feature)))
+      return map(this.features, feature => initializeFeature(this.writeFeatureInViewProj(this.readFeatureInDataProj(feature))))
     },
     currentFeaturesDataProj () {
       if (!this.rev) return []
@@ -152,7 +151,10 @@ export default {
       return map(this.getFeatures(), feature => this.writeFeatureInViewProj(feature))
     },
     extentDataProj () {
-      return this.extentToDataProj(this.extentViewProj)
+      return this.rev ? this.getExtent() : undefined
+    },
+    extentViewProj () {
+      return this.rev ? this.getExtent(true) : undefined
     },
     inputUrl () {
       return this.createUrlFunc(this.url)
@@ -188,9 +190,6 @@ export default {
 
       if (this.currentUrl !== this.$source.getUrl()) {
         this.currentUrl = this.$source.getUrl()
-      }
-      if (!isEqual(this.extentViewProj, this.$source.getExtent())) {
-        this.extentViewProj = this.$source.getExtent()
       }
     },
     .../*#__PURE__*/makeChangeOrRecreateWatchers([
@@ -598,23 +597,14 @@ export default {
      * @protected
      */
     featuresViewProjChanged (value) {
-      if (isEqual(value, this.currentFeaturesViewProj)) return
       // add new features
       this.addFeatures(value, true)
       // remove non-matched features
       this.removeFeatures(difference(
-        this.currentFeaturesViewProj,
+        this.getFeatures(),
         value,
         (a, b) => getFeatureId(a) === getFeatureId(b),
       ))
-      this.removeFeatures([{
-        type: 'Feature',
-        id: '123',
-        geometry: {
-          type: 'Point',
-          coordinates: [10, 10],
-        },
-      }])
     },
     /**
      * @param {GeoJSONFeature[]} value

@@ -1,12 +1,6 @@
-import LRU from 'lru-cache'
 import {
   COORD_PRECISION,
   EPSG_3857,
-  getFeatureGeom,
-  getFeatureId,
-  getFeatureProperties,
-  getGeomCoords,
-  getGeomType,
   readGeoJsonFeature,
   readGeoJsonGeometry,
   transformExtent,
@@ -19,7 +13,7 @@ import {
   writeGeoJsonFeature,
   writeGeoJsonGeometry,
 } from '../ol-ext'
-import { coalesce, serialize } from '../utils'
+import { coalesce } from '../utils'
 
 /**
  * Mixin with helpers for projection transforms between current view projection and global defined projection.
@@ -101,134 +95,29 @@ export default {
     },
 
     writeGeometryInDataProj (geometry, precision = COORD_PRECISION) {
-      if (!geometry) return
-
-      const key = this.makeGeometryKey(geometry, this.resolvedDataProjection, precision)
-      let geometryJson = this.getProjTransformCache().get(key)
-      if (geometryJson) {
-        return geometryJson
-      }
-
-      geometryJson = writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedDataProjection, precision)
-      this.getProjTransformCache().set(key, geometryJson)
-
-      return geometryJson
+      return writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     writeGeometryInViewProj (geometry, precision = COORD_PRECISION) {
-      if (!geometry) return
-
-      const key = this.makeGeometryKey(geometry, this.resolvedViewProjection, precision)
-      let geometryJson = this.getProjTransformCache().get(key)
-      if (geometryJson) {
-        return geometryJson
-      }
-
-      geometryJson = writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedViewProjection, precision)
-      this.getProjTransformCache().set(key, geometryJson)
-
-      return geometryJson
+      return writeGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedViewProjection, precision)
     },
     readGeometryInDataProj (geometry, precision = COORD_PRECISION) {
-      if (!geometry) return
-
       return readGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     readGeometryInViewProj (geometry, precision = COORD_PRECISION) {
-      if (!geometry) return
-
       return readGeoJsonGeometry(geometry, this.resolvedViewProjection, this.resolvedViewProjection, precision)
     },
 
     writeFeatureInDataProj (feature, precision = COORD_PRECISION) {
-      if (!feature) return
-
-      const key = this.makeFeatureKey(feature, this.resolvedDataProjection, precision)
-      let featureJson = this.getProjTransformCache().get(key)
-      if (featureJson) {
-        return featureJson
-      }
-
-      featureJson = writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedDataProjection, precision)
-      this.getProjTransformCache().set(key, featureJson)
-
-      return featureJson
+      return writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     writeFeatureInViewProj (feature, precision = COORD_PRECISION) {
-      if (!feature) return
-
-      const key = this.makeFeatureKey(feature, this.resolvedViewProjection, precision)
-      let featureJson = this.getProjTransformCache().get(key)
-      if (featureJson) {
-        return featureJson
-      }
-
-      featureJson = writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedViewProjection, precision)
-      this.getProjTransformCache().set(key, featureJson)
-
-      return featureJson
+      return writeGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedViewProjection, precision)
     },
     readFeatureInDataProj (feature, precision = COORD_PRECISION) {
-      if (!feature) return
-
       return readGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedDataProjection, precision)
     },
     readFeatureInViewProj (feature, precision = COORD_PRECISION) {
-      if (!feature) return
-
       return readGeoJsonFeature(feature, this.resolvedViewProjection, this.resolvedViewProjection, precision)
-    },
-    /**
-     * @return {LRUCache}
-     * @protected
-     */
-    getProjTransformCache () {
-      if (!this._projTransformCache) {
-        this._projTransformCache = new LRU({
-          max: 10e3,
-          maxAge: 3600e3,
-        })
-      }
-
-      return this._projTransformCache
-    },
-    /**
-     * @param object
-     * @param projection
-     * @param precision
-     * @return {string}
-     * @protected
-     */
-    makeKey (object, projection, precision) {
-      return serialize({ object, projection, precision })
-    },
-    /**
-     * @param geometry
-     * @param projection
-     * @param precision
-     * @return {string}
-     * @protected
-     */
-    makeGeometryKey (geometry, projection, precision) {
-      return this.makeKey({
-        type: getGeomType(geometry),
-        coordinates: getGeomCoords(geometry),
-      }, projection, precision)
-    },
-    /**
-     * @param feature
-     * @param projection
-     * @param precision
-     * @return {string}
-     * @protected
-     */
-    makeFeatureKey (feature, projection, precision) {
-      return this.makeKey({
-        id: getFeatureId(feature),
-        properties: getFeatureProperties(feature),
-        geometry: getFeatureGeom(feature)
-          ? this.makeGeometryKey(getFeatureGeom(feature), projection, precision)
-          : null,
-      }, projection, precision)
     },
     /**
      * @param {string} value
