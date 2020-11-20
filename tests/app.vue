@@ -1,102 +1,64 @@
 <template>
   <div id="app">
     <VlMap
-      :id.sync="mapId"
       ref="map"
-      :data-projection.sync="dataProj">
+      data-projection="EPSG:4326">
       <VlView
-        :id.sync="viewId"
         ref="view"
-        :center.sync="center"
-        :zoom.sync="zoom"
-        :projection.sync="viewProj" />
+        :center="center"
+        :zoom="zoom"
+        @update:center="centerChanged"
+        @update:zoom="zoomChanged" />
 
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
-
-      <VlLayerVector :declutter.sync="decl">
-        <VlSourceVector :features.sync="features" />
-        <VlStyle>
-          <VlStyleStroke
-            :width="2"
-            color="black" />
-          <VlStyleFill color="pink" />
-          <VlStyleCircle :radius="5">
-            <VlStyleStroke
-              :width="2"
-              color="black" />
-            <VlStyleFill color="pink" />
-          </VlStyleCircle>
-        </VlStyle>
-      </VlLayerVector>
-
-      <VlInteractionSelect :condition="pointerMove">
-        <VlStyleFunc :function="selectStyleFunc" />
-      </VlInteractionSelect>
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { pointerMove } from 'ol/events/condition'
-  import { createStyle } from '../src/ol-ext'
-
   export default {
     name: 'App',
     data () {
+      let center = [0, 0]
+      let zoom = 3
+      const urlVals = this.parseUrl()
+      if (urlVals) {
+        center = urlVals.center
+        zoom = urlVals.zoom
+      }
+
       return {
-        center: [0, 40],
-        zoom: 3,
+        center,
+        zoom,
         rotation: 0,
-        features: [],
-        mapId: 'qwerty',
-        viewId: 'asdfg',
-        dataProj: 'EPSG:4326',
-        viewProj: 'EPSG:3857',
-        decl: true,
       }
     },
-    mounted () {
-      setTimeout(() => {
-        this.features = [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [10, 10],
-                  [10, 20],
-                  [20, 20],
-                  [20, 10],
-                  [10, 10],
-                ],
-              ],
-            },
-          },
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [-10, -10],
-            },
-          },
-        ]
-      }, 1000)
-    },
     methods: {
-      pointerMove,
-      selectStyleFunc () {
-        return createStyle({
-          fillColor: 'green',
-          strokeColor: 'black',
-          strokeWidth: 3,
-          imageRadius: 6,
-          imageFillColor: 'green',
-          imageStrokeColor: 'black',
-          imageStrokeWidth: 3,
-        })
+      centerChanged (center) {
+        this.center = center
+        this.updateUrl()
+      },
+      zoomChanged (zoom) {
+        this.zoom = zoom
+        this.updateUrl()
+      },
+      updateUrl () {
+        const url = new URL(window.location.href)
+        url.hash = `#${this.center[0]},${this.center[1]},${this.zoom}`
+        window.location.href = url.href
+      },
+      parseUrl () {
+        const url = new URL(window.location.href)
+        const hash = url.hash.slice(1)
+        if (!hash) return
+
+        const arr = hash.split(',').map(v => Number(v.trim()))
+        return {
+          center: [arr[0], arr[1]],
+          zoom: arr[2],
+        }
       },
     },
   }
