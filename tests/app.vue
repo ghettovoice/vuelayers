@@ -19,8 +19,7 @@
       <VlInteractionSelect
         :features.sync="selectedFeatures"
         :condition="pointerMove"
-        :layers="['features']">
-      </VlInteractionSelect>
+        :layers="['features']" />
 
       <VlOverlay
         v-show="selectedFeature"

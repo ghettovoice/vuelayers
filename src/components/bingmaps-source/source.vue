@@ -100,7 +100,7 @@
         return coalesce(this.$source?.getImagerySet(), this.imagerySet)
       },
       stateChanged: noop,
-      attributionsCollapsible: noop,
+      attributionsCollapsibleChanged: noop,
       projectionChanged: noop,
       tileGridIdentChanged: noop,
       inputTileGridFactoryChanged: noop,

@@ -105,7 +105,7 @@ export default {
       if (this.currentTileUrlFunction !== this.$source.getTileUrlFunction()) {
         this.currentTileUrlFunction = this.$source.getTileUrlFunction()
       }
-      if (!isEqual(this.currentUrls, this.$source.getUrls()) && !this.inputTileUrlFunc) {
+      if (!isEqual(this.currentUrls, this.$source.getUrls()) && !this.inputTileUrlFunction) {
         this.currentUrls = this.$source.getUrls()
       }
     },
