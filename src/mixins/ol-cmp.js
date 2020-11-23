@@ -658,7 +658,9 @@ async function execInit (resetEventsObs = true) {
         .then(() => true),
     ])
     if (canceled) {
-      this.$logger.log(`ol object ${OlObjectAction.CREATE} canceled`)
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`ol object ${OlObjectAction.CREATE} canceled`)
+      }
       return
     }
 
@@ -707,7 +709,9 @@ async function execMount () {
         .then(() => true),
     ])
     if (canceled) {
-      this.$logger.log(`ol object ${OlObjectAction.MOUNT} canceled`)
+      if (process.env.VUELAYERS_DEBUG) {
+        this.$logger.log(`ol object ${OlObjectAction.MOUNT} canceled`)
+      }
       return
     }
 
