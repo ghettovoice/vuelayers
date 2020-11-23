@@ -278,6 +278,7 @@ export default {
      */
     subscribeAll () {
       this::source.methods.subscribeAll()
+      this::featuresContainer.methods.subscribeAll()
       this::subscribeToSourceEvents()
     },
     /**

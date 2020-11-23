@@ -107,7 +107,7 @@ class GeoJSON extends BaseGeoJSON {
     if (!isEmpty(properties)) {
       object.properties = {
         ...object.properties || {},
-        ...properties,
+        ...clonePlainObject(properties),
       }
     }
 

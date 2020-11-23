@@ -1,8 +1,7 @@
 <template>
   <div id="app">
     <VlMap
-      ref="map"
-      data-projection="EPSG:4326">
+      ref="map">
       <VlView
         ref="view"
         :center.sync="center"
@@ -13,60 +12,70 @@
       </VlLayerTile>
 
       <VlLayerVectorImage id="features">
-        <VlSourceVector :features="features" />
+        <VlSourceVector
+          url="https://openlayers.org/en/latest/examples/data/gpx/fells_loop.gpx"
+          :features.sync="features"
+          :format-factory="gpxFactory" />
+        <VlStyleFunc :function="styleFunc" />
       </VlLayerVectorImage>
-
-      <VlInteractionSelect
-        :features.sync="selectedFeatures"
-        :condition="pointerMove"
-        :layers="['features']" />
-
-      <VlOverlay
-        v-show="selectedFeature"
-        :position="selectedFeature && selectedFeature.geometry.coordinates">
-        <div style="background: #fff">
-          {{ selectedFeature && selectedFeature.id }}
-        </div>
-      </VlOverlay>
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { random, range } from 'lodash'
-  import { pointerMove } from 'ol/events/condition'
+  import { GPX } from 'ol/format'
+  import { Circle, Fill, Stroke, Style } from 'ol/style'
 
   export default {
     name: 'App',
     data () {
       return {
-        center: [0, 0],
-        zoom: 3,
+        zoom: 12,
+        center: [-7916041.528716288, 5228379.045749711],
         rotation: 0,
         features: [],
         selectedFeatures: [],
       }
     },
     computed: {
-      selectedFeature () {
-        return this.selectedFeatures[0]
+      styleFunc () {
+        return this.newStyleFunc()
       },
     },
-    mounted () {
-      this.features = range(0, 3000).map(i => ({
-        type: 'Feature',
-        id: 'feature-' + (i + 1),
-        geometry: {
-          type: 'Point',
-          coordinates: [
-            random(-180, 180),
-            random(-80, 80),
-          ],
-        },
-      }))
-    },
     methods: {
-      pointerMove,
+      gpxFactory () {
+        return new GPX()
+      },
+      newStyleFunc () {
+        const style = {
+          Point: new Style({
+            image: new Circle({
+              fill: new Fill({
+                color: 'rgba(255,255,0,0.4)',
+              }),
+              radius: 5,
+              stroke: new Stroke({
+                color: '#ffff00',
+                width: 1,
+              }),
+            }),
+          }),
+          LineString: new Style({
+            stroke: new Stroke({
+              color: '#ff0000',
+              width: 3,
+            }),
+          }),
+          MultiLineString: new Style({
+            stroke: new Stroke({
+              color: '#0f0',
+              width: 3,
+            }),
+          }),
+        }
+
+        return feature => style[feature.getGeometry().getType()]
+      },
     },
   }
 </script>
