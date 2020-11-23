@@ -3,10 +3,10 @@
     :id="vmId"
     :class="classes">
     <slot
-      :id="resolvedId"
-      :position="resolvedPositionDataProj"
-      :offset="resolvedOffset"
-      :positioning="resolvedPositioning" />
+      :id="currentId"
+      :position="currentPositionDataProj"
+      :offset="currentOffset"
+      :positioning="currentPositioning" />
   </div>
 </template>
 
@@ -43,7 +43,7 @@
       position: {
         type: Array,
         validator: value => value.length === 2,
-        required: true,
+        // required: true,
       },
       positioning: {
         type: String,
@@ -282,8 +282,8 @@
         return this.pointToDataProj(position)
       },
       setPosition (position, viewProj = false) {
-        assert(isArray(position) && position.length === 2, 'Invalid position')
-        position = position.slice()
+        assert(position == null || (isArray(position) && position.length === 2), 'Invalid position')
+        position = position?.slice()
 
         if (!viewProj) {
           position = this.pointToViewProj(position)
