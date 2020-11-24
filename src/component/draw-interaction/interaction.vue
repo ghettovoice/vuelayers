@@ -3,8 +3,8 @@
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import { from as fromObs, merge as mergeObs } from 'rxjs/observable'
-  import { map as mapObs, mapTo, mergeMap } from 'rxjs/operators'
+  import { merge as mergeObs } from 'rxjs/observable'
+  import { delay as delayObs, map as mapObs } from 'rxjs/operators'
   import { interaction, stylesContainer } from '../../mixin'
   import { createStyle, defaultEditStyle, GEOMETRY_TYPE, initializeFeature } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
@@ -148,7 +148,7 @@
        * @protected
        */
       async createInteraction () {
-        let source = await this.getInstance(this.source)
+        let source = this._source = await this.getInstance(this.source)
         assert(!!source, `Source "${this.source}" not found in identity map.`)
         let features
         if (!(source instanceof VectorSource)) {
@@ -283,12 +283,7 @@
         ),
       observableFromOlEvent(this.$interaction, 'drawend').pipe(
         // FIXME blood patch, wait for vl-vector-source featuresDataProj watcher to trigger
-        mergeMap(evt => fromObs(Promise.resolve(this.getInstance(this.source))).pipe(
-          mergeMap(source => fromObs(new Promise(resolve => {
-            setTimeout(resolve, 1000 / 60)
-          }))),
-          mapTo(evt),
-        )),
+        delayObs(1000 / 60),
       ),
     )
     this.subscribeTo(drawEvents, evt => {
