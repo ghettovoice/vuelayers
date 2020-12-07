@@ -285,7 +285,7 @@ function subscribeToCollectionEvents () {
       const events = mergeObs(propChanges, changes).pipe(
         distinctUntilChanged(isEqual),
       )
-      this._featureSubs[uid] = this.subscribeTo(events, ::this.scheduleRefresh)
+      this._featureSubs[uid] = this.subscribeTo(events, ::this.debounceChanged)
     }),
   )
   const removes = obsFromOlEvent(this.$featuresCollection, CollectionEventType.REMOVE).pipe(
