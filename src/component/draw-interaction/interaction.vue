@@ -3,8 +3,8 @@
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
-  import { merge as mergeObs } from 'rxjs/observable'
-  import { delay as delayObs, map as mapObs } from 'rxjs/operators'
+  import { fromEventPattern, merge as mergeObs } from 'rxjs/observable'
+  import { delay, first, map as mapObs, mapTo, mergeMap } from 'rxjs/operators'
   import { interaction, stylesContainer } from '../../mixin'
   import { createStyle, defaultEditStyle, GEOMETRY_TYPE, initializeFeature } from '../../ol-ext'
   import { observableFromOlEvent } from '../../rx-ext'
@@ -282,9 +282,24 @@
           }),
         ),
       observableFromOlEvent(this.$interaction, 'drawend').pipe(
-        // FIXME blood patch, wait for vl-vector-source featuresDataProj watcher to trigger
-        delayObs(1000 / 60),
-      ),
+        mergeMap(evt => {
+          let obs
+          if (this._source.vm && this._source.vm[0]) {
+            obs = fromEventPattern(
+              handler => this._source.vm[0].$on('update:features', handler),
+              handler => this._source.vm[0].$off('update:features', handler),
+            )
+          } else {
+            obs = observableFromOlEvent(this._source, 'change').pipe(
+              delay(2 * (1000 / 60)),
+            )
+          }
+          return obs.pipe(
+            mapTo(evt),
+            first(),
+          )
+        }),
+      )
     )
     this.subscribeTo(drawEvents, evt => {
       ++this.rev

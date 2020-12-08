@@ -1,9 +1,5 @@
 <template>
   <div id="app">
-    <div>
-      <a href="#" @click="changeStation">Change Station</a><br>
-      {{ stationUrl }}
-    </div>
     <vl-map ref="map" data-projection="EPSG:4326">
       <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
                ident="view" ref="view" />
@@ -12,9 +8,11 @@
         <vl-source-osm />
       </vl-layer-tile>
 
-      <vl-layer-tile>
-        <vl-source-wms :url="stationUrl" :layers="productLayers"></vl-source-wms>
-      </vl-layer-tile>
+      <vl-layer-vector>
+        <vl-source-vector ident="target" :features.sync="features" />
+      </vl-layer-vector>
+      <vl-interaction-draw source="target" type="polygon" @drawend="drawEnd" />
+      <vl-interaction-modify source="target" @modifyend="modifyEnd" />
     </vl-map>
   </div>
 </template>
@@ -28,22 +26,16 @@
         center: [0, 0],
         rotation: 0,
         features: [],
-        geoUrl: 'http://opengeo.ncep.noaa.gov/geoserver/',
-        station: 'krax',
-        product: 'bref_raw',
       }
     },
-    computed: {
-      stationUrl () {
-        return `${this.geoUrl}${this.station}/ows`
-      },
-      productLayers () {
-        return `${this.station}_${this.product}`
-      },
-    },
     methods: {
-      changeStation () {
-        this.station = 'kakq'
+      drawEnd ({ feature }) {
+        console.log('new feature', feature)
+        console.log('drawn features', this.features.slice())
+      },
+      modifyEnd (evt) {
+        console.log('modified', evt)
+        console.log('features', this.features[0].geometry.coordinates.slice(0))
       },
     },
   }
