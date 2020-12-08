@@ -4,7 +4,7 @@
   import { Vector as VectorSource } from 'ol/source'
   import VectorEventType from 'ol/source/VectorEventType'
   import { merge as mergeObs } from 'rxjs'
-  import { map as mapObs } from 'rxjs/operators'
+  import { map as mapObs, tap } from 'rxjs/operators'
   import { interaction, makeChangeOrRecreateWatchers } from '../../mixins'
   import { COORD_PRECISION, getLayerId, writeGeoJsonFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
@@ -141,8 +141,12 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    const start = obsFromOlEvent(this.$interaction, 'translatestart')
-    const end = obsFromOlEvent(this.$interaction, 'translateend')
+    const start = obsFromOlEvent(this.$interaction, 'translatestart').pipe(
+      tap(() => this.setInteracting(true)),
+    )
+    const end = obsFromOlEvent(this.$interaction, 'translateend').pipe(
+      tap(() => this.setInteracting(false)),
+    )
     const progress = obsFromOlEvent(this.$interaction, 'translating')
     const events = mergeObs(start, end, progress).pipe(
       mapObs(({ type, features, coordinate, startCoordinate }) => {
@@ -162,9 +166,6 @@
         }
       }),
     )
-    this.subscribeTo(events, evt => {
-      this.scheduleRefresh()
-      this.$emit(evt.type, evt)
-    })
+    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
 </script>

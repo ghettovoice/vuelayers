@@ -52,6 +52,7 @@ export default {
       dataProjection: EPSG_3857,
       currentActive: this.active,
       currentPriority: this.priority,
+      interacting: false,
     }
   },
   watch: {
@@ -97,6 +98,7 @@ export default {
         this.currentPriority,
       )
       interaction.setActive(this.currentActive)
+      interaction.set('interacting', this.interacting)
 
       return interaction
     },
@@ -218,6 +220,19 @@ export default {
     // setMap (map) {
     //   this.$interaction?.setMap(map)
     // },
+    setInteracting (flag) {
+      flag = !!flag
+
+      if (flag !== this.interacting) {
+        this.interacting = flag
+      }
+      if (this.$interaction && flag !== this.$interaction.get('interacting')) {
+        this.$interaction.set('interacting', flag)
+      }
+    },
+    isInteracting () {
+      return coalesce(this.$interaction?.get('interacting'), this.interacting)
+    },
     /**
      * @param {boolean} value
      * @protected

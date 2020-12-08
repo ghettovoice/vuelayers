@@ -5,8 +5,8 @@
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs, of as obsOf } from 'rxjs'
-  import { first, map as mapObs, mapTo, mergeMap } from 'rxjs/operators'
-  import { interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
+  import { delay, first, map as mapObs, mapTo, mergeMap, tap } from 'rxjs/operators'
+  import { FRAME_TIME, interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
   import { COORD_PRECISION, initializeFeature, roundLineCoords, writeGeoJsonFeature } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
   import { assert, camelCase, instanceOf, isFunction, mergeDescriptors, upperFirst } from '../../utils'
@@ -276,10 +276,11 @@
         ...evt,
         feature: initializeFeature(evt.feature),
       })),
+      tap(() => this.setInteracting(true)),
     )
     const sourceUpdObs = () => {
       if (!this._source?.vm?.length) {
-        return obsOf(true)
+        return obsOf(true).pipe(delay(3 * FRAME_TIME))
       }
       // update:features on the source (which is feature-container)
       // will be always after drawend with delay ~= computed property update time + FRAME_TIME
@@ -292,6 +293,7 @@
       mergeMap(evt => sourceUpdObs().pipe(
         mapTo(evt),
       )),
+      tap(() => this.setInteracting(false)),
     )
     const events = mergeObs(start, end).pipe(
       mapObs(({ type, feature }) => {
@@ -309,9 +311,6 @@
         }
       }),
     )
-    this.subscribeTo(events, evt => {
-      this.scheduleRefresh()
-      this.$emit(evt.type, evt)
-    })
+    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
 </script>

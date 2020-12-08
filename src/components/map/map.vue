@@ -675,6 +675,11 @@
 
         return this::olCmp.methods.refresh()
       },
+      isInteracting () {
+        if (!this.$map) return false
+
+        return this.getInteractions().some(interaction => !!interaction.get('interacting'))
+      },
       /**
        * @param {Object} sourceVm
        * @protected

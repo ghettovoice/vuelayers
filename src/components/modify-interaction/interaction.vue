@@ -175,11 +175,13 @@
    * @private
    */
   function subscribeToInteractionChanges () {
-    this.modifing = []
+    let modifying
     const start = obsFromOlEvent(this.$interaction, 'modifystart').pipe(
       tap(evt => {
+        this.setInteracting(true)
+        modifying = []
         evt.features.forEach(feature => {
-          this.modifing[feature.getId()] = feature.getRevision()
+          modifying[feature.getId()] = feature.getRevision()
         })
       }),
     )
@@ -187,12 +189,13 @@
       mapObs(evt => ({
         ...evt,
         modified: evt.features.getArray().reduce((modified, feature, idx) => {
-          if (this.modifing[feature.getId()] !== feature.getRevision()) {
+          if (modifying[feature.getId()] !== feature.getRevision()) {
             modified[idx] = feature.getId()
           }
           return modified
         }, {}),
       })),
+      tap(() => this.setInteracting(false)),
     )
     const events = mergeObs(start, end).pipe(
       mapObs(({ type, features, modified }) => {
@@ -211,9 +214,6 @@
         }
       }),
     )
-    this.subscribeTo(events, evt => {
-      this.scheduleRefresh()
-      this.$emit(evt.type, evt)
-    })
+    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
 </script>

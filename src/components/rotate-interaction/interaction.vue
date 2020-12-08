@@ -5,7 +5,7 @@
   import { Vector as VectorSource } from 'ol/source'
   import VectorEventType from 'ol/source/VectorEventType'
   import { merge as mergeObs } from 'rxjs'
-  import { map as mapObs } from 'rxjs/operators'
+  import { map as mapObs, tap } from 'rxjs/operators'
   import { interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
   import { COORD_PRECISION, isPointCoords, roundPointCoords, writeGeoJsonFeature } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent, fromOlEvent as obsFromOlEvent } from '../../rx-ext'
@@ -250,8 +250,12 @@
     }))
     this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
 
-    const start = obsFromOlEvent(this.$interaction, 'rotatestart')
-    const end = obsFromOlEvent(this.$interaction, 'rotateend')
+    const start = obsFromOlEvent(this.$interaction, 'rotatestart').pipe(
+      tap(() => this.setInteracting(true)),
+    )
+    const end = obsFromOlEvent(this.$interaction, 'rotateend').pipe(
+      tap(() => this.setInteracting(false)),
+    )
     const progress = obsFromOlEvent(this.$interaction, 'rotating')
     const events = mergeObs(start, end, progress).pipe(
       mapObs(({ type, features, angle, anchor }) => {
@@ -271,9 +275,6 @@
         }
       }),
     )
-    this.subscribeTo(events, evt => {
-      this.scheduleRefresh()
-      this.$emit(evt.type, evt)
-    })
+    this.subscribeTo(events, evt => this.$emit(evt.type, evt))
   }
 </script>

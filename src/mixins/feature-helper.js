@@ -35,6 +35,8 @@ export default {
      * @protected
      */
     updateFeature (feature, newFeature) {
+      if (this.$mapVm?.isInteracting()) return
+
       const featureJson = this.writeFeatureInViewProj(feature)
       const newFeatureJson = this.writeFeatureInViewProj(newFeature)
 

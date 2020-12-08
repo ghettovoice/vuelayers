@@ -11,11 +11,30 @@
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
+
+      <VlLayerVector>
+        <VlSourceVector
+          ident="target"
+          :features.sync="features" />
+        <VlStyle>
+          <VlStyleStroke
+            color="blue"
+            :width="5" />
+        </VlStyle>
+      </VlLayerVector>
+      <VlInteractionDraw
+        source="target"
+        type="polygon" />
+      <VlInteractionModify
+        source="target"
+        @modifyend="modifyEnd" />
     </VlMap>
   </div>
 </template>
 
 <script>
+  import { clonePlainObject } from '../src/utils'
+
   export default {
     name: 'App',
     data () {
@@ -25,6 +44,11 @@
         rotation: 0,
         features: [],
       }
+    },
+    methods: {
+      modifyEnd (evt) {
+        console.log(evt, clonePlainObject(this.features))
+      },
     },
   }
 </script>
