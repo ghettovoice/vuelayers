@@ -183,6 +183,7 @@ function subscribeToCollectionEvents () {
     bufferDebounceTime(FRAME_TIME),
   )
   this.subscribeTo(events, async events => {
+    await this.debounceChanged()
     this.$nextTick(() => {
       forEach(events, ({ type, element }) => {
         this.$emit(type + 'layer', element)

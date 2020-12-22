@@ -314,7 +314,8 @@ function subscribeToCollectionEvents () {
     }),
     bufferDebounceTime(FRAME_TIME),
   )
-  this.subscribeTo(events, events => {
+  this.subscribeTo(events, async events => {
+    await this.debounceChanged()
     this.$nextTick(() => {
       forEach(events, evt => {
         this.$emit(evt.type + 'feature', evt)

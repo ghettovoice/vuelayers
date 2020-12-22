@@ -16,12 +16,9 @@
         <VlSourceVector
           ident="target"
           :features.sync="features" />
-        <VlStyle>
-          <VlStyleStroke
-            color="blue"
-            :width="5" />
-        </VlStyle>
       </VlLayerVector>
+
+      <VlInteractionSelect :features.sync="selectedFeatures" />
     </VlMap>
   </div>
 </template>
@@ -34,7 +31,16 @@
         zoom: 2,
         center: [0, 0],
         rotation: 0,
-        features: [],
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [10, 10],
+            },
+          },
+        ],
+        selectedFeatures: [],
       }
     },
   }
