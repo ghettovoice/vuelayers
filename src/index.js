@@ -13,6 +13,7 @@ import {
   ImageWmsSource,
   Map,
   MapboxSource,
+  MapboxVectorLayer,
   ModifyInteraction,
   OsmSource,
   Overlay,
@@ -72,6 +73,7 @@ export default function plugin (Vue, options = {}) {
   Vue.use(ImageWmsSource, options)
   Vue.use(Map, options)
   Vue.use(MapboxSource, options)
+  Vue.use(MapboxVectorLayer, options)
   Vue.use(ModifyInteraction, options)
   Vue.use(OsmSource, options)
   Vue.use(Overlay, options)
@@ -112,6 +114,7 @@ export {
   ImageWmsSource,
   Map,
   MapboxSource,
+  MapboxVectorLayer,
   ModifyInteraction,
   OsmSource,
   Overlay,

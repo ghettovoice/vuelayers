@@ -2,7 +2,6 @@
   <div id="app">
     <VlMap
       ref="map"
-      :default-interactions="interactions"
       data-projection="EPSG:4326">
       <VlView
         ref="view"
@@ -36,9 +35,6 @@
         center: [0, 0],
         rotation: 0,
         features: [],
-        interactions: {
-          dragPan: false,
-        },
       }
     },
   }

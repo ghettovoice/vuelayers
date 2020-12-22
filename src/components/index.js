@@ -12,6 +12,7 @@ import * as ImageStaticSource from './image-static-source'
 import * as ImageWmsSource from './image-wms-source'
 import * as Map from './map'
 import * as MapboxSource from './mapbox-source'
+import * as MapboxVectorLayer from './mapbox-vector-layer'
 import * as ModifyInteraction from './modify-interaction'
 import * as OsmSource from './osm-source'
 import * as Overlay from './overlay'
@@ -49,6 +50,7 @@ export {
   ImageWmsSource,
   Map,
   MapboxSource,
+  MapboxVectorLayer,
   ModifyInteraction,
   OsmSource,
   Overlay,
