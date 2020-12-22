@@ -2,6 +2,7 @@
   <div id="app">
     <VlMap
       ref="map"
+      :default-interactions="interactions"
       data-projection="EPSG:4326">
       <VlView
         ref="view"
@@ -22,19 +23,11 @@
             :width="5" />
         </VlStyle>
       </VlLayerVector>
-      <VlInteractionDraw
-        source="target"
-        type="polygon" />
-      <VlInteractionModify
-        source="target"
-        @modifyend="modifyEnd" />
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { clonePlainObject } from '../src/utils'
-
   export default {
     name: 'App',
     data () {
@@ -43,12 +36,10 @@
         center: [0, 0],
         rotation: 0,
         features: [],
+        interactions: {
+          dragPan: false,
+        },
       }
-    },
-    methods: {
-      modifyEnd (evt) {
-        console.log(evt, clonePlainObject(this.features))
-      },
     },
   }
 </script>

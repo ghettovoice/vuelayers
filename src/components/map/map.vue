@@ -291,11 +291,17 @@
           this.$emit('update:size', value?.slice())
         },
       },
-      defaultControls (value) {
-        this.initDefaultControls(value)
+      defaultControls: {
+        deep: true,
+        handler (value) {
+          this.initDefaultControls(value)
+        },
       },
-      defaultInteractions (value) {
-        this.initDefaultInteractions(value)
+      defaultInteractions: {
+        deep: true,
+        handler (value) {
+          this.initDefaultInteractions(value)
+        },
       },
       dataProjection (value) {
         this.setDataProjection(value)
