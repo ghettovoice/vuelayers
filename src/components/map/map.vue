@@ -26,7 +26,7 @@
 </template>
 
 <script>
-  import { Collection, Map, View } from 'ol'
+  import { Map, View } from 'ol'
   import MapBrowserEventType from 'ol/MapBrowserEventType'
   import MapEventType from 'ol/MapEventType'
   import { get as getProj } from 'ol/proj'
@@ -106,20 +106,20 @@
       /**
        * Options for default controls added to the map by default. Set to `false` to disable all map controls. Object
        * value is used to configure controls.
-       * @type {Object|boolean|Array<module:ol/control/Control~Control>|Collection<module:ol/control/Control~Control>}
+       * @type {Object|boolean}
        * @todo remove when vl-control-* components will be ready
        */
       defaultControls: {
-        type: [Object, Boolean, Array, Collection],
+        type: [Object, Boolean],
         default: true,
       },
       /**
        * Options for default interactions added to the map by default. Object
        * value is used to configure default interactions.
-       * @type {Object|boolean|Array<module:ol/interaction/Interaction~Interaction>|Collection<module:ol/interaction/Interaction~Interaction>}
+       * @type {Object|boolean}
        */
       defaultInteractions: {
-        type: [Object, Boolean, Array, Collection],
+        type: [Object, Boolean],
         default: true,
       },
       /**
