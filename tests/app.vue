@@ -14,11 +14,16 @@
 
       <VlLayerVector>
         <VlSourceVector
-          ident="target"
-          :features.sync="features" />
+          url="https://gist.githubusercontent.com/ghettovoice/37ef37dd571ed39b0985c16560b157d3/raw/a850973f91b811e4ef9af5c317c0dead661ff2ac/map.geojson"
+          :features.sync="features"
+          @addfeature="onAddFeature"
+          @removefeature="onRemoveFeature" />
       </VlLayerVector>
 
-      <VlInteractionSelect :features.sync="selectedFeatures" />
+      <VlInteractionSelect
+        :features.sync="selectedFeatures"
+        @select="onSelect"
+        @unselect="onUnselect" />
     </VlMap>
   </div>
 </template>
@@ -42,6 +47,20 @@
         ],
         selectedFeatures: [],
       }
+    },
+    methods: {
+      onSelect (evt) {
+        console.log('select', evt)
+      },
+      onUnselect (evt) {
+        console.log('unselect', evt)
+      },
+      onAddFeature (evt) {
+        console.log('add', evt)
+      },
+      onRemoveFeature (evt) {
+        console.log('remove', evt)
+      },
     },
   }
 </script>

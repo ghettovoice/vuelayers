@@ -50,7 +50,7 @@ export default {
             }
           },
         )
-        await this.$nextTick()
+        await this.$nextTickPromise()
 
         return this::olCmp.methods.beforeInit()
       } catch (err) {

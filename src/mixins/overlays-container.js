@@ -183,12 +183,10 @@ function subscribeToCollectionEvents () {
   )
   this.subscribeTo(events, async events => {
     await this.debounceChanged()
-    this.$nextTick(() => {
-      forEach(events, ({ type, element }) => {
-        this.$emit(type + 'overlay', element)
-        // todo remove in v0.13.x
-        this.$emit(type + ':overlay', element)
-      })
+    forEach(events, ({ type, element }) => {
+      this.$emit(type + 'overlay', element)
+      // todo remove in v0.13.x
+      this.$emit(type + ':overlay', element)
     })
   })
 }

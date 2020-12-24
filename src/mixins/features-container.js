@@ -1,4 +1,5 @@
-import { Collection, getUid } from 'ol'
+import { Collection } from 'ol'
+import { getUid } from 'ol/util'
 import CollectionEventType from 'ol/CollectionEventType'
 import EventType from 'ol/events/EventType'
 import ObjectEventType from 'ol/ObjectEventType'
@@ -316,12 +317,10 @@ function subscribeToCollectionEvents () {
   )
   this.subscribeTo(events, async events => {
     await this.debounceChanged()
-    this.$nextTick(() => {
-      forEach(events, evt => {
-        this.$emit(evt.type + 'feature', evt)
-        // todo remove in v0.13.x
-        this.$emit(evt.type + ':feature', evt.feature)
-      })
+    forEach(events, evt => {
+      this.$emit(evt.type + 'feature', evt)
+      // todo remove in v0.13.x
+      this.$emit(evt.type + ':feature', evt.feature)
     })
   })
 }
