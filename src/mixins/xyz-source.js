@@ -1,8 +1,9 @@
 import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
 import { XYZ as XYZSource } from 'ol/source'
 import { createXYZ } from 'ol/tilegrid'
-import { extentFromProjection } from '../ol-ext'
+import { EPSG_3857, extentFromProjection } from '../ol-ext'
 import { and, coalesce, isArray, isFunction, isNumber, noop, or } from '../utils'
+import source from './source'
 import tileImageSource from './tile-image-source'
 
 const validateMinZoom = value => value >= 0
@@ -15,6 +16,13 @@ export default {
     tileImageSource,
   ],
   props: {
+    /* eslint-disable vue/require-prop-types */
+    // ol/source/Source
+    projection: {
+      ...source.props.projection,
+      default: EPSG_3857,
+    },
+    /* eslint-enable vue/require-prop-types */
     // ol/source/XYZ
     maxZoom: {
       type: Number,

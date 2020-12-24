@@ -1,4 +1,3 @@
-import { EPSG_3857 } from '../ol-ext'
 import { coalesce, isFunction, sealFactory } from '../utils'
 import { makeChangeOrRecreateWatchers } from './ol-cmp'
 import source from './source'
@@ -8,13 +7,6 @@ export default {
     source,
   ],
   props: {
-    /* eslint-disable vue/require-prop-types */
-    // ol/source/Source
-    projection: {
-      ...source.props.projection,
-      default: EPSG_3857,
-    },
-    /* eslint-enable vue/require-prop-types */
     // ol/source/Tile
     /**
      * @type {number|undefined}
