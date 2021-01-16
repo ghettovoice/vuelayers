@@ -225,7 +225,7 @@
         return coalesce(
           this.dataProjection,
           this.$options?.dataProjection,
-          this.resolvedViewProjection,
+          this.currentProjection,
         )
       },
     },
@@ -262,9 +262,6 @@
         }
         if (this.currentMinResolution !== this.$view.getMinResolution()) {
           this.currentMinResolution = this.$view.getMinResolution()
-        }
-        if (this.currentProjection !== this.$view.getProjection().getCode()) {
-          this.currentProjection = this.$view.getProjection().getCode()
         }
       },
       centerViewProj: {

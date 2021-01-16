@@ -203,7 +203,7 @@
           this.currentDataProjection,
           this.dataProjection,
           this.$options?.dataProjection,
-          this.resolvedViewProjection,
+          this.viewProjection,
         )
       },
       view () {
