@@ -18,6 +18,7 @@
         :id="'vl-' + currentId + '-default-source'"
         ref="featuresOverlaySource"
         :wrap-x="wrapX"
+        :projection="currentDataProjection"
         @created="featuresOverlaySourceCreated">
         <slot name="overlay" />
       </VectorSourceCmp>

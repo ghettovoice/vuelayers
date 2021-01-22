@@ -28,15 +28,17 @@
               <option value="EPSG:3413">
                 WGS84 NSIDC Sea Ice Polar Stereographic North
               </option>
+              <option value="EPSG:3857">
+                WGS84 Web Mercator
+              </option>
             </select>
           </td>
         </tr>
       </tbody>
     </table>
-    <hr />
+    <hr>
     <VlMap
       ref="AppMap"
-      :data-projection="projection"
       :load-tiles-while-animating="true"
       :load-tiles-while-interacting="true">
       <VlView
@@ -47,6 +49,10 @@
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
+
+      <VlFeature>
+        <VlGeomPoint :coordinates="[0, 0]" />
+      </VlFeature>
     </VlMap>
   </div>
 </template>
