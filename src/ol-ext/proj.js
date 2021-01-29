@@ -69,8 +69,11 @@ export function transform (
   precision = COORD_PRECISION,
 ) {
   if (!coordinate) return
-
-  return roundCoords(GeometryType.POINT, baseTransform(coordinate, sourceProjection, destProjection), precision)
+  let coord = baseTransform(coordinate, sourceProjection, destProjection)
+  if (coord.some(x => isNaN(x))) {
+    coord = baseTransform(baseTransform(coordinate, sourceProjection, EPSG_4326), EPSG_4326, destProjection)
+  }
+  return roundCoords(GeometryType.POINT, coord, precision)
 }
 
 /**
@@ -379,8 +382,12 @@ export function transformExtent (
   precision = COORD_PRECISION,
 ) {
   if (!extent) return
-
-  return roundExtent(baseTransformExtent(extent, sourceProjection, destProjection), precision)
+  if (extent.every(x => !isFinite(x))) return extent
+  let ext = baseTransformExtent(extent, sourceProjection, destProjection)
+  if (ext.some(x => isNaN(x))) {
+    ext = baseTransformExtent(baseTransformExtent(extent, sourceProjection, EPSG_4326), EPSG_4326, destProjection)
+  }
+  return roundExtent(ext, precision)
 }
 
 /**

@@ -78,6 +78,14 @@ export default {
     currentResolutions () {
       return this.rev ? this.getResolutions() : []
     },
+    resolvedDataProjection () {
+      return coalesce(
+        this.projection,
+        this.dataProjection, // may or may not be present
+        this.$options?.dataProjection, // may or may not be present
+        this.resolvedViewProjection,
+      )
+    },
   },
   watch: {
     rev () {

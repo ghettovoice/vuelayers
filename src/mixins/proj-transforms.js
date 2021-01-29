@@ -25,7 +25,7 @@ export default {
      */
     resolvedViewProjection () {
       return coalesce(
-        this.viewProjection,
+        this.viewProjection, // may or may not be present
         EPSG_3857,
       )
     },
@@ -34,7 +34,6 @@ export default {
      */
     resolvedDataProjection () {
       return coalesce(
-        this.projection, // may or may not be present
         this.dataProjection, // may or may not be present
         this.$options?.dataProjection, // may or may not be present
         this.resolvedViewProjection,

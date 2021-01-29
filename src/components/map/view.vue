@@ -168,7 +168,8 @@
     },
     data () {
       return {
-        dataProjection: EPSG_3857,
+        dataProjection: this.projection,
+        currentProjection: this.projection,
         currentCenterViewProj: roundPointCoords(this.center),
         currentZoom: this.zoom,
         currentRotation: this.rotation,
@@ -178,7 +179,6 @@
         currentResolutions: this.resolutions?.slice(),
         currentMaxResolution: this.maxResolution,
         currentMinResolution: this.minResolution,
-        currentProjection: this.projection,
       }
     },
     computed: {
@@ -219,15 +219,6 @@
       resolvedViewProjection () {
         return this.currentProjection
       },
-      resolvedDataProjection () {
-        // exclude this.projection from lookup to allow view rendering in projection
-        // that differs from data projection
-        return coalesce(
-          this.dataProjection,
-          this.$options?.dataProjection,
-          this.resolvedViewProjection,
-        )
-      },
     },
     watch: {
       rev () {
@@ -263,13 +254,10 @@
         if (this.currentMinResolution !== this.$view.getMinResolution()) {
           this.currentMinResolution = this.$view.getMinResolution()
         }
-        if (this.currentProjection !== this.$view.getProjection().getCode()) {
-          this.currentProjection = this.$view.getProjection().getCode()
-        }
       },
       centerViewProj: {
         deep: true,
-        handler (value) {
+        handler (value, prev) {
           if (this.getAnimating()) return
 
           this.setCenter(value, true)
@@ -277,7 +265,7 @@
       },
       currentCenterDataProj: {
         deep: true,
-        handler (value) {
+        handler (value, prev) {
           if (isEqual(value, this.centerDataProj)) return
 
           this.$emit('update:center', value.slice())
@@ -409,7 +397,7 @@
           )
         }
 
-        this.currentProjection = value
+        this.currentProjection = this.dataProjection = value
         // reset current resolution fields to inputs
         // so zoom fields will take precedence
         this.currentResolution = this.resolution
