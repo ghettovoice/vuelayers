@@ -1,9 +1,23 @@
 <script>
+  import Feature from 'ol/Feature'
   import VectorSource from 'ol/source/Vector'
+  import { getUid } from 'ol'
+  import Vue from 'vue'
   import { vectorSource } from '../../mixin'
-  import { createGeoJsonFmt, getFeatureId, initializeFeature, loadingAll, transform } from '../../ol-ext'
-  import { constant, difference, isEqual, isFinite, isFunction, stubArray, isArray, isString } from '../../util/minilo'
+  import { createGeoJsonFmt, getFeatureId, initializeFeature, loadingAll, mergeFeatures, transform } from '../../ol-ext'
+  import {
+    constant,
+    difference,
+    isEqual,
+    isFinite,
+    isFunction,
+    stubArray,
+    isArray,
+    isString,
+    forEach, isPlainObject,
+  } from '../../util/minilo'
   import { makeWatchers } from '../../util/vue-helpers'
+  import { instanceOf } from '../../util/assert'
 
   export default {
     name: 'vl-source-vector',
@@ -148,6 +162,54 @@
           dataProjection: this.resolvedDataProjection,
         })
       },
+      addFeatures (features) {
+        const newFeatures = []
+        forEach(features || [], feature => {
+          if (feature instanceof Vue) {
+            feature = feature.$feature
+          } else if (isPlainObject(feature)) {
+            feature = this.readFeatureInDataProj(feature)
+          }
+          instanceOf(feature, Feature)
+          initializeFeature(feature)
+
+          const foundFeature = this.getFeatureById(getFeatureId(feature))
+          if (foundFeature) {
+            mergeFeatures(foundFeature, feature)
+          } else {
+            newFeatures.push(feature)
+          }
+        })
+
+        if (this.$source && features.length) {
+          this.$source.addFeatures(newFeatures)
+        } else {
+          forEach(newFeatures, feature => this::vectorSource.methods.addFeature(feature))
+        }
+      },
+      removeFeatures (features) {
+        if (!this.$source) {
+          return this::vectorSource.methods.removeFeatures(features)
+        }
+
+        let changed = false
+        forEach(features, feature => {
+          feature = this.getFeatureById(getFeatureId(feature))
+          if (!feature) return
+
+          const featureKey = getUid(feature)
+          if (featureKey in this.$source.nullGeometryFeatures_) {
+            delete this.$source.nullGeometryFeatures_[featureKey]
+          } else {
+            if (this.$source.featuresRtree_) {
+              this.$source.featuresRtree_.remove(feature)
+            }
+          }
+          this.$source.removeFeatureInternal(feature)
+          changed = true
+        })
+        if (changed) this.$source.changed()
+      },
     },
     watch: {
       initializedFeatures: {
@@ -160,7 +222,7 @@
           this.removeFeatures(difference(
             this.getFeatures(),
             features,
-            (a, b) => getFeatureId(a) === getFeatureId(b)
+            (a, b) => getFeatureId(a) === getFeatureId(b),
           ))
         },
       },

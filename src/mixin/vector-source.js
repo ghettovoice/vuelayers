@@ -81,6 +81,12 @@ export default {
     writeGeometryInViewProj (feature) {
       return this::projTransforms.methods.writeFeatureInViewProj(feature)
     },
+    addFeature (feature) {
+      return this::featuresContainer.methods.addFeature(feature)
+    },
+    removeFeatures (features) {
+      return this::featuresContainer.methods.removeFeatures(features)
+    },
   },
   watch: {
     featuresDataProj: {

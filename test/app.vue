@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <button @click="features = savedFeatures.slice()">set</button>
+    <button @click="features = []">unset</button>
     <vl-map ref="map" data-projection="EPSG:4326">
       <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
                ident="view" ref="view" />
@@ -9,15 +11,17 @@
       </vl-layer-tile>
 
       <vl-layer-vector>
-        <vl-source-vector ident="target" :features.sync="features" />
+        <vl-source-cluster>
+          <vl-source-vector ident="target" :features.sync="features" />
+        </vl-source-cluster>
       </vl-layer-vector>
-      <vl-interaction-draw source="target" type="polygon" @drawend="drawEnd" />
-      <vl-interaction-modify source="target" @modifyend="modifyEnd" />
     </vl-map>
   </div>
 </template>
 
 <script>
+  import { range, random } from 'lodash'
+
   export default {
     name: 'app',
     data () {
@@ -26,17 +30,18 @@
         center: [0, 0],
         rotation: 0,
         features: [],
+        savedFeatures: range(1, 500).map(i => ({
+          type: 'Feature',
+          id: 'f' + i,
+          geometry: {
+            type: 'Point',
+            coordinates: [
+              random(-5, 5),
+              random(-5, 5),
+            ],
+          },
+        }))
       }
-    },
-    methods: {
-      drawEnd ({ feature }) {
-        console.log('new feature', feature)
-        console.log('drawn features', this.features.slice())
-      },
-      modifyEnd (evt) {
-        console.log('modified', evt)
-        console.log('features', this.features[0].geometry.coordinates.slice(0))
-      },
     },
   }
 </script>
