@@ -1,4 +1,4 @@
-import { Feature } from 'ol'
+import { Feature, getUid } from 'ol'
 import { all as loadAll } from 'ol/loadingstrategy'
 import { Vector as VectorSource } from 'ol/source'
 import {
@@ -282,16 +282,20 @@ export default {
       this::subscribeToSourceEvents()
     },
     /**
-     * @param {FeatureLike} features
+     * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features
      * @param {boolean} [viewProj=false]
      */
     addFeatures (features, viewProj = false) {
+      if (!this.$source) {
+        return this::featuresContainer.methods.addFeatures(features, viewProj)
+      }
+
       const newFeatures = []
       forEach(features || [], feature => {
         feature = this.initializeFeature(feature, viewProj)
         instanceOf(feature, Feature)
 
-        const foundFeature = this.getFeatureById(getFeatureId(feature))
+        const foundFeature = this.$source.getFeatureById(getFeatureId(feature))
         if (foundFeature) {
           this.updateFeature(foundFeature, feature)
         } else {
@@ -299,33 +303,67 @@ export default {
         }
       })
 
-      if (this.$source) {
-        this.$source.addFeatures(newFeatures)
-      } else {
-        forEach(newFeatures, feature => this::featuresContainer.methods.addFeature(feature, true))
-      }
+      if (!newFeatures.length) return
+
+      this.$source.addFeatures(newFeatures)
     },
     /**
      * @param {FeatureLike} feature
      * @param {boolean} [viewProj=false]
      */
     addFeature (feature, viewProj = false) {
-      this.addFeatures([feature], viewProj)
+      if (!this.$source) {
+        return this::featuresContainer.methods.addFeature(feature, viewProj)
+      }
+
+      feature = this.initializeFeature(feature, viewProj)
+      const foundFeature = this.$source.getFeatureById(getFeatureId(feature))
+      if (foundFeature == null) {
+        this.$source.addFeature(feature)
+      } else {
+        this.updateFeature(foundFeature, feature)
+      }
+    },
+    /**
+     * @param {FeatureLike[]|module:ol/Collection~Collection<FeatureLike>} features
+     */
+    removeFeatures (features) {
+      if (!this.$source) {
+        return this::featuresContainer.methods.removeFeatures(features)
+      }
+
+      let changed = false
+      forEach(features, feature => {
+        feature = this.getFeatureById(getFeatureId(feature))
+        if (!feature) return
+        const featureKey = getUid(feature)
+        if (featureKey in this.$source.nullGeometryFeatures_) {
+          delete this.$source.nullGeometryFeatures_[featureKey]
+        } else {
+          if (this.$source.featuresRtree_) {
+            this.$source.featuresRtree_.remove(feature)
+          }
+        }
+        this.$source.removeFeatureInternal(feature)
+        changed = true
+      })
+
+      if (!changed) return
+
+      this.$source.changed()
     },
     /**
      * @param {FeatureLike} feature
      */
     removeFeature (feature) {
-      feature = feature?.$feature || feature
-
-      if (this.$source) {
-        feature = this.$source.getFeatureById(getFeatureId(feature))
-        if (feature) {
-          this.$source.removeFeature(feature)
-        }
-      } else {
-        this::featuresContainer.methods.removeFeature(feature)
+      if (!this.$source) {
+        return this::featuresContainer.methods.removeFeature(feature)
       }
+
+      feature = this.$source.getFeatureById(getFeatureId(feature?.$feature || feature))
+      if (!feature) return
+
+      this.$source.removeFeature(feature)
     },
     /**
      * @param {string} featureId
