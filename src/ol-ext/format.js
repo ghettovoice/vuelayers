@@ -3,7 +3,8 @@ import { GeoJSON as BaseGeoJSON, MVT } from 'ol/format'
 import { Circle, LineString } from 'ol/geom'
 import { isEmpty } from 'ol/obj'
 import { getLength } from 'ol/sphere'
-import { clonePlainObject, isArray, isFunction, noop, omit } from '../utils'
+import { clonePlainObject, isArray, isFunction, map, noop, omit } from '../utils'
+import { isGeoJSONFeature } from './geojson'
 import { createCircularPolygon, isCircleGeom } from './geom'
 import { EPSG_4326, transformDistance, transformPoint } from './proj'
 
@@ -107,7 +108,16 @@ class GeoJSON extends BaseGeoJSON {
     if (!isEmpty(properties)) {
       object.properties = {
         ...object.properties || {},
-        ...clonePlainObject(properties),
+        ...clonePlainObject(omit(properties, 'features')),
+      }
+
+      if (isArray(properties.features)) {
+        object.properties.features = map(properties.features, feature => {
+          if (feature instanceof Feature) {
+            return this.writeFeatureObject(feature, options)
+          }
+          return feature
+        })
       }
     }
 
@@ -175,6 +185,15 @@ class GeoJSON extends BaseGeoJSON {
           )),
         )
         delete geoJSONFeature.properties[STYLE_SERIALIZE_PROP]
+      }
+
+      if (isArray(geoJSONFeature.properties.features)) {
+        geoJSONFeature.properties.features = map(geoJSONFeature.properties.features, feature => {
+          if (isGeoJSONFeature(feature)) {
+            return this.readFeatureFromObject(feature, options)
+          }
+          return feature
+        })
       }
 
       feature.setProperties(geoJSONFeature.properties, true)

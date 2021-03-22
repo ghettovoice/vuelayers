@@ -1,6 +1,5 @@
-import { Feature } from 'ol'
 import GeometryType from 'ol/geom/GeometryType'
-import { get, isArray, isPlainObject } from '../utils'
+import { isArray, isPlainObject } from '../utils'
 import { COORD_PRECISION } from './coord'
 import { createGeoJsonFmt } from './format'
 import { EPSG_3857, EPSG_4326 } from './proj'
@@ -34,22 +33,11 @@ export function writeGeoJsonFeature (
 ) {
   if (!feature) return
 
-  const geoJsonFeature = getGeoJsonFmt().writeFeatureObject(feature, {
+  return getGeoJsonFmt().writeFeatureObject(feature, {
     featureProjection,
     dataProjection,
     decimals,
   })
-
-  if (Array.isArray(get(geoJsonFeature, 'properties.features'))) {
-    geoJsonFeature.properties.features = geoJsonFeature.properties.features.map(feature => {
-      if (feature instanceof Feature) {
-        return writeGeoJsonFeature(feature, featureProjection, dataProjection, decimals)
-      }
-      return feature
-    })
-  }
-
-  return geoJsonFeature
 }
 
 /**
@@ -67,22 +55,11 @@ export function readGeoJsonFeature (
 ) {
   if (!geoJsonFeature) return
 
-  const feature = getGeoJsonFmt().readFeature(geoJsonFeature, {
+  return getGeoJsonFmt().readFeature(geoJsonFeature, {
     featureProjection,
     dataProjection,
     decimals,
   })
-
-  if (Array.isArray(feature.get('features'))) {
-    feature.set('features', feature.get('features').map(feature => {
-      if (isPlainObject(feature)) {
-        return readGeoJsonFeature(feature, featureProjection, dataProjection, decimals)
-      }
-      return feature
-    }))
-  }
-
-  return feature
 }
 
 /**

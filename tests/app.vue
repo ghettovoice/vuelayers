@@ -14,18 +14,18 @@
         <VlSourceOsm />
       </VlLayerTile>
       <VlLayerVector>
-        <VlSourceVector :features.sync="features" />
+        <VlSourceCluster>
+          <VlSourceVector :features.sync="features" />
+        </VlSourceCluster>
       </VlLayerVector>
       <VlInteractionSelect
-        :condition="pointerMove"
         :features.sync="selectedFeatures" />
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { range, random } from 'lodash'
-  import { pointerMove } from 'ol/events/condition'
+  import { random, range } from 'lodash'
 
   export default {
     name: 'App',
@@ -35,7 +35,7 @@
         center: [0, 0],
         features: [],
         selectedFeatures: [],
-        savedFeatures: range(0, 1).map(i => ({
+        savedFeatures: range(0, 100).map(i => ({
           type: 'Feature',
           geometry: {
             type: 'Point',
@@ -46,9 +46,6 @@
           },
         })),
       }
-    },
-    methods: {
-      pointerMove,
     },
   }
 </script>
