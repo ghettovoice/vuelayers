@@ -369,8 +369,8 @@
        */
       this._view = new View({
         center: [0, 0],
-        zoom: 2
-      });
+        zoom: 2,
+      })
       /**
        * @type {Object|undefined}
        */
