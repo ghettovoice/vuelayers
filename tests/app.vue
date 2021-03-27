@@ -18,28 +18,30 @@
           <VlSourceVector :features.sync="features" />
         </VlSourceCluster>
       </VlLayerVector>
+      <VlInteractionSelect
+        :features.sync="selectedFeatures" />
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { range, random } from 'lodash'
+  import { random, range } from 'lodash'
 
   export default {
     name: 'App',
-
     data: function () {
       return {
         zoom: 1,
         center: [0, 0],
         features: [],
+        selectedFeatures: [],
         savedFeatures: range(0, 100).map(i => ({
           type: 'Feature',
           geometry: {
             type: 'Point',
             coordinates: [
-              random(-5, 5),
-              random(-5, 5),
+              random(-50, 50),
+              random(-50, 50),
             ],
           },
         })),

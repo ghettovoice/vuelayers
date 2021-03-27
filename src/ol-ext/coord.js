@@ -1,7 +1,7 @@
 import GeometryType from 'ol/geom/GeometryType'
 import { and, every, isArray, isEqual, isNumber, round } from '../utils'
 
-export const COORD_PRECISION = 9
+export const COORD_PRECISION = -1
 
 export function roundExtent (extent, precision = COORD_PRECISION) {
   if (!extent) return

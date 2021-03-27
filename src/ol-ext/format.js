@@ -1,11 +1,14 @@
 import { Feature } from 'ol'
 import { GeoJSON as BaseGeoJSON, MVT } from 'ol/format'
 import { Circle, LineString } from 'ol/geom'
+import GeometryType from 'ol/geom/GeometryType'
 import { isEmpty } from 'ol/obj'
 import { getLength } from 'ol/sphere'
-import { clonePlainObject, isArray, isFunction, noop, omit } from '../utils'
+import { clonePlainObject, isArray, isFunction, isPlainObject, map, noop, omit } from '../utils'
+import { COORD_PRECISION } from './coord'
 import { createCircularPolygon, isCircleGeom } from './geom'
-import { EPSG_4326, transformDistance, transformPoint } from './proj'
+import { EPSG_3857, EPSG_4326, transformDistance, transformPoint } from './proj'
+import { createStyle, dumpStyle } from './style'
 
 /**
  * @param {Object} [options]
@@ -107,7 +110,16 @@ class GeoJSON extends BaseGeoJSON {
     if (!isEmpty(properties)) {
       object.properties = {
         ...object.properties || {},
-        ...clonePlainObject(properties),
+        ...clonePlainObject(omit(properties, 'features')),
+      }
+
+      if (isArray(properties.features)) {
+        object.properties.features = map(properties.features, feature => {
+          if (feature instanceof Feature) {
+            return this.writeFeatureObject(feature, options)
+          }
+          return feature
+        })
       }
     }
 
@@ -177,6 +189,15 @@ class GeoJSON extends BaseGeoJSON {
         delete geoJSONFeature.properties[STYLE_SERIALIZE_PROP]
       }
 
+      if (isArray(geoJSONFeature.properties.features)) {
+        geoJSONFeature.properties.features = map(geoJSONFeature.properties.features, feature => {
+          if (isGeoJSONFeature(feature)) {
+            return this.readFeatureFromObject(feature, options)
+          }
+          return feature
+        })
+      }
+
       feature.setProperties(geoJSONFeature.properties, true)
     }
 
@@ -205,4 +226,126 @@ class GeoJSON extends BaseGeoJSON {
 
     return super.readGeometryFromObject(clonePlainObject(object), options)
   }
+}
+
+let geoJsonFmt
+
+export function getGeoJsonFmt () {
+  if (geoJsonFmt) {
+    return geoJsonFmt
+  }
+  return createGeoJsonFmt({
+    decimals: COORD_PRECISION,
+    styleReader: createStyle,
+    styleWriter: dumpStyle,
+  })
+}
+
+/**
+ * @param {Feature} feature
+ * @param {ProjectionLike|undefined} [featureProjection=EPSG:3857]
+ * @param {ProjectionLike|undefined} [dataProjection=EPSG:4326]
+ * @param {number} [decimals=COORD_PRECISION]
+ * @return {Object}
+ */
+export function writeGeoJsonFeature (
+  feature,
+  featureProjection = EPSG_3857,
+  dataProjection = EPSG_4326,
+  decimals = COORD_PRECISION,
+) {
+  if (!feature) return
+
+  return getGeoJsonFmt().writeFeatureObject(feature, {
+    featureProjection,
+    dataProjection,
+    decimals,
+  })
+}
+
+/**
+ * @param {Object} geoJsonFeature
+ * @param {ProjectionLike|undefined} [featureProjection=EPSG:3857]
+ * @param {ProjectionLike|undefined} [dataProjection=EPSG:4326]
+ * @param {number} [decimals=COORD_PRECISION]
+ * @return {Feature}
+ */
+export function readGeoJsonFeature (
+  geoJsonFeature,
+  featureProjection = EPSG_3857,
+  dataProjection = EPSG_4326,
+  decimals = COORD_PRECISION,
+) {
+  if (!geoJsonFeature) return
+
+  return getGeoJsonFmt().readFeature(geoJsonFeature, {
+    featureProjection,
+    dataProjection,
+    decimals,
+  })
+}
+
+/**
+ * @param {Geometry} geometry
+ * @param {ProjectionLike|undefined} [geometryProjection=EPSG:3857]
+ * @param {ProjectionLike|undefined} [dataProjection=EPSG:4326]
+ * @param {number} [decimals=COORD_PRECISION]
+ * @return {Object}
+ */
+export function writeGeoJsonGeometry (
+  geometry,
+  geometryProjection = EPSG_3857,
+  dataProjection = EPSG_4326,
+  decimals = COORD_PRECISION,
+) {
+  if (!geometry) return
+
+  return getGeoJsonFmt().writeGeometryObject(geometry, {
+    featureProjection: geometryProjection,
+    dataProjection,
+    decimals,
+  })
+}
+
+/**
+ * @param {Object|Object} geoJsonGeometry
+ * @param {ProjectionLike|undefined} [geometryProjection=EPSG:3857]
+ * @param {ProjectionLike|undefined} [dataProjection=EPSG:4326]
+ * @param {number} [decimals=COORD_PRECISION]
+ * @return {Geometry}
+ */
+export function readGeoJsonGeometry (
+  geoJsonGeometry,
+  geometryProjection = EPSG_3857,
+  dataProjection = EPSG_4326,
+  decimals = COORD_PRECISION,
+) {
+  if (!geoJsonGeometry) return
+
+  dataProjection = readProjection(geoJsonGeometry, dataProjection)
+
+  return getGeoJsonFmt().readGeometry(geoJsonGeometry, {
+    featureProjection: geometryProjection,
+    dataProjection,
+    decimals,
+  })
+}
+
+export function readProjection (geoJsonObj, defaultProjection) {
+  return getGeoJsonFmt().readProjection(geoJsonObj) || defaultProjection
+}
+
+/**
+ * @param {Object} feature
+ * @returns {boolean}
+ */
+export function isGeoJSONFeature (feature) {
+  return isPlainObject(feature) && feature.type === 'Feature' &&
+    isGeoJSONGeometry(feature.geometry)
+}
+
+export function isGeoJSONGeometry (geometry) {
+  return isPlainObject(geometry) &&
+    Object.values(GeometryType).includes(geometry.type) &&
+    isArray(geometry.coordinates)
 }
