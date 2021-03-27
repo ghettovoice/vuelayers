@@ -2,7 +2,7 @@
   <div id="app">
     <button @click="features = savedFeatures.slice()">set</button>
     <button @click="features = []">unset</button>
-    <vl-map ref="map" data-projection="EPSG:4326">
+    <vl-map ref="map" data-projection="EPSG:4326" :default-controls="false">
       <vl-view :center.sync="center" :rotation.sync="rotation" :zoom.sync="zoom"
                ident="view" ref="view" />
 

@@ -136,6 +136,13 @@
         validator: val => ['canvas', 'webgl'].includes(val),
       },
     },
+    computed: {
+      controlsCollectionIdent () {
+        if (!this.olObjIdent) return
+
+        return this.makeIdent(this.olObjIdent, 'controls_collection')
+      },
+    },
     methods: {
       /**
        * @return {module:ol/PluggableMap~PluggableMap}
@@ -350,7 +357,7 @@
 
         setMapId(this.$map, value)
       },
-      controls (value) {
+      defaultControls (value) {
         if (value === false) {
           this._controlsCollection.clear()
           return
@@ -359,6 +366,16 @@
         value = typeof value === 'object' ? value : undefined
         this._controlsCollection.clear()
         this._controlsCollection.extend(createDefaultControls(value).getArray())
+      },
+      defaultInteractions (value) {
+        if (value === false) {
+          this._interactionsCollection.clear()
+          return
+        }
+
+        value = typeof value === 'object' ? value : undefined
+        this._interactionsCollection.clear()
+        this._interactionsCollection.extend(createDefaultControls(value).getArray())
       },
       wrapX (value) {
         if (this._featuresOverlay == null) return
@@ -381,6 +398,7 @@
         zoom: 0,
       })
       // todo make controls handling like with interactions
+      this._controlsCollection = this.instanceFactoryCall(this.controlsCollectionIdent, () => new Collection())
       if (this.defaultControls instanceof Collection) {
         this._controlsCollection = this.defaultControls
       } else if (this.defaultControls !== false) {
