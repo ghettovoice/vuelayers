@@ -201,6 +201,7 @@
         return this.resolutions?.slice()
       },
       visibleExtentDataProj () {
+        this.center;
         if (!this.rev) return
 
         return this.getExtent()?.slice()
