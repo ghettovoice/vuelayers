@@ -379,9 +379,6 @@
       <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
       <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
     </codeStyleSettings>
-    <codeStyleSettings language="kotlin">
-      <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
-    </codeStyleSettings>
     <codeStyleSettings language="yaml">
       <indentOptions>
         <option name="INDENT_SIZE" value="4" />

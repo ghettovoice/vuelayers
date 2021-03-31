@@ -15,11 +15,19 @@
           <vl-source-vector ident="target" :features.sync="features" />
         </vl-source-cluster>
       </vl-layer-vector>
+
+      <vl-layer-vector-tile ref="vectorTileLayer">
+        <vl-source-vector-tile :url="url" :format-factory="createMvtFormat" />
+      </vl-layer-vector-tile>
+
+      <vl-interaction-select :features.sync="selectedFeatures" />
     </vl-map>
   </div>
 </template>
 
 <script>
+  import { Feature } from 'ol'
+  import { MVT } from 'ol/format'
   import { range, random } from 'lodash'
 
   export default {
@@ -40,8 +48,17 @@
               random(-5, 5),
             ],
           },
-        }))
+        })),
+        selectedFeatures: [],
+        url: 'https://ahocevar.com/geoserver/gwc/service/tms/1.0.0/ne:ne_10m_admin_0_countries@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
       }
+    },
+    methods: {
+      createMvtFormat () {
+        return new MVT({
+          featureClass: Feature,
+        })
+      },
     },
   }
 </script>

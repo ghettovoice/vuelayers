@@ -1,7 +1,11 @@
 <script>
+  import Feature from 'ol/Feature'
   import VectorTileSource from 'ol/source/VectorTile'
+  import { observableFromOlEvent } from 'rx-ext'
+  import { hasSource } from '../../util/assert'
+  import { forEach } from '../../util/minilo'
   import { tileSource } from '../../mixin'
-  import { createMvtFmt } from '../../ol-ext'
+  import { createMvtFmt, initializeFeature } from '../../ol-ext'
 
   export default {
     name: 'vl-source-vector-tile',
@@ -48,6 +52,10 @@
           transition: this.transition,
         })
       },
+      subscribeAll () {
+        this::tileSource.methods.subscribeAll()
+        this::subscribeToSourceEvents()
+      },
     },
   }
 
@@ -56,5 +64,22 @@
    */
   function defaultFormatFactory () {
     return createMvtFmt()
+  }
+
+  function subscribeToSourceEvents () {
+    hasSource(this)
+
+    this.subscribeTo(observableFromOlEvent(this.$source, 'tileloadend'), evt => {
+      if (!evt.tile) {
+        return
+      }
+
+      forEach(evt.tile.getFeatures(), feature => {
+        if (!(feature instanceof Feature)) {
+          return
+        }
+        initializeFeature(feature)
+      })
+    })
   }
 </script>
