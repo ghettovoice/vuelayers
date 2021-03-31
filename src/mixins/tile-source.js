@@ -71,6 +71,15 @@ export default {
 
       return sealFactory(::this.derivedTileGridFactory)
     },
+    /**
+     * @returns {string}
+     */
+    resolvedDataProjection () {
+      return coalesce(
+        this.projection,
+        this.resolvedViewProjection,
+      )
+    },
   },
   watch: {
     rev () {

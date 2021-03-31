@@ -1,10 +1,13 @@
 <script>
+  import { Feature } from 'ol'
   import { createTileUrlFunctionFromTemplates } from 'ol-tilecache'
   import { VectorTile as VectorTileSource } from 'ol/source'
+  import TileEventType from 'ol/source/TileEventType'
   import { createXYZ } from 'ol/tilegrid'
-  import { makeChangeOrRecreateWatchers, tileSource, urlTileSource } from '../../mixins'
+  import { featureHelper, makeChangeOrRecreateWatchers, tileSource, urlTileSource } from '../../mixins'
   import { createMvtFmt, extentFromProjection, roundExtent } from '../../ol-ext'
-  import { and, isArray, isFunction, isNumber, or, sealFactory, noop, coalesce } from '../../utils'
+  import { fromOlEvent as obsFromOlEvent } from '../../rx-ext'
+  import { and, coalesce, forEach, isArray, isFunction, isNumber, noop, or, sealFactory } from '../../utils'
 
   const validateTileSize = /*#__PURE__*/or(isNumber, and(isArray, value => value.length === 2 && value.every(isNumber)))
 
@@ -12,6 +15,7 @@
     name: 'VlSourceVectorTile',
     mixins: [
       urlTileSource,
+      featureHelper,
     ],
     props: {
       /* eslint-disable vue/require-prop-types */
@@ -160,6 +164,13 @@
           tileClass: this.tileClass,
         })
       },
+      /**
+       * @returns {void}
+       */
+      subscribeAll () {
+        this::urlTileSource.methods.subscribeAll()
+        this::subscribeToSourceEvents()
+      },
       async getFeaturesInExtent (extent, viewProj = false) {
         extent = viewProj ? roundExtent(extent) : this.extentToViewProj(extent)
 
@@ -172,5 +183,16 @@
       opaqueChanged: noop,
       tilePixelRatioChanged: noop,
     },
+  }
+
+  function subscribeToSourceEvents () {
+    this.subscribeTo(obsFromOlEvent(this.$source, TileEventType.TILELOADEND), evt => {
+      if (!evt.tile) return
+
+      forEach(evt.tile.getFeatures(), feature => {
+        if (!(feature instanceof Feature)) return
+        this.initializeFeature(feature)
+      })
+    })
   }
 </script>

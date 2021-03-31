@@ -18,6 +18,11 @@
           <VlSourceVector :features.sync="features" />
         </VlSourceCluster>
       </VlLayerVector>
+      <VlLayerVectorTile>
+        <VlSourceVectorTile
+          :url="url"
+          :format-factory="createFormat" />
+      </VlLayerVectorTile>
       <VlInteractionSelect
         :features.sync="selectedFeatures" />
     </VlMap>
@@ -26,6 +31,8 @@
 
 <script>
   import { random, range } from 'lodash'
+  import { Feature } from 'ol'
+  import { MVT } from 'ol/format'
 
   export default {
     name: 'App',
@@ -45,7 +52,13 @@
             ],
           },
         })),
+        url: 'https://ahocevar.com/geoserver/gwc/service/tms/1.0.0/ne:ne_10m_admin_0_countries@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
       }
+    },
+    methods: {
+      createFormat () {
+        return new MVT({ featureClass: Feature })
+      },
     },
   }
 </script>
