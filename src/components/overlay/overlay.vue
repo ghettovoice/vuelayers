@@ -300,8 +300,6 @@
         return this.$overlay?.getPositioning() || this.currentPositioning
       },
       setPositioning (positioning) {
-        positioning = !!positioning
-
         if (positioning !== this.currentPositioning) {
           this.currentPositioning = positioning
         }
