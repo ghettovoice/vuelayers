@@ -1,7 +1,7 @@
 <script>
   import Feature from 'ol/Feature'
   import VectorTileSource from 'ol/source/VectorTile'
-  import { observableFromOlEvent } from 'rx-ext'
+  import { observableFromOlEvent } from '../../rx-ext'
   import { hasSource } from '../../util/assert'
   import { forEach } from '../../util/minilo'
   import { tileSource } from '../../mixin'
