@@ -14,7 +14,7 @@
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
   import { merge as mergeObs } from 'rxjs/observable'
-  import { distinctUntilChanged, map as mapObs, throttleTime } from 'rxjs/operators'
+  import { distinctUntilChanged, map as mapObs } from 'rxjs/operators'
   import Vue from 'vue'
   import {
     featuresContainer,
@@ -462,7 +462,6 @@
     hasMap(this)
     hasView(this)
 
-    const ft = 1000 / 60
     // pointer
     const pointerEvents = mergeObs(
       observableFromOlEvent(this.$map, [
@@ -474,8 +473,13 @@
         'pointerdrag',
         'pointermove',
       ]).pipe(
-        throttleTime(ft),
-        distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
+        distinctUntilChanged((a, b) => isEqual({
+          t: a.type,
+          c: a.coordinate,
+        }, {
+          t: b.type,
+          c: b.coordinate,
+        })),
       ),
     ).pipe(
       mapObs(evt => ({
