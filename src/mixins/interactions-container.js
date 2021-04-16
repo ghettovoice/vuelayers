@@ -1,6 +1,7 @@
-import { Collection, getUid } from 'ol'
+import { Collection } from 'ol'
 import CollectionEventType from 'ol/CollectionEventType'
 import { defaults as createDefaultInteractions, Interaction } from 'ol/interaction'
+import { getUid } from 'ol/util'
 import { merge as mergeObs } from 'rxjs'
 import { map as mapObs, tap } from 'rxjs/operators'
 import { getInteractionId, getInteractionPriority, initializeInteraction } from '../ol-ext'

@@ -1,6 +1,7 @@
-import { Collection, getUid } from 'ol'
+import { Collection } from 'ol'
 import CollectionEventType from 'ol/CollectionEventType'
 import { Control, defaults as createDefaultControls } from 'ol/control'
+import { getUid } from 'ol/util'
 import { merge as mergeObs } from 'rxjs'
 import { map as mapObs, tap } from 'rxjs/operators'
 import { getControlId, initializeControl } from '../ol-ext'

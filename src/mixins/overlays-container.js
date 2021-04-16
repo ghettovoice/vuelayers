@@ -1,5 +1,6 @@
-import { Collection, getUid, Overlay } from 'ol'
+import { Collection, Overlay } from 'ol'
 import CollectionEventType from 'ol/CollectionEventType'
+import { getUid } from 'ol/util'
 import { merge as mergeObs } from 'rxjs'
 import { map as mapObs, tap } from 'rxjs/operators'
 import { getOverlayId, initializeOverlay } from '../ol-ext'
