@@ -6,10 +6,13 @@
     <button @click="features = []">
       Unset
     </button>
+    <p>{{ extent }}</p>
+    <button @click="resetCenter">Reset</button>
     <VlMap data-projection="EPSG:4326">
       <VlView
         :zoom.sync="zoom"
-        :center.sync="center" />
+        :center.sync="center"
+        @update:visibleExtent="updateExtent" />
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
@@ -40,6 +43,7 @@
       return {
         zoom: 1,
         center: [0, 0],
+        extent: null,
         features: [],
         selectedFeatures: [],
         savedFeatures: range(0, 100).map(i => ({
@@ -58,6 +62,14 @@
     methods: {
       createFormat () {
         return new MVT({ featureClass: Feature })
+      },
+      updateExtent (extent) {
+        console.log(extent)
+        this.extent = extent
+      },
+      resetCenter () {
+        this.center = [0, 0]
+        this.zoom = 2
       },
     },
   }

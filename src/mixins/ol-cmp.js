@@ -1,7 +1,8 @@
 import debounce from 'debounce-promise'
 import { Object as OlObject, Observable } from 'ol'
 import EventType from 'ol/events/EventType'
-import { merge as mergeObs, of as obsOf, race as raceObs, throwError as throwErrorObs, interval } from 'rxjs'
+import ObjectEventType from 'ol/ObjectEventType'
+import { interval, merge as mergeObs, of as obsOf, race as raceObs, throwError as throwErrorObs } from 'rxjs'
 import {
   delayWhen,
   filter as filterObs,
@@ -865,7 +866,13 @@ function subscribeToOlObjectEvents () {
     }))
     this.subscribeTo(propChanges, ({ setter, value }) => setter(value))
 
-    this.subscribeTo(obsFromOlEvent(this.$olObject, EventType.CHANGE), ::this.debounceChanged)
+    this.subscribeTo(
+      mergeObs(
+        obsFromOlEvent(this.$olObject, EventType.CHANGE),
+        obsFromOlEvent(this.$olObject, ObjectEventType.PROPERTYCHANGE),
+      ),
+      ::this.debounceChanged,
+    )
 
     this.subscribeTo(obsFromOlEvent(this.$olObject, EventType.ERROR), evt => this.$emit(OlObjectEvent.ERROR, evt))
   } else {
