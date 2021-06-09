@@ -52,7 +52,7 @@ export default {
      * @return {Interaction[]}
      */
     getInteractions () {
-      return this.$interactionsCollection.getArray()
+      return this.$interactionsCollection.getArray().slice()
     },
     /**
      * @return {Collection<Interaction>>}

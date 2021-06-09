@@ -2,6 +2,7 @@
   <div id="app">
     <vl-map
       ref="map"
+      :default-interactions="interactionOptions"
       data-projection="EPSG:4326"
       @created="mapCreated">
       <vl-view
@@ -10,6 +11,12 @@
       <vl-layer-tile>
         <vl-source-osm />
       </vl-layer-tile>
+
+      <vl-layer-vector>
+        <vl-source-vector :features="savedFeatures" />
+      </vl-layer-vector>
+
+      <vl-interaction-select :features.sync="selectedFeatures" />
     </vl-map>
   </div>
 </template>
@@ -38,12 +45,29 @@
           },
         })),
         url: 'https://ahocevar.com/geoserver/gwc/service/tms/1.0.0/ne:ne_10m_admin_0_countries@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
+        interactionOptions: {
+          dragPan: true,
+          shiftDragZoom: true,
+          mouseWheelZoom: true,
+          pinchZoom: true,
+        },
+        mapLock: false,
       }
+    },
+    watch: {
+      mapLock () {
+        this.lockToggle()
+      },
     },
     methods: {
       mapCreated (vm) {
-        vm.$map.addControl(new OverviewMap({
-        }))
+        vm.$map.addControl(new OverviewMap())
+      },
+      lockToggle () {
+        this.interactionOptions.dragPan = !this.interactionOptions.dragPan
+        this.interactionOptions.shiftDragZoom = !this.interactionOptions.shiftDragZoom
+        this.interactionOptions.mouseWheelZoom = !this.interactionOptions.mouseWheelZoom
+        this.interactionOptions.pinchZoom = !this.interactionOptions.pinchZoom
       },
     },
   }

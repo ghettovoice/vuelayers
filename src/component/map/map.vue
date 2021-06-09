@@ -10,9 +10,9 @@
   import { defaults as createDefaultInteractions } from 'ol/interaction'
   import VectorLayer from 'ol/layer/Vector'
   import Map from 'ol/Map'
-  import WebGLMap from 'ol/WebGLMap'
   import VectorSource from 'ol/source/Vector'
   import View from 'ol/View'
+  import WebGLMap from 'ol/WebGLMap'
   import { merge as mergeObs } from 'rxjs/observable'
   import { distinctUntilChanged, map as mapObs } from 'rxjs/operators'
   import Vue from 'vue'
@@ -357,25 +357,42 @@
 
         setMapId(this.$map, value)
       },
-      defaultControls (value) {
-        if (value === false) {
-          this._controlsCollection.clear()
-          return
-        }
-
-        value = typeof value === 'object' ? value : undefined
-        this._controlsCollection.clear()
-        this._controlsCollection.extend(createDefaultControls(value).getArray())
+      defaultControls: {
+        deep: true,
+        handler (value) {
+          this._controlsCollection.getArray().slice().forEach(control => {
+            if (control.get('vl_default')) {
+              this._controlsCollection.remove(control)
+            }
+          })
+          if (value === false) {
+            return
+          }
+          value = typeof value === 'object' ? value : undefined
+          this._controlsCollection.extend(createDefaultControls(value).getArray().map(control => {
+            control.set('vl_default', true)
+            return control
+          }))
+        },
       },
-      defaultInteractions (value) {
-        if (value === false) {
-          this._interactionsCollection.clear()
-          return
-        }
-
-        value = typeof value === 'object' ? value : undefined
-        this._interactionsCollection.clear()
-        this._interactionsCollection.extend(createDefaultControls(value).getArray())
+      defaultInteractions: {
+        deep: true,
+        handler (value) {
+          this._interactionsCollection.getArray().slice().forEach(interaction => {
+            if (interaction.get('vl_default')) {
+              this._interactionsCollection.remove(interaction)
+            }
+          })
+          if (value === false) {
+            return
+          }
+          value = typeof value === 'object' ? value : undefined
+          this._interactionsCollection.extend(createDefaultInteractions(value).getArray().map(interaction => {
+            interaction.set('vl_default', true)
+            return interaction
+          }))
+          console.log(this._interactionsCollection.getArray().slice())
+        },
       },
       wrapX (value) {
         if (this._featuresOverlay == null) return
@@ -408,6 +425,9 @@
             : undefined,
         )
       }
+      this._controlsCollection.forEach(control => {
+        control.set('vl_default', true)
+      })
       // todo initialize without interactions and provide vl-interaction-default component
       if (this.defaultInteractions instanceof Collection) {
         this._interactionsCollection = this.defaultInteractions
@@ -418,7 +438,10 @@
             : undefined,
         )
       }
-      this._interactionsCollection.forEach(interaction => initializeInteraction(interaction))
+      this._interactionsCollection.forEach(interaction => {
+        interaction = initializeInteraction(interaction)
+        interaction.set('vl_default', true)
+      })
       // prepare default overlay
       this._featuresOverlay = new VectorLayer({
         source: new VectorSource({

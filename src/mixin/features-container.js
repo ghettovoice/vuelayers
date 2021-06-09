@@ -101,7 +101,7 @@ export default {
      * @return {Feature[]}
      */
     getFeatures () {
-      return this.$featuresCollection.getArray()
+      return this.$featuresCollection.getArray().slice()
     },
     /**
      * @return {Collection<Feature>>}

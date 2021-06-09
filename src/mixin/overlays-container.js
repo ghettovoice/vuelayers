@@ -50,7 +50,7 @@ export default {
      * @return {Overlay[]}
      */
     getOverlays () {
-      return this.$overlaysCollection.getArray()
+      return this.$overlaysCollection.getArray().slice()
     },
     /**
      * @return {Collection<Overlay>}

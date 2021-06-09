@@ -50,7 +50,7 @@ export default {
      * @return {BaseLayer[]}
      */
     getLayers () {
-      return this.$layersCollection.getArray()
+      return this.$layersCollection.getArray().slice()
     },
     /**
      * @return {module:ol/Collection~Collection<BaseLayer>}
