@@ -806,7 +806,13 @@
         MapBrowserEventType.POINTERDRAG,
         MapBrowserEventType.POINTERMOVE,
       ], null, [
-        distinctUntilChanged((a, b) => isEqual(a.coordinate, b.coordinate)),
+        distinctUntilChanged((a, b) => isEqual({
+          t: a.type,
+          c: a.coordinate,
+        }, {
+          t: b.type,
+          c: b.coordinate,
+        })),
       ]),
     ).pipe(
       mapObs(evt => omit({

@@ -1,41 +1,22 @@
 <template>
   <div id="app">
-    <button @click="features = savedFeatures.slice()">
-      Set
-    </button>
-    <button @click="features = []">
-      Unset
-    </button>
-    <p>{{ extent }}</p>
-    <button @click="resetCenter">Reset</button>
-    <VlMap data-projection="EPSG:4326">
+    <VlMap
+      ref="map"
+      data-projection="EPSG:4326">
       <VlView
         :zoom.sync="zoom"
-        :center.sync="center"
-        @update:visibleExtent="updateExtent" />
+        :center.sync="center" />
       <VlLayerTile>
-        <VlSourceOsm />
+        <VlSourceOsm @created="sourceCreated" />
       </VlLayerTile>
-      <VlLayerVector>
-        <VlSourceCluster>
-          <VlSourceVector :features.sync="features" />
-        </VlSourceCluster>
-      </VlLayerVector>
-      <VlLayerVectorTile>
-        <VlSourceVectorTile
-          :url="url"
-          :format-factory="createFormat" />
-      </VlLayerVectorTile>
-      <VlInteractionSelect
-        :features.sync="selectedFeatures" />
     </VlMap>
   </div>
 </template>
 
 <script>
   import { random, range } from 'lodash'
-  import { Feature } from 'ol'
-  import { MVT } from 'ol/format'
+  import { OverviewMap } from 'ol/control'
+  import { Tile as TileLayer } from 'ol/layer'
 
   export default {
     name: 'App',
@@ -60,16 +41,11 @@
       }
     },
     methods: {
-      createFormat () {
-        return new MVT({ featureClass: Feature })
-      },
-      updateExtent (extent) {
-        console.log(extent)
-        this.extent = extent
-      },
-      resetCenter () {
-        this.center = [0, 0]
-        this.zoom = 2
+      sourceCreated (vm) {
+        this.$refs.map.addControl(new OverviewMap({
+          collapsed: false,
+          layers: [new TileLayer({ source: vm.$source })],
+        }))
       },
     },
   }

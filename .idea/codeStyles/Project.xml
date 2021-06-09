@@ -32,8 +32,15 @@
       <option name="MOVE_ALL_IMPORTS_IN_ONE_DECLARATION" value="true" />
       <option name="MOVE_ALL_STDLIB_IMPORTS_IN_ONE_GROUP" value="true" />
       <option name="GROUP_STDLIB_IMPORTS" value="true" />
-      <option name="GROUP_CURRENT_PROJECT_IMPORTS" value="true" />
     </GoCodeStyleSettings>
+    <H2CodeStyleSettings version="5">
+      <option name="USE_GENERAL_STYLE" value="false" />
+      <option name="KEYWORD_CASE" value="2" />
+      <option name="TABLE_OPENING" value="1" />
+      <option name="TABLE_CONTENT" value="2" />
+      <option name="TABLE_CLOSING" value="3" />
+      <option name="POST_OPT_WRAP_1" value="true" />
+    </H2CodeStyleSettings>
     <H2CodeStyleSettings version="5">
       <option name="USE_GENERAL_STYLE" value="false" />
       <option name="KEYWORD_CASE" value="2" />
