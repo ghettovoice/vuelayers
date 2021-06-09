@@ -118,7 +118,7 @@ export default {
      * @return {Array<module:ol/layer/Base~BaseLayer>}
      */
     getLayers () {
-      return this.$layersCollection.getArray()
+      return this.$layersCollection.getArray().slice()
     },
     /**
      * @return {module:ol/Collection~Collection<module:ol/layer/Base~BaseLayer>}

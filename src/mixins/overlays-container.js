@@ -117,7 +117,7 @@ export default {
      * @return {Array<module:ol/Overlay~Overlay>}
      */
     getOverlays () {
-      return this.$overlaysCollection.getArray()
+      return this.$overlaysCollection.getArray().slice()
     },
     /**
      * @return {module:ol/Collection~Collection<module:ol/Overlay~Overlay>}

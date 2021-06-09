@@ -71,7 +71,11 @@ export default {
      * @param {InteractionLike[]|module:ol/Collection~Collection<InteractionLike>} defaultInteractions
      */
     initDefaultInteractions (defaultInteractions) {
-      this.clearInteractions()
+      this.getInteractions().forEach(interaction => {
+        if (interaction.get('vl_default')) {
+          this.removeInteraction(interaction)
+        }
+      })
 
       let interactions
       if (isArray(defaultInteractions) || defaultInteractions instanceof Collection) {
@@ -84,6 +88,7 @@ export default {
         )
       }
       if (interactions) {
+        interactions.forEach(interaction => interaction.set('vl_default', true))
         this.addInteractions(interactions)
       }
     },
@@ -140,7 +145,7 @@ export default {
      * @return {module:ol/interaction/Interaction~Interaction[]}
      */
     getInteractions () {
-      return this.$interactionsCollection.getArray()
+      return this.$interactionsCollection.getArray().slice()
     },
     /**
      * @return {module:ol/Collection~Collection<module:ol/interaction/Interaction~Interaction>}

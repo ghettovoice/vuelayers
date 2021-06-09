@@ -71,7 +71,11 @@ export default {
      * @param {ControlLike[]|module:ol/Collection~Collection<ControlLike>} defaultControls
      */
     initDefaultControls (defaultControls) {
-      this.clearControls()
+      this.getControls().forEach(control => {
+        if (control.get('vl_default')) {
+          this.removeControl(control)
+        }
+      })
 
       let controls
       if (isArray(defaultControls) || defaultControls instanceof Collection) {
@@ -84,6 +88,7 @@ export default {
         )
       }
       if (controls) {
+        controls.forEach(control => control.set('vl_default', true))
         this.addControls(controls)
       }
     },
@@ -138,7 +143,7 @@ export default {
      * @returns {Array<module:ol/control/Control~Control>}
      */
     getControls () {
-      return this.$controlsCollection.getArray()
+      return this.$controlsCollection.getArray().slice()
     },
     /**
      * @returns {module:ol/Collection~Collection<module:ol/control/Control~Control>}

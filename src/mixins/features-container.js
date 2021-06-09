@@ -126,7 +126,7 @@ export default {
      * @return {Array<module:ol/Feature~Feature>}
      */
     getFeatures () {
-      return this.$featuresCollection.getArray()
+      return this.$featuresCollection.getArray().slice()
     },
     /**
      * @return {module:ol/Collection~Collection<module:ol/Feature~Feature>}

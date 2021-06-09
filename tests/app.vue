@@ -2,6 +2,7 @@
   <div id="app">
     <VlMap
       ref="map"
+      :default-interactions="interactionOptions"
       data-projection="EPSG:4326">
       <VlView
         :zoom.sync="zoom"
@@ -9,6 +10,12 @@
       <VlLayerTile>
         <VlSourceOsm @created="sourceCreated" />
       </VlLayerTile>
+
+      <VlLayerVector>
+        <VlSourceVector :features="savedFeatures" />
+      </VlLayerVector>
+
+      <VlInteractionSelect :features.sync="selectedFeatures" />
     </VlMap>
   </div>
 </template>
@@ -38,7 +45,20 @@
           },
         })),
         url: 'https://ahocevar.com/geoserver/gwc/service/tms/1.0.0/ne:ne_10m_admin_0_countries@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
+        interactionOptions: {
+          dragPan: true,
+          onFocusOnly: true,
+          shiftDragZoom: true,
+          mouseWheelZoom: true,
+          pinchZoom: true,
+        },
+        mapLock: false,
       }
+    },
+    watch: {
+      mapLock () {
+        this.lockToggle()
+      },
     },
     methods: {
       sourceCreated (vm) {
@@ -46,6 +66,13 @@
           collapsed: false,
           layers: [new TileLayer({ source: vm.$source })],
         }))
+      },
+      lockToggle () {
+        this.interactionOptions.dragPan = !this.interactionOptions.dragPan
+        this.interactionOptions.onFocusOnly = !this.interactionOptions.onFocusOnly
+        this.interactionOptions.shiftDragZoom = !this.interactionOptions.shiftDragZoom
+        this.interactionOptions.mouseWheelZoom = !this.interactionOptions.mouseWheelZoom
+        this.interactionOptions.pinchZoom = !this.interactionOptions.pinchZoom
       },
     },
   }
