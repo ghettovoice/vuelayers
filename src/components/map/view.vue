@@ -16,7 +16,7 @@
   import { View } from 'ol'
   import { get as getProj } from 'ol/proj'
   import { merge as mergeObs } from 'rxjs'
-  import { distinctUntilKeyChanged, map as mapObs } from 'rxjs/operators'
+  import { map as mapObs } from 'rxjs/operators'
   import { makeChangeOrRecreateWatchers, olCmp, projTransforms, waitForMap } from '../../mixins'
   import {
     EPSG_3857,
@@ -227,8 +227,8 @@
         if (this.currentProjection !== this.$view.getProjection().getCode()) {
           this.currentProjection = this.$view.getProjection().getCode()
         }
-        if (!isEqual(this.currentCenterViewProj, this.$view.getCenter())) {
-          this.currentCenterViewProj = this.$view.getCenter()
+        if (!isEqual(this.currentCenterViewProj, roundPointCoords(this.$view.getCenter()))) {
+          this.currentCenterViewProj = roundPointCoords(this.$view.getCenter())
         }
         if (this.currentZoom !== this.$view.getZoom()) {
           this.currentZoom = this.$view.getZoom()
@@ -257,7 +257,7 @@
       },
       centerViewProj: {
         deep: true,
-        handler (value, prev) {
+        handler (value) {
           if (this.getAnimating()) return
 
           this.setCenter(value, true)
@@ -265,7 +265,7 @@
       },
       currentCenterDataProj: {
         deep: true,
-        handler (value, prev) {
+        handler (value) {
           if (isEqual(value, this.centerDataProj)) return
 
           this.$emit('update:center', value.slice())
@@ -701,11 +701,10 @@
           center = this.pointToViewProj(center)
         }
 
-        if (!isEqual(center, this.currentCenterViewProj)) {
-          this.currentCenterViewProj = center
-        }
-        if (this.$view && !isEqual(center, this.$view.getCenter())) {
+        if (this.$view && !isEqual(center, roundPointCoords(this.$view.getCenter()))) {
           this.$view.setCenter(center)
+        } else if (!isEqual(center, this.currentCenterViewProj)) {
+          this.currentCenterViewProj = center
         }
       },
       /**
@@ -721,11 +720,10 @@
         resolution = Number(resolution)
         assert(isNumber(resolution), 'Invalid resolution')
 
-        if (resolution !== this.currentResolution) {
-          this.currentResolution = resolution
-        }
         if (this.$view && resolution !== this.$view.getResolution()) {
           this.$view.setResolution(resolution)
+        } else if (resolution !== this.currentResolution) {
+          this.currentResolution = resolution
         }
       },
       /**
@@ -779,11 +777,10 @@
         zoom = Number(zoom)
         assert(isNumber(zoom), 'Invalid zoom')
 
-        if (zoom !== this.currentZoom) {
-          this.currentZoom = zoom
-        }
         if (this.$view && zoom !== this.$view.getZoom()) {
           this.$view.setZoom(zoom)
+        } else if (zoom !== this.currentZoom) {
+          this.currentZoom = zoom
         }
       },
       /**
@@ -806,11 +803,10 @@
         zoom = Number(zoom)
         assert(isNumber(zoom), 'Invalid maxZoom')
 
-        if (zoom !== this.currentMaxZoom) {
-          this.currentMaxZoom = zoom
-        }
         if (this.$view && zoom !== this.$view.getMaxZoom()) {
           this.$view.setMaxZoom(zoom)
+        } else if (zoom !== this.currentMaxZoom) {
+          this.currentMaxZoom = zoom
         }
       },
       /**
@@ -826,11 +822,10 @@
         zoom = Number(zoom)
         assert(isNumber(zoom), 'Invalid minZoom')
 
-        if (zoom !== this.currentMinZoom) {
-          this.currentMinZoom = zoom
-        }
         if (this.$view && zoom !== this.$view.getMinZoom()) {
           this.$view.setMinZoom(zoom)
+        } else if (zoom !== this.currentMinZoom) {
+          this.currentMinZoom = zoom
         }
       },
       /**
@@ -852,11 +847,10 @@
         rotation = Number(rotation)
         assert(isNumber(rotation), 'Invalid rotation')
 
-        if (rotation !== this.currentRotation) {
-          this.currentRotation = rotation
-        }
         if (this.$view && rotation !== this.$view.getRotation()) {
           this.$view.setRotation(rotation)
+        } else if (rotation !== this.currentRotation) {
+          this.currentRotation = rotation
         }
       },
     },
@@ -895,22 +889,22 @@
    */
   async function subscribeToEvents () {
     const setterKey = addPrefix('set')
-    const resolutionChanges = obsFromOlChangeEvent(this.$view, 'resolution', true)
-    const zoomChanges = resolutionChanges.pipe(
-      mapObs(() => ({
-        prop: 'zoom',
-        value: this.getZoom(),
-      })),
-      distinctUntilKeyChanged('value'),
-    )
+    // const resolutionChanges = obsFromOlChangeEvent(this.$view, 'resolution', true)
+    // const zoomChanges = resolutionChanges.pipe(
+    //   mapObs(() => ({
+    //     prop: 'zoom',
+    //     value: this.getZoom(),
+    //   })),
+    //   distinctUntilKeyChanged('value'),
+    // )
     const propChanges = mergeObs(
       obsFromOlChangeEvent(this.$view, [
         'id',
-        'rotation',
-        'center',
+        // 'rotation',
+        // 'center',
       ], true),
-      resolutionChanges,
-      zoomChanges,
+      // resolutionChanges,
+      // zoomChanges,
     ).pipe(
       mapObs(evt => ({
         ...evt,

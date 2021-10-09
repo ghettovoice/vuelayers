@@ -6,7 +6,8 @@
       data-projection="EPSG:4326">
       <VlView
         :zoom.sync="zoom"
-        :center.sync="center" />
+        :center.sync="center"
+        :extent="[-10,-10,10,10]" />
       <VlLayerTile>
         <VlSourceOsm @created="sourceCreated" />
       </VlLayerTile>
@@ -22,14 +23,14 @@
 
 <script>
   import { random, range } from 'lodash'
-  import { OverviewMap } from 'ol/control'
-  import { Tile as TileLayer } from 'ol/layer'
+  // import { OverviewMap } from 'ol/control'
+  // import { Tile as TileLayer } from 'ol/layer'
 
   export default {
     name: 'App',
     data: function () {
       return {
-        zoom: 1,
+        zoom: 5,
         center: [0, 0],
         extent: null,
         features: [],
@@ -62,10 +63,10 @@
     },
     methods: {
       sourceCreated (vm) {
-        this.$refs.map.addControl(new OverviewMap({
-          collapsed: false,
-          layers: [new TileLayer({ source: vm.$source })],
-        }))
+        // this.$refs.map.addControl(new OverviewMap({
+        //   collapsed: false,
+        //   layers: [new TileLayer({ source: vm.$source })],
+        // }))
       },
       lockToggle () {
         this.interactionOptions.dragPan = !this.interactionOptions.dragPan
