@@ -33,7 +33,7 @@
      * @protected
      */
     createStyle () {
-      return RegularShape({
+      return new RegularShape({
         points: this.points,
         radius: this.radius,
         radius1: this.radius1,
