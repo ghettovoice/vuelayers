@@ -7,7 +7,7 @@
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
   import { makeChangeOrRecreateWatchers, tileImageSource } from '../../mixins'
   import { extentFromProjection, getCorner as getExtentCorner, roundExtent, roundPointCoords } from '../../ol-ext'
-  import { coalesce, isArray, isFunction, isNumber, noop, range } from '../../utils'
+  import { coalesce, isArray, isFunction, isNumber, isString, noop, or, range } from '../../utils'
 
   export default {
     name: 'VlSourceWmts',
@@ -56,7 +56,7 @@
       },
       matrixIds: {
         type: Array,
-        validator: value => value.every(isNumber),
+        validator: value => value.every(or(isNumber, isString)),
       },
       maxZoom: {
         type: Number,
