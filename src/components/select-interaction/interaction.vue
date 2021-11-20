@@ -125,6 +125,7 @@
         type: Function,
         default: shiftKeyOnly,
       },
+      useFeatureStyle: Boolean,
     },
     data () {
       return {
@@ -239,6 +240,7 @@
        * @protected
        */
       createInteraction () {
+        console.log('style', this.$style)
         return new SelectInteraction({
           multi: this.multi,
           filter: this.filter,
@@ -287,6 +289,16 @@
             this.scheduleRecreate()
           },
         }
+      },
+      /**
+       * @return {StyleLike|undefined}
+       */
+      getStyle () {
+        let style = coalesce(this.getStyleTarget()?.getStyle(), this._style)
+        if (style === undefined && this.useFeatureStyle) {
+          style = null // disable ol/interaction/Select default styles
+        }
+        return style
       },
       /**
        * @param {FeatureLike} feature
