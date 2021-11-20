@@ -44,14 +44,14 @@ module.exports = function sass (options) {
         outFile: dest,
         sourceMap: options.sourceMap,
         data: code,
-        indentedSyntax: path.extname(id) === '.sass',
+        // indentedSyntax: path.extname(id) === '.sass',
         omitSourceMapUrl: false,
         sourceMapContents: true,
       }, options.sass)
       sassConfig.includePaths = sassConfig.includePaths
         ? sassConfig.includePaths.concat(paths.filter(x => !sassConfig.includePaths.includes(x)))
         : paths
-      let { css, map } = require('node-sass').renderSync(sassConfig)
+      let { css, map } = require('sass').renderSync(sassConfig)
       code = css.toString().trim()
       map = map.toString()
 

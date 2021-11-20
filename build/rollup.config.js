@@ -186,7 +186,6 @@ function makePlugins (min, replaces, cssOutput) {
       banner: config.banner,
       sourceMap: true,
       sass: {
-        indentedSyntax: true,
         includePaths: [
           utils.resolve('src'),
           utils.resolve('src/styles'),
