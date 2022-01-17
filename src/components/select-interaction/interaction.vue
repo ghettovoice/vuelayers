@@ -240,7 +240,6 @@
        * @protected
        */
       createInteraction () {
-        console.log('style', this.$style)
         return new SelectInteraction({
           multi: this.multi,
           filter: this.filter,
