@@ -10,4 +10,5 @@ services:
 cache:
   directories:
     - node_modules
+install: npm install --legacy-peer-deps
 after_success: npm run coverage

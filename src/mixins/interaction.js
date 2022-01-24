@@ -302,7 +302,7 @@ function defineServices () {
 }
 
 async function subscribeToInteractionEvents () {
-  const setterKey = addPrefix('current')
+  const setterKey = addPrefix('set')
   const propChanges = obsFromOlChangeEvent(this.$interaction, [
     'active',
     'priority',
