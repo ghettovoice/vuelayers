@@ -13,7 +13,9 @@
       ref="featuresOverlay"
       :overlay="true"
       :update-while-animating="updateWhileAnimating"
-      :update-while-interacting="updateWhileInteracting">
+      :update-while-interacting="updateWhileInteracting"
+      @prerender="$emit('dl:prerender', $event)"
+      @postrender="$emit('dl:postrender', $event)">
       <VectorSourceCmp
         :id="'vl-' + currentId + '-default-source'"
         ref="featuresOverlaySource"
