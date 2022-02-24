@@ -81,5 +81,5 @@ npm test
 
 ## License
 
-**MIT** (c) 2017-2020, Vladimir Vershinin  
+**MIT** (c) 2017-2022, Vladimir Vershinin  
 Based on [Vue](https://vuejs.org/) and [OpenLayers](https://openlayers.org/)
