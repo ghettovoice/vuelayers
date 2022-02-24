@@ -27,7 +27,7 @@ and with [`vl-source-sputnik`](/docs/component/sputnik-source.md).
     <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
     
     <vl-layer-tile>
-      <vl-source-sputnik></vl-source-sputnik>
+      <vl-source-osm></vl-source-osm>
     </vl-layer-tile>
     
     <vl-layer-tile id="wmts">

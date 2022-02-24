@@ -43,13 +43,13 @@ Taken from OpenLayers [Static Image Example](http://openlayers.org/en/latest/exa
   // create custom projection for image 
   // NOTE: VueLayers.olExt available only in UMD build
   // in ES build it should be imported explicitly from 'vuelayers/lib/ol-ext'
-  let customProj = VueLayers.olExt.createProj({
+  let customProj = new ol.proj.Projection({
     code: 'xkcd-image',
     units: 'pixels',
     extent,
   })
   // add it to the list of known projections
-  VueLayers.olExt.addProj(customProj)
+  ol.proj.addProjection(customProj)
 
   export default {
     data () {

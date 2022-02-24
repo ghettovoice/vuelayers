@@ -2,14 +2,14 @@
 
 > Style the stroke of a line or polygon.
 
-Use it inside [`vl-style-box`](/docs/component/style-box.md) to style lines and polygons or inside [`vl-style-circle`](/docs/component/circle-style.md) to style circles.
+Use it inside [`vl-style`](/docs/component/style.md) to style lines and polygons or inside [`vl-style-circle`](/docs/component/circle-style.md) to style circles.
 
 ## ES6 Module
 
 ```javascript
-import { StrokeStyle } from 'vuelayers'
+import { Style } from 'vuelayers'
 
-Vue.use(StrokeStyle)
+Vue.use(Style)
 ```
 
 ## Usage
@@ -29,14 +29,14 @@ Vue.use(StrokeStyle)
       <vl-layer-vector>
         <vl-source-vector :features="features"></vl-source-vector>
 
-        <vl-style-box>
+        <vl-style>
           <vl-style-fill color="white"></vl-style-fill>
           <vl-style-stroke
             color="red"
             :width="3"
-            :line-dash="[3, 5, 30, 5]"
-          ></vl-style-stroke>
-        </vl-style-box>
+            :line-dash="[3, 5, 30, 5]">
+          </vl-style-stroke>
+        </vl-style>
       </vl-layer-vector>
     </vl-map>
   </div>

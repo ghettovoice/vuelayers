@@ -2,14 +2,14 @@
 
 > Styles points as circles.
 
-Use it inside [`vl-style-box`](/docs/component/style-box.md) to style points as circles.
+Use it inside [`vl-style`](/docs/component/style.md) to style points as circles.
 
 ## ES6 Module
 
 ```javascript
-import { CircleStyle } from 'vuelayers'
+import { Style } from 'vuelayers'
 
-Vue.use(CircleStyle)
+Vue.use(Style)
 ```
 
 ## Usage
@@ -29,18 +29,18 @@ Styling a feature inside a vector layer.
       </vl-layer-tile>
 
       <vl-layer-vector>
-        <vl-feature>
-          <vl-geom-point
-            :coordinates="[12.492442,41.890170]" 
-          ></vl-geom-point>
-
-          <vl-style-box>
-            <vl-style-circle :radius="20">
-              <vl-style-fill color="white"></vl-style-fill>
-              <vl-style-stroke color="red"></vl-style-stroke>
-            </vl-style-circle>
-          </vl-style-box>
-        </vl-feature>
+        <vl-source-vector>
+          <vl-feature>
+            <vl-geom-point :coordinates="[12.492442,41.890170]"></vl-geom-point>
+  
+            <vl-style>
+              <vl-style-circle :radius="20">
+                <vl-style-fill color="white"></vl-style-fill>
+                <vl-style-stroke color="red"></vl-style-stroke>
+              </vl-style-circle>
+            </vl-style>
+          </vl-feature>
+        </vl-source-vector>
       </vl-layer-vector>
     </vl-map>
   </div>
@@ -76,12 +76,12 @@ Styling the whole layer
       <vl-layer-vector>
         <vl-source-vector :features="points"></vl-source-vector>
 
-        <vl-style-box>
+        <vl-style>
           <vl-style-circle :radius="20">
             <vl-style-fill color="white"></vl-style-fill>
             <vl-style-stroke color="red"></vl-style-stroke>
           </vl-style-circle>
-        </vl-style-box>
+        </vl-style>
       </vl-layer-vector>
     </vl-map>
   </div>

@@ -49,7 +49,7 @@
 
   * Style
 
-    * [vl-style-box](/docs/component/style-box.md)
+    * [vl-style](/docs/component/style.md)
     * [vl-style-circle](/docs/component/circle-style.md)
     * [vl-style-fill](/docs/component/fill-style.md)
     * [vl-style-func](/docs/component/func-style.md)

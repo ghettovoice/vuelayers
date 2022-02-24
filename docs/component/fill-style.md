@@ -2,14 +2,14 @@
 
 > Color the filling of a polygon or mulipolygon in a vector layer
 
-Use it inside [`vl-style-box`](/docs/component/style-box.md) along with [`vl-style-stroke`](/docs/component/stroke-style.md) to style polygons and other shapes with area like circles.
+Use it inside [`vl-style`](/docs/component/style.md) along with [`vl-style-stroke`](/docs/component/stroke-style.md) to style polygons and other shapes with area like circles.
 
 ## ES6 Module
 
 ```javascript
-import { FillStyle } from 'vuelayers'
+import { Style } from 'vuelayers'
 
-Vue.use(FillStyle)
+Vue.use(Style)
 ```
 
 ## Usage
@@ -29,18 +29,18 @@ Styling points like circles with filling.
       </vl-layer-tile>
 
       <vl-layer-vector>
-        <vl-feature>
-          <vl-geom-point
-            :coordinates="[12.492442,41.890170]"
-          ></vl-geom-point>
-
-          <vl-style-box>
-            <vl-style-circle :radius="20">
-              <vl-style-fill color="white"></vl-style-fill>
-              <vl-style-stroke color="red"></vl-style-stroke>
-            </vl-style-circle>
-          </vl-style-box>
-        </vl-feature>
+        <vl-source-vector>
+          <vl-feature>
+            <vl-geom-point :coordinates="[12.492442,41.890170]"></vl-geom-point>
+  
+            <vl-style>
+              <vl-style-circle :radius="20">
+                <vl-style-fill color="white"></vl-style-fill>
+                <vl-style-stroke color="red"></vl-style-stroke>
+              </vl-style-circle>
+            </vl-style>
+          </vl-feature>
+        </vl-source-vector>
       </vl-layer-vector>
     </vl-map>
   </div>
@@ -76,10 +76,10 @@ Styling all features with filling in a layer.
       <vl-layer-vector>
         <vl-source-vector :features="features"></vl-source-vector>
 
-        <vl-style-box>
+        <vl-style>
           <vl-style-fill color="white"></vl-style-fill>
           <vl-style-stroke color="red"></vl-style-stroke>
-        </vl-style-box>
+        </vl-style>
       </vl-layer-vector>
     </vl-map>
   </div>
