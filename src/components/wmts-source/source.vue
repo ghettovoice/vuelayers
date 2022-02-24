@@ -132,6 +132,7 @@
           tileGrid: this.tileGrid,
           tilePixelRatio: this.tilePixelRatio,
           transition: this.transition,
+          zDirection: this.zDirection,
           // ol/source/UrlTile
           urls: this.currentUrls,
           tileLoadFunction: this.currentTileLoadFunction,
@@ -175,7 +176,6 @@
       stateChanged: noop,
       tileKeyChanged: noop,
       opaqueChanged: noop,
-      zDirectionChanged: noop,
       inputTileUrlFunctionChanged: noop,
     },
   }
