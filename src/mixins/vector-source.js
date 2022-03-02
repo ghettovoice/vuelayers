@@ -527,8 +527,10 @@ export default {
       if (url !== this.currentUrl) {
         this.currentUrl = url
       }
+
       if (this.$source && url !== this.$source.getUrl()) {
         this.$source.setUrl(url)
+        this.refresh()
       }
     },
     /**
@@ -540,6 +542,7 @@ export default {
       if (loader !== this.currentLoader) {
         this.currentLoader = loader
         this.$source?.setLoader(loader)
+        this.refresh()
       }
     },
     /**
