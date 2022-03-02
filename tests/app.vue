@@ -1,5 +1,11 @@
 <template>
   <div id="app">
+    <p>
+      Drawn features: {{ drawnFeatures }}
+    </p>
+    <button @click="undo">
+      Undo
+    </button>
     <VlMap
       ref="map"
       data-projection="EPSG:4326">
@@ -10,27 +16,23 @@
         <VlSourceOsm />
       </VlLayerTile>
 
-      <VlLayerVector
-        id="cluster-source"
-        class-name="qwerty">
-        <VlSourceCluster
-          id="cluster-source"
-          :distance="50">
-          <VlSourceVector
-            id="cluster-inner-source"
-            :features="features" />
-        </VlSourceCluster>
-        <VlStyleFunc :function="clusterStyleFunc()" />
+      <VlLayerVector>
+        <VlSourceVector
+          :features.sync="features"
+          ident="draw" />
       </VlLayerVector>
 
-      <VlInteractionSelect :features.sync="selectedFeatures" />
+      <VlInteractionDraw
+        ref="draw"
+        source="draw"
+        type="polygon"
+        @drawend="drawend"
+        @drawstart="drawstart" />
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { random, range } from 'lodash'
-  import { createStyle } from '../src/ol-ext'
 
   export default {
     name: 'App',
@@ -39,40 +41,28 @@
         zoom: 2,
         center: [0, 0],
         extent: null,
-        features: range(0, 1000).map(i => {
-          return {
-            type: 'Feature',
-            id: 'random-' + i,
-            geometry: {
-              type: 'Point',
-              coordinates: [
-                random(-50, 50),
-                random(-50, 50),
-              ],
-            },
-          }
-        }),
-        selectedFeatures: [],
+        features: [],
+        drawing: false,
       }
     },
+    computed: {
+      drawnFeatures () {
+        return this.features.map(({ id }) => id)
+      },
+    },
     methods: {
-      clusterStyleFunc () {
-        const cache = {}
-        return function __clusterStyleFunc (feature) {
-          const size = feature.get('features').length
-          let style = cache[size]
-          if (!style) {
-            style = createStyle({
-              imageRadius: 10,
-              imageStrokeColor: '#ffffff',
-              imageFillColor: '#3399cc',
-              text: size.toString(),
-              textFillColor: '#ffffff',
-            })
-            cache[size] = style
-          }
-          return [style]
+      undo () {
+        if (this.drawing) {
+          this.$refs.draw.removeLastPoint()
+        } else {
+          this.features.pop()
         }
+      },
+      drawstart () {
+        this.drawing = true
+      },
+      drawend ({ feature }) {
+        this.drawing = false
       },
     },
   }

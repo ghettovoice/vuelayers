@@ -1,4 +1,5 @@
-import { Feature, getUid } from 'ol'
+import { Feature } from 'ol'
+import { getUid } from 'ol/util'
 import { all as loadAll } from 'ol/loadingstrategy'
 import { Vector as VectorSource } from 'ol/source'
 import {
