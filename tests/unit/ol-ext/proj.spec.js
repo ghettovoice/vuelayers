@@ -2,9 +2,9 @@ import { expect } from 'chai'
 import * as proj from '@/ol-ext/proj'
 
 describe('ol coordinate helper', () => {
-  const point3857 = [5565974.539663679, 7361866.113051185]
+  const point3857 = [5565974.539664, 7361866.113051]
   const point4326 = [50, 55]
-  const line3857 = [[5565974.539663679, 7361866.113051185], [-3896182.1777645755, -11068715.659379495]]
+  const line3857 = [[5565974.539664, 7361866.113051], [-3896182.177765, -11068715.659379]]
   const line4326 = [[50, 55], [-35, -70]]
 
   /** @test pointToLonLat */
