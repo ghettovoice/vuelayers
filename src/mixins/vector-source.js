@@ -16,9 +16,9 @@ import {
   clonePlainObject,
   coalesce,
   constant,
-  difference,
   every,
   forEach,
+  reduce,
   identity,
   instanceOf,
   isArray,
@@ -141,6 +141,12 @@ export default {
     featuresViewProj () {
       return map(this.features, feature => initializeFeature(this.writeFeatureInViewProj(this.readFeatureInDataProj(feature))))
     },
+    featuresHash () {
+      return reduce(this.features, (hash, feature) => {
+        hash[getFeatureId(feature)] = true
+        return hash
+      }, {})
+    },
     currentFeaturesDataProj () {
       if (!this.rev) return []
 
@@ -150,6 +156,14 @@ export default {
       if (!this.rev) return []
 
       return map(this.getFeatures(), feature => this.writeFeatureInViewProj(feature))
+    },
+    currentFeaturesHash () {
+      if (!this.rev) return {}
+
+      return reduce(this.getFeatures(), (hash, feature) => {
+        hash[getFeatureId(feature)] = true
+        return hash
+      }, {})
     },
     extentDataProj () {
       return this.rev ? this.getExtent() : undefined
@@ -335,23 +349,26 @@ export default {
 
       let changed = false
       forEach(features, feature => {
-        feature = this.getFeatureById(getFeatureId(feature))
-        if (!feature) return
-        const featureKey = getUid(feature)
-        if (featureKey in this.$source.nullGeometryFeatures_) {
-          delete this.$source.nullGeometryFeatures_[featureKey]
-        } else {
-          if (this.$source.featuresRtree_) {
-            this.$source.featuresRtree_.remove(feature)
-          }
-        }
-        this.$source.removeFeatureInternal(feature)
-        changed = true
+        changed = this.removeFeatureInternal(feature)
       })
 
       if (!changed) return
 
       this.$source.changed()
+    },
+    removeFeatureInternal (feature) {
+      feature = this.getFeatureById(getFeatureId(feature))
+      if (!feature) return false
+      const featureKey = getUid(feature)
+      if (featureKey in this.$source.nullGeometryFeatures_) {
+        delete this.$source.nullGeometryFeatures_[featureKey]
+      } else {
+        if (this.$source.featuresRtree_) {
+          this.$source.featuresRtree_.remove(feature)
+        }
+      }
+      this.$source.removeFeatureInternal(feature)
+      return true
     },
     /**
      * @param {FeatureLike} feature
@@ -637,17 +654,20 @@ export default {
     },
     /**
      * @param {GeoJSONFeature[]} value
+     * @param {GeoJSONFeature[]} prevValue
      * @protected
      */
-    featuresViewProjChanged (value) {
+    async featuresViewProjChanged (value, prevValue) {
+      if (isEqual(value, prevValue)) return
+      // remove non-matched features
+      forEach(this.getFeatures(), feature => {
+        if (!this.featuresHash[getFeatureId(feature)]) {
+          this.removeFeatureInternal(feature)
+        }
+      })
       // add new features
       this.addFeatures(value, true)
-      // remove non-matched features
-      this.removeFeatures(difference(
-        this.getFeatures(),
-        value,
-        (a, b) => getFeatureId(a) === getFeatureId(b),
-      ))
+      await this.debounceChanged()
     },
     /**
      * @param {GeoJSONFeature[]} value

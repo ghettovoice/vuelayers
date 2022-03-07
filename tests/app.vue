@@ -1,11 +1,5 @@
 <template>
   <div id="app">
-    <p>
-      Drawn features: {{ drawnFeatures }}
-    </p>
-    <button @click="undo">
-      Undo
-    </button>
     <VlMap
       ref="map"
       data-projection="EPSG:4326">
@@ -18,21 +12,14 @@
 
       <VlLayerVector>
         <VlSourceVector
-          :features.sync="features"
-          ident="draw" />
+          :features.sync="features" />
       </VlLayerVector>
-
-      <VlInteractionDraw
-        ref="draw"
-        source="draw"
-        type="polygon"
-        @drawend="drawend"
-        @drawstart="drawstart" />
     </VlMap>
   </div>
 </template>
 
 <script>
+  import { range, random } from 'lodash'
 
   export default {
     name: 'App',
@@ -40,30 +27,18 @@
       return {
         zoom: 2,
         center: [0, 0],
-        extent: null,
-        features: [],
-        drawing: false,
+        features: range(1, 10000).map(i => ({
+          type: 'Feature',
+          id: 'feature' + i,
+          geometry: {
+            type: 'Point',
+            coordinates: [
+              random(80, -80),
+              random(80, -80),
+            ],
+          },
+        })),
       }
-    },
-    computed: {
-      drawnFeatures () {
-        return this.features.map(({ id }) => id)
-      },
-    },
-    methods: {
-      undo () {
-        if (this.drawing) {
-          this.$refs.draw.removeLastPoint()
-        } else {
-          this.features.pop()
-        }
-      },
-      drawstart () {
-        this.drawing = true
-      },
-      drawend ({ feature }) {
-        this.drawing = false
-      },
     },
   }
 </script>

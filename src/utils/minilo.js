@@ -450,8 +450,12 @@ export function hasProp (object, prop) {
 }
 
 export function includes (array, value, comparator = isEqual) {
-  const elems = filter(array, elem => comparator(elem, value))
-  return elems.shift()
+  let found = false
+  forEach(array, elem => {
+    found = comparator(elem, value)
+    if (found) return false
+  })
+  return found
 }
 
 export function difference (array1, array2, comparator = isEqual) {

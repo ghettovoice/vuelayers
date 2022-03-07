@@ -33,7 +33,7 @@ import rxSubs from './rx-subs'
 import services from './services'
 
 export const VM_PROP = 'vm'
-export const FRAME_TIME = 1000 / 60
+export const FRAME_TIME = 1000 / 30
 
 export const OlObjectState = {
   UNDEF: 'undef',
