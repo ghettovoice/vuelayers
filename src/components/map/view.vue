@@ -323,7 +323,7 @@
       inputResolutions: {
         deep: true,
         handler (value) {
-          if (value === this.currentResolutions) return
+          if (isEqual(value, this.currentResolutions)) return
 
           if (process.env.VUELAYERS_DEBUG) {
             this.$logger.log(
