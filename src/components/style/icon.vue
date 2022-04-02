@@ -162,6 +162,14 @@
         const anchor = this.$style?.getAnchor()?.slice()
         if (!anchor) return this.currentAnchor
 
+        return this.transformAnchor(anchor)
+      },
+      /**
+       * @param {number[]} anchor
+       * @returns {number[]}
+       * @protected
+       */
+      transformAnchor (anchor) {
         const size = this.getSize()
         if (!size) return
 
@@ -189,7 +197,7 @@
           this.currentAnchor = anchor
           this.scheduleRefresh()
         }
-        if (this.$style && !isEqual(anchor, this.$style.getAnchor())) {
+        if (this.$style && !isEqual(anchor, this.transformAnchor(this.$style.getAnchor()))) {
           this.$style.setAnchor(anchor)
           this.scheduleRefresh()
         }
