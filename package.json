@@ -1,6 +1,6 @@
 {
   "name": "vuelayers",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "description": "Web map Vue components with the power of OpenLayers",
   "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
   "scripts": {
@@ -77,7 +77,7 @@
     "chai": "^4.2.0",
     "chai-dom": "^1.8.2",
     "chalk": "^4.1.0",
-    "chromedriver": "^98.0.0",
+    "chromedriver": "^100.0.0",
     "coveralls": "^3.1.0",
     "cssnano": "^4.1.10",
     "docsify-cli": "^4.4.1",
