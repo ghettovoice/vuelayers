@@ -84,7 +84,10 @@ module.exports = [
   {
     ...baseConf,
     external: makeExternal(config.dependencies.concat(['../../mixins', '../../ol-ext', '../../rx-ext', '../../utils'])),
-    plugins: makePlugins(false, null, `dist/${config.name}.css`),
+    plugins: makePlugins(false, {
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
+    }, `dist/${config.name}.css`),
     output: {
       ...baseConf.output,
       file: utils.resolve(`dist/${config.name}.esm.js`),
