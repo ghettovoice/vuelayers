@@ -84,7 +84,10 @@ module.exports = [
   {
     ...baseConf,
     external: makeExternal(config.dependencies.concat(['../../mixins', '../../ol-ext', '../../rx-ext', '../../utils'])),
-    plugins: makePlugins(false, null, `dist/${config.name}.css`),
+    plugins: makePlugins(false, {
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
+    }, `dist/${config.name}.css`),
     output: {
       ...baseConf.output,
       file: utils.resolve(`dist/${config.name}.esm.js`),
@@ -98,6 +101,8 @@ module.exports = [
       '../ol-ext': './ol-ext',
       '../rx-ext': './rx-ext',
       '../utils': './utils',
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
     }),
     output: {
       ...baseConf.output,
@@ -110,6 +115,8 @@ module.exports = [
     input: utils.resolve('src/ol-ext/index.js'),
     plugins: makePlugins(false, {
       '../utils': './utils',
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
     }),
     output: {
       ...baseConf.output,
@@ -122,6 +129,8 @@ module.exports = [
     input: utils.resolve('src/rx-ext/index.js'),
     plugins: makePlugins(false, {
       '../utils': './utils',
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
     }),
     output: {
       ...baseConf.output,
