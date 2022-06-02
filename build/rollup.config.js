@@ -101,6 +101,8 @@ module.exports = [
       '../ol-ext': './ol-ext',
       '../rx-ext': './rx-ext',
       '../utils': './utils',
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
     }),
     output: {
       ...baseConf.output,
@@ -113,6 +115,8 @@ module.exports = [
     input: utils.resolve('src/ol-ext/index.js'),
     plugins: makePlugins(false, {
       '../utils': './utils',
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
     }),
     output: {
       ...baseConf.output,
@@ -125,6 +129,8 @@ module.exports = [
     input: utils.resolve('src/rx-ext/index.js'),
     plugins: makePlugins(false, {
       '../utils': './utils',
+      'process.env.NODE_ENV': "'production'",
+      'process.env.VUELAYERS_DEBUG': 'false',
     }),
     output: {
       ...baseConf.output,
