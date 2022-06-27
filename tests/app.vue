@@ -9,44 +9,21 @@
       <VlLayerTile>
         <VlSourceOsm />
       </VlLayerTile>
-
-      <VlLayerVector>
-        <VlSourceVector
-          :features.sync="features" />
-        <VlStyle>
-          <VlStyleIcon
-            :rotation="rotation"
-            :scale="scale"
-            :src="src" />
-        </VlStyle>
-      </VlLayerVector>
+      <VlLayerVectorTile>
+        <VlSourceVectorTile
+          url="https://basemaps.arcgis.com/v1/arcgis/rest/services/World_Basemap/VectorTileServer/tile/{z}/{y}/{x}.pbf" />
+      </VlLayerVectorTile>
     </VlMap>
   </div>
 </template>
 
 <script>
-  import { random, range } from 'lodash'
-
   export default {
     name: 'App',
     data: function () {
       return {
-        zoom: 2,
+        zoom: 5,
         center: [0, 0],
-        features: range(1, 10).map(i => ({
-          type: 'Feature',
-          id: 'feature' + i,
-          geometry: {
-            type: 'Point',
-            coordinates: [
-              random(80, -80),
-              random(80, -80),
-            ],
-          },
-        })),
-        scale: 0.1,
-        rotation: 0,
-        src: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
       }
     },
   }

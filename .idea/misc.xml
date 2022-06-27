@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GOROOT" path="/usr/local/go" />
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>
@@ -8,6 +7,7 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="WebPackConfiguration">
+    <option name="mode" value="MANUAL" />
     <option name="path" value="$PROJECT_DIR$/build/webpack.base.conf.js" />
   </component>
 </project>

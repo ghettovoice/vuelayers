@@ -293,8 +293,7 @@ export default {
       if (value === this.currentState) return
 
       if (process.env.VUELAYERS_DEBUG) {
-        this.$logger.log('state changed, scheduling recreate... %O ===> %O',
-          this.currentState, value)
+        this.$logger.log('state changed, scheduling recreate... %O ===> %O', this.currentState, value)
       }
 
       this.currentState = value
