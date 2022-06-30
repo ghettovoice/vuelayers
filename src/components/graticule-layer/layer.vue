@@ -7,7 +7,7 @@
       <slot name="lon">
         <TextStyle
           :id="'vl-' + currentId + '-default-text-style'"
-          font="'12px sans-serif'"
+          font="'12px Calibri,sans-serif'"
           text-baseline="bottom">
           <FillStyle
             :id="'vl-' + currentId + '-default-fill-style'"
@@ -24,7 +24,7 @@
         <TextStyle
           :id="'vl-' + currentId + '-default-text-style'"
           font="'12px Calibri,sans-serif'"
-          text-baseline="bottom">
+          text-align="end">
           <FillStyle
             :id="'vl-' + currentId + '-default-fill-style'"
             color="rgba(0,0,0,1)" />
