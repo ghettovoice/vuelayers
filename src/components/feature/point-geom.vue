@@ -1,8 +1,7 @@
 <script>
   import { Point } from 'ol/geom'
-  import GeometryType from 'ol/geom/GeometryType'
   import { simpleGeometry } from '../../mixins'
-  import { isPointCoords } from '../../ol-ext'
+  import { isPointCoords, GeometryType } from '../../ol-ext'
   import { assert, constant } from '../../utils'
 
   export default {

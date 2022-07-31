@@ -1,8 +1,7 @@
 <script>
   import { LineString } from 'ol/geom'
-  import GeometryType from 'ol/geom/GeometryType'
   import { simpleGeometry } from '../../mixins'
-  import { isLineCoords } from '../../ol-ext'
+  import { isLineCoords, GeometryType } from '../../ol-ext'
   import { assert, constant } from '../../utils'
 
   export default {

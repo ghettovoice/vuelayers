@@ -10,11 +10,11 @@ import {
   Point,
   Polygon,
 } from 'ol/geom'
-import GeometryType from 'ol/geom/GeometryType'
 import { circular as circularPolygon } from 'ol/geom/Polygon'
 import { v4 as uuid } from 'uuid'
 import { isPlainObject } from '../utils'
 import { COORD_PRECISION, roundCoords } from './coord'
+import { GeometryType } from './enums'
 
 /**
  * @param {number|number[]} lonOrCoordinates

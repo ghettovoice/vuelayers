@@ -1,5 +1,5 @@
-import GeometryType from 'ol/geom/GeometryType'
 import { fromLonLat, toLonLat, transform as baseTransform, transformExtent as baseTransformExtent } from 'ol/proj'
+import { GeometryType } from './enums'
 import { calcDistance, COORD_PRECISION, roundCoords, roundExtent } from './coord'
 
 export const EPSG_4326 = 'EPSG:4326'

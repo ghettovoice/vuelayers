@@ -1,7 +1,6 @@
 import { boundingExtent as baseBoundingExtent } from 'ol/extent'
 import GeometryLayout from 'ol/geom/GeometryLayout'
-import GeometryType from 'ol/geom/GeometryType'
-import { findPointOnSurface, isEqualCoord, roundCoords, roundPointCoords, transforms } from '../ol-ext'
+import { findPointOnSurface, isEqualCoord, roundCoords, roundPointCoords, transforms, GeometryType } from '../ol-ext'
 import { assert, clonePlainObject, coalesce, isArray, isEmpty, isEqual, negate } from '../utils'
 import geometry from './geometry'
 import { makeChangeOrRecreateWatchers } from './ol-cmp'

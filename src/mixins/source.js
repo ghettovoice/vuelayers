@@ -1,6 +1,5 @@
 import { get as getProj } from 'ol/proj'
-import SourceState from 'ol/source/State'
-import { EPSG_3857, getSourceId, initializeSource, setSourceId } from '../ol-ext'
+import { EPSG_3857, getSourceId, initializeSource, setSourceId, SourceState } from '../ol-ext'
 import { assert, coalesce, isArray, isEqual, isFunction, isString, mergeDescriptors, or } from '../utils'
 import olCmp, { makeChangeOrRecreateWatchers } from './ol-cmp'
 import projTransforms from './proj-transforms'

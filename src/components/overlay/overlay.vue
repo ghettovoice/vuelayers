@@ -12,9 +12,15 @@
 
 <script>
   import { Overlay } from 'ol'
-  import OverlayPositioning from 'ol/OverlayPositioning'
   import { makeChangeOrRecreateWatchers, olCmp, projTransforms, waitForMap } from '../../mixins'
-  import { EPSG_3857, getOverlayId, initializeOverlay, roundPointCoords, setOverlayId } from '../../ol-ext'
+  import {
+    EPSG_3857,
+    getOverlayId,
+    initializeOverlay,
+    roundPointCoords,
+    setOverlayId,
+    OverlayPositioning,
+  } from '../../ol-ext'
   import { fromOlChangeEvent as obsFromOlChangeEvent } from '../../rx-ext'
   import {
     addPrefix,

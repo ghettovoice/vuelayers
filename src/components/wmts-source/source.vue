@@ -1,12 +1,17 @@
 <script>
   import { getHeight as getExtentHeight, getWidth as getExtentWidth } from 'ol/extent'
-  import ExtentCorner from 'ol/extent/Corner'
   import { toSize } from 'ol/size'
   import { WMTS as WMTSSource } from 'ol/source'
   import { DEFAULT_MAX_ZOOM, DEFAULT_TILE_SIZE } from 'ol/tilegrid/common'
   import WMTSTileGrid from 'ol/tilegrid/WMTS'
   import { makeChangeOrRecreateWatchers, tileImageSource } from '../../mixins'
-  import { extentFromProjection, getCorner as getExtentCorner, roundExtent, roundPointCoords } from '../../ol-ext'
+  import {
+    extentFromProjection,
+    getCorner as getExtentCorner,
+    roundExtent,
+    roundPointCoords,
+    ExtentCorner,
+  } from '../../ol-ext'
   import { coalesce, isArray, isFunction, isNumber, isString, noop, or, range } from '../../utils'
 
   export default {

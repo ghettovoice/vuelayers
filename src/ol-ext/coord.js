@@ -1,4 +1,4 @@
-import GeometryType from 'ol/geom/GeometryType'
+import { GeometryType } from './enums'
 import { and, every, isArray, isEqual, isNumber, round } from '../utils'
 
 export const COORD_PRECISION = 6

@@ -1,9 +1,8 @@
 <script>
   import { Circle } from 'ol/geom'
-  import GeometryType from 'ol/geom/GeometryType'
   import { get as getProj } from 'ol/proj'
   import { simpleGeometry } from '../../mixins'
-  import { isPointCoords, roundPointCoords, transformDistance } from '../../ol-ext'
+  import { isPointCoords, roundPointCoords, transformDistance, GeometryType } from '../../ol-ext'
   import { assert, coalesce, constant, isEqual, isNumber, round } from '../../utils'
 
   export default {

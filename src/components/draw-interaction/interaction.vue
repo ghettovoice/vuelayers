@@ -1,13 +1,12 @@
 <script>
   import { Collection } from 'ol'
   import { noModifierKeys, shiftKeyOnly } from 'ol/events/condition'
-  import GeometryType from 'ol/geom/GeometryType'
   import { Draw as DrawInteraction } from 'ol/interaction'
   import { Vector as VectorSource } from 'ol/source'
   import { merge as mergeObs, of as obsOf } from 'rxjs'
   import { delay, first, map as mapObs, mapTo, mergeMap, tap } from 'rxjs/operators'
   import { FRAME_TIME, interaction, makeChangeOrRecreateWatchers, styleContainer } from '../../mixins'
-  import { COORD_PRECISION, initializeFeature, roundLineCoords, writeGeoJsonFeature } from '../../ol-ext'
+  import { COORD_PRECISION, initializeFeature, roundLineCoords, writeGeoJsonFeature, GeometryType } from '../../ol-ext'
   import { fromOlEvent as obsFromOlEvent, fromVueEvent as obsFromVueEvent } from '../../rx-ext'
   import { assert, camelCase, instanceOf, isFunction, mergeDescriptors, upperFirst } from '../../utils'
 

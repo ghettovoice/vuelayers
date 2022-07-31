@@ -1,5 +1,4 @@
-import WMSServerType from 'ol/source/WMSServerType'
-import { cleanSourceParams } from '../ol-ext'
+import { cleanSourceParams, WMSServerType } from '../ol-ext'
 import {
   clonePlainObject,
   coalesce,

@@ -1,8 +1,7 @@
 <script>
   import { MultiPoint } from 'ol/geom'
-  import GeometryType from 'ol/geom/GeometryType'
   import { simpleGeometry } from '../../mixins'
-  import { isMultiPointCoords } from '../../ol-ext'
+  import { isMultiPointCoords, GeometryType } from '../../ol-ext'
   import { assert, constant } from '../../utils'
 
   export default {

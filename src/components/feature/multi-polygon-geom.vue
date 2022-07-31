@@ -1,8 +1,7 @@
 <script>
   import { MultiPolygon } from 'ol/geom'
-  import GeometryType from 'ol/geom/GeometryType'
   import { simpleGeometry } from '../../mixins'
-  import { isMultiPolygonCoords } from '../../ol-ext'
+  import { isMultiPolygonCoords, GeometryType } from '../../ol-ext'
   import { assert, constant } from '../../utils'
 
   export default {

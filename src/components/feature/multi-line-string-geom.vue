@@ -1,8 +1,7 @@
 <script>
   import { MultiLineString } from 'ol/geom'
-  import GeometryType from 'ol/geom/GeometryType'
   import { simpleGeometry } from '../../mixins'
-  import { isMultiLineCoords } from '../../ol-ext'
+  import { isMultiLineCoords, GeometryType } from '../../ol-ext'
   import { assert, constant } from '../../utils'
 
   export default {

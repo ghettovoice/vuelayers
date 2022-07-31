@@ -169,7 +169,7 @@
       <option name="IMPORT_PREFER_ABSOLUTE_PATH" value="TRUE" />
     </TypeScriptCodeStyleSettings>
     <VueCodeStyleSettings>
-      <option name="INDENT_CHILDREN_OF_TOP_LEVEL" value="template, script, style" />
+      <option name="INDENT_CHILDREN_OF_TOP_LEVEL" value="template,script,style" />
     </VueCodeStyleSettings>
     <XML>
       <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="true" />

@@ -1,5 +1,6 @@
 export * from './control'
 export * from './coord'
+export * from './enums'
 export * from './extent'
 export * from './feature'
 export * from './format'

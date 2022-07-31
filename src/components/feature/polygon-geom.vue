@@ -1,8 +1,7 @@
 <script>
   import { Polygon } from 'ol/geom'
-  import GeometryType from 'ol/geom/GeometryType'
   import { simpleGeometry } from '../../mixins'
-  import { isPolygonCoords } from '../../ol-ext'
+  import { isPolygonCoords, GeometryType } from '../../ol-ext'
   import { assert, constant } from '../../utils'
 
   export default {
