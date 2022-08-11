@@ -78,7 +78,7 @@ export default {
     },
     /**
      * Feature loader.
-     * Feature loader should load features from some remote service, decode them and pas to `features` prop to render.
+     * Feature loader should load features from some remote service, decode them and pass to `features` prop to render.
      * @type {module:ol/featureloader~FeatureLoader|undefined} loader
      */
     loader: Function,
@@ -88,9 +88,9 @@ export default {
      */
     loaderFactory: Function,
     /**
-     * Loading strategy factory.
+     * Loading strategy.
      * Extent here in map view projection.
-     * @type {function} strategyFactory
+     * @type {function} loadingStrategy
      */
     loadingStrategy: {
       type: Function,
