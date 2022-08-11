@@ -13,7 +13,6 @@ import {
   refCount,
 } from 'rxjs/operators'
 import { v4 as uuid } from 'uuid'
-import VueQuery from 'vuequery'
 import { fromOlChangeEvent as obsFromOlChangeEvent, fromOlEvent as obsFromOlEvent, fromVueEvent } from '../rx-ext'
 import {
   addPrefix,
@@ -487,10 +486,6 @@ function defineDebounceMethods () {
 
 function defineServices () {
   Object.defineProperties(this, {
-    $vq: {
-      enumerable: true,
-      get: () => VueQuery(this),
-    },
     /**
      * @type {{warn: (function(...[*]): void), log: (function(...[*]): void), error: (function(...[*]): void)}}
      */

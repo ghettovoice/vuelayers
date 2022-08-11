@@ -1,3 +1,5 @@
+import { isString } from './minilo'
+
 /**
  * Constructs watch hash for multiple properties.
  * @param {string[]} props
@@ -18,4 +20,24 @@ export function extractChildren (slots, slotNames = []) {
 
     return all
   }, [])
+}
+
+export function hasAncestorVm (vm, selector) {
+  if (matchesVm(vm, selector)) {
+    return true
+  }
+  if (!vm.$parent) {
+    return false
+  }
+  return hasAncestorVm(vm.$parent, selector)
+}
+
+export function matchesVm (vm, selector) {
+  if (!selector) {
+    return true
+  }
+  if (isString(selector)) {
+    return vm.$options.name === selector
+  }
+  return selector === vm
 }

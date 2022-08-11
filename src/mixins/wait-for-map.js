@@ -1,7 +1,7 @@
 import { race as raceObs } from 'rxjs'
 import { filter as filterObs, mapTo } from 'rxjs/operators'
 import { fromVueEvent as obsFromVueEvent, fromVueWatcher as obsFromVueWatcher } from '../rx-ext'
-import { hasProp, stubTrue, waitFor } from '../utils'
+import { hasAncestorVm, hasProp, stubTrue, waitFor } from '../utils'
 import olCmp, { CanceledError, isCreateError, OlObjectEvent } from './ol-cmp'
 
 export default {
@@ -21,7 +21,7 @@ export default {
               filterObs(([err, vm]) => {
                 return isCreateError(err) &&
                   hasProp(vm, '$map') &&
-                  this.$vq.closest(vm)
+                  hasAncestorVm(this, vm)
               }),
             ),
           ).pipe(

@@ -17,6 +17,7 @@ import {
   assert,
   clonePlainObject,
   coalesce,
+  hasAncestorVm,
   hasProp,
   isArray,
   isEmpty,
@@ -188,7 +189,7 @@ export default {
               filterObs(([err, vm]) => {
                 return (isCreateError(err) || isMountError(err)) &&
                   hasProp(vm, '$geometry') &&
-                  vm.$vq?.closest(this)
+                  hasAncestorVm(vm, this)
               }),
             ),
           ).pipe(
