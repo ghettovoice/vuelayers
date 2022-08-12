@@ -17,7 +17,7 @@ Vue.use(VectorLayer)
 
 Example below shows how you can use `vl-layer-vector` and [`vl-source-vector`](/docs/component/vector-source.md) to render some 
 vector features from remote backend.
-
+```javascript
 <vuep template="#usage-example"></vuep>
 
 <script v-pre type="text/x-template" id="usage-example">
@@ -179,7 +179,7 @@ vector features from remote backend.
   }
 </script>
 </script>
-
+```
 ## Properties
 
 ### id
