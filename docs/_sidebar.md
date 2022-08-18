@@ -4,7 +4,7 @@
   * [Demo](/docs/demo.md)
 
 * Components
-  
+
   * [vl-geoloc](/docs/component/geoloc.md)
   * [vl-map](/docs/component/map.md)
   * [vl-feature](/docs/component/feature.md)
@@ -29,6 +29,7 @@
     * [vl-source-vector-tile](/docs/component/vector-tile-source.md)
     * [vl-source-wms](/docs/component/wms-source.md)
     * [vl-source-wmts](/docs/component/wmts-source.md)
+    * [vl-source-xyz](/docs/component/xyz-source.md)
 
   * Geometry
 
@@ -59,7 +60,7 @@
     * [vl-style-text](/docs/component/text-style.md)
 
 * Mixins
-  
+
 * Misc
 
   * [ol-ext](/docs/misc/ol-ext.md)
