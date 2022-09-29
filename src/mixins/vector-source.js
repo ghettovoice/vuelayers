@@ -630,6 +630,7 @@ export default {
             resolution,
             this.resolvedDataProjection,
           )
+          if (!features) return
           if (!(isArray(features) && features[0] instanceof Feature)) {
             features = this.readSource(features)
           }
