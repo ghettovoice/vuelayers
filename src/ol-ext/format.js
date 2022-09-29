@@ -346,8 +346,8 @@ export function isGeoJSONFeature (feature) {
 
 export function isGeoJSONGeometry (geometry) {
   return isPlainObject(geometry) &&
-    Object.values(GeometryType).includes(geometry.type) &&
-    geometry.geometries
-      ? geometry.geometries.every((geometry) => isArray(geometry.coordinates))
-      : isArray(geometry.coordinates)
+  Object.values(GeometryType).includes(geometry.type) &&
+  geometry.geometries
+    ? geometry.geometries.every((geometry) => isArray(geometry.coordinates))
+    : isArray(geometry.coordinates)
 }
