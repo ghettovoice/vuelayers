@@ -70,7 +70,7 @@ plugins: [{
 	}, { ... }],
 modules: [
                 ...,
-		'~/shared/vueLayers',
+		'~/shared/vuelayers',
 	],
 ```
 
