@@ -175,7 +175,7 @@ multiple `vl-view` components in multiple `vl-map` components.
       <vl-view ident="view"></vl-view>
 
       <vl-layer-tile>
-        <vl-source-sputnik></vl-source-sputnik>
+        <vl-source-stamen layer="watercolor"></vl-source-stamen>
       </vl-layer-tile>
     </vl-map>
   </div>
